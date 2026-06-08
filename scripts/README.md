@@ -1,0 +1,698 @@
+# scripts/ — alimentation, analyse et préparation de set
+
+Cinq outils :
+
+- **`grab.py`** : télécharge la meilleure source audio (YT/SC/Bandcamp)
+- **`analyze.py`** : analyse audiophile (Phase 1+2+6A+6C+6D : qualité +
+  structure + bandes fréquence + rythmique enrichie + signature de groove)
+- **`setbuilder.py`** : préparation de set (Phase 4 : doublons,
+  compatibilité harmonique Camelot, génération de playlist, inférence
+  des champs vides, lookup MusicBrainz, voisinage et clustering par groove)
+- **`groove.py`** : Phase 6.D, extrait un groove jouable (`.mid` + pattern
+  TidalCycles) depuis le stem drums Demucs
+- **`visualize.py`** : Phase 5, génère une PNG signature par track
+  (waveform + mel-spectrogram + structure + cues overlay + tonal profile)
+- **`stems.py`** : Phase 6.B, sépare en 4 stems via Demucs
+  (drums/bass/other/vocals) pour sampling TidalCycles
+
+Format library.md : **table markdown unique** (migration de 2026-05-31).
+Voir `../SPEC.md` (source of truth) pour l'état détaillé.
+
+---
+
+# grab.py — alimentation de la library
+
+Télécharge un morceau depuis **YouTube / SoundCloud / Bandcamp** en
+choisissant automatiquement la **meilleure qualité disponible**, sans
+recompression. FLAC est réservé aux sources lossless ; un Opus 160 reste
+en `.opus`, un AAC 160 en `.m4a`, un MP3 en `.mp3`. La library est un
+fichier unique `library/library.md` avec une section par morceau.
+
+## Prérequis système
+
+- `yt-dlp` et `ffmpeg` dans le `PATH` (Homebrew sur macOS)
+- Python 3.10+
+
+## Installation
+
+Depuis ce dossier (`music/scripts/`) :
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+> librosa pèse ~200 Mo. Si tu veux alléger, lance avec `--no-analyze` et
+> renseigne `--bpm` / `--key` à la main.
+
+## Usage
+
+```bash
+source .venv/bin/activate
+
+# Par URL (un ou plusieurs)
+python grab.py "https://perctrax.bandcamp.com/track/90s-hammer-original-mix"
+python grab.py URL1 URL2 URL3
+
+# Backfill : remplit buy_url pour les entrees existantes de library.md
+python grab.py --refresh-buy-urls
+
+# Par requete texte libre — le moteur cherche sur YT + SC et compare
+python grab.py "RVDE 90s Hammer Original Mix"
+python grab.py "90s Hammer (Original Mix) de l'album 90s Hammer (TPTX003) par RVDE"
+
+# Liste multi-lignes (une query par ligne, label/annee final retire automatiquement)
+python grab.py "Noisia - The Hole Pt. 1 [VISION]
+Ivy Lab x Two Fingers - Orange [2020]
+Two Fingers - 296 Rhythm [NOMARK]"
+
+# Voir le candidat retenu sans telecharger
+python grab.py --dry-run "RVDE 90s Hammer"
+
+# Ecraser un fichier deja present (pour upgrader la qualite)
+python grab.py --replace URL
+
+# Hint BPM librosa pour tribe / acid core (defaut 140)
+python grab.py --start-bpm 180 URL
+
+# Override BPM / key / genre
+python grab.py --no-analyze --bpm 175 --key "A minor" --genre "hardtek, tribe" URL
+```
+
+## Choix de la source
+
+Pour une requête texte libre, le moteur :
+
+1. Nettoie la requête (drop "de l'album X", déplace "par X" en tête)
+2. Cherche sur YouTube + SoundCloud (top 3 par défaut, `--search-n N`)
+3. Sonde le meilleur format audio de chaque candidat
+4. Score qualité = **bitrate × multiplicateur perceptuel** (Opus ×1.6, Vorbis
+   ×1.3, AAC ×1.2, MP3 ×1.0, lossless = score absolu)
+5. Score match = fraction des tokens de la query trouvés dans `title + artist + uploader` du candidat ; match <50% pénalise ×10
+6. Score final = `qualité × match`. Sélectionne le max et affiche le tableau
+
+Bandcamp n'est **pas** dans la recherche libre (son stream public plafonne à MP3
+128 kbps, perdu d'avance). Reste accessible en mode URL.
+
+## Stockage
+
+- `library/audio/<artist>_-_<title>.<ext>` — audio sans recompression
+  - `.flac` pour sources lossless (FLAC/ALAC/WAV → recodé en FLAC)
+  - `.opus`, `.m4a`, `.mp3`, `.ogg` pour le reste, codec natif préservé
+- `library/library.md` — catalogue unique, une section par morceau
+
+## Tags audio
+
+Écrits dans le conteneur natif via mutagen :
+- FLAC / Opus / OGG → Vorbis comments (`TITLE`, `ARTIST`, `BPM`, `KEY`, ...)
+- M4A → atoms iTunes (`\xa9nam`, `\xa9ART`, `tmpo`, `initialkey` freeform)
+- MP3 → ID3v2 via EasyID3 (`title`, `artist`, `bpm`, `initialkey` → TKEY)
+
+Lisibles par Rekordbox, Mixxx, Serato.
+
+## Library — édition manuelle
+
+Le fichier `library/library.md` contient un bloc par morceau :
+
+```markdown
+## RVDE — 90s Hammer (Original Mix)
+
+- **artist**: RVDE
+- **title**: 90s Hammer (Original Mix)
+- **bpm**: 175
+- **key**: A minor
+- **genre**: Techno
+- **quality**: mp4a.40.2 160kbps
+- **file**: [[audio/rvde_-_90s_hammer_original_mix.m4a]]
+- **energy**: high              ← edite-les a la main
+- **mood**: dark, peak time     ← preserves lors des re-runs
+- **tags**: tribe, kick puissant
+- **notes**: bon en sortie d'intro, attention break vers 3:20
+```
+
+Les champs **`energy`, `mood`, `tags`, `notes`** sont préservés lors des
+ré-exécutions du script. Tout autre champ est régénéré.
+
+## Idempotence
+
+- Si un fichier audio avec le slug existe déjà (toute extension), pas de
+  re-download. Utiliser `--replace` pour forcer (utile pour upgrader la
+  qualité quand on découvre une meilleure source).
+- L'entrée dans `library.md` est mise à jour (préserve les champs
+  manuels) ; l'ordre dans le fichier est alphabétique par artist + title.
+
+## Détection du lien d'achat (`buy_url`)
+
+À chaque téléchargement, le pipeline cherche un lien d'achat dans cet ordre :
+
+1. **URL source** : si elle est sur un site marchand (`bandcamp.com`,
+   `beatport.com`, etc.), on la garde directement.
+2. **Description du upload YT/SC** : on extrait les URL et on garde la
+   première qui pointe vers un domaine marchand direct.
+3. **Recherche Bandcamp** via leur API publique `bcsearch_public_api` :
+   retourne le track le mieux matché (au moins 50% des tokens de
+   `artist + title` en commun).
+4. **Smart link** dans la description (`fanlink.to`, `linktr.ee`,
+   `ffm.to`, `ditto.fm`, etc.) en dernier recours.
+
+Le résultat est écrit dans le champ `buy_url` de library.md. Si rien
+n'est trouvé, le champ reste vide (à éditer manuellement).
+
+## Heuristique BPM
+
+librosa détecte souvent en half-time sur le tribe rapide (180 BPM → 90).
+Le script double automatiquement si <90 BPM. Pour les BPM intermédiaires
+(ex. 175 détecté comme 136), pas de magie : vérifier à l'oreille et
+corriger avec `--bpm`, ou éditer le frontmatter de la section. Utiliser
+`--start-bpm 180` comme hint à librosa peut aider sur du tribe.
+
+---
+
+# analyze.py — analyse audiophile (Phase 1)
+
+Mesure la qualité technique et perceptuelle d'un fichier audio, produit
+un score 0-100 et écrit le résultat dans `library.md` + un sidecar JSON
+dans `library/quality/<slug>.json`.
+
+## Pipeline
+
+1. **Metadata** (ffprobe) : codec, bitrate, sample rate, bit depth
+2. **Signal** : sample peak, true peak (oversampling 4×), RMS, clipping
+3. **Loudness** : LUFS intégré + LRA (pyloudnorm, BS.1770)
+4. **Dynamique** : crest factor + catégorisation (very_dynamic / good /
+   modern / compressed / overcompressed)
+5. **Spectral** : bandwidth via Welch PSD, ratio HF >16 kHz, probabilité
+   fake-lossless (cutoff suspect dans un conteneur lossless)
+6. **Score audiophile** pondéré (dynamique 25 / spectral 25 / clipping 20
+   / codec 15) → rating reference / excellent / good / average / poor /
+   severely_degraded + flags (clipping_detected, crushed_master,
+   fake_lossless_suspected, low_bitrate, etc.)
+
+## Usage
+
+```bash
+source .venv/bin/activate
+
+# Un fichier (chemin absolu, relatif, ou nom dans library/audio/)
+python analyze.py rvde_-_90s_hammer_original_mix.m4a
+
+# Toute la library
+python analyze.py --all
+
+# JSON sur stdout (pour piper vers jq, etc.)
+python analyze.py --json track.opus
+
+# Ne pas mettre à jour library.md
+python analyze.py --no-update-library track.opus
+```
+
+## Intégration avec grab.py
+
+```bash
+# Télécharger + analyser en une commande
+python grab.py --analyze-quality "RVDE 90s Hammer Original Mix"
+```
+
+Le `quality_score` apparaît directement dans la section library.md du
+morceau, et un sidecar JSON détaillé est créé.
+
+## Interprétation des flags
+
+| Flag | Signification |
+|---|---|
+| `overcompressed` | crest factor < 6 dB, brickwall master |
+| `clipping_detected` | >0.1% des samples dépassent -0.026 dBFS |
+| `intersample_clipping_risk` | true peak >-0.1 dBFS (clipping post-DAC) |
+| `crushed_master` | LUFS intégré >-7 (loudness war) |
+| `fake_lossless_suspected` | FLAC/ALAC avec spectre tronqué (transcodé) |
+| `low_bitrate` | <128 kbps en lossy |
+| `low_sample_rate` | <44.1 kHz |
+
+## Phase 2 — beats / structure / cue points / signature de groove
+
+Activée par défaut. Ajoute quatre sections au rapport :
+
+- **Beats** : tempo + confiance + candidats alternatifs (voir détail
+  ci-dessous) + positions des beats
+- **Structure** : segmentation en 4-15 segments contigus via clustering
+  agglomératif sur features MFCC + chroma beat-synchrones, labellisés
+  `intro` / `build` / `peak` / `main` / `breakdown` / `outro` par
+  énergie relative + position. Les segments adjacents de même label
+  sont fusionnés.
+- **Cues** : extraction depuis la structure (`intro_start`,
+  `beat_entry`, `drop`, `breakdown`, `outro`) alignés sur le beat le
+  plus proche (±0.5 s). Triés par temps.
+- **Rhythm signature** (Phase 6.D) : empreinte de groove tempo-invariante
+  (patterns 16 pas par bande + syncope/pulse/swing). Détail dans la
+  section dédiée plus bas.
+
+Skip Phase 2 avec `--quick` (Phase 1 seule, ~3× plus rapide sur les
+tracks longs).
+
+### Détection BPM blindée (3 algos + consensus)
+
+Pour blinder le tempo (librosa peut se tromper d'un facteur 2 sur le
+tribe/breakbeat), l'analyzer lance **trois détecteurs structurellement
+indépendants** :
+
+1. **`librosa.beat.beat_track`** : dynamic programming sur l'onset
+   envelope
+2. **`librosa.feature.tempo`** : autocorrelation du tempogramme
+3. **IOI comb-filter** (custom) : détection d'onsets en pics discrets +
+   scoring d'un comb-filter sur la distribution des intervalles
+   inter-onsets (harmoniques k=1..4). Algo *radicalement* différent des
+   deux librosa (regarde les pics, pas l'envelope continu).
+
+**Consensus** : clustering ±5% des candidats avec équivalence harmonique
+(x2 et /2 sont considérés équivalents pour le cluster). Vote majoritaire.
+Confidence = `votes_du_cluster / nb_detecteurs_valides`.
+
+**Override library.md** : si tu corriges un `bpm` à la main dans
+library.md, l'analyzer utilise cette valeur comme tempo primaire MAIS
+relance les 3 détecteurs auto et les liste comme candidats. Conf=1.00 si
+ton override matche un cluster auto, conf=0.70 sinon (signal d'alerte
+"vérifie à l'oreille").
+
+Affichage terminal :
+```
+[Beats] tempo 175.0 BPM — 995 beats  (manual override; conf=0.70, candidates=[132.5, 137.0])
+```
+
+Lecture : tu as forcé 175, mais les 3 algos auto donnent 132-137. Soit
+ton oreille a raison (tribe rapide piège librosa), soit l'edit manuel
+est faux. À vérifier.
+
+## Limites connues
+
+- **Opus en float dépasse ±1.0** : le `sample_peak_dbfs` peut afficher
+  +2 dBFS après décodage. C'est attendu (Opus n'est pas normalisé en
+  amplitude), c'est un indicateur de master très chaud.
+- **m4a/opus passent par audioread** (libsndfile ne les lit pas
+  nativement) : warning supprimé mais chargement plus lent.
+- **Calibration des seuils** : volontairement permissive pour la musique
+  électronique moderne (mastering club 8-10 dB crest = "good"). Ajustable
+  dans `analyzer/scoring.py`.
+- **Détection BPM librosa** : imparfaite sur tribe/acid core, le tempo
+  affiché dans `[Beats]` peut différer du `bpm` de `library.md` (qui peut
+  avoir été corrigé à la main).
+- **Détection structure** : fonctionne bien sur DnB / techno bien
+  structurés, plus bruité sur tribe / ambient / live coding peu cadré.
+  Les segments restent une heuristique : à confronter à l'écoute.
+- **Pas encore implémenté** : export DJ (Rekordbox/Traktor XML) et plots
+  matplotlib (Phase 3 skipée), ML perceptual quality / similarité
+  structurelle (Phase 4 partielle) — voir `quality-analyzer.md`.
+
+---
+
+# setbuilder.py — préparation de set (Phase 4)
+
+Exploite `library.md` et les sidecars JSON pour préparer un set :
+détecter les doublons, trouver les tracks compatibles harmoniquement,
+générer une playlist greedy avec progression d'énergie, et
+auto-remplir les champs vides.
+
+## Commandes
+
+```bash
+source .venv/bin/activate
+
+# Inventaire des keys + Camelot
+python setbuilder.py keys
+
+# Doublons (artist+title normalisés : drop "Original Mix", "feat.", labels)
+python setbuilder.py duplicates
+
+# Top N tracks compatibles avec un slug (BPM + key + energie)
+python setbuilder.py compatible <slug> -n 10 \
+    --energy maintain --min-score 0.4
+
+# Génération de playlist greedy à partir d'un slug de départ
+python setbuilder.py playlist --start <slug> \
+    --duration 60 --energy rising --max-track 15
+
+# Génération backward depuis un peak final (build vers le climax)
+python setbuilder.py playlist --peak <slug> \
+    --duration 60 --max-track 15
+
+# Export Mixxx (M3U8 importable via File -> Import Playlist)
+python setbuilder.py playlist --peak <slug> --duration 60 \
+    --export-m3u8 ../sets/build-vers-x.m3u8
+
+# Auto-fill genre / energy / mood / tags depuis les sidecars
+python setbuilder.py infer [--field genre|energy|mood|tags|all] [--force]
+
+# Lookup MusicBrainz pour remplir `about` (pays + tags genres)
+python setbuilder.py describe [--force]
+
+# Voisins par groove (signature rythmique, indépendant du BPM/key)
+python setbuilder.py similar <slug> -n 8
+
+# Familles de groove (clustering ; --write pour écrire groove_cluster)
+python setbuilder.py groove-clusters --k 6 [--write]
+```
+
+`--start` et `--peak` sont mutuellement exclusifs :
+- `--start` construit forward (le slug ouvre le set, progression selon `--energy`)
+- `--peak` construit backward (le slug ferme le set en climax, progression rising forcée). Plancher d'énergie automatique à `peak - 2 crans` pour éviter que le greedy ne dégringole.
+
+## Compatibilité harmonique (Camelot Wheel)
+
+Les keys sont mappées en notation Camelot (1A..12B, A=minor / B=major).
+Score de compatibilité :
+
+| Cas | Score |
+|---|---|
+| Même code (8A → 8A) | 1.0 |
+| Même chiffre, lettre opposée (8A → 8B, relatif maj/min) | 0.9 |
+| ±1 sur la roue, même lettre (8A → 7A ou 9A, quinte/quarte) | 0.85 |
+| ±2 sur la roue, même lettre (boost énergétique) | 0.55 |
+| Autre | 0.0 |
+
+## Compatibilité BPM
+
+| Ratio B/A | Score | Type de mix |
+|---|---|---|
+| 0.97 - 1.03 | 1.0 | direct |
+| 0.94 - 1.06 | 0.85 | tempo nudge |
+| 0.5 ou 2.0 (±4%) | 0.7 | half-time / double-time |
+| 0.90 - 1.10 | 0.5 | pitch shift |
+| autre | 0.0 | incompatible |
+
+## Score de transition
+
+```
+total = 0.5 × bpm_score + 0.3 × key_score + 0.2 × energy_score
+```
+
+L'energy_score dépend de `--energy` : `rising` favorise B > A,
+`falling` favorise B < A, `maintain` favorise B ≈ A.
+
+## Inférence des champs vides
+
+`infer` lit les sidecars de `library/quality/` et remplit :
+
+| Champ | Méthode | Marqueur |
+|---|---|---|
+| `genre` | BPM range + genre yt-dlp existant (downtempo / hip-hop / house / techno / dubstep / breakbeat / dnb / tribe / hardcore) | sans `?` |
+| `energy` | 0.5 × BPM + 0.3 × LUFS + 0.2 × crest factor → very_low / low / medium / high / very_high | sans `?` |
+| `mood` | mode (major/minor) × tempo × LUFS → dark / uplifting / driving / chill / peak time / intimate | **avec `?`** (à valider à l'oreille) |
+| `tags` | bandwidth → `lo-fi`, half-time correction → `half-time-suspect` | sans `?` |
+
+**Important** : `infer` ne touche **jamais aux champs non vides** sauf
+si tu passes `--force`. Et même sous `--force`, on n'écrase jamais par
+une valeur vide (tes éditions manuelles sont protégées). Pour clearer
+un champ, édite `library.md` à la main.
+
+L'inférence préfère le `bpm` de library.md (corrigible à la main) au
+tempo détecté par librosa. Donc si tu corriges un BPM dans library.md
+et relances `infer`, le genre/energy/mood s'actualisent en cohérence.
+
+## Description d'artiste (`about`)
+
+`setbuilder.py describe` interroge **MusicBrainz** (API publique, free)
+pour chaque artiste unique de la library. Format de sortie : `<pays> |
+<tag1>, <tag2>, <tag3>`.
+
+- Cache local dans `library/artists/<slug>.json` pour éviter le rate
+  limit (1 req/sec)
+- Skip les artistes ayant déjà un `about` non vide (sauf `--force`)
+- Regroupe par `primary_artist` (split sur `feat.` / `&` / `,` / ` x `)
+  pour ne pas faire de requête redondante
+- Filtre les tags pourris (`seen live`, `favourite`, etc.)
+
+Exemples obtenus sur la library :
+- Polar Inertia → `ambient, techno, minimal techno`
+- Quantic → `downtempo, jazz, funk`
+- Zero 7 → `UK | trip hop, electronic, downtempo`
+- BAD BUNNY → `PR | hip hop, latin, reggaeton`
+
+Couverture typique : 60-70% (MusicBrainz n'a pas les artistes free
+party / acid core / labels indé). Édite à la main pour le reste.
+
+---
+
+# signature de groove + groove.py (Phase 6.D)
+
+Décrit la **forme** du pattern rythmique, repliée sur une mesure de 16 pas,
+**indépendamment du tempo**. Sert à trouver des tracks au groove proche et à
+regrouper la library en familles — un axe que BPM + key + energy ne capturent
+pas (un tribe roulant syncopé et un acid four-on-floor martelé peuvent partager
+BPM/key/energy mais avoir un groove opposé).
+
+## Ce qui est extrait (`RhythmSignatureReport`, sidecar)
+
+Calculé en Phase 2 par `analyze.py` (donc `analyze.py --all` repeuple les
+sidecars). Affiché dans le bloc `[Rhythm signature]` du rapport terminal :
+
+```
+[Rhythm signature] 16 pas/mesure  —  164 mesures repliees
+  bar : █▃▁▃▅▅▃▄█▄▂▃▇▅▂▄
+  sub : ▇▇▃▃▅▇▄▂██▄▁▆█▂▁     ← kick (20-200 Hz)
+  mid : █▄▂▁▅▅▅▄█▅▄▁▇▅▆▄     ← snare/clap/corps (200-2k)
+  high: ▇▁▂▆▅▃▃▆▆▁▁█▇▂▃▇     ← hats/texture (2k+)
+  syncope: 0.49  |  pulse: 0.93  |  swing: 0.45
+```
+
+- patterns normalisés min-max (relief des hits) ; `syncopation` (hors-temps),
+  `pulse_clarity` (régularité), `swing` (microtiming des contretemps).
+- **N'encode ni BPM, ni key, ni energy** : volontairement orthogonal à la
+  compatibilité Camelot (cf. SPEC 6.D et décisions arbitrées).
+
+## Similarité et clustering (`setbuilder.py`)
+
+```bash
+# Voisins de groove (cross-corrélation invariante à la phase du downbeat)
+python setbuilder.py similar <slug> -n 8
+
+# Familles de groove (clustering agglomératif, métrique = rhythm_distance)
+python setbuilder.py groove-clusters --k 6          # dry-run
+python setbuilder.py groove-clusters --k 6 --write  # écrit groove_cluster
+```
+
+Le clustering est **indicatif** : sur une petite library, viser ~5-8 familles.
+
+## Export groove jouable (`groove.py`)
+
+Transcrit le pattern en hits discrets kick/snare/hat et l'exporte en `.mid`
+**et** `.tidal`. Source préférée : le **stem drums Demucs** (lance `stems.py`
+avant pour un rendu propre ; fallback sur le mix avec warning).
+
+```bash
+# Exporte library/grooves/<slug>.{mid,tidal}
+python groove.py <slug>
+
+# Réglages : finesse de grille, longueur, format, sensibilité
+python groove.py <slug> --steps 32 --bars 2 --format tidal --threshold 0.5
+python groove.py <slug> --no-align   # ne pas caler sur le kick le plus fort
+```
+
+Sortie `.tidal` (collable en live) :
+
+```
+-- groove extrait de 2HOT2PLAY — Keep The Balance
+-- 152 BPM, 16 pas/mesure, 1 mesure(s)
+-- setcps (152/60/4)
+d1 $ stack [
+  s "bd ~ ~ ~ bd bd ~ ~ ~ ~ ~ ~ bd ~ ~ ~",
+  s "sn ~ ~ sn ~ ~ sn ~ sn ~ sn sn ~ ~ sn sn",
+  s "~ ~ hh hh ~ ~ hh hh ~ ~ hh hh ~ ~ hh hh"
+  ]
+```
+
+Le `.mid` (kick=36, snare=38, hat=42, canal GM batterie) s'ouvre dans Renoise
+(cf. `to_xrns.py`) ou n'importe quel DAW.
+
+## Méthode
+
+Une mel-spectrogram → onset strength par bande → repliage sur la grille via les
+`beat_times` (4/4 par défaut sauf signature impaire confiante). `groove.py`
+seuille le pattern replié+étiré (robuste au jitter, là où la détection d'onsets
+discrets se disperse entre pas adjacents). Modules :
+`analyzer/rhythm_signature.py`, `groove.py`. Tests :
+`tests/test_rhythm_signature.py` (`python -m pytest tests/`).
+
+---
+
+# stems.py — séparation Demucs (Phase 6.B)
+
+Sépare chaque track en 4 stems via Demucs (Meta, modèle htdemucs) :
+- `drums.wav` (kicks, snares, hats)
+- `bass.wav` (basses sub + bass synth)
+- `other.wav` (mélodies, harmonies, FX)
+- `vocals.wav` (voix si présentes)
+
+Stockés dans `library/stems/<slug>/`. Champ `has_stems: yes` dans
+library.md. **Apple Silicon GPU (MPS) détecté en auto** → ~15-25s/track
+(contre ~30-60s en CPU). 1er run = +250 Mo de modèle à télécharger.
+
+## Usage
+
+```bash
+source .venv/bin/activate
+
+# Track spécifique
+python stems.py kodaman_-_beton
+
+# Toute la library (long : ~60min pour 60 tracks)
+python stems.py --all
+
+# Forcer re-génération
+python stems.py --force <slug>
+
+# Autre modèle
+python stems.py --model htdemucs_ft <slug>     # fine-tuned, plus précis
+python stems.py --model mdx_extra <slug>        # alternative
+
+# Forcer un device particulier
+python stems.py --device cpu <slug>     # force CPU
+python stems.py --device mps <slug>     # force Apple Silicon GPU
+
+# Post-processing techno (cleanup des fuites Demucs)
+python stems.py --cleanup <slug>        # cleanup seul (stems déjà existants)
+python stems.py --cleanup --all         # applique le cleanup à toute la library
+```
+
+## Cleanup techno-aware (`--cleanup`)
+
+Demucs `htdemucs` est entraîné majoritairement sur pop/rock (MUSDB18).
+Sur tribe/techno/hardtek il a 3 fuites typiques qu'on peut corriger
+avec des règles domain :
+
+1. **Sub-kick → drums** : highpass `bass.wav` à 60 Hz (le sub 20-60 Hz
+   appartient au kick territory, pas à la bassline)
+2. **Pas de mélodie aigüe dans bass** : lowpass `bass.wav` à 500 Hz
+   (au-dessus = fuite de lead/synth)
+3. **Vocals quasi-silencieux** : si RMS < -40 dBFS, on merge dans
+   `other.wav` (track instrumental, le contenu de `vocals.wav` est du
+   leak)
+
+Quand le cleanup est appliqué, `has_stems: cleaned` (au lieu de `yes`)
+dans library.md. Les stems sont **overwrités** (pas de version raw
+préservée). Si tu veux revenir au brut, relance `stems.py --force <slug>`
+sans `--cleanup`.
+
+**Caveat** : ces règles sont techno-aware. Sur de la pop/rock (bass
+guitar qui monte à 1 kHz, voix réelle dans vocals), elles empirent le
+résultat. À activer track par track ou batch si toute la library est
+électronique.
+
+Théorie audio détaillée derrière ces règles (filtres Butterworth, RMS
+vs peak, où vit une bassline techno) : voir
+`../technique/cleanup-stems-techno.md`.
+
+## Cas d'usage TidalCycles
+
+```haskell
+-- Charger les stems d'un track dans SuperDirt
+-- (à mettre dans ~/.config/SuperCollider/startup.scd ou en run-time)
+~dirt.loadSoundFiles("/Users/tom/.../library/stems/kodaman_-_beton/*.wav");
+
+-- Puis dans Tidal :
+d1 $ s "drums:0"     -- drums du Kodaman
+d2 $ s "bass:0" # gain 1.2
+```
+
+## Limites
+
+- **Modèle bias** : Demucs est entraîné majoritairement sur pop/rock.
+  Sur tribe/acid core très dense, "other" et "drums" peuvent fuiter
+  l'un dans l'autre. Vérifier à l'oreille avant de sampler.
+- **Vocals vide** = OK : si pas de voix dans le track, `vocals.wav`
+  contient juste du quasi-silence.
+
+---
+
+# visualize.py — PNG signatures (Phase 5)
+
+Une PNG par track dans `library/visuals/<slug>.png` au format **1200×320 px**.
+Permet de **browser visuellement la library** : tu reconnais une signature
+spectrale en moins d'1 seconde, plus rapide qu'écouter.
+
+## Layout d'une PNG
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Artist — Title | BPM | key (Camelot) | energy | LUFS | dur  │  header
+├─────────────────────────────────────────────────────────────┤
+│ ▁▄▆█▆▄▂▄▆█▆▄▂▁▂▄▆█▆▄▂                            waveform  │  RMS
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  mel-spectrogram (palette magma, log frequency)             │  spectro
+│  cue points : lignes blanches verticales avec labels         │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│ intro │ build │ peak │ break │ main │ outro                 │  structure
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Usage
+
+```bash
+source .venv/bin/activate
+
+# Toute la library + génère library/visuals/_index.md
+python visualize.py
+
+# Tracks spécifiques par slug
+python visualize.py rvde_-_90s_hammer_original_mix noisia_-_the_hole_pt_1
+
+# Force la régénération (sinon skip si PNG existe)
+python visualize.py --force
+```
+
+## Couleurs des segments de structure
+
+| Label | Couleur |
+|---|---|
+| intro | gris clair |
+| build | orange |
+| peak | rouge |
+| main | bleu |
+| breakdown | violet |
+| outro | gris foncé |
+
+## Browse dans Obsidian
+
+`library/visuals/_index.md` est auto-généré et embarque toutes les PNG via
+wikilinks. Ouvre-le dans Obsidian et scroll pour scanner toute ta library
+en mode visuel.
+
+## Cas d'usage typiques
+
+- **Comparer deux tracks pour valider une transition** : ouvre les 2 PNG
+  côte à côte, regarde si les structures s'enchaînent
+- **Trouver tous les tracks avec un gros breakdown** : scan visuel, repère
+  les bandes violettes longues
+- **Identifier les tracks lo-fi** (bandwidth coupée) : le mel-spectrogram
+  est noir au-dessus d'une certaine fréquence
+- **Repérer les masters compressés** : la waveform RMS est saturée
+  uniformément (pas de creux)
+
+---
+
+# Import dans Mixxx
+
+`--export-m3u8 <chemin>` génère un fichier M3U8 standard avec :
+- `#EXTINF:durée,Artist - Title` par track
+- Chemin absolu vers le fichier audio
+
+Dans Mixxx : **File → Import Playlist** ou drag-and-drop. Les tags
+audio (BPM, KEY, Comment) écrits par `grab.py` sont lus
+automatiquement par Mixxx — pas besoin d'une autre étape.
+
+Pour des exports plus riches (cue points, beat grids dans XML
+Rekordbox lisible par Mixxx), voir Phase 3 dans `quality-analyzer.md`
+(non implémentée à date).
+
+## Limites
+
+- **`mood` et `tags` suggérés peuvent être faux** si la détection
+  librosa s'est trompée sur le BPM ou le mode (major/minor). Le suffixe
+  `?` sur `mood` te rappelle que c'est à valider.
+- **Pas d'optimisation globale de playlist** : algorithme greedy, prend
+  le meilleur voisin à chaque étape. Pour une optimisation globale (TSP)
+  il faudrait un algo plus coûteux ; pas justifié sous 2h de set.
+- **`duplicates` ne fait pas de fuzzy match d'audio** : juste sur le
+  texte normalisé. Deux mêmes morceaux nommés différemment ne seront
+  pas détectés.

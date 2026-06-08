@@ -1,0 +1,21 @@
+# Environnement Python et caches
+scripts/.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Données binaires lourdes (régénérables via le pipeline)
+library/audio/
+library/stems/
+library/visuals/
+
+# Artefacts générés (régénérables via groove.py / visualize.py / to_xrns.py)
+library/grooves/
+library/renoise/
+
+# État de session Obsidian (config conservée, workspace ignoré)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+# macOS
+.DS_Store
