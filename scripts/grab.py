@@ -8,8 +8,13 @@ telecharge sans recompression. FLAC est reserve aux sources lossless.
 Usage:
     grab.py URL [URL ...]
     grab.py "RVDE 90s Hammer Original Mix"
+    grab.py https://open.spotify.com/playlist/...  # playlist Spotify -> N tracks
     grab.py --dry-run "query"        # voir le candidat retenu sans dl
     grab.py --replace URL            # ecraser un fichier deja present
+
+Une URL Spotify (playlist / album / track) est developpee en autant de requetes
+'artiste titre' qu'elle contient de morceaux : Spotify n'autorise pas le DL audio,
+on recupere seulement la tracklist puis on cherche chaque titre sur YT/SoundCloud.
 """
 from __future__ import annotations
 
@@ -18,6 +23,7 @@ import json
 import re
 import subprocess
 import sys
+import urllib.request
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -60,6 +66,70 @@ def detect_source(url: str) -> str:
     if "youtube.com" in url or "youtu.be" in url:
         return "youtube"
     return "unknown"
+
+
+# ---------------------------------------------------------------------------
+# Spotify (extraction de tracklist -> requetes texte)
+# ---------------------------------------------------------------------------
+
+# Spotify n'autorise aucun telechargement audio direct. On lit la tracklist
+# (artiste + titre) d'une URL Spotify via l'endpoint `embed` public (sans auth),
+# puis chaque morceau est cherche/telecharge sur YouTube/SoundCloud comme une
+# requete texte ordinaire.
+
+_SPOTIFY_URL_RE = re.compile(
+    r"(?:open\.spotify\.com/(?:embed/)?|spotify:)(playlist|album|track)[/:]([A-Za-z0-9]+)"
+)
+
+
+def is_spotify(value: str) -> bool:
+    return bool(_SPOTIFY_URL_RE.search(value))
+
+
+def spotify_queries(url: str) -> list[str]:
+    """Extrait les morceaux d'une URL Spotify (playlist/album/track) et retourne
+    des requetes 'artiste titre' a chercher sur YouTube/SoundCloud.
+
+    Limitation : l'endpoint embed plafonne les grosses playlists (~100 pistes) ;
+    le compte affiche reflete ce qui a reellement ete extrait."""
+    m = _SPOTIFY_URL_RE.search(url)
+    if not m:
+        return []
+    kind, sid = m.group(1), m.group(2)
+    embed = f"https://open.spotify.com/embed/{kind}/{sid}"
+    req = urllib.request.Request(embed, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            html = resp.read().decode()
+    except Exception as exc:  # noqa: BLE001
+        print(f"    spotify: echec recuperation ({exc})", file=sys.stderr)
+        return []
+
+    blob = re.search(
+        r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', html, re.S
+    )
+    if not blob:
+        print("    spotify: tracklist introuvable (page modifiee ?)", file=sys.stderr)
+        return []
+    try:
+        data = json.loads(blob.group(1))
+        entity = data["props"]["pageProps"]["state"]["data"]["entity"]
+    except (KeyError, TypeError, ValueError) as exc:
+        print(f"    spotify: structure inattendue ({exc})", file=sys.stderr)
+        return []
+
+    track_list = entity.get("trackList") or []
+    if not track_list and entity.get("type") == "track":
+        track_list = [entity]
+
+    queries: list[str] = []
+    for t in track_list:
+        title = (t.get("title") or "").strip()
+        artists = (t.get("subtitle") or "").strip()
+        if not title:
+            continue
+        queries.append(f"{artists} {title}".strip() if artists else title)
+    return queries
 
 
 # ---------------------------------------------------------------------------
@@ -1010,6 +1080,20 @@ def main() -> int:
     inputs = expand_inputs(args.inputs)
     if len(inputs) != len(args.inputs):
         print(f"[i] {len(inputs)} entrees apres expansion multi-lignes")
+
+    # Developpe les URLs Spotify en requetes texte 'artiste titre'.
+    expanded: list[str] = []
+    for item in inputs:
+        if is_spotify(item):
+            queries = spotify_queries(item)
+            if not queries:
+                print(f"[!] Spotify: aucune piste extraite de {item}", file=sys.stderr)
+                continue
+            print(f"[i] Spotify: {len(queries)} piste(s) extraite(s) de {item}")
+            expanded.extend(queries)
+        else:
+            expanded.append(item)
+    inputs = expanded
 
     code = 0
     for q in inputs:

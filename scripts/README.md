@@ -55,6 +55,10 @@ source .venv/bin/activate
 python grab.py "https://perctrax.bandcamp.com/track/90s-hammer-original-mix"
 python grab.py URL1 URL2 URL3
 
+# Playlist / album / track Spotify : developpe en N requetes 'artiste titre'
+# (Spotify n'autorise pas le DL audio ; chaque titre est cherche sur YT/SC)
+python grab.py "https://open.spotify.com/playlist/69CWyZkHWDzKXc8u6f1POR"
+
 # Backfill : remplit buy_url pour les entrees existantes de library.md
 python grab.py --refresh-buy-urls
 
