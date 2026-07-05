@@ -73,8 +73,9 @@ def resolve_files(args_files: list[str], all_flag: bool) -> list[Path]:
     if all_flag:
         if not AUDIO_DIR.exists():
             return []
+        # rglob : les fichiers sont ranges dans des sous-dossiers par style
         return sorted(
-            p for p in AUDIO_DIR.iterdir()
+            p for p in AUDIO_DIR.rglob("*")
             if p.is_file() and p.suffix.lower() in KNOWN_EXTS
         )
     files: list[Path] = []

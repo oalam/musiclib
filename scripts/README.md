@@ -82,6 +82,9 @@ python grab.py --start-bpm 180 URL
 
 # Override BPM / key / genre
 python grab.py --no-analyze --bpm 175 --key "A minor" --genre "hardtek, tribe" URL
+
+# Ranger dans un sous-dossier de style explicite
+python grab.py --folder swing "Glenn Miller In the Mood"
 ```
 
 ## Choix de la source
@@ -101,10 +104,15 @@ Bandcamp n'est **pas** dans la recherche libre (son stream public plafonne à MP
 
 ## Stockage
 
-- `library/audio/<artist>_-_<title>.<ext>` — audio sans recompression
+- `library/audio/<style>/<artist>_-_<title>.<ext>` — audio sans recompression,
+  rangé par style : `--folder` si fourni, sinon premier genre connu (slugifié),
+  sinon racine de `library/audio/` (comportement historique)
   - `.flac` pour sources lossless (FLAC/ALAC/WAV → recodé en FLAC)
   - `.opus`, `.m4a`, `.mp3`, `.ogg` pour le reste, codec natif préservé
-- `library/library.md` — catalogue unique, une section par morceau
+- `library/library.md` — catalogue unique, une section par morceau ; le champ
+  `file` porte le chemin relatif complet (`[[audio/swing/....opus]]`)
+- Un morceau déjà présent (racine ou sous-dossier) est détecté récursivement
+  et n'est pas re-téléchargé sans `--replace`
 
 ## Tags audio
 

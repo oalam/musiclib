@@ -11,6 +11,12 @@ Usage:
     grab.py https://open.spotify.com/playlist/...  # playlist Spotify -> N tracks
     grab.py --dry-run "query"        # voir le candidat retenu sans dl
     grab.py --replace URL            # ecraser un fichier deja present
+    grab.py --folder swing "query"   # ranger dans library/audio/swing/
+
+Rangement : chaque fichier va dans un sous-dossier de library/audio/ par
+style. Le style vient de --folder si fourni, sinon il est deduit du genre
+(--genre ou metadata de la source). Sans genre connu, le fichier reste a
+la racine de library/audio/.
 
 Une URL Spotify (playlist / album / track) est developpee en autant de requetes
 'artiste titre' qu'elle contient de morceaux : Spotify n'autorise pas le DL audio,
@@ -765,14 +771,31 @@ def upsert_track(
 
 
 # ---------------------------------------------------------------------------
-# Existing file detection
+# Existing file detection + rangement par style
 # ---------------------------------------------------------------------------
 
 def existing_audio(slug: str) -> Path | None:
+    """Cherche slug.<ext> a la racine de library/audio/ puis recursivement
+    dans ses sous-dossiers de style."""
     for ext in KNOWN_EXTS:
         p = AUDIO_DIR / f"{slug}{ext}"
         if p.exists():
             return p
+    for p in AUDIO_DIR.rglob(f"{slug}.*"):
+        if p.is_file() and p.suffix.lower() in KNOWN_EXTS:
+            return p
+    return None
+
+
+def deduce_folder(folder_arg: str | None, genres: list[str]) -> str | None:
+    """Sous-dossier de rangement dans library/audio/.
+
+    --folder prime ; sinon le premier genre connu (slugifie) ; sinon None
+    (racine de library/audio/, comportement historique)."""
+    if folder_arg:
+        return folder_arg
+    if genres:
+        return slugify(genres[0])
     return None
 
 
@@ -791,6 +814,7 @@ def grab_one(
     search_n: int,
     start_bpm: float,
     analyze_quality_flag: bool = False,
+    folder: str | None = None,
 ) -> None:
     label = "url" if is_url(query_or_url) else "query"
     print(f"[+] {label}: {query_or_url}")
@@ -869,6 +893,11 @@ def grab_one(
     quality = f"{picked.codec} {int(picked.abr)}kbps"
     print(f"    selection : {picked.source} | {quality}")
 
+    dest_folder = deduce_folder(folder, genre)
+    dest_dir = AUDIO_DIR / dest_folder if dest_folder else AUDIO_DIR
+    print(f"    dossier   : {dest_dir.relative_to(LIBRARY).as_posix()}/"
+          + ("" if folder else " (deduit)" if dest_folder else " (racine, genre inconnu)"))
+
     if dry_run:
         print("    dry-run : pas de telechargement")
         return
@@ -876,15 +905,16 @@ def grab_one(
     slug = f"{slugify(artist)}_-_{slugify(title)}"
     existing = existing_audio(slug)
     if existing and not replace:
-        print(f"    deja present : {existing.name} (--replace pour ecraser)")
+        rel = existing.relative_to(AUDIO_DIR).as_posix()
+        print(f"    deja present : {rel} (--replace pour ecraser)")
         audio_path = existing
     else:
         if existing and replace:
             print(f"    --replace : suppression de {existing.name}")
             existing.unlink()
-        out_stem = AUDIO_DIR / slug
+        out_stem = dest_dir / slug
         audio_path = download_candidate(picked, out_stem)
-        print(f"    telecharge : {audio_path.name}")
+        print(f"    telecharge : {audio_path.relative_to(AUDIO_DIR).as_posix()}")
 
     if bpm_override is not None:
         bpm = float(bpm_override)
@@ -900,7 +930,7 @@ def grab_one(
         bpm, key = 0.0, key_override or "?"
 
     write_tags(audio_path, meta, bpm, key)
-    audio_rel = Path("audio") / audio_path.name
+    audio_rel = audio_path.relative_to(LIBRARY)
     created, slug = upsert_track(LIBRARY_FILE, meta, audio_rel, bpm, key, quality)
     verb = "ajoute" if created else "mis a jour"
     print(f"    library.md : {verb}")
@@ -1052,6 +1082,10 @@ def main() -> int:
     parser.add_argument("--bpm", type=float, help="Force BPM, skip detection.")
     parser.add_argument("--key", type=str, help="Force key (ex: 'A minor').")
     parser.add_argument("--genre", type=str, help="Genres separes par virgule.")
+    parser.add_argument("--folder", type=str,
+                        help="Sous-dossier de library/audio/ ou ranger le fichier "
+                             "(ex: swing). Si absent, deduit du genre ; sans genre "
+                             "connu, racine de library/audio/.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Cherche et selectionne sans telecharger.")
     parser.add_argument("--replace", action="store_true",
@@ -1067,6 +1101,12 @@ def main() -> int:
 
     if args.refresh_buy_urls:
         return refresh_buy_urls()
+
+    if args.folder:
+        sub = Path(args.folder)
+        if sub.is_absolute() or ".." in sub.parts:
+            parser.error(f"--folder doit etre un sous-chemin relatif simple "
+                         f"(recu : {args.folder})")
 
     if not args.inputs:
         parser.print_help()
@@ -1109,6 +1149,7 @@ def main() -> int:
                 search_n=args.search_n,
                 start_bpm=args.start_bpm,
                 analyze_quality_flag=args.analyze_quality,
+                folder=args.folder,
             )
         except subprocess.CalledProcessError as exc:
             err = exc.stderr if isinstance(exc.stderr, str) else ""
