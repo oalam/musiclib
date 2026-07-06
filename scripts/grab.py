@@ -51,6 +51,10 @@ LIBRARY_FILE = LIBRARY / "library.md"
 
 KNOWN_EXTS = (".flac", ".opus", ".m4a", ".mp3", ".ogg", ".webm")
 
+# Options passees a chaque appel yt-dlp (ex: cookies), remplies par --cookies-from-browser.
+# Debloque les videos en 403 et, avec un compte Premium, le format AAC 256k.
+YTDLP_EXTRA_ARGS: list[str] = []
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -271,7 +275,7 @@ def best_audio_format(info: dict[str, Any]) -> dict[str, Any] | None:
 
 def fetch_metadata(url: str) -> dict[str, Any]:
     raw = subprocess.check_output(
-        ["yt-dlp", "-J", "--no-warnings", url],
+        ["yt-dlp", "-J", "--no-warnings", *YTDLP_EXTRA_ARGS, url],
         text=True, stderr=subprocess.PIPE,
     )
     return json.loads(raw)
@@ -281,7 +285,8 @@ def flat_search(prefix: str, query: str, n: int) -> list[dict[str, Any]]:
     search_url = f"{prefix}{n}:{query}"
     try:
         raw = subprocess.check_output(
-            ["yt-dlp", "-J", "--flat-playlist", "--no-warnings", search_url],
+            ["yt-dlp", "-J", "--flat-playlist", "--no-warnings",
+             *YTDLP_EXTRA_ARGS, search_url],
             text=True, stderr=subprocess.PIPE,
         )
     except subprocess.CalledProcessError as exc:
@@ -422,7 +427,7 @@ def download_candidate(cand: Candidate, out_stem: Path) -> Path:
     ext, lossless, _ = codec_info(cand.codec)
 
     cmd = [
-        "yt-dlp", "--no-progress", "--no-warnings",
+        "yt-dlp", "--no-progress", "--no-warnings", *YTDLP_EXTRA_ARGS,
         "-f", "bestaudio", "-x", "-o", template,
     ]
     if lossless:
@@ -1086,6 +1091,10 @@ def main() -> int:
                         help="Sous-dossier de library/audio/ ou ranger le fichier "
                              "(ex: swing). Si absent, deduit du genre ; sans genre "
                              "connu, racine de library/audio/.")
+    parser.add_argument("--cookies-from-browser", type=str, metavar="BROWSER",
+                        help="Authentifie yt-dlp avec les cookies du navigateur "
+                             "(chrome, firefox, safari...). Debloque playlists "
+                             "privees, videos en 403 et formats Premium.")
     parser.add_argument("--dry-run", action="store_true",
                         help="Cherche et selectionne sans telecharger.")
     parser.add_argument("--replace", action="store_true",
@@ -1098,6 +1107,9 @@ def main() -> int:
                         help="Lance l'analyse audiophile apres download "
                              "(quality_score + sidecar JSON).")
     args = parser.parse_args()
+
+    if args.cookies_from_browser:
+        YTDLP_EXTRA_ARGS[:] = ["--cookies-from-browser", args.cookies_from_browser]
 
     if args.refresh_buy_urls:
         return refresh_buy_urls()

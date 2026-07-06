@@ -85,6 +85,10 @@ python grab.py --no-analyze --bpm 175 --key "A minor" --genre "hardtek, tribe" U
 
 # Ranger dans un sous-dossier de style explicite
 python grab.py --folder swing "Glenn Miller In the Mood"
+
+# Authentifier yt-dlp avec les cookies du navigateur (playlists privees,
+# videos en 403, formats Premium type AAC 256k)
+python grab.py --cookies-from-browser chrome URL
 ```
 
 ## Choix de la source
