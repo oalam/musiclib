@@ -45,7 +45,7 @@ python samples.py copy --dest ~/Samples/keep --category 'one shots/*' --max-dura
 python samples.py copy --dest ~/Samples/keep --marked
 ```
 
-Destination : `<dest>/<source>/<catégorie>/<nom>`. La copie est rejouable
+Destination : `<dest>/<source>/<arborescence d'origine sans le préfixe Samples>`. La copie est rejouable
 (les fichiers déjà présents à la même taille sont sautés). Les banques
 Kontakt `.nkx` protégées ne sont pas couvertes.
 

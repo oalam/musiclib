@@ -185,12 +185,25 @@ def select(
     return out
 
 
+def target_of(r: Sample, dest: Path) -> Path:
+    """Chemin de destination : arborescence d'origine sous ``dest/<source>``.
+
+    On garde tous les niveaux (la categorie n'en garde que deux, ce qui
+    melangerait des kits differents) ; seul le prefixe ``Samples`` saute.
+    """
+    parts = Path(r.path).parts
+    rel = parts[len(parts) - 1 - parts[::-1].index(r.source) + 1:]
+    if len(rel) > 1 and rel[0].lower() == "samples":
+        rel = rel[1:]
+    return dest.joinpath(r.source, *rel)
+
+
 def copy_samples(rows: list[Sample], dest: Path, dry_run: bool = False) -> tuple[int, int]:
     """Copie idempotente ; renvoie (copies, deja presents)."""
     copied = skipped = 0
     for r in rows:
         src = Path(r.path)
-        target = dest / r.source / r.category / r.name
+        target = target_of(r, dest)
         if target.exists() and target.stat().st_size == src.stat().st_size:
             skipped += 1
             continue

@@ -81,7 +81,7 @@ def test_copy_idempotent(tmp_path):
     dest = tmp_path / "dest"
 
     assert samples.copy_samples([row], dest) == (1, 0)
-    assert (dest / "src" / "-" / "K.wav").exists()
+    assert (dest / "src" / "K.wav").exists()
     assert samples.copy_samples([row], dest) == (0, 1)
 
 
@@ -89,3 +89,15 @@ def test_copy_catalogue_absent(tmp_path, capsys):
     rc = samples.main(["copy", str(tmp_path / "nope.csv"), "--dest", str(tmp_path)])
     assert rc == 1
     assert "introuvable" in capsys.readouterr().err
+
+
+def test_target_garde_arborescence_complete(tmp_path):
+    base = dict(category="x", name="Shaker1.WAV", duration_s=1.0, samplerate=44100,
+                channels=1, subtype="PCM_16", size_kb=1)
+    a = samples.Sample(source="Battery 3 Library",
+                       path="/v/Battery 3 Library/Demo/Dragon Kit/Shaker1.WAV", **base)
+    b = samples.Sample(source="Maschine 2 Library",
+                       path="/v/Maschine 2 Library/Samples/Loops/Percussion/Djembe/D.wav", **base)
+    dest = tmp_path / "d"
+    assert samples.target_of(a, dest) == dest / "Battery 3 Library/Demo/Dragon Kit/Shaker1.WAV"
+    assert samples.target_of(b, dest) == dest / "Maschine 2 Library/Loops/Percussion/Djembe/D.wav"
