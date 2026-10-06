@@ -100,8 +100,8 @@ longueurs sur les phrases de 8 / 16 / 32 mesures (cf. §6, principe 6).
   mutant / démutant. Garder quelques patterns de variation pour les grosses
   bascules.
 - **Temp save et reload** : avant de triturer un pattern en live, faire un temp
-  save. [FUNC] + [NO] revient à l'état propre *(combinaison de sauvegarde à
-  vérifier)*.
+  save ([FUNC] + [YES]) ; [FUNC] + [NO] revient à l'état propre (cf.
+  [[kb/perform-kit-temp-save]]).
 
 ## 4. Mutes : le vrai séquenceur du live
 
