@@ -79,3 +79,10 @@ fermer le filtre sur 4 mesures, puis `[NO]` avant de lâcher : vérifier le
 retour exact.
 
 Source : manuel DT2 OS 1.17, §4, §6.2.2, §9.8, §12.6-12.9.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=7024) : « Mixer » (1:57:04) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1517) : « Setting the track level » (25:17) · DT2, 2024

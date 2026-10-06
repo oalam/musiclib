@@ -69,3 +69,12 @@ Hat ouvert en `4:4`, clap de fill en `FILL` ON, riser en `LST` ; chaîner
 deux patterns et vérifier que le riser tombe juste avant la bascule.
 
 Source : manuel DT2 OS 1.17, §10.7.3, §10.8.4, §11.2.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — DIGITAKT II Conditions & Fill](https://youtu.be/WvuW8m9zrCI) (vidéo entière) · DT2, 2024
+- [XNB — DIGITAKT II Conditions & Fill](https://youtu.be/WvuW8m9zrCI?t=1093) : « Fill » (18:13) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=2969) : « Conditional trigs » (49:29) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1440) : « Trig conditions » (24:00) · DT2, 2024

@@ -65,3 +65,12 @@ Faire le riser ci-dessus sur 1 mesure (`SPD` 8) puis 4 mesures (`SPD` 2),
 comparer RAMP et EXPO, garder la version préférée comme preset.
 
 Source : manuel DT2 OS 1.17, §11.9-11.11, annexe C.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Synthackers — Digitakt II LFO Deep Dive](https://youtu.be/8Dn7kXQtcKg) (vidéo entière) · DT2, 2024
+- [Synthackers — Digitakt II LFO Deep Dive](https://youtu.be/8Dn7kXQtcKg?t=819) : « Trig Locking LFO Parameters » (13:39) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1957) : « Modulating a hihat - predictably » (32:37) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3353) : « Parameter locking a modulation » (55:53) · DT2, 2024

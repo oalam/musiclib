@@ -108,3 +108,14 @@ rumble pompe toujours.
 Sources : manuel DT2 OS 1.17, §9.8.1, §10.1.2, §12, §14.6.1 ; Elektronauts
 (fils *Digitakt II Tips & Tricks*, *Introducing Digitakt II*, *Can I use the
 digitakt compressor on external audio?*, *Dummy Sidechain for Digitakt 2*).
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=5492) : « FX » (1:31:32) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=5776) : « Compressor » (1:36:16) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3484) : « The master compressor » (58:04) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1075) : « New FX » (17:55) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1140) : « Bypass compress » (19:00) · DT2, 2024
+- [Braintree56 — Effects : Compression, Reverb, Delay, Bit Reduction](https://youtu.be/kWJSEuysPvE?t=111) : « Delay Parameters » (1:51) · DT1, principe identique, 2023

@@ -58,3 +58,12 @@ Sur le kick, comparer `OD.RT` PRE et POST avec le même `OVER`, puis tester
 `BR` à 4 bits sur un hat ouvert et revenir avec `[FX] + [NO]`.
 
 Source : manuel DT2 OS 1.17, §11.7, §11.8, §11.1.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=5391) : « Amp page » (1:29:51) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1537) : « Adjusting the amp envelope » (25:37) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=2209) : « Envelope modes » (36:49) · DT2, 2024
+- [Braintree56 — Effects : Compression, Reverb, Delay, Bit Reduction](https://youtu.be/kWJSEuysPvE?t=869) : « Bit Rate Reduction » (14:29) · DT1, principe identique, 2023

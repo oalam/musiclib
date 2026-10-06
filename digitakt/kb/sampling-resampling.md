@@ -64,3 +64,12 @@ Faire le rumble ci-dessus, puis refaire la prise avec `R.LEN` = 8 et
 comparer les deux en `FORWARD LOOP` (page SRC).
 
 Source : manuel DT2 OS 1.17, §7.5, §13.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — DIGITAKT II Sampling](https://youtu.be/tDBeHZV-qnU) (vidéo entière) · DT2, 2024
+- [Optoproductions — Digitakt 2 Creative Resampling](https://youtu.be/pvR1gMepME0) (vidéo entière) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=4616) : « Sampling your first sample » (1:16:56) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=4795) : « Sample a loop » (1:19:55) · DT2, 2024

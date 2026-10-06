@@ -65,3 +65,12 @@ Même boucle sur trois tracks en STRETCH, REPITCH et WERP, à 190 BPM, puis
 monter le tempo à 200 et écouter laquelle tient le mieux.
 
 Source : manuel DT2 OS 1.17, §11.4, §13.4, annexe A.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — DIGITAKT II Machines](https://youtu.be/jcC623awE7E) (vidéo entière) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=4737) : « SRC page » (1:18:57) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=505) : « Stretch machine » (8:25) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=4950) : « Track machines » (1:22:30) · DT2, 2024

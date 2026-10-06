@@ -62,3 +62,13 @@ Même hat sur MULTI-MODE, `TYPE` de passe-bas à passe-haut en jouant ; puis
 COMB+ avec `FDBK` monté, et accorder `FREQ` sur la tonalité du morceau.
 
 Source : manuel DT2 OS 1.17, §11.5, §11.6, annexe A.3.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=4916) : « Filter » (1:21:56) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=5227) : « New filter modes » (1:27:07) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=595) : « Filter machines » (9:55) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=700) : « Comb filter » (11:40) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=2849) : « Exploring the other filters » (47:29) · DT2, 2024
