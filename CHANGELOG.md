@@ -26,6 +26,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.D] Lot 4 de fiches : song mode (rejouer la chaîne d'une bank),
   changement de pattern et chaînes, mutes globaux / de pattern, perform kit
   et temp save.
+- [7.D] Lot 5 de fiches : CC et NRPN (numéros utiles en live), tracks MIDI
+  pour piloter un synthé, audio routing et Overbridge. Base complète
+  (25 fiches, statut draft).
+
+### Modifié
+
+- [7.E] Requalifiée en enregistrement assisté + pré-réglage CC / NRPN :
+  aucun NRPN ne pose un trig sur un pas (annexe B du manuel).
 
 ### Corrigé
 

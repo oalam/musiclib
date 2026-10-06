@@ -381,8 +381,8 @@ mutes, FX de transition, principes d'arc).
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
-| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, lots 1-4 de fiches rédigés (22/25), lot 5 à venir |
-| 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
+| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | fait : recherche + panneau, 25 fiches en 5 lots (statut draft, à tester sur la machine) |
+| 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | à venir |
 
 **Décisions 7.B** :
 - 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des
@@ -440,6 +440,14 @@ mutes, FX de transition, principes d'arc).
   test sur la machine.
 - Recherche sur KB + doctrine, résultats par section avec extrait surligné.
 - Affichage en panneau latéral (`/`), accessible pendant la lecture.
+
+**Décision 7.E (requalifiée le 2026-10-06)** : l'annexe B du manuel ne donne
+aucun NRPN pour poser un trig sur un pas (les NRPN 3:0-3:2 règlent la note, la
+vélocité et la longueur par défaut de la track). Le push direct des trigs est
+abandonné ; 7.E devient un enregistrement assisté (le script rejoue chaque
+piste du `.mid` sur l'AUTO CHANNEL pendant que la DT2 enregistre, une track à
+la fois) et un pré-réglage des sons par CC / NRPN. Piste non retenue : le
+SYSEX DUMP de pattern (§14.5), format non documenté.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

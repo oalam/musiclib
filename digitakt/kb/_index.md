@@ -79,8 +79,8 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 
 ## Lot 5 — MIDI et intégration
 
-| # | Thème | Manuel | Statut |
+| # | Fiche | Manuel | Statut |
 |---|---|---|---|
-| 23 | CC et NRPN (prérequis Phase 7.E) | annexe B | à rédiger |
-| 24 | Tracks MIDI pour piloter un synthé | §5.3.2, §16.3 | à rédiger |
-| 25 | Audio routing et Overbridge | §6.6, §14.6 | à rédiger |
+| 23 | [[cc-nrpn]] | annexe B, §14.4.2-14.4.3 | draft (numéros à tester) |
+| 24 | [[tracks-midi]] | §5.3.2, §16.3, A.2.7 | draft |
+| 25 | [[audio-routing-overbridge]] | §6.6, §14.6, §14.8.1 | draft |
