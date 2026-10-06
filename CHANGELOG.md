@@ -13,6 +13,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   `/api/kb/search` et `/api/kb/note` (chemins limités au corpus).
 - [7.D] Panneau latéral KB dans le front (touche `/`), extraits surlignés,
   note rendue avec `marked` (HTML brut échappé) et positionnée sur la section.
+- [7.D] Hub `digitakt/kb/_index.md` (24 thèmes, 5 lots) et lot 1 de fiches :
+  projet et sauvegarde, presets / kits / pool, copier-coller, page setup,
+  tempo et métronome.
 
 ## [0.11.0] - 2026-10-06
 

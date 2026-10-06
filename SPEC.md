@@ -381,7 +381,7 @@ mutes, FX de transition, principes d'arc).
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
-| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, import du manuel PDF à venir |
+| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, lot 1 de fiches rédigé (5/24), lots 2-5 à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
 **Décisions 7.B** :
@@ -424,9 +424,15 @@ mutes, FX de transition, principes d'arc).
   `01 … 11 06 05 12 13`, mesure décalée de 2 temps.
 
 **Décisions 7.D (arbitrées le 2026-10-06)** :
-- Contenu initial = manuel PDF Elektron de la DT2, découpé **par script**
-  selon les signets du PDF (une note par section, page source en
-  frontmatter), pas réécrit à la main.
+- Contenu = **fiches pédagogiques courtes rédigées** depuis le manuel
+  (`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`), pas un découpage
+  automatique (révisé le 2026-10-06 : remplace l'import par signets).
+- 24 thèmes en 5 lots, dans l'ordre de **préparation d'un set** ; liste et
+  statuts dans le hub [[digitakt/kb/_index]]. Un lot par session.
+- Format arbitré : frontmatter (`theme`, `lot`, `manuel`, `os`, `statut`),
+  *En une phrase*, *Gestes rapides*, *Pas à pas*, *En live techno*,
+  *Pièges*, *À essayer (5 min)* ; 40-70 lignes ; `statut: draft` jusqu'au
+  test sur la machine.
 - Recherche sur KB + doctrine, résultats par section avec extrait surligné.
 - Affichage en panneau latéral (`/`), accessible pendant la lecture.
 
