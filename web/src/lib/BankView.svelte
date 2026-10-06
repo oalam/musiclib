@@ -1,6 +1,6 @@
 <script lang="ts">
   import { api, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type ManualRef, type Pattern } from './api'
-  import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, type Func, type Param } from './dt2'
+  import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
 
   let { bank, currentTime, playing, onseek, onplay, onstop, onhelp }: {
     bank: Bank
@@ -153,6 +153,11 @@
   let outline = $state<Record<string, ManualRef>>({})
   api.manualOutline().then(o => (outline = o)).catch(() => { /* manuel absent : liens masques */ })
 
+  /** Boite centree en (cx, cy), w x h, en unites du dessin du §3.1 (834 x 682) -> % du panneau. */
+  const at = (cx: number, cy: number, w: number, h = w) =>
+    `left: ${((cx - w / 2) / 834) * 100}%; top: ${((cy - h / 2) / 682) * 100}%; ` +
+    `width: ${(w / 834) * 100}%; height: ${(h / 682) * 100}%`
+
   const paramPage = $derived(PARAM_PAGES.find(pg => pg.id === pageId) ?? PARAM_PAGES[0])
   const focused = $derived(CONTROLS[shown.id])
   const focusedParam = $derived(shown.param !== undefined ? paramPage.params[shown.param] : null)
@@ -220,34 +225,60 @@
 </script>
 
 <section class="bank">
-  {#snippet hw(id: string, primary?: () => void, secondary?: () => void, lit = false, cls = '')}
+  {#snippet glyph(name: string)}
+    <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      {#if name === 'preset'}<path d="M5 7h9M5 11h9M5 15h5M18 5v10" /><circle cx="16" cy="16" r="2" />
+      {:else if name === 'settings'}<circle cx="12" cy="12" r="6.5" stroke-width="3" stroke-dasharray="2.2 1.9" /><circle cx="12" cy="12" r="2.5" />
+      {:else if name === 'sampling'}<path d="M4 10v4M7 7v10M10 9v6M13 5v14M16 8v8M19 10v4" />
+      {:else if name === 'tempo'}<path d="M7 20h10L13.5 5h-3zM12 15l5-8" />
+      {:else if name === 'keyboard'}<rect x="4" y="5" width="16" height="14" rx="1" /><path d="M8 5v8M12 5v8M16 5v8M8 13v6M12 13v6M16 13v6" stroke-width="2.6" />
+      {:else if name === 'record'}<circle cx="12" cy="12" r="6.5" />
+      {:else if name === 'play'}<path d="M8 5.5v13l10-6.5z" />
+      {:else if name === 'stop'}<rect x="6" y="6" width="12" height="12" rx="1" />
+      {:else if name === 'up'}<path d="M7 16l5-9 5 9" />
+      {:else if name === 'down'}<path d="M7 8l5 9 5-9" />
+      {:else if name === 'left'}<path d="M16 6l-8 6 8 6" />
+      {:else if name === 'right'}<path d="M8 6l8 6-8 6" />{/if}
+    </svg>
+  {/snippet}
+  {#snippet hw(id: string, box: [number, number, number, number], o: { primary?: () => void; secondary?: () => void; lit?: boolean; icon?: string; silk?: string; label?: string } = {})}
     {@const c = CONTROLS[id]}
-    <button class="hw {cls}" class:lit class:hasfunc={!!c.func} class:sel={focus.id === id && focus.param === undefined}
-      onmouseenter={() => peek({ id })} onmouseleave={unpeek} onclick={() => act(id, primary, secondary)}>
-      {c.label}{#if c.func}<span class="sub">{c.func.label}</span>{/if}
+    {@const silk = o.silk ?? SILK[id]}
+    <button class="hw" class:lit={o.lit} class:hasfunc={!!c.func} class:sel={focus.id === id && focus.param === undefined}
+      class:icon={!!o.icon} style={at(...box)} aria-label={o.label ?? c.label}
+      onmouseenter={() => peek({ id })} onmouseleave={unpeek} onclick={() => act(id, o.primary, o.secondary)}>
+      {#if o.icon}{@render glyph(o.icon)}{:else}<span class="kl">{c.label}</span>{/if}
+      {#if silk}<span class="sub">{silk}</span>{/if}
     </button>
   {/snippet}
-  {#snippet knob(id: string, label: string, value: number | null, onclick: () => void, onenter: () => void, sel: boolean, big = false)}
-    <button class="knob" class:big class:sel class:known={value !== null}
-      style="--a: {value === null ? 0 : -135 + (270 * value) / 127}deg"
-      aria-label="{label}" onmouseenter={onenter} onmouseleave={unpeek} {onclick}>
-      <span class="cap"></span><span class="klabel">{label}</span>
+  {#snippet knob(box: [number, number, number], label: string, value: number | null, onclick: () => void, onenter: () => void, sel: boolean, sub = '')}
+    <button class="knob" class:sel class:known={value !== null} style="{at(...box)}; --a: {value === null ? 0 : -135 + (270 * value) / 127}deg"
+      aria-label={label} onmouseenter={onenter} onmouseleave={unpeek} {onclick}>
+      <span class="cap"></span><span class="klabel">{label}{#if sub}<span class="sub2">{sub}</span>{/if}</span>
     </button>
   {/snippet}
 
+  <div class="fronttools">
+    <button class="small" class:on={help} title="Mode aide : un clic sur un contrôle ouvre sa fiche ou le manuel"
+      onclick={() => (help = !help)}>Aide ?</button>
+    <button class="small" class:on={follow} title="Spécifique au front : la page et le pattern suivent la lecture"
+      onclick={() => (follow = !follow)}>Follow</button>
+  </div>
+
+  <!-- implantation et echelle reprises du dessin du §3.1 (panneau de 834 x 682 unites) -->
   <div class="dt" class:funcmode={func} class:helpmode={help} aria-label="Façade Digitakt II">
-    <div class="top">
-      <div class="menu">
-        {@render knob('volume', 'VOLUME', null, () => act('volume'), () => peek({ id: 'volume' }), focus.id === 'volume')}
-        <div class="menukeys">
-          {@render hw('preset')}
-          {@render hw('settings')}
-          {@render hw('sampling')}
-          {@render hw('tempo')}
-        </div>
-      </div>
+    <div class="ports" aria-hidden="true">
+      {#each [[60, 'Phones'], [135, 'L · Out · R'], [250, 'L · In · R'], [349, 'MIDI In'], [427, 'MIDI Out'], [504, 'MIDI Thru'], [589, 'USB'], [663, 'DC In'], [748, 'Power']] as [x, t]}
+        <span style="left: {(Number(x) / 834) * 100}%">{t}</span>
+      {/each}
+    </div>
 
-      <div class="screen mono" role="presentation" onmouseenter={() => peek({ id: 'screen' })} onmouseleave={unpeek}>
+    {@render knob([68, 126, 52], 'Main Volume', null, () => act('volume'), () => peek({ id: 'volume' }), focus.id === 'volume')}
+    {@render knob([68, 223, 52], 'Level/Data', null, () => act('level'), () => peek({ id: 'level' }), focus.id === 'level', SILK.level)}
+
+    <div class="bezel" style={at(264, 184, 284, 196)}><span class="brand">Digitakt II</span></div>
+    <div class="screen mono" role="presentation" style={at(263.5, 175, 237, 130)}
+      onmouseenter={() => peek({ id: 'screen' })} onmouseleave={unpeek}>
         <div class="bar">
           <span class="tag">{patName(pattern.slot)}</span>
           <span class="name">{pattern.label.toUpperCase()}</span>
@@ -281,100 +312,87 @@
           </div>
         {/if}
         <div class="row dim foot">{bank.from_stems ? 'STEMS' : 'MIX'} · {pattern.bars} BAR{pattern.bars > 1 ? 'S' : ''} · {mmss(pattern.start_s)}-{mmss(pattern.end_s)} · {mmss(currentTime)}</div>
-      </div>
-
-      <div class="data">
-        {@render knob('level', 'LEVEL', null, () => act('level'), () => peek({ id: 'level' }), focus.id === 'level', true)}
-        <div class="pair stack">
-          {@render hw('no')}
-          {@render hw('yes')}
-        </div>
-      </div>
-
-      <div class="entry">
-        <div class="knobs">
-          {#each KNOBS as k, i}
-            {@const param = paramPage.params[i]}
-            {@render knob('knobs', k, paramValue(param), () => pressKnob(i), () => peek({ id: 'knobs', param: i }),
-              focus.id === 'knobs' && focus.param === i)}
-          {/each}
-        </div>
-        <div class="pkeys">
-          {#each ['p-trig', 'p-src', 'p-fltr', 'p-amp', 'p-fx', 'p-mod'] as id}
-            {@render hw(id, () => pressParamKey(id), undefined, paramPage.key === id, 'pkey')}
-          {/each}
-        </div>
-      </div>
     </div>
 
-    <div class="mid">
-      <button class="hw front" class:lit={help} title="Mode aide : un clic ouvre la fiche ou le manuel"
-        onclick={() => (help = !help)}>AIDE ?</button>
-      <button class="hw front" class:lit={follow} title="Spécifique au front : la page et le pattern suivent la lecture"
-        onclick={() => (follow = !follow)}>FOLLOW</button>
-      <div class="leds" role="group" aria-label="Pages" onmouseenter={() => peek({ id: 'leds' })} onmouseleave={unpeek}>
-        {#each Array(8) as _, i}
-          <button class="led" class:lit={page === i} class:play={page !== i && currentStep >= 0 && Math.floor(currentStep / 16) === i}
-            disabled={i >= pages} aria-label="page {i + 1}"
-            onclick={() => act('leds', () => { page = i; follow = false })}></button>
-        {/each}
-      </div>
-      <div class="arrows" role="group" aria-label="Flèches" onmouseenter={() => peek({ id: 'arrows' })} onmouseleave={unpeek}>
-        <button class="hw arr up" aria-label="UP" onclick={() => act('arrows')}>▲</button>
-        <button class="hw arr left" aria-label="LEFT" onclick={() => act('arrows', () => pressArrow(-1))}>◀</button>
-        <button class="hw arr down" aria-label="DOWN" onclick={() => act('arrows')}>▼</button>
-        <button class="hw arr right" aria-label="RIGHT" onclick={() => act('arrows', () => pressArrow(1))}>▶</button>
-      </div>
-      {@render hw('page', () => { page = (page + 1) % pages; follow = false })}
-    </div>
+    <div class="frame" style={at(614, 184, 367, 170)}></div>
+    {#each KNOBS as k, i}
+      {@const param = paramPage.params[i]}
+      {@render knob([460 + 102 * (i % 4), i < 4 ? 126 : 223, 50], k, paramValue(param), () => pressKnob(i),
+        () => peek({ id: 'knobs', param: i }), focus.id === 'knobs' && focus.param === i)}
+    {/each}
+    <div class="frame" style={at(614, 315, 367, 62)}></div>
+    {#each ['p-trig', 'p-src', 'p-fltr', 'p-amp', 'p-fx', 'p-mod'] as id, i}
+      {@render hw(id, [458 + 62 * i, 308, 44, 44], { primary: () => pressParamKey(id), lit: paramPage.key === id })}
+    {/each}
 
-    <div class="bottom">
-      <div class="side">
-        {@render hw('record')}
-        {@render hw('play', onplay, undefined, playing)}
-        {@render hw('stop', () => onstop(playingStart))}
-        {@render hw('trk', () => (mode = mode === 'trk' ? 'trig' : 'trk'), () => (mode = mode === 'mute' ? 'trig' : 'mute'), mode === 'trk' || mode === 'mute')}
-        {@render hw('ptn', () => (mode = mode === 'ptn' ? 'trig' : 'ptn'), () => (mode = 'ptn'), mode === 'ptn')}
-        {@render hw('song')}
-        {@render hw('func', undefined, undefined, func)}
-        {@render hw('keyboard')}
-      </div>
+    {@render hw('func', [78, 349, 68, 42], { lit: func })}
+    {#each [['preset', 170], ['settings', 233], ['sampling', 295], ['tempo', 358]] as [id, x]}
+      {@render hw(String(id), [Number(x), 349, 44, 44], { icon: String(id) })}
+    {/each}
 
-      <div class="keys" role="group" aria-label="Trig keys" onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek}>
-        {#each Array(16) as _, i}
-          {#if mode === 'trig'}
-            {@const s = page * 16 + i}
-            {@const trig = s < pattern.steps ? trigAt(track, s) : undefined}
-            <button class="key" class:off={s >= pattern.steps} class:red={!!trig} class:cursor={s === currentStep}
-              style={trig ? `--v: ${0.45 + (0.55 * trig.velocity) / 127}` : ''}
-              title={trig ? `pas ${s + 1} · vel ${trig.velocity}${trig.note !== null ? ' · ' + noteName(trig.note) : ''}` : `pas ${s + 1}`}
-              onclick={() => pressKey(i)}>
-              <span class="n">{i + 1}</span>
-              {#if trig && trig.note !== null && track.index > 8}<span class="note">{noteName(trig.note)}</span>{/if}
-            </button>
-          {:else if mode === 'trk'}
-            {@const t = pattern.tracks.find(t => t.index === i + 1)}
-            <button class="key" class:off={!t?.trigs.length} class:red={track.index === i + 1}
-              title="{i + 1} {t?.role ?? ''}" onclick={() => pressKey(i)}>
-              <span class="n">{i + 1}</span><span class="note">{t?.role ?? ''}</span>
-            </button>
-          {:else if mode === 'mute'}
-            {@const t = pattern.tracks.find(t => t.index === i + 1)}
-            <button class="key" class:off={!t?.trigs.length} class:green={!!t?.trigs.length && unmuted.has(i + 1)}
-              title="{i + 1} {t?.role ?? ''}" onclick={() => pressKey(i)}>
-              <span class="n">{i + 1}</span><span class="note">{t?.role ?? ''}</span>
-            </button>
-          {:else}
-            {@const p = bank.patterns.find(p => p.slot === i + 1)}
-            <button class="key" class:off={!p} class:white={!!p} class:red={p?.slot === pattern.slot}
-              class:blink={playingPattern?.slot === i + 1}
-              title={p ? `${patName(p.slot)} · ${p.label} · ${mmss(p.start_s)}` : ''} onclick={() => pressKey(i)}>
-              <span class="n">{i + 1}</span>{#if p}<span class="note">{p.label}</span>{/if}
-            </button>
-          {/if}
-        {/each}
-      </div>
-    </div>
+    {@render hw('keyboard', [78, 410, 44, 44], { icon: 'keyboard' })}
+    {@render hw('record', [182, 411, 68, 42], { icon: 'record' })}
+    {@render hw('play', [264, 411, 68, 42], { icon: 'play', primary: onplay, lit: playing })}
+    {@render hw('stop', [346, 411, 68, 42], { icon: 'stop', primary: () => onstop(playingStart) })}
+
+    {@render hw('yes', [458, 380, 44, 44])}
+    {@render hw('no', [458, 442, 44, 44])}
+
+    <div class="frame" style={at(582, 418, 176, 125)}></div>
+    {@render hw('arrows', [582, 380, 44, 44], { icon: 'up', silk: 'Trig Mode', label: 'UP' })}
+    <span class="silk" style="left: {(612 / 834) * 100}%; top: {(374 / 682) * 100}%">↕ KB Octave</span>
+    {@render hw('arrows', [520, 442, 44, 44], { icon: 'left', silk: 'µTime−', label: 'LEFT', primary: () => pressArrow(-1) })}
+    {@render hw('arrows', [582, 442, 44, 44], { icon: 'down', silk: 'Trig Mode', label: 'DOWN' })}
+    {@render hw('arrows', [645, 442, 44, 44], { icon: 'right', silk: 'µTime+', label: 'RIGHT', primary: () => pressArrow(1) })}
+
+    <div class="frame" style={at(756, 383, 88, 42)}></div>
+    {#each Array(8) as _, i}
+      <button class="led" class:lit={page === i} class:play={page !== i && currentStep >= 0 && Math.floor(currentStep / 16) === i}
+        style={at(722 + 23 * (i % 4), i < 4 ? 372 : 395, 13)} disabled={i >= pages} aria-label="page {i + 1}"
+        onmouseenter={() => peek({ id: 'leds' })} onmouseleave={unpeek}
+        onclick={() => act('leds', () => { page = i; follow = false })}></button>
+    {/each}
+    {@render hw('page', [756, 442, 68, 42], { primary: () => { page = (page + 1) % pages; follow = false } })}
+
+    {@render hw('trk', [78, 481, 68, 42], { primary: () => (mode = mode === 'trk' ? 'trig' : 'trk'),
+      secondary: () => (mode = mode === 'mute' ? 'trig' : 'mute'), lit: mode === 'trk' || mode === 'mute' })}
+    {@render hw('ptn', [78, 547, 68, 42], { primary: () => (mode = mode === 'ptn' ? 'trig' : 'ptn'),
+      secondary: () => (mode = 'ptn'), lit: mode === 'ptn' })}
+    {@render hw('song', [78, 612, 68, 42])}
+
+    <div class="frame" style={at(469, 569, 657, 166)}></div>
+    <span class="silk tm" style="left: {(469 / 834) * 100}%; top: {(568 / 682) * 100}%">
+      <i>⋮·······</i> Track/Mute <i>·······⋮</i></span>
+    {#each Array(16) as _, i}
+      {@const box = at(182 + 82 * (i % 8), i < 8 ? 524 : 611, 68)}
+      {#if mode === 'trig'}
+        {@const s = page * 16 + i}
+        {@const trig = s < pattern.steps ? trigAt(track, s) : undefined}
+        <button class="key" class:beat={i % 4 === 0} class:off={s >= pattern.steps} class:red={!!trig} class:cursor={s === currentStep}
+          style="{box}{trig ? `; --v: ${0.45 + (0.55 * trig.velocity) / 127}` : ''}"
+          title={trig ? `pas ${s + 1} · vel ${trig.velocity}${trig.note !== null ? ' · ' + noteName(trig.note) : ''}` : `pas ${s + 1}`}
+          onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek} onclick={() => pressKey(i)}>
+          <span class="n">{i + 1}</span>
+          {#if trig && trig.note !== null && track.index > 8}<span class="note">{noteName(trig.note)}</span>{/if}
+        </button>
+      {:else if mode === 'trk' || mode === 'mute'}
+        {@const t = pattern.tracks.find(t => t.index === i + 1)}
+        <button class="key" class:beat={i % 4 === 0} class:off={!t?.trigs.length}
+          class:red={mode === 'trk' && track.index === i + 1} class:green={mode === 'mute' && !!t?.trigs.length && unmuted.has(i + 1)}
+          style={box} title="{i + 1} {t?.role ?? ''}"
+          onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek} onclick={() => pressKey(i)}>
+          <span class="n">{i + 1}</span><span class="note">{t?.role ?? ''}</span>
+        </button>
+      {:else}
+        {@const p = bank.patterns.find(p => p.slot === i + 1)}
+        <button class="key" class:beat={i % 4 === 0} class:off={!p} class:white={!!p} class:red={p?.slot === pattern.slot}
+          class:blink={playingPattern?.slot === i + 1} style={box}
+          title={p ? `${patName(p.slot)} · ${p.label} · ${mmss(p.start_s)}` : ''}
+          onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek} onclick={() => pressKey(i)}>
+          <span class="n">{i + 1}</span>{#if p}<span class="note">{p.label}</span>{/if}
+        </button>
+      {/if}
+    {/each}
   </div>
 
   <div class="legend" aria-live="polite">
@@ -468,105 +486,128 @@
   .small { font-size: 12px; }
   h2 { font-size: 14px; margin: 18px 0 6px; }
 
-  /* facade DT2 : toujours sombre, comme la machine, quel que soit le theme */
+  /* facade DT2 : toujours sombre, comme la machine, quel que soit le theme.
+     Implantation absolue au dessin du §3.1 ; --u = 1 unite du dessin (834 de large). */
+  .fronttools { display: flex; gap: 6px; max-width: 900px; margin-bottom: 6px; }
+  .fronttools .on { outline: 2px solid var(--accent); }
   .dt {
-    --face: #1c1c1c; --key: #262626; --key-edge: #0a0a0a; --silk: #d8d8d4; --func: #e9a23b;
+    --face: #1c1c1c; --key-edge: #0a0a0a; --silk: #d8d8d4; --func: #e9a23b;
     --led-red: #ff3b3b; --led-green: #4cff6a; --lcd: #9fd0ff; --lcd-bg: #07142a;
-    background: linear-gradient(#262626, var(--face));
-    border: 1px solid #000; border-radius: 10px;
-    padding: 16px; max-width: 980px;
+    container-type: inline-size;
+    position: relative; width: 100%; max-width: 900px; aspect-ratio: 834 / 682;
+    background: linear-gradient(#272727, var(--face));
+    border: 1px solid #000; border-radius: 1.4%;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
     color: var(--silk);
   }
+  .dt > * { position: absolute; box-sizing: border-box; }
+  .dt { --u: calc(100cqw / 834); }
   .dt button { font: inherit; color: inherit; }
-  .top { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 10px; }
-  .menu { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .menukeys { display: grid; grid-template-columns: repeat(2, auto); gap: 8px; }
-  .data { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .entry { display: flex; flex-direction: column; gap: 10px; }
-  .knobs { display: grid; grid-template-columns: repeat(4, 44px); gap: 6px 10px; }
-  .pkeys { display: grid; grid-template-columns: repeat(6, auto); gap: 5px; }
-  .pkey { padding: 6px 5px !important; min-width: 0; }
+  .ports { left: 0; right: 0; top: calc(var(--u) * 8); height: 0; }
+  .ports span { position: absolute; transform: translateX(-50%); font-size: calc(var(--u) * 8); color: #8a8a86; white-space: nowrap; }
+  .frame { border: 1px solid #555; border-radius: calc(var(--u) * 4); pointer-events: none; }
+  .silk { font-size: calc(var(--u) * 9.5); color: #9a9a96; white-space: nowrap; transform: translateY(-50%); }
+  .silk.tm { transform: translate(-50%, -50%); color: var(--silk); }
+  .silk.tm i { font-style: normal; color: #6a6a66; letter-spacing: 0.1em; }
 
-  /* potards : capuchon sombre, trait blanc = position (centre si valeur inconnue) */
-  .knob { all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .knob .cap {
-    position: relative; width: 34px; height: 34px; border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #4a4a48, #1a1a1a 70%);
-    border: 1px solid #000; box-shadow: 0 3px 0 #000, inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  }
-  .knob .cap::after {
-    content: ''; position: absolute; left: 50%; top: 3px; width: 2px; height: 11px; margin-left: -1px;
-    background: #8a8a86; border-radius: 1px; transform-origin: 50% 14px; transform: rotate(var(--a));
-  }
-  .knob.known .cap::after { background: #fff; }
-  .knob.big .cap { width: 44px; height: 44px; }
-  .knob.big .cap::after { transform-origin: 50% 19px; height: 14px; }
-  .knob .klabel { font-size: 10px; color: var(--silk); }
-  .knob.sel .cap, .knob:hover .cap { border-color: #777; }
-  .knob.sel .klabel { color: #fff; }
+  .bezel { background: #0d0d0d; border-radius: calc(var(--u) * 3); }
+  .brand { position: absolute; left: calc(var(--u) * 23); bottom: calc(var(--u) * 10); font: 700 calc(var(--u) * 19) / 1 system-ui, sans-serif; color: #f2f2ee; letter-spacing: -0.02em; }
 
   /* ecran : fond bleu nuit, bandeau inverse en tete comme l'UI du DT2 */
   .screen {
-    flex: 1 1 280px; background: var(--lcd-bg); border: 6px solid #0d0d0d; border-radius: 4px;
-    box-shadow: inset 0 0 0 1px #24324a; padding: 6px 8px;
-    color: var(--lcd); font-size: 12px; line-height: 1.5;
+    background: var(--lcd-bg); box-shadow: inset 0 0 0 1px #24324a; padding: calc(var(--u) * 5) calc(var(--u) * 6);
+    color: var(--lcd); font-size: calc(var(--u) * 9.5); line-height: 1.45; overflow: hidden;
   }
-  .bar { display: flex; align-items: center; gap: 6px; background: var(--lcd); color: var(--lcd-bg); padding: 1px 4px; font-weight: 700; margin-bottom: 4px; }
-  .bar .tag { border: 1px solid var(--lcd-bg); padding: 0 3px; font-size: 10px; }
-  .bar .name { font-size: 15px; letter-spacing: 0.03em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .bar .bpm { margin-left: auto; font-size: 11px; }
+  .bar { display: flex; align-items: center; gap: calc(var(--u) * 4); background: var(--lcd); color: var(--lcd-bg); padding: 0 calc(var(--u) * 3); font-weight: 700; margin-bottom: calc(var(--u) * 3); }
+  .bar .tag { border: 1px solid var(--lcd-bg); padding: 0 calc(var(--u) * 2); font-size: calc(var(--u) * 8); }
+  .bar .name { font-size: calc(var(--u) * 12); letter-spacing: 0.03em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar .bpm { margin-left: auto; font-size: calc(var(--u) * 9); }
   .screen .row { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .screen .big { font-size: 16px; font-weight: 700; }
+  .screen .big { font-size: calc(var(--u) * 12.5); font-weight: 700; }
   .screen .dim { opacity: 0.6; }
-  .screen .foot { font-size: 10px; margin-top: 2px; }
-  .banks { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; margin: 2px 0; }
-  .banks button { all: unset; cursor: pointer; text-align: center; font-size: 10px; border: 1px solid #24324a; }
+  .screen .foot { font-size: calc(var(--u) * 8); margin-top: calc(var(--u) * 1); }
+  .screen .pgt { float: right; font-size: calc(var(--u) * 8.5); font-weight: 400; opacity: 0.8; }
+  .banks { display: grid; grid-template-columns: repeat(16, 1fr); gap: 1px; margin: 1px 0; }
+  .banks button { all: unset; cursor: pointer; text-align: center; font-size: calc(var(--u) * 8); border: 1px solid #24324a; }
   .banks button.sel { background: var(--lcd); color: var(--lcd-bg); }
+  .params { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 calc(var(--u) * 4); font-size: calc(var(--u) * 9); }
+  .params span { white-space: nowrap; overflow: hidden; }
+  .params b { font-weight: 400; opacity: 0.6; margin-right: calc(var(--u) * 3); }
+  .params .hl { background: var(--lcd); color: var(--lcd-bg); }
 
-  .mid { display: flex; align-items: center; justify-content: flex-end; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
-  .mid .front { border-style: dashed; flex-direction: row; }
-  .mid .front + .front { margin-right: auto; }
-  .arrows { display: grid; grid-template-columns: repeat(3, 26px); grid-template-rows: repeat(2, 22px); gap: 3px; }
-  .arr { padding: 0 !important; font-size: 9px !important; }
-  .arr.up { grid-column: 2; grid-row: 1; }
-  .arr.left { grid-column: 1; grid-row: 2; }
-  .arr.down { grid-column: 2; grid-row: 2; }
-  .arr.right { grid-column: 3; grid-row: 2; }
-  .leds { display: grid; grid-template-columns: repeat(4, 12px); gap: 8px 10px; }
-  .led { width: 12px; height: 12px; padding: 0; border-radius: 50%; background: #8a8a86; border: 1px solid #000; box-shadow: inset 0 -2px 2px rgba(0, 0, 0, 0.4); }
-  .led:disabled { opacity: 0.3; cursor: default; }
-  .led.play { background: #2f7a3b; }
-  .led.lit { background: var(--led-green); box-shadow: 0 0 8px var(--led-green); }
-  .pair { display: flex; gap: 8px; }
-  .pair.stack { flex-direction: column; }
+  /* potards : capuchon qui tourne, trait = position (en haut si valeur inconnue) */
+  .knob { padding: 0; border: 0; background: none; cursor: pointer; overflow: visible; }
+  .knob .cap {
+    position: absolute; inset: 0; border-radius: 50%; transform: rotate(var(--a));
+    background: radial-gradient(circle, #3c3c3a 0, #262625 60%, #141414 100%);
+    border: 1px solid #000; box-shadow: 0 calc(var(--u) * 2.5) 0 #000;
+  }
+  .knob .cap::after {
+    content: ''; position: absolute; left: 50%; top: 7%; width: 6%; height: 28%; margin-left: -3%;
+    background: #8a8a86; border-radius: 1px;
+  }
+  .knob.known .cap::after { background: #fff; }
+  .knob.sel .cap, .knob:hover .cap { border-color: #888; }
+  .klabel {
+    position: absolute; top: calc(100% + var(--u) * 4); left: 50%; transform: translateX(-50%);
+    font-size: calc(var(--u) * 9.5); white-space: nowrap; text-align: center; line-height: 1.25;
+  }
+  .knob.sel .klabel { color: #fff; }
+  .sub2 { display: block; color: var(--func); }
 
   .hw {
-    font-size: 11px !important; letter-spacing: 0.04em; padding: 8px 12px; color: #bdbdb8 !important;
-    background: linear-gradient(#2e2e2e, #222); border: 1px solid var(--key-edge); border-radius: 6px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 3px 0 #000;
+    padding: 0; display: flex; align-items: center; justify-content: center; overflow: visible;
+    font-size: calc(var(--u) * 9.5) !important; letter-spacing: 0.02em; color: #c8c8c4 !important;
+    background: linear-gradient(#323232, #232323); border: 1px solid var(--key-edge); border-radius: calc(var(--u) * 7);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 calc(var(--u) * 2.5) 0 #000;
   }
-  .hw { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-  .hw.lit { color: #fff !important; box-shadow: inset 0 -3px 0 var(--led-red), 0 3px 0 #000; }
-  .hw.sel { border-color: #777; }
+  .hw .glyph { width: 52%; height: 52%; }
+  .hw .sub {
+    position: absolute; top: calc(100% + var(--u) * 4); left: 50%; transform: translateX(-50%);
+    font-size: calc(var(--u) * 9); color: var(--func); white-space: nowrap; letter-spacing: 0;
+  }
+  .hw.lit { color: #fff !important; box-shadow: inset 0 calc(var(--u) * -3) 0 var(--led-red), 0 calc(var(--u) * 2.5) 0 #000; }
+  .hw.sel { border-color: #888; }
+  .hw:hover, .key:hover, .led:hover:not(:disabled) { border-color: #666; }
   .funcmode .hw.hasfunc .sub { color: #ffc46b; text-shadow: 0 0 6px rgba(233, 162, 59, 0.6); }
   .funcmode .hw:not(.hasfunc):not(.lit) { opacity: 0.55; }
   .helpmode .hw, .helpmode .knob, .helpmode .key { cursor: help; }
-  .hw:hover, .key:hover, .led:hover:not(:disabled) { border-color: #555; }
 
-  .bottom { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
-  .side { display: grid; grid-template-columns: repeat(3, 64px); gap: 10px 8px; align-content: start; }
-  .side .hw { padding: 8px 4px 4px; }
-  .sub { font-size: 9px; color: var(--func); letter-spacing: 0; }
+  .led { padding: 0; border-radius: 50%; background: #6a6a66; border: 1px solid #000; box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.4); }
+  .led:disabled { opacity: 0.3; cursor: default; }
+  .led.play { background: #2f7a3b; }
+  .led.lit { background: var(--led-green); box-shadow: 0 0 8px var(--led-green); }
 
-  .screen .pgt { float: right; font-size: 11px; font-weight: 400; opacity: 0.8; }
-  .params { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0 6px; font-size: 11px; margin: 2px 0; }
-  .params span { white-space: nowrap; overflow: hidden; }
-  .params b { font-weight: 400; opacity: 0.6; margin-right: 4px; }
-  .params .hl { background: var(--lcd); color: var(--lcd-bg); }
+  /* 16 trig keys : chiffre souligne, cadre sur 1 / 5 / 9 / 13, LED = contour + chiffre */
+  .key {
+    padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: linear-gradient(#2e2e2e, #1f1f1f); border: 1px solid var(--key-edge); border-radius: calc(var(--u) * 7);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 calc(var(--u) * 3) 0 #000;
+  }
+  .key.beat::before {
+    content: ''; position: absolute; inset: 20%; border: calc(var(--u) * 1.5) solid #8a8a86; border-radius: calc(var(--u) * 2); pointer-events: none;
+  }
+  .key .n {
+    font-size: calc(var(--u) * 21); line-height: 1; color: #d8d8d4;
+    border-bottom: calc(var(--u) * 2) solid currentColor; padding-bottom: calc(var(--u) * 1.5);
+  }
+  .key .note { position: absolute; bottom: calc(var(--u) * 3); left: 2px; right: 2px; font-size: calc(var(--u) * 8); color: #9a9a96;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+  .key.off .n { opacity: 0.35; }
+  .key.white .n { color: #fff; }
+  .key.red {
+    box-shadow: inset 0 0 0 calc(var(--u) * 3) #111, inset 0 0 0 calc(var(--u) * 5) rgba(255, 59, 59, var(--v, 1)), 0 0 10px rgba(255, 59, 59, calc(var(--v, 1) * 0.35)), 0 calc(var(--u) * 3) 0 #000;
+  }
+  .key.red .n { color: var(--led-red); text-shadow: 0 0 6px rgba(255, 59, 59, 0.6); }
+  .key.green { box-shadow: inset 0 0 0 calc(var(--u) * 3) #111, inset 0 0 0 calc(var(--u) * 5) var(--led-green), 0 0 10px rgba(76, 255, 106, 0.3), 0 calc(var(--u) * 3) 0 #000; }
+  .key.green .n { color: var(--led-green); }
+  .key.cursor { background: linear-gradient(#5a5a56, #444); }
+  .key.blink { animation: blink 0.5s steps(1) infinite; }
+  @keyframes blink { 50% { box-shadow: inset 0 0 0 calc(var(--u) * 3) #111, inset 0 0 0 calc(var(--u) * 5) var(--led-green), 0 calc(var(--u) * 3) 0 #000; } }
+  @media (prefers-reduced-motion: reduce) { .key.blink { animation: none; } }
 
   .legend {
-    max-width: 980px; margin-top: 8px; padding: 8px 12px; min-height: 92px; box-sizing: border-box;
+    max-width: 900px; margin-top: 8px; padding: 8px 12px; min-height: 92px; box-sizing: border-box;
     border: 1px solid var(--border); border-radius: 6px; background: var(--panel); font-size: 13px;
   }
   .legend .lh { margin-bottom: 2px; }
@@ -574,39 +615,6 @@
   .legend .fn { color: var(--func, #e9a23b); font-weight: 700; font-size: 11px; }
   .legend .links { display: flex; gap: 6px; margin-top: 4px; }
   .legend .hint { margin-top: 4px; }
-
-  /* 16 trig keys en 2 rangees de 8 : chiffre souligne, LED = contour + chiffre */
-  .keys { flex: 1 1 320px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
-  .key {
-    position: relative; aspect-ratio: 1; min-width: 0; padding: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    background: linear-gradient(#2c2c2c, #1e1e1e); border: 1px solid var(--key-edge); border-radius: 8px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 4px 0 #000;
-  }
-  .key .n {
-    font-size: clamp(12px, 2.4vw, 22px); line-height: 1; color: #d8d8d4;
-    border-bottom: 2px solid currentColor; padding-bottom: 2px;
-  }
-  .key .note { position: absolute; bottom: 4px; left: 2px; right: 2px; font-size: 9px; color: #9a9a96;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .key.off .n { opacity: 0.35; }
-  .key.white .n { color: #fff; }
-  .key.red {
-    box-shadow: inset 0 0 0 3px #111, inset 0 0 0 5px rgba(255, 59, 59, var(--v, 1)), 0 0 10px rgba(255, 59, 59, calc(var(--v, 1) * 0.35)), 0 4px 0 #000;
-  }
-  .key.red .n { color: var(--led-red); text-shadow: 0 0 6px rgba(255, 59, 59, 0.6); }
-  .key.green { box-shadow: inset 0 0 0 3px #111, inset 0 0 0 5px var(--led-green), 0 0 10px rgba(76, 255, 106, 0.3), 0 4px 0 #000; }
-  .key.green .n { color: var(--led-green); }
-  .key.cursor { background: linear-gradient(#5a5a56, #444); }
-  .key.blink { animation: blink 0.5s steps(1) infinite; }
-  @keyframes blink { 50% { box-shadow: inset 0 0 0 3px #111, inset 0 0 0 5px var(--led-green), 0 4px 0 #000; } }
-  @media (prefers-reduced-motion: reduce) { .key.blink { animation: none; } }
-  @media (max-width: 560px) {
-    .keys { gap: 6px; }
-    .side { grid-template-columns: repeat(3, 52px); }
-    .knobs { grid-template-columns: repeat(4, 38px); }
-    .key .note { display: none; }
-  }
 
   .grid-wrap, .mutes-wrap { overflow-x: auto; max-width: 100%; }
   .grid {

@@ -452,7 +452,9 @@ la fois) et un pré-réglage des sons par CC / NRPN. Piste non retenue : le
 SYSEX DUMP de pattern (§14.5), format non documenté.
 
 **Décisions 7.G (arbitrées le 2026-10-06)** :
-- Les 23 contrôles du §3.1 sont dessinés, fonctions secondaires en orange.
+- Les 23 contrôles du §3.1 sont dessinés à l'échelle et aux emplacements du
+  dessin du manuel (panneau 834 × 682), sérigraphie des fonctions secondaires
+  en orange ; AIDE et FOLLOW (propres au front) hors du panneau.
   Ce qui a un sens dans le front agit : PLAY (lecture / pause), STOP (retour
   au début du pattern en cours), TRK, `[FUNC]` + TRK (MUTE), PTN et
   `[LEFT]`/`[RIGHT]` (lettre de bank), PAGE, LEDs de page, touches PARAMETER

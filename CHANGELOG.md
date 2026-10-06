@@ -62,6 +62,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.G] Façade Digitakt II redessinée à l'échelle sur le dessin du §3.1 du
+  manuel : emplacements et tailles exacts des knobs, touches, flèches, LEDs et
+  trig keys (positionnement absolu sur un panneau de 834 × 682 unités, qui
+  s'adapte à la largeur), icônes des touches de menu et du transport,
+  sérigraphie des fonctions secondaires telle qu'imprimée (Perform, Save Proj,
+  µTime−…), cadres des trig keys 1 / 5 / 9 / 13. AIDE et FOLLOW, propres au
+  front, sortent du panneau.
 - [7.E] Requalifiée en enregistrement assisté + pré-réglage CC / NRPN :
   aucun NRPN ne pose un trig sur un pas (annexe B du manuel).
 

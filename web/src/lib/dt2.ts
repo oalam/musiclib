@@ -71,7 +71,8 @@ export const CONTROLS: Record<string, Control> = Object.fromEntries(([
   { id: 'leds', label: 'PATTERN PAGE', ref: 10,
     main: { label: 'LEDs de page', text: 'Nombre de pages du pattern et page active ; la LED clignote sur la page qui joue.', kb: KB('page-setup'), manual: '10.7' } },
   { id: 'arrows', label: 'ARROWS', ref: 11,
-    main: { label: 'Flèches', text: 'Navigation dans les menus ; [LEFT]/[RIGHT] + [PTN] changent de bank.', manual: '6.1' } },
+    main: { label: 'Flèches', text: 'Navigation dans les menus ; [LEFT]/[RIGHT] + [PTN] changent de bank.', manual: '6.1' },
+    func: { label: 'µTIME / TRIG MODE', text: 'Sérigraphie : µTime −/+ (micro timing du trig), Trig Mode, KB Octave en mode KEYBOARD.', kb: KB('microtiming-retrigs'), manual: '10.4' } },
   { id: 'page', label: 'PAGE', ref: 12,
     main: { label: 'PAGE', text: 'Page suivante du pattern ; maintenu = mode FILL.', kb: KB('fill-conditions'), manual: '10.8.4' },
     func: { label: 'PAGE SETUP', text: 'Longueur et échelle du pattern.', kb: KB('page-setup'), manual: '10.7' } },
@@ -107,6 +108,14 @@ export const CONTROLS: Record<string, Control> = Object.fromEntries(([
   { id: 'screen', label: 'SCREEN', ref: 23,
     main: { label: 'Écran', text: 'Page active, paramètres, menus.', manual: '6.1' } },
 ] satisfies Control[]).map(c => [c.id, c]))
+
+/** Fonctions secondaires telles qu'imprimees sous les touches (dessin du §3.1). */
+export const SILK: Record<string, string> = {
+  preset: 'Perform', settings: 'Save Proj', sampling: 'Samples', tempo: 'Tap Tempo',
+  'p-trig': 'Quantize', 'p-src': 'Machine', 'p-fltr': 'Setup', 'p-amp': 'Sequencer', 'p-fx': 'Send FX', 'p-mod': 'Mixer',
+  yes: 'Save', no: 'Reload', page: 'Fill/Setup', keyboard: 'KB Setup',
+  record: 'Copy', play: 'Clear', stop: 'Paste', trk: 'Mute Mode', ptn: 'Bank', song: 'Song Edit', level: 'Preset Pool',
+}
 
 /** Parametre d'un knob A-H et son pilotage MIDI (annexe B, sur le canal de la track). */
 export interface Param {

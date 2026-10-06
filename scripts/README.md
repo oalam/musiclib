@@ -705,7 +705,8 @@ python api.py &   puis   cd ../web && npm run dev
   dans la phrase en cours), **PTN** (slots de la bank, lettre A-P mémorisée
   par morceau dans le navigateur, flèches gauche / droite = bank). Patterns
   nommés A01-P16.
-- **Façade complète (7.G)** : les 23 contrôles du §3.1 du manuel, fonctions
+- **Façade complète (7.G)** : les 23 contrôles du §3.1 du manuel, placés à
+  l'échelle sur le dessin de la façade, fonctions
   secondaires en orange ; **PLAY / STOP** pilotent le lecteur, **FUNC** est
   une bascule, les touches **TRIG / SRC / FLTR / AMP / FX / MOD** changent la
   page des knobs A-H (noms du §11, NOTE / VEL du pas courant). Clic = légende épinglée
