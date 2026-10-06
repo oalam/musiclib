@@ -561,6 +561,61 @@ discrets se disperse entre pas adjacents). Modules :
 
 ---
 
+# digitakt.py — draft de bank Digitakt II (Phase 7.B)
+
+1 morceau = 1 bank. Chaque section de la structure devient un pattern (16 au
+plus, 128 pas = 8 mesures au plus), réparti sur la **grille fixe des 16
+tracks** de [[../digitakt/doctrine|la doctrine]] (1 kick, 2 rumble, 3 clap,
+4-6 hats/ride, 7-8 percs, 9 basse, 10 lead, 11 atmo, 12-13 Id1/Id2 laissées
+vides, 14 vocal, 15 FX, 16 réserve). Prérequis : sidecar (`analyze.py`) et de
+préférence les stems (`stems.py <slug> --cleanup`) ; fallback mix avec warning.
+
+```bash
+# library/digitakt/<slug>.{json,md} + library/digitakt/<slug>/pNN.mid
+python digitakt.py <slug>
+
+# Partition de mutes par phrases de 16 mesures, trigs plus sensibles, sans MIDI
+python digitakt.py <slug> --phrase-bars 16 --threshold 0.4 --no-midi
+
+# Toute la library (tracks avec sidecar)
+python digitakt.py --all
+```
+
+Exemple réel (`2hot2play_-_keep_the_balance`, pattern 03, 1re page) :
+
+```
+01 Kick          x...x...x...x...
+02 Rumble        .x...x...x...x..
+05 Hat ouvert    .x...x...x...x..
+09 Basse         .x...x...x...x..
+```
+
+**Méthode** :
+- Beats **re-suivis sur la bande kick (30-120 Hz) du stem drums** : la grille
+  du sidecar est parfois un tempo constant légèrement faux (152 BPM au lieu de
+  kicks à 0,406 s soit 147,8 BPM) ; sur 128 pas la dérive rend le repliage
+  illisible.
+- Une STFT par stem ; chaque track lit sa bande dans son stem (kick 30-120 Hz,
+  clap 300-3000 Hz, hats 3-16 kHz…), agrégée par double-croche.
+- Calage de phase sur le kick, puis activité par mesure (actif si à moins de
+  12 dB du max de la track) → **partition de mutes** par phrase.
+- Par section : repliage des mesures actives modulo 1/2/4/8 mesures,
+  normalisation robuste (médiane → 95e percentile), seuil → trigs. Hats
+  ventilés ouvert / fermé / ride par décroissance et rapport de bandes.
+  Notes basse / lead estimées par chroma.
+- Track 15 : impact au pas 0 d'un drop (saut de RMS ≥ 4 dB entre sections),
+  riser figuré sur la dernière mesure d'avant.
+
+**Sorties** : JSON `DigitaktBank` (Pydantic, consommé par le futur front),
+note Obsidian (tableau des patterns, partition de mutes, grilles `x...`),
+un `.mid` par pattern avec **canal MIDI = track** (drums sur la note 60 =
+pitch d'origine du sample) à enregistrer en live recording sur la DT2.
+
+**Limites** : draft, pas transcription. Les percs et le lead sont bruités, les
+hats ouverts sur-détectés quand la reverb tient. Id1 / Id2 sont à choisir à
+l'oreille. Les mutes à l'intérieur d'une section diluent le repliage (trous
+dans le kick).
+
 # stems.py — séparation Demucs (Phase 6.B)
 
 Sépare chaque track en 4 stems via Demucs (Meta, modèle htdemucs) :

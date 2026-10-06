@@ -204,3 +204,58 @@ class QualityReport(BaseModel):
     frequency_bands: FrequencyBandsReport | None = None
     # Phase 6.D : optionnel (calcule avec Phase 2, skippe avec --quick)
     rhythm_signature: RhythmSignatureReport | None = None
+
+
+# --- Phase 7.B : draft de bank Digitakt II -----------------------------------
+
+class DigitaktTrig(BaseModel):
+    """Un trig sur la grille de pas d'une track Digitakt."""
+    step: int = Field(..., ge=0, description="Index de pas (0-based) dans le pattern")
+    velocity: int = Field(100, ge=1, le=127)
+    note: int | None = Field(None, description="Note MIDI estimee (tracks tonales)")
+
+
+class DigitaktTrack(BaseModel):
+    """Une des 16 tracks, role fixe par la doctrine (digitakt/doctrine.md)."""
+    index: int = Field(..., ge=1, le=16)
+    role: str
+    source: str = Field("", description="Stem / bande d'ou vient la detection")
+    active: bool = False
+    level: float = Field(0.0, ge=0, le=1, description="Niveau relatif au max de la track")
+    trigs: list[DigitaktTrig] = Field(default_factory=list)
+
+
+class DigitaktPattern(BaseModel):
+    """Un pattern = une section du morceau, repliee sur <= 128 pas."""
+    slot: int = Field(..., ge=1, le=16)
+    label: str
+    start_s: float
+    end_s: float
+    bars: int = Field(..., ge=1, le=8, description="Mesures dans le pattern (1, 2, 4 ou 8)")
+    steps: int = Field(..., ge=1, le=128, description="Longueur du pattern en pas")
+    repeats: float = Field(..., description="Nb de tours du pattern sur la section")
+    tracks: list[DigitaktTrack]
+
+
+class DigitaktPhrase(BaseModel):
+    """Phrase de N mesures : quelles tracks jouent (partition de mutes)."""
+    start_s: float
+    bar: int = Field(..., ge=0, description="Index de mesure de debut")
+    pattern_slot: int
+    active: list[int] = Field(default_factory=list, description="Tracks actives (1-16)")
+
+
+class DigitaktBank(BaseModel):
+    """Draft de bank : 1 morceau = 1 bank de <= 16 patterns."""
+    slug: str
+    artist: str = ""
+    title: str = ""
+    bpm: float
+    time_signature: str = "4/4"
+    steps_per_bar: int = 16
+    from_stems: bool
+    phrase_bars: int = 8
+    patterns: list[DigitaktPattern]
+    mutes: list[DigitaktPhrase] = Field(default_factory=list)
+    generated_at: str
+    method: str = "stem_band_fold_v1"

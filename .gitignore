@@ -19,3 +19,6 @@ library/renoise/
 
 # macOS
 .DS_Store
+
+# Draft Digitakt : MIDI par pattern (régénérable via digitakt.py)
+library/digitakt/*/

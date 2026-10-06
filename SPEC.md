@@ -1,6 +1,6 @@
 ---
 tags: [spec, projet, library, dj, mir]
-updated: 2026-05-31
+updated: 2026-10-06
 status: living document
 ---
 
@@ -36,6 +36,7 @@ music/scripts/
 ├── analyze.py                    # analyse qualité + structure
 ├── setbuilder.py                 # préparation de set
 ├── visualize.py                  # rendu PNG signatures
+├── digitakt.py                   # draft de bank Digitakt II (Phase 7.B)
 ├── library_md.py                 # parse / write library.md
 └── analyzer/
     ├── audio_loader.py           # soundfile + fallback librosa
@@ -57,7 +58,8 @@ music/scripts/
     ├── playlist.py               # builder greedy forward + backward
     ├── infer.py                  # auto-fill champs sémantiques
     ├── describe.py               # MusicBrainz lookup
-    └── visualize.py              # render_track + write_index_md
+    ├── visualize.py              # render_track + write_index_md
+    └── digitakt.py               # grille 16 tracks, patterns, mutes, MIDI
 ```
 
 ### Schéma de la library
@@ -362,6 +364,38 @@ kick le plus fort. Sorties `library/grooves/<slug>.{mid,tidal}` :
 **Modules** : `analyzer/rhythm_signature.py` (extraction + distance +
 clustering), `groove.py` (export). Dép. ajoutée : `mido` (MIDI, pur python).
 Tests : `tests/test_rhythm_signature.py`.
+
+---
+
+## Phase 7 — Digitakt II (en cours, démarrée le 2026-10-06)
+
+**But** : analyser des morceaux de référence sous l'angle patterns / tracks du
+workflow Elektron, et aider à produire des sets live sur Digitakt II. Source
+of truth des conventions : [[digitakt/doctrine]] (grille des 16 tracks, banks,
+mutes, FX de transition, principes d'arc).
+
+| Sous-phase | Contenu | Statut |
+|---|---|---|
+| 7.A | Doctrine `digitakt/doctrine.md` | fait |
+| 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
+| 7.C | Front POC : FastAPI + Svelte/Vite + wavesurfer.js (lib, lecteur, vue bank) ; natif Mac ensuite via Tauri | à venir |
+| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | à venir |
+| 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
+
+**Décisions 7.B** :
+- 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des
+  plus courtes) ; longueur 1/2/4/8 mesures (<= 128 pas).
+- Patterns = sections (grossières), mais **partition de mutes par phrase**
+  (8 mesures par défaut) : c'est elle qui raconte le morceau.
+- Beats re-suivis sur le kick du stem drums (cf. [[scripts/README]]).
+- Id1 / Id2 jamais remplies automatiquement.
+- Sortie MIDI : canal = track, à enregistrer en live recording (la DT2
+  n'importe pas de fichier de pattern).
+
+**Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
+légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient
+sur `beat_times_s`. Le recalage `retrack_beats` de `analyzer/digitakt.py` est
+réutilisable pour eux.
 
 ---
 
