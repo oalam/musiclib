@@ -61,3 +61,11 @@ Mode projet à 190 BPM, lancer un pattern, maintenir `[FUNC]` et monter A à
 morceau joué à côté et comparer.
 
 Source : manuel DT2 OS 1.17, §7.3, §17.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1424) : « Metronome » (23:44) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1480) : « Changing the tempo (bpm) » (24:40) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1827) : « Set Preroll for Live rec count-in » (30:27) · DT2, 2024

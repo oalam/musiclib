@@ -23,6 +23,11 @@
   const marked = new Marked({
     renderer: {
       html({ text }) { return escapeHtml(text) },
+      // liens externes (videos des fiches) : nouvel onglet, sinon l'app est remplacee
+      link({ href, title, tokens }) {
+        const ext = /^https?:\/\//.test(href)
+        return `<a href="${escapeHtml(href)}"${title ? ` title="${escapeHtml(title)}"` : ''}${ext ? ' target="_blank" rel="noopener"' : ''}>${this.parser.parseInline(tokens)}</a>`
+      },
       heading({ tokens, depth, text }) {
         return `<h${depth} id="${slugify(text)}">${this.parser.parseInline(tokens)}</h${depth}>`
       },

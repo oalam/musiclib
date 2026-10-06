@@ -14,7 +14,8 @@ conventions (grille des 16 tracks, banks, mutes, FX) restent dans
 
 Format d'une fiche : frontmatter (`theme`, `lot`, `ordre`, `manuel`, `os`, `statut`),
 puis *En une phrase*, *Gestes rapides*, *Pas à pas*, *En live techno*,
-*Pièges*, *À essayer (5 min)*. `statut: draft` passe à `vérifié` une fois
+*Pièges*, *À essayer (5 min)*, puis *Vidéos* (tutos YouTube horodatés au
+chapitre, repérés par les chapitres, modèle DT1 / DT2 précisé). `statut: draft` passe à `vérifié` une fois
 testé sur la machine.
 
 Recherche : panneau `/` du front ou `python scripts/kb.py search "..."`.

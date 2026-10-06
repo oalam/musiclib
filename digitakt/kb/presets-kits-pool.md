@@ -66,3 +66,13 @@ EMPTY`, puis changer le kick dans un seul des deux : vérifier que l'autre
 garde l'original.
 
 Source : manuel DT2 OS 1.17, §5, §9.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=930) : « Presets » (15:30) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=1442) : « Kits » (24:02) · DT2, 2024
+- [Daddy Long Les — Lessons For Complete Beginners 1 : Samples & Presets](https://youtu.be/NSZabPi5qLA?t=1193) : « THE PRESET POOL » (19:53) · DT2, 2025
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=4169) : « Saving presets to the Preset Pool » (1:09:29) · DT2, 2024
+- [Synthackers — Comprehensive Guide to Sample Management](https://youtu.be/aTq7VydK8Bk?t=820) : « Transfer - Managing Samples » (13:40) · DT2, 2024

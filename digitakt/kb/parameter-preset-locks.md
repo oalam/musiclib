@@ -61,3 +61,13 @@ Sur un hat 16e, locker `FREQ` différemment sur 4 trigs, puis `[TRIG] +
 [YES]` sur chacun pour entendre la préécoute avec locks.
 
 Source : manuel DT2 OS 1.17, §9.1.1, §10.8.1, §10.8.2, §11.2.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=6108) : « Param Locks » (1:41:48) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=6419) : « Preset Locks » (1:46:59) · DT2, 2024
+- [Synthackers — Digitakt II Parameter Locks Explained](https://youtu.be/gPTynHFzAyA) (vidéo entière) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=4257) : « Multiple presets on one track » (1:10:57) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=4544) : « Trig mode - Preset Pool » (1:15:44) · DT2, 2024

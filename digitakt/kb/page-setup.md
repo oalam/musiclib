@@ -64,3 +64,11 @@ Passer en PER TRACK, mettre la track 4 (hats) sur 12 pas et le kick sur 16 :
 écouter le décalage, puis `RESET` sur 48 et entendre la remise en phase.
 
 Source : manuel DT2 OS 1.17, §10.7, §17.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Synthackers — Optimise Your Workflow with Sequencer Page Setup](https://youtu.be/5zCFR5911zY) (vidéo entière) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=2799) : « Pattern & Track Length » (46:39) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=2456) : « Set pattern pages per track » (40:56) · DT2, 2024

@@ -8,6 +8,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.F] Fiches KB : section **Vidéos** (tutos YouTube horodatés au chapitre :
+  XNB, True Cuckoo, Synthackers…) sur le lot 1 et `parameter-preset-locks` ;
+  liens externes du panneau KB ouverts dans un nouvel onglet.
 - [7.H] Vue d'ensemble : ligne **Accords** en tête de grille, un accord par
   mesure du pattern (passage en cours, sinon le premier), mesure jouée
   encadrée, opacité = confiance.

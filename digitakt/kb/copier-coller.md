@@ -62,3 +62,11 @@ A04 (`[PTN]`, `[TRIG 4] + [PLAY]`) et annuler en refaisant la même
 combinaison.
 
 Source : manuel DT2 OS 1.17, §6.4, §10.1.1, §17.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=3526) : « Copy, Paste » (58:46) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3766) : « Copy/ Paste Patterns and tracks » (1:02:46) · DT2, 2024
+- [soffter — Every Elektron Copy & Paste & Undo Function](https://youtu.be/c9E55vhiGPs) (vidéo entière) · Elektron, générique, 2023
