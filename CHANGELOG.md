@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.C] Vue patterns façon Digitakt II, calquée sur la façade : écran bleu
+  à bandeau inversé, 16 trig keys en 2 rangées de 8 (chiffre souligné, LED en
+  contour rouge, une track à la fois, clic = saut au pas), LEDs de page 2 × 4
+  + PAGE / FOLLOW, colonne TRK / MUTE / PTN (sélection de track, état des
+  mutes de la phrase en cours, slots de la bank avec lettre A-P mémorisée par
+  morceau) et nommage des patterns A01-P16. La grille multi-tracks devient une
+  vue d'ensemble secondaire.
 - [7.D] `kb.py` : corpus KB (`digitakt/kb/*.md`) + doctrine découpé en
   sections, recherche plein texte insensible aux accents ; routes
   `/api/kb/search` et `/api/kb/note` (chemins limités au corpus).

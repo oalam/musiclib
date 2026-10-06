@@ -683,12 +683,16 @@ python api.py &   puis   cd ../web && npm run dev
   ÷2 / ×2, `L` = on/off, `Échap` = retirer.
 - **Structure** : quand une bank existe, la bande sous l'onde affiche les
   sections déduites des tracks (au lieu de celles du sidecar).
-- **Bank Digitakt** : slots 01-16 (clic = saut au début de la 1re section
-  jouée par le slot), **chaîne** (ordre de jeu, clic = saut à la section,
-  passage en cours encadré), pages
-  1-8 de 16 pas ou vue « tout », grille 16 tracks avec vélocité en opacité et
-  note au survol, **curseur de pas synchronisé avec la lecture**, tracks mutées
-  dans la phrase en cours grisées (`M`). Partition de mutes cliquable.
+- **Bank Digitakt, façade DT2** : écran à bandeau (`A01 INTRO ♩161.5`),
+  **16 trig keys en 2 rangées de 8** pour la track sélectionnée (contour
+  rouge = trig, intensité = vélocité, note sur les tracks 9-16, pas joué
+  éclairci, clic = saut au pas), LEDs de page 2 × 4 + PAGE / FOLLOW, colonne
+  **TRK** (choisir la track), **MUTE** (vert = track active dans la phrase en
+  cours), **PTN** (slots de la bank, lettre A-P mémorisée par morceau dans le
+  navigateur). Patterns nommés A01-P16. Dessous : **chaîne** (ordre de jeu,
+  clic = saut à la section), **vue d'ensemble** 16 tracks × tous les pas
+  (curseur synchronisé, tracks mutées grisées `M`), partition de mutes
+  cliquable.
 - **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py`,
   quelques secondes) : utile après `stems.py` ou une mise à jour de l'analyzer.
 
