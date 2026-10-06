@@ -641,6 +641,8 @@ python api.py &   puis   cd ../web && npm run dev
 - **Lecteur** : forme d'onde, **clic = position de lecture**, bande des
   sections de structure sous l'onde (mêmes couleurs que `visualize.py`, clic =
   début de section), boutons de cues. Espace = lecture / pause, flèches = ±10 s.
+  **Molette = zoom** (jusqu'à 600 px/s, la bande des sections suit), geste
+  horizontal du trackpad = défilement, bouton « Ajuster » pour revenir.
 - **Boucle** : **glisser sur la forme d'onde** crée une boucle calée sur un
   nombre entier de mesures (grille de la bank, recalée sur le kick ; sinon
   grille du sidecar). Poignées redimensionnables (recalage à chaque fois),
@@ -649,8 +651,8 @@ python api.py &   puis   cd ../web && npm run dev
   1-8 de 16 pas ou vue « tout », grille 16 tracks avec vélocité en opacité et
   note au survol, **curseur de pas synchronisé avec la lecture**, tracks mutées
   dans la phrase en cours grisées (`M`). Partition de mutes cliquable.
-- **Générer la bank** depuis le front si elle n'existe pas (appelle
-  `digitakt.py`, quelques secondes).
+- **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py`,
+  quelques secondes) : utile après `stems.py` ou une mise à jour de l'analyzer.
 
 **API** (127.0.0.1 uniquement ; un fichier n'est servi que pour un slug présent
 dans library.md) :

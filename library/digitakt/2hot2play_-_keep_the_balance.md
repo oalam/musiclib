@@ -2,7 +2,7 @@
 tags: [digitakt, bank, draft]
 slug: 2hot2play_-_keep_the_balance
 bpm: 152.0
-generated: 2026-10-06T11:05:20+00:00
+generated: 2026-10-06T11:09:16+00:00
 ---
 
 # Bank — 2HOT2PLAY — Keep The Balance

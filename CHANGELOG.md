@@ -6,6 +6,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+## [0.10.0] - 2026-10-06
+
+### Ajouté
+
+- [7.C] Zoom à la molette dans le lecteur (bande des sections synchronisée sur
+  la fenêtre visible, bouton « Ajuster »).
+- [7.C] Bouton « Régénérer la bank » quand une bank existe déjà.
+
 ## [0.9.0] - 2026-10-06
 
 ### Ajouté

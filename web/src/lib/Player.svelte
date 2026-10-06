@@ -24,6 +24,42 @@
   let loopOn = $state(true)
   let prevTime = 0
 
+  // zoom molette : px par seconde (0 = ajuste a la largeur)
+  let zoom = $state(0)
+  let viewStart = $state(0)
+  let viewEnd = $state(0)
+  const MAX_ZOOM = 600
+
+  function fitZoom(): number {
+    return duration > 0 ? container.clientWidth / duration : 1
+  }
+
+  function updateView(start?: number, end?: number) {
+    if (start !== undefined && end !== undefined) {
+      viewStart = start
+      viewEnd = end
+      return
+    }
+    const px = zoom > 0 ? zoom : fitZoom()
+    viewStart = (ws?.getScroll() ?? 0) / px
+    viewEnd = viewStart + container.clientWidth / px
+  }
+
+  function setZoom(next: number) {
+    const fit = fitZoom()
+    zoom = next <= fit * 1.01 ? 0 : Math.min(MAX_ZOOM, next)
+    ws?.zoom(zoom)
+    requestAnimationFrame(() => updateView())
+  }
+
+  function onwheel(e: WheelEvent) {
+    // geste horizontal (trackpad) : on laisse defiler ; vertical : zoom
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) || duration <= 0) return
+    e.preventDefault()
+    const current = zoom > 0 ? zoom : fitZoom()
+    setZoom(current * Math.exp(-e.deltaY * 0.002))
+  }
+
   /** Saute a `t` secondes (appele par la vue bank / la partition de mutes). */
   export function seek(t: number) {
     ws?.setTime(t)
@@ -71,6 +107,12 @@
     loop = null
   }
 
+  // non passif : sinon preventDefault est ignore et la page defile en zoomant
+  $effect(() => {
+    container.addEventListener('wheel', onwheel, { passive: false })
+    return () => container.removeEventListener('wheel', onwheel)
+  })
+
   $effect(() => {
     const slug = track.slug
     loading = true
@@ -94,7 +136,10 @@
     inst.on('ready', () => {
       loading = false
       duration = inst.getDuration()
+      zoom = 0
+      updateView(0, duration)
     })
+    inst.on('scroll', (start, end) => updateView(start, end))
     // glisser sur la forme d'onde = nouvelle boucle ; un simple clic = seek
     reg.enableDragSelection({ color: 'rgba(232, 89, 12, 0.22)' }, 4)
     reg.on('region-created', region => {
@@ -160,15 +205,17 @@
 
   {#if duration > 0}
     <div class="sections" aria-label="Sections">
-      {#each track.segments as s}
+      {#each track.segments.filter(s => s.end_s > viewStart && s.start_s < viewEnd) as s}
         <button class="section" title="{s.label} · {mmss(s.start_s)}"
-          style="left: {(s.start_s / duration) * 100}%; width: {((s.end_s - s.start_s) / duration) * 100}%; --c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
+          style="left: {((Math.max(s.start_s, viewStart) - viewStart) / (viewEnd - viewStart)) * 100}%; width: {((Math.min(s.end_s, viewEnd) - Math.max(s.start_s, viewStart)) / (viewEnd - viewStart)) * 100}%; --c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
           onclick={() => seek(s.start_s)}>{s.label}</button>
       {/each}
     </div>
   {/if}
 
   <div class="tools">
+    <span class="mono small muted">zoom {zoom > 0 ? `x${(zoom / fitZoom()).toFixed(1)}` : 'ajusté'}</span>
+    {#if zoom > 0}<button class="small" onclick={() => setZoom(0)}>Ajuster</button>{/if}
     {#if loop}
       <button class:on={loopOn} onclick={() => (loopOn = !loopOn)}>Boucle {loopOn ? 'ON' : 'OFF'}</button>
       <span class="mono small">
@@ -190,7 +237,7 @@
 
   {#if loading}<p class="muted small">Chargement et décodage de l'audio…</p>{/if}
   {#if error}<p class="small err">Erreur audio : {error}</p>{/if}
-  <p class="muted small">Clic : position · glisser : boucle · Espace : lecture / pause · flèches : ±10 s · L : boucle on/off · Échap : retirer la boucle</p>
+  <p class="muted small">Clic : position · glisser : boucle · molette : zoom · Espace : lecture / pause · flèches : ±10 s · L : boucle on/off · Échap : retirer la boucle</p>
 </section>
 
 <style>
@@ -201,7 +248,7 @@
   .transport { display: flex; align-items: center; gap: 10px; }
   .wave { width: 100%; }
   .wave :global([part~="region-content"]) { font-size: 11px; padding: 2px 4px; color: var(--accent); font-weight: 600; }
-  .sections { position: relative; height: 18px; margin-top: 4px; }
+  .sections { position: relative; height: 18px; margin-top: 4px; overflow: hidden; }
   .section {
     position: absolute; top: 0; height: 18px; padding: 0 4px; border: 0; border-radius: 0;
     background: color-mix(in srgb, var(--c) 35%, transparent);
