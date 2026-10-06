@@ -6,6 +6,24 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+## [0.8.0] - 2026-10-06
+
+### Ajouté
+
+- [7.C] API locale `scripts/api.py` (FastAPI, 127.0.0.1) : liste et détail des
+  tracks, audio avec Range, lecture et génération des banks Digitakt.
+- [7.C] Front POC `web/` (Svelte 5 + Vite + wavesurfer.js) : library filtrable,
+  lecteur avec sections cliquables, vue bank 16 tracks x 128 pas avec curseur
+  synchronisé à la lecture, tracks mutées grisées, partition de mutes cliquable.
+- Tests `tests/test_api.py` (library factice).
+- Dépendances `fastapi`, `uvicorn`, `httpx` dans `requirements.txt`.
+
+### Corrigé
+
+- [7.B] Partition de mutes : les phrases repartent à chaque début de section ;
+  avant, une phrase pouvait chevaucher deux patterns et afficher le kick muté
+  alors qu'il jouait.
+
 ## [0.7.0] - 2026-10-06
 
 ### Ajouté

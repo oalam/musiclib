@@ -378,7 +378,7 @@ mutes, FX de transition, principes d'arc).
 |---|---|---|
 | 7.A | Doctrine `digitakt/doctrine.md` | fait |
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
-| 7.C | Front POC : FastAPI + Svelte/Vite + wavesurfer.js (lib, lecteur, vue bank) ; natif Mac ensuite via Tauri | à venir |
+| 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
@@ -391,6 +391,8 @@ mutes, FX de transition, principes d'arc).
 - Id1 / Id2 jamais remplies automatiquement.
 - Sortie MIDI : canal = track, à enregistrer en live recording (la DT2
   n'importe pas de fichier de pattern).
+- Partition de mutes : les phrases repartent à chaque début de section (une
+  phrase ne chevauche jamais deux patterns).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

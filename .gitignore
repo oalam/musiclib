@@ -22,3 +22,7 @@ library/renoise/
 
 # Draft Digitakt : MIDI par pattern (régénérable via digitakt.py)
 library/digitakt/*/
+
+# Front : dépendances et build
+web/node_modules/
+web/dist/

@@ -616,6 +616,53 @@ hats ouverts sur-détectés quand la reverb tient. Id1 / Id2 sont à choisir à
 l'oreille. Les mutes à l'intérieur d'une section diluent le repliage (trous
 dans le kick).
 
+# api.py + web/ — front de la library (Phase 7.C)
+
+POC web local : parcourir la library, écouter un morceau et naviguer dedans,
+voir sa bank Digitakt comme sur la machine. Backend FastAPI (`scripts/api.py`),
+front Svelte 5 + Vite + wavesurfer.js (`web/`). Le passage en app native Mac
+se fera via Tauri en reprenant `web/` tel quel.
+
+```bash
+# Une fois : dépendances
+pip install -r requirements.txt          # fastapi, uvicorn, httpx
+cd ../web && npm install && npm run build && cd ../scripts
+
+# Lancer : API + front buildé sur http://127.0.0.1:8765
+python api.py
+
+# Dev du front (hot reload sur http://localhost:5173, proxy /api → 8765)
+python api.py &   puis   cd ../web && npm run dev
+```
+
+**Ce que fait le front** :
+- **Library** : 386 tracks, filtre texte (artiste, titre, genre, key, mood),
+  tri BPM / key / energy, filtres « a des stems » / « a une bank ».
+- **Lecteur** : forme d'onde, sections de structure colorées (mêmes couleurs que
+  `visualize.py`) cliquables, boutons de cues. Espace = lecture / pause,
+  flèches = ±10 s.
+- **Bank Digitakt** : slots 01-16 (clic = saut au début de la section), pages
+  1-8 de 16 pas ou vue « tout », grille 16 tracks avec vélocité en opacité et
+  note au survol, **curseur de pas synchronisé avec la lecture**, tracks mutées
+  dans la phrase en cours grisées (`M`). Partition de mutes cliquable.
+- **Générer la bank** depuis le front si elle n'existe pas (appelle
+  `digitakt.py`, quelques secondes).
+
+**API** (127.0.0.1 uniquement ; un fichier n'est servi que pour un slug présent
+dans library.md) :
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/tracks` | liste (`TrackSummary`) |
+| GET | `/api/tracks/{slug}` | détail + segments + cues |
+| GET | `/api/tracks/{slug}/audio` | fichier audio (requêtes Range pour le seek) |
+| GET | `/api/tracks/{slug}/bank` | `DigitaktBank` (404 si absente) |
+| POST | `/api/tracks/{slug}/bank` | génère la bank |
+
+**Limites** : le curseur de pas utilise le tempo médian de la bank, il peut
+flotter un peu sur un morceau qui accélère. La forme d'onde est décodée dans le
+navigateur (quelques secondes sur un morceau long).
+
 # stems.py — séparation Demucs (Phase 6.B)
 
 Sépare chaque track en 4 stems via Demucs (Meta, modèle htdemucs) :
