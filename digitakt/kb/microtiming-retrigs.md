@@ -62,3 +62,12 @@ Même trig de snare, comparer `RATE` 1/16, 1/32, 1/12 avec `VFAD` +64, puis
 presets (`[TRIG] + [PRESET/KIT]`).
 
 Source : manuel DT2 OS 1.17, §7.3, §10.4, §10.5, §11.3.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=4403) : « Retrigger » (1:13:23) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=4057) : « Trig Page » (1:07:37) · DT2, 2024
+- [Braintree56 — Micro-Timing + Retrigs](https://youtu.be/MSUI7-RuNw8?t=112) : « Using the micro time menu » (1:52) · DT1, principe identique, 2023
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1937) : « Add fast hi-hats in no-time » (32:17) · DT2, 2024

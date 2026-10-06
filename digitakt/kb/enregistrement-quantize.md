@@ -65,3 +65,13 @@ passer en LIVE avec quantize auto coupée, jouer un rim sur la track 7, et
 monter la quantize TRACK jusqu'à entendre le calage.
 
 Source : manuel DT2 OS 1.17, §10.2, §10.6, §17.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Synthackers — Mastering Recording Modes](https://youtu.be/VOXnpUoH_nQ) (vidéo entière) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=1749) : « LIVE recording » (29:09) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=2220) : « GRID recording » (37:00) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=1356) : « Quantising live recording » (22:36) · DT2, 2024
+- [Braintree56 — Recording Modes, Note Locks, Trig Locks](https://youtu.be/3ClMEjaKO5A?t=700) : « Step Recording » (11:40) · DT1, principe identique, 2023

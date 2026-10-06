@@ -64,3 +64,12 @@ enregistrer en LIVE sur la track 1. Puis tester l'envoi des 16 canaux d'un
 coup et noter le résultat ici (passer `statut` à `vérifié`).
 
 Source : manuel DT2 OS 1.17, §10.2.3, §14.4.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Optoproductions — Digitakt 2 MIDI Setup](https://youtu.be/noEAqTsXL8M) (vidéo entière) · DT2, 2024
+- [EZBOT — The Elektron MIDI Syncing Guide](https://youtu.be/i69tj48vfxM?t=173) : « What is Auto Channel? » (2:53) · Elektron, générique, 2023
+- [Synthackers — Mastering Recording Modes](https://youtu.be/VOXnpUoH_nQ?t=1070) : « Using an External Keyboard » (17:50) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1330) : « MIDI learn » (22:10) · DT2, 2024

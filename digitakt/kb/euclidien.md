@@ -61,3 +61,12 @@ Track 7 en 3/8, track 8 en 5/16, puis tourner `TRO` de la track 8 sur une
 boucle de 4 mesures et noter les deux réglages qui sonnent le mieux.
 
 Source : manuel DT2 OS 1.17, §10.3, §10.7.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=3710) : « Euclidean sequencer » (1:01:50) · DT2, 2024
+- [Synthackers — Digitakt II Euclidean Mode](https://youtu.be/uUjW6s3nuug) (vidéo entière) · DT2, 2024
+- [Optoproductions — Digitakt 2 Euclidean Sequencer Tutorial](https://youtu.be/j29cOWAzDyY) (vidéo entière) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=750) : « Euclidean seq » (12:30) · DT2, 2024
