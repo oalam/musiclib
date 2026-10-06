@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
+  import { tick, type Snippet } from 'svelte'
   import { api, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type ManualRef, type Pattern } from './api'
   import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
 
@@ -212,6 +212,27 @@
     // [PTN] + [LEFT]/[RIGHT] change de bank, comme sur la machine
     if (mode === 'ptn') setBankLetter((bankLetter + dir + 16) % 16)
   }
+
+  // vue d'ensemble : quand le curseur sort de la partie visible, la grille defile
+  // jusqu'a la mesure en cours (calee a gauche) ; seulement en FOLLOW
+  let gridWrap: HTMLDivElement | undefined = $state()
+  $effect(() => {
+    const step = currentStep
+    if (!follow || step < 0 || !gridWrap) return
+    const wrap = gridWrap
+    const barStep = step - (step % bank.steps_per_bar)
+    tick().then(() => {
+      const cell = wrap.querySelector<HTMLElement>(`.cell[data-s="${step}"]`)
+      const bar = wrap.querySelector<HTMLElement>(`.cell[data-s="${barStep}"]`)
+      const label = wrap.querySelector<HTMLElement>('.label')
+      if (!cell || !bar || !label) return
+      const left = wrap.scrollLeft + label.offsetWidth
+      const right = wrap.scrollLeft + wrap.clientWidth
+      if (cell.offsetLeft < left || cell.offsetLeft + cell.offsetWidth > right) {
+        wrap.scrollTo({ left: bar.offsetLeft - label.offsetWidth, behavior: 'smooth' })
+      }
+    })
+  })
 
   function pressKey(i: number) {
     if (help) { act('trigs'); return }
@@ -445,7 +466,7 @@
   {/if}
 
   <h2>Vue d'ensemble <span class="muted small">({patName(pattern.slot)}, toutes les tracks, clic = sélection)</span></h2>
-  <div class="grid-wrap">
+  <div class="grid-wrap" bind:this={gridWrap}>
     <div class="grid" style="--cols: {pattern.steps}">
       {#each pattern.tracks as t (t.index)}
         {@const muted = liveActive !== null && t.trigs.length > 0 && !liveActive.has(t.index)}
@@ -456,7 +477,7 @@
         </button>
         {#each Array(pattern.steps) as _, s}
           {@const trig = trigAt(t, s)}
-          <div class="cell" class:beat={s % 4 === 0} class:pagestart={s % 16 === 0 && s > 0}
+          <div class="cell" data-s={s} class:beat={s % 4 === 0} class:pagestart={s % 16 === 0 && s > 0}
             class:cursor={s === currentStep} class:melodic={t.index > 8} class:muted
             class:trig={!!trig}
             style={trig ? `--v: ${0.35 + (0.65 * trig.velocity) / 127}` : ''}
@@ -643,13 +664,14 @@
   .legend .hint { margin-top: 4px; }
 
   .grid-wrap, .mutes-wrap { overflow-x: auto; max-width: 100%; }
+  .grid-wrap { position: relative; }
   .grid {
     display: grid;
     grid-template-columns: 130px repeat(var(--cols), minmax(9px, 1fr));
     gap: 2px 1px;
     min-width: calc(130px + var(--cols) * 10px);
   }
-  .label { all: unset; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 6px; line-height: 18px; }
+  .label { all: unset; position: sticky; left: 0; z-index: 1; background: var(--panel); cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 6px; line-height: 18px; }
   .label.empty { color: var(--muted); opacity: 0.6; }
   .label.muted { opacity: 0.45; }
   .label.sel { color: var(--accent); }

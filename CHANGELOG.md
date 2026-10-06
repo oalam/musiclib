@@ -62,6 +62,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.G] Vue d'ensemble : défilement horizontal automatique jusqu'à la mesure
+  en cours quand la lecture sort de la partie visible (en FOLLOW), colonne
+  des noms de tracks figée.
 - [7.G] Vue bank en deux colonnes dès 1150 px de large : DT2 et légende à
   gauche, figées au défilement et dimensionnées sur la hauteur de l'écran ;
   lecteur, chaîne, vue d'ensemble et mutes à droite. En dessous, empilement.
