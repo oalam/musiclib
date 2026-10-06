@@ -757,7 +757,9 @@ python api.py &   puis   cd ../web && npm run dev
   clavier chromatique (rangée basse = blanches, haute = noires) : notes de la
   gamme éclairées, fondamentale en rouge, notes de l'accord en vert. Dans la
   **vue d'ensemble**, bouton **Notes** : nom de la note sur les tracks 9-16
-  quand elle change (ou en début de mesure), contour = note hors gamme.
+  quand elle change (ou en début de mesure), contour = note hors gamme ; ligne
+  **Accords** en tête de grille, un accord par mesure du pattern (passage en
+  cours, sinon le premier ; mesure jouée encadrée).
 - **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py` puis
   `harmony.py` sur la nouvelle grille, une vingtaine de secondes) : utile après
   `stems.py` ou une mise à jour de l'analyzer. Un échec de l'harmonie n'empêche

@@ -153,6 +153,17 @@
     return out
   })
 
+  /** Accord de chaque mesure du pattern, pris sur le passage en cours (sinon le premier). */
+  const barChords = $derived.by(() => {
+    if (!harmony) return []
+    const base = playingPattern?.slot === pattern.slot ? playingStart : pattern.start_s
+    const b0 = barAt(base + 0.01)
+    return [...Array(pattern.bars).keys()].map(k => {
+      const t = b0 >= 0 && b0 + k < bars.length ? bars[b0 + k] : base + k * bank.steps_per_bar * stepDur
+      return chordAt(harmony.chords, t + 0.01)
+    })
+  })
+
   function trigAt(track: BankTrack, step: number) {
     return track.trigs.find(t => t.step === step)
   }
@@ -548,6 +559,17 @@
       title="Nom de la note sur les tracks 9-16 quand elle change ; contour = hors gamme (si analyse harmonique)">Notes</button></p>
   <div class="grid-wrap" bind:this={gridWrap}>
     <div class="grid" style="--cols: {pattern.steps}">
+      {#if barChords.length}
+        <span class="label chordlabel" title="Accord de chaque mesure (analyse harmonique 7.H)">Accords</span>
+        {#each barChords as c, k}
+          <div class="barchord mono" class:none={!c || c.label === 'N'}
+            class:cur={currentStep >= 0 && Math.floor(currentStep / bank.steps_per_bar) === k}
+            style="grid-column: span {bank.steps_per_bar}; --o: {0.35 + 0.65 * (c?.confidence ?? 0)}"
+            title={c ? `mesure ${c.bar + 1} · ${c.label === 'N' ? 'pas de contenu tonal' : c.label} · confiance ${c.confidence}` : ''}>
+            {c && c.label !== 'N' ? c.label : '–'}
+          </div>
+        {/each}
+      {/if}
       {#each pattern.tracks as t (t.index)}
         {@const muted = liveActive !== null && t.trigs.length > 0 && !liveActive.has(t.index)}
         <button class="label" class:empty={!t.trigs.length} class:muted class:sel={t.index === track.index}
@@ -766,6 +788,15 @@
   .idx { display: inline-block; width: 18px; color: var(--rhythm); }
   .idx.melodic { color: var(--melodic); }
   .m { font-size: 10px; margin-left: 4px; padding: 0 3px; border: 1px solid var(--muted); border-radius: 2px; }
+  .chordlabel { cursor: default; color: var(--muted); }
+  .barchord {
+    height: 18px; line-height: 18px; padding-left: 4px; font-size: 11px; font-weight: 600; overflow: hidden; white-space: nowrap;
+    border-left: 2px solid var(--melodic); border-radius: 2px;
+    background: color-mix(in srgb, var(--melodic) calc(var(--o) * 18%), transparent);
+  }
+  .barchord + .barchord { margin-left: 4px; }
+  .barchord.none { color: var(--muted); font-weight: 400; border-left-color: var(--border); background: transparent; }
+  .barchord.cur { outline: 2px solid var(--accent); outline-offset: -1px; }
   .cell { position: relative; height: 18px; background: var(--cell-off); border-radius: 2px; }
   .cell.beat { box-shadow: inset 0 -2px 0 var(--border); }
   .cell.pagestart { margin-left: 4px; }
