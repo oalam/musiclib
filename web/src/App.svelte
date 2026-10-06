@@ -12,6 +12,7 @@
   let bankState = $state<'idle' | 'loading' | 'missing' | 'generating' | 'error'>('idle')
   let bankError = $state('')
   let currentTime = $state(0)
+  let playing = $state(false)
   let listError = $state('')
   let player: Player | undefined = $state()
   let kbPanel: KbPanel | undefined = $state()
@@ -66,7 +67,7 @@
   <main>
     {#if detail}
       {#key detail.slug}
-        <Player bind:this={player} track={detail} bind:currentTime
+        <Player bind:this={player} track={detail} bind:currentTime bind:playing
           bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times}
           sections={bank?.sections?.length ? bank.sections : undefined} />
       {/key}
@@ -78,7 +79,9 @@
           </button>
           {#if bankState === 'error'}<span class="err">{bankError}</span>{/if}
         </div>
-        <BankView {bank} {currentTime} onseek={t => player?.seek(t)} />
+        <BankView {bank} {currentTime} {playing} onseek={t => player?.seek(t)}
+          onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
+          onhelp={(path, page) => (path ? kbPanel?.openPath(path) : page && kbPanel?.openManual(page))} />
       {:else if bankState === 'missing' || bankState === 'error'}
         <div class="empty">
           <p>Pas encore de bank Digitakt pour ce morceau.

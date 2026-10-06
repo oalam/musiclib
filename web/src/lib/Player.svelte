@@ -3,20 +3,21 @@
   import RegionsPlugin, { type Region } from 'wavesurfer.js/plugins/regions'
   import { api, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
 
-  let { track, bars = [], sections, currentTime = $bindable(0) }: {
+  let { track, bars = [], sections, currentTime = $bindable(0), playing = $bindable(false) }: {
     track: TrackDetail
     /** Debuts de mesure (s) : la boucle se cale dessus. Vide = pas de calage. */
     bars?: number[]
     /** Structure a afficher (celle de la bank) ; defaut = segments du sidecar. */
     sections?: { start_s: number; end_s: number; label: string }[]
     currentTime?: number
+    /** Etat de lecture, lu par le transport de la facade (7.G). */
+    playing?: boolean
   } = $props()
 
   let container: HTMLDivElement
   let ws: WaveSurfer | null = null
   let regions: RegionsPlugin | null = null
   let loopRegion: Region | null = null
-  let playing = $state(false)
   let duration = $state(0)
   let loading = $state(true)
   let error = $state<string | null>(null)
@@ -64,6 +65,17 @@
 
   /** Saute a `t` secondes (appele par la vue bank / la partition de mutes). */
   export function seek(t: number) {
+    ws?.setTime(t)
+  }
+
+  /** [PLAY] de la facade : lecture / pause, comme un second appui sur la machine. */
+  export function playPause() {
+    ws?.playPause()
+  }
+
+  /** [STOP] de la facade : arret et retour en `t` (debut du pattern en cours). */
+  export function stop(t: number) {
+    ws?.pause()
     ws?.setTime(t)
   }
 

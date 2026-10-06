@@ -108,6 +108,13 @@ def test_api_note_refuses_path_outside_corpus(vault: Path):
         assert client.get("/api/kb/note", params={"path": path}).status_code == 404
 
 
+def test_api_manual_outline(vault: Path):
+    client = TestClient(api.create_app())
+    res = client.get("/api/manual/outline")
+    assert res.status_code == 200 and res.json()["12.6"] == {
+        "section": "12.6", "title": "COMPRESSOR", "page": 65}
+
+
 def test_parse_frontmatter():
     fm = kb.parse_frontmatter(NOTE)
     assert fm["manuel"] == "§10.8.4, §12.6-12.9 (p49)" and fm["lot"] == "2"

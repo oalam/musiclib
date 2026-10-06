@@ -145,6 +145,7 @@ export const api = {
   kbSearch: (q: string) => fetch(`/api/kb/search?q=${enc(q)}`).then(r => json<KbHit[]>(r)),
   kbNote: (path: string) => fetch(`/api/kb/note?path=${enc(path)}`).then(r => json<KbNote>(r)),
   kbToc: () => fetch('/api/kb/toc').then(r => json<KbLot[]>(r)),
+  manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }
 
 /** Minuscules sans accents (meme regle que kb.normalize). */

@@ -165,6 +165,11 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
     def kb_toc() -> list[kb.KbLot]:
         return kb.table_of_contents()
 
+    @app.get("/api/manual/outline", response_model=dict[str, kb.ManualRef])
+    def manual_outline() -> dict[str, kb.ManualRef]:
+        """Sommaire du manuel (§ -> page) pour les liens de la facade (7.G) ; {} sans PDF."""
+        return kb.manual_outline()
+
     @app.get("/api/manual")
     def manual() -> FileResponse:
         """Manuel PDF local (chemin fixe), ouvert a la page voulue par `#page=N`."""

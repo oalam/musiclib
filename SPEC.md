@@ -384,7 +384,7 @@ mutes, FX de transition, principes d'arc).
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | fait : recherche + panneau, 25 fiches en 5 lots (statut draft, à tester sur la machine) |
 | 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | à venir |
 | 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
-| 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | à venir |
+| 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 
 **Décisions 7.B** :
 - 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des
@@ -450,6 +450,27 @@ abandonné ; 7.E devient un enregistrement assisté (le script rejoue chaque
 piste du `.mid` sur l'AUTO CHANNEL pendant que la DT2 enregistre, une track à
 la fois) et un pré-réglage des sons par CC / NRPN. Piste non retenue : le
 SYSEX DUMP de pattern (§14.5), format non documenté.
+
+**Décisions 7.G (arbitrées le 2026-10-06)** :
+- Les 23 contrôles du §3.1 sont dessinés, fonctions secondaires en orange.
+  Ce qui a un sens dans le front agit : PLAY (lecture / pause), STOP (retour
+  au début du pattern en cours), TRK, `[FUNC]` + TRK (MUTE), PTN et
+  `[LEFT]`/`[RIGHT]` (lettre de bank), PAGE, LEDs de page, touches PARAMETER
+  (appuis successifs = page suivante). Les autres affichent leur légende.
+- `[FUNC]` est une bascule (pas de maintien à la souris) ; bouton AIDE (propre
+  au front, comme FOLLOW) : un clic sur un contrôle ouvre sa fiche, ou le
+  manuel à défaut. Survol = légende (fonction, FUNC, fiche, § et page).
+- Potards A-H : noms des paramètres de la page active (§11, machines par
+  défaut ONESHOT et MULTI-MODE), valeurs `--` sauf NOTE / VEL du pas courant
+  (seules valeurs connues de la bank). Pas de valeur éditable.
+- Pilotage MIDI : table de mapping seule (CC / NRPN de l'annexe B, affichés
+  dans la légende), aucun envoi ; l'envoi reste en 7.E. Hub :
+  `web/src/lib/dt2.ts` ; si 7.E en a besoin côté Python, le déplacer en JSON
+  partagé plutôt que dupliquer.
+- Ordre des knobs = ordre du texte du manuel, à vérifier sur la machine
+  (TRIG 2, FLTR 2, AMP à 9 paramètres) ; numéros FX / FLT.T / LFO.T sans
+  colonne sûre dans l'extraction de l'annexe, signalés « à vérifier ».
+- Route `/api/manual/outline` (§ → page) pour résoudre les liens de la façade.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

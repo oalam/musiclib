@@ -700,10 +700,17 @@ python api.py &   puis   cd ../web && npm run dev
 - **Bank Digitakt, façade DT2** : écran à bandeau (`A01 INTRO ♩161.5`),
   **16 trig keys en 2 rangées de 8** pour la track sélectionnée (contour
   rouge = trig, intensité = vélocité, note sur les tracks 9-16, pas joué
-  éclairci, clic = saut au pas), LEDs de page 2 × 4 + PAGE / FOLLOW, colonne
-  **TRK** (choisir la track), **MUTE** (vert = track active dans la phrase en
-  cours), **PTN** (slots de la bank, lettre A-P mémorisée par morceau dans le
-  navigateur). Patterns nommés A01-P16. Dessous : **chaîne** (ordre de jeu,
+  éclairci, clic = saut au pas), LEDs de page 2 × 4 + PAGE / FOLLOW, touches
+  **TRK** (choisir la track), `[FUNC]` + TRK = **MUTE** (vert = track active
+  dans la phrase en cours), **PTN** (slots de la bank, lettre A-P mémorisée
+  par morceau dans le navigateur, flèches gauche / droite = bank). Patterns
+  nommés A01-P16.
+- **Façade complète (7.G)** : les 23 contrôles du §3.1 du manuel, fonctions
+  secondaires en orange ; **PLAY / STOP** pilotent le lecteur, **FUNC** est
+  une bascule, les touches **TRIG / SRC / FLTR / AMP / FX / MOD** changent la
+  page des knobs A-H (noms du §11, NOTE / VEL du pas courant). Survol = légende
+  (fonction, CC / NRPN, fiche, § du manuel) ; **AIDE ?** = un clic ouvre la
+  fiche. Données dans `web/src/lib/dt2.ts`. Dessous : **chaîne** (ordre de jeu,
   clic = saut à la section), **vue d'ensemble** 16 tracks × tous les pas
   (curseur synchronisé, tracks mutées grisées `M`), partition de mutes
   cliquable.
@@ -723,6 +730,7 @@ dans library.md) :
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
 | GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
 | GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
+| GET | `/api/manual/outline` | sommaire du manuel, § → page (`ManualRef`) ; `{}` sans PDF |
 | GET | `/api/manual` | manuel PDF (chemin fixe, 404 s'il manque) |
 
 **Limites** : la forme d'onde est décodée dans le navigateur (quelques secondes

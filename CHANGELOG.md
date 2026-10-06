@@ -8,6 +8,17 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.G] Façade Digitakt II complète : les 23 contrôles du §3.1 (VOLUME,
+  LEVEL/DATA, PRESET/KIT, SETTINGS, SAMPLING, TEMPO, NO/YES, knobs A-H,
+  touches PARAMETER, flèches, PAGE, RECORD/PLAY/STOP, TRK/PTN/SONG, FUNC,
+  KEYBOARD) avec fonctions secondaires en orange. PLAY / STOP pilotent le
+  lecteur, `[FUNC]` + TRK ouvre le mode MUTE, PTN + flèches change la lettre
+  de bank, les touches PARAMETER changent la page des knobs (noms tirés du
+  §11, NOTE / VEL du pas courant lus dans la bank).
+- [7.G] Légende sous la façade (survol) : fonction, fonction FUNC, CC / NRPN
+  de l'annexe B pour chaque knob, liens vers la fiche KB et le § du manuel ;
+  bouton AIDE (un clic ouvre la fiche). Hub `web/src/lib/dt2.ts`, route
+  `/api/manual/outline`.
 - [7.F] KB intégrée au front : bandeau « Base de connaissance / Manuel PDF »,
   panneau ouvert sur le sommaire des fiches par lot (`/api/kb/toc`, noms de
   lots tirés du hub), wikilinks entre fiches cliquables.
