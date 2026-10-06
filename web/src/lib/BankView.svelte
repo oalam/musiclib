@@ -261,6 +261,8 @@
     </button>
   {/snippet}
 
+  <div class="cols">
+  <div class="col-dt">
   <div class="fronttools">
     <button class="small" class:on={help} title="Mode aide : un clic sur un contrôle ouvre sa fiche ou le manuel"
       onclick={() => (help = !help)}>Aide ?</button>
@@ -423,6 +425,9 @@
       {help ? 'AIDE active : un clic ouvre la fiche (ou le manuel).' : 'FUNC puis une touche = fonction secondaire ; AIDE ? = clic vers la fiche.'}</div>
   </div>
 
+  </div>
+
+  <div class="col-rest">
   <div class="deck">
   {@render player?.()}
   {#if sections.length}
@@ -478,11 +483,24 @@
       {/each}
     </div>
   </div>
+  </div>
+  </div>
 </section>
 
 <style>
-  .bank { padding: 12px 16px; display: flex; flex-direction: column; align-items: center; }
-  .bank > * { width: 100%; max-width: 900px; box-sizing: border-box; }
+  /* empile par defaut ; deux colonnes quand la place le permet (liste des morceaux
+     repliee ou grand ecran) : DT2 figee a gauche, a la hauteur de l'ecran, le reste a droite */
+  .bank { padding: 12px 16px; container-type: inline-size; }
+  .cols { display: flex; flex-direction: column; align-items: center; }
+  .col-dt, .col-rest { width: 100%; max-width: 900px; box-sizing: border-box; }
+  .col-rest > * { max-width: 100%; }
+  @container (min-width: 1150px) {
+    .cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+    .col-dt { position: sticky; top: 0; max-width: calc((100vh - 260px) * 834 / 682); justify-self: end; }
+    .col-rest { max-width: none; }
+    .col-rest .deck { margin-top: 0; }
+    .col-rest h2:first-of-type { margin-top: 18px; }
+  }
   .deck { margin-top: 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); padding: 0 12px 12px; }
   .deck .chain { margin-top: 10px; }
   .deck :global(.player) { border-bottom: 0; background: none; padding: 12px 0 0; }

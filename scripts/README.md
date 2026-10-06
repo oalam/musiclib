@@ -705,8 +705,10 @@ python api.py &   puis   cd ../web && npm run dev
   dans la phrase en cours), **PTN** (slots de la bank, lettre A-P mémorisée
   par morceau dans le navigateur, flèches gauche / droite = bank). Patterns
   nommés A01-P16.
-- **Mise en page** : façade DT2 en haut, puis un bloc lecteur + chaîne + vue
-  d'ensemble, centrés ; bouton **Morceaux** pour masquer la liste.
+- **Mise en page** : en large (≥ 1150 px), DT2 et légende à gauche, figées et
+  calées sur la hauteur de l'écran, lecteur + chaîne + vue d'ensemble + mutes à
+  droite ; en étroit, tout est empilé et centré. Bouton **Morceaux** pour
+  masquer la liste et gagner la largeur.
 - **Façade complète (7.G)** : les 23 contrôles du §3.1 du manuel, placés à
   l'échelle sur le dessin de la façade, fonctions
   secondaires en orange ; **PLAY / STOP** pilotent le lecteur, **FUNC** est

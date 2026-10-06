@@ -62,6 +62,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.G] Vue bank en deux colonnes dès 1150 px de large : DT2 et légende à
+  gauche, figées au défilement et dimensionnées sur la hauteur de l'écran ;
+  lecteur, chaîne, vue d'ensemble et mutes à droite. En dessous, empilement.
 - [7.G] Mise en page du front : DT2 en haut, centrée, sans les cadres gris
   autour des groupes de contrôles, touche FUNC en jaune ; lecteur, chaîne et
   vue d'ensemble réunis dans un seul bloc sous la façade (même largeur,
