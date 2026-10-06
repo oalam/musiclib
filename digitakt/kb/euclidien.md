@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Mode euclidien
 lot: 2
+ordre: 10
 manuel: "§10.3, §10.7 (p44-46)"
 os: "1.17"
 statut: draft

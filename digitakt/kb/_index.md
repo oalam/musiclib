@@ -12,12 +12,28 @@ de **préparation d'un set** : du projet vide au set prêt à jouer. Les
 conventions (grille des 16 tracks, banks, mutes, FX) restent dans
 [[../doctrine]] ; les fiches disent *comment le faire sur la machine*.
 
-Format d'une fiche : frontmatter (`theme`, `lot`, `manuel`, `os`, `statut`),
+Format d'une fiche : frontmatter (`theme`, `lot`, `ordre`, `manuel`, `os`, `statut`),
 puis *En une phrase*, *Gestes rapides*, *Pas à pas*, *En live techno*,
 *Pièges*, *À essayer (5 min)*. `statut: draft` passe à `vérifié` une fois
 testé sur la machine.
 
 Recherche : panneau `/` du front ou `python scripts/kb.py search "..."`.
+
+## Parcours dans l'ordre (Dataview)
+
+Fiches rédigées, triées par lot puis par `ordre` (le numéro des tableaux
+ci-dessous). Vue dynamique dans Obsidian (plugin Dataview) ; les tableaux
+statiques plus bas restent la liste de référence, thèmes à rédiger compris.
+
+```dataview
+TABLE WITHOUT ID ordre AS "#", file.link AS "Fiche", lot AS "Lot", statut AS "Statut"
+FROM "digitakt/kb"
+WHERE ordre
+SORT lot ASC, ordre ASC
+```
+
+Pour ne voir que ce qui reste à tester sur la machine : ajouter
+`AND statut = "draft"` à la ligne `WHERE`.
 
 ## Lot 1 — Poser le cadre du projet
 

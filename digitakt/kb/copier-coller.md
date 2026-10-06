@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Copier, coller, effacer
 lot: 1
+ordre: 3
 manuel: "§6.4, §10.1.1, §17 (p19, 40, 88)"
 os: "1.17"
 statut: draft

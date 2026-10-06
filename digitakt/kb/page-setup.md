@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Page setup (longueur, vitesse, changement)
 lot: 1
+ordre: 4
 manuel: "§10.7 (p45-47)"
 os: "1.17"
 statut: draft

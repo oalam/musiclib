@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: +Drive, pool, presets et kits
 lot: 1
+ordre: 2
 manuel: "§5, §9.1-9.8 (p16-17, 29-37)"
 os: "1.17"
 statut: draft

@@ -434,7 +434,7 @@ mutes, FX de transition, principes d'arc).
   automatique (révisé le 2026-10-06 : remplace l'import par signets).
 - 24 thèmes en 5 lots, dans l'ordre de **préparation d'un set** ; liste et
   statuts dans le hub [[digitakt/kb/_index]]. Un lot par session.
-- Format arbitré : frontmatter (`theme`, `lot`, `manuel`, `os`, `statut`),
+- Format arbitré : frontmatter (`theme`, `lot`, `ordre`, `manuel`, `os`, `statut`),
   *En une phrase*, *Gestes rapides*, *Pas à pas*, *En live techno*,
   *Pièges*, *À essayer (5 min)* ; 40-70 lignes ; `statut: draft` jusqu'au
   test sur la machine.

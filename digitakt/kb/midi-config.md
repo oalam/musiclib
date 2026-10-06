@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Configuration MIDI (canaux, sync, import des .mid)
 lot: 2
+ordre: 7
 manuel: "§10.2.3, §14.4 (p43, 77-79)"
 os: "1.17"
 statut: draft

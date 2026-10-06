@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Tempo et métronome
 lot: 1
+ordre: 5
 manuel: "§7.3, §17 (p22-23, 89)"
 os: "1.17"
 statut: draft

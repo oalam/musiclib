@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Micro timing et retrigs
 lot: 2
+ordre: 9
 manuel: "§10.4, §10.5, §11.3, §7.3 (p23, 45, 54)"
 os: "1.17"
 statut: draft

@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Projet, sauvegarde, Transfer
 lot: 1
+ordre: 1
 manuel: "§5.2, §6.9, §14.1, §14.3, §17 (p16, 20-21, 75-76, 88-89)"
 os: "1.17"
 statut: draft

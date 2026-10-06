@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Grid, live et step recording, quantize
 lot: 2
+ordre: 6
 manuel: "§10.2, §10.6, §17 (p41-44, 45, 89)"
 os: "1.17"
 statut: draft

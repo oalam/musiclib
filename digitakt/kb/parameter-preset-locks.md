@@ -2,6 +2,7 @@
 tags: [digitakt, kb]
 theme: Parameter locks et preset locks
 lot: 2
+ordre: 8
 manuel: "§10.8.1, §10.8.2, §9.1.1, §11.2 (p29, 47-48, 53)"
 os: "1.17"
 statut: draft
