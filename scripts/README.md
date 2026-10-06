@@ -634,6 +634,22 @@ hats ouverts sur-détectés quand la reverb tient. Id1 / Id2 sont à choisir à
 l'oreille. Les mutes à l'intérieur d'une section diluent le repliage (trous
 dans le kick).
 
+# kb.py — base de connaissance Digitakt II (Phase 7.D)
+
+Corpus : `digitakt/kb/*.md` + `digitakt/doctrine.md`, découpés en sections
+(`##` / `###`). Recherche plein texte **sans index ni RAG** : le corpus est
+relu à chaque requête (une note éditée dans Obsidian est vue tout de suite).
+Tous les termes doivent être présents dans la section, sans tenir compte des
+accents ni de la casse ; score = occurrences, ×5 dans le titre.
+
+```bash
+python kb.py search "pattern modele"
+```
+
+Dans le front : **panneau latéral** (touche `/` ou bouton `KB` en bas à
+droite, `Échap` pour fermer), extraits surlignés, clic = note rendue et
+positionnée sur la section. Utilisable pendant la lecture d'un morceau.
+
 # api.py + web/ — front de la library (Phase 7.C)
 
 POC web local : parcourir la library, écouter un morceau et naviguer dedans,
@@ -686,6 +702,8 @@ dans library.md) :
 | GET | `/api/tracks/{slug}/audio` | fichier audio (requêtes Range pour le seek) |
 | GET | `/api/tracks/{slug}/bank` | `DigitaktBank` (404 si absente) |
 | POST | `/api/tracks/{slug}/bank` | génère la bank |
+| GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
+| GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) |
 
 **Limites** : la forme d'onde est décodée dans le navigateur (quelques secondes
 sur un morceau long). Le rebouclage se fait sur l'événement `timeupdate` du

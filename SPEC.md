@@ -37,6 +37,7 @@ music/scripts/
 ├── setbuilder.py                 # préparation de set
 ├── visualize.py                  # rendu PNG signatures
 ├── digitakt.py                   # draft de bank Digitakt II (Phase 7.B)
+├── kb.py                         # base de connaissance Digitakt (Phase 7.D)
 ├── library_md.py                 # parse / write library.md
 └── analyzer/
     ├── audio_loader.py           # soundfile + fallback librosa
@@ -380,7 +381,7 @@ mutes, FX de transition, principes d'arc).
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
-| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | à venir |
+| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, import du manuel PDF à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
 **Décisions 7.B** :
@@ -421,6 +422,13 @@ mutes, FX de transition, principes d'arc).
   saut de RMS du sidecar.
 - Exemple `2hot2play_-_keep_the_balance` : 15 sections, 13 patterns, chaîne
   `01 … 11 06 05 12 13`, mesure décalée de 2 temps.
+
+**Décisions 7.D (arbitrées le 2026-10-06)** :
+- Contenu initial = manuel PDF Elektron de la DT2, découpé **par script**
+  selon les signets du PDF (une note par section, page source en
+  frontmatter), pas réécrit à la main.
+- Recherche sur KB + doctrine, résultats par section avec extrait surligné.
+- Affichage en panneau latéral (`/`), accessible pendant la lecture.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

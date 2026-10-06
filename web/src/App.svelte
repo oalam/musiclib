@@ -3,6 +3,7 @@
   import TrackList from './lib/TrackList.svelte'
   import Player from './lib/Player.svelte'
   import BankView from './lib/BankView.svelte'
+  import KbPanel from './lib/KbPanel.svelte'
 
   let tracks = $state<TrackSummary[]>([])
   let selected = $state<string | null>(null)
@@ -82,6 +83,7 @@
     {/if}
   </main>
 </div>
+<KbPanel />
 
 <style>
   .layout { display: grid; grid-template-columns: 320px 1fr; height: 100%; }

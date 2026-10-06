@@ -96,6 +96,18 @@ export interface Bank {
   generated_at: string
 }
 
+/** Section de la base de connaissance qui contient tous les termes (Phase 7.D). */
+export interface KbHit {
+  path: string
+  title: string
+  heading: string
+  anchor: string
+  snippet: string
+  score: number
+}
+
+export interface KbNote { path: string; title: string; markdown: string }
+
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
@@ -113,6 +125,18 @@ export const api = {
   generateBank: (slug: string) =>
     fetch(`/api/tracks/${enc(slug)}/bank`, { method: 'POST' }).then(r => json<Bank>(r)),
   audioUrl: (slug: string) => `/api/tracks/${enc(slug)}/audio`,
+  kbSearch: (q: string) => fetch(`/api/kb/search?q=${enc(q)}`).then(r => json<KbHit[]>(r)),
+  kbNote: (path: string) => fetch(`/api/kb/note?path=${enc(path)}`).then(r => json<KbNote>(r)),
+}
+
+/** Minuscules sans accents (meme regle que kb.normalize). */
+export function normalize(s: string): string {
+  return s.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase()
+}
+
+/** Ancre de titre (meme regle que kb.slugify). */
+export function slugify(s: string): string {
+  return normalize(s).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 }
 
 /** 0:00 */

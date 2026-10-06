@@ -6,6 +6,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+### Ajouté
+
+- [7.D] `kb.py` : corpus KB (`digitakt/kb/*.md`) + doctrine découpé en
+  sections, recherche plein texte insensible aux accents ; routes
+  `/api/kb/search` et `/api/kb/note` (chemins limités au corpus).
+- [7.D] Panneau latéral KB dans le front (touche `/`), extraits surlignés,
+  note rendue avec `marked` (HTML brut échappé) et positionnée sur la section.
+
 ## [0.11.0] - 2026-10-06
 
 ### Ajouté

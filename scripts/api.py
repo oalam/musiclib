@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt.
+"""API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt,
+base de connaissance (Phase 7.D).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py`. Ecoute sur 127.0.0.1 uniquement. Les fichiers ne
@@ -18,12 +19,13 @@ import json
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import digitakt
+import kb
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.types import CuePoint, DigitaktBank, Segment
@@ -146,6 +148,18 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
             raise HTTPException(422, f"generation impossible pour {slug} "
                                      "(sidecar ou audio manquant, voir les logs)")
         return track_bank(slug)
+
+    @app.get("/api/kb/search", response_model=list[kb.KbHit])
+    def kb_search(q: str = Query(..., min_length=1, max_length=200),
+                  limit: int = Query(20, ge=1, le=100)) -> list[kb.KbHit]:
+        return kb.search(q, kb.load_corpus(), limit)
+
+    @app.get("/api/kb/note", response_model=kb.KbNote)
+    def kb_note(path: str) -> kb.KbNote:
+        note = kb.read_note(path)
+        if note is None:
+            raise HTTPException(404, f"note hors base de connaissance : {path}")
+        return note
 
     if WEB_DIST.exists():
         app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")
