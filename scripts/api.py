@@ -25,6 +25,7 @@ from pydantic import BaseModel
 
 import digitakt
 from analyzer.infer import load_sidecar
+from analyzer.rhythm_signature import beats_per_bar
 from analyzer.types import CuePoint, DigitaktBank, Segment
 from library_md import parse_library
 from stems import _resolve_audio_path
@@ -60,6 +61,7 @@ class TrackSummary(BaseModel):
 class TrackDetail(TrackSummary):
     tempo_bpm: float | None = None
     time_signature: str | None = None
+    bar_times: list[float] = []  # grille du sidecar (repli si pas de bank)
     segments: list[Segment] = []
     cues: list[CuePoint] = []
     fields: dict[str, str] = {}
@@ -78,6 +80,14 @@ def _summary(slug: str, entry: dict[str, str]) -> TrackSummary:
         has_bank=(DIGITAKT_DIR / f"{slug}.json").exists(),
         **data,
     )
+
+
+def _bar_times(beats: dict[str, Any]) -> list[float]:
+    """Debuts de mesure depuis les beats du sidecar (4/4 sauf signature confiante)."""
+    bpb = beats_per_bar(beats.get("time_signature") or "4/4")
+    if float(beats.get("time_signature_confidence") or 0) < 0.5:
+        bpb = 4
+    return [round(float(t), 3) for t in (beats.get("beat_times_s") or [])[::bpb]]
 
 
 def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
@@ -105,6 +115,7 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
             **_summary(slug, entry).model_dump(),
             tempo_bpm=beats.get("tempo_bpm"),
             time_signature=beats.get("time_signature"),
+            bar_times=_bar_times(beats),
             segments=((sidecar.get("structure") or {}).get("segments") or []),
             cues=((sidecar.get("cues") or {}).get("cues") or []),
             fields={k: _clean(v) for k, v in entry.items()},

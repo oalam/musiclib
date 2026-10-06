@@ -6,6 +6,22 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+## [0.9.0] - 2026-10-06
+
+### Ajouté
+
+- [7.C] Lecteur : clic sur la forme d'onde = position de lecture (les sections
+  passent dans une bande cliquable sous l'onde).
+- [7.C] Boucle par glisser sur la forme d'onde, calée sur un nombre entier de
+  mesures, redimensionnable, ÷2 / ×2, raccourcis `L` et `Échap`.
+- [7.B] `DigitaktBank.bar_times_s` (grille de mesures recalée sur le kick) et
+  `bar_times` dans le détail de track de l'API (repli sidecar).
+
+### Modifié
+
+- [7.C] Le curseur de pas de la grille suit la grille de mesures réelle au lieu
+  d'un tempo constant (plus de dérive).
+
 ## [0.8.0] - 2026-10-06
 
 ### Ajouté

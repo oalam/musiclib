@@ -477,7 +477,8 @@ def build_bank(
     return DigitaktBank(
         slug=slug, artist=fields.get("artist", ""), title=fields.get("title", ""),
         bpm=round(bpm, 1), time_signature=time_signature, steps_per_bar=spb,
-        from_stems=from_stems, phrase_bars=phrase_bars, patterns=patterns,
+        from_stems=from_stems, phrase_bars=phrase_bars,
+        bar_times_s=[round(float(t), 3) for t in bar_times], patterns=patterns,
         mutes=mutes, generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
 

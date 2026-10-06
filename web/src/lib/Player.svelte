@@ -1,19 +1,28 @@
 <script lang="ts">
   import WaveSurfer from 'wavesurfer.js'
-  import RegionsPlugin from 'wavesurfer.js/plugins/regions'
+  import RegionsPlugin, { type Region } from 'wavesurfer.js/plugins/regions'
   import { api, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
 
-  let { track, currentTime = $bindable(0) }: {
+  let { track, bars = [], currentTime = $bindable(0) }: {
     track: TrackDetail
+    /** Debuts de mesure (s) : la boucle se cale dessus. Vide = pas de calage. */
+    bars?: number[]
     currentTime?: number
   } = $props()
 
   let container: HTMLDivElement
   let ws: WaveSurfer | null = null
+  let regions: RegionsPlugin | null = null
+  let loopRegion: Region | null = null
   let playing = $state(false)
   let duration = $state(0)
   let loading = $state(true)
   let error = $state<string | null>(null)
+
+  // boucle : bornes calees sur les mesures
+  let loop = $state<{ start: number; end: number; nBars: number } | null>(null)
+  let loopOn = $state(true)
+  let prevTime = 0
 
   /** Saute a `t` secondes (appele par la vue bank / la partition de mutes). */
   export function seek(t: number) {
@@ -24,13 +33,52 @@
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
   }
 
+  function nearestBar(t: number): number {
+    let best = 0
+    for (let i = 1; i < bars.length; i++) {
+      if (Math.abs(bars[i] - t) < Math.abs(bars[best] - t)) best = i
+    }
+    return best
+  }
+
+  /** Cale une region sur un nombre entier de mesures (au moins 1). */
+  function snap(region: Region) {
+    let start = region.start
+    let end = region.end
+    let nBars = 0
+    if (bars.length > 1) {
+      const i0 = Math.min(nearestBar(start), bars.length - 2)
+      const i1 = Math.max(nearestBar(end), i0 + 1)
+      start = bars[i0]
+      end = bars[i1]
+      nBars = i1 - i0
+    }
+    region.setOptions({ start, end, content: nBars ? `${nBars} mes.` : 'boucle' })
+    loop = { start, end, nBars }
+  }
+
+  function setLoopBars(nBars: number) {
+    if (!loop || !loopRegion || bars.length < 2 || nBars < 1) return
+    const i0 = nearestBar(loop.start)
+    const i1 = Math.min(i0 + nBars, bars.length - 1)
+    loopRegion.setOptions({ start: bars[i0], end: bars[i1] })
+    snap(loopRegion)
+  }
+
+  export function clearLoop() {
+    regions?.clearRegions()
+    loopRegion = null
+    loop = null
+  }
+
   $effect(() => {
     const slug = track.slug
-    const segments = track.segments
     loading = true
     error = null
     playing = false
-    const regions = RegionsPlugin.create()
+    loop = null
+    loopRegion = null
+    const reg = RegionsPlugin.create()
     const inst = WaveSurfer.create({
       container,
       url: api.audioUrl(slug),
@@ -41,31 +89,39 @@
       barWidth: 2,
       barGap: 1,
       normalize: true,
-      plugins: [regions],
+      plugins: [reg],
     })
     inst.on('ready', () => {
       loading = false
       duration = inst.getDuration()
-      for (const s of segments) {
-        regions.addRegion({
-          start: s.start_s,
-          end: s.end_s,
-          color: (SEGMENT_COLORS[s.label] ?? '#888888') + '33',
-          content: s.label,
-          drag: false,
-          resize: false,
-        })
-      }
     })
-    regions.on('region-clicked', (region, e) => {
+    // glisser sur la forme d'onde = nouvelle boucle ; un simple clic = seek
+    reg.enableDragSelection({ color: 'rgba(232, 89, 12, 0.22)' }, 4)
+    reg.on('region-created', region => {
+      for (const r of reg.getRegions()) if (r !== region) r.remove()
+      loopRegion = region
+      loopOn = true
+      snap(region)
+      inst.setTime(region.start)
+    })
+    reg.on('region-updated', region => snap(region))
+    reg.on('region-clicked', (region, e) => {
       e.stopPropagation()
       inst.setTime(region.start)
     })
-    inst.on('timeupdate', t => { currentTime = t })
+    inst.on('timeupdate', t => {
+      if (loop && loopOn && prevTime < loop.end && t >= loop.end) {
+        inst.setTime(loop.start)
+        t = loop.start
+      }
+      prevTime = t
+      currentTime = t
+    })
     inst.on('play', () => { playing = true })
     inst.on('pause', () => { playing = false })
     inst.on('error', err => { error = String(err); loading = false })
     ws = inst
+    regions = reg
     return () => inst.destroy()
   })
 
@@ -75,6 +131,8 @@
     if (e.code === 'Space') { e.preventDefault(); ws?.playPause() }
     if (e.code === 'ArrowLeft') ws?.setTime(Math.max(0, (ws?.getCurrentTime() ?? 0) - 10))
     if (e.code === 'ArrowRight') ws?.setTime((ws?.getCurrentTime() ?? 0) + 10)
+    if (e.code === 'KeyL' && loop) loopOn = !loopOn
+    if (e.code === 'Escape') clearLoop()
   }
 </script>
 
@@ -97,17 +155,42 @@
       <span class="mono">{mmss(currentTime)} / {mmss(duration)}</span>
     </div>
   </header>
+
   <div class="wave" bind:this={container}></div>
-  {#if loading}<p class="muted small">Chargement et décodage de l'audio…</p>{/if}
-  {#if error}<p class="small err">Erreur audio : {error}</p>{/if}
-  {#if track.cues.length}
-    <div class="cues">
-      {#each track.cues as c}
-        <button class="small" onclick={() => seek(c.time_s)}>{c.type} <span class="mono">{mmss(c.time_s)}</span></button>
+
+  {#if duration > 0}
+    <div class="sections" aria-label="Sections">
+      {#each track.segments as s}
+        <button class="section" title="{s.label} · {mmss(s.start_s)}"
+          style="left: {(s.start_s / duration) * 100}%; width: {((s.end_s - s.start_s) / duration) * 100}%; --c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
+          onclick={() => seek(s.start_s)}>{s.label}</button>
       {/each}
     </div>
   {/if}
-  <p class="muted small">Espace : lecture / pause · flèches : ±10 s · clic sur une section : saut au début</p>
+
+  <div class="tools">
+    {#if loop}
+      <button class:on={loopOn} onclick={() => (loopOn = !loopOn)}>Boucle {loopOn ? 'ON' : 'OFF'}</button>
+      <span class="mono small">
+        {loop.nBars ? `${loop.nBars} mesure${loop.nBars > 1 ? 's' : ''}` : 'non calée'}
+        · {mmss(loop.start)}–{mmss(loop.end)}
+      </span>
+      {#if loop.nBars}
+        <button class="small" onclick={() => setLoopBars(Math.max(1, Math.floor(loop!.nBars / 2)))}>÷2</button>
+        <button class="small" onclick={() => setLoopBars(loop!.nBars * 2)}>×2</button>
+      {/if}
+      <button class="small" onclick={clearLoop}>Retirer</button>
+    {:else}
+      <span class="muted small">Glisser sur la forme d'onde pour créer une boucle {bars.length > 1 ? 'calée sur les mesures' : '(pas de grille de mesures pour ce morceau)'}.</span>
+    {/if}
+    {#each track.cues as c}
+      <button class="small" onclick={() => seek(c.time_s)}>{c.type} <span class="mono">{mmss(c.time_s)}</span></button>
+    {/each}
+  </div>
+
+  {#if loading}<p class="muted small">Chargement et décodage de l'audio…</p>{/if}
+  {#if error}<p class="small err">Erreur audio : {error}</p>{/if}
+  <p class="muted small">Clic : position · glisser : boucle · Espace : lecture / pause · flèches : ±10 s · L : boucle on/off · Échap : retirer la boucle</p>
 </section>
 
 <style>
@@ -117,8 +200,16 @@
   header p { margin: 2px 0 8px; font-size: 12px; }
   .transport { display: flex; align-items: center; gap: 10px; }
   .wave { width: 100%; }
-  .wave :global([part~="region-content"]) { font-size: 11px; padding: 2px 4px; color: var(--muted); }
-  .cues { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .wave :global([part~="region-content"]) { font-size: 11px; padding: 2px 4px; color: var(--accent); font-weight: 600; }
+  .sections { position: relative; height: 18px; margin-top: 4px; }
+  .section {
+    position: absolute; top: 0; height: 18px; padding: 0 4px; border: 0; border-radius: 0;
+    background: color-mix(in srgb, var(--c) 35%, transparent);
+    border-left: 2px solid var(--c);
+    font-size: 10px; text-align: left; overflow: hidden; white-space: nowrap; color: var(--text);
+  }
+  .section:hover { background: color-mix(in srgb, var(--c) 60%, transparent); }
+  .tools { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
   .small { font-size: 12px; }
   .err { color: #dc2626; }
   p.small { margin: 6px 0 0; }

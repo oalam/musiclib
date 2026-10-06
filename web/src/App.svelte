@@ -53,7 +53,8 @@
   <main>
     {#if detail}
       {#key detail.slug}
-        <Player bind:this={player} track={detail} bind:currentTime />
+        <Player bind:this={player} track={detail} bind:currentTime
+          bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times} />
       {/key}
       {#if bank}
         <BankView {bank} {currentTime} onseek={t => player?.seek(t)} />

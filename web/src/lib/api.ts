@@ -35,6 +35,7 @@ export interface CuePoint {
 export interface TrackDetail extends TrackSummary {
   tempo_bpm: number | null
   time_signature: string | null
+  bar_times: number[]
   segments: Segment[]
   cues: CuePoint[]
   fields: Record<string, string>
@@ -73,6 +74,7 @@ export interface Bank {
   steps_per_bar: number
   from_stems: boolean
   phrase_bars: number
+  bar_times_s: number[]
   patterns: Pattern[]
   mutes: Phrase[]
   generated_at: string

@@ -138,6 +138,7 @@ def test_build_bank_four_on_floor():
     assert [t.step for t in kick.trigs] == list(range(0, 128, 4))
     assert len(p.tracks) == 16
     assert all(1 in ph.active for ph in bank.mutes)
+    assert len(bank.bar_times_s) == 17 and bank.bar_times_s[1] == 2.0
 
 
 def test_build_bank_drop_adds_fx():

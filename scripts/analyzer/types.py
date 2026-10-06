@@ -255,6 +255,10 @@ class DigitaktBank(BaseModel):
     steps_per_bar: int = 16
     from_stems: bool
     phrase_bars: int = 8
+    bar_times_s: list[float] = Field(
+        default_factory=list,
+        description="Debut de chaque mesure (grille recalee sur le kick) — loops du front",
+    )
     patterns: list[DigitaktPattern]
     mutes: list[DigitaktPhrase] = Field(default_factory=list)
     generated_at: str

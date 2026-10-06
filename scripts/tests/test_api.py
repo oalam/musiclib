@@ -33,7 +33,8 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
     quality = tmp_path / "quality"
     quality.mkdir()
     (quality / f"{SLUG}.json").write_text(json.dumps({
-        "beats": {"tempo_bpm": 150.0, "time_signature": "4/4"},
+        "beats": {"tempo_bpm": 150.0, "time_signature": "4/4",
+                  "beat_times_s": [0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2]},
         "structure": {"segments": [{"start_s": 0, "end_s": 10, "duration_s": 10,
                                     "rms_dbfs": -8, "label": "main"}]},
         "cues": {"cues": [{"time_s": 0, "type": "intro_start", "confidence": 0.9}]},
@@ -57,6 +58,7 @@ def test_list_tracks(client: TestClient):
 def test_track_detail(client: TestClient):
     d = client.get(f"/api/tracks/{SLUG}").json()
     assert d["tempo_bpm"] == 150.0
+    assert d["bar_times"] == [0.0, 1.6, 3.2]
     assert d["segments"][0]["label"] == "main"
     assert d["cues"][0]["type"] == "intro_start"
 

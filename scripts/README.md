@@ -638,9 +638,13 @@ python api.py &   puis   cd ../web && npm run dev
 **Ce que fait le front** :
 - **Library** : 386 tracks, filtre texte (artiste, titre, genre, key, mood),
   tri BPM / key / energy, filtres « a des stems » / « a une bank ».
-- **Lecteur** : forme d'onde, sections de structure colorées (mêmes couleurs que
-  `visualize.py`) cliquables, boutons de cues. Espace = lecture / pause,
-  flèches = ±10 s.
+- **Lecteur** : forme d'onde, **clic = position de lecture**, bande des
+  sections de structure sous l'onde (mêmes couleurs que `visualize.py`, clic =
+  début de section), boutons de cues. Espace = lecture / pause, flèches = ±10 s.
+- **Boucle** : **glisser sur la forme d'onde** crée une boucle calée sur un
+  nombre entier de mesures (grille de la bank, recalée sur le kick ; sinon
+  grille du sidecar). Poignées redimensionnables (recalage à chaque fois),
+  ÷2 / ×2, `L` = on/off, `Échap` = retirer.
 - **Bank Digitakt** : slots 01-16 (clic = saut au début de la section), pages
   1-8 de 16 pas ou vue « tout », grille 16 tracks avec vélocité en opacité et
   note au survol, **curseur de pas synchronisé avec la lecture**, tracks mutées
@@ -659,9 +663,11 @@ dans library.md) :
 | GET | `/api/tracks/{slug}/bank` | `DigitaktBank` (404 si absente) |
 | POST | `/api/tracks/{slug}/bank` | génère la bank |
 
-**Limites** : le curseur de pas utilise le tempo médian de la bank, il peut
-flotter un peu sur un morceau qui accélère. La forme d'onde est décodée dans le
-navigateur (quelques secondes sur un morceau long).
+**Limites** : la forme d'onde est décodée dans le navigateur (quelques secondes
+sur un morceau long). Le rebouclage se fait sur l'événement `timeupdate` du
+navigateur : quelques millisecondes de flottement possibles au saut, suffisant
+pour écouter, pas pour un enregistrement. Sans bank, la boucle se cale sur la
+grille du sidecar, qui peut dériver (cf. SPEC Phase 7).
 
 # stems.py — séparation Demucs (Phase 6.B)
 

@@ -14,8 +14,8 @@
   const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
   const noteName = (n: number) => `${NOTE_NAMES[n % 12]}${Math.floor(n / 12) - 1}`
 
-  // un pas = une double croche = 1/4 de beat (tempo median : leger flottement
-  // possible si le morceau accelere, la grille Python suit les beats reels)
+  // repli sans grille de mesures (ancienne bank) : tempo median, leger flottement
+  // possible si le morceau accelere
   const stepDur = $derived(bank.bpm > 0 ? 60 / bank.bpm / 4 : 0)
 
   const playingPattern = $derived(
@@ -28,8 +28,32 @@
   const pattern = $derived<Pattern>(
     bank.patterns.find(p => p.slot === selectedSlot) ?? bank.patterns[0])
 
+  const bars = $derived(bank.bar_times_s ?? [])
+
+  /** Index de la mesure contenant t (recherche dichotomique), -1 hors grille. */
+  function barAt(t: number): number {
+    if (bars.length < 2 || t < bars[0] || t >= bars[bars.length - 1]) return -1
+    let lo = 0
+    let hi = bars.length - 1
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1
+      if (bars[mid] <= t) lo = mid
+      else hi = mid
+    }
+    return lo
+  }
+
   const currentStep = $derived.by(() => {
-    if (!playingPattern || playingPattern.slot !== pattern.slot || stepDur <= 0) return -1
+    if (!playingPattern || playingPattern.slot !== pattern.slot) return -1
+    const spb = bank.steps_per_bar
+    const b = barAt(currentTime)
+    const b0 = barAt(pattern.start_s + 0.01)
+    if (b >= 0 && b0 >= 0) {
+      // grille reelle (beats recales sur le kick) : pas de derive
+      const frac = (currentTime - bars[b]) / (bars[b + 1] - bars[b])
+      return ((b - b0) % pattern.bars) * spb + Math.min(spb - 1, Math.floor(frac * spb))
+    }
+    if (stepDur <= 0) return -1
     return Math.floor((currentTime - pattern.start_s) / stepDur) % pattern.steps
   })
 
