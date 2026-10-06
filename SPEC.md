@@ -379,6 +379,7 @@ mutes, FX de transition, principes d'arc).
 | 7.A | Doctrine `digitakt/doctrine.md` | fait |
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
+| 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | à venir (prochaine session) |
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
@@ -393,6 +394,22 @@ mutes, FX de transition, principes d'arc).
   n'importe pas de fichier de pattern).
 - Partition de mutes : les phrases repartent à chaque début de section (une
   phrase ne chevauche jamais deux patterns).
+
+**Plan 7.B2 (arbitré le 2026-10-06)** :
+1. **Premier temps de la mesure** : `kick_shift` ne corrige que la phase à
+   l'intérieur d'un temps, donc la mesure peut démarrer sur le temps 2, 3 ou 4
+   (constaté sur les boucles du front). Tester les 4 décalages de beat, garder
+   celui qui maximise l'alignement des changements d'activité des tracks sur
+   les débuts de mesure / phrase et le clap sur les temps 2 et 4.
+2. **Structure déduite des patterns** : remplacer la segmentation librosa
+   (grossière) par un découpage là où l'ensemble des tracks actives change,
+   sur une grille de 4/8 mesures alignée sur le premier temps. Labels déduits
+   du contenu (sans kick = breakdown, tout actif = peak, peu de tracks au
+   début = intro). Le front affiche cette structure à la place de celle du
+   sidecar.
+3. **Réutilisation de slots** : deux sections au contenu identique (même
+   activité + grilles proches) partagent le même pattern ; la bank expose un
+   ordre de jeu (ex. 1-2-1-3), comme une chaîne de patterns sur la DT2.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient
