@@ -1,11 +1,14 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte'
   import { api, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type ManualRef, type Pattern } from './api'
   import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
 
-  let { bank, currentTime, playing, onseek, onplay, onstop, onhelp }: {
+  let { bank, currentTime, playing, player, onseek, onplay, onstop, onhelp }: {
     bank: Bank
     currentTime: number
     playing: boolean
+    /** Lecteur rendu sous la facade, dans le meme bloc que la vue d'ensemble. */
+    player?: Snippet
     onseek: (t: number) => void
     onplay: () => void
     /** Arret et retour au debut du pattern en cours. */
@@ -241,10 +244,10 @@
       {:else if name === 'right'}<path d="M8 6l8 6-8 6" />{/if}
     </svg>
   {/snippet}
-  {#snippet hw(id: string, box: [number, number, number, number], o: { primary?: () => void; secondary?: () => void; lit?: boolean; icon?: string; silk?: string; label?: string } = {})}
+  {#snippet hw(id: string, box: [number, number, number, number], o: { primary?: () => void; secondary?: () => void; lit?: boolean; icon?: string; silk?: string; label?: string; cls?: string } = {})}
     {@const c = CONTROLS[id]}
     {@const silk = o.silk ?? SILK[id]}
-    <button class="hw" class:lit={o.lit} class:hasfunc={!!c.func} class:sel={focus.id === id && focus.param === undefined}
+    <button class="hw {o.cls ?? ''}" class:lit={o.lit} class:hasfunc={!!c.func} class:sel={focus.id === id && focus.param === undefined}
       class:icon={!!o.icon} style={at(...box)} aria-label={o.label ?? c.label}
       onmouseenter={() => peek({ id })} onmouseleave={unpeek} onclick={() => act(id, o.primary, o.secondary)}>
       {#if o.icon}{@render glyph(o.icon)}{:else}<span class="kl">{c.label}</span>{/if}
@@ -314,18 +317,16 @@
         <div class="row dim foot">{bank.from_stems ? 'STEMS' : 'MIX'} · {pattern.bars} BAR{pattern.bars > 1 ? 'S' : ''} · {mmss(pattern.start_s)}-{mmss(pattern.end_s)} · {mmss(currentTime)}</div>
     </div>
 
-    <div class="frame" style={at(614, 184, 367, 170)}></div>
     {#each KNOBS as k, i}
       {@const param = paramPage.params[i]}
       {@render knob([460 + 102 * (i % 4), i < 4 ? 126 : 223, 50], k, paramValue(param), () => pressKnob(i),
         () => peek({ id: 'knobs', param: i }), focus.id === 'knobs' && focus.param === i)}
     {/each}
-    <div class="frame" style={at(614, 315, 367, 62)}></div>
     {#each ['p-trig', 'p-src', 'p-fltr', 'p-amp', 'p-fx', 'p-mod'] as id, i}
       {@render hw(id, [458 + 62 * i, 308, 44, 44], { primary: () => pressParamKey(id), lit: paramPage.key === id })}
     {/each}
 
-    {@render hw('func', [78, 349, 68, 42], { lit: func })}
+    {@render hw('func', [78, 349, 68, 42], { lit: func, cls: 'func' })}
     {#each [['preset', 170], ['settings', 233], ['sampling', 295], ['tempo', 358]] as [id, x]}
       {@render hw(String(id), [Number(x), 349, 44, 44], { icon: String(id) })}
     {/each}
@@ -338,14 +339,12 @@
     {@render hw('yes', [458, 380, 44, 44])}
     {@render hw('no', [458, 442, 44, 44])}
 
-    <div class="frame" style={at(582, 418, 176, 125)}></div>
     {@render hw('arrows', [582, 380, 44, 44], { icon: 'up', silk: 'Trig Mode', label: 'UP' })}
     <span class="silk" style="left: {(612 / 834) * 100}%; top: {(374 / 682) * 100}%">↕ KB Octave</span>
     {@render hw('arrows', [520, 442, 44, 44], { icon: 'left', silk: 'µTime−', label: 'LEFT', primary: () => pressArrow(-1) })}
     {@render hw('arrows', [582, 442, 44, 44], { icon: 'down', silk: 'Trig Mode', label: 'DOWN' })}
     {@render hw('arrows', [645, 442, 44, 44], { icon: 'right', silk: 'µTime+', label: 'RIGHT', primary: () => pressArrow(1) })}
 
-    <div class="frame" style={at(756, 383, 88, 42)}></div>
     {#each Array(8) as _, i}
       <button class="led" class:lit={page === i} class:play={page !== i && currentStep >= 0 && Math.floor(currentStep / 16) === i}
         style={at(722 + 23 * (i % 4), i < 4 ? 372 : 395, 13)} disabled={i >= pages} aria-label="page {i + 1}"
@@ -360,7 +359,6 @@
       secondary: () => (mode = 'ptn'), lit: mode === 'ptn' })}
     {@render hw('song', [78, 612, 68, 42])}
 
-    <div class="frame" style={at(469, 569, 657, 166)}></div>
     <span class="silk tm" style="left: {(469 / 834) * 100}%; top: {(568 / 682) * 100}%">
       <i>⋮·······</i> Track/Mute <i>·······⋮</i></span>
     {#each Array(16) as _, i}
@@ -425,6 +423,8 @@
       {help ? 'AIDE active : un clic ouvre la fiche (ou le manuel).' : 'FUNC puis une touche = fonction secondaire ; AIDE ? = clic vers la fiche.'}</div>
   </div>
 
+  <div class="deck">
+  {@render player?.()}
   {#if sections.length}
     <div class="chain" aria-label="Ordre de jeu">
       <span class="muted small">Chaîne</span>
@@ -462,6 +462,8 @@
     </div>
   </div>
 
+  </div>
+
   <h2>Partition de mutes <span class="muted small">(phrases de {bank.phrase_bars} mesures, clic = saut)</span></h2>
   <div class="mutes-wrap">
     <div class="mutes" style="--n: {bank.mutes.length}">
@@ -479,7 +481,11 @@
 </section>
 
 <style>
-  .bank { padding: 12px 16px; }
+  .bank { padding: 12px 16px; display: flex; flex-direction: column; align-items: center; }
+  .bank > * { width: 100%; max-width: 900px; box-sizing: border-box; }
+  .deck { margin-top: 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); padding: 0 12px 12px; }
+  .deck .chain { margin-top: 10px; }
+  .deck :global(.player) { border-bottom: 0; background: none; padding: 12px 0 0; }
   .chain { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; margin: 10px 0 6px; }
   .chain .link { font-size: 11px; padding: 2px 5px; border-bottom: 3px solid var(--c); }
   .chain .link.cur { outline: 1px solid var(--accent); }
@@ -491,7 +497,7 @@
   .fronttools { display: flex; gap: 6px; max-width: 900px; margin-bottom: 6px; }
   .fronttools .on { outline: 2px solid var(--accent); }
   .dt {
-    --face: #1c1c1c; --key-edge: #0a0a0a; --silk: #d8d8d4; --func: #e9a23b;
+    --face: #1c1c1c; --key-edge: #0a0a0a; --silk: #d8d8d4; --func: #e9a23b; --func-key: #f5c518;
     --led-red: #ff3b3b; --led-green: #4cff6a; --lcd: #9fd0ff; --lcd-bg: #07142a;
     container-type: inline-size;
     position: relative; width: 100%; max-width: 900px; aspect-ratio: 834 / 682;
@@ -505,7 +511,6 @@
   .dt button { font: inherit; color: inherit; }
   .ports { left: 0; right: 0; top: calc(var(--u) * 8); height: 0; }
   .ports span { position: absolute; transform: translateX(-50%); font-size: calc(var(--u) * 8); color: #8a8a86; white-space: nowrap; }
-  .frame { border: 1px solid #555; border-radius: calc(var(--u) * 4); pointer-events: none; }
   .silk { font-size: calc(var(--u) * 9.5); color: #9a9a96; white-space: nowrap; transform: translateY(-50%); }
   .silk.tm { transform: translate(-50%, -50%); color: var(--silk); }
   .silk.tm i { font-style: normal; color: #6a6a66; letter-spacing: 0.1em; }
@@ -568,6 +573,9 @@
   }
   .hw.lit { color: #fff !important; box-shadow: inset 0 calc(var(--u) * -3) 0 var(--led-red), 0 calc(var(--u) * 2.5) 0 #000; }
   .hw.sel { border-color: #888; }
+  /* FUNC : touche a serigraphie jaune, comme les fonctions secondaires */
+  .hw.func { color: var(--func-key) !important; }
+  .hw.func.lit { box-shadow: inset 0 calc(var(--u) * -3) 0 var(--func-key), 0 0 10px rgba(245, 197, 24, 0.35), 0 calc(var(--u) * 2.5) 0 #000; }
   .hw:hover, .key:hover, .led:hover:not(:disabled) { border-color: #666; }
   .funcmode .hw.hasfunc .sub { color: #ffc46b; text-shadow: 0 0 6px rgba(233, 162, 59, 0.6); }
   .funcmode .hw:not(.hasfunc):not(.lit) { opacity: 0.55; }

@@ -62,6 +62,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.G] Mise en page du front : DT2 en haut, centrée, sans les cadres gris
+  autour des groupes de contrôles, touche FUNC en jaune ; lecteur, chaîne et
+  vue d'ensemble réunis dans un seul bloc sous la façade (même largeur,
+  centré) ; barre « Régénérer la bank » en bas. Liste des morceaux repliable
+  (bouton « Morceaux », choix mémorisé dans le navigateur) pour donner toute
+  la largeur à la vue.
 - [7.G] Façade Digitakt II redessinée à l'échelle sur le dessin du §3.1 du
   manuel : emplacements et tailles exacts des knobs, touches, flèches, LEDs et
   trig keys (positionnement absolu sur un panneau de 834 × 682 unités, qui

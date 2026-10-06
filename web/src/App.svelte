@@ -17,6 +17,14 @@
   let player: Player | undefined = $state()
   let kbPanel: KbPanel | undefined = $state()
 
+  // liste des morceaux repliable pour laisser toute la largeur a la DT2 (memorise)
+  let showList = $state(true)
+  try { showList = localStorage.getItem('ui:list') !== '0' } catch { /* stockage indisponible */ }
+  function toggleList() {
+    showList = !showList
+    try { localStorage.setItem('ui:list', showList ? '1' : '0') } catch { /* stockage indisponible */ }
+  }
+
   api.tracks().then(t => (tracks = t)).catch(e => (listError = String(e)))
 
   async function select(slug: string) {
@@ -50,6 +58,8 @@
 
 <div class="app">
 <header class="topbar">
+  <button class="small" onclick={toggleList} aria-pressed={showList}
+    title="Afficher / masquer la liste des morceaux">{showList ? '◀ Morceaux' : '▶ Morceaux'}</button>
   <strong>Digitakt II</strong>
   <span class="muted small">morceaux → banks → set</span>
   <nav>
@@ -59,19 +69,28 @@
     <button class="small" onclick={() => kbPanel?.openManual(1)}>Manuel PDF</button>
   </nav>
 </header>
-<div class="layout">
+<div class="layout" class:full={!showList}>
+  {#if showList}
   <aside>
     {#if listError}<p class="err">API injoignable : {listError}. Lance <code>python scripts/api.py</code>.</p>{/if}
     <TrackList {tracks} {selected} onselect={select} />
   </aside>
+  {/if}
   <main>
     {#if detail}
-      {#key detail.slug}
-        <Player bind:this={player} track={detail} bind:currentTime bind:playing
-          bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times}
-          sections={bank?.sections?.length ? bank.sections : undefined} />
-      {/key}
+      {#snippet playerView()}
+        {#key detail?.slug}
+          {#if detail}
+            <Player bind:this={player} track={detail} bind:currentTime bind:playing
+              bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times}
+              sections={bank?.sections?.length ? bank.sections : undefined} />
+          {/if}
+        {/key}
+      {/snippet}
       {#if bank}
+        <BankView {bank} {currentTime} {playing} player={playerView} onseek={t => player?.seek(t)}
+          onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
+          onhelp={(path, page) => (path ? kbPanel?.openPath(path) : page && kbPanel?.openManual(page))} />
         <div class="bankbar">
           <span class="muted small">Bank générée le {new Date(bank.generated_at).toLocaleString('fr-FR')}</span>
           <button class="small" onclick={generate} disabled={bankState === 'generating'}>
@@ -79,9 +98,11 @@
           </button>
           {#if bankState === 'error'}<span class="err">{bankError}</span>{/if}
         </div>
-        <BankView {bank} {currentTime} {playing} onseek={t => player?.seek(t)}
-          onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
-          onhelp={(path, page) => (path ? kbPanel?.openPath(path) : page && kbPanel?.openManual(page))} />
+      {:else}
+        {@render playerView()}
+      {/if}
+      {#if bank}
+        <!-- bank affichee ci-dessus -->
       {:else if bankState === 'missing' || bankState === 'error'}
         <div class="empty">
           <p>Pas encore de bank Digitakt pour ce morceau.
@@ -94,7 +115,7 @@
         <p class="empty muted">Analyse en cours (quelques secondes)…</p>
       {/if}
     {:else}
-      <p class="empty muted">Choisis un morceau dans la liste.</p>
+      <p class="empty muted">Choisis un morceau dans la liste{showList ? '' : ' (bouton ▶ Morceaux)'}.</p>
     {/if}
   </main>
 </div>
@@ -107,14 +128,16 @@
   .topbar nav { margin-left: auto; display: flex; gap: 6px; }
   kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
   .layout { display: grid; grid-template-columns: 320px 1fr; flex: 1; min-height: 0; }
+  .layout.full { grid-template-columns: 1fr; }
   aside { border-right: 1px solid var(--border); background: var(--panel); min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
   main { overflow-y: auto; min-width: 0; }
   .empty { padding: 24px 16px; }
-  .bankbar { display: flex; gap: 10px; align-items: center; justify-content: flex-end; padding: 10px 16px 0; flex-wrap: wrap; }
+  .bankbar { display: flex; gap: 10px; align-items: center; justify-content: center; padding: 0 16px 16px; flex-wrap: wrap; }
   .small { font-size: 12px; }
   .err { color: #dc2626; padding: 0 10px; font-size: 12px; }
   @media (max-width: 760px) {
     .layout { grid-template-columns: 1fr; grid-template-rows: 40vh 1fr; }
+    .layout.full { grid-template-rows: 1fr; }
     aside { border-right: 0; border-bottom: 1px solid var(--border); }
   }
 </style>
