@@ -29,6 +29,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.D] Lot 5 de fiches : CC et NRPN (numéros utiles en live), tracks MIDI
   pour piloter un synthé, audio routing et Overbridge. Base complète
   (25 fiches, statut draft).
+- [7.D] Fiche send FX et compresseur : routing vs source de sidechain
+  (valeurs de `SCS`), réglages de départ, kick fantôme pour garder le
+  pompage pendant les breaks, ducker vs colle master.
 
 ### Modifié
 
