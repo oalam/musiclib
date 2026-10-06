@@ -3,13 +3,15 @@
   import { api, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type ManualRef, type Pattern } from './api'
   import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
 
-  let { bank, currentTime, playing, player, onseek, onplay, onstop, onhelp }: {
+  let { bank, currentTime, playing, player, onseek, onloop, onplay, onstop, onhelp }: {
     bank: Bank
     currentTime: number
     playing: boolean
     /** Lecteur rendu sous la facade, dans le meme bloc que la vue d'ensemble. */
     player?: Snippet
     onseek: (t: number) => void
+    /** Boucle du lecteur sur une section (double-clic dans la chaine). */
+    onloop: (start: number, end: number) => void
     onplay: () => void
     /** Arret et retour au debut du pattern en cours. */
     onstop: (t: number) => void
@@ -453,12 +455,13 @@
   {@render player?.()}
   {#if sections.length}
     <div class="chain" aria-label="Ordre de jeu">
-      <span class="muted small">Chaîne</span>
+      <span class="muted small" title="Clic = saut, double-clic = boucle sur la section">Chaîne</span>
       {#each sections as s (s.index)}
         <button class="link mono" class:cur={playingSection?.index === s.index}
           style="--c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
-          title="{s.label} · {mmss(s.start_s)} · {s.bars} mes. · tracks {s.active.join(' ')}"
-          onclick={() => { selectedSlot = s.pattern_slot; onseek(s.start_s) }}>
+          title="{s.label} · {mmss(s.start_s)} · {s.bars} mes. · tracks {s.active.join(' ')} · double-clic = boucle"
+          onclick={() => { selectedSlot = s.pattern_slot; onseek(s.start_s) }}
+          ondblclick={() => onloop(s.start_s, s.end_s)}>
           {patName(s.pattern_slot)}
         </button>
       {/each}

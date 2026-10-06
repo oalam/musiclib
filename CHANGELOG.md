@@ -8,6 +8,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.G] Chaîne : double-clic sur un maillon = boucle du lecteur sur la
+  section (calée sur les mesures, ÷2 / ×2 / Retirer comme une boucle tracée).
 - [7.G] Façade Digitakt II complète : les 23 contrôles du §3.1 (VOLUME,
   LEVEL/DATA, PRESET/KIT, SETTINGS, SAMPLING, TEMPO, NO/YES, knobs A-H,
   touches PARAMETER, flèches, PAGE, RECORD/PLAY/STOP, TRK/PTN/SONG, FUNC,

@@ -89,7 +89,7 @@
       {/snippet}
       {#if bank}
         <BankView {bank} {currentTime} {playing} player={playerView} onseek={t => player?.seek(t)}
-          onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
+          onloop={(start, end) => player?.setLoop(start, end)} onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
           onhelp={(path, page) => (path ? kbPanel?.openPath(path) : page && kbPanel?.openManual(page))} />
         <div class="bankbar">
           <span class="muted small">Bank générée le {new Date(bank.generated_at).toLocaleString('fr-FR')}</span>

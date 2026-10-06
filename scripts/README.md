@@ -716,7 +716,7 @@ python api.py &   puis   cd ../web && npm run dev
   page des knobs A-H (noms du §11, NOTE / VEL du pas courant). Clic = légende épinglée
   (fonction, CC / NRPN, fiche, § du manuel), survol = simple aperçu ; **AIDE ?** = un clic ouvre la
   fiche. Données dans `web/src/lib/dt2.ts`. Dessous : **chaîne** (ordre de jeu,
-  clic = saut à la section), **vue d'ensemble** 16 tracks × tous les pas
+  clic = saut à la section, double-clic = boucle sur la section), **vue d'ensemble** 16 tracks × tous les pas
   (curseur synchronisé, tracks mutées grisées `M`), partition de mutes
   cliquable.
 - **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py`,

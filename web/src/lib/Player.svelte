@@ -115,6 +115,11 @@
     snap(loopRegion)
   }
 
+  /** Boucle sur [start, end] (double-clic sur un maillon de la chaine), calee sur les mesures. */
+  export function setLoop(start: number, end: number) {
+    regions?.addRegion({ start, end, color: 'rgba(232, 89, 12, 0.22)' })  // -> region-created
+  }
+
   export function clearLoop() {
     regions?.clearRegions()
     loopRegion = null
