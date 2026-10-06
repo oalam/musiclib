@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 0.08824895969412697,
     "true_peak_dbfs": -0.1186709828648265,
     "rms_dbfs": -10.693494141942656,
-    "clipping_ratio": 1.50384804638108e-7,
+    "clipping_ratio": 1.50384804638108e-07,
     "clipping_count": 1
   },
   "loudness": {
@@ -502,5 +502,794 @@
     "pulse_clarity": 0.906,
     "swing": 0.322,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "mix",
+    "scale": {
+      "root": 2,
+      "root_name": "D",
+      "scale": "BLUES",
+      "label": "D blues",
+      "notes": [
+        "D",
+        "F",
+        "G",
+        "G#",
+        "A",
+        "C"
+      ],
+      "score": 0.725,
+      "margin": 0.038,
+      "uncertain": true,
+      "candidates": [
+        {
+          "root": 1,
+          "root_name": "C#",
+          "scale": "HARMONIC MINOR",
+          "label": "C# mineur harmonique",
+          "notes": [
+            "C#",
+            "D#",
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "C"
+          ],
+          "score": 0.687
+        },
+        {
+          "root": 1,
+          "root_name": "C#",
+          "scale": "LYDIAN",
+          "label": "C# lydien",
+          "notes": [
+            "C#",
+            "D#",
+            "F",
+            "G",
+            "G#",
+            "A#",
+            "C"
+          ],
+          "score": 0.642
+        },
+        {
+          "root": 0,
+          "root_name": "C",
+          "scale": "PENTATONIC MAJOR",
+          "label": "C pentatonique majeure",
+          "notes": [
+            "C",
+            "D",
+            "E",
+            "G",
+            "A"
+          ],
+          "score": 0.624
+        },
+        {
+          "root": 8,
+          "root_name": "G#",
+          "scale": "IONIAN (MAJOR)",
+          "label": "G# majeur (ionien)",
+          "notes": [
+            "G#",
+            "A#",
+            "C",
+            "C#",
+            "D#",
+            "F",
+            "G"
+          ],
+          "score": 0.599
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 0.629,
+        "end_s": 2.379,
+        "label": "C",
+        "root": 0,
+        "quality": "maj",
+        "confidence": 0.736
+      },
+      {
+        "bar": 1,
+        "start_s": 2.379,
+        "end_s": 4.021,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.783
+      },
+      {
+        "bar": 2,
+        "start_s": 4.021,
+        "end_s": 5.877,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.702
+      },
+      {
+        "bar": 3,
+        "start_s": 5.877,
+        "end_s": 7.883,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.749
+      },
+      {
+        "bar": 4,
+        "start_s": 7.883,
+        "end_s": 9.589,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.684
+      },
+      {
+        "bar": 5,
+        "start_s": 9.589,
+        "end_s": 11.445,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.85
+      },
+      {
+        "bar": 6,
+        "start_s": 11.445,
+        "end_s": 13.163,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.827
+      },
+      {
+        "bar": 7,
+        "start_s": 13.163,
+        "end_s": 15.051,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.692
+      },
+      {
+        "bar": 8,
+        "start_s": 15.051,
+        "end_s": 16.853,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.719
+      },
+      {
+        "bar": 9,
+        "start_s": 16.853,
+        "end_s": 18.741,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.714
+      },
+      {
+        "bar": 10,
+        "start_s": 18.741,
+        "end_s": 20.448,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.66
+      },
+      {
+        "bar": 11,
+        "start_s": 20.448,
+        "end_s": 22.261,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.808
+      },
+      {
+        "bar": 12,
+        "start_s": 22.261,
+        "end_s": 24.288,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.756
+      },
+      {
+        "bar": 13,
+        "start_s": 24.288,
+        "end_s": 26.144,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.815
+      },
+      {
+        "bar": 14,
+        "start_s": 26.144,
+        "end_s": 27.989,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.852
+      },
+      {
+        "bar": 15,
+        "start_s": 27.989,
+        "end_s": 29.845,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.711
+      },
+      {
+        "bar": 16,
+        "start_s": 29.845,
+        "end_s": 31.712,
+        "label": "Bsus2",
+        "root": 11,
+        "quality": "sus2",
+        "confidence": 0.729
+      },
+      {
+        "bar": 17,
+        "start_s": 31.712,
+        "end_s": 33.568,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.781
+      },
+      {
+        "bar": 18,
+        "start_s": 33.568,
+        "end_s": 35.563,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 19,
+        "start_s": 35.563,
+        "end_s": 37.429,
+        "label": "Am",
+        "root": 9,
+        "quality": "min",
+        "confidence": 0.664
+      },
+      {
+        "bar": 20,
+        "start_s": 37.429,
+        "end_s": 39.275,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.712
+      },
+      {
+        "bar": 21,
+        "start_s": 39.275,
+        "end_s": 41.291,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.8
+      },
+      {
+        "bar": 22,
+        "start_s": 41.291,
+        "end_s": 43.157,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.761
+      },
+      {
+        "bar": 23,
+        "start_s": 43.157,
+        "end_s": 45.003,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.798
+      },
+      {
+        "bar": 24,
+        "start_s": 45.003,
+        "end_s": 46.859,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.924
+      },
+      {
+        "bar": 25,
+        "start_s": 46.859,
+        "end_s": 48.715,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.86
+      },
+      {
+        "bar": 26,
+        "start_s": 48.715,
+        "end_s": 50.571,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.708
+      },
+      {
+        "bar": 27,
+        "start_s": 50.571,
+        "end_s": 52.416,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.734
+      },
+      {
+        "bar": 28,
+        "start_s": 52.416,
+        "end_s": 54.432,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.68
+      },
+      {
+        "bar": 29,
+        "start_s": 54.432,
+        "end_s": 56.139,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.763
+      },
+      {
+        "bar": 30,
+        "start_s": 56.139,
+        "end_s": 57.984,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.74
+      },
+      {
+        "bar": 31,
+        "start_s": 57.984,
+        "end_s": 59.84,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.682
+      },
+      {
+        "bar": 32,
+        "start_s": 59.84,
+        "end_s": 61.856,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.894
+      },
+      {
+        "bar": 33,
+        "start_s": 61.856,
+        "end_s": 63.755,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.865
+      },
+      {
+        "bar": 34,
+        "start_s": 63.755,
+        "end_s": 65.557,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.767
+      },
+      {
+        "bar": 35,
+        "start_s": 65.557,
+        "end_s": 67.488,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.738
+      },
+      {
+        "bar": 36,
+        "start_s": 67.488,
+        "end_s": 69.451,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.732
+      },
+      {
+        "bar": 37,
+        "start_s": 69.451,
+        "end_s": 71.285,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.719
+      },
+      {
+        "bar": 38,
+        "start_s": 71.285,
+        "end_s": 73.28,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.666
+      },
+      {
+        "bar": 39,
+        "start_s": 73.28,
+        "end_s": 75.157,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.784
+      },
+      {
+        "bar": 40,
+        "start_s": 75.157,
+        "end_s": 77.163,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.817
+      },
+      {
+        "bar": 41,
+        "start_s": 77.163,
+        "end_s": 78.869,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.788
+      },
+      {
+        "bar": 42,
+        "start_s": 78.869,
+        "end_s": 80.736,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.762
+      },
+      {
+        "bar": 43,
+        "start_s": 80.736,
+        "end_s": 82.581,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.744
+      },
+      {
+        "bar": 44,
+        "start_s": 82.581,
+        "end_s": 84.587,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.611
+      },
+      {
+        "bar": 45,
+        "start_s": 84.587,
+        "end_s": 86.443,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.687
+      },
+      {
+        "bar": 46,
+        "start_s": 86.443,
+        "end_s": 88.299,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.685
+      },
+      {
+        "bar": 47,
+        "start_s": 88.299,
+        "end_s": 89.995,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.706
+      },
+      {
+        "bar": 48,
+        "start_s": 89.995,
+        "end_s": 91.861,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.867
+      },
+      {
+        "bar": 49,
+        "start_s": 91.861,
+        "end_s": 93.643,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.804
+      },
+      {
+        "bar": 50,
+        "start_s": 93.643,
+        "end_s": 95.413,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.87
+      },
+      {
+        "bar": 51,
+        "start_s": 95.413,
+        "end_s": 97.131,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.842
+      },
+      {
+        "bar": 52,
+        "start_s": 97.131,
+        "end_s": 98.965,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.66
+      },
+      {
+        "bar": 53,
+        "start_s": 98.965,
+        "end_s": 100.928,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.869
+      },
+      {
+        "bar": 54,
+        "start_s": 100.928,
+        "end_s": 102.752,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.838
+      },
+      {
+        "bar": 55,
+        "start_s": 102.752,
+        "end_s": 104.384,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.8
+      },
+      {
+        "bar": 56,
+        "start_s": 104.384,
+        "end_s": 106.24,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.916
+      },
+      {
+        "bar": 57,
+        "start_s": 106.24,
+        "end_s": 108.096,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.857
+      },
+      {
+        "bar": 58,
+        "start_s": 108.096,
+        "end_s": 109.952,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.697
+      },
+      {
+        "bar": 59,
+        "start_s": 109.952,
+        "end_s": 111.808,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.731
+      },
+      {
+        "bar": 60,
+        "start_s": 111.808,
+        "end_s": 113.813,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.692
+      },
+      {
+        "bar": 61,
+        "start_s": 113.813,
+        "end_s": 115.52,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.763
+      },
+      {
+        "bar": 62,
+        "start_s": 115.52,
+        "end_s": 117.376,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.726
+      },
+      {
+        "bar": 63,
+        "start_s": 117.376,
+        "end_s": 119.232,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.675
+      },
+      {
+        "bar": 64,
+        "start_s": 119.232,
+        "end_s": 121.237,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.872
+      },
+      {
+        "bar": 65,
+        "start_s": 121.237,
+        "end_s": 123.136,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.868
+      },
+      {
+        "bar": 66,
+        "start_s": 123.136,
+        "end_s": 124.939,
+        "label": "C#sus2",
+        "root": 1,
+        "quality": "sus2",
+        "confidence": 0.758
+      },
+      {
+        "bar": 67,
+        "start_s": 124.939,
+        "end_s": 126.816,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.735
+      },
+      {
+        "bar": 68,
+        "start_s": 126.816,
+        "end_s": 128.661,
+        "label": "C#m",
+        "root": 1,
+        "quality": "min",
+        "confidence": 0.73
+      },
+      {
+        "bar": 69,
+        "start_s": 128.661,
+        "end_s": 130.677,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.928
+      },
+      {
+        "bar": 70,
+        "start_s": 130.677,
+        "end_s": 132.373,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.804
+      },
+      {
+        "bar": 71,
+        "start_s": 132.373,
+        "end_s": 134.069,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.736
+      },
+      {
+        "bar": 72,
+        "start_s": 134.069,
+        "end_s": 135.765,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.884
+      },
+      {
+        "bar": 73,
+        "start_s": 135.765,
+        "end_s": 137.323,
+        "label": "C#5",
+        "root": 1,
+        "quality": "5",
+        "confidence": 0.762
+      }
+    ],
+    "progression": [
+      {
+        "label": "intro",
+        "start_s": 0.0,
+        "end_s": 5.41,
+        "chords": [
+          "C",
+          "C#m",
+          "C#5"
+        ]
+      },
+      {
+        "label": "breakdown",
+        "start_s": 5.41,
+        "end_s": 10.53,
+        "chords": [
+          "C#m",
+          "C#5"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 10.53,
+        "end_s": 138.53,
+        "chords": [
+          "C#sus2",
+          "C#5",
+          "C#m",
+          "C#sus2",
+          "C#5",
+          "C#sus2",
+          "Bsus2",
+          "C#m"
+        ]
+      }
+    ]
   }
 }

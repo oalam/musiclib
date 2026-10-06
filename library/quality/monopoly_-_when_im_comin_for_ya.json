@@ -409,5 +409,583 @@
     "pulse_clarity": 0.929,
     "swing": 0.481,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "stems",
+    "scale": {
+      "root": 11,
+      "root_name": "B",
+      "scale": "PENTATONIC MAJOR",
+      "label": "B pentatonique majeure",
+      "notes": [
+        "B",
+        "C#",
+        "D#",
+        "F#",
+        "G#"
+      ],
+      "score": 0.655,
+      "margin": 0.162,
+      "uncertain": false,
+      "candidates": [
+        {
+          "root": 11,
+          "root_name": "B",
+          "scale": "LOCRIAN",
+          "label": "B locrien",
+          "notes": [
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A"
+          ],
+          "score": 0.602
+        },
+        {
+          "root": 11,
+          "root_name": "B",
+          "scale": "PHRYGIAN",
+          "label": "B phrygien",
+          "notes": [
+            "B",
+            "C",
+            "D",
+            "E",
+            "F#",
+            "G",
+            "A"
+          ],
+          "score": 0.573
+        },
+        {
+          "root": 11,
+          "root_name": "B",
+          "scale": "LYDIAN",
+          "label": "B lydien",
+          "notes": [
+            "B",
+            "C#",
+            "D#",
+            "F",
+            "F#",
+            "G#",
+            "A#"
+          ],
+          "score": 0.55
+        },
+        {
+          "root": 11,
+          "root_name": "B",
+          "scale": "AEOLIAN (MINOR)",
+          "label": "B mineur (éolien)",
+          "notes": [
+            "B",
+            "C#",
+            "D",
+            "E",
+            "F#",
+            "G",
+            "A"
+          ],
+          "score": 0.523
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 0.041,
+        "end_s": 2.455,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.665
+      },
+      {
+        "bar": 1,
+        "start_s": 2.455,
+        "end_s": 4.87,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.721
+      },
+      {
+        "bar": 2,
+        "start_s": 4.87,
+        "end_s": 7.284,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.754
+      },
+      {
+        "bar": 3,
+        "start_s": 7.284,
+        "end_s": 9.699,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.71
+      },
+      {
+        "bar": 4,
+        "start_s": 9.699,
+        "end_s": 12.113,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.74
+      },
+      {
+        "bar": 5,
+        "start_s": 12.113,
+        "end_s": 14.528,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.733
+      },
+      {
+        "bar": 6,
+        "start_s": 14.528,
+        "end_s": 16.942,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.758
+      },
+      {
+        "bar": 7,
+        "start_s": 16.942,
+        "end_s": 19.357,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.702
+      },
+      {
+        "bar": 8,
+        "start_s": 19.357,
+        "end_s": 21.771,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.609
+      },
+      {
+        "bar": 9,
+        "start_s": 21.771,
+        "end_s": 24.186,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.767
+      },
+      {
+        "bar": 10,
+        "start_s": 24.186,
+        "end_s": 26.6,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.677
+      },
+      {
+        "bar": 11,
+        "start_s": 26.6,
+        "end_s": 29.015,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.754
+      },
+      {
+        "bar": 12,
+        "start_s": 29.015,
+        "end_s": 31.429,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.594
+      },
+      {
+        "bar": 13,
+        "start_s": 31.429,
+        "end_s": 33.844,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.783
+      },
+      {
+        "bar": 14,
+        "start_s": 33.844,
+        "end_s": 36.258,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.623
+      },
+      {
+        "bar": 15,
+        "start_s": 36.258,
+        "end_s": 38.673,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.72
+      },
+      {
+        "bar": 16,
+        "start_s": 38.673,
+        "end_s": 41.087,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.645
+      },
+      {
+        "bar": 17,
+        "start_s": 41.087,
+        "end_s": 43.502,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.607
+      },
+      {
+        "bar": 18,
+        "start_s": 43.502,
+        "end_s": 45.916,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.623
+      },
+      {
+        "bar": 19,
+        "start_s": 45.916,
+        "end_s": 48.33,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 20,
+        "start_s": 48.33,
+        "end_s": 50.745,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.599
+      },
+      {
+        "bar": 21,
+        "start_s": 50.745,
+        "end_s": 53.159,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 22,
+        "start_s": 53.159,
+        "end_s": 55.574,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.544
+      },
+      {
+        "bar": 23,
+        "start_s": 55.574,
+        "end_s": 57.988,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 24,
+        "start_s": 57.988,
+        "end_s": 60.403,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.691
+      },
+      {
+        "bar": 25,
+        "start_s": 60.403,
+        "end_s": 62.817,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.663
+      },
+      {
+        "bar": 26,
+        "start_s": 62.817,
+        "end_s": 65.232,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.715
+      },
+      {
+        "bar": 27,
+        "start_s": 65.232,
+        "end_s": 67.646,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.675
+      },
+      {
+        "bar": 28,
+        "start_s": 67.646,
+        "end_s": 70.061,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.734
+      },
+      {
+        "bar": 29,
+        "start_s": 70.061,
+        "end_s": 72.475,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.651
+      },
+      {
+        "bar": 30,
+        "start_s": 72.475,
+        "end_s": 74.89,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.725
+      },
+      {
+        "bar": 31,
+        "start_s": 74.89,
+        "end_s": 77.304,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.686
+      },
+      {
+        "bar": 32,
+        "start_s": 77.304,
+        "end_s": 79.719,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.607
+      },
+      {
+        "bar": 33,
+        "start_s": 79.719,
+        "end_s": 82.133,
+        "label": "Bdim",
+        "root": 11,
+        "quality": "dim",
+        "confidence": 0.636
+      },
+      {
+        "bar": 34,
+        "start_s": 82.133,
+        "end_s": 84.548,
+        "label": "G#dim",
+        "root": 8,
+        "quality": "dim",
+        "confidence": 0.671
+      },
+      {
+        "bar": 35,
+        "start_s": 84.548,
+        "end_s": 86.962,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.637
+      },
+      {
+        "bar": 36,
+        "start_s": 86.962,
+        "end_s": 89.377,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.661
+      },
+      {
+        "bar": 37,
+        "start_s": 89.377,
+        "end_s": 91.791,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.633
+      },
+      {
+        "bar": 38,
+        "start_s": 91.791,
+        "end_s": 94.206,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.701
+      },
+      {
+        "bar": 39,
+        "start_s": 94.206,
+        "end_s": 96.62,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.672
+      },
+      {
+        "bar": 40,
+        "start_s": 96.62,
+        "end_s": 99.035,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.754
+      },
+      {
+        "bar": 41,
+        "start_s": 99.035,
+        "end_s": 101.449,
+        "label": "Bdim",
+        "root": 11,
+        "quality": "dim",
+        "confidence": 0.65
+      },
+      {
+        "bar": 42,
+        "start_s": 101.449,
+        "end_s": 103.864,
+        "label": "Bsus2",
+        "root": 11,
+        "quality": "sus2",
+        "confidence": 0.605
+      },
+      {
+        "bar": 43,
+        "start_s": 103.864,
+        "end_s": 106.278,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.721
+      },
+      {
+        "bar": 44,
+        "start_s": 106.278,
+        "end_s": 108.693,
+        "label": "D",
+        "root": 2,
+        "quality": "maj",
+        "confidence": 0.677
+      },
+      {
+        "bar": 45,
+        "start_s": 108.693,
+        "end_s": 111.107,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.785
+      },
+      {
+        "bar": 46,
+        "start_s": 111.107,
+        "end_s": 113.522,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.59
+      },
+      {
+        "bar": 47,
+        "start_s": 113.522,
+        "end_s": 115.936,
+        "label": "F#5",
+        "root": 6,
+        "quality": "5",
+        "confidence": 0.668
+      },
+      {
+        "bar": 48,
+        "start_s": 115.936,
+        "end_s": 118.351,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 49,
+        "start_s": 118.351,
+        "end_s": 120.765,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 50,
+        "start_s": 120.765,
+        "end_s": 123.18,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      }
+    ],
+    "progression": [
+      {
+        "label": "intro",
+        "start_s": 0.0,
+        "end_s": 0.66,
+        "chords": []
+      },
+      {
+        "label": "build",
+        "start_s": 0.66,
+        "end_s": 40.55,
+        "chords": [
+          "Bsus4"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 40.55,
+        "end_s": 124.51,
+        "chords": [
+          "A5",
+          "G5",
+          "Gsus2",
+          "Bsus4",
+          "Bdim",
+          "G#dim",
+          "Bsus4",
+          "Asus2"
+        ]
+      }
+    ]
   }
 }

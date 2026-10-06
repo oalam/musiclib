@@ -574,5 +574,937 @@
     "pulse_clarity": 0.931,
     "swing": 0.268,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "stems",
+    "scale": {
+      "root": 5,
+      "root_name": "F",
+      "scale": "LYDIAN",
+      "label": "F lydien",
+      "notes": [
+        "F",
+        "G",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "score": 0.791,
+      "margin": 0.0,
+      "uncertain": true,
+      "candidates": [
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "PHRYGIAN",
+          "label": "E phrygien",
+          "notes": [
+            "E",
+            "F",
+            "G",
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "score": 0.791
+        },
+        {
+          "root": 11,
+          "root_name": "B",
+          "scale": "BLUES",
+          "label": "B blues",
+          "notes": [
+            "B",
+            "D",
+            "E",
+            "F",
+            "F#",
+            "A"
+          ],
+          "score": 0.694
+        },
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "PENTATONIC MAJOR",
+          "label": "E pentatonique majeure",
+          "notes": [
+            "E",
+            "F#",
+            "G#",
+            "B",
+            "C#"
+          ],
+          "score": 0.6
+        },
+        {
+          "root": 11,
+          "root_name": "B",
+          "scale": "LOCRIAN",
+          "label": "B locrien",
+          "notes": [
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A"
+          ],
+          "score": 0.599
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 0.308,
+        "end_s": 2.259,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 1,
+        "start_s": 2.259,
+        "end_s": 4.21,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 2,
+        "start_s": 4.21,
+        "end_s": 6.162,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 3,
+        "start_s": 6.162,
+        "end_s": 8.113,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 4,
+        "start_s": 8.113,
+        "end_s": 10.064,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.86
+      },
+      {
+        "bar": 5,
+        "start_s": 10.064,
+        "end_s": 12.015,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.864
+      },
+      {
+        "bar": 6,
+        "start_s": 12.015,
+        "end_s": 13.967,
+        "label": "E",
+        "root": 4,
+        "quality": "maj",
+        "confidence": 0.845
+      },
+      {
+        "bar": 7,
+        "start_s": 13.967,
+        "end_s": 15.918,
+        "label": "E",
+        "root": 4,
+        "quality": "maj",
+        "confidence": 0.701
+      },
+      {
+        "bar": 8,
+        "start_s": 15.918,
+        "end_s": 17.869,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.841
+      },
+      {
+        "bar": 9,
+        "start_s": 17.869,
+        "end_s": 19.82,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.904
+      },
+      {
+        "bar": 10,
+        "start_s": 19.82,
+        "end_s": 21.771,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.869
+      },
+      {
+        "bar": 11,
+        "start_s": 21.771,
+        "end_s": 23.723,
+        "label": "E",
+        "root": 4,
+        "quality": "maj",
+        "confidence": 0.75
+      },
+      {
+        "bar": 12,
+        "start_s": 23.723,
+        "end_s": 25.674,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.845
+      },
+      {
+        "bar": 13,
+        "start_s": 25.674,
+        "end_s": 27.625,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.898
+      },
+      {
+        "bar": 14,
+        "start_s": 27.625,
+        "end_s": 29.576,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.895
+      },
+      {
+        "bar": 15,
+        "start_s": 29.576,
+        "end_s": 31.528,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.835
+      },
+      {
+        "bar": 16,
+        "start_s": 31.528,
+        "end_s": 33.479,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.866
+      },
+      {
+        "bar": 17,
+        "start_s": 33.479,
+        "end_s": 35.43,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.845
+      },
+      {
+        "bar": 18,
+        "start_s": 35.43,
+        "end_s": 37.381,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.862
+      },
+      {
+        "bar": 19,
+        "start_s": 37.381,
+        "end_s": 39.332,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.857
+      },
+      {
+        "bar": 20,
+        "start_s": 39.332,
+        "end_s": 41.284,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 21,
+        "start_s": 41.284,
+        "end_s": 43.235,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.584
+      },
+      {
+        "bar": 22,
+        "start_s": 43.235,
+        "end_s": 45.186,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.623
+      },
+      {
+        "bar": 23,
+        "start_s": 45.186,
+        "end_s": 47.137,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.648
+      },
+      {
+        "bar": 24,
+        "start_s": 47.137,
+        "end_s": 49.089,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.654
+      },
+      {
+        "bar": 25,
+        "start_s": 49.089,
+        "end_s": 51.04,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.62
+      },
+      {
+        "bar": 26,
+        "start_s": 51.04,
+        "end_s": 52.991,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.628
+      },
+      {
+        "bar": 27,
+        "start_s": 52.991,
+        "end_s": 54.942,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.6
+      },
+      {
+        "bar": 28,
+        "start_s": 54.942,
+        "end_s": 56.893,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.603
+      },
+      {
+        "bar": 29,
+        "start_s": 56.893,
+        "end_s": 58.845,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.617
+      },
+      {
+        "bar": 30,
+        "start_s": 58.845,
+        "end_s": 60.796,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.605
+      },
+      {
+        "bar": 31,
+        "start_s": 60.796,
+        "end_s": 62.747,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.627
+      },
+      {
+        "bar": 32,
+        "start_s": 62.747,
+        "end_s": 64.698,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.601
+      },
+      {
+        "bar": 33,
+        "start_s": 64.698,
+        "end_s": 66.649,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.594
+      },
+      {
+        "bar": 34,
+        "start_s": 66.649,
+        "end_s": 68.601,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.6
+      },
+      {
+        "bar": 35,
+        "start_s": 68.601,
+        "end_s": 70.552,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.636
+      },
+      {
+        "bar": 36,
+        "start_s": 70.552,
+        "end_s": 72.503,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.62
+      },
+      {
+        "bar": 37,
+        "start_s": 72.503,
+        "end_s": 74.454,
+        "label": "Am",
+        "root": 9,
+        "quality": "min",
+        "confidence": 0.641
+      },
+      {
+        "bar": 38,
+        "start_s": 74.454,
+        "end_s": 76.406,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.843
+      },
+      {
+        "bar": 39,
+        "start_s": 76.406,
+        "end_s": 78.357,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.808
+      },
+      {
+        "bar": 40,
+        "start_s": 78.357,
+        "end_s": 80.308,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.825
+      },
+      {
+        "bar": 41,
+        "start_s": 80.308,
+        "end_s": 82.259,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.771
+      },
+      {
+        "bar": 42,
+        "start_s": 82.259,
+        "end_s": 84.21,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.852
+      },
+      {
+        "bar": 43,
+        "start_s": 84.21,
+        "end_s": 86.162,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.735
+      },
+      {
+        "bar": 44,
+        "start_s": 86.162,
+        "end_s": 88.113,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.856
+      },
+      {
+        "bar": 45,
+        "start_s": 88.113,
+        "end_s": 90.064,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.725
+      },
+      {
+        "bar": 46,
+        "start_s": 90.064,
+        "end_s": 92.015,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.748
+      },
+      {
+        "bar": 47,
+        "start_s": 92.015,
+        "end_s": 93.967,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.67
+      },
+      {
+        "bar": 48,
+        "start_s": 93.967,
+        "end_s": 95.918,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.746
+      },
+      {
+        "bar": 49,
+        "start_s": 95.918,
+        "end_s": 97.869,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.74
+      },
+      {
+        "bar": 50,
+        "start_s": 97.869,
+        "end_s": 99.82,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.773
+      },
+      {
+        "bar": 51,
+        "start_s": 99.82,
+        "end_s": 101.771,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.734
+      },
+      {
+        "bar": 52,
+        "start_s": 101.771,
+        "end_s": 103.723,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 53,
+        "start_s": 103.723,
+        "end_s": 105.674,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.682
+      },
+      {
+        "bar": 54,
+        "start_s": 105.674,
+        "end_s": 107.625,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.706
+      },
+      {
+        "bar": 55,
+        "start_s": 107.625,
+        "end_s": 109.576,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.625
+      },
+      {
+        "bar": 56,
+        "start_s": 109.576,
+        "end_s": 111.528,
+        "label": "G",
+        "root": 7,
+        "quality": "maj",
+        "confidence": 0.693
+      },
+      {
+        "bar": 57,
+        "start_s": 111.528,
+        "end_s": 113.479,
+        "label": "Gsus4",
+        "root": 7,
+        "quality": "sus4",
+        "confidence": 0.623
+      },
+      {
+        "bar": 58,
+        "start_s": 113.479,
+        "end_s": 115.43,
+        "label": "Fsus2",
+        "root": 5,
+        "quality": "sus2",
+        "confidence": 0.664
+      },
+      {
+        "bar": 59,
+        "start_s": 115.43,
+        "end_s": 117.381,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.612
+      },
+      {
+        "bar": 60,
+        "start_s": 117.381,
+        "end_s": 119.332,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.734
+      },
+      {
+        "bar": 61,
+        "start_s": 119.332,
+        "end_s": 121.284,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.599
+      },
+      {
+        "bar": 62,
+        "start_s": 121.284,
+        "end_s": 123.235,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.657
+      },
+      {
+        "bar": 63,
+        "start_s": 123.235,
+        "end_s": 125.186,
+        "label": "Fdim",
+        "root": 5,
+        "quality": "dim",
+        "confidence": 0.614
+      },
+      {
+        "bar": 64,
+        "start_s": 125.186,
+        "end_s": 127.137,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.747
+      },
+      {
+        "bar": 65,
+        "start_s": 127.137,
+        "end_s": 129.089,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.586
+      },
+      {
+        "bar": 66,
+        "start_s": 129.089,
+        "end_s": 131.04,
+        "label": "Fsus2",
+        "root": 5,
+        "quality": "sus2",
+        "confidence": 0.646
+      },
+      {
+        "bar": 67,
+        "start_s": 131.04,
+        "end_s": 132.991,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.629
+      },
+      {
+        "bar": 68,
+        "start_s": 132.991,
+        "end_s": 134.942,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.672
+      },
+      {
+        "bar": 69,
+        "start_s": 134.942,
+        "end_s": 136.893,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.912
+      },
+      {
+        "bar": 70,
+        "start_s": 136.893,
+        "end_s": 138.845,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.859
+      },
+      {
+        "bar": 71,
+        "start_s": 138.845,
+        "end_s": 140.796,
+        "label": "E",
+        "root": 4,
+        "quality": "maj",
+        "confidence": 0.8
+      },
+      {
+        "bar": 72,
+        "start_s": 140.796,
+        "end_s": 142.747,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.691
+      },
+      {
+        "bar": 73,
+        "start_s": 142.747,
+        "end_s": 144.698,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.622
+      },
+      {
+        "bar": 74,
+        "start_s": 144.698,
+        "end_s": 146.649,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 75,
+        "start_s": 146.649,
+        "end_s": 148.601,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.591
+      },
+      {
+        "bar": 76,
+        "start_s": 148.601,
+        "end_s": 150.552,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.583
+      },
+      {
+        "bar": 77,
+        "start_s": 150.552,
+        "end_s": 152.503,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.605
+      },
+      {
+        "bar": 78,
+        "start_s": 152.503,
+        "end_s": 154.454,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.629
+      },
+      {
+        "bar": 79,
+        "start_s": 154.454,
+        "end_s": 156.406,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.652
+      },
+      {
+        "bar": 80,
+        "start_s": 156.406,
+        "end_s": 158.357,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.644
+      },
+      {
+        "bar": 81,
+        "start_s": 158.357,
+        "end_s": 160.308,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.671
+      },
+      {
+        "bar": 82,
+        "start_s": 160.308,
+        "end_s": 162.259,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.676
+      },
+      {
+        "bar": 83,
+        "start_s": 162.259,
+        "end_s": 164.21,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.623
+      },
+      {
+        "bar": 84,
+        "start_s": 164.21,
+        "end_s": 166.162,
+        "label": "Bsus4",
+        "root": 11,
+        "quality": "sus4",
+        "confidence": 0.74
+      },
+      {
+        "bar": 85,
+        "start_s": 166.162,
+        "end_s": 168.113,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 86,
+        "start_s": 168.113,
+        "end_s": 170.064,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 87,
+        "start_s": 170.064,
+        "end_s": 172.015,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      }
+    ],
+    "progression": [
+      {
+        "label": "intro",
+        "start_s": 0.0,
+        "end_s": 9.56,
+        "chords": [
+          "E5"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 9.56,
+        "end_s": 15.75,
+        "chords": [
+          "E5",
+          "E"
+        ]
+      },
+      {
+        "label": "peak",
+        "start_s": 15.75,
+        "end_s": 133.69,
+        "chords": [
+          "E5",
+          "Esus2",
+          "E",
+          "E5",
+          "Esus2",
+          "E5",
+          "Esus2",
+          "Esus4"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 133.69,
+        "end_s": 141.45,
+        "chords": [
+          "Esus4",
+          "E5",
+          "E"
+        ]
+      },
+      {
+        "label": "peak",
+        "start_s": 141.45,
+        "end_s": 172.05,
+        "chords": [
+          "Esus2",
+          "Bsus4"
+        ]
+      }
+    ]
   }
 }

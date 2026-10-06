@@ -679,5 +679,1151 @@
     "pulse_clarity": 0.928,
     "swing": 0.609,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "mix",
+    "scale": {
+      "root": 0,
+      "root_name": "C",
+      "scale": "PENTATONIC MAJOR",
+      "label": "C pentatonique majeure",
+      "notes": [
+        "C",
+        "D",
+        "E",
+        "G",
+        "A"
+      ],
+      "score": 0.582,
+      "margin": 0.032,
+      "uncertain": true,
+      "candidates": [
+        {
+          "root": 7,
+          "root_name": "G",
+          "scale": "BLUES",
+          "label": "G blues",
+          "notes": [
+            "G",
+            "A#",
+            "C",
+            "C#",
+            "D",
+            "F"
+          ],
+          "score": 0.55
+        },
+        {
+          "root": 2,
+          "root_name": "D",
+          "scale": "PENTATONIC MINOR",
+          "label": "D pentatonique mineure",
+          "notes": [
+            "D",
+            "F",
+            "G",
+            "A",
+            "C"
+          ],
+          "score": 0.493
+        },
+        {
+          "root": 0,
+          "root_name": "C",
+          "scale": "PHRYGIAN",
+          "label": "C phrygien",
+          "notes": [
+            "C",
+            "C#",
+            "D#",
+            "F",
+            "G",
+            "G#",
+            "A#"
+          ],
+          "score": 0.479
+        },
+        {
+          "root": 1,
+          "root_name": "C#",
+          "scale": "LYDIAN",
+          "label": "C# lydien",
+          "notes": [
+            "C#",
+            "D#",
+            "F",
+            "G",
+            "G#",
+            "A#",
+            "C"
+          ],
+          "score": 0.471
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 22.763,
+        "end_s": 24.299,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 1,
+        "start_s": 24.299,
+        "end_s": 25.877,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 2,
+        "start_s": 25.877,
+        "end_s": 27.339,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 3,
+        "start_s": 27.339,
+        "end_s": 28.736,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 4,
+        "start_s": 28.736,
+        "end_s": 30.272,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 5,
+        "start_s": 30.272,
+        "end_s": 31.659,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 6,
+        "start_s": 31.659,
+        "end_s": 33.12,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 7,
+        "start_s": 33.12,
+        "end_s": 34.603,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 8,
+        "start_s": 34.603,
+        "end_s": 36.171,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 9,
+        "start_s": 36.171,
+        "end_s": 37.707,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 10,
+        "start_s": 37.707,
+        "end_s": 39.221,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 11,
+        "start_s": 39.221,
+        "end_s": 40.683,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 12,
+        "start_s": 40.683,
+        "end_s": 42.208,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 13,
+        "start_s": 42.208,
+        "end_s": 43.712,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 14,
+        "start_s": 43.712,
+        "end_s": 45.216,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 15,
+        "start_s": 45.216,
+        "end_s": 46.603,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.741
+      },
+      {
+        "bar": 16,
+        "start_s": 46.603,
+        "end_s": 48.021,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.662
+      },
+      {
+        "bar": 17,
+        "start_s": 48.021,
+        "end_s": 49.525,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.64
+      },
+      {
+        "bar": 18,
+        "start_s": 49.525,
+        "end_s": 51.019,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.675
+      },
+      {
+        "bar": 19,
+        "start_s": 51.019,
+        "end_s": 52.523,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.666
+      },
+      {
+        "bar": 20,
+        "start_s": 52.523,
+        "end_s": 54.016,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 21,
+        "start_s": 54.016,
+        "end_s": 55.52,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.678
+      },
+      {
+        "bar": 22,
+        "start_s": 55.52,
+        "end_s": 57.024,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 23,
+        "start_s": 57.024,
+        "end_s": 58.517,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 24,
+        "start_s": 58.517,
+        "end_s": 60.021,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.648
+      },
+      {
+        "bar": 25,
+        "start_s": 60.021,
+        "end_s": 61.525,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.666
+      },
+      {
+        "bar": 26,
+        "start_s": 61.525,
+        "end_s": 63.019,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.671
+      },
+      {
+        "bar": 27,
+        "start_s": 63.019,
+        "end_s": 64.523,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.665
+      },
+      {
+        "bar": 28,
+        "start_s": 64.523,
+        "end_s": 65.963,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.654
+      },
+      {
+        "bar": 29,
+        "start_s": 65.963,
+        "end_s": 67.339,
+        "label": "C5",
+        "root": 0,
+        "quality": "5",
+        "confidence": 0.71
+      },
+      {
+        "bar": 30,
+        "start_s": 67.339,
+        "end_s": 68.832,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 31,
+        "start_s": 68.832,
+        "end_s": 70.336,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 32,
+        "start_s": 70.336,
+        "end_s": 71.712,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 33,
+        "start_s": 71.712,
+        "end_s": 73.141,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.624
+      },
+      {
+        "bar": 34,
+        "start_s": 73.141,
+        "end_s": 74.645,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 35,
+        "start_s": 74.645,
+        "end_s": 76.139,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.673
+      },
+      {
+        "bar": 36,
+        "start_s": 76.139,
+        "end_s": 77.643,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 37,
+        "start_s": 77.643,
+        "end_s": 79.147,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.651
+      },
+      {
+        "bar": 38,
+        "start_s": 79.147,
+        "end_s": 80.64,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.673
+      },
+      {
+        "bar": 39,
+        "start_s": 80.64,
+        "end_s": 82.144,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.674
+      },
+      {
+        "bar": 40,
+        "start_s": 82.144,
+        "end_s": 83.648,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.651
+      },
+      {
+        "bar": 41,
+        "start_s": 83.648,
+        "end_s": 85.141,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.641
+      },
+      {
+        "bar": 42,
+        "start_s": 85.141,
+        "end_s": 86.645,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.674
+      },
+      {
+        "bar": 43,
+        "start_s": 86.645,
+        "end_s": 88.149,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.668
+      },
+      {
+        "bar": 44,
+        "start_s": 88.149,
+        "end_s": 89.643,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.662
+      },
+      {
+        "bar": 45,
+        "start_s": 89.643,
+        "end_s": 91.147,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.647
+      },
+      {
+        "bar": 46,
+        "start_s": 91.147,
+        "end_s": 92.64,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 47,
+        "start_s": 92.64,
+        "end_s": 94.144,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.678
+      },
+      {
+        "bar": 48,
+        "start_s": 94.144,
+        "end_s": 95.648,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 49,
+        "start_s": 95.648,
+        "end_s": 97.141,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.677
+      },
+      {
+        "bar": 50,
+        "start_s": 97.141,
+        "end_s": 98.645,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.671
+      },
+      {
+        "bar": 51,
+        "start_s": 98.645,
+        "end_s": 100.149,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.677
+      },
+      {
+        "bar": 52,
+        "start_s": 100.149,
+        "end_s": 101.643,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.666
+      },
+      {
+        "bar": 53,
+        "start_s": 101.643,
+        "end_s": 103.147,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.65
+      },
+      {
+        "bar": 54,
+        "start_s": 103.147,
+        "end_s": 104.64,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.676
+      },
+      {
+        "bar": 55,
+        "start_s": 104.64,
+        "end_s": 106.144,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.681
+      },
+      {
+        "bar": 56,
+        "start_s": 106.144,
+        "end_s": 107.637,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.667
+      },
+      {
+        "bar": 57,
+        "start_s": 107.637,
+        "end_s": 109.141,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.684
+      },
+      {
+        "bar": 58,
+        "start_s": 109.141,
+        "end_s": 110.645,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.672
+      },
+      {
+        "bar": 59,
+        "start_s": 110.645,
+        "end_s": 112.149,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.675
+      },
+      {
+        "bar": 60,
+        "start_s": 112.149,
+        "end_s": 113.643,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 61,
+        "start_s": 113.643,
+        "end_s": 115.147,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.658
+      },
+      {
+        "bar": 62,
+        "start_s": 115.147,
+        "end_s": 116.64,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.676
+      },
+      {
+        "bar": 63,
+        "start_s": 116.64,
+        "end_s": 118.144,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.681
+      },
+      {
+        "bar": 64,
+        "start_s": 118.144,
+        "end_s": 119.637,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.664
+      },
+      {
+        "bar": 65,
+        "start_s": 119.637,
+        "end_s": 121.013,
+        "label": "C5",
+        "root": 0,
+        "quality": "5",
+        "confidence": 0.688
+      },
+      {
+        "bar": 66,
+        "start_s": 121.013,
+        "end_s": 122.453,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 67,
+        "start_s": 122.453,
+        "end_s": 123.957,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 68,
+        "start_s": 123.957,
+        "end_s": 125.451,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 69,
+        "start_s": 125.451,
+        "end_s": 126.965,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 70,
+        "start_s": 126.965,
+        "end_s": 128.459,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 71,
+        "start_s": 128.459,
+        "end_s": 129.963,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 72,
+        "start_s": 129.963,
+        "end_s": 131.467,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 73,
+        "start_s": 131.467,
+        "end_s": 132.96,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 74,
+        "start_s": 132.96,
+        "end_s": 134.453,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 75,
+        "start_s": 134.453,
+        "end_s": 135.957,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 76,
+        "start_s": 135.957,
+        "end_s": 137.461,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 77,
+        "start_s": 137.461,
+        "end_s": 138.955,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 78,
+        "start_s": 138.955,
+        "end_s": 140.459,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 79,
+        "start_s": 140.459,
+        "end_s": 141.963,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 80,
+        "start_s": 141.963,
+        "end_s": 143.456,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 81,
+        "start_s": 143.456,
+        "end_s": 144.768,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 82,
+        "start_s": 144.768,
+        "end_s": 146.272,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 83,
+        "start_s": 146.272,
+        "end_s": 147.776,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 84,
+        "start_s": 147.776,
+        "end_s": 149.269,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.662
+      },
+      {
+        "bar": 85,
+        "start_s": 149.269,
+        "end_s": 150.773,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.64
+      },
+      {
+        "bar": 86,
+        "start_s": 150.773,
+        "end_s": 152.267,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.671
+      },
+      {
+        "bar": 87,
+        "start_s": 152.267,
+        "end_s": 153.771,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.674
+      },
+      {
+        "bar": 88,
+        "start_s": 153.771,
+        "end_s": 155.275,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 89,
+        "start_s": 155.275,
+        "end_s": 156.768,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.643
+      },
+      {
+        "bar": 90,
+        "start_s": 156.768,
+        "end_s": 158.272,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.672
+      },
+      {
+        "bar": 91,
+        "start_s": 158.272,
+        "end_s": 159.765,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.677
+      },
+      {
+        "bar": 92,
+        "start_s": 159.765,
+        "end_s": 161.269,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.67
+      },
+      {
+        "bar": 93,
+        "start_s": 161.269,
+        "end_s": 162.773,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.649
+      },
+      {
+        "bar": 94,
+        "start_s": 162.773,
+        "end_s": 164.277,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.678
+      },
+      {
+        "bar": 95,
+        "start_s": 164.277,
+        "end_s": 165.771,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.68
+      },
+      {
+        "bar": 96,
+        "start_s": 165.771,
+        "end_s": 167.275,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.669
+      },
+      {
+        "bar": 97,
+        "start_s": 167.275,
+        "end_s": 168.768,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.641
+      },
+      {
+        "bar": 98,
+        "start_s": 168.768,
+        "end_s": 170.272,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.673
+      },
+      {
+        "bar": 99,
+        "start_s": 170.272,
+        "end_s": 171.765,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 100,
+        "start_s": 171.765,
+        "end_s": 173.269,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.669
+      },
+      {
+        "bar": 101,
+        "start_s": 173.269,
+        "end_s": 174.773,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.645
+      },
+      {
+        "bar": 102,
+        "start_s": 174.773,
+        "end_s": 176.267,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.674
+      },
+      {
+        "bar": 103,
+        "start_s": 176.267,
+        "end_s": 177.771,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.676
+      },
+      {
+        "bar": 104,
+        "start_s": 177.771,
+        "end_s": 179.275,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.673
+      },
+      {
+        "bar": 105,
+        "start_s": 179.275,
+        "end_s": 180.768,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.642
+      },
+      {
+        "bar": 106,
+        "start_s": 180.768,
+        "end_s": 182.272,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.676
+      },
+      {
+        "bar": 107,
+        "start_s": 182.272,
+        "end_s": 183.755,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.684
+      },
+      {
+        "bar": 108,
+        "start_s": 183.755,
+        "end_s": 185.269,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.675
+      },
+      {
+        "bar": 109,
+        "start_s": 185.269,
+        "end_s": 186.773,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.658
+      },
+      {
+        "bar": 110,
+        "start_s": 186.773,
+        "end_s": 188.267,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.678
+      },
+      {
+        "bar": 111,
+        "start_s": 188.267,
+        "end_s": 189.771,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.679
+      },
+      {
+        "bar": 112,
+        "start_s": 189.771,
+        "end_s": 191.264,
+        "label": "Csus2",
+        "root": 0,
+        "quality": "sus2",
+        "confidence": 0.676
+      }
+    ],
+    "progression": [
+      {
+        "label": "intro",
+        "start_s": 0.0,
+        "end_s": 45.22,
+        "chords": []
+      },
+      {
+        "label": "build",
+        "start_s": 45.22,
+        "end_s": 72.39,
+        "chords": [
+          "G#",
+          "F5",
+          "Csus2",
+          "C5"
+        ]
+      },
+      {
+        "label": "peak",
+        "start_s": 72.39,
+        "end_s": 120.68,
+        "chords": [
+          "Csus2",
+          "C5"
+        ]
+      },
+      {
+        "label": "breakdown",
+        "start_s": 120.68,
+        "end_s": 144.41,
+        "chords": [
+          "Csus2"
+        ]
+      },
+      {
+        "label": "build",
+        "start_s": 144.41,
+        "end_s": 211.47,
+        "chords": [
+          "Csus2"
+        ]
+      }
+    ]
   }
 }

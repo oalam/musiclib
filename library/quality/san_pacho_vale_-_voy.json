@@ -536,5 +536,869 @@
     "pulse_clarity": 0.947,
     "swing": 0.453,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "mix",
+    "scale": {
+      "root": 4,
+      "root_name": "E",
+      "scale": "HARMONIC MINOR",
+      "label": "E mineur harmonique",
+      "notes": [
+        "E",
+        "F#",
+        "G",
+        "A",
+        "B",
+        "C",
+        "D#"
+      ],
+      "score": 0.908,
+      "margin": 0.197,
+      "uncertain": false,
+      "candidates": [
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "MELODIC MINOR",
+          "label": "E mineur mélodique",
+          "notes": [
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C#",
+            "D#"
+          ],
+          "score": 0.896
+        },
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "PENTATONIC MINOR",
+          "label": "E pentatonique mineure",
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "B",
+            "D"
+          ],
+          "score": 0.755
+        },
+        {
+          "root": 7,
+          "root_name": "G",
+          "scale": "PENTATONIC MAJOR",
+          "label": "G pentatonique majeure",
+          "notes": [
+            "G",
+            "A",
+            "B",
+            "D",
+            "E"
+          ],
+          "score": 0.712
+        },
+        {
+          "root": 9,
+          "root_name": "A",
+          "scale": "BLUES",
+          "label": "A blues",
+          "notes": [
+            "A",
+            "C",
+            "D",
+            "D#",
+            "E",
+            "G"
+          ],
+          "score": 0.698
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 32.288,
+        "end_s": 34.197,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.628
+      },
+      {
+        "bar": 1,
+        "start_s": 34.197,
+        "end_s": 36.096,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.609
+      },
+      {
+        "bar": 2,
+        "start_s": 36.096,
+        "end_s": 38.005,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.629
+      },
+      {
+        "bar": 3,
+        "start_s": 38.005,
+        "end_s": 39.904,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.602
+      },
+      {
+        "bar": 4,
+        "start_s": 39.904,
+        "end_s": 41.813,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.628
+      },
+      {
+        "bar": 5,
+        "start_s": 41.813,
+        "end_s": 43.712,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.605
+      },
+      {
+        "bar": 6,
+        "start_s": 43.712,
+        "end_s": 45.621,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.633
+      },
+      {
+        "bar": 7,
+        "start_s": 45.621,
+        "end_s": 47.531,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 8,
+        "start_s": 47.531,
+        "end_s": 49.429,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.628
+      },
+      {
+        "bar": 9,
+        "start_s": 49.429,
+        "end_s": 51.339,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.604
+      },
+      {
+        "bar": 10,
+        "start_s": 51.339,
+        "end_s": 53.237,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.629
+      },
+      {
+        "bar": 11,
+        "start_s": 53.237,
+        "end_s": 55.147,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.6
+      },
+      {
+        "bar": 12,
+        "start_s": 55.147,
+        "end_s": 57.045,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.624
+      },
+      {
+        "bar": 13,
+        "start_s": 57.045,
+        "end_s": 58.955,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.608
+      },
+      {
+        "bar": 14,
+        "start_s": 58.955,
+        "end_s": 60.864,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.622
+      },
+      {
+        "bar": 15,
+        "start_s": 60.864,
+        "end_s": 62.997,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.611
+      },
+      {
+        "bar": 16,
+        "start_s": 62.997,
+        "end_s": 64.907,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.64
+      },
+      {
+        "bar": 17,
+        "start_s": 64.907,
+        "end_s": 66.816,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.642
+      },
+      {
+        "bar": 18,
+        "start_s": 66.816,
+        "end_s": 68.725,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.641
+      },
+      {
+        "bar": 19,
+        "start_s": 68.725,
+        "end_s": 70.624,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.647
+      },
+      {
+        "bar": 20,
+        "start_s": 70.624,
+        "end_s": 72.523,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.637
+      },
+      {
+        "bar": 21,
+        "start_s": 72.523,
+        "end_s": 74.432,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.633
+      },
+      {
+        "bar": 22,
+        "start_s": 74.432,
+        "end_s": 76.341,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 23,
+        "start_s": 76.341,
+        "end_s": 78.24,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.608
+      },
+      {
+        "bar": 24,
+        "start_s": 78.24,
+        "end_s": 80.149,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.635
+      },
+      {
+        "bar": 25,
+        "start_s": 80.149,
+        "end_s": 82.048,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.627
+      },
+      {
+        "bar": 26,
+        "start_s": 82.048,
+        "end_s": 83.957,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.629
+      },
+      {
+        "bar": 27,
+        "start_s": 83.957,
+        "end_s": 85.856,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.648
+      },
+      {
+        "bar": 28,
+        "start_s": 85.856,
+        "end_s": 87.765,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.633
+      },
+      {
+        "bar": 29,
+        "start_s": 87.765,
+        "end_s": 89.675,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.623
+      },
+      {
+        "bar": 30,
+        "start_s": 89.675,
+        "end_s": 91.563,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.775
+      },
+      {
+        "bar": 31,
+        "start_s": 91.563,
+        "end_s": 93.472,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.668
+      },
+      {
+        "bar": 32,
+        "start_s": 93.472,
+        "end_s": 95.392,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.755
+      },
+      {
+        "bar": 33,
+        "start_s": 95.392,
+        "end_s": 97.291,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.779
+      },
+      {
+        "bar": 34,
+        "start_s": 97.291,
+        "end_s": 99.2,
+        "label": "Em",
+        "root": 4,
+        "quality": "min",
+        "confidence": 0.723
+      },
+      {
+        "bar": 35,
+        "start_s": 99.2,
+        "end_s": 101.088,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.919
+      },
+      {
+        "bar": 36,
+        "start_s": 101.088,
+        "end_s": 103.008,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.847
+      },
+      {
+        "bar": 37,
+        "start_s": 103.008,
+        "end_s": 104.768,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.824
+      },
+      {
+        "bar": 38,
+        "start_s": 104.768,
+        "end_s": 106.827,
+        "label": "Em",
+        "root": 4,
+        "quality": "min",
+        "confidence": 0.82
+      },
+      {
+        "bar": 39,
+        "start_s": 106.827,
+        "end_s": 108.715,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 40,
+        "start_s": 108.715,
+        "end_s": 110.635,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 41,
+        "start_s": 110.635,
+        "end_s": 112.523,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 42,
+        "start_s": 112.523,
+        "end_s": 114.443,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 43,
+        "start_s": 114.443,
+        "end_s": 116.352,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 44,
+        "start_s": 116.352,
+        "end_s": 118.251,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 45,
+        "start_s": 118.251,
+        "end_s": 120.331,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 46,
+        "start_s": 120.331,
+        "end_s": 122.293,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 47,
+        "start_s": 122.293,
+        "end_s": 124.203,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 48,
+        "start_s": 124.203,
+        "end_s": 126.112,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 49,
+        "start_s": 126.112,
+        "end_s": 128.011,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 50,
+        "start_s": 128.011,
+        "end_s": 129.92,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 51,
+        "start_s": 129.92,
+        "end_s": 131.819,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 52,
+        "start_s": 131.819,
+        "end_s": 133.728,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 53,
+        "start_s": 133.728,
+        "end_s": 135.627,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 54,
+        "start_s": 135.627,
+        "end_s": 137.6,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 55,
+        "start_s": 137.6,
+        "end_s": 139.445,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.619
+      },
+      {
+        "bar": 56,
+        "start_s": 139.445,
+        "end_s": 141.344,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.606
+      },
+      {
+        "bar": 57,
+        "start_s": 141.344,
+        "end_s": 143.243,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.625
+      },
+      {
+        "bar": 58,
+        "start_s": 143.243,
+        "end_s": 145.152,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.606
+      },
+      {
+        "bar": 59,
+        "start_s": 145.152,
+        "end_s": 147.051,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.627
+      },
+      {
+        "bar": 60,
+        "start_s": 147.051,
+        "end_s": 148.96,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.607
+      },
+      {
+        "bar": 61,
+        "start_s": 148.96,
+        "end_s": 150.859,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.617
+      },
+      {
+        "bar": 62,
+        "start_s": 150.859,
+        "end_s": 152.768,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.604
+      },
+      {
+        "bar": 63,
+        "start_s": 152.768,
+        "end_s": 154.667,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.622
+      },
+      {
+        "bar": 64,
+        "start_s": 154.667,
+        "end_s": 156.576,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.605
+      },
+      {
+        "bar": 65,
+        "start_s": 156.576,
+        "end_s": 158.485,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.618
+      },
+      {
+        "bar": 66,
+        "start_s": 158.485,
+        "end_s": 160.288,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.612
+      },
+      {
+        "bar": 67,
+        "start_s": 160.288,
+        "end_s": 162.048,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.616
+      },
+      {
+        "bar": 68,
+        "start_s": 162.048,
+        "end_s": 163.957,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.612
+      },
+      {
+        "bar": 69,
+        "start_s": 163.957,
+        "end_s": 165.856,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.609
+      },
+      {
+        "bar": 70,
+        "start_s": 165.856,
+        "end_s": 167.765,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 71,
+        "start_s": 167.765,
+        "end_s": 169.675,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.616
+      },
+      {
+        "bar": 72,
+        "start_s": 169.675,
+        "end_s": 171.573,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.627
+      },
+      {
+        "bar": 73,
+        "start_s": 171.573,
+        "end_s": 173.483,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.63
+      },
+      {
+        "bar": 74,
+        "start_s": 173.483,
+        "end_s": 175.381,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 75,
+        "start_s": 175.381,
+        "end_s": 177.291,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.644
+      },
+      {
+        "bar": 76,
+        "start_s": 177.291,
+        "end_s": 179.189,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.633
+      },
+      {
+        "bar": 77,
+        "start_s": 179.189,
+        "end_s": 181.099,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.622
+      },
+      {
+        "bar": 78,
+        "start_s": 181.099,
+        "end_s": 182.997,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      }
+    ],
+    "progression": [
+      {
+        "label": "main",
+        "start_s": 0.0,
+        "end_s": 84.44,
+        "chords": [
+          "Edim",
+          "Dsus2",
+          "Edim",
+          "A5",
+          "Edim",
+          "Dsus2",
+          "Edim",
+          "Dsus2"
+        ]
+      },
+      {
+        "label": "breakdown",
+        "start_s": 84.44,
+        "end_s": 127.06,
+        "chords": [
+          "D#dim",
+          "A5",
+          "D#dim",
+          "Asus2",
+          "E5",
+          "Asus2",
+          "A5",
+          "Em"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 127.06,
+        "end_s": 142.29,
+        "chords": [
+          "Edim"
+        ]
+      },
+      {
+        "label": "peak",
+        "start_s": 142.29,
+        "end_s": 169.19,
+        "chords": [
+          "Dsus2",
+          "Edim",
+          "A5",
+          "Edim",
+          "Dsus2",
+          "Edim",
+          "Dsus2",
+          "Edim"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 169.19,
+        "end_s": 185.01,
+        "chords": [
+          "A5",
+          "D#dim",
+          "Asus2",
+          "D#dim",
+          "A5",
+          "D#dim"
+        ]
+      }
+    ]
   }
 }

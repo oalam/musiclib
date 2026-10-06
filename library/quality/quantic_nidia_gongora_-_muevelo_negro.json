@@ -1058,5 +1058,1996 @@
     "pulse_clarity": 0.886,
     "swing": 0.293,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "stems",
+    "scale": {
+      "root": 9,
+      "root_name": "A",
+      "scale": "PENTATONIC MINOR",
+      "label": "A pentatonique mineure",
+      "notes": [
+        "A",
+        "C",
+        "D",
+        "E",
+        "G"
+      ],
+      "score": 0.757,
+      "margin": 0.005,
+      "uncertain": true,
+      "candidates": [
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "IONIAN (MAJOR)",
+          "label": "E majeur (ionien)",
+          "notes": [
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "B",
+            "C#",
+            "D#"
+          ],
+          "score": 0.752
+        },
+        {
+          "root": 9,
+          "root_name": "A",
+          "scale": "MELODIC MINOR",
+          "label": "A mineur mélodique",
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F#",
+            "G#"
+          ],
+          "score": 0.738
+        },
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "PENTATONIC MINOR",
+          "label": "E pentatonique mineure",
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "B",
+            "D"
+          ],
+          "score": 0.728
+        },
+        {
+          "root": 4,
+          "root_name": "E",
+          "scale": "MIXOLYDIAN",
+          "label": "E mixolydien",
+          "notes": [
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "B",
+            "C#",
+            "D"
+          ],
+          "score": 0.725
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 0.193,
+        "end_s": 2.236,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.578
+      },
+      {
+        "bar": 1,
+        "start_s": 2.236,
+        "end_s": 4.278,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.553
+      },
+      {
+        "bar": 2,
+        "start_s": 4.278,
+        "end_s": 6.321,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.596
+      },
+      {
+        "bar": 3,
+        "start_s": 6.321,
+        "end_s": 8.364,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.555
+      },
+      {
+        "bar": 4,
+        "start_s": 8.364,
+        "end_s": 10.406,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.597
+      },
+      {
+        "bar": 5,
+        "start_s": 10.406,
+        "end_s": 12.449,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.626
+      },
+      {
+        "bar": 6,
+        "start_s": 12.449,
+        "end_s": 14.491,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.576
+      },
+      {
+        "bar": 7,
+        "start_s": 14.491,
+        "end_s": 16.534,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.66
+      },
+      {
+        "bar": 8,
+        "start_s": 16.534,
+        "end_s": 18.576,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.57
+      },
+      {
+        "bar": 9,
+        "start_s": 18.576,
+        "end_s": 20.619,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.668
+      },
+      {
+        "bar": 10,
+        "start_s": 20.619,
+        "end_s": 22.661,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.573
+      },
+      {
+        "bar": 11,
+        "start_s": 22.661,
+        "end_s": 24.704,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.66
+      },
+      {
+        "bar": 12,
+        "start_s": 24.704,
+        "end_s": 26.747,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.573
+      },
+      {
+        "bar": 13,
+        "start_s": 26.747,
+        "end_s": 28.789,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.666
+      },
+      {
+        "bar": 14,
+        "start_s": 28.789,
+        "end_s": 30.832,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.605
+      },
+      {
+        "bar": 15,
+        "start_s": 30.832,
+        "end_s": 32.874,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.664
+      },
+      {
+        "bar": 16,
+        "start_s": 32.874,
+        "end_s": 34.917,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.606
+      },
+      {
+        "bar": 17,
+        "start_s": 34.917,
+        "end_s": 36.959,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.667
+      },
+      {
+        "bar": 18,
+        "start_s": 36.959,
+        "end_s": 39.002,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.609
+      },
+      {
+        "bar": 19,
+        "start_s": 39.002,
+        "end_s": 41.044,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.664
+      },
+      {
+        "bar": 20,
+        "start_s": 41.044,
+        "end_s": 43.087,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.614
+      },
+      {
+        "bar": 21,
+        "start_s": 43.087,
+        "end_s": 45.13,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.656
+      },
+      {
+        "bar": 22,
+        "start_s": 45.13,
+        "end_s": 47.172,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.6
+      },
+      {
+        "bar": 23,
+        "start_s": 47.172,
+        "end_s": 49.215,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.657
+      },
+      {
+        "bar": 24,
+        "start_s": 49.215,
+        "end_s": 51.257,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.611
+      },
+      {
+        "bar": 25,
+        "start_s": 51.257,
+        "end_s": 53.3,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.656
+      },
+      {
+        "bar": 26,
+        "start_s": 53.3,
+        "end_s": 55.342,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.589
+      },
+      {
+        "bar": 27,
+        "start_s": 55.342,
+        "end_s": 57.385,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.651
+      },
+      {
+        "bar": 28,
+        "start_s": 57.385,
+        "end_s": 59.427,
+        "label": "Em",
+        "root": 4,
+        "quality": "min",
+        "confidence": 0.604
+      },
+      {
+        "bar": 29,
+        "start_s": 59.427,
+        "end_s": 61.47,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.678
+      },
+      {
+        "bar": 30,
+        "start_s": 61.47,
+        "end_s": 63.513,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.614
+      },
+      {
+        "bar": 31,
+        "start_s": 63.513,
+        "end_s": 65.555,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.66
+      },
+      {
+        "bar": 32,
+        "start_s": 65.555,
+        "end_s": 67.598,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.616
+      },
+      {
+        "bar": 33,
+        "start_s": 67.598,
+        "end_s": 69.64,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.65
+      },
+      {
+        "bar": 34,
+        "start_s": 69.64,
+        "end_s": 71.683,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.607
+      },
+      {
+        "bar": 35,
+        "start_s": 71.683,
+        "end_s": 73.725,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.645
+      },
+      {
+        "bar": 36,
+        "start_s": 73.725,
+        "end_s": 75.768,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.591
+      },
+      {
+        "bar": 37,
+        "start_s": 75.768,
+        "end_s": 77.81,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.645
+      },
+      {
+        "bar": 38,
+        "start_s": 77.81,
+        "end_s": 79.853,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.603
+      },
+      {
+        "bar": 39,
+        "start_s": 79.853,
+        "end_s": 81.895,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.646
+      },
+      {
+        "bar": 40,
+        "start_s": 81.895,
+        "end_s": 83.938,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.576
+      },
+      {
+        "bar": 41,
+        "start_s": 83.938,
+        "end_s": 85.981,
+        "label": "E",
+        "root": 4,
+        "quality": "maj",
+        "confidence": 0.639
+      },
+      {
+        "bar": 42,
+        "start_s": 85.981,
+        "end_s": 88.023,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.642
+      },
+      {
+        "bar": 43,
+        "start_s": 88.023,
+        "end_s": 90.066,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.577
+      },
+      {
+        "bar": 44,
+        "start_s": 90.066,
+        "end_s": 92.108,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 45,
+        "start_s": 92.108,
+        "end_s": 94.151,
+        "label": "G#5",
+        "root": 8,
+        "quality": "5",
+        "confidence": 0.624
+      },
+      {
+        "bar": 46,
+        "start_s": 94.151,
+        "end_s": 96.193,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.638
+      },
+      {
+        "bar": 47,
+        "start_s": 96.193,
+        "end_s": 98.236,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.601
+      },
+      {
+        "bar": 48,
+        "start_s": 98.236,
+        "end_s": 100.278,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.576
+      },
+      {
+        "bar": 49,
+        "start_s": 100.278,
+        "end_s": 102.321,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.64
+      },
+      {
+        "bar": 50,
+        "start_s": 102.321,
+        "end_s": 104.364,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.613
+      },
+      {
+        "bar": 51,
+        "start_s": 104.364,
+        "end_s": 106.406,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.616
+      },
+      {
+        "bar": 52,
+        "start_s": 106.406,
+        "end_s": 108.449,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.603
+      },
+      {
+        "bar": 53,
+        "start_s": 108.449,
+        "end_s": 110.491,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.617
+      },
+      {
+        "bar": 54,
+        "start_s": 110.491,
+        "end_s": 112.534,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.614
+      },
+      {
+        "bar": 55,
+        "start_s": 112.534,
+        "end_s": 114.576,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.602
+      },
+      {
+        "bar": 56,
+        "start_s": 114.576,
+        "end_s": 116.619,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 57,
+        "start_s": 116.619,
+        "end_s": 118.661,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.613
+      },
+      {
+        "bar": 58,
+        "start_s": 118.661,
+        "end_s": 120.704,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.617
+      },
+      {
+        "bar": 59,
+        "start_s": 120.704,
+        "end_s": 122.747,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.617
+      },
+      {
+        "bar": 60,
+        "start_s": 122.747,
+        "end_s": 124.789,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.599
+      },
+      {
+        "bar": 61,
+        "start_s": 124.789,
+        "end_s": 126.832,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.656
+      },
+      {
+        "bar": 62,
+        "start_s": 126.832,
+        "end_s": 128.874,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.607
+      },
+      {
+        "bar": 63,
+        "start_s": 128.874,
+        "end_s": 130.917,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.626
+      },
+      {
+        "bar": 64,
+        "start_s": 130.917,
+        "end_s": 132.959,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.586
+      },
+      {
+        "bar": 65,
+        "start_s": 132.959,
+        "end_s": 135.002,
+        "label": "G#",
+        "root": 8,
+        "quality": "maj",
+        "confidence": 0.622
+      },
+      {
+        "bar": 66,
+        "start_s": 135.002,
+        "end_s": 137.044,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.577
+      },
+      {
+        "bar": 67,
+        "start_s": 137.044,
+        "end_s": 139.087,
+        "label": "F#dim",
+        "root": 6,
+        "quality": "dim",
+        "confidence": 0.65
+      },
+      {
+        "bar": 68,
+        "start_s": 139.087,
+        "end_s": 141.13,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.758
+      },
+      {
+        "bar": 69,
+        "start_s": 141.13,
+        "end_s": 143.172,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.768
+      },
+      {
+        "bar": 70,
+        "start_s": 143.172,
+        "end_s": 145.215,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 71,
+        "start_s": 145.215,
+        "end_s": 147.257,
+        "label": "F",
+        "root": 5,
+        "quality": "maj",
+        "confidence": 0.67
+      },
+      {
+        "bar": 72,
+        "start_s": 147.257,
+        "end_s": 149.3,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.786
+      },
+      {
+        "bar": 73,
+        "start_s": 149.3,
+        "end_s": 151.342,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.749
+      },
+      {
+        "bar": 74,
+        "start_s": 151.342,
+        "end_s": 153.385,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 75,
+        "start_s": 153.385,
+        "end_s": 155.427,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.589
+      },
+      {
+        "bar": 76,
+        "start_s": 155.427,
+        "end_s": 157.47,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.618
+      },
+      {
+        "bar": 77,
+        "start_s": 157.47,
+        "end_s": 159.513,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.766
+      },
+      {
+        "bar": 78,
+        "start_s": 159.513,
+        "end_s": 161.555,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.613
+      },
+      {
+        "bar": 79,
+        "start_s": 161.555,
+        "end_s": 163.598,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.684
+      },
+      {
+        "bar": 80,
+        "start_s": 163.598,
+        "end_s": 165.64,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.602
+      },
+      {
+        "bar": 81,
+        "start_s": 165.64,
+        "end_s": 167.683,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.682
+      },
+      {
+        "bar": 82,
+        "start_s": 167.683,
+        "end_s": 169.725,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.602
+      },
+      {
+        "bar": 83,
+        "start_s": 169.725,
+        "end_s": 171.768,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.681
+      },
+      {
+        "bar": 84,
+        "start_s": 171.768,
+        "end_s": 173.81,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 85,
+        "start_s": 173.81,
+        "end_s": 175.853,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.692
+      },
+      {
+        "bar": 86,
+        "start_s": 175.853,
+        "end_s": 177.895,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.596
+      },
+      {
+        "bar": 87,
+        "start_s": 177.895,
+        "end_s": 179.938,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.685
+      },
+      {
+        "bar": 88,
+        "start_s": 179.938,
+        "end_s": 181.981,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.597
+      },
+      {
+        "bar": 89,
+        "start_s": 181.981,
+        "end_s": 184.023,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.683
+      },
+      {
+        "bar": 90,
+        "start_s": 184.023,
+        "end_s": 186.066,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.603
+      },
+      {
+        "bar": 91,
+        "start_s": 186.066,
+        "end_s": 188.108,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.675
+      },
+      {
+        "bar": 92,
+        "start_s": 188.108,
+        "end_s": 190.151,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 93,
+        "start_s": 190.151,
+        "end_s": 192.193,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.677
+      },
+      {
+        "bar": 94,
+        "start_s": 192.193,
+        "end_s": 194.236,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.595
+      },
+      {
+        "bar": 95,
+        "start_s": 194.236,
+        "end_s": 196.278,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.682
+      },
+      {
+        "bar": 96,
+        "start_s": 196.278,
+        "end_s": 198.321,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.601
+      },
+      {
+        "bar": 97,
+        "start_s": 198.321,
+        "end_s": 200.364,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.662
+      },
+      {
+        "bar": 98,
+        "start_s": 200.364,
+        "end_s": 202.406,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.541
+      },
+      {
+        "bar": 99,
+        "start_s": 202.406,
+        "end_s": 204.449,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 100,
+        "start_s": 204.449,
+        "end_s": 206.491,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.563
+      },
+      {
+        "bar": 101,
+        "start_s": 206.491,
+        "end_s": 208.534,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.649
+      },
+      {
+        "bar": 102,
+        "start_s": 208.534,
+        "end_s": 210.576,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 103,
+        "start_s": 210.576,
+        "end_s": 212.619,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.777
+      },
+      {
+        "bar": 104,
+        "start_s": 212.619,
+        "end_s": 214.661,
+        "label": "A",
+        "root": 9,
+        "quality": "maj",
+        "confidence": 0.676
+      },
+      {
+        "bar": 105,
+        "start_s": 214.661,
+        "end_s": 216.704,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 106,
+        "start_s": 216.704,
+        "end_s": 218.747,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.661
+      },
+      {
+        "bar": 107,
+        "start_s": 218.747,
+        "end_s": 220.789,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 108,
+        "start_s": 220.789,
+        "end_s": 222.832,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.684
+      },
+      {
+        "bar": 109,
+        "start_s": 222.832,
+        "end_s": 224.874,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.644
+      },
+      {
+        "bar": 110,
+        "start_s": 224.874,
+        "end_s": 226.917,
+        "label": "F#m",
+        "root": 6,
+        "quality": "min",
+        "confidence": 0.615
+      },
+      {
+        "bar": 111,
+        "start_s": 226.917,
+        "end_s": 228.959,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.576
+      },
+      {
+        "bar": 112,
+        "start_s": 228.959,
+        "end_s": 231.002,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.753
+      },
+      {
+        "bar": 113,
+        "start_s": 231.002,
+        "end_s": 233.044,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.645
+      },
+      {
+        "bar": 114,
+        "start_s": 233.044,
+        "end_s": 235.087,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.579
+      },
+      {
+        "bar": 115,
+        "start_s": 235.087,
+        "end_s": 237.13,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.58
+      },
+      {
+        "bar": 116,
+        "start_s": 237.13,
+        "end_s": 239.172,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.585
+      },
+      {
+        "bar": 117,
+        "start_s": 239.172,
+        "end_s": 241.215,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.584
+      },
+      {
+        "bar": 118,
+        "start_s": 241.215,
+        "end_s": 243.257,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.579
+      },
+      {
+        "bar": 119,
+        "start_s": 243.257,
+        "end_s": 245.3,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.576
+      },
+      {
+        "bar": 120,
+        "start_s": 245.3,
+        "end_s": 247.342,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.571
+      },
+      {
+        "bar": 121,
+        "start_s": 247.342,
+        "end_s": 249.385,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.584
+      },
+      {
+        "bar": 122,
+        "start_s": 249.385,
+        "end_s": 251.427,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.58
+      },
+      {
+        "bar": 123,
+        "start_s": 251.427,
+        "end_s": 253.47,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.623
+      },
+      {
+        "bar": 124,
+        "start_s": 253.47,
+        "end_s": 255.513,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.616
+      },
+      {
+        "bar": 125,
+        "start_s": 255.513,
+        "end_s": 257.555,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.609
+      },
+      {
+        "bar": 126,
+        "start_s": 257.555,
+        "end_s": 259.598,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.61
+      },
+      {
+        "bar": 127,
+        "start_s": 259.598,
+        "end_s": 261.64,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.6
+      },
+      {
+        "bar": 128,
+        "start_s": 261.64,
+        "end_s": 263.683,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.61
+      },
+      {
+        "bar": 129,
+        "start_s": 263.683,
+        "end_s": 265.725,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.606
+      },
+      {
+        "bar": 130,
+        "start_s": 265.725,
+        "end_s": 267.768,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.601
+      },
+      {
+        "bar": 131,
+        "start_s": 267.768,
+        "end_s": 269.81,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.61
+      },
+      {
+        "bar": 132,
+        "start_s": 269.81,
+        "end_s": 271.853,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.615
+      },
+      {
+        "bar": 133,
+        "start_s": 271.853,
+        "end_s": 273.895,
+        "label": "Dsus4",
+        "root": 2,
+        "quality": "sus4",
+        "confidence": 0.628
+      },
+      {
+        "bar": 134,
+        "start_s": 273.895,
+        "end_s": 275.938,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.573
+      },
+      {
+        "bar": 135,
+        "start_s": 275.938,
+        "end_s": 277.981,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.627
+      },
+      {
+        "bar": 136,
+        "start_s": 277.981,
+        "end_s": 280.023,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.619
+      },
+      {
+        "bar": 137,
+        "start_s": 280.023,
+        "end_s": 282.066,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.619
+      },
+      {
+        "bar": 138,
+        "start_s": 282.066,
+        "end_s": 284.108,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.568
+      },
+      {
+        "bar": 139,
+        "start_s": 284.108,
+        "end_s": 286.151,
+        "label": "C#dim",
+        "root": 1,
+        "quality": "dim",
+        "confidence": 0.621
+      },
+      {
+        "bar": 140,
+        "start_s": 286.151,
+        "end_s": 288.193,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.588
+      },
+      {
+        "bar": 141,
+        "start_s": 288.193,
+        "end_s": 290.236,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.808
+      },
+      {
+        "bar": 142,
+        "start_s": 290.236,
+        "end_s": 292.278,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.83
+      },
+      {
+        "bar": 143,
+        "start_s": 292.278,
+        "end_s": 294.321,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.809
+      },
+      {
+        "bar": 144,
+        "start_s": 294.321,
+        "end_s": 296.364,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.823
+      },
+      {
+        "bar": 145,
+        "start_s": 296.364,
+        "end_s": 298.406,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.801
+      },
+      {
+        "bar": 146,
+        "start_s": 298.406,
+        "end_s": 300.449,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.819
+      },
+      {
+        "bar": 147,
+        "start_s": 300.449,
+        "end_s": 302.491,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.818
+      },
+      {
+        "bar": 148,
+        "start_s": 302.491,
+        "end_s": 304.534,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.767
+      },
+      {
+        "bar": 149,
+        "start_s": 304.534,
+        "end_s": 306.576,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 150,
+        "start_s": 306.576,
+        "end_s": 308.619,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 151,
+        "start_s": 308.619,
+        "end_s": 310.661,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 152,
+        "start_s": 310.661,
+        "end_s": 312.704,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 153,
+        "start_s": 312.704,
+        "end_s": 314.747,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 154,
+        "start_s": 314.747,
+        "end_s": 316.789,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 155,
+        "start_s": 316.789,
+        "end_s": 318.832,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 156,
+        "start_s": 318.832,
+        "end_s": 320.874,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 157,
+        "start_s": 320.874,
+        "end_s": 322.917,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 158,
+        "start_s": 322.917,
+        "end_s": 324.959,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 159,
+        "start_s": 324.959,
+        "end_s": 327.002,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 160,
+        "start_s": 327.002,
+        "end_s": 329.044,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 161,
+        "start_s": 329.044,
+        "end_s": 331.087,
+        "label": "Dsus2",
+        "root": 2,
+        "quality": "sus2",
+        "confidence": 0.663
+      },
+      {
+        "bar": 162,
+        "start_s": 331.087,
+        "end_s": 333.13,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.569
+      },
+      {
+        "bar": 163,
+        "start_s": 333.13,
+        "end_s": 335.172,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 164,
+        "start_s": 335.172,
+        "end_s": 337.215,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.812
+      },
+      {
+        "bar": 165,
+        "start_s": 337.215,
+        "end_s": 339.257,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.806
+      },
+      {
+        "bar": 166,
+        "start_s": 339.257,
+        "end_s": 341.3,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.82
+      },
+      {
+        "bar": 167,
+        "start_s": 341.3,
+        "end_s": 343.342,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.831
+      },
+      {
+        "bar": 168,
+        "start_s": 343.342,
+        "end_s": 345.385,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.836
+      },
+      {
+        "bar": 169,
+        "start_s": 345.385,
+        "end_s": 347.427,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.818
+      },
+      {
+        "bar": 170,
+        "start_s": 347.427,
+        "end_s": 349.47,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.817
+      },
+      {
+        "bar": 171,
+        "start_s": 349.47,
+        "end_s": 351.513,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.831
+      },
+      {
+        "bar": 172,
+        "start_s": 351.513,
+        "end_s": 353.555,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.801
+      },
+      {
+        "bar": 173,
+        "start_s": 353.555,
+        "end_s": 355.598,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.812
+      },
+      {
+        "bar": 174,
+        "start_s": 355.598,
+        "end_s": 357.64,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.824
+      },
+      {
+        "bar": 175,
+        "start_s": 357.64,
+        "end_s": 359.683,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.825
+      },
+      {
+        "bar": 176,
+        "start_s": 359.683,
+        "end_s": 361.725,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.842
+      },
+      {
+        "bar": 177,
+        "start_s": 361.725,
+        "end_s": 363.768,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.833
+      },
+      {
+        "bar": 178,
+        "start_s": 363.768,
+        "end_s": 365.81,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.821
+      },
+      {
+        "bar": 179,
+        "start_s": 365.81,
+        "end_s": 367.853,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.84
+      },
+      {
+        "bar": 180,
+        "start_s": 367.853,
+        "end_s": 369.895,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.802
+      },
+      {
+        "bar": 181,
+        "start_s": 369.895,
+        "end_s": 371.938,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.799
+      },
+      {
+        "bar": 182,
+        "start_s": 371.938,
+        "end_s": 373.981,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.798
+      },
+      {
+        "bar": 183,
+        "start_s": 373.981,
+        "end_s": 376.023,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.788
+      },
+      {
+        "bar": 184,
+        "start_s": 376.023,
+        "end_s": 378.066,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.765
+      },
+      {
+        "bar": 185,
+        "start_s": 378.066,
+        "end_s": 380.108,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.836
+      },
+      {
+        "bar": 186,
+        "start_s": 380.108,
+        "end_s": 382.151,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 187,
+        "start_s": 382.151,
+        "end_s": 384.193,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 188,
+        "start_s": 384.193,
+        "end_s": 386.236,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 189,
+        "start_s": 386.236,
+        "end_s": 388.278,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.769
+      },
+      {
+        "bar": 190,
+        "start_s": 388.278,
+        "end_s": 390.321,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.766
+      },
+      {
+        "bar": 191,
+        "start_s": 390.321,
+        "end_s": 392.364,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.761
+      },
+      {
+        "bar": 192,
+        "start_s": 392.364,
+        "end_s": 394.406,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.773
+      },
+      {
+        "bar": 193,
+        "start_s": 394.406,
+        "end_s": 396.449,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.777
+      },
+      {
+        "bar": 194,
+        "start_s": 396.449,
+        "end_s": 398.491,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.741
+      },
+      {
+        "bar": 195,
+        "start_s": 398.491,
+        "end_s": 400.534,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.682
+      },
+      {
+        "bar": 196,
+        "start_s": 400.534,
+        "end_s": 402.576,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.638
+      },
+      {
+        "bar": 197,
+        "start_s": 402.576,
+        "end_s": 404.619,
+        "label": "Esus4",
+        "root": 4,
+        "quality": "sus4",
+        "confidence": 0.62
+      },
+      {
+        "bar": 198,
+        "start_s": 404.619,
+        "end_s": 406.661,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 199,
+        "start_s": 406.661,
+        "end_s": 408.704,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 200,
+        "start_s": 408.704,
+        "end_s": 410.747,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 201,
+        "start_s": 410.747,
+        "end_s": 412.789,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 202,
+        "start_s": 412.789,
+        "end_s": 414.832,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 203,
+        "start_s": 414.832,
+        "end_s": 416.874,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 204,
+        "start_s": 416.874,
+        "end_s": 418.917,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      }
+    ],
+    "progression": [
+      {
+        "label": "intro",
+        "start_s": 0.0,
+        "end_s": 1.22,
+        "chords": []
+      },
+      {
+        "label": "main",
+        "start_s": 1.22,
+        "end_s": 242.25,
+        "chords": [
+          "Esus4",
+          "D#dim",
+          "Esus4",
+          "D#dim",
+          "Esus4",
+          "D#dim",
+          "Esus4",
+          "D#dim"
+        ]
+      },
+      {
+        "label": "peak",
+        "start_s": 242.25,
+        "end_s": 304.82,
+        "chords": [
+          "C#dim",
+          "Dsus4",
+          "C#dim",
+          "A5"
+        ]
+      },
+      {
+        "label": "breakdown",
+        "start_s": 304.82,
+        "end_s": 337.12,
+        "chords": [
+          "Dsus2",
+          "A5"
+        ]
+      },
+      {
+        "label": "build",
+        "start_s": 337.12,
+        "end_s": 386.86,
+        "chords": [
+          "A5"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 386.86,
+        "end_s": 419.97,
+        "chords": [
+          "A5",
+          "Esus4"
+        ]
+      }
+    ]
   }
 }

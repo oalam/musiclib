@@ -579,5 +579,950 @@
     "pulse_clarity": 0.952,
     "swing": 0.736,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "mix",
+    "scale": {
+      "root": 4,
+      "root_name": "E",
+      "scale": "BLUES",
+      "label": "E blues",
+      "notes": [
+        "E",
+        "G",
+        "A",
+        "A#",
+        "B",
+        "D"
+      ],
+      "score": 0.664,
+      "margin": 0.032,
+      "uncertain": true,
+      "candidates": [
+        {
+          "root": 9,
+          "root_name": "A",
+          "scale": "PHRYGIAN",
+          "label": "A phrygien",
+          "notes": [
+            "A",
+            "A#",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G"
+          ],
+          "score": 0.632
+        },
+        {
+          "root": 10,
+          "root_name": "A#",
+          "scale": "LYDIAN",
+          "label": "A# lydien",
+          "notes": [
+            "A#",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A"
+          ],
+          "score": 0.63
+        },
+        {
+          "root": 9,
+          "root_name": "A",
+          "scale": "PENTATONIC MAJOR",
+          "label": "A pentatonique majeure",
+          "notes": [
+            "A",
+            "B",
+            "C#",
+            "E",
+            "F#"
+          ],
+          "score": 0.594
+        },
+        {
+          "root": 7,
+          "root_name": "G",
+          "scale": "MELODIC MINOR",
+          "label": "G mineur mélodique",
+          "notes": [
+            "G",
+            "A",
+            "A#",
+            "C",
+            "D",
+            "E",
+            "F#"
+          ],
+          "score": 0.532
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 2.901,
+        "end_s": 4.853,
+        "label": "A",
+        "root": 9,
+        "quality": "maj",
+        "confidence": 0.744
+      },
+      {
+        "bar": 1,
+        "start_s": 4.853,
+        "end_s": 6.955,
+        "label": "Dm",
+        "root": 2,
+        "quality": "min",
+        "confidence": 0.738
+      },
+      {
+        "bar": 2,
+        "start_s": 6.955,
+        "end_s": 9.045,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.825
+      },
+      {
+        "bar": 3,
+        "start_s": 9.045,
+        "end_s": 10.987,
+        "label": "F",
+        "root": 5,
+        "quality": "maj",
+        "confidence": 0.709
+      },
+      {
+        "bar": 4,
+        "start_s": 10.987,
+        "end_s": 13.141,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.857
+      },
+      {
+        "bar": 5,
+        "start_s": 13.141,
+        "end_s": 15.253,
+        "label": "Dm",
+        "root": 2,
+        "quality": "min",
+        "confidence": 0.779
+      },
+      {
+        "bar": 6,
+        "start_s": 15.253,
+        "end_s": 17.333,
+        "label": "E5",
+        "root": 4,
+        "quality": "5",
+        "confidence": 0.807
+      },
+      {
+        "bar": 7,
+        "start_s": 17.333,
+        "end_s": 19.424,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.752
+      },
+      {
+        "bar": 8,
+        "start_s": 19.424,
+        "end_s": 21.333,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.661
+      },
+      {
+        "bar": 9,
+        "start_s": 21.333,
+        "end_s": 23.275,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.65
+      },
+      {
+        "bar": 10,
+        "start_s": 23.275,
+        "end_s": 25.312,
+        "label": "A#5",
+        "root": 10,
+        "quality": "5",
+        "confidence": 0.666
+      },
+      {
+        "bar": 11,
+        "start_s": 25.312,
+        "end_s": 27.349,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.655
+      },
+      {
+        "bar": 12,
+        "start_s": 27.349,
+        "end_s": 29.376,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.7
+      },
+      {
+        "bar": 13,
+        "start_s": 29.376,
+        "end_s": 31.413,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.689
+      },
+      {
+        "bar": 14,
+        "start_s": 31.413,
+        "end_s": 33.451,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.684
+      },
+      {
+        "bar": 15,
+        "start_s": 33.451,
+        "end_s": 35.477,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.687
+      },
+      {
+        "bar": 16,
+        "start_s": 35.477,
+        "end_s": 37.515,
+        "label": "A#5",
+        "root": 10,
+        "quality": "5",
+        "confidence": 0.658
+      },
+      {
+        "bar": 17,
+        "start_s": 37.515,
+        "end_s": 39.552,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.647
+      },
+      {
+        "bar": 18,
+        "start_s": 39.552,
+        "end_s": 41.579,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.604
+      },
+      {
+        "bar": 19,
+        "start_s": 41.579,
+        "end_s": 43.616,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.638
+      },
+      {
+        "bar": 20,
+        "start_s": 43.616,
+        "end_s": 45.653,
+        "label": "Edim",
+        "root": 4,
+        "quality": "dim",
+        "confidence": 0.6
+      },
+      {
+        "bar": 21,
+        "start_s": 45.653,
+        "end_s": 47.68,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.623
+      },
+      {
+        "bar": 22,
+        "start_s": 47.68,
+        "end_s": 49.717,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.617
+      },
+      {
+        "bar": 23,
+        "start_s": 49.717,
+        "end_s": 51.755,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 24,
+        "start_s": 51.755,
+        "end_s": 53.781,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.634
+      },
+      {
+        "bar": 25,
+        "start_s": 53.781,
+        "end_s": 55.819,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.59
+      },
+      {
+        "bar": 26,
+        "start_s": 55.819,
+        "end_s": 57.856,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.623
+      },
+      {
+        "bar": 27,
+        "start_s": 57.856,
+        "end_s": 59.883,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.635
+      },
+      {
+        "bar": 28,
+        "start_s": 59.883,
+        "end_s": 61.92,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.612
+      },
+      {
+        "bar": 29,
+        "start_s": 61.92,
+        "end_s": 63.947,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.657
+      },
+      {
+        "bar": 30,
+        "start_s": 63.947,
+        "end_s": 65.984,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.624
+      },
+      {
+        "bar": 31,
+        "start_s": 65.984,
+        "end_s": 68.021,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.621
+      },
+      {
+        "bar": 32,
+        "start_s": 68.021,
+        "end_s": 70.048,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.656
+      },
+      {
+        "bar": 33,
+        "start_s": 70.048,
+        "end_s": 72.149,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.612
+      },
+      {
+        "bar": 34,
+        "start_s": 72.149,
+        "end_s": 74.347,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.637
+      },
+      {
+        "bar": 35,
+        "start_s": 74.347,
+        "end_s": 76.373,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.665
+      },
+      {
+        "bar": 36,
+        "start_s": 76.373,
+        "end_s": 78.4,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 37,
+        "start_s": 78.4,
+        "end_s": 80.523,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.664
+      },
+      {
+        "bar": 38,
+        "start_s": 80.523,
+        "end_s": 82.763,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.666
+      },
+      {
+        "bar": 39,
+        "start_s": 82.763,
+        "end_s": 84.8,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.613
+      },
+      {
+        "bar": 40,
+        "start_s": 84.8,
+        "end_s": 86.837,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.599
+      },
+      {
+        "bar": 41,
+        "start_s": 86.837,
+        "end_s": 88.789,
+        "label": "G#sus2",
+        "root": 8,
+        "quality": "sus2",
+        "confidence": 0.603
+      },
+      {
+        "bar": 42,
+        "start_s": 88.789,
+        "end_s": 90.699,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 43,
+        "start_s": 90.699,
+        "end_s": 92.8,
+        "label": "Am",
+        "root": 9,
+        "quality": "min",
+        "confidence": 0.641
+      },
+      {
+        "bar": 44,
+        "start_s": 92.8,
+        "end_s": 94.848,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.612
+      },
+      {
+        "bar": 45,
+        "start_s": 94.848,
+        "end_s": 96.875,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.63
+      },
+      {
+        "bar": 46,
+        "start_s": 96.875,
+        "end_s": 98.901,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.62
+      },
+      {
+        "bar": 47,
+        "start_s": 98.901,
+        "end_s": 100.939,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.625
+      },
+      {
+        "bar": 48,
+        "start_s": 100.939,
+        "end_s": 102.976,
+        "label": "Am",
+        "root": 9,
+        "quality": "min",
+        "confidence": 0.615
+      },
+      {
+        "bar": 49,
+        "start_s": 102.976,
+        "end_s": 105.003,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.605
+      },
+      {
+        "bar": 50,
+        "start_s": 105.003,
+        "end_s": 107.04,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.61
+      },
+      {
+        "bar": 51,
+        "start_s": 107.04,
+        "end_s": 109.077,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.624
+      },
+      {
+        "bar": 52,
+        "start_s": 109.077,
+        "end_s": 111.115,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.683
+      },
+      {
+        "bar": 53,
+        "start_s": 111.115,
+        "end_s": 113.109,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.701
+      },
+      {
+        "bar": 54,
+        "start_s": 113.109,
+        "end_s": 115.2,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.697
+      },
+      {
+        "bar": 55,
+        "start_s": 115.2,
+        "end_s": 117.227,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.731
+      },
+      {
+        "bar": 56,
+        "start_s": 117.227,
+        "end_s": 119.424,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.716
+      },
+      {
+        "bar": 57,
+        "start_s": 119.424,
+        "end_s": 121.355,
+        "label": "A5",
+        "root": 9,
+        "quality": "5",
+        "confidence": 0.684
+      },
+      {
+        "bar": 58,
+        "start_s": 121.355,
+        "end_s": 123.317,
+        "label": "Asus2",
+        "root": 9,
+        "quality": "sus2",
+        "confidence": 0.721
+      },
+      {
+        "bar": 59,
+        "start_s": 123.317,
+        "end_s": 125.355,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.612
+      },
+      {
+        "bar": 60,
+        "start_s": 125.355,
+        "end_s": 127.392,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.61
+      },
+      {
+        "bar": 61,
+        "start_s": 127.392,
+        "end_s": 129.419,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.644
+      },
+      {
+        "bar": 62,
+        "start_s": 129.419,
+        "end_s": 131.456,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.602
+      },
+      {
+        "bar": 63,
+        "start_s": 131.456,
+        "end_s": 133.483,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.635
+      },
+      {
+        "bar": 64,
+        "start_s": 133.483,
+        "end_s": 135.52,
+        "label": "A#sus2",
+        "root": 10,
+        "quality": "sus2",
+        "confidence": 0.64
+      },
+      {
+        "bar": 65,
+        "start_s": 135.52,
+        "end_s": 137.611,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.588
+      },
+      {
+        "bar": 66,
+        "start_s": 137.611,
+        "end_s": 139.829,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 67,
+        "start_s": 139.829,
+        "end_s": 141.931,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 68,
+        "start_s": 141.931,
+        "end_s": 143.808,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 69,
+        "start_s": 143.808,
+        "end_s": 145.685,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 70,
+        "start_s": 145.685,
+        "end_s": 147.808,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 71,
+        "start_s": 147.808,
+        "end_s": 149.995,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.0
+      },
+      {
+        "bar": 72,
+        "start_s": 149.995,
+        "end_s": 152.032,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 73,
+        "start_s": 152.032,
+        "end_s": 153.877,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.578
+      },
+      {
+        "bar": 74,
+        "start_s": 153.877,
+        "end_s": 156.0,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.702
+      },
+      {
+        "bar": 75,
+        "start_s": 156.0,
+        "end_s": 158.112,
+        "label": "Em",
+        "root": 4,
+        "quality": "min",
+        "confidence": 0.667
+      },
+      {
+        "bar": 76,
+        "start_s": 158.112,
+        "end_s": 160.213,
+        "label": "Gsus2",
+        "root": 7,
+        "quality": "sus2",
+        "confidence": 0.623
+      },
+      {
+        "bar": 77,
+        "start_s": 160.213,
+        "end_s": 162.123,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.648
+      },
+      {
+        "bar": 78,
+        "start_s": 162.123,
+        "end_s": 164.085,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.761
+      },
+      {
+        "bar": 79,
+        "start_s": 164.085,
+        "end_s": 166.08,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.647
+      },
+      {
+        "bar": 80,
+        "start_s": 166.08,
+        "end_s": 167.968,
+        "label": "F#sus2",
+        "root": 6,
+        "quality": "sus2",
+        "confidence": 0.65
+      },
+      {
+        "bar": 81,
+        "start_s": 167.968,
+        "end_s": 169.931,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.657
+      },
+      {
+        "bar": 82,
+        "start_s": 169.931,
+        "end_s": 171.936,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.696
+      },
+      {
+        "bar": 83,
+        "start_s": 171.936,
+        "end_s": 173.813,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.633
+      },
+      {
+        "bar": 84,
+        "start_s": 173.813,
+        "end_s": 175.691,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.684
+      },
+      {
+        "bar": 85,
+        "start_s": 175.691,
+        "end_s": 177.568,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.625
+      },
+      {
+        "bar": 86,
+        "start_s": 177.568,
+        "end_s": 179.413,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.687
+      },
+      {
+        "bar": 87,
+        "start_s": 179.413,
+        "end_s": 181.269,
+        "label": "G5",
+        "root": 7,
+        "quality": "5",
+        "confidence": 0.605
+      }
+    ],
+    "progression": [
+      {
+        "label": "intro",
+        "start_s": 0.0,
+        "end_s": 29.89,
+        "chords": [
+          "A",
+          "Dm",
+          "Asus2",
+          "F",
+          "A5",
+          "Dm",
+          "E5",
+          "A5"
+        ]
+      },
+      {
+        "label": "build",
+        "start_s": 29.89,
+        "end_s": 91.79,
+        "chords": [
+          "A5",
+          "Asus2",
+          "A#5",
+          "Asus2",
+          "A#sus2",
+          "Edim",
+          "A#sus2",
+          "Asus2"
+        ]
+      },
+      {
+        "label": "peak",
+        "start_s": 91.79,
+        "end_s": 137.02,
+        "chords": [
+          "A#sus2",
+          "Asus2",
+          "A#sus2",
+          "Am",
+          "Asus2",
+          "A5",
+          "Asus2",
+          "A5"
+        ]
+      },
+      {
+        "label": "breakdown",
+        "start_s": 137.02,
+        "end_s": 151.55,
+        "chords": []
+      },
+      {
+        "label": "build",
+        "start_s": 151.55,
+        "end_s": 183.69,
+        "chords": [
+          "G5",
+          "Em",
+          "Gsus2",
+          "G5",
+          "F#sus2",
+          "G5"
+        ]
+      }
+    ]
   }
 }

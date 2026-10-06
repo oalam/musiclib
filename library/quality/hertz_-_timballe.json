@@ -1027,5 +1027,563 @@
     "pulse_clarity": 0.834,
     "swing": 0.5,
     "method": "onset_fold_16_per_band"
+  },
+  "harmony": {
+    "analyzed_at": "2026-10-06",
+    "source": "stems",
+    "scale": {
+      "root": 0,
+      "root_name": "C",
+      "scale": "BLUES",
+      "label": "C blues",
+      "notes": [
+        "C",
+        "D#",
+        "F",
+        "F#",
+        "G",
+        "A#"
+      ],
+      "score": 0.991,
+      "margin": 0.314,
+      "uncertain": false,
+      "candidates": [
+        {
+          "root": 0,
+          "root_name": "C",
+          "scale": "LOCRIAN",
+          "label": "C locrien",
+          "notes": [
+            "C",
+            "C#",
+            "D#",
+            "F",
+            "F#",
+            "G#",
+            "A#"
+          ],
+          "score": 0.749
+        },
+        {
+          "root": 0,
+          "root_name": "C",
+          "scale": "PENTATONIC MINOR",
+          "label": "C pentatonique mineure",
+          "notes": [
+            "C",
+            "D#",
+            "F",
+            "G",
+            "A#"
+          ],
+          "score": 0.719
+        },
+        {
+          "root": 5,
+          "root_name": "F",
+          "scale": "PHRYGIAN",
+          "label": "F phrygien",
+          "notes": [
+            "F",
+            "F#",
+            "G#",
+            "A#",
+            "C",
+            "C#",
+            "D#"
+          ],
+          "score": 0.677
+        },
+        {
+          "root": 6,
+          "root_name": "F#",
+          "scale": "LYDIAN",
+          "label": "F# lydien",
+          "notes": [
+            "F#",
+            "G#",
+            "A#",
+            "C",
+            "C#",
+            "D#",
+            "F"
+          ],
+          "score": 0.663
+        }
+      ]
+    },
+    "chords": [
+      {
+        "bar": 0,
+        "start_s": 0.007,
+        "end_s": 7.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.551
+      },
+      {
+        "bar": 1,
+        "start_s": 7.507,
+        "end_s": 15.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.583
+      },
+      {
+        "bar": 2,
+        "start_s": 15.007,
+        "end_s": 22.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.59
+      },
+      {
+        "bar": 3,
+        "start_s": 22.507,
+        "end_s": 30.007,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.631
+      },
+      {
+        "bar": 4,
+        "start_s": 30.007,
+        "end_s": 37.507,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.617
+      },
+      {
+        "bar": 5,
+        "start_s": 37.507,
+        "end_s": 45.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.578
+      },
+      {
+        "bar": 6,
+        "start_s": 45.007,
+        "end_s": 52.507,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.643
+      },
+      {
+        "bar": 7,
+        "start_s": 52.507,
+        "end_s": 60.007,
+        "label": "Fsus4",
+        "root": 5,
+        "quality": "sus4",
+        "confidence": 0.604
+      },
+      {
+        "bar": 8,
+        "start_s": 60.007,
+        "end_s": 67.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.586
+      },
+      {
+        "bar": 9,
+        "start_s": 67.507,
+        "end_s": 75.007,
+        "label": "F#5",
+        "root": 6,
+        "quality": "5",
+        "confidence": 0.69
+      },
+      {
+        "bar": 10,
+        "start_s": 75.007,
+        "end_s": 82.507,
+        "label": "F#sus4",
+        "root": 6,
+        "quality": "sus4",
+        "confidence": 0.644
+      },
+      {
+        "bar": 11,
+        "start_s": 82.507,
+        "end_s": 90.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.554
+      },
+      {
+        "bar": 12,
+        "start_s": 90.007,
+        "end_s": 97.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.562
+      },
+      {
+        "bar": 13,
+        "start_s": 97.507,
+        "end_s": 105.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.548
+      },
+      {
+        "bar": 14,
+        "start_s": 105.007,
+        "end_s": 112.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.565
+      },
+      {
+        "bar": 15,
+        "start_s": 112.507,
+        "end_s": 120.007,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.67
+      },
+      {
+        "bar": 16,
+        "start_s": 120.007,
+        "end_s": 127.507,
+        "label": "F#dim",
+        "root": 6,
+        "quality": "dim",
+        "confidence": 0.679
+      },
+      {
+        "bar": 17,
+        "start_s": 127.507,
+        "end_s": 135.007,
+        "label": "F#dim",
+        "root": 6,
+        "quality": "dim",
+        "confidence": 0.664
+      },
+      {
+        "bar": 18,
+        "start_s": 135.007,
+        "end_s": 142.507,
+        "label": "F#dim",
+        "root": 6,
+        "quality": "dim",
+        "confidence": 0.616
+      },
+      {
+        "bar": 19,
+        "start_s": 142.507,
+        "end_s": 150.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.593
+      },
+      {
+        "bar": 20,
+        "start_s": 150.007,
+        "end_s": 157.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.564
+      },
+      {
+        "bar": 21,
+        "start_s": 157.507,
+        "end_s": 165.007,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.628
+      },
+      {
+        "bar": 22,
+        "start_s": 165.007,
+        "end_s": 172.507,
+        "label": "Esus2",
+        "root": 4,
+        "quality": "sus2",
+        "confidence": 0.603
+      },
+      {
+        "bar": 23,
+        "start_s": 172.507,
+        "end_s": 180.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.589
+      },
+      {
+        "bar": 24,
+        "start_s": 180.007,
+        "end_s": 187.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.539
+      },
+      {
+        "bar": 25,
+        "start_s": 187.507,
+        "end_s": 195.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      },
+      {
+        "bar": 26,
+        "start_s": 195.007,
+        "end_s": 202.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.576
+      },
+      {
+        "bar": 27,
+        "start_s": 202.507,
+        "end_s": 210.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.564
+      },
+      {
+        "bar": 28,
+        "start_s": 210.007,
+        "end_s": 217.507,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.65
+      },
+      {
+        "bar": 29,
+        "start_s": 217.507,
+        "end_s": 225.007,
+        "label": "F#dim",
+        "root": 6,
+        "quality": "dim",
+        "confidence": 0.625
+      },
+      {
+        "bar": 30,
+        "start_s": 225.007,
+        "end_s": 232.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.577
+      },
+      {
+        "bar": 31,
+        "start_s": 232.507,
+        "end_s": 240.007,
+        "label": "F5",
+        "root": 5,
+        "quality": "5",
+        "confidence": 0.753
+      },
+      {
+        "bar": 32,
+        "start_s": 240.007,
+        "end_s": 247.507,
+        "label": "Csus4",
+        "root": 0,
+        "quality": "sus4",
+        "confidence": 0.68
+      },
+      {
+        "bar": 33,
+        "start_s": 247.507,
+        "end_s": 255.007,
+        "label": "D#m",
+        "root": 3,
+        "quality": "min",
+        "confidence": 0.645
+      },
+      {
+        "bar": 34,
+        "start_s": 255.007,
+        "end_s": 262.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.547
+      },
+      {
+        "bar": 35,
+        "start_s": 262.507,
+        "end_s": 270.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.56
+      },
+      {
+        "bar": 36,
+        "start_s": 270.007,
+        "end_s": 277.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.539
+      },
+      {
+        "bar": 37,
+        "start_s": 277.507,
+        "end_s": 285.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.521
+      },
+      {
+        "bar": 38,
+        "start_s": 285.007,
+        "end_s": 292.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.541
+      },
+      {
+        "bar": 39,
+        "start_s": 292.507,
+        "end_s": 300.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.522
+      },
+      {
+        "bar": 40,
+        "start_s": 300.007,
+        "end_s": 307.507,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.536
+      },
+      {
+        "bar": 41,
+        "start_s": 307.507,
+        "end_s": 315.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.544
+      },
+      {
+        "bar": 42,
+        "start_s": 315.007,
+        "end_s": 322.507,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.64
+      },
+      {
+        "bar": 43,
+        "start_s": 322.507,
+        "end_s": 330.007,
+        "label": "D#dim",
+        "root": 3,
+        "quality": "dim",
+        "confidence": 0.63
+      },
+      {
+        "bar": 44,
+        "start_s": 330.007,
+        "end_s": 337.507,
+        "label": "Cdim",
+        "root": 0,
+        "quality": "dim",
+        "confidence": 0.635
+      },
+      {
+        "bar": 45,
+        "start_s": 337.507,
+        "end_s": 345.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.592
+      },
+      {
+        "bar": 46,
+        "start_s": 345.007,
+        "end_s": 352.507,
+        "label": "F#sus4",
+        "root": 6,
+        "quality": "sus4",
+        "confidence": 0.609
+      },
+      {
+        "bar": 47,
+        "start_s": 352.507,
+        "end_s": 360.007,
+        "label": "N",
+        "root": null,
+        "quality": null,
+        "confidence": 0.598
+      }
+    ],
+    "progression": [
+      {
+        "label": "main",
+        "start_s": 0.0,
+        "end_s": 153.72,
+        "chords": [
+          "Cdim",
+          "Fsus4",
+          "F#5",
+          "F#sus4",
+          "Cdim",
+          "F#dim"
+        ]
+      },
+      {
+        "label": "breakdown",
+        "start_s": 153.72,
+        "end_s": 181.1,
+        "chords": [
+          "D#dim",
+          "Esus2"
+        ]
+      },
+      {
+        "label": "main",
+        "start_s": 181.1,
+        "end_s": 364.79,
+        "chords": [
+          "Cdim",
+          "F#dim",
+          "F5",
+          "Csus4",
+          "D#m",
+          "Cdim",
+          "D#dim",
+          "Cdim"
+        ]
+      }
+    ]
   }
 }
