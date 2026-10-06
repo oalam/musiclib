@@ -161,6 +161,17 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
             raise HTTPException(404, f"note hors base de connaissance : {path}")
         return note
 
+    @app.get("/api/kb/toc", response_model=list[kb.KbLot])
+    def kb_toc() -> list[kb.KbLot]:
+        return kb.table_of_contents()
+
+    @app.get("/api/manual")
+    def manual() -> FileResponse:
+        """Manuel PDF local (chemin fixe), ouvert a la page voulue par `#page=N`."""
+        if not kb.MANUAL_PDF.exists():
+            raise HTTPException(404, "manuel PDF absent de refs/")
+        return FileResponse(kb.MANUAL_PDF, media_type="application/pdf")
+
     if WEB_DIST.exists():
         app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")
     return app

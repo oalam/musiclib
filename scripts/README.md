@@ -634,7 +634,7 @@ hats ouverts sur-détectés quand la reverb tient. Id1 / Id2 sont à choisir à
 l'oreille. Les mutes à l'intérieur d'une section diluent le repliage (trous
 dans le kick).
 
-# kb.py — base de connaissance Digitakt II (Phase 7.D)
+# kb.py — base de connaissance Digitakt II (Phase 7.D, 7.F)
 
 Corpus : `digitakt/kb/*.md` + `digitakt/doctrine.md`, découpés en sections
 (`##` / `###`). Recherche plein texte **sans index ni RAG** : le corpus est
@@ -644,11 +644,25 @@ accents ni de la casse ; score = occurrences, ×5 dans le titre.
 
 ```bash
 python kb.py search "pattern modele"
+python kb.py toc                         # fiches par lot (noms tirés de _index.md)
 ```
 
-Dans le front : **panneau latéral** (touche `/` ou bouton `KB` en bas à
-droite, `Échap` pour fermer), extraits surlignés, clic = note rendue et
-positionnée sur la section. Utilisable pendant la lecture d'un morceau.
+**Lien avec le manuel (7.F)** : le sommaire du PDF
+`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf` (lu par `pypdf`, mis en
+cache par version du fichier) donne la page de chaque `§x.y` ; le numéro de
+page imprimé est celui du PDF. Les références du frontmatter `manuel` et
+celles du texte sont résolues (bornes des plages `§12.6-12.9` comprises).
+`doctrine §3`, `[[../doctrine]] §3` et, dans la doctrine, un `§3` à un seul
+niveau visent la doctrine, pas le manuel. Le PDF est ignoré par git : à
+déposer dans `refs/` pour activer les liens.
+
+Dans le front : bouton **Base de connaissance** du bandeau (ou touche `/`,
+`Échap` pour fermer). Le panneau s'ouvre sur le **sommaire par lot** (statut
+draft visible), la recherche surligne les extraits. Une fiche affiche ses
+**pages du manuel** en tête (`§11.7 amp page p56`), les `§` du texte et les
+wikilinks deviennent cliquables (manuel, section de la doctrine, autre
+fiche). Le manuel s'ouvre dans le panneau élargi à la bonne page
+(`#page=N`, visionneuse PDF du navigateur) ou dans un nouvel onglet.
 
 # api.py + web/ — front de la library (Phase 7.C)
 
@@ -707,7 +721,9 @@ dans library.md) :
 | GET | `/api/tracks/{slug}/bank` | `DigitaktBank` (404 si absente) |
 | POST | `/api/tracks/{slug}/bank` | génère la bank |
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
-| GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) |
+| GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
+| GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
+| GET | `/api/manual` | manuel PDF (chemin fixe, 404 s'il manque) |
 
 **Limites** : la forme d'onde est décodée dans le navigateur (quelques secondes
 sur un morceau long). Le rebouclage se fait sur l'événement `timeupdate` du

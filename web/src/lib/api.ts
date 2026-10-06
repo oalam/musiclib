@@ -106,7 +106,24 @@ export interface KbHit {
   score: number
 }
 
-export interface KbNote { path: string; title: string; markdown: string }
+/** Paragraphe du manuel PDF et sa page (7.F). */
+export interface ManualRef { section: string; title: string; page: number }
+
+export interface KbNote {
+  path: string
+  title: string
+  markdown: string
+  /** References du frontmatter `manuel`. */
+  manual: ManualRef[]
+  /** Tous les § resolus de la note (frontmatter + texte), par numero. */
+  manual_index: Record<string, ManualRef>
+}
+
+export interface KbEntry { path: string; title: string; ordre: number; statut: string }
+export interface KbLot { number: number; name: string; notes: KbEntry[] }
+
+/** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
+export const manualUrl = (page = 1) => `/api/manual#page=${page}`
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -127,6 +144,7 @@ export const api = {
   audioUrl: (slug: string) => `/api/tracks/${enc(slug)}/audio`,
   kbSearch: (q: string) => fetch(`/api/kb/search?q=${enc(q)}`).then(r => json<KbHit[]>(r)),
   kbNote: (path: string) => fetch(`/api/kb/note?path=${enc(path)}`).then(r => json<KbNote>(r)),
+  kbToc: () => fetch('/api/kb/toc').then(r => json<KbLot[]>(r)),
 }
 
 /** Minuscules sans accents (meme regle que kb.normalize). */

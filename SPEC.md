@@ -383,6 +383,8 @@ mutes, FX de transition, principes d'arc).
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | fait : recherche + panneau, 25 fiches en 5 lots (statut draft, à tester sur la machine) |
 | 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | à venir |
+| 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
+| 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | à venir |
 
 **Décisions 7.B** :
 - 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des

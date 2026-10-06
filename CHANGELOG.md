@@ -8,6 +8,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.F] KB intégrée au front : bandeau « Base de connaissance / Manuel PDF »,
+  panneau ouvert sur le sommaire des fiches par lot (`/api/kb/toc`, noms de
+  lots tirés du hub), wikilinks entre fiches cliquables.
+- [7.F] Liens vers le manuel : `kb.py` lit le sommaire du PDF (`pypdf`) pour
+  résoudre chaque `§x.y` en page ; pastilles « Manuel » en tête de fiche et
+  `§` du texte cliquables, `doctrine §N` renvoyant à la section de la
+  doctrine. Route `/api/manual` (chemin fixe), visionneuse dans le panneau
+  élargi ou nouvel onglet. `pypdf` ajouté aux dépendances, `refs/*.pdf`
+  ignoré par git.
 - [7.C] Vue patterns façon Digitakt II, calquée sur la façade : écran bleu
   à bandeau inversé, 16 trig keys en 2 rangées de 8 (chiffre souligné, LED en
   contour rouge, une track à la fois, clic = saut au pas), LEDs de page 2 × 4

@@ -1,32 +1,44 @@
 #!/usr/bin/env python3
-"""Base de connaissance Digitakt II (Phase 7.D) : notes markdown + recherche.
+"""Base de connaissance Digitakt II (Phase 7.D, 7.F) : notes markdown + recherche.
 
 Corpus = `digitakt/kb/*.md` + `digitakt/doctrine.md`, decoupes en sections
 (titres `##` / `###`). Recherche plein texte sans index ni RAG : le corpus
 tient en memoire, on le relit a chaque requete (les notes editees dans
 Obsidian sont vues tout de suite).
 
+Lien avec le manuel PDF (7.F) : le sommaire du PDF donne la page de chaque
+paragraphe `§x.y` ; les references du frontmatter `manuel` et celles citees
+dans le texte deviennent des liens vers cette page.
+
 Usage:
     kb.py search "pattern modele"        # resultats en console
+    kb.py toc                            # sommaire des fiches par lot
 """
 from __future__ import annotations
 
 import argparse
+import functools
 import re
 import sys
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel
 
 VAULT_ROOT = Path(__file__).resolve().parent.parent
 KB_DIR = VAULT_ROOT / "digitakt" / "kb"
 DOCTRINE = VAULT_ROOT / "digitakt" / "doctrine.md"
+KB_INDEX = KB_DIR / "_index.md"
+MANUAL_PDF = VAULT_ROOT / "refs" / "Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf"
 
 _HEADING = re.compile(r"^(#{1,3})\s+(.+?)\s*$")
 _SNIPPET_CHARS = 90
 _HEADING_BONUS = 5
+_SECTION_REF = re.compile(r"§(\d+(?:\.\d+)*)(?:\s*-\s*(\d+(?:\.\d+)*))?")
+_DOCTRINE_BEFORE = re.compile(r"doctrine\]*\s*\(?\s*$", re.IGNORECASE)  # « doctrine §3 », « [[../doctrine]] (§3 »
+_LOT_HEADING = re.compile(r"^##\s+Lot\s+(\d+)\s*[—–-]\s*(.+?)\s*$", re.MULTILINE)
 
 
 class KbHit(BaseModel):
@@ -39,10 +51,32 @@ class KbHit(BaseModel):
     score: float
 
 
+class ManualRef(BaseModel):
+    """Paragraphe du manuel et sa page (numero imprime = page du PDF)."""
+    section: str       # ex. 11.7
+    title: str         # titre du sommaire, ex. AMP PAGE
+    page: int
+
+
 class KbNote(BaseModel):
     path: str
     title: str
     markdown: str      # sans frontmatter
+    manual: list[ManualRef] = []                 # references du frontmatter `manuel`
+    manual_index: dict[str, ManualRef] = {}      # tous les § resolus (frontmatter + texte)
+
+
+class KbEntry(BaseModel):
+    path: str
+    title: str
+    ordre: int
+    statut: str
+
+
+class KbLot(BaseModel):
+    number: int
+    name: str
+    notes: list[KbEntry]
 
 
 @dataclass(frozen=True)
@@ -71,6 +105,21 @@ def strip_frontmatter(text: str) -> str:
         if end != -1:
             return text[end + 4:].lstrip("\n")
     return text
+
+
+def parse_frontmatter(text: str) -> dict[str, str]:
+    """Frontmatter plat `cle: valeur` (guillemets retires), {} si absent."""
+    if not text.startswith("---\n"):
+        return {}
+    end = text.find("\n---", 4)
+    if end == -1:
+        return {}
+    out: dict[str, str] = {}
+    for line in text[4:end].splitlines():
+        key, sep, value = line.partition(":")
+        if sep and key.strip() and not key.startswith(" "):
+            out[key.strip()] = value.strip().strip('"').strip("'")
+    return out
 
 
 def corpus_files() -> list[Path]:
@@ -143,15 +192,96 @@ def search(query: str, sections: list[KbSection], limit: int = 20) -> list[KbHit
     return hits[:limit]
 
 
+def outline_from_pdf(pdf: Path) -> dict[str, ManualRef]:
+    """Sommaire du PDF -> {"10.8.6": ManualRef}, cle = numero en tete de titre."""
+    from pypdf import PdfReader  # import local : seul le lien manuel en a besoin
+
+    reader = PdfReader(pdf)
+    out: dict[str, ManualRef] = {}
+
+    def walk(items: list[Any]) -> None:
+        for item in items:
+            if isinstance(item, list):
+                walk(item)
+                continue
+            title = str(item.title).strip()
+            m = re.match(r"(\d+(?:\.\d+)*)\.?\s+(.*)", title)
+            if m and m.group(1) not in out:
+                out[m.group(1)] = ManualRef(section=m.group(1), title=m.group(2).strip(),
+                                            page=reader.get_destination_page_number(item) + 1)
+
+    walk(reader.outline)
+    return out
+
+
+@functools.lru_cache(maxsize=2)
+def _cached_outline(pdf: Path, mtime: float) -> dict[str, ManualRef]:
+    return outline_from_pdf(pdf)
+
+
+def manual_outline() -> dict[str, ManualRef]:
+    """Sommaire du manuel, lu une fois par version du fichier ; {} sans PDF."""
+    if not MANUAL_PDF.exists():
+        return {}
+    return _cached_outline(MANUAL_PDF, MANUAL_PDF.stat().st_mtime)
+
+
+def is_doctrine_ref(text: str, start: int, num: str, in_doctrine: bool) -> bool:
+    """`doctrine §3` (ou `§3` a un niveau dans la doctrine) vise la doctrine, pas le manuel."""
+    return (in_doctrine and "." not in num) or bool(_DOCTRINE_BEFORE.search(text[max(0, start - 30):start]))
+
+
+def manual_refs(text: str, outline: dict[str, ManualRef],
+                in_doctrine: bool = False) -> list[ManualRef]:
+    """References `§x.y` (et bornes de plages `§12.6-12.9`) resolues, sans doublon."""
+    seen: dict[str, ManualRef] = {}
+    for m in _SECTION_REF.finditer(text):
+        if is_doctrine_ref(text, m.start(), m.group(1), in_doctrine):
+            continue
+        for num in filter(None, m.groups()):
+            ref = outline.get(num)
+            if ref is not None and num not in seen:
+                seen[num] = ref
+    return list(seen.values())
+
+
 def read_note(rel_path: str) -> KbNote | None:
     """Note du corpus uniquement (pas de chemin libre)."""
     allowed = {f.relative_to(VAULT_ROOT).as_posix(): f for f in corpus_files()}
     path = allowed.get(rel_path)
     if path is None:
         return None
-    text = strip_frontmatter(path.read_text(encoding="utf-8"))
+    raw = path.read_text(encoding="utf-8")
+    text = strip_frontmatter(raw)
     m = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
-    return KbNote(path=rel_path, title=m.group(1).strip() if m else path.stem, markdown=text)
+    outline = manual_outline()
+    header = manual_refs(parse_frontmatter(raw).get("manuel", ""), outline)
+    index = {r.section: r for r in header + manual_refs(text, outline, path == DOCTRINE)}
+    return KbNote(path=rel_path, title=m.group(1).strip() if m else path.stem, markdown=text,
+                  manual=header, manual_index=index)
+
+
+def table_of_contents() -> list[KbLot]:
+    """Fiches rangees par lot puis `ordre` ; noms des lots tires du hub `_index.md`."""
+    names = ({int(n): name for n, name in _LOT_HEADING.findall(KB_INDEX.read_text(encoding="utf-8"))}
+             if KB_INDEX.exists() else {})
+    lots: dict[int, list[KbEntry]] = {}
+    for f in corpus_files():
+        if f == DOCTRINE:
+            continue
+        raw = f.read_text(encoding="utf-8")
+        fm = parse_frontmatter(raw)
+        if not fm.get("lot", "").isdigit():
+            continue
+        m = re.search(r"^#\s+(.+)$", strip_frontmatter(raw), re.MULTILINE)
+        lots.setdefault(int(fm["lot"]), []).append(KbEntry(
+            path=f.relative_to(VAULT_ROOT).as_posix(),
+            title=fm.get("theme") or (m.group(1).strip() if m else f.stem),
+            ordre=int(fm["ordre"]) if fm.get("ordre", "").isdigit() else 0,
+            statut=fm.get("statut", "")))
+    return [KbLot(number=n, name=names.get(n, f"Lot {n}"),
+                  notes=sorted(entries, key=lambda e: (e.ordre, e.title)))
+            for n, entries in sorted(lots.items())]
 
 
 def main() -> int:
@@ -160,12 +290,18 @@ def main() -> int:
     p_search = sub.add_parser("search", help="Recherche plein texte")
     p_search.add_argument("query")
     p_search.add_argument("--limit", type=int, default=10)
+    sub.add_parser("toc", help="Sommaire des fiches par lot")
     args = parser.parse_args()
 
     if args.cmd == "search":
         for h in search(args.query, load_corpus(), args.limit):
             print(f"{h.score:5.0f}  {h.path}#{h.anchor}  {h.heading or h.title}")
             print(f"       {h.snippet}")
+    elif args.cmd == "toc":
+        for lot in table_of_contents():
+            print(f"Lot {lot.number} — {lot.name}")
+            for e in lot.notes:
+                print(f"  {e.ordre:2d}  {e.title}  ({e.path}, {e.statut})")
     return 0
 
 

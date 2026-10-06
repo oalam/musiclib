@@ -14,6 +14,7 @@
   let currentTime = $state(0)
   let listError = $state('')
   let player: Player | undefined = $state()
+  let kbPanel: KbPanel | undefined = $state()
 
   api.tracks().then(t => (tracks = t)).catch(e => (listError = String(e)))
 
@@ -46,6 +47,17 @@
   }
 </script>
 
+<div class="app">
+<header class="topbar">
+  <strong>Digitakt II</strong>
+  <span class="muted small">morceaux → banks → set</span>
+  <nav>
+    <button class="small" onclick={() => kbPanel?.show()} title="Fiches par lot et recherche">
+      Base de connaissance <kbd>/</kbd>
+    </button>
+    <button class="small" onclick={() => kbPanel?.openManual(1)}>Manuel PDF</button>
+  </nav>
+</header>
 <div class="layout">
   <aside>
     {#if listError}<p class="err">API injoignable : {listError}. Lance <code>python scripts/api.py</code>.</p>{/if}
@@ -83,10 +95,15 @@
     {/if}
   </main>
 </div>
-<KbPanel />
+</div>
+<KbPanel bind:this={kbPanel} />
 
 <style>
-  .layout { display: grid; grid-template-columns: 320px 1fr; height: 100%; }
+  .app { display: flex; flex-direction: column; height: 100%; }
+  .topbar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  .topbar nav { margin-left: auto; display: flex; gap: 6px; }
+  kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
+  .layout { display: grid; grid-template-columns: 320px 1fr; flex: 1; min-height: 0; }
   aside { border-right: 1px solid var(--border); background: var(--panel); min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
   main { overflow-y: auto; min-width: 0; }
   .empty { padding: 24px 16px; }

@@ -26,3 +26,6 @@ library/digitakt/*/
 # Front : dépendances et build
 web/node_modules/
 web/dist/
+
+# Manuel Elektron (PDF tiers, sert le front en local via /api/manual)
+refs/*.pdf
