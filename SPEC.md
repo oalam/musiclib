@@ -385,7 +385,7 @@ mutes, FX de transition, principes d'arc).
 | 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | à venir |
 | 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
-| 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | en cours : analyse et CLI faits, front à venir |
+| 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 
 **Décisions 7.B** :
 - 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des
@@ -493,6 +493,9 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Sorties : bloc `harmony` du sidecar (conservé par une re-analyse), section
   Harmonie et `scale` en frontmatter de la note de bank (pas de colonne dans
   `library.md`), front (entête du lecteur, bande d'accords, écran DT2).
+- Front : `harmony` et `keyboard_setup` exposés par `GET /api/tracks/{slug}` ;
+  l'écran DT2 passe par la touche [KEYBOARD] (mode KB SETUP), les trig keys
+  montrent la gamme sur le clavier chromatique (pas de FOLD simulé).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

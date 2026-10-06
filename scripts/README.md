@@ -657,7 +657,8 @@ ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
   marquée *incertaine* (modes relatifs, ex. F majeur / A# lydien) ; les gammes
   voisines sur la même fondamentale sont listées comme alternatives.
 - **Sorties** : bloc `harmony` du sidecar (conservé quand `analyze.py` réécrit
-  le sidecar), section Harmonie + `scale` dans la note de bank.
+  le sidecar), section Harmonie + `scale` dans la note de bank, front (gamme
+  dans l'entête du lecteur, bande d'accords, mode KEYBOARD de la DT2).
 - **Limites** : sur les musiques peu mélodiques (dubstep, tek), beaucoup de
   quintes à vide et de sus2 ; un draft à valider à l'oreille.
 
@@ -746,6 +747,15 @@ python api.py &   puis   cd ../web && npm run dev
   clic = saut à la section, double-clic = boucle sur la section), **vue d'ensemble** (onglet, avec mesures et répétitions du pattern) 16 tracks × tous les pas
   (curseur synchronisé, tracks mutées grisées `M`), partition de mutes
   cliquable (second onglet).
+- **Harmonie (7.H)**, si `harmony.py` a tourné : gamme dans l'entête du
+  lecteur (soulignée en pointillé si *incertaine* ; survol = notes, marge,
+  réglage DT2, alternatives) suivie de l'accord en cours ; **bande d'accords**
+  par mesure sous les sections (opacité = confiance, hachures = « N », clic =
+  début de mesure, suit le zoom). Sur la façade, **[KEYBOARD]** (ou `[FUNC]` +
+  KEYBOARD) passe l'écran en **KB SETUP** (SCALE / ROOT à reporter sur la
+  machine, accord en cours, progression de la section) et les trig keys en
+  clavier chromatique (rangée basse = blanches, haute = noires) : notes de la
+  gamme éclairées, fondamentale en rouge, notes de l'accord en vert.
 - **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py`,
   quelques secondes) : utile après `stems.py` ou une mise à jour de l'analyzer.
 
@@ -755,7 +765,7 @@ dans library.md) :
 | Méthode | Route | Rôle |
 |---|---|---|
 | GET | `/api/tracks` | liste (`TrackSummary`) |
-| GET | `/api/tracks/{slug}` | détail + segments + cues |
+| GET | `/api/tracks/{slug}` | détail + segments + cues + `harmony` / `keyboard_setup` (7.H) |
 | GET | `/api/tracks/{slug}/audio` | fichier audio (requêtes Range pour le seek) |
 | GET | `/api/tracks/{slug}/bank` | `DigitaktBank` (404 si absente) |
 | POST | `/api/tracks/{slug}/bank` | génère la bank |

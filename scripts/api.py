@@ -26,6 +26,7 @@ from pydantic import BaseModel
 
 import digitakt
 import kb
+from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.types import CuePoint, DigitaktBank, Segment
@@ -67,6 +68,8 @@ class TrackDetail(TrackSummary):
     segments: list[Segment] = []
     cues: list[CuePoint] = []
     fields: dict[str, str] = {}
+    harmony: Harmony | None = None  # Phase 7.H (harmony.py)
+    keyboard_setup: str | None = None  # reglage DT2 de la gamme (§8.5.2)
 
 
 def _clean(value: str) -> str:
@@ -113,6 +116,7 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
         entry = entry_or_404(slug)
         sidecar = load_sidecar(QUALITY_DIR, slug) or {}
         beats = sidecar.get("beats") or {}
+        harmony = Harmony.model_validate(sidecar["harmony"]) if sidecar.get("harmony") else None
         return TrackDetail(
             **_summary(slug, entry).model_dump(),
             tempo_bpm=beats.get("tempo_bpm"),
@@ -121,6 +125,8 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
             segments=((sidecar.get("structure") or {}).get("segments") or []),
             cues=((sidecar.get("cues") or {}).get("cues") or []),
             fields={k: _clean(v) for k, v in entry.items()},
+            harmony=harmony,
+            keyboard_setup=keyboard_setup(harmony.scale) if harmony else None,
         )
 
     @app.get("/api/tracks/{slug}/audio")

@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.H] Front : gamme dans l'entête du lecteur (incertaine soulignée, survol =
+  notes, marge, réglage DT2, alternatives) et accord en cours ; bande d'accords
+  par mesure sous les sections (opacité = confiance, clic = saut, suit le
+  zoom) ; touche [KEYBOARD] de la façade = écran KB SETUP (SCALE / ROOT, accord,
+  progression de la section) et trig keys en clavier chromatique (gamme,
+  fondamentale, notes de l'accord). `GET /api/tracks/{slug}` expose `harmony`
+  et `keyboard_setup`.
 - [7.H] `analyzer/harmony.py` + CLI `harmony.py <slug>|--all` : gamme du
   morceau (12 gammes du KEYBOARD SETUP de la DT2, fondamentale départagée par
   la basse, marge et statut « incertaine »), accords par mesure (triades, sus,

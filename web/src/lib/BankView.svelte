@@ -1,10 +1,12 @@
 <script lang="ts">
   import { tick, type Snippet } from 'svelte'
-  import { api, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type ManualRef, type Pattern } from './api'
+  import { api, chordAt, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type Harmony, type ManualRef, type Pattern } from './api'
   import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
 
-  let { bank, currentTime, playing, player, onseek, onloop, onplay, onstop, onhelp }: {
+  let { bank, harmony = null, currentTime, playing, player, onseek, onloop, onplay, onstop, onhelp }: {
     bank: Bank
+    /** Gamme et accords du morceau (7.H), affiches en mode KEYBOARD. */
+    harmony?: Harmony | null
     currentTime: number
     playing: boolean
     /** Lecteur rendu sous la facade, dans le meme bloc que la vue d'ensemble. */
@@ -95,7 +97,7 @@
   const pageSteps = $derived([...Array(16).keys()].map(i => i + page * 16))
 
   // facade DT2 : une track a la fois sur les 16 trig keys
-  type Mode = 'trig' | 'trk' | 'mute' | 'ptn'
+  type Mode = 'trig' | 'trk' | 'mute' | 'ptn' | 'kb'
   let mode = $state<Mode>('trig')
   let selectedTrack = $state(1)
   const track = $derived(pattern.tracks.find(t => t.index === selectedTrack) ?? pattern.tracks[0])
@@ -113,6 +115,19 @@
   }
   const patName = (slot: number) =>
     `${BANKS[(bankLetter + Math.floor((slot - 1) / 16)) % 16]}${String(((slot - 1) % 16) + 1).padStart(2, '0')}`
+
+  // 7.H : mode KEYBOARD = gamme du morceau sur les trig keys, rangee basse en
+  // touches blanches, rangee haute en noires (clavier chromatique, §8.5.1)
+  const KB_LAYOUT = [null, 1, 3, null, 6, 8, 10, null, 0, 2, 4, 5, 7, 9, 11, 0]
+  // miroir de analyzer/harmony.py CHORDS (intervalles par qualite)
+  const CHORD_INTERVALS: Record<string, number[]> = {
+    maj: [0, 4, 7], min: [0, 3, 7], sus2: [0, 2, 7], sus4: [0, 5, 7], dim: [0, 3, 6], '5': [0, 7],
+  }
+  const chord = $derived(harmony ? chordAt(harmony.chords, currentTime) : null)
+  const scalePcs = $derived(new Set(harmony?.scale.notes.map(n => NOTE_NAMES.indexOf(n)) ?? []))
+  const chordPcs = $derived(new Set(chord?.root != null && chord.quality
+    ? (CHORD_INTERVALS[chord.quality] ?? []).map(i => (chord.root! + i) % 12) : []))
+  const sectionChords = $derived(harmony?.progression.find(p => currentTime >= p.start_s && currentTime < p.end_s)?.chords ?? [])
 
   function trigAt(track: BankTrack, step: number) {
     return track.trigs.find(t => t.step === step)
@@ -247,7 +262,7 @@
   function pressKey(i: number) {
     if (help) { act('trigs'); return }
     focus = { id: 'trigs' }
-    if (func) { func = false; return }  // QUICK MUTE : legende seule, les mutes viennent de la bank
+    if (func || mode === 'kb') { func = false; return }  // QUICK MUTE / clavier : legende seule : legende seule, les mutes viennent de la bank
     if (mode === 'trig') { if (page * 16 + i < pattern.steps) { lastStep = page * 16 + i; seekStep(lastStep) } }
     else if (mode === 'trk') { selectedTrack = i + 1; mode = 'trig' }  // comme relacher TRK
     else if (mode === 'mute') selectedTrack = i + 1
@@ -338,6 +353,16 @@
           <div class="row big">MUTE MODE</div>
           <div class="row">{unmuted.size}/16 TRACKS ACTIVES</div>
           <div class="row dim">{currentPhrase >= 0 && liveActive ? `PHRASE ${currentPhrase + 1}/${bank.mutes.length}` : 'ETAT DU PATTERN'}</div>
+        {:else if mode === 'kb'}
+          <div class="row big">KB SETUP <span class="pgt">§8.5.2</span></div>
+          {#if harmony}
+            <div class="row">SCALE {harmony.scale.scale}</div>
+            <div class="row">ROOT {harmony.scale.root_name}{harmony.scale.uncertain ? ' ? INCERTAINE' : ''} <span class="dim">· {harmony.scale.notes.join(' ')}</span></div>
+            <div class="row dim">{chord && chord.label !== 'N' ? `ACCORD ${chord.label} · MES ${chord.bar + 1}` : 'ACCORD --'}{sectionChords.length ? ` · ${sectionChords.join(' ')}` : ''}</div>
+          {:else}
+            <div class="row">PAS D'ANALYSE HARMONIQUE</div>
+            <div class="row dim">python harmony.py {bank.slug}</div>
+          {/if}
         {:else}
           <div class="row big">BANK {BANKS[bankLetter]} <span class="pgt">◀ ▶ = BANK</span></div>
           <div class="row">{bank.patterns.length} PATTERNS · {playingPattern ? `PLAY ${patName(playingPattern.slot)}` : 'STOP'}</div>
@@ -364,7 +389,8 @@
       {@render hw(String(id), [Number(x), 349, 44, 44], { icon: String(id) })}
     {/each}
 
-    {@render hw('keyboard', [78, 410, 44, 44], { icon: 'keyboard' })}
+    {@render hw('keyboard', [78, 410, 44, 44], { icon: 'keyboard', primary: () => (mode = mode === 'kb' ? 'trig' : 'kb'),
+      secondary: () => (mode = 'kb'), lit: mode === 'kb' })}
     {@render hw('record', [182, 411, 68, 42], { icon: 'record' })}
     {@render hw('play', [264, 411, 68, 42], { icon: 'play', primary: onplay, lit: playing })}
     {@render hw('stop', [346, 411, 68, 42], { icon: 'stop', primary: () => onstop(playingStart) })}
@@ -413,6 +439,14 @@
           style={box} title="{i + 1} {t?.role ?? ''}"
           onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek} onclick={() => pressKey(i)}>
           <span class="n">{i + 1}</span><span class="note">{t?.role ?? ''}</span>
+        </button>
+      {:else if mode === 'kb'}
+        {@const pc = KB_LAYOUT[i]}
+        <button class="key" class:off={pc === null || !scalePcs.has(pc)} class:white={pc !== null && scalePcs.has(pc)}
+          class:red={pc !== null && pc === harmony?.scale.root} class:green={pc !== null && chordPcs.has(pc) && pc !== harmony?.scale.root}
+          style={box} title={pc === null ? '' : `${NOTE_NAMES[pc]}${scalePcs.has(pc) ? ' · dans la gamme' : ''}${chordPcs.has(pc) ? ' · accord en cours' : ''}`}
+          onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek} onclick={() => pressKey(i)}>
+          <span class="n">{i + 1}</span>{#if pc !== null}<span class="note">{NOTE_NAMES[pc]}</span>{/if}
         </button>
       {:else}
         {@const p = bank.patterns.find(p => p.slot === i + 1)}

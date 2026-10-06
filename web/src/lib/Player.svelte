@@ -1,7 +1,7 @@
 <script lang="ts">
   import WaveSurfer from 'wavesurfer.js'
   import RegionsPlugin, { type Region } from 'wavesurfer.js/plugins/regions'
-  import { api, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
+  import { api, chordAt, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
 
   let { track, bars = [], sections, currentTime = $bindable(0), playing = $bindable(false) }: {
     track: TrackDetail
@@ -78,6 +78,17 @@
     ws?.pause()
     ws?.setTime(t)
   }
+
+  // 7.H : gamme dans l'entete, accord par mesure sous les sections
+  const harmony = $derived(track.harmony)
+  const chord = $derived(harmony ? chordAt(harmony.chords, currentTime) : null)
+  const scaleTitle = $derived(harmony
+    ? `${harmony.scale.notes.join(' ')} · score ${harmony.scale.score} · marge ${harmony.scale.margin}` +
+      ` (${harmony.source === 'stems' ? 'stems' : 'mix, plus bruité'})` +
+      (harmony.scale.uncertain ? ' · incertaine : fondamentale ambiguë, à confirmer à l\'oreille' : '') +
+      `\nDT2 : [FUNC] + [KEYBOARD] > ${track.keyboard_setup}` +
+      `\nAlternatives : ${harmony.scale.candidates.slice(0, 3).map(c => `${c.label} (${c.score})`).join(', ')}`
+    : '')
 
   function cssVar(name: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
@@ -210,6 +221,10 @@
         {track.bpm ? Math.round(parseFloat(track.bpm)) : '?'} BPM · {track.key || '?'}
         · {track.time_signature ?? '?'} · {track.genre || '?'}
         {#if track.mood}· {track.mood}{/if}
+        {#if harmony}
+          · <span class="scale" class:uncertain={harmony.scale.uncertain} title={scaleTitle}>{harmony.scale.label}{harmony.scale.uncertain ? ' ?' : ''}</span>
+          {#if chord && chord.label !== 'N'}· <span class="chord">{chord.label}</span>{/if}
+        {/if}
       </p>
     </div>
     <div class="transport">
@@ -228,6 +243,17 @@
         <button class="section" title="{s.label} · {mmss(s.start_s)}"
           style="left: {((Math.max(s.start_s, viewStart) - viewStart) / (viewEnd - viewStart)) * 100}%; width: {((Math.min(s.end_s, viewEnd) - Math.max(s.start_s, viewStart)) / (viewEnd - viewStart)) * 100}%; --c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
           onclick={() => seek(s.start_s)}>{s.label}</button>
+      {/each}
+    </div>
+  {/if}
+
+  {#if duration > 0 && harmony}
+    <div class="chords" aria-label="Accords par mesure">
+      {#each harmony.chords.filter(c => c.end_s > viewStart && c.start_s < viewEnd) as c (c.bar)}
+        <button class="chordcell mono" class:none={c.label === 'N'} class:cur={c === chord}
+          title="mesure {c.bar + 1} · {c.label === 'N' ? 'pas de contenu tonal' : c.label} · confiance {c.confidence} · {mmss(c.start_s)}"
+          style="left: {((Math.max(c.start_s, viewStart) - viewStart) / (viewEnd - viewStart)) * 100}%; width: {((Math.min(c.end_s, viewEnd) - Math.max(c.start_s, viewStart)) / (viewEnd - viewStart)) * 100}%; --o: {0.25 + 0.75 * c.confidence}"
+          onclick={() => seek(c.start_s)}>{c.label === 'N' ? '' : c.label}</button>
       {/each}
     </div>
   {/if}
@@ -275,6 +301,19 @@
     font-size: 10px; text-align: left; overflow: hidden; white-space: nowrap; color: var(--text);
   }
   .section:hover { background: color-mix(in srgb, var(--c) 60%, transparent); }
+  .scale { color: var(--text); }
+  .scale.uncertain { text-decoration: underline dotted; }
+  .chord { color: var(--accent); font-weight: 600; }
+  .chords { position: relative; height: 16px; margin-top: 2px; overflow: hidden; }
+  .chordcell {
+    position: absolute; top: 0; height: 16px; padding: 0 3px; border: 0; border-radius: 0;
+    border-left: 1px solid var(--border); background: transparent;
+    font-size: 10px; text-align: left; overflow: hidden; white-space: nowrap;
+    color: color-mix(in srgb, var(--text) calc(var(--o) * 100%), transparent);
+  }
+  .chordcell.none { background: repeating-linear-gradient(45deg, transparent 0 3px, color-mix(in srgb, var(--border) 50%, transparent) 3px 4px); }
+  .chordcell.cur { background: color-mix(in srgb, var(--accent) 25%, transparent); color: var(--text); font-weight: 600; }
+  .chordcell:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); }
   .tools { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
   .small { font-size: 12px; }
   .err { color: #dc2626; }

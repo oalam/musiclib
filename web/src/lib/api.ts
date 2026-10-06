@@ -32,6 +32,43 @@ export interface CuePoint {
   label: string | null
 }
 
+/** Gamme candidate (7.H), `scale` = nom KB SCALE de la DT2. */
+export interface ScaleMatch {
+  root: number
+  root_name: string
+  scale: string
+  label: string
+  notes: string[]
+  score: number
+}
+
+export interface ScaleResult extends ScaleMatch {
+  margin: number
+  uncertain: boolean
+  candidates: ScaleMatch[]
+}
+
+/** Accord d'une mesure ; `label` = « N » sans contenu tonal. */
+export interface BarChord {
+  bar: number
+  start_s: number
+  end_s: number
+  label: string
+  root: number | null
+  quality: string | null
+  confidence: number
+}
+
+export interface SectionProgression { label: string; start_s: number; end_s: number; chords: string[] }
+
+export interface Harmony {
+  analyzed_at: string
+  source: string
+  scale: ScaleResult
+  chords: BarChord[]
+  progression: SectionProgression[]
+}
+
 export interface TrackDetail extends TrackSummary {
   tempo_bpm: number | null
   time_signature: string | null
@@ -39,6 +76,10 @@ export interface TrackDetail extends TrackSummary {
   segments: Segment[]
   cues: CuePoint[]
   fields: Record<string, string>
+  /** Absent tant que harmony.py n'a pas tourne sur le morceau. */
+  harmony: Harmony | null
+  /** Reglage DT2 de la gamme, ex. « KB SCALE = DORIAN, ROOT NOTE = F » (§8.5.2). */
+  keyboard_setup: string | null
 }
 
 export interface Trig { step: number; velocity: number; note: number | null }
@@ -162,6 +203,19 @@ export function slugify(s: string): string {
 export function mmss(s: number): string {
   const t = Math.max(0, Math.floor(s))
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`
+}
+
+/** Accord en cours a t (recherche dichotomique), null hors grille. */
+export function chordAt(chords: BarChord[], t: number): BarChord | null {
+  let lo = 0
+  let hi = chords.length - 1
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1
+    if (chords[mid].end_s <= t) lo = mid + 1
+    else if (chords[mid].start_s > t) hi = mid - 1
+    else return chords[mid]
+  }
+  return null
 }
 
 /** Couleurs de segments, alignees sur visualize.py (SPEC Phase 5). */

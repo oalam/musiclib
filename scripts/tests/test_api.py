@@ -61,6 +61,26 @@ def test_track_detail(client: TestClient):
     assert d["bar_times"] == [0.0, 1.6, 3.2]
     assert d["segments"][0]["label"] == "main"
     assert d["cues"][0]["type"] == "intro_start"
+    assert d["harmony"] is None and d["keyboard_setup"] is None
+
+
+def test_track_detail_harmony(client: TestClient):
+    path = api.QUALITY_DIR / f"{SLUG}.json"
+    sidecar = json.loads(path.read_text(encoding="utf-8"))
+    scale = {"root": 9, "root_name": "A", "scale": "AEOLIAN (MINOR)", "label": "A mineur (éolien)",
+             "notes": ["A", "B", "C", "D", "E", "F", "G"], "score": 1.1}
+    sidecar["harmony"] = {
+        "analyzed_at": "2026-10-06", "source": "stems",
+        "scale": {**scale, "margin": 0.2, "candidates": [scale]},
+        "chords": [{"bar": 0, "start_s": 0.0, "end_s": 1.6, "label": "Am", "root": 9,
+                    "quality": "min", "confidence": 0.9}],
+        "progression": [{"label": "main", "start_s": 0.0, "end_s": 10.0, "chords": ["Am"]}],
+    }
+    path.write_text(json.dumps(sidecar), encoding="utf-8")
+    d = client.get(f"/api/tracks/{SLUG}").json()
+    assert d["harmony"]["scale"]["label"] == "A mineur (éolien)"
+    assert d["harmony"]["chords"][0]["label"] == "Am"
+    assert d["keyboard_setup"] == "KB SCALE = AEOLIAN (MINOR), ROOT NOTE = A"
 
 
 def test_audio_supports_range(client: TestClient):
