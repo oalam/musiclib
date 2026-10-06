@@ -70,3 +70,13 @@ minutes d'un pattern sur le Mac, puis repasser en `L:T1 / R:T9` et
 comparer kick et basse.
 
 Source : manuel DT2 OS 1.17, §6.6, §6.8, §14.6, §14.8.1.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Synthackers — Digitakt II Now Has Overbridge!](https://youtu.be/ghWoEDlLwKA) (vidéo entière) · DT2, 2024
+- [Synthackers — Digitakt II Now Has Overbridge!](https://youtu.be/ghWoEDlLwKA?t=1441) : « DAW: Multitracking Seperate Tracks » (24:01) · DT2, 2024
+- [Synthackers — Digitakt II Now Has Overbridge!](https://youtu.be/ghWoEDlLwKA?t=2072) : « Routing Audio From DAW Into Digitakt II » (34:32) · DT2, 2024
+- [Zonal Audio — The Big Elektron Overbridge Tutorial, multitrack](https://youtu.be/NYLRBTIsoDo) (vidéo entière) · DT2, 2026
+- [XNB — DIGITAKT II Sampling](https://youtu.be/tDBeHZV-qnU?t=659) : « External Mixer » (10:59) · DT2, 2024

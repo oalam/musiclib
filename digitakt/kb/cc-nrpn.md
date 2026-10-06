@@ -94,3 +94,13 @@ MIDI sur le Mac (ou `mido` en écoute) et tourner le filtre du kick : relever
 les messages et les comparer au tableau.
 
 Source : manuel DT2 OS 1.17, annexe B, §14.4.2, §14.4.3, §14.5.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Optoproductions — Digitakt 2 MIDI Setup](https://youtu.be/noEAqTsXL8M?t=355) : « Naming Parameters » (5:55) · DT2, 2024
+- [Optoproductions — Digitakt 2 MIDI Setup](https://youtu.be/noEAqTsXL8M?t=542) : « CC Issue » (9:02) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1390) : « Name CCs » (23:10) · DT2, 2024
+- [Synthackers — Digitakt II Now Has Overbridge!](https://youtu.be/ghWoEDlLwKA?t=2155) : « DAW Automation for Digitakt II » (35:55) · DT2, 2024
+- [XNB — Elektron DIGITAKT MIDI Tracks deep dive](https://youtu.be/ZTFFs89y5gg?t=650) : « CC's » (10:50) · DT1 : 8 tracks MIDI dédiées, sur DT2 toute track peut l'être, 2023

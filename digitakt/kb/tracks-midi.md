@@ -70,3 +70,12 @@ mineur avec `NOT2` = 3 et `NOT3` = 7, VAL1 sur le cutoff, un p-lock de
 VAL1 par trig.
 
 Source : manuel DT2 OS 1.17, §5.3.2, §16.3, annexe A.2.7.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Optoproductions — Digitakt 2 MIDI Setup](https://youtu.be/noEAqTsXL8M) (vidéo entière) · DT2, 2024
+- [XNB — Elektron DIGITAKT MIDI Tracks deep dive](https://youtu.be/ZTFFs89y5gg) (vidéo entière) · DT1 : 8 tracks MIDI dédiées, sur DT2 toute track peut l'être, 2023
+- [Elektron — Digitakt — The MIDI Tracks](https://youtu.be/ZyFY0o44DK8) (vidéo entière) · DT1 : 8 tracks MIDI dédiées, sur DT2 toute track peut l'être, 2017
+- [Elektron Video Klub — Using MIDI with External Hardware](https://youtu.be/0Vf4GClejb0?t=241) : « turn the 16 steps into a single octave keyboard » (4:01) · DT1 : 8 tracks MIDI dédiées, sur DT2 toute track peut l'être, 2020
