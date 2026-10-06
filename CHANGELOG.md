@@ -8,6 +8,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.H] « Générer / Régénérer la bank » du front relance aussi l'analyse
+  harmonique (`POST /api/tracks/{slug}/bank` enchaîne `harmony.process` ; un
+  échec ne bloque pas la bank) ; le front met à jour gamme et accords sans
+  recharger l'audio.
 - [7.H] Front : gamme dans l'entête du lecteur (incertaine soulignée, survol =
   notes, marge, réglage DT2, alternatives) et accord en cours ; bande d'accords
   par mesure sous les sections (opacité = confiance, clic = saut, suit le

@@ -756,8 +756,10 @@ python api.py &   puis   cd ../web && npm run dev
   machine, accord en cours, progression de la section) et les trig keys en
   clavier chromatique (rangée basse = blanches, haute = noires) : notes de la
   gamme éclairées, fondamentale en rouge, notes de l'accord en vert.
-- **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py`,
-  quelques secondes) : utile après `stems.py` ou une mise à jour de l'analyzer.
+- **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py` puis
+  `harmony.py` sur la nouvelle grille, une vingtaine de secondes) : utile après
+  `stems.py` ou une mise à jour de l'analyzer. Un échec de l'harmonie n'empêche
+  pas la bank (l'ancien bloc `harmony` reste en place).
 
 **API** (127.0.0.1 uniquement ; un fichier n'est servi que pour un slug présent
 dans library.md) :

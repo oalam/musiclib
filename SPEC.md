@@ -496,6 +496,8 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Front : `harmony` et `keyboard_setup` exposés par `GET /api/tracks/{slug}` ;
   l'écran DT2 passe par la touche [KEYBOARD] (mode KB SETUP), les trig keys
   montrent la gamme sur le clavier chromatique (pas de FOLD simulé).
+- (Re)générer la bank depuis le front relance aussi `harmony.py`, sur la grille
+  de la nouvelle bank ; un échec de l'harmonie ne bloque pas la bank.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

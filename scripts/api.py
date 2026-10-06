@@ -3,7 +3,7 @@
 base de connaissance (Phase 7.D).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
-qui appelle `digitakt.py`. Ecoute sur 127.0.0.1 uniquement. Les fichiers ne
+qui appelle `digitakt.py` puis `harmony.py` (7.H). Ecoute sur 127.0.0.1 uniquement. Les fichiers ne
 sont servis que pour un slug present dans library.md (pas de chemin libre).
 
 Usage:
@@ -25,6 +25,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 import digitakt
+import harmony
 import kb
 from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
@@ -153,6 +154,9 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
         if rc != 0:
             raise HTTPException(422, f"generation impossible pour {slug} "
                                      "(sidecar ou audio manquant, voir les logs)")
+        # harmonie recalculee sur la grille de la nouvelle bank ; un echec
+        # (logue) laisse la bank intacte et l'ancien bloc harmony en place
+        harmony.process(slug, all_entries)
         return track_bank(slug)
 
     @app.get("/api/kb/search", response_model=list[kb.KbHit])

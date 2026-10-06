@@ -93,6 +93,25 @@ def test_unknown_slug_is_404(client: TestClient):
     assert client.get("/api/tracks/nope/audio").status_code == 404
 
 
+def test_generate_bank_runs_harmony(client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    calls: list[str] = []
+
+    def fake_bank(slug: str, entries: dict[str, dict[str, str]], **kw: object) -> int:
+        calls.append("bank")
+        api.DIGITAKT_DIR.mkdir(exist_ok=True)
+        (api.DIGITAKT_DIR / f"{slug}.json").write_text(json.dumps({
+            "slug": slug, "bpm": 150, "from_stems": True, "patterns": [],
+            "generated_at": "2026-10-06T00:00:00+00:00",
+        }), encoding="utf-8")
+        return 0
+
+    monkeypatch.setattr(api.digitakt, "process", fake_bank)
+    monkeypatch.setattr(api.harmony, "process", lambda slug, entries: calls.append("harmony") or 1)
+    r = client.post(f"/api/tracks/{SLUG}/bank")
+    assert r.status_code == 200 and r.json()["bpm"] == 150  # echec harmonie : bank servie quand meme
+    assert calls == ["bank", "harmony"]
+
+
 def test_bank_missing_then_present(client: TestClient):
     assert client.get(f"/api/tracks/{SLUG}/bank").status_code == 404
     api.DIGITAKT_DIR.mkdir()

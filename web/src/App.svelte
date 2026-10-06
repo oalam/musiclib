@@ -46,8 +46,16 @@
     if (!selected) return
     bankState = 'generating'
     try {
-      bank = await api.generateBank(selected)
+      const slug = selected
+      bank = await api.generateBank(slug)
       bankState = 'idle'
+      // harmonie recalculee avec la bank (7.H) : mise a jour des seuls champs
+      // concernes, sans remplacer detail (le lecteur rechargerait l'audio)
+      const fresh = await api.track(slug)
+      if (detail && detail.slug === slug) {
+        detail.harmony = fresh.harmony
+        detail.keyboard_setup = fresh.keyboard_setup
+      }
       tracks = tracks.map(t => (t.slug === selected ? { ...t, has_bank: true } : t))
     } catch (e) {
       bankState = 'error'
@@ -94,7 +102,7 @@
         <div class="bankbar">
           <span class="muted small">Bank générée le {new Date(bank.generated_at).toLocaleString('fr-FR')}</span>
           <button class="small" onclick={generate} disabled={bankState === 'generating'}>
-            {bankState === 'generating' ? 'Analyse en cours…' : 'Régénérer la bank'}
+            {bankState === 'generating' ? 'Analyse en cours…' : 'Régénérer la bank et l’harmonie'}
           </button>
           {#if bankState === 'error'}<span class="err">{bankError}</span>{/if}
         </div>
@@ -108,11 +116,11 @@
           <p>Pas encore de bank Digitakt pour ce morceau.
             {#if !detail.has_stems}<span class="muted">Sans stems, la détection part du mix (plus bruitée) : <code>python stems.py {detail.slug} --cleanup</code>.</span>{/if}
           </p>
-          <button onclick={generate}>Générer la bank</button>
+          <button onclick={generate}>Générer la bank et l’harmonie</button>
           {#if bankState === 'error'}<p class="err">{bankError}</p>{/if}
         </div>
       {:else if bankState === 'generating'}
-        <p class="empty muted">Analyse en cours (quelques secondes)…</p>
+        <p class="empty muted">Analyse en cours (bank puis harmonie, une vingtaine de secondes)…</p>
       {/if}
     {:else}
       <p class="empty muted">Choisis un morceau dans la liste{showList ? '' : ' (bouton ▶ Morceaux)'}.</p>
