@@ -13,7 +13,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   `/api/kb/search` et `/api/kb/note` (chemins limités au corpus).
 - [7.D] Panneau latéral KB dans le front (touche `/`), extraits surlignés,
   note rendue avec `marked` (HTML brut échappé) et positionnée sur la section.
-- [7.D] Hub `digitakt/kb/_index.md` (24 thèmes, 5 lots) et lot 1 de fiches :
+- [7.D] Hub `digitakt/kb/_index.md` (25 thèmes, 5 lots) et lot 1 de fiches :
   projet et sauvegarde, presets / kits / pool, copier-coller, page setup,
   tempo et métronome.
 - [7.D] Lot 2 de fiches : enregistrement et quantize, configuration MIDI
@@ -21,7 +21,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   retrigs, mode euclidien.
 - [7.D] Lot 3 de fiches : sampling et resampling, machines SRC, amp /
   overdrive / bit reduction, filtres, LFO (riser one-shot), send FX et
-  compresseur (sidechain), FILL et conditions de trig.
+  compresseur (sidechain), mixer et setup global (control all, overdrive
+  master, équilibrage des patterns), FILL et conditions de trig.
 
 ### Corrigé
 

@@ -2,7 +2,7 @@
 tags: [digitakt, kb]
 theme: FILL et conditions de trig
 lot: 3
-ordre: 17
+ordre: 18
 manuel: "§10.7.3, §10.8.4, §11.2 (p48-49, 53-54)"
 os: "1.17"
 statut: draft

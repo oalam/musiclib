@@ -65,21 +65,22 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 14 | [[filtres]] | §11.5, §11.6, A.3 | draft |
 | 15 | [[lfo]] | §11.9-11.11, annexe C | draft |
 | 16 | [[send-fx-compresseur]] | §12 | draft |
-| 17 | [[fill-conditions]] | §10.7.3, §10.8.4 | draft |
+| 17 | [[mixer-setup]] | §6.2.2, §9.8, §12.6-12.9 | draft |
+| 18 | [[fill-conditions]] | §10.7.3, §10.8.4 | draft |
 
 ## Lot 4 — Structurer le set, puis le jouer
 
 | # | Thème | Manuel | Statut |
 |---|---|---|---|
-| 18 | Song mode (rejouer la chaîne d'une bank) | §10.9 | à rédiger |
-| 19 | Changer de pattern en live, chaînes | §10.1 | à rédiger |
-| 20 | Mutes (globaux / de pattern) | §8.5 | à rédiger |
-| 21 | Perform kit mode | §10.10 | à rédiger |
+| 19 | Song mode (rejouer la chaîne d'une bank) | §10.9 | à rédiger |
+| 20 | Changer de pattern en live, chaînes | §10.1 | à rédiger |
+| 21 | Mutes (globaux / de pattern) | §8.5 | à rédiger |
+| 22 | Perform kit mode | §10.10 | à rédiger |
 
 ## Lot 5 — MIDI et intégration
 
 | # | Thème | Manuel | Statut |
 |---|---|---|---|
-| 22 | CC et NRPN (prérequis Phase 7.E) | annexe B | à rédiger |
-| 23 | Tracks MIDI pour piloter un synthé | §5.3.2, §16.3 | à rédiger |
-| 24 | Audio routing et Overbridge | §6.6, §14.6 | à rédiger |
+| 23 | CC et NRPN (prérequis Phase 7.E) | annexe B | à rédiger |
+| 24 | Tracks MIDI pour piloter un synthé | §5.3.2, §16.3 | à rédiger |
+| 25 | Audio routing et Overbridge | §6.6, §14.6 | à rédiger |
