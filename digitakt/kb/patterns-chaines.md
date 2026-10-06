@@ -74,3 +74,12 @@ Chaîne 01-02-03-02 en lecture ; pendant le break, choisir 01 à la main et
 vérifier qu'on sort de la chaîne à la fin du break.
 
 Source : manuel DT2 OS 1.17, §10.1, §10.7.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — DIGITAKT II Song Mode & Chain](https://youtu.be/55fCA4d2vNw?t=40) : « Chain » (0:40) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3831) : « Queue up pattern change » (1:03:51) · DT2, 2024
+- [Synthackers — Optimise Your Workflow with Sequencer Page Setup](https://youtu.be/5zCFR5911zY?t=291) : « Pattern Change » (4:51) · DT2, 2024
+- [Hexwave — New Conditional Trigs For Easy Hands-Free Transitions](https://youtu.be/DLi1B6ia-_M) (vidéo entière) · DT2, 2024

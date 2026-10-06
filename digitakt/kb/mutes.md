@@ -72,3 +72,12 @@ mute global, dérouler la montée de la doctrine §4 en préparant chaque
 entrée avec `[FUNC]` maintenu et en lâchant sur le 1.
 
 Source : manuel DT2 OS 1.17, §8.5.3.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [Synthackers — How to Use Mute Modes on Digitakt II for Live Performance](https://youtu.be/-JVdETENNyo) (vidéo entière) · DT2, 2025
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=3359) : « Mute mode » (55:59) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3866) : « The two mute modes » (1:04:26) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1030) : « Prepare mutes » (17:10) · DT2, 2024

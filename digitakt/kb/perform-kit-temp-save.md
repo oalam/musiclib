@@ -72,3 +72,12 @@ autre pattern du morceau, puis `[PRESET/KIT] + [NO]` sur le 1 ; finir par
 `[FUNC] + [NO]` et vérifier que tout est revenu.
 
 Source : manuel DT2 OS 1.17, §10.10, §10.8.6.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=6691) : « Perform kit » (1:51:31) · DT2, 2024
+- [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3413) : « The perform kit » (56:53) · DT2, 2024
+- [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=420) : « Perform kit » (7:00) · DT2, 2024
+- [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=6906) : « Page loop » (1:55:06) · DT2, 2024

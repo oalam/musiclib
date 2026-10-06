@@ -77,3 +77,11 @@ lecture, `[SONG] + [LEFT]` sur la ligne main, la laisser tourner 4 tours,
 relâcher et écouter la reprise.
 
 Source : manuel DT2 OS 1.17, §10.9.
+
+## Vidéos
+
+Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait foi pour l'OS 1.17.
+
+- [XNB — DIGITAKT II Song Mode & Chain](https://youtu.be/55fCA4d2vNw?t=199) : « Song » (3:19) · DT2, 2024
+- [Elektron — Using pattern mutes per row to quickly arrange a Song](https://youtu.be/Isb0EiRSrJw) (vidéo entière) · Digitakt, OS song mode, 2022
+- [EZBOT — ELEKTRON SONG MODE: Full Tutorial](https://youtu.be/e-4qQbD5hxQ) (vidéo entière) · Elektron, générique, 2022

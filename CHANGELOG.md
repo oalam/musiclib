@@ -9,7 +9,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 ### Ajouté
 
 - [7.F] Fiches KB : section **Vidéos** (tutos YouTube horodatés au chapitre :
-  XNB, True Cuckoo, Synthackers…) sur les lots 1 à 3 ;
+  XNB, True Cuckoo, Synthackers…) sur les lots 1 à 4 ;
   liens externes du panneau KB ouverts dans un nouvel onglet.
 - [7.H] Vue d'ensemble : ligne **Accords** en tête de grille, un accord par
   mesure du pattern (passage en cours, sinon le premier), mesure jouée
