@@ -70,12 +70,12 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 
 ## Lot 4 — Structurer le set, puis le jouer
 
-| # | Thème | Manuel | Statut |
+| # | Fiche | Manuel | Statut |
 |---|---|---|---|
-| 19 | Song mode (rejouer la chaîne d'une bank) | §10.9 | à rédiger |
-| 20 | Changer de pattern en live, chaînes | §10.1 | à rédiger |
-| 21 | Mutes (globaux / de pattern) | §8.5 | à rédiger |
-| 22 | Perform kit mode | §10.10 | à rédiger |
+| 19 | [[song-mode]] | §10.9 | draft |
+| 20 | [[patterns-chaines]] | §10.1, §10.7 | draft |
+| 21 | [[mutes]] | §8.5.3 | draft |
+| 22 | [[perform-kit-temp-save]] | §10.10, §10.8.6 | draft |
 
 ## Lot 5 — MIDI et intégration
 

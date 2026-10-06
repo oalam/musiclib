@@ -23,11 +23,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   overdrive / bit reduction, filtres, LFO (riser one-shot), send FX et
   compresseur (sidechain), mixer et setup global (control all, overdrive
   master, équilibrage des patterns), FILL et conditions de trig.
+- [7.D] Lot 4 de fiches : song mode (rejouer la chaîne d'une bank),
+  changement de pattern et chaînes, mutes globaux / de pattern, perform kit
+  et temp save.
 
 ### Corrigé
 
 - Doctrine §8 : la copie de pattern sur la DT2 se fait avec
   `[FUNC] + [RECORD]` / `[FUNC] + [STOP]` (et non `[COPY]` / `[PASTE]`).
+- Doctrine §3 : combinaison du temp save confirmée par le manuel
+  (`[FUNC] + [YES]`).
 
 ## [0.11.0] - 2026-10-06
 
