@@ -193,6 +193,24 @@ le kick disparaît et le riser monte. On relâche : le kick retombe sur le temps
 4. Reconstruire sur la DT2 à partir du **pattern modèle** : les grilles sont un
    point de départ, pas une transcription.
 
+
+## 8. Pattern "Modèle"
+
+Il n'y a pas de pattern « modèle » officiel dans la Digitakt : aucune fonction ne désigne un pattern comme template. C'est une convention que tu te fixes toi-même.
+
+**1. Choisis un emplacement fixe**  
+Prends un slot que tu n'utiliseras jamais pour jouer, toujours le même dans tous tes projets. Par exemple **H16**, le tout dernier pattern de la dernière bank. Il est facile à retrouver et ne gêne pas tes banks de set, qui commencent en A. Certains préfèrent **A01** et commencent leurs morceaux en A02. Le choix n'a aucune importance, seule compte la constance.
+
+**2. Construis le modèle**  
+Dans ce pattern, mets ta répartition des tracks : le kick sur la 1, le rumble sur la 2, les hats, la basse sur la 9, la track de transitions, etc. Charge des sons de base, règle les volumes, les envois d'effets, les LFO de riser, et pose quelques trigs FILL et NOT FILL déjà préparés. Laisse la séquence presque vide, ou juste un kick en 4/4.
+
+**3. Copie-le pour chaque nouveau pattern**  
+Hors GRID RECORDING, sélectionne le pattern modèle et fais [FUNC] + [RECORD] (copier). Va sur le pattern de destination, puis fais [FUNC] + [STOP] (coller). Tu repars de ton modèle à chaque fois. Variante sans quitter le modèle : [PTN], puis [TRIG] du modèle + [RECORD], et [TRIG] de chaque destination + [STOP] (manuel §10.1.1, §17 ; détail dans [[kb/copier-coller]]).
+
+**4. Bonus : sauvegarde aussi les sons en kit**  
+La Digitakt II peut sauvegarder l'ensemble des sons des 16 tracks en **kit**, via le menu PRESET/KIT. Sauvegarde ton modèle en kit : tu pourras recharger ces sons dans n'importe quel pattern, même dans un autre projet, sans écraser la séquence. Le pattern modèle donne la structure complète, le kit seulement la palette de sons.
+
+**Astuce** : pour réutiliser ce modèle dans tous tes projets, garde un projet « TEMPLATE » sur le +Drive. Pour chaque nouveau set, charge-le et sauvegarde-le aussitôt sous un nouveau nom.
 ## Liens
 
 - [[../SPEC]] — Phase 7 (Digitakt)

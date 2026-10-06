@@ -53,8 +53,6 @@ Coller ou effacer **une deuxième fois** annule l'opération.
   auparavant.
 - Les copies de track, page et trig ne marchent qu'en GRID RECORDING
   (`[RECORD]` allumé).
-- La doctrine §8 mentionne `[FUNC] + [COPY]` / `[PASTE]` : sur la DT2 ce sont
-  `[FUNC] + [RECORD]` / `[FUNC] + [STOP]`.
 
 ## À essayer (5 min)
 
