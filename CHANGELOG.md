@@ -8,6 +8,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.H] `analyzer/harmony.py` + CLI `harmony.py <slug>|--all` : gamme du
+  morceau (12 gammes du KEYBOARD SETUP de la DT2, fondamentale départagée par
+  la basse, marge et statut « incertaine »), accords par mesure (triades, sus,
+  dim, quinte à vide) et progression par section. Bloc `harmony` dans le
+  sidecar (conservé si `analyze.py` réécrit le sidecar), section Harmonie et
+  `scale` dans la note de bank. `digitakt.load_sources` rendu public.
 - [7.G] Chaîne : double-clic sur un maillon = boucle du lecteur sur la
   section (calée sur les mesures, ÷2 / ×2 / Retirer comme une boucle tracée).
 - [7.G] Façade Digitakt II complète : les 23 contrôles du §3.1 (VOLUME,

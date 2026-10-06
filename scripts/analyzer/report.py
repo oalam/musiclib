@@ -1,8 +1,10 @@
 """Rendu terminal + sauvegarde JSON sidecar."""
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
+from .harmony import Harmony
 from .types import QualityReport
 
 
@@ -132,5 +134,13 @@ def save_sidecar(r: QualityReport, output_dir: Path) -> Path:
     """Sauvegarde un JSON sidecar `<slug>.json`."""
     output_dir.mkdir(parents=True, exist_ok=True)
     out_path = output_dir / f"{r.slug}.json"
+    if r.harmony is None and out_path.exists():
+        # le bloc harmony (harmony.py) survit a une re-analyse qui ne le recalcule pas
+        try:
+            previous = json.loads(out_path.read_text(encoding="utf-8")).get("harmony")
+        except (OSError, ValueError):
+            previous = None
+        if previous:
+            r = r.model_copy(update={"harmony": Harmony.model_validate(previous)})
     out_path.write_text(r.model_dump_json(indent=2), encoding="utf-8")
     return out_path

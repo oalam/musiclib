@@ -33,6 +33,7 @@ from typing import Any
 
 import numpy as np
 
+from .harmony import Harmony, keyboard_setup
 from .types import (
     DigitaktBank,
     DigitaktPattern,
@@ -688,6 +689,23 @@ def _mute_partition(bar_on: dict[int, np.ndarray], bar_times: np.ndarray,
 
 # --- rendus ------------------------------------------------------------------
 
+def harmony_markdown(h: Harmony) -> list[str]:
+    """Section Harmonie de la note : gamme, reglage DT2, progression par section."""
+    sc = h.scale
+    alt = ", ".join(f"{c.label} ({c.score})" for c in sc.candidates[:3])
+    lines = ["## Harmonie", "",
+             f"Gamme : **{sc.label}** ({' '.join(sc.notes)}), score {sc.score}, marge {sc.margin}"
+             f" ({'stems' if h.source == 'stems' else 'mix, plus bruite'})"
+             f"{' : **incertaine**, fondamentale ambigue, a confirmer a l oreille' if sc.uncertain else ''}."
+             f" Alternatives : {alt}.",
+             "",
+             f"Sur la DT2 : `[FUNC]` + `[KEYBOARD]` > {keyboard_setup(sc)} (manuel §8.5.2).",
+             "", "| Section | Debut | Accords |", "|---|---|---|"]
+    for p in h.progression:
+        lines.append(f"| {p.label} | {_mmss(p.start_s)} | {' - '.join(p.chords) or '-'} |")
+    return lines + [""]
+
+
 def grid_line(track: DigitaktTrack, steps: int) -> str:
     """`x...x...` par page de 16 pas, separees par un espace."""
     on = {t.step for t in track.trigs}
@@ -695,14 +713,15 @@ def grid_line(track: DigitaktTrack, steps: int) -> str:
     return " ".join(cells[i:i + 16] for i in range(0, steps, 16))
 
 
-def render_markdown(bank: DigitaktBank) -> str:
-    """Note Obsidian : resume, partition de mutes, grilles par pattern."""
+def render_markdown(bank: DigitaktBank, harmony: Harmony | None = None) -> str:
+    """Note Obsidian : resume, harmonie (7.H), partition de mutes, grilles par pattern."""
     name = f"{bank.artist} — {bank.title}" if bank.artist else bank.slug
     lines = [
         "---",
         "tags: [digitakt, bank, draft]",
         f"slug: {bank.slug}",
         f"bpm: {bank.bpm}",
+        *([f'scale: "{harmony.scale.root_name} {harmony.scale.scale}"'] if harmony else []),
         f"generated: {bank.generated_at}",
         "---",
         "",
@@ -712,6 +731,7 @@ def render_markdown(bank: DigitaktBank) -> str:
         f"{bank.bpm} BPM, {bank.time_signature}. Grille des tracks : "
         "[[../../digitakt/doctrine|doctrine]]. Point de depart, pas une transcription.",
         "",
+        *(harmony_markdown(harmony) if harmony else []),
         "## Patterns",
         "",
         "| Slot | Section | Debut | Mesures | Tours | Tracks actives |",

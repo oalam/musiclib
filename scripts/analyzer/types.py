@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field, computed_field
 
+from .harmony import Harmony
+
 
 class MetadataReport(BaseModel):
     """Issu de ffprobe : caracteristiques du conteneur audio."""
@@ -204,6 +206,7 @@ class QualityReport(BaseModel):
     frequency_bands: FrequencyBandsReport | None = None
     # Phase 6.D : optionnel (calcule avec Phase 2, skippe avec --quick)
     rhythm_signature: RhythmSignatureReport | None = None
+    harmony: Harmony | None = None  # Phase 7.H, calcule par harmony.py
 
 
 # --- Phase 7.B : draft de bank Digitakt II -----------------------------------

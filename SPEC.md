@@ -385,6 +385,7 @@ mutes, FX de transition, principes d'arc).
 | 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | à venir |
 | 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
+| 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | en cours : analyse et CLI faits, front à venir |
 
 **Décisions 7.B** :
 - 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des
@@ -474,6 +475,24 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   (TRIG 2, FLTR 2, AMP à 9 paramètres) ; numéros FX / FLT.T / LFO.T sans
   colonne sûre dans l'extraction de l'annexe, signalés « à vérifier ».
 - Route `/api/manual/outline` (§ → page) pour résoudre les liens de la façade.
+
+**Décisions 7.H (arbitrées le 2026-10-06)** :
+- Gammes reconnues : les 7 modes, mineurs harmonique et mélodique,
+  pentatoniques majeure et mineure, blues, sous leurs noms KB SCALE (annexe D)
+  pour être reportées telles quelles sur la machine (§8.5.2).
+- Accords : triades (majeur, mineur, sus2, sus4, diminué) et quinte à vide, un
+  par mesure avec confiance, « N » sans contenu tonal ; progression = accords
+  distincts par section. Pas de 7e ni de résolution au temps.
+- Calcul sur les stems (other en HPSS, notes dominantes par trame ; basse =
+  note tenue, départage la fondamentale), repli sur le mix. Grille de mesures
+  de la bank si elle existe, sinon beats du sidecar.
+- Marge = écart avec la meilleure autre fondamentale ; sous 0,05 la gamme est
+  « incertaine » (cas typique : modes relatifs, ex. F majeur / A# lydien). Les
+  gammes voisines sur la même fondamentale sont des alternatives, pas une
+  incertitude.
+- Sorties : bloc `harmony` du sidecar (conservé par une re-analyse), section
+  Harmonie et `scale` en frontmatter de la note de bank (pas de colonne dans
+  `library.md`), front (entête du lecteur, bande d'accords, écran DT2).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

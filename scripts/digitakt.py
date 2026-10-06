@@ -35,6 +35,7 @@ from analyzer.digitakt import (
     step_grid,
     write_pattern_midi,
 )
+from analyzer.harmony import Harmony
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import _SIG_CONF_THRESHOLD, beats_per_bar
 from library_md import parse_library
@@ -53,7 +54,7 @@ class DigitaktSourceError(Exception):
     """Ni sidecar exploitable, ni audio pour construire la bank."""
 
 
-def _load_sources(slug: str, entry: dict[str, str]) -> tuple[dict[str, tuple[np.ndarray, int]], bool]:
+def load_sources(slug: str, entry: dict[str, str]) -> tuple[dict[str, tuple[np.ndarray, int]], bool]:
     """Stems Demucs si presents, sinon le mix route sur tous les roles."""
     stem_dir = STEMS_DIR / slug
     if (stem_dir / "drums.wav").exists():
@@ -91,7 +92,7 @@ def process(slug: str, entries: dict[str, dict[str, str]], phrase_bars: int,
     spb = bpb * 4
 
     try:
-        stems, from_stems = _load_sources(slug, entry)
+        stems, from_stems = load_sources(slug, entry)
     except DigitaktSourceError as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 1
@@ -121,7 +122,9 @@ def process(slug: str, entries: dict[str, dict[str, str]], phrase_bars: int,
     json_path = DIGITAKT_DIR / f"{slug}.json"
     json_path.write_text(bank.model_dump_json(indent=2), encoding="utf-8")
     md_path = DIGITAKT_DIR / f"{slug}.md"
-    md_path.write_text(render_markdown(bank), encoding="utf-8")
+    harmony = (sidecar or {}).get("harmony")
+    md_path.write_text(render_markdown(bank, Harmony.model_validate(harmony) if harmony else None),
+                       encoding="utf-8")
     written = [json_path, md_path]
     if midi:
         for p in bank.patterns:

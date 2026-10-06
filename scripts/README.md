@@ -634,6 +634,33 @@ hats ouverts sur-détectés quand la reverb tient. Id1 / Id2 sont à choisir à
 l'oreille. Les mutes à l'intérieur d'une section diluent le repliage (trous
 dans le kick).
 
+# harmony.py — gamme et accords (Phase 7.H)
+
+Gamme du morceau sous son nom **KB SCALE** de la DT2 (7 modes, mineurs
+harmonique / mélodique, pentatoniques, blues) et accords par mesure (triades,
+sus2 / sus4, dim, quinte à vide), progression par section.
+
+```bash
+# Une track (stems conseillés : stems.py <slug> --cleanup)
+python harmony.py 2hot2play_-_keep_the_balance
+# Toute la library (tracks avec sidecar)
+python harmony.py --all
+```
+
+Exemple : `F blues (score 0.731, marge 0.264, stems)`, `DT2 : KB SCALE = BLUES,
+ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
+
+- **Source** : stem `other` (composante harmonique HPSS, 3 notes dominantes par
+  trame) + stem `bass` (note tenue, départage la fondamentale) ; repli sur le
+  mix. Grille de mesures de la bank si elle existe.
+- **Marge** : écart avec la meilleure autre fondamentale. Sous 0,05 la gamme est
+  marquée *incertaine* (modes relatifs, ex. F majeur / A# lydien) ; les gammes
+  voisines sur la même fondamentale sont listées comme alternatives.
+- **Sorties** : bloc `harmony` du sidecar (conservé quand `analyze.py` réécrit
+  le sidecar), section Harmonie + `scale` dans la note de bank.
+- **Limites** : sur les musiques peu mélodiques (dubstep, tek), beaucoup de
+  quintes à vide et de sus2 ; un draft à valider à l'oreille.
+
 # kb.py — base de connaissance Digitakt II (Phase 7.D, 7.F)
 
 Corpus : `digitakt/kb/*.md` + `digitakt/doctrine.md`, découpés en sections
