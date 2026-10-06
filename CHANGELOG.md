@@ -6,6 +6,32 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+## [0.11.0] - 2026-10-06
+
+### Ajouté
+
+- [7.B2] Premier temps de la mesure (`downbeat_offset`) : parmi les 4
+  décalages de temps, celui qui aligne les changements d'activité des tracks
+  sur les débuts de mesure, plus le clap sur 2 et 4.
+- [7.B2] Structure déduite de l'activité des tracks (`detect_sections`,
+  `label_sections`) sur une grille de 4 mesures, labels intro / main / peak /
+  breakdown / outro.
+- [7.B2] Réutilisation de slot pour les sections au contenu proche ;
+  `DigitaktBank.sections` et `chain` (ordre de jeu), table « Structure » dans
+  la note Obsidian.
+- [7.C] Le front affiche la structure de la bank sous l'onde et la chaîne des
+  slots ; le curseur de pas suit le passage en cours d'un slot réutilisé.
+
+### Modifié
+
+- [7.B2] Impact FX sur le retour du kick au lieu du saut de RMS du sidecar ;
+  `method` passe à `stem_band_fold_v2`.
+
+### Supprimé
+
+- [7.B2] `plan_sections` (segmentation librosa du sidecar) dans
+  `analyzer/digitakt.py`.
+
 ## [0.10.0] - 2026-10-06
 
 ### Ajouté

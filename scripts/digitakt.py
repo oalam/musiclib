@@ -25,6 +25,7 @@ import numpy as np
 from analyzer.audio_loader import load_audio, to_mono
 from analyzer.digitakt import (
     build_bank,
+    downbeat_offset,
     kick_shift,
     median_bpm,
     retrack_beats,
@@ -109,9 +110,12 @@ def process(slug: str, entries: dict[str, dict[str, str]], phrase_bars: int,
     feat = stem_features(stems, bounds)
     if 1 in feat.onset:
         feat = shift_features(feat, kick_shift(feat.onset[1], spb))
-    segments = ((sidecar or {}).get("structure") or {}).get("segments") or []
-    bank = build_bank(slug, entry, bpm, time_sig, bpb, feat, segments,
-                      from_stems, phrase_bars, threshold)
+    beat_off = downbeat_offset(feat, bpb, spb)
+    if beat_off:
+        print(f"[info] premier temps de la mesure : decalage de {beat_off} temps")
+        feat = shift_features(feat, beat_off * (spb // bpb))
+    bank = build_bank(slug, entry, bpm, time_sig, bpb, feat, from_stems,
+                      phrase_bars, threshold)
 
     DIGITAKT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = DIGITAKT_DIR / f"{slug}.json"
@@ -130,6 +134,8 @@ def process(slug: str, entries: dict[str, dict[str, str]], phrase_bars: int,
     for p in bank.patterns:
         act = " ".join(str(t.index) for t in p.tracks if t.trigs)
         print(f"  {p.slot:02d} {p.label:<10} {p.bars} mes. x{p.repeats:<5} tracks: {act}")
+    print(f"  chaine : {' '.join(f'{c:02d}' for c in bank.chain)} "
+          f"({len(bank.sections)} sections)")
     for path in written[:2]:
         print(f"[export] {path.relative_to(VAULT_ROOT)}")
     if midi:

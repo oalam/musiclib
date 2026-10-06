@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { mmss, type Bank, type BankTrack, type Pattern } from './api'
+  import { mmss, SEGMENT_COLORS, type Bank, type BankTrack, type Pattern } from './api'
 
   let { bank, currentTime, onseek }: {
     bank: Bank
@@ -18,8 +18,16 @@
   // possible si le morceau accelere
   const stepDur = $derived(bank.bpm > 0 ? 60 / bank.bpm / 4 : 0)
 
+  // section en cours (7.B2) ; repli sur les patterns pour les banks anterieures
+  const sections = $derived(bank.sections ?? [])
+  const playingSection = $derived(
+    sections.find(s => currentTime >= s.start_s && currentTime < s.end_s) ?? null)
   const playingPattern = $derived(
-    bank.patterns.find(p => currentTime >= p.start_s && currentTime < p.end_s) ?? null)
+    playingSection
+      ? bank.patterns.find(p => p.slot === playingSection.pattern_slot) ?? null
+      : bank.patterns.find(p => currentTime >= p.start_s && currentTime < p.end_s) ?? null)
+  /** Debut du passage en cours du pattern (un slot peut etre joue plusieurs fois). */
+  const playingStart = $derived(playingSection?.start_s ?? playingPattern?.start_s ?? 0)
 
   $effect(() => {
     if (follow && playingPattern) selectedSlot = playingPattern.slot
@@ -47,14 +55,14 @@
     if (!playingPattern || playingPattern.slot !== pattern.slot) return -1
     const spb = bank.steps_per_bar
     const b = barAt(currentTime)
-    const b0 = barAt(pattern.start_s + 0.01)
+    const b0 = barAt(playingStart + 0.01)
     if (b >= 0 && b0 >= 0) {
       // grille reelle (beats recales sur le kick) : pas de derive
       const frac = (currentTime - bars[b]) / (bars[b + 1] - bars[b])
       return ((b - b0) % pattern.bars) * spb + Math.min(spb - 1, Math.floor(frac * spb))
     }
     if (stepDur <= 0) return -1
-    return Math.floor((currentTime - pattern.start_s) / stepDur) % pattern.steps
+    return Math.floor((currentTime - playingStart) / stepDur) % pattern.steps
   })
 
   const currentPhrase = $derived.by(() => {
@@ -95,6 +103,20 @@
     </div>
     <label class="small"><input type="checkbox" bind:checked={follow} /> suivre la lecture</label>
   </header>
+
+  {#if sections.length}
+    <div class="chain" aria-label="Ordre de jeu">
+      <span class="muted small">Chaîne</span>
+      {#each sections as s (s.index)}
+        <button class="link mono" class:cur={playingSection?.index === s.index}
+          style="--c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
+          title="{s.label} · {mmss(s.start_s)} · {s.bars} mes. · tracks {s.active.join(' ')}"
+          onclick={() => { selectedSlot = s.pattern_slot; onseek(s.start_s) }}>
+          {String(s.pattern_slot).padStart(2, '0')}
+        </button>
+      {/each}
+    </div>
+  {/if}
 
   <p class="muted small mono">
     Pattern {String(pattern.slot).padStart(2, '0')} · {pattern.label} · {mmss(pattern.start_s)}–{mmss(pattern.end_s)}
@@ -151,6 +173,9 @@
   .bank { padding: 12px 16px; }
   header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
   .slots, .pages { display: flex; gap: 4px; flex-wrap: wrap; }
+  .chain { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; margin: 6px 0; }
+  .chain .link { font-size: 11px; padding: 2px 5px; border-bottom: 3px solid var(--c); }
+  .chain .link.cur { outline: 1px solid var(--accent); }
   .slot { font-family: ui-monospace, Menlo, monospace; padding: 4px 8px; }
   .slot.playing:not(.on) { border-color: var(--accent); }
   .pages { margin: 6px 0; }

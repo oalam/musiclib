@@ -1,7 +1,7 @@
 """Modeles Pydantic pour serialisation JSON et passage entre modules."""
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 
 class MetadataReport(BaseModel):
@@ -245,6 +245,20 @@ class DigitaktPhrase(BaseModel):
     active: list[int] = Field(default_factory=list, description="Tracks actives (1-16)")
 
 
+class DigitaktSection(BaseModel):
+    """Section du morceau deduite de l'activite des tracks, jouee par un slot.
+
+    Plusieurs sections au contenu proche partagent le meme pattern_slot."""
+    index: int = Field(..., ge=0)
+    label: str
+    bar: int = Field(..., ge=0, description="Index de mesure de debut")
+    bars: int = Field(..., ge=1)
+    start_s: float
+    end_s: float
+    pattern_slot: int = Field(..., ge=1, le=16)
+    active: list[int] = Field(default_factory=list, description="Tracks actives (1-16)")
+
+
 class DigitaktBank(BaseModel):
     """Draft de bank : 1 morceau = 1 bank de <= 16 patterns."""
     slug: str
@@ -260,6 +274,14 @@ class DigitaktBank(BaseModel):
         description="Debut de chaque mesure (grille recalee sur le kick) — loops du front",
     )
     patterns: list[DigitaktPattern]
+    sections: list[DigitaktSection] = Field(
+        default_factory=list, description="Structure deduite des tracks, dans l'ordre de jeu")
     mutes: list[DigitaktPhrase] = Field(default_factory=list)
     generated_at: str
-    method: str = "stem_band_fold_v1"
+    method: str = "stem_band_fold_v2"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def chain(self) -> list[int]:
+        """Ordre de jeu des slots (chaine de patterns), ex. [1, 2, 1, 3]."""
+        return [s.pattern_slot for s in self.sections]

@@ -563,8 +563,10 @@ discrets se disperse entre pas adjacents). Modules :
 
 # digitakt.py — draft de bank Digitakt II (Phase 7.B)
 
-1 morceau = 1 bank. Chaque section de la structure devient un pattern (16 au
-plus, 128 pas = 8 mesures au plus), réparti sur la **grille fixe des 16
+1 morceau = 1 bank. La structure est **déduite de l'activité des tracks**
+(16 sections au plus) ; chaque section est jouée par un pattern (128 pas =
+8 mesures au plus), deux sections au contenu proche partageant le même slot
+(ordre de jeu = chaîne, ex. `01 02 01 03`). Les patterns sont répartis sur la **grille fixe des 16
 tracks** de [[../digitakt/doctrine|la doctrine]] (1 kick, 2 rumble, 3 clap,
 4-6 hats/ride, 7-8 percs, 9 basse, 10 lead, 11 atmo, 12-13 Id1/Id2 laissées
 vides, 14 vocal, 15 FX, 16 réserve). Prérequis : sidecar (`analyze.py`) et de
@@ -581,7 +583,7 @@ python digitakt.py <slug> --phrase-bars 16 --threshold 0.4 --no-midi
 python digitakt.py --all
 ```
 
-Exemple réel (`2hot2play_-_keep_the_balance`, pattern 03, 1re page) :
+Exemple réel (`2hot2play_-_keep_the_balance`, un pattern, 1re page, génération 7.B) :
 
 ```
 01 Kick          x...x...x...x...
@@ -597,17 +599,33 @@ Exemple réel (`2hot2play_-_keep_the_balance`, pattern 03, 1re page) :
   illisible.
 - Une STFT par stem ; chaque track lit sa bande dans son stem (kick 30-120 Hz,
   clap 300-3000 Hz, hats 3-16 kHz…), agrégée par double-croche.
-- Calage de phase sur le kick, puis activité par mesure (actif si à moins de
-  12 dB du max de la track) → **partition de mutes** par phrase.
+- Calage de phase sur le kick (dans le temps), puis **premier temps de la
+  mesure** : parmi les 4 décalages de temps, celui qui aligne le mieux les
+  changements d'activité des tracks (fenêtre de 2 mesures, maxima locaux) sur
+  les débuts de mesure, plus un bonus si le clap tombe sur 2 et 4.
+- Activité par mesure (actif si à moins de 12 dB du max de la track).
+- **Structure** : grille de 4 mesures (phase choisie là où les tracks
+  basculent le plus, pour gérer une anacrouse), tracks actives à la majorité
+  par bloc, blocs identiques fusionnés, bloc isolé à une track près absorbé
+  (c'est un mute, pas une section), fusion des voisines les plus proches
+  au-delà de 16. Labels déduits du contenu : sans kick = `breakdown` (`intro` /
+  `outro` en bord), le plus de tracks = `peak`, sinon `intro` / `main` /
+  `outro`. La segmentation librosa du sidecar n'est plus utilisée ici.
+- **Réutilisation de slot** : une section reprend le slot d'une précédente si
+  mêmes tracks actives et grilles proches (Jaccard moyen des pas ≥ 0,3 sur
+  l'union des tracks ; seuil bas car les trigs détectés sont bruités).
+- **Partition de mutes** par phrase (repart à chaque section).
 - Par section : repliage des mesures actives modulo 1/2/4/8 mesures,
   normalisation robuste (médiane → 95e percentile), seuil → trigs. Hats
   ventilés ouvert / fermé / ride par décroissance et rapport de bandes.
   Notes basse / lead estimées par chroma.
-- Track 15 : impact au pas 0 d'un drop (saut de RMS ≥ 4 dB entre sections),
-  riser figuré sur la dernière mesure d'avant.
+- Track 15 : impact au pas 0 d'un drop (retour du kick après une section sans
+  kick), riser figuré sur la dernière mesure d'avant. Un slot réutilisé porte
+  ses FX à chaque passage, comme sur la DT.
 
-**Sorties** : JSON `DigitaktBank` (Pydantic, consommé par le futur front),
-note Obsidian (tableau des patterns, partition de mutes, grilles `x...`),
+**Sorties** : JSON `DigitaktBank` (Pydantic, consommé par le front :
+`patterns`, `sections`, `chain`, `mutes`), note Obsidian (tableau des
+patterns, structure et chaîne, partition de mutes, grilles `x...`),
 un `.mid` par pattern avec **canal MIDI = track** (drums sur la note 60 =
 pitch d'origine du sample) à enregistrer en live recording sur la DT2.
 
@@ -647,7 +665,11 @@ python api.py &   puis   cd ../web && npm run dev
   nombre entier de mesures (grille de la bank, recalée sur le kick ; sinon
   grille du sidecar). Poignées redimensionnables (recalage à chaque fois),
   ÷2 / ×2, `L` = on/off, `Échap` = retirer.
-- **Bank Digitakt** : slots 01-16 (clic = saut au début de la section), pages
+- **Structure** : quand une bank existe, la bande sous l'onde affiche les
+  sections déduites des tracks (au lieu de celles du sidecar).
+- **Bank Digitakt** : slots 01-16 (clic = saut au début de la 1re section
+  jouée par le slot), **chaîne** (ordre de jeu, clic = saut à la section,
+  passage en cours encadré), pages
   1-8 de 16 pas ou vue « tout », grille 16 tracks avec vélocité en opacité et
   note au survol, **curseur de pas synchronisé avec la lecture**, tracks mutées
   dans la phrase en cours grisées (`M`). Partition de mutes cliquable.

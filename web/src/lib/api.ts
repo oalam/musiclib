@@ -63,6 +63,18 @@ export interface Pattern {
   tracks: BankTrack[]
 }
 
+/** Section deduite des tracks (7.B2), jouee par un slot ; plusieurs sections peuvent partager un slot. */
+export interface Section {
+  index: number
+  label: string
+  bar: number
+  bars: number
+  start_s: number
+  end_s: number
+  pattern_slot: number
+  active: number[]
+}
+
 export interface Phrase { start_s: number; bar: number; pattern_slot: number; active: number[] }
 
 export interface Bank {
@@ -76,6 +88,10 @@ export interface Bank {
   phrase_bars: number
   bar_times_s: number[]
   patterns: Pattern[]
+  /** Absent des banks generees avant 7.B2. */
+  sections?: Section[]
+  /** Ordre de jeu des slots, ex. [1, 2, 1, 3]. */
+  chain?: number[]
   mutes: Phrase[]
   generated_at: string
 }

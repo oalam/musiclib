@@ -12,10 +12,14 @@ Pipeline :
 1. Une STFT par stem Demucs (drums / bass / other / vocals), fallback mix.
 2. Pour chaque track : enveloppes onset + energie dans sa bande, agregees
    par pas de double-croche sur la grille issue des `beat_times`.
-3. Calage global sur le kick (le pas le plus fort devient le « 1 »).
-4. Partition de mutes : activite de chaque track par phrase de N mesures.
+3. Calage sur le kick (phase dans le temps), puis premier temps de la
+   mesure (changements d'activite des tracks + clap sur 2 et 4).
+4. Structure deduite des tracks : decoupe sur une grille de 4 mesures la ou
+   l'ensemble des tracks actives change, labels deduits du contenu.
 5. Pour chaque section : repliage des pas actifs sur la longueur du pattern,
-   seuillage en trigs (notes estimees par chroma pour basse / lead).
+   seuillage en trigs (notes estimees par chroma pour basse / lead). Deux
+   sections au contenu proche partagent le meme slot (ordre de jeu = chaine).
+6. Partition de mutes : activite de chaque track par phrase de N mesures.
 
 Ce n'est PAS une transcription : c'est un point de depart pour bootstraper une
 bank. Id1 / Id2 (12-13) restent vides, c'est a l'oreille de les choisir.
@@ -33,6 +37,7 @@ from .types import (
     DigitaktBank,
     DigitaktPattern,
     DigitaktPhrase,
+    DigitaktSection,
     DigitaktTrack,
     DigitaktTrig,
 )
@@ -44,7 +49,10 @@ _MAX_PATTERNS = 16
 _SILENT_STEM_DBFS = -45.0   # stem quasi muet (ex. vocals d'un instrumental)
 _ACTIVE_DB = -12.0          # actif si energie de phrase > max de la track - 12 dB
 _LOW_CONTRAST = 0.3         # relief (max - mediane) / max sous lequel = son tenu
-_DROP_DB = 4.0              # saut de RMS entre sections = drop (impact FX)
+_SECTION_GRID = 4           # structure decoupee sur une grille de 4 mesures
+_CLAP_WEIGHT = 0.5          # poids du clap sur 2 et 4 dans le choix du premier temps
+_CHANGE_MIN = 0.25          # saut d'activite minimal (0-1) compte comme changement
+_REUSE_SIM = 0.3            # similarite de grille (trigs bruites) pour reutiliser un slot
 
 
 @dataclass(frozen=True)
@@ -228,49 +236,152 @@ def shift_features(feat: StepFeatures, shift: int) -> StepFeatures:
     )
 
 
+def _beat_level(energy: np.ndarray, per_beat: int, n_beats: int) -> np.ndarray:
+    """Niveau par temps ramene sur 0-1 (-24 dB sous le max de la track = 0)."""
+    e = energy[: n_beats * per_beat].reshape(n_beats, per_beat).mean(axis=1)
+    ref = float(e.max())
+    if ref <= 0:
+        return np.zeros(n_beats)
+    db = 10 * np.log10(np.maximum(e, 1e-20) / ref)
+    return np.clip((db + 24.0) / 24.0, 0.0, 1.0)
+
+
+def beat_changes(energy: dict[int, np.ndarray], per_beat: int, n_beats: int,
+                 window: int) -> np.ndarray:
+    """Force des changements d'activite par temps, sommee sur les tracks.
+
+    Pour chaque track : |niveau moyen des `window` temps apres - avant|. Le
+    niveau etant lineaire dans le melange, l'ecart culmine pile sur la bascule ;
+    on ne garde que les maxima locaux (un clap sur 2 et 4 donne la meme moyenne
+    des deux cotes, donc pas de faux changement)."""
+    out = np.zeros(n_beats)
+    if n_beats <= 2 * window:
+        return out
+    for e in energy.values():
+        x = _beat_level(e, per_beat, n_beats)
+        c = np.concatenate([[0.0], np.cumsum(x)])
+        b = np.arange(window, n_beats - window + 1)
+        d = np.zeros(n_beats)
+        d[b] = np.abs((c[b + window] - c[b]) - (c[b] - c[b - window])) / window
+        left = np.concatenate([[0.0], d[:-1]])
+        right = np.concatenate([d[1:], [0.0]])
+        peaks = (d >= left) & (d > right) & (d >= _CHANGE_MIN)
+        out += np.where(peaks, d, 0.0)
+    return out
+
+
+def downbeat_offset(feat: StepFeatures, beats_per_bar: int, steps_per_bar: int) -> int:
+    """Temps (0..beats_per_bar-1) sur lequel demarre la mesure.
+
+    `kick_shift` ne fixe que la phase dans le temps : sur un four-on-floor les
+    4 temps se valent. On garde le decalage qui aligne le mieux les changements
+    d'activite des tracks sur les debuts de mesure, plus le clap sur 2 et 4."""
+    per_beat = max(1, steps_per_bar // beats_per_bar)
+    n_beats = (len(feat.step_times) - 1) // per_beat
+    if n_beats < 4 * beats_per_bar:
+        return 0
+    change = beat_changes(feat.energy, per_beat, n_beats, 2 * beats_per_bar)
+    total = float(change.sum())
+    scores = np.array([change[k::beats_per_bar].sum() for k in range(beats_per_bar)])
+    scores = scores / total if total > 0 else scores
+    clap = feat.onset.get(3)
+    if clap is not None and beats_per_bar == 4:
+        on_beat = clap[: n_beats * per_beat].reshape(n_beats, per_beat)[:, 0]
+        pos = np.array([on_beat[k::4].sum() for k in range(4)])
+        if pos.sum() > 0:
+            for k in range(4):
+                back = pos[(k + 1) % 4] + pos[(k + 3) % 4]
+                scores[k] += _CLAP_WEIGHT * (back - pos[k] - pos[(k + 2) % 4]) / pos.sum()
+    return int(np.argmax(scores))
+
+
 # --- sections & activite -------------------------------------------------------
 
-def plan_sections(segments: list[dict[str, Any]], bar_times: np.ndarray,
-                  fallback_bars: int = 32) -> list[tuple[int, int, str, float]]:
-    """Segments de structure → (bar_debut, bar_fin, label, rms_dbfs), <= 16.
+Section = tuple[int, int, str, frozenset[int]]   # bar debut, bar fin, label, tracks
 
-    Les bornes sont ramenees a la mesure la plus proche. Les sections < 1
-    mesure sont absorbees ; au-dela de 16, on fusionne la plus courte avec sa
-    voisine la plus courte."""
-    n_bars = len(bar_times) - 1
+
+def _majority(bar_on: dict[int, np.ndarray], b0: int, b1: int) -> frozenset[int]:
+    """Tracks actives sur au moins la moitie des mesures [b0, b1)."""
+    return frozenset(i for i, on in bar_on.items() if on[b0:b1].mean() >= 0.5)
+
+
+def detect_sections(bar_on: dict[int, np.ndarray], n_bars: int,
+                    grid: int = _SECTION_GRID) -> list[tuple[int, int, frozenset[int]]]:
+    """Decoupe la ou l'ensemble des tracks actives change, sur une grille de
+    `grid` mesures, <= 16 sections.
+
+    1. Phase de la grille : le decalage (0..grid-1) qui porte le plus de
+       bascules de tracks (un morceau peut demarrer par une mesure d'anacrouse).
+    2. Blocs de `grid` mesures, tracks actives a la majorite ; blocs voisins
+       identiques fusionnes.
+    3. Un bloc isole qui ne differe de ses deux voisins (identiques) que d'une
+       track est absorbe : c'est un mute, pas une section.
+    4. Au-dela de 16, fusion de la paire voisine la plus proche en contenu."""
     if n_bars < 1:
         return []
-    sections: list[tuple[int, int, str, float]] = []
-    for seg in segments:
-        b0 = int(np.argmin(np.abs(bar_times - float(seg["start_s"]))))
-        b1 = int(np.argmin(np.abs(bar_times - float(seg["end_s"]))))
-        b1 = min(b1, n_bars)
-        if b1 > b0:
-            sections.append((b0, b1, str(seg.get("label", "?")),
-                             float(seg.get("rms_dbfs", 0.0))))
-    if not sections:
-        sections = [(b, min(b + fallback_bars, n_bars), "main", 0.0)
-                    for b in range(0, n_bars, fallback_bars)]
-    # contiguite : chaque section commence ou finit la precedente
-    fixed = [sections[0]]
-    for s in sections[1:]:
-        prev = fixed[-1]
-        fixed.append((prev[1], max(s[1], prev[1] + 1), s[2], s[3]))
-    fixed[0] = (0, fixed[0][1], fixed[0][2], fixed[0][3])
-    fixed[-1] = (fixed[-1][0], n_bars, fixed[-1][2], fixed[-1][3])
-    while len(fixed) > _MAX_PATTERNS:
-        lens = [s[1] - s[0] for s in fixed]
-        i = int(np.argmin(lens))
-        if i == 0:
-            j = 1
-        elif i == len(fixed) - 1:
-            j = i - 1
+    if not bar_on:
+        return [(0, n_bars, frozenset())]
+    idxs = sorted(bar_on)
+    m = np.stack([bar_on[i][:n_bars] for i in idxs], axis=1)
+    flips = np.zeros(n_bars)
+    flips[1:] = (m[1:] != m[:-1]).sum(axis=1)
+    offset = int(np.argmax([flips[o::grid].sum() for o in range(grid)]))
+    cuts = sorted({0, n_bars} | set(range(offset, n_bars, grid)))
+    blocks = [(a, b, _majority(bar_on, a, b)) for a, b in zip(cuts[:-1], cuts[1:])]
+
+    merged: list[tuple[int, int, frozenset[int]]] = []
+    for blk in blocks:
+        if merged and merged[-1][2] == blk[2]:
+            merged[-1] = (merged[-1][0], blk[1], blk[2])
         else:
-            j = i - 1 if lens[i - 1] <= lens[i + 1] else i + 1
-        a, b = sorted((i, j))
-        keep = fixed[a] if lens[a] >= lens[b] else fixed[b]
-        fixed[a:b + 1] = [(fixed[a][0], fixed[b][1], keep[2], keep[3])]
-    return fixed
+            merged.append(blk)
+
+    i = 1
+    while i < len(merged) - 1:
+        prev, cur, nxt = merged[i - 1], merged[i], merged[i + 1]
+        if prev[2] == nxt[2] and cur[1] - cur[0] <= grid and len(cur[2] ^ prev[2]) <= 1:
+            merged[i - 1:i + 2] = [(prev[0], nxt[1], prev[2])]
+        else:
+            i += 1
+
+    while len(merged) > _MAX_PATTERNS:
+        cost = [(len(merged[k][2] ^ merged[k + 1][2]),
+                 merged[k + 1][1] - merged[k][0], k) for k in range(len(merged) - 1)]
+        _, _, k = min(cost)
+        a, b = merged[k][0], merged[k + 1][1]
+        merged[k:k + 2] = [(a, b, _majority(bar_on, a, b))]
+    # une fusion peut rendre deux voisines identiques
+    out: list[tuple[int, int, frozenset[int]]] = []
+    for part in merged:
+        if out and out[-1][2] == part[2]:
+            out[-1] = (out[-1][0], part[1], part[2])
+        else:
+            out.append(part)
+    return out
+
+
+def label_sections(parts: list[tuple[int, int, frozenset[int]]]) -> list[Section]:
+    """Labels deduits du contenu : sans kick = breakdown (intro / outro en
+    bord de morceau), le plus de tracks = peak, moins au debut = intro, moins
+    a la fin = outro, sinon main."""
+    if not parts:
+        return []
+    full = max(len(p[2]) for p in parts)
+    last = len(parts) - 1
+    out: list[Section] = []
+    for i, (b0, b1, act) in enumerate(parts):
+        if 1 not in act:
+            label = "intro" if i == 0 else "outro" if i == last else "breakdown"
+        elif len(act) >= full - (1 if full >= 4 else 0):
+            label = "peak"
+        elif i == 0:
+            label = "intro"
+        elif i == last:
+            label = "outro"
+        else:
+            label = "main"
+        out.append((b0, b1, label, act))
+    return out
 
 
 def pattern_bars(section_bars: int, steps_per_bar: int) -> int:
@@ -379,140 +490,189 @@ def build_bank(
     time_signature: str,
     beats_per_bar: int,
     feat: StepFeatures,
-    segments: list[dict[str, Any]],
     from_stems: bool,
     phrase_bars: int = 8,
     threshold: float = 0.5,
 ) -> DigitaktBank:
-    """Assemble la bank a partir des features par pas (deja calees sur le kick)."""
+    """Assemble la bank a partir des features par pas (deja calees sur le
+    premier temps de la mesure)."""
     spb = beats_per_bar * 4
     n_steps = len(feat.step_times) - 1
     n_bars = n_steps // spb
     bar_times = feat.step_times[::spb][: n_bars + 1]
-    sections = plan_sections(segments, bar_times)
 
-    # activite par mesure puis par phrase, pour chaque track detectable
+    # activite par mesure, pour chaque track detectable
     bar_on: dict[int, np.ndarray] = {}
     for idx, e in feat.energy.items():
         per_bar = bar_activity(e, spb, n_bars)
         bar_on[idx] = active_mask(per_bar)
+    sections = label_sections(detect_sections(bar_on, n_bars))
 
+    # une section reprend le slot d'une section precedente si memes tracks
+    # actives et grilles proches (comme une chaine de patterns sur la DT)
     patterns: list[DigitaktPattern] = []
-    drops: list[int] = []
-    for slot, (b0, b1, label, rms) in enumerate(sections, start=1):
-        if slot > 1 and rms - sections[slot - 2][3] >= _DROP_DB:
-            drops.append(slot)
-        p_bars = pattern_bars(b1 - b0, spb)
-        length = p_bars * spb
-        hits_by_track: dict[int, tuple[list[int], np.ndarray]] = {}
-        levels: dict[int, float] = {}
-        for spec in TRACKS:
-            if spec.index not in feat.energy:
-                continue
-            on = bar_on[spec.index][b0:b1]
-            levels[spec.index] = float(on.mean()) if on.size else 0.0
-            bars = [b for b in range(b0, b1) if bar_on[spec.index][b]]
-            if len(bars) < max(1, (b1 - b0) // 4):
-                continue
-            # repliage relatif au debut de section : le pas 0 = 1er temps de la section
-            rel = [b - b0 for b in bars]
-            src = feat.energy if spec.kind in ("rumble", "sustain") else feat.onset
-            values = src[spec.index][b0 * spb:b1 * spb]
-            pattern = fold_steps(values, rel, spb, p_bars)
-            hits_by_track[spec.index] = pick_hits(
-                pattern, threshold if spec.kind != "rumble" else 0.6)
+    slot_act: dict[int, frozenset[int]] = {}
+    section_slots: list[int] = []
+    for b0, b1, label, act in sections:
+        candidate = _section_pattern(len(patterns) + 1, label, b0, b1, feat, bar_on,
+                                     bar_times, spb, threshold)
+        reuse = next((q.slot for q in patterns if slot_act[q.slot] == act
+                      and pattern_similarity(q, candidate) >= _REUSE_SIM), None)
+        if reuse is None:
+            patterns.append(candidate)
+            slot_act[candidate.slot] = act
+            reuse = candidate.slot
+        section_slots.append(reuse)
 
-        # exclusions et famille hats
-        hat_hits = sorted({s for i in _HAT_FAMILY if i in hits_by_track
-                           for s in hits_by_track[i][0]})
-        if hat_hits:
-            fold_e = {i: fold_steps(feat.energy[i][b0 * spb:b1 * spb],
-                                    list(range(b1 - b0)), spb, p_bars)
-                      for i in _HAT_FAMILY if i in feat.energy}
-            split = classify_hats(hat_hits, fold_e)
-            ref = next(iter(hits_by_track[i][1] for i in _HAT_FAMILY
-                            if i in hits_by_track))
-            for i in _HAT_FAMILY:
-                hits_by_track[i] = (split[i], ref)
-
-        tracks: list[DigitaktTrack] = []
-        for spec in TRACKS:
-            trigs: list[DigitaktTrig] = []
-            source = spec.stem or ""
-            if spec.index in hits_by_track:
-                steps, stretched = hits_by_track[spec.index]
-                blocked = {s for j in spec.exclude if j in hits_by_track
-                           for s in hits_by_track[j][0]}
-                if spec.kind == "sustain":
-                    steps = [0] if steps else []
-                chroma = None
-                if spec.kind == "tonal" and spec.index in feat.chroma:
-                    chroma = fold_steps(feat.chroma[spec.index][b0 * spb:b1 * spb],
-                                        list(range(b1 - b0)), spb, p_bars)
-                for s in steps:
-                    if s in blocked or s >= length:
-                        continue
-                    note = None
-                    if chroma is not None:
-                        note = spec.base_note + int(np.argmax(chroma[s]))
-                    trigs.append(DigitaktTrig(
-                        step=s, velocity=_velocity(float(stretched[s])), note=note))
-            elif spec.kind == "fx":
-                source = "structure (heuristique)"
-            tracks.append(DigitaktTrack(
-                index=spec.index, role=spec.role,
-                source=f"{source} {spec.lo:.0f}-{spec.hi:.0f} Hz" if spec.stem else source,
-                active=bool(trigs), level=round(min(1.0, levels.get(spec.index, 0.0)), 2),
-                trigs=trigs,
-            ))
-        patterns.append(DigitaktPattern(
-            slot=slot, label=label,
+    # drop = retour du kick apres une section sans kick
+    drops = [k for k in range(1, len(sections))
+             if 1 in sections[k][3] and 1 not in sections[k - 1][3]]
+    _add_fx(patterns, section_slots, drops, spb)
+    mutes = _mute_partition(bar_on, bar_times, sections, section_slots, phrase_bars,
+                            patterns)
+    out_sections = [
+        DigitaktSection(
+            index=k, label=label, bar=b0, bars=b1 - b0,
             start_s=round(float(bar_times[b0]), 2), end_s=round(float(bar_times[b1]), 2),
-            bars=p_bars, steps=length, repeats=round((b1 - b0) / p_bars, 1),
-            tracks=tracks,
-        ))
-
-    _add_fx(patterns, drops, spb)
-    mutes = _mute_partition(bar_on, bar_times, sections, phrase_bars, patterns)
+            pattern_slot=section_slots[k], active=sorted(act),
+        )
+        for k, (b0, b1, label, act) in enumerate(sections)
+    ]
     return DigitaktBank(
         slug=slug, artist=fields.get("artist", ""), title=fields.get("title", ""),
         bpm=round(bpm, 1), time_signature=time_signature, steps_per_bar=spb,
         from_stems=from_stems, phrase_bars=phrase_bars,
         bar_times_s=[round(float(t), 3) for t in bar_times], patterns=patterns,
-        mutes=mutes, generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        sections=out_sections, mutes=mutes,
+        generated_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
     )
 
 
-def _add_fx(patterns: list[DigitaktPattern], drops: list[int], spb: int) -> None:
+def _section_pattern(slot: int, label: str, b0: int, b1: int, feat: StepFeatures,
+                     bar_on: dict[int, np.ndarray], bar_times: np.ndarray, spb: int,
+                     threshold: float) -> DigitaktPattern:
+    """Replie une section [b0, b1) sur la longueur de son pattern."""
+    p_bars = pattern_bars(b1 - b0, spb)
+    length = p_bars * spb
+    hits_by_track: dict[int, tuple[list[int], np.ndarray]] = {}
+    levels: dict[int, float] = {}
+    for spec in TRACKS:
+        if spec.index not in feat.energy:
+            continue
+        on = bar_on[spec.index][b0:b1]
+        levels[spec.index] = float(on.mean()) if on.size else 0.0
+        bars = [b for b in range(b0, b1) if bar_on[spec.index][b]]
+        if len(bars) < max(1, (b1 - b0) // 4):
+            continue
+        # repliage relatif au debut de section : le pas 0 = 1er temps de la section
+        rel = [b - b0 for b in bars]
+        src = feat.energy if spec.kind in ("rumble", "sustain") else feat.onset
+        values = src[spec.index][b0 * spb:b1 * spb]
+        pattern = fold_steps(values, rel, spb, p_bars)
+        hits_by_track[spec.index] = pick_hits(
+            pattern, threshold if spec.kind != "rumble" else 0.6)
+
+    # exclusions et famille hats
+    hat_hits = sorted({s for i in _HAT_FAMILY if i in hits_by_track
+                       for s in hits_by_track[i][0]})
+    if hat_hits:
+        fold_e = {i: fold_steps(feat.energy[i][b0 * spb:b1 * spb],
+                                list(range(b1 - b0)), spb, p_bars)
+                  for i in _HAT_FAMILY if i in feat.energy}
+        split = classify_hats(hat_hits, fold_e)
+        ref = next(iter(hits_by_track[i][1] for i in _HAT_FAMILY
+                        if i in hits_by_track))
+        for i in _HAT_FAMILY:
+            hits_by_track[i] = (split[i], ref)
+
+    tracks: list[DigitaktTrack] = []
+    for spec in TRACKS:
+        trigs: list[DigitaktTrig] = []
+        source = spec.stem or ""
+        if spec.index in hits_by_track:
+            steps, stretched = hits_by_track[spec.index]
+            blocked = {s for j in spec.exclude if j in hits_by_track
+                       for s in hits_by_track[j][0]}
+            if spec.kind == "sustain":
+                steps = [0] if steps else []
+            chroma = None
+            if spec.kind == "tonal" and spec.index in feat.chroma:
+                chroma = fold_steps(feat.chroma[spec.index][b0 * spb:b1 * spb],
+                                    list(range(b1 - b0)), spb, p_bars)
+            for s in steps:
+                if s in blocked or s >= length:
+                    continue
+                note = None
+                if chroma is not None:
+                    note = spec.base_note + int(np.argmax(chroma[s]))
+                trigs.append(DigitaktTrig(
+                    step=s, velocity=_velocity(float(stretched[s])), note=note))
+        elif spec.kind == "fx":
+            source = "structure (heuristique)"
+        tracks.append(DigitaktTrack(
+            index=spec.index, role=spec.role,
+            source=f"{source} {spec.lo:.0f}-{spec.hi:.0f} Hz" if spec.stem else source,
+            active=bool(trigs), level=round(min(1.0, levels.get(spec.index, 0.0)), 2),
+            trigs=trigs,
+        ))
+    return DigitaktPattern(
+        slot=slot, label=label,
+        start_s=round(float(bar_times[b0]), 2), end_s=round(float(bar_times[b1]), 2),
+        bars=p_bars, steps=length, repeats=round((b1 - b0) / p_bars, 1),
+        tracks=tracks,
+    )
+
+
+def pattern_similarity(a: DigitaktPattern, b: DigitaktPattern) -> float:
+    """0-1 : Jaccard moyen des pas par track, sur l'union des tracks jouees
+    (une track absente d'un cote compte 0), grilles repliees sur la longueur
+    la plus courte."""
+    n = min(a.steps, b.steps)
+    sa = {t.index: {tr.step % n for tr in t.trigs} for t in a.tracks if t.trigs}
+    sb = {t.index: {tr.step % n for tr in t.trigs} for t in b.tracks if t.trigs}
+    keys = set(sa) | set(sb)
+    if not keys:
+        return 1.0
+    return float(np.mean([len(sa.get(k, set()) & sb.get(k, set()))
+                          / len(sa.get(k, set()) | sb.get(k, set())) for k in keys]))
+
+
+def _add_fx(patterns: list[DigitaktPattern], section_slots: list[int],
+            drops: list[int], spb: int) -> None:
     """Track 15 : impact au pas 0 d'un drop, riser sur la derniere mesure avant.
 
     Le riser est figure par un trig par temps a velocite croissante : a
-    remplacer par la recette de la doctrine (LFO one-shot ou p-locks, FILL)."""
-    for slot in drops:
-        drop = patterns[slot - 1]
-        fx = drop.tracks[14]
-        fx.trigs = [DigitaktTrig(step=0, velocity=127)]
-        fx.active = True
-        prev = patterns[slot - 2].tracks[14]
-        last = patterns[slot - 2].steps - spb
+    remplacer par la recette de la doctrine (LFO one-shot ou p-locks, FILL).
+    Un slot reutilise porte ses FX a chaque passage, comme sur la DT."""
+    by_slot = {p.slot: p for p in patterns}
+    for k in drops:
+        drop = by_slot[section_slots[k]]
+        prev = by_slot[section_slots[k - 1]]
+        last = prev.steps - spb
         beat = spb // 4 if spb >= 4 else 1
         n = spb // beat
-        prev.trigs = [DigitaktTrig(step=last + k * beat,
-                                   velocity=int(50 + 77 * (k + 1) / n))
-                      for k in range(n)]
-        prev.active = True
+        riser = [DigitaktTrig(step=last + j * beat, velocity=int(50 + 77 * (j + 1) / n))
+                 for j in range(n)]
+        for pat, trigs in ((drop, [DigitaktTrig(step=0, velocity=127)]), (prev, riser)):
+            fx = pat.tracks[14]
+            merged = {t.step: t for t in fx.trigs}
+            merged.update({t.step: t for t in trigs})
+            fx.trigs = [merged[s] for s in sorted(merged)]
+            fx.active = True
 
 
 def _mute_partition(bar_on: dict[int, np.ndarray], bar_times: np.ndarray,
-                    sections: list[tuple[int, int, str, float]], phrase_bars: int,
-                    patterns: list[DigitaktPattern]) -> list[DigitaktPhrase]:
+                    sections: list[Section], section_slots: list[int],
+                    phrase_bars: int, patterns: list[DigitaktPattern]
+                    ) -> list[DigitaktPhrase]:
     """Par phrase : tracks actives (majorite des mesures) et pattern en cours.
 
     Les phrases repartent a chaque debut de section : une phrase ne chevauche
     jamais deux patterns (une bascule de pattern tombe en debut de phrase)."""
+    by_slot = {p.slot: p for p in patterns}
     out: list[DigitaktPhrase] = []
-    for slot, (s0, s1, _label, _rms) in enumerate(sections, start=1):
-        pat_tracks = {t.index for t in patterns[slot - 1].tracks if t.trigs}
+    for (s0, s1, _label, _act), slot in zip(sections, section_slots):
+        pat_tracks = {t.index for t in by_slot[slot].tracks if t.trigs}
         for b in range(s0, s1, phrase_bars):
             end = min(b + phrase_bars, s1)
             active = sorted(
@@ -561,6 +721,13 @@ def render_markdown(bank: DigitaktBank) -> str:
         act = " ".join(str(t.index) for t in p.tracks if t.trigs) or "-"
         lines.append(f"| {p.slot:02d} | {p.label} | {_mmss(p.start_s)} | {p.bars} "
                      f"| x{p.repeats} | {act} |")
+    lines += ["", "## Structure (ordre de jeu)", "",
+              "Chaine : " + " - ".join(f"{c:02d}" for c in bank.chain), "",
+              "| Section | Debut | Mesures | Slot | Tracks actives |", "|---|---|---|---|---|"]
+    for sec in bank.sections:
+        act = " ".join(str(i) for i in sec.active) or "-"
+        lines.append(f"| {sec.label} | {_mmss(sec.start_s)} | {sec.bars} "
+                     f"| {sec.pattern_slot:02d} | {act} |")
     lines += ["", f"## Partition de mutes (phrases de {bank.phrase_bars} mesures)", "",
               "```", "temps  pat  " + "".join(f"{i:<3d}" for i in range(1, 17))]
     for ph in bank.mutes:

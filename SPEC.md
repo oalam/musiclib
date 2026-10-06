@@ -379,7 +379,7 @@ mutes, FX de transition, principes d'arc).
 | 7.A | Doctrine `digitakt/doctrine.md` | fait |
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
-| 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | à venir (prochaine session) |
+| 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
@@ -410,6 +410,17 @@ mutes, FX de transition, principes d'arc).
 3. **Réutilisation de slots** : deux sections au contenu identique (même
    activité + grilles proches) partagent le même pattern ; la bank expose un
    ordre de jeu (ex. 1-2-1-3), comme une chaîne de patterns sur la DT2.
+
+**Décisions 7.B2 (implémentation)** :
+- Grille de structure fixée à 4 mesures (pas 8) : les bascules réelles
+  tombent souvent sur 4.
+- Réutilisation : mêmes tracks actives (activité par mesure, fiable) **et**
+  Jaccard moyen des grilles ≥ 0,3 (les trigs sont trop bruités pour un seuil
+  plus haut : des sections identiques à l'oreille plafonnent vers 0,3-0,45).
+- Drop (impact FX) = retour du kick après une section sans kick, au lieu du
+  saut de RMS du sidecar.
+- Exemple `2hot2play_-_keep_the_balance` : 15 sections, 13 patterns, chaîne
+  `01 … 11 06 05 12 13`, mesure décalée de 2 temps.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

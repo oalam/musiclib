@@ -3,10 +3,12 @@
   import RegionsPlugin, { type Region } from 'wavesurfer.js/plugins/regions'
   import { api, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
 
-  let { track, bars = [], currentTime = $bindable(0) }: {
+  let { track, bars = [], sections, currentTime = $bindable(0) }: {
     track: TrackDetail
     /** Debuts de mesure (s) : la boucle se cale dessus. Vide = pas de calage. */
     bars?: number[]
+    /** Structure a afficher (celle de la bank) ; defaut = segments du sidecar. */
+    sections?: { start_s: number; end_s: number; label: string }[]
     currentTime?: number
   } = $props()
 
@@ -205,7 +207,7 @@
 
   {#if duration > 0}
     <div class="sections" aria-label="Sections">
-      {#each track.segments.filter(s => s.end_s > viewStart && s.start_s < viewEnd) as s}
+      {#each (sections ?? track.segments).filter(s => s.end_s > viewStart && s.start_s < viewEnd) as s}
         <button class="section" title="{s.label} · {mmss(s.start_s)}"
           style="left: {((Math.max(s.start_s, viewStart) - viewStart) / (viewEnd - viewStart)) * 100}%; width: {((Math.min(s.end_s, viewEnd) - Math.max(s.start_s, viewStart)) / (viewEnd - viewStart)) * 100}%; --c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
           onclick={() => seek(s.start_s)}>{s.label}</button>

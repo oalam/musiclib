@@ -54,7 +54,8 @@
     {#if detail}
       {#key detail.slug}
         <Player bind:this={player} track={detail} bind:currentTime
-          bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times} />
+          bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times}
+          sections={bank?.sections?.length ? bank.sections : undefined} />
       {/key}
       {#if bank}
         <div class="bankbar">
