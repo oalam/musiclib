@@ -166,3 +166,12 @@ def test_render_and_midi(tmp_path: Path):
     notes = [m for m in mido.MidiFile(str(out)).tracks[0] if m.type == "note_on"]
     assert len(notes) == 32
     assert {m.channel for m in notes} == {0}  # track 1 → canal MIDI 1
+
+
+def test_mute_phrases_restart_at_section_boundary():
+    segs = [{"start_s": 0, "end_s": 10, "label": "intro", "rms_dbfs": -8},
+            {"start_s": 10, "end_s": 32, "label": "main", "rms_dbfs": -8}]
+    bank = build_bank("x", {}, 120, "4/4", 4, _features(16), segs, from_stems=True)
+    # section 1 = mesures 0-5, section 2 = 5-16 : phrases a 0, puis 5 et 13
+    assert [ph.bar for ph in bank.mutes] == [0, 5, 13]
+    assert [ph.pattern_slot for ph in bank.mutes] == [1, 2, 2]

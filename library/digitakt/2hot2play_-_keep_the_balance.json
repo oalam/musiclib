@@ -4427,8 +4427,24 @@
       ]
     },
     {
-      "start_s": 54.02,
-      "bar": 32,
+      "start_s": 43.03,
+      "bar": 25,
+      "pattern_slot": 2,
+      "active": [
+        3,
+        4,
+        5,
+        8,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "start_s": 55.72,
+      "bar": 33,
       "pattern_slot": 2,
       "active": [
         3,
@@ -4442,8 +4458,8 @@
       ]
     },
     {
-      "start_s": 66.83,
-      "bar": 40,
+      "start_s": 63.63,
+      "bar": 38,
       "pattern_slot": 3,
       "active": [
         1,
@@ -4458,42 +4474,8 @@
       ]
     },
     {
-      "start_s": 79.62,
-      "bar": 48,
-      "pattern_slot": 3,
-      "active": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        8,
-        9,
-        10,
-        11,
-        14,
-        15
-      ]
-    },
-    {
-      "start_s": 92.43,
-      "bar": 56,
-      "pattern_slot": 3,
-      "active": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        8,
-        9,
-        14,
-        15
-      ]
-    },
-    {
-      "start_s": 105.21,
-      "bar": 64,
+      "start_s": 76.42,
+      "bar": 46,
       "pattern_slot": 3,
       "active": [
         1,
@@ -4510,10 +4492,33 @@
       ]
     },
     {
-      "start_s": 118.02,
-      "bar": 72,
+      "start_s": 89.21,
+      "bar": 54,
       "pattern_slot": 3,
       "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "start_s": 102.02,
+      "bar": 62,
+      "pattern_slot": 3,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
         9,
         10,
         11,
@@ -4522,8 +4527,22 @@
       ]
     },
     {
-      "start_s": 130.73,
-      "bar": 80,
+      "start_s": 114.81,
+      "bar": 70,
+      "pattern_slot": 3,
+      "active": [
+        4,
+        5,
+        9,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "start_s": 127.54,
+      "bar": 78,
       "pattern_slot": 3,
       "active": [
         3,
@@ -4538,8 +4557,23 @@
       ]
     },
     {
-      "start_s": 143.22,
-      "bar": 88,
+      "start_s": 140.02,
+      "bar": 86,
+      "pattern_slot": 3,
+      "active": [
+        3,
+        4,
+        5,
+        8,
+        10,
+        11,
+        14,
+        15
+      ]
+    },
+    {
+      "start_s": 152.83,
+      "bar": 94,
       "pattern_slot": 3,
       "active": [
         3,
@@ -4551,9 +4585,9 @@
       ]
     },
     {
-      "start_s": 156.04,
-      "bar": 96,
-      "pattern_slot": 3,
+      "start_s": 157.66,
+      "bar": 97,
+      "pattern_slot": 4,
       "active": [
         14,
         15
@@ -4675,6 +4709,6 @@
       ]
     }
   ],
-  "generated_at": "2026-10-06T10:11:06+00:00",
+  "generated_at": "2026-10-06T10:57:21+00:00",
   "method": "stem_band_fold_v1"
 }

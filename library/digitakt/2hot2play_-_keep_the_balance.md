@@ -2,7 +2,7 @@
 tags: [digitakt, bank, draft]
 slug: 2hot2play_-_keep_the_balance
 bpm: 152.0
-generated: 2026-10-06T10:11:06+00:00
+generated: 2026-10-06T10:57:21+00:00
 ---
 
 # Bank — 2HOT2PLAY — Keep The Balance
@@ -27,15 +27,17 @@ temps  pat  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
 0:16  01   x  x  x  x  x  .  x  x  .  x  x  .  .  .  .  .  
 0:28  01   .  .  .  .  .  .  .  .  x  x  x  .  .  x  .  .  
 0:41  01   .  .  x  x  x  .  .  x  x  x  x  .  .  x  .  .  
-0:54  02   .  .  x  x  x  .  x  x  .  x  .  .  .  x  x  .  
-1:06  03   x  x  x  x  x  .  .  x  x  .  .  .  .  x  x  .  
-1:19  03   x  x  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
-1:32  03   x  x  x  x  x  .  .  x  x  .  .  .  .  x  x  .  
-1:45  03   x  x  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
-1:58  03   .  .  .  .  .  .  .  .  x  x  x  .  .  x  x  .  
-2:10  03   .  .  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
-2:23  03   .  .  x  x  x  .  .  x  .  .  .  .  .  x  x  .  
-2:36  03   .  .  .  .  .  .  .  .  .  .  .  .  .  x  x  .  
+0:43  02   .  .  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
+0:55  02   .  .  x  x  x  .  x  x  .  x  .  .  .  x  x  .  
+1:03  03   x  x  x  x  x  .  .  x  x  .  .  .  .  x  x  .  
+1:16  03   x  x  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
+1:29  03   x  x  x  x  x  .  .  x  x  .  x  .  .  x  x  .  
+1:42  03   x  x  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
+1:54  03   .  .  .  x  x  .  .  .  x  x  x  .  .  x  x  .  
+2:07  03   .  .  x  x  x  .  .  x  x  x  x  .  .  x  x  .  
+2:20  03   .  .  x  x  x  .  .  x  .  x  x  .  .  x  x  .  
+2:32  03   .  .  x  x  x  .  .  x  .  .  .  .  .  x  x  .  
+2:37  04   .  .  .  .  .  .  .  .  .  .  .  .  .  x  x  .  
 2:48  05   x  x  x  x  x  .  x  x  x  .  .  .  .  x  x  .  
 3:01  05   x  x  x  x  x  .  x  x  x  x  x  .  .  x  x  .  
 3:14  05   x  x  x  x  x  .  x  x  x  .  .  .  .  x  x  .  

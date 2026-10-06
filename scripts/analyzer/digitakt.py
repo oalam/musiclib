@@ -505,21 +505,23 @@ def _add_fx(patterns: list[DigitaktPattern], drops: list[int], spb: int) -> None
 def _mute_partition(bar_on: dict[int, np.ndarray], bar_times: np.ndarray,
                     sections: list[tuple[int, int, str, float]], phrase_bars: int,
                     patterns: list[DigitaktPattern]) -> list[DigitaktPhrase]:
-    """Par phrase : tracks actives (majorite des mesures) et pattern en cours."""
-    n_bars = len(bar_times) - 1
+    """Par phrase : tracks actives (majorite des mesures) et pattern en cours.
+
+    Les phrases repartent a chaque debut de section : une phrase ne chevauche
+    jamais deux patterns (une bascule de pattern tombe en debut de phrase)."""
     out: list[DigitaktPhrase] = []
-    for b in range(0, n_bars, phrase_bars):
-        end = min(b + phrase_bars, n_bars)
-        slot = next((i for i, s in enumerate(sections, start=1) if s[0] <= b < s[1]), 1)
+    for slot, (s0, s1, _label, _rms) in enumerate(sections, start=1):
         pat_tracks = {t.index for t in patterns[slot - 1].tracks if t.trigs}
-        active = sorted(
-            i for i, on in bar_on.items()
-            if i in pat_tracks and on[b:end].mean() >= 0.5
-        )
-        if 15 in pat_tracks:
-            active = sorted(set(active) | {15})
-        out.append(DigitaktPhrase(start_s=round(float(bar_times[b]), 2), bar=b,
-                                  pattern_slot=slot, active=active))
+        for b in range(s0, s1, phrase_bars):
+            end = min(b + phrase_bars, s1)
+            active = sorted(
+                i for i, on in bar_on.items()
+                if i in pat_tracks and on[b:end].mean() >= 0.5
+            )
+            if 15 in pat_tracks:
+                active = sorted(set(active) | {15})
+            out.append(DigitaktPhrase(start_s=round(float(bar_times[b]), 2), bar=b,
+                                      pattern_slot=slot, active=active))
     return out
 
 
