@@ -16,6 +16,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.D] Hub `digitakt/kb/_index.md` (24 thèmes, 5 lots) et lot 1 de fiches :
   projet et sauvegarde, presets / kits / pool, copier-coller, page setup,
   tempo et métronome.
+- [7.D] Lot 2 de fiches : enregistrement et quantize, configuration MIDI
+  (import des `.mid` de bank), parameter / preset locks, micro timing et
+  retrigs, mode euclidien.
+
+### Corrigé
+
+- Doctrine §8 : la copie de pattern sur la DT2 se fait avec
+  `[FUNC] + [RECORD]` / `[FUNC] + [STOP]` (et non `[COPY]` / `[PASTE]`).
 
 ## [0.11.0] - 2026-10-06
 

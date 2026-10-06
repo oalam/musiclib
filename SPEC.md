@@ -381,7 +381,7 @@ mutes, FX de transition, principes d'arc).
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
-| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, lot 1 de fiches rédigé (5/24), lots 2-5 à venir |
+| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, lots 1-2 de fiches rédigés (10/24), lots 3-5 à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
 **Décisions 7.B** :
@@ -420,6 +420,11 @@ mutes, FX de transition, principes d'arc).
   plus haut : des sections identiques à l'oreille plafonnent vers 0,3-0,45).
 - Drop (impact FX) = retour du kick après une section sans kick, au lieu du
   saut de RMS du sidecar.
+- **À vérifier sur la machine** (fiche `kb/midi-config`) : le manuel ne
+  garantit pas l'enregistrement simultané des 16 canaux d'un `.mid` ; la
+  voie documentée est l'AUTO CHANNEL vers la track active (une track à la
+  fois). Si confirmé, `write_pattern_midi` pourrait sortir un `.mid` par
+  track.
 - Exemple `2hot2play_-_keep_the_balance` : 15 sections, 13 patterns, chaîne
   `01 … 11 06 05 12 13`, mesure décalée de 2 temps.
 

@@ -31,13 +31,13 @@ Recherche : panneau `/` du front ou `python scripts/kb.py search "..."`.
 
 ## Lot 2 — Remplir les patterns depuis les banks générées
 
-| # | Thème | Manuel | Statut |
+| # | Fiche | Manuel | Statut |
 |---|---|---|---|
-| 6 | Grid / live / step recording, quantize | §10.2, §10.6 | à rédiger |
-| 7 | Configuration MIDI (canaux auto, sync) | §14.4 | à rédiger |
-| 8 | Parameter locks et sound locks | §10.8 | à rédiger |
-| 9 | Micro timing et retrigs | §10.4, §10.5 | à rédiger |
-| 10 | Mode euclidien | §10.3 | à rédiger |
+| 6 | [[enregistrement-quantize]] | §10.2, §10.6 | draft |
+| 7 | [[midi-config]] | §14.4 | draft (import multi-canal à vérifier) |
+| 8 | [[parameter-preset-locks]] | §10.8 | draft |
+| 9 | [[microtiming-retrigs]] | §10.4, §10.5, §11.3 | draft |
+| 10 | [[euclidien]] | §10.3 | draft |
 
 ## Lot 3 — Sons et transitions
 
