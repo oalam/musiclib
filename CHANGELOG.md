@@ -64,6 +64,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.G] Vue d'ensemble et partition de mutes en onglets sous le lecteur
+  (choix mémorisé) ; l'onglet vue d'ensemble donne le pattern, son nombre de
+  mesures et ses répétitions (`A01 · 8 mesures · joué ×2`), l'onglet mutes le
+  nombre de phrases.
 - [7.G] Vue d'ensemble : défilement horizontal automatique jusqu'à la mesure
   en cours quand la lecture sort de la partie visible (en FOLLOW), colonne
   des noms de tracks figée.

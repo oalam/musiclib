@@ -236,6 +236,14 @@
     })
   })
 
+  // onglets sous le lecteur : vue d'ensemble ou partition de mutes (memorise)
+  let tab = $state<'grid' | 'mutes'>('grid')
+  try { if (localStorage.getItem('ui:bank-tab') === 'mutes') tab = 'mutes' } catch { /* stockage indisponible */ }
+  function setTab(t: 'grid' | 'mutes') {
+    tab = t
+    try { localStorage.setItem('ui:bank-tab', t) } catch { /* stockage indisponible */ }
+  }
+
   function pressKey(i: number) {
     if (help) { act('trigs'); return }
     focus = { id: 'trigs' }
@@ -468,7 +476,16 @@
     </div>
   {/if}
 
-  <h2>Vue d'ensemble <span class="muted small">({patName(pattern.slot)}, toutes les tracks, clic = sélection)</span></h2>
+  <div class="tabs" role="tablist" aria-label="Vue de la bank">
+    <button role="tab" aria-selected={tab === 'grid'} class:on={tab === 'grid'} onclick={() => setTab('grid')}>
+      Vue d'ensemble <span class="muted small">{patName(pattern.slot)} · {pattern.bars} mesure{pattern.bars > 1 ? 's' : ''} · joué ×{pattern.repeats}</span>
+    </button>
+    <button role="tab" aria-selected={tab === 'mutes'} class:on={tab === 'mutes'} onclick={() => setTab('mutes')}>
+      Mutes <span class="muted small">{bank.mutes.length} phrases × {bank.phrase_bars} mes.</span>
+    </button>
+  </div>
+  {#if tab === 'grid'}
+  <p class="muted small hint">16 tracks × {pattern.steps} pas · clic sur une track = sélection</p>
   <div class="grid-wrap" bind:this={gridWrap}>
     <div class="grid" style="--cols: {pattern.steps}">
       {#each pattern.tracks as t (t.index)}
@@ -490,10 +507,8 @@
       {/each}
     </div>
   </div>
-
-  </div>
-
-  <h2>Partition de mutes <span class="muted small">(phrases de {bank.phrase_bars} mesures, clic = saut)</span></h2>
+  {:else}
+  <p class="muted small hint">Clic = saut à la phrase</p>
   <div class="mutes-wrap">
     <div class="mutes" style="--n: {bank.mutes.length}">
       {#each Array(16) as _, row}
@@ -506,6 +521,8 @@
         {/each}
       {/each}
     </div>
+  </div>
+  {/if}
   </div>
   </div>
   </div>
@@ -523,7 +540,6 @@
     .col-dt { position: sticky; top: 0; max-width: calc((100vh - 260px) * 834 / 682); justify-self: end; }
     .col-rest { max-width: none; }
     .col-rest .deck { margin-top: 0; }
-    .col-rest h2:first-of-type { margin-top: 18px; }
   }
   .deck { margin-top: 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); padding: 0 12px 12px; }
   .deck .chain { margin-top: 10px; }
@@ -532,7 +548,14 @@
   .chain .link { font-size: 11px; padding: 2px 5px; border-bottom: 3px solid var(--c); }
   .chain .link.cur { outline: 1px solid var(--accent); }
   .small { font-size: 12px; }
-  h2 { font-size: 14px; margin: 18px 0 6px; }
+  .tabs { display: flex; gap: 4px; margin: 14px 0 6px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .tabs button {
+    font-size: 14px; font-weight: 600; padding: 6px 10px; background: none; border: 0;
+    border-bottom: 2px solid transparent; border-radius: 0; margin-bottom: -1px; cursor: pointer; white-space: nowrap;
+  }
+  .tabs button.on { background: none; color: var(--text); border-bottom-color: var(--accent); }
+  .tabs .small { font-weight: 400; margin-left: 4px; }
+  .hint { margin: 0 0 6px; }
 
   /* facade DT2 : toujours sombre, comme la machine, quel que soit le theme.
      Implantation absolue au dessin du §3.1 ; --u = 1 unite du dessin (834 de large). */
