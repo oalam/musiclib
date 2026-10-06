@@ -8,6 +8,7 @@ Vault Obsidian d'apprentissage et de documentation.
 
 - `journal/` — entrées chronologiques datées (flux brut, voir [[journal/2026-05-10|dernière entrée]])
 - `technique/` — apprentissage Tidal, synthèse, mix, sound system
+- `digitakt/` — live sur Digitakt II : [[digitakt/doctrine|doctrine]] (grille des 16 tracks, banks, mutes, transitions)
 - `sets/` — brouillons de set, structures, captations
 - `inspirations/` — sets de référence, artistes, morceaux, ambiances qui nourrissent
 - `refs/` — docs techniques, papers, talks, articles
