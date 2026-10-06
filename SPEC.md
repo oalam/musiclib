@@ -459,7 +459,8 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   (appuis successifs = page suivante). Les autres affichent leur légende.
 - `[FUNC]` est une bascule (pas de maintien à la souris) ; bouton AIDE (propre
   au front, comme FOLLOW) : un clic sur un contrôle ouvre sa fiche, ou le
-  manuel à défaut. Survol = légende (fonction, FUNC, fiche, § et page).
+  manuel à défaut. Clic = légende épinglée (fonction, FUNC, fiche, § et page), survol = aperçu
+  temporaire, pour atteindre les liens sans que la légende change en route.
 - Potards A-H : noms des paramètres de la page active (§11, machines par
   défaut ONESHOT et MULTI-MODE), valeurs `--` sauf NOTE / VEL du pas courant
   (seules valeurs connues de la bank). Pas de valeur éditable.

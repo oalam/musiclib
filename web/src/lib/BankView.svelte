@@ -132,15 +132,30 @@
   // les autres affichent leur legende ; en mode AIDE, un clic ouvre la fiche.
   let func = $state(false)
   let help = $state(false)
-  let focus = $state<{ id: string; param?: number }>({ id: 'screen' })
+  // legende : le clic epingle un controle (focus), le survol n'en montre qu'un
+  // apercu, apres un court delai et efface en sortie, pour pouvoir traverser la
+  // facade jusqu'aux liens sans perdre le controle epingle
+  type Focus = { id: string; param?: number }
+  let focus = $state<Focus>({ id: 'screen' })
+  let hover = $state<Focus | null>(null)
+  let hoverTimer: ReturnType<typeof setTimeout> | undefined
+  const shown = $derived(hover ?? focus)
+  function peek(f: Focus) {
+    clearTimeout(hoverTimer)
+    hoverTimer = setTimeout(() => (hover = f), 120)
+  }
+  function unpeek() {
+    clearTimeout(hoverTimer)
+    hover = null
+  }
   let pageId = $state('trig1')
   let lastStep = $state(-1)
   let outline = $state<Record<string, ManualRef>>({})
   api.manualOutline().then(o => (outline = o)).catch(() => { /* manuel absent : liens masques */ })
 
   const paramPage = $derived(PARAM_PAGES.find(pg => pg.id === pageId) ?? PARAM_PAGES[0])
-  const focused = $derived(CONTROLS[focus.id])
-  const focusedParam = $derived(focus.param !== undefined ? paramPage.params[focus.param] : null)
+  const focused = $derived(CONTROLS[shown.id])
+  const focusedParam = $derived(shown.param !== undefined ? paramPage.params[shown.param] : null)
   /** Fonction montree par la legende : secondaire quand FUNC est allume. */
   const shownFunc = $derived<Func>(func && focused.func ? focused.func : focused.main)
 
@@ -207,15 +222,15 @@
 <section class="bank">
   {#snippet hw(id: string, primary?: () => void, secondary?: () => void, lit = false, cls = '')}
     {@const c = CONTROLS[id]}
-    <button class="hw {cls}" class:lit class:hasfunc={!!c.func} class:sel={focus.id === id}
-      onmouseenter={() => (focus = { id })} onclick={() => act(id, primary, secondary)}>
+    <button class="hw {cls}" class:lit class:hasfunc={!!c.func} class:sel={focus.id === id && focus.param === undefined}
+      onmouseenter={() => peek({ id })} onmouseleave={unpeek} onclick={() => act(id, primary, secondary)}>
       {c.label}{#if c.func}<span class="sub">{c.func.label}</span>{/if}
     </button>
   {/snippet}
   {#snippet knob(id: string, label: string, value: number | null, onclick: () => void, onenter: () => void, sel: boolean, big = false)}
     <button class="knob" class:big class:sel class:known={value !== null}
       style="--a: {value === null ? 0 : -135 + (270 * value) / 127}deg"
-      aria-label="{label}" onmouseenter={onenter} {onclick}>
+      aria-label="{label}" onmouseenter={onenter} onmouseleave={unpeek} {onclick}>
       <span class="cap"></span><span class="klabel">{label}</span>
     </button>
   {/snippet}
@@ -223,7 +238,7 @@
   <div class="dt" class:funcmode={func} class:helpmode={help} aria-label="Façade Digitakt II">
     <div class="top">
       <div class="menu">
-        {@render knob('volume', 'VOLUME', null, () => act('volume'), () => (focus = { id: 'volume' }), focus.id === 'volume')}
+        {@render knob('volume', 'VOLUME', null, () => act('volume'), () => peek({ id: 'volume' }), focus.id === 'volume')}
         <div class="menukeys">
           {@render hw('preset')}
           {@render hw('settings')}
@@ -232,7 +247,7 @@
         </div>
       </div>
 
-      <div class="screen mono" role="presentation" onmouseenter={() => (focus = { id: 'screen' })}>
+      <div class="screen mono" role="presentation" onmouseenter={() => peek({ id: 'screen' })} onmouseleave={unpeek}>
         <div class="bar">
           <span class="tag">{patName(pattern.slot)}</span>
           <span class="name">{pattern.label.toUpperCase()}</span>
@@ -242,7 +257,7 @@
           <div class="row big">T{String(track.index).padStart(2, '0')} {track.role.toUpperCase()} <span class="pgt">{paramPage.title}</span></div>
           <div class="params">
             {#each paramPage.params as param, i}
-              <span class:hl={focus.id === 'knobs' && focus.param === i}>
+              <span class:hl={shown.id === 'knobs' && shown.param === i}>
                 <b>{param?.key ?? '·'}</b>{param ? shownValue(param, paramValue(param)) : ''}
               </span>
             {/each}
@@ -269,7 +284,7 @@
       </div>
 
       <div class="data">
-        {@render knob('level', 'LEVEL', null, () => act('level'), () => (focus = { id: 'level' }), focus.id === 'level', true)}
+        {@render knob('level', 'LEVEL', null, () => act('level'), () => peek({ id: 'level' }), focus.id === 'level', true)}
         <div class="pair stack">
           {@render hw('no')}
           {@render hw('yes')}
@@ -280,7 +295,7 @@
         <div class="knobs">
           {#each KNOBS as k, i}
             {@const param = paramPage.params[i]}
-            {@render knob('knobs', k, paramValue(param), () => pressKnob(i), () => (focus = { id: 'knobs', param: i }),
+            {@render knob('knobs', k, paramValue(param), () => pressKnob(i), () => peek({ id: 'knobs', param: i }),
               focus.id === 'knobs' && focus.param === i)}
           {/each}
         </div>
@@ -297,14 +312,14 @@
         onclick={() => (help = !help)}>AIDE ?</button>
       <button class="hw front" class:lit={follow} title="Spécifique au front : la page et le pattern suivent la lecture"
         onclick={() => (follow = !follow)}>FOLLOW</button>
-      <div class="leds" role="group" aria-label="Pages" onmouseenter={() => (focus = { id: 'leds' })}>
+      <div class="leds" role="group" aria-label="Pages" onmouseenter={() => peek({ id: 'leds' })} onmouseleave={unpeek}>
         {#each Array(8) as _, i}
           <button class="led" class:lit={page === i} class:play={page !== i && currentStep >= 0 && Math.floor(currentStep / 16) === i}
             disabled={i >= pages} aria-label="page {i + 1}"
             onclick={() => act('leds', () => { page = i; follow = false })}></button>
         {/each}
       </div>
-      <div class="arrows" role="group" aria-label="Flèches" onmouseenter={() => (focus = { id: 'arrows' })}>
+      <div class="arrows" role="group" aria-label="Flèches" onmouseenter={() => peek({ id: 'arrows' })} onmouseleave={unpeek}>
         <button class="hw arr up" aria-label="UP" onclick={() => act('arrows')}>▲</button>
         <button class="hw arr left" aria-label="LEFT" onclick={() => act('arrows', () => pressArrow(-1))}>◀</button>
         <button class="hw arr down" aria-label="DOWN" onclick={() => act('arrows')}>▼</button>
@@ -325,7 +340,7 @@
         {@render hw('keyboard')}
       </div>
 
-      <div class="keys" role="group" aria-label="Trig keys" onmouseenter={() => (focus = { id: 'trigs' })}>
+      <div class="keys" role="group" aria-label="Trig keys" onmouseenter={() => peek({ id: 'trigs' })} onmouseleave={unpeek}>
         {#each Array(16) as _, i}
           {#if mode === 'trig'}
             {@const s = page * 16 + i}
@@ -363,9 +378,9 @@
   </div>
 
   <div class="legend" aria-live="polite">
-    {#if focusedParam !== null && focus.param !== undefined}
+    {#if focusedParam !== null && shown.param !== undefined}
       {@const ref = manualRef(paramPage)}
-      <div class="lh"><span class="kbd mono">{KNOBS[focus.param]}</span> <b>{focusedParam.key}</b> · {focusedParam.name}
+      <div class="lh"><span class="kbd mono">{KNOBS[shown.param]}</span> <b>{focusedParam.key}</b> · {focusedParam.name}
         <span class="muted">· page {paramPage.title}</span></div>
       <div class="ltext mono">{midiLabel(focusedParam)} <span class="muted">· canal de la track</span></div>
       {#if paramPage.note}<div class="muted small">{paramPage.note}</div>{/if}
@@ -373,8 +388,8 @@
         <button class="small" onclick={() => onhelp(paramPage.kb)}>Fiche</button>
         {#if ref}<button class="small" onclick={() => onhelp(undefined, ref.page)}>Manuel §{ref.section} p{ref.page}</button>{/if}
       </div>
-    {:else if focus.param !== undefined}
-      <div class="lh"><span class="kbd mono">{KNOBS[focus.param]}</span> <span class="muted">sans paramètre sur la page {paramPage.title}</span></div>
+    {:else if shown.param !== undefined}
+      <div class="lh"><span class="kbd mono">{KNOBS[shown.param]}</span> <span class="muted">sans paramètre sur la page {paramPage.title}</span></div>
     {:else}
       <div class="lh"><span class="kbd mono">[{focused.label}]</span> <b>{shownFunc.label}</b>
         <span class="muted">· n°{focused.ref} du §3.1{func && focused.func ? ' · fonction FUNC' : ''}</span></div>
@@ -388,7 +403,8 @@
         {/if}
       </div>
     {/if}
-    <div class="muted small hint">{help ? 'AIDE active : un clic ouvre la fiche (ou le manuel).' : 'Survol = légende ; FUNC puis une touche = fonction secondaire ; AIDE ? = clic vers la fiche.'}</div>
+    <div class="muted small hint">{hover ? 'Aperçu : clic pour épingler la légende.' : 'Épinglé : la légende reste en traversant la façade.'}
+      {help ? 'AIDE active : un clic ouvre la fiche (ou le manuel).' : 'FUNC puis une touche = fonction secondaire ; AIDE ? = clic vers la fiche.'}</div>
   </div>
 
   {#if sections.length}

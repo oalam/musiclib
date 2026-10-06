@@ -708,8 +708,8 @@ python api.py &   puis   cd ../web && npm run dev
 - **Façade complète (7.G)** : les 23 contrôles du §3.1 du manuel, fonctions
   secondaires en orange ; **PLAY / STOP** pilotent le lecteur, **FUNC** est
   une bascule, les touches **TRIG / SRC / FLTR / AMP / FX / MOD** changent la
-  page des knobs A-H (noms du §11, NOTE / VEL du pas courant). Survol = légende
-  (fonction, CC / NRPN, fiche, § du manuel) ; **AIDE ?** = un clic ouvre la
+  page des knobs A-H (noms du §11, NOTE / VEL du pas courant). Clic = légende épinglée
+  (fonction, CC / NRPN, fiche, § du manuel), survol = simple aperçu ; **AIDE ?** = un clic ouvre la
   fiche. Données dans `web/src/lib/dt2.ts`. Dessous : **chaîne** (ordre de jeu,
   clic = saut à la section), **vue d'ensemble** 16 tracks × tous les pas
   (curseur synchronisé, tracks mutées grisées `M`), partition de mutes

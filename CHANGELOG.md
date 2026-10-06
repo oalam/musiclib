@@ -67,6 +67,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.G] Légende de la façade : le clic épingle le contrôle, le survol n'en
+  montre qu'un aperçu (délai 120 ms, effacé en sortie), ce qui permet de
+  traverser la façade jusqu'aux liens Fiche / Manuel sans perdre la cible.
 - Doctrine §8 : la copie de pattern sur la DT2 se fait avec
   `[FUNC] + [RECORD]` / `[FUNC] + [STOP]` (et non `[COPY]` / `[PASTE]`).
 - Doctrine §3 : combinaison du temp save confirmée par le manuel
