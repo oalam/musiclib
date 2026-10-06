@@ -755,7 +755,9 @@ python api.py &   puis   cd ../web && npm run dev
   KEYBOARD) passe l'écran en **KB SETUP** (SCALE / ROOT à reporter sur la
   machine, accord en cours, progression de la section) et les trig keys en
   clavier chromatique (rangée basse = blanches, haute = noires) : notes de la
-  gamme éclairées, fondamentale en rouge, notes de l'accord en vert.
+  gamme éclairées, fondamentale en rouge, notes de l'accord en vert. Dans la
+  **vue d'ensemble**, bouton **Notes** : nom de la note sur les tracks 9-16
+  quand elle change (ou en début de mesure), contour = note hors gamme.
 - **Générer / Régénérer la bank** depuis le front (appelle `digitakt.py` puis
   `harmony.py` sur la nouvelle grille, une vingtaine de secondes) : utile après
   `stems.py` ou une mise à jour de l'analyzer. Un échec de l'harmonie n'empêche

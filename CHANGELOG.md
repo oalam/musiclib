@@ -8,6 +8,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.H] Vue d'ensemble : nom de la note sur les tracks mélodiques quand elle
+  change ou en début de mesure, contour sur les notes hors gamme, bouton
+  **Notes** (mémorisé) ; intensité des trigs portée par le fond pour garder
+  les noms lisibles.
 - [7.H] « Générer / Régénérer la bank » du front relance aussi l'analyse
   harmonique (`POST /api/tracks/{slug}/bank` enchaîne `harmony.process` ; un
   échec ne bloque pas la bank) ; le front met à jour gamme et accords sans

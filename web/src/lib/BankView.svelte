@@ -129,6 +129,30 @@
     ? (CHORD_INTERVALS[chord.quality] ?? []).map(i => (chord.root! + i) % 12) : []))
   const sectionChords = $derived(harmony?.progression.find(p => currentTime >= p.start_s && currentTime < p.end_s)?.chords ?? [])
 
+  // vue d'ensemble : nom de note sur les tracks melodiques, seulement quand la
+  // note change ou en debut de mesure (une repetition se lit « idem »)
+  let showNotes = $state(true)
+  try { showNotes = localStorage.getItem('ui:grid-notes') !== '0' } catch { /* stockage indisponible */ }
+  function toggleNotes() {
+    showNotes = !showNotes
+    try { localStorage.setItem('ui:grid-notes', showNotes ? '1' : '0') } catch { /* stockage indisponible */ }
+  }
+  const noteLabels = $derived.by(() => {
+    const out = new Map<number, Map<number, string>>()
+    for (const t of pattern.tracks) {
+      if (t.index <= 8) continue
+      const m = new Map<number, string>()
+      let prev: number | null = null
+      for (const tr of [...t.trigs].sort((a, b) => a.step - b.step)) {
+        if (tr.note === null) continue
+        if (tr.note !== prev || tr.step % bank.steps_per_bar === 0) m.set(tr.step, NOTE_NAMES[tr.note % 12])
+        prev = tr.note
+      }
+      out.set(t.index, m)
+    }
+    return out
+  })
+
   function trigAt(track: BankTrack, step: number) {
     return track.trigs.find(t => t.step === step)
   }
@@ -519,7 +543,9 @@
     </button>
   </div>
   {#if tab === 'grid'}
-  <p class="muted small hint">16 tracks × {pattern.steps} pas · clic sur une track = sélection</p>
+  <p class="muted small hint">16 tracks × {pattern.steps} pas · clic sur une track = sélection
+    · <button class="small" class:on={showNotes} onclick={toggleNotes}
+      title="Nom de la note sur les tracks 9-16 quand elle change ; contour = hors gamme (si analyse harmonique)">Notes</button></p>
   <div class="grid-wrap" bind:this={gridWrap}>
     <div class="grid" style="--cols: {pattern.steps}">
       {#each pattern.tracks as t (t.index)}
@@ -534,8 +560,10 @@
           <div class="cell" data-s={s} class:beat={s % 4 === 0} class:pagestart={s % 16 === 0 && s > 0}
             class:cursor={s === currentStep} class:melodic={t.index > 8} class:muted
             class:trig={!!trig}
+            class:outscale={!!trig && trig.note !== null && t.index > 8 && scalePcs.size > 0 && !scalePcs.has(trig.note % 12)}
             style={trig ? `--v: ${0.35 + (0.65 * trig.velocity) / 127}` : ''}
-            title={trig ? `pas ${s + 1} · vel ${trig.velocity}${trig.note !== null ? ' · ' + noteName(trig.note) : ''}` : ''}>
+            title={trig ? `pas ${s + 1} · vel ${trig.velocity}${trig.note !== null ? ' · ' + noteName(trig.note) + (t.index > 8 && scalePcs.size > 0 && !scalePcs.has(trig.note % 12) ? ' · hors gamme' : '') : ''}` : ''}>
+            {#if showNotes && trig && noteLabels.get(t.index)?.has(s)}<span class="nl">{noteLabels.get(t.index)!.get(s)}</span>{/if}
           </div>
         {/each}
       {/each}
@@ -738,11 +766,14 @@
   .idx { display: inline-block; width: 18px; color: var(--rhythm); }
   .idx.melodic { color: var(--melodic); }
   .m { font-size: 10px; margin-left: 4px; padding: 0 3px; border: 1px solid var(--muted); border-radius: 2px; }
-  .cell { height: 18px; background: var(--cell-off); border-radius: 2px; }
+  .cell { position: relative; height: 18px; background: var(--cell-off); border-radius: 2px; }
   .cell.beat { box-shadow: inset 0 -2px 0 var(--border); }
   .cell.pagestart { margin-left: 4px; }
-  .cell.trig { background: var(--rhythm); opacity: var(--v); }
-  .cell.trig.melodic { background: var(--melodic); }
+  /* intensite par le fond (pas opacity) pour garder le nom de note lisible */
+  .cell.trig { background: color-mix(in srgb, var(--rhythm) calc(var(--v) * 100%), var(--cell-off)); }
+  .cell.trig.melodic { background: color-mix(in srgb, var(--melodic) calc(var(--v) * 100%), var(--cell-off)); }
+  .cell.outscale { box-shadow: inset 0 0 0 2px var(--text); }
+  .nl { position: absolute; left: 1px; top: 0; font: 600 9px/18px ui-monospace, Menlo, monospace; color: var(--text); white-space: nowrap; pointer-events: none; text-shadow: 0 0 2px var(--panel), 0 0 2px var(--panel); }
   .cell.muted.trig { opacity: 0.2; }
   .cell.cursor { outline: 2px solid var(--accent); outline-offset: -1px; }
 
