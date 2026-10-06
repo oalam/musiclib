@@ -4,7 +4,7 @@ manuel: "refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf"
 os: "1.17"
 updated: 2026-10-06
 ---
-
+ok
 # Base de connaissance Digitakt II
 
 Fiches courtes et pratiques, rédigées depuis le manuel (OS 1.17), dans l'ordre
@@ -57,15 +57,15 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 
 ## Lot 3 — Sons et transitions
 
-| # | Thème | Manuel | Statut |
+| # | Fiche | Manuel | Statut |
 |---|---|---|---|
-| 11 | Sampling et resampling interne | §13 | à rédiger |
-| 12 | Machines SRC | annexe A.2 | à rédiger |
-| 13 | Amp, overdrive, bit reduction | §11.7, §11.8 | à rédiger |
-| 14 | Filtres (machines FLTR, enveloppes) | §11.5, §11.6, A.3 | à rédiger |
-| 15 | LFO (dont riser one-shot track 15) | §11.9-11.11, annexe C | à rédiger |
-| 16 | Send FX et compresseur master | §12 | à rédiger |
-| 17 | FILL et conditions de trig | §10.8 | à rédiger |
+| 11 | [[sampling-resampling]] | §13 | draft |
+| 12 | [[machines-src]] | annexe A.2 | draft |
+| 13 | [[amp-overdrive-bitreduction]] | §11.7, §11.8 | draft |
+| 14 | [[filtres]] | §11.5, §11.6, A.3 | draft |
+| 15 | [[lfo]] | §11.9-11.11, annexe C | draft |
+| 16 | [[send-fx-compresseur]] | §12 | draft |
+| 17 | [[fill-conditions]] | §10.7.3, §10.8.4 | draft |
 
 ## Lot 4 — Structurer le set, puis le jouer
 

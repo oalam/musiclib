@@ -381,7 +381,7 @@ mutes, FX de transition, principes d'arc).
 | 7.B | `digitakt.py` : draft de bank (JSON + note + MIDI par pattern) | fait |
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
-| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, lots 1-2 de fiches rédigés (10/24), lots 3-5 à venir |
+| 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | en cours : recherche + panneau faits, lots 1-3 de fiches rédigés (17/24), lots 4-5 à venir |
 | 7.E | Push des trigs vers la DT2 via NRPN (note / vélocité / durée de trig) depuis le JSON ou les `.mid`, avec mido | à venir, numéros NRPN à vérifier dans le manuel |
 
 **Décisions 7.B** :

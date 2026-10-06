@@ -19,6 +19,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.D] Lot 2 de fiches : enregistrement et quantize, configuration MIDI
   (import des `.mid` de bank), parameter / preset locks, micro timing et
   retrigs, mode euclidien.
+- [7.D] Lot 3 de fiches : sampling et resampling, machines SRC, amp /
+  overdrive / bit reduction, filtres, LFO (riser one-shot), send FX et
+  compresseur (sidechain), FILL et conditions de trig.
 
 ### Corrigé
 
