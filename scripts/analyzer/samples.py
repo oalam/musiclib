@@ -19,10 +19,19 @@ Bibliotheque (7.J4) : les overrides portent aussi les tags libres, les etoiles
 (son rejete partout, distinct de `drop` qui ne vaut que pour la case). Les
 operations du front (`move`, `set_stars`, `set_tags`, `trash`, `restore`)
 modifient le manifeste et les overrides en memoire ; l'appelant les ecrit.
+
+Export (7.J3) : les retenus (`selected`) sont copies tels quels sous
+`<dest>/<FAMILLE>/<CODE>/<nom>.wav`, arborescence que Transfer envoie sur le
++Drive de la DT2. Rejouable : un index (`export.json`) liste les fichiers
+ecrits par l'export ; un relancement ne recopie que ce qui a change et ne
+retire que des fichiers de l'index, jamais un fichier pose a la main.
 """
 from __future__ import annotations
 
+import json
+import os
 import re
+import shutil
 import struct
 from collections import defaultdict
 from collections.abc import Callable, Iterable
@@ -250,6 +259,25 @@ class Manifest(BaseModel):
     unclassified: list[str] = Field(default_factory=list)
     folded: list[str] = Field(default_factory=list)   # cases "FAM/CODE" repliees
     trashed: list[str] = Field(default_factory=list)  # corbeille (overrides trash)
+
+
+class ExportItem(BaseModel):
+    """Fichier ecrit par l'export (index, cle = chemin relatif a dest)."""
+    source: str
+    size: int
+    mtime_ns: int
+
+
+class ExportReport(BaseModel):
+    dest: str
+    dry_run: bool
+    files: int = 0                  # retenus exportes (plan)
+    bytes: int = 0
+    copied: list[str] = Field(default_factory=list)
+    unchanged: int = 0
+    removed: list[str] = Field(default_factory=list)
+    missing: list[str] = Field(default_factory=list)    # source absente du disque
+    conflicts: list[str] = Field(default_factory=list)  # fichier pose a la main a cet endroit
 
 
 class _Raw(BaseModel):
@@ -881,3 +909,90 @@ def grid(manifest: Manifest) -> dict[str, dict[str, tuple[int, int]]]:
         n, s = out[e.family].get(e.code, (0, 0))
         out[e.family][e.code] = (n + 1, s + int(e.selected))
     return out
+
+
+# --- Export (7.J3) ----------------------------------------------------------
+
+def load_export_index(path: Path) -> dict[str, ExportItem]:
+    if not path.exists():
+        return {}
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SampleError(f"{path} : JSON invalide ({exc})") from exc
+    return {k: ExportItem.model_validate(v) for k, v in raw.items()}
+
+
+def save_export_index(index: dict[str, ExportItem], path: Path) -> None:
+    data = {k: v.model_dump() for k, v in sorted(index.items())}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    tmp.replace(path)
+
+
+def export_plan(manifest: Manifest) -> dict[str, str]:
+    """Chemin d'arrivee (relatif a dest) -> source, pour les retenus. Les noms
+    sont uniques par case ; la casse est ignoree (disque macOS)."""
+    plan: dict[str, str] = {}
+    seen: set[str] = set()
+    for e in sorted(manifest.entries, key=lambda e: (e.family, e.code, e.rank)):
+        if e.selected and e.dest.lower() not in seen:
+            seen.add(e.dest.lower())
+            plan[e.dest] = e.source
+    return plan
+
+
+def export(manifest: Manifest, root: Path, dest: Path, index_path: Path,
+           dry_run: bool = False) -> ExportReport:
+    """Synchronise `dest` avec les retenus du manifeste (voir l'en-tete)."""
+    index = load_export_index(index_path)
+    plan = export_plan(manifest)
+    report = ExportReport(dest=str(dest), dry_run=dry_run)
+    new_index: dict[str, ExportItem] = {}
+    for rel, source in plan.items():
+        src, out = root / source, dest / rel
+        try:
+            st = src.stat()
+        except FileNotFoundError:
+            report.missing.append(source)
+            continue
+        item = ExportItem(source=source, size=st.st_size, mtime_ns=st.st_mtime_ns)
+        report.files += 1
+        report.bytes += st.st_size
+        old = index.get(rel)
+        same_size = out.is_file() and out.stat().st_size == st.st_size
+        if out.exists() and old is None and not same_size:
+            report.conflicts.append(rel)
+            continue
+        # meme taille sans entree d'index : copie d'un export interrompu, reprise
+        if same_size and old in (None, item):
+            report.unchanged += 1
+            new_index[rel] = item
+            continue
+        report.copied.append(rel)
+        new_index[rel] = item
+        if not dry_run:
+            out.parent.mkdir(parents=True, exist_ok=True)
+            tmp = out.with_name(f".{out.name}.tmp")
+            shutil.copy2(src, tmp)
+            tmp.replace(out)
+    for rel in sorted(index.keys() - plan.keys()):
+        report.removed.append(rel)
+        if not dry_run:
+            (dest / rel).unlink(missing_ok=True)
+    if not dry_run:
+        _prune_empty_dirs(dest)
+        save_export_index(new_index, index_path)
+    return report
+
+
+def _prune_empty_dirs(dest: Path) -> None:
+    """Retire les dossiers de case vides (une case videe par l'ecoute)."""
+    if not dest.is_dir():
+        return
+    for dirpath, _dirs, _files in sorted(os.walk(dest), key=lambda w: -len(w[0])):
+        d = Path(dirpath)
+        if d != dest and not any(d.iterdir()):
+            d.rmdir()
+

@@ -703,7 +703,7 @@ ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
 - **Limites** : sur les musiques peu mélodiques (dubstep, tek), beaucoup de
   quintes à vide et de sus2 ; un draft à valider à l'oreille.
 
-# samples.py — bibliothèque de samples DT2 (Phase 7.J1, 7.J2, 7.J4)
+# samples.py — bibliothèque de samples DT2 (Phase 7.J)
 
 Classe la copie des packs faite depuis Transfer (`<MEDIA>/Samples`, jamais
 modifiée) en famille / code, nomme les candidats pour l'écran de la DT2 et
@@ -751,6 +751,15 @@ BL basse.
   sans note, `T` tag, `Suppr` corbeille, `U` restaurer (corbeille). Un
   sample noté passe devant les non-notés de sa case ; noter ne vaut pas
   garder.
+- **Export (7.J3)** : `samples.py --export --dry-run` (bilan), puis
+  `samples.py --export`, ou le bouton « Exporter… » de l'onglet Samples.
+  Copie les retenus tels quels vers
+  `<MEDIA>/Live/samples/<FAMILLE>/<CODE>/<nom>.wav`, à envoyer sur le +Drive
+  avec Transfer. Rejouable : `library/samples/export.json` liste les fichiers
+  écrits par l'export ; un relancement ne recopie que ce qui a changé et ne
+  retire que ces fichiers (sortis des retenus ou changés de case). Un fichier
+  posé à la main n'est jamais écrasé (signalé en conflit) ni supprimé.
+  Premier bilan : 1 053 retenus, 468 Mo.
 - **Rejouable** : relancer après un ajout de pack ou un override ; les statuts
   `keep` / `drop` et les mesures du manifeste précédent sont conservés.
 - **Tests** : `python -m pytest tests/test_samples.py` (unitaires, fausse
@@ -764,8 +773,8 @@ BL basse.
 - **Limites** : classement par mots-clés du chemin ; environ 400 fichiers sans
   code (abréviations `MPC_Kit`, packs sans nom de catégorie : `Aotearoa`,
   `Phaised air`). Les seuils du pré-filtre sont fixes, pas réglés par style
-  (un kick hardcore écrêté exprès est signalé `sature`). L'export renommé
-  arrive en 7.J3.
+  (un kick hardcore écrêté exprès est signalé `sature`). L'export ne pousse
+  pas sur la DT2 : l'envoi reste à faire dans Transfer.
 
 # kb.py — base de connaissance Digitakt II (Phase 7.D, 7.F)
 
@@ -892,6 +901,7 @@ dans library.md) :
 | POST | `/api/samples/stars` | `{sources, stars}` (1 à 5, `null` retire) → grille |
 | POST | `/api/samples/tags` | `{sources, add, remove}` → grille |
 | POST | `/api/samples/trash`, `/restore` | `{sources}` → grille ; corbeille / retour dans la case ou les non classés |
+| POST | `/api/samples/export` | `{dry_run}` (défaut `true`) → `ExportReport` : copiés, inchangés, retirés, sources absentes, conflits ; 503 sans disque média |
 | GET | `/api/samples/audio?source=` | wav source (404 hors manifeste, corbeille et non classés compris ; 503 sans disque média) |
 
 Les `POST /api/samples/*` agissent par lot (`sources`, sans doublon) : une

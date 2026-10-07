@@ -4,9 +4,10 @@
   // ecouter (keep / drop au clavier) et la reserve ; un drop fait monter le
   // candidat suivant (selection recalculee par l'API). Selection multiple
   // (Cmd, Maj), barre d'outils, glisser-deposer vers une case ou la corbeille.
+  // Export des retenus vers Transfer (7.J3) : bilan, puis copie confirmee.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleStatus } from './api'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleStatus } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -49,6 +50,9 @@
   let moveSelect: HTMLSelectElement | undefined = $state()
   // glisser-deposer : sources tirees, cible survolee ("FAM/CODE" ou "trash")
   let dragging = $state<string[] | null>(null)
+  // export (7.J3) : bilan (dry_run) puis rapport de la copie
+  let exportReport = $state<SampleExportReport | null>(null)
+  let exporting = $state(false)
   let dropKey = $state<string | null>(null)
 
   let container: HTMLDivElement | undefined = $state()
@@ -278,6 +282,21 @@
     else act(s => api.sampleMove(s, target.family, target.code), sources)
   }
 
+  async function runExport(dryRun: boolean) {
+    if (exporting) return
+    exporting = true
+    try {
+      exportReport = await api.sampleExport(dryRun)
+      error = ''
+    } catch (e) {
+      fail(e)
+    } finally {
+      exporting = false
+    }
+  }
+
+  const mo = (b: number) => `${Math.round(b / 1e6)} Mo`
+
   async function setFilter() {
     await refresh()
     if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
@@ -398,7 +417,28 @@
           title="Sons rejetés partout, restaurables, jamais supprimés du disque"
           onclick={() => open({ kind: 'trash' })}>Corbeille ({counts.trash})</button>
       </span>
+      <button class="small export-btn" disabled={exporting}
+        title="Copie les retenus vers Live/samples (famille / code / nom DT2), pour Transfer"
+        onclick={() => runExport(true)}>{exporting ? 'Export…' : 'Exporter…'}</button>
     </div>
+    {#if exportReport}
+      {@const r = exportReport}
+      <div class="export small">
+        <strong>{r.dry_run ? 'Bilan de l’export' : 'Export terminé'}</strong>
+        <span class="muted">→ {r.dest}</span>
+        <p>
+          {r.files} retenus ({mo(r.bytes)}) : {r.copied.length} {r.dry_run ? 'à copier' : 'copiés'},
+          {r.unchanged} inchangés, {r.removed.length} {r.dry_run ? 'à retirer' : 'retirés'}.
+        </p>
+        {#if r.missing.length}<p class="err">Sources absentes ({r.missing.length}) : {r.missing.slice(0, 5).join(', ')}</p>{/if}
+        {#if r.conflicts.length}<p class="err">Fichiers posés à la main, non écrasés ({r.conflicts.length}) : {r.conflicts.slice(0, 5).join(', ')}</p>{/if}
+        {#if r.dry_run}
+          <button class="small" disabled={exporting || (!r.copied.length && !r.removed.length)}
+            onclick={() => runExport(false)}>{exporting ? 'Copie…' : 'Copier'}</button>
+        {/if}
+        <button class="small" onclick={() => (exportReport = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
+      </div>
+    {/if}
   </section>
 
   <section class="detail">
@@ -505,6 +545,9 @@
   td.over .cell, td.over .slot { outline: 2px dashed var(--accent); background: var(--panel-2); }
   .loose { display: flex; gap: 8px; margin-top: 10px; }
   .trash-drop { border-radius: 4px; }
+  .export-btn { margin-left: auto; }
+  .export { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); max-width: 60ch; }
+  .export p { margin: 6px 0; }
   .trash-drop.over { outline: 2px dashed #dc2626; }
   .detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .detail header { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }

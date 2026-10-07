@@ -527,3 +527,69 @@ def test_rebuild_ranks_rated_first(tree: Path) -> None:
     m = smp.build_manifest(tree, {last: Override(stars=1, tags=["x"])}, measure_fn=None)
     cell = smp.cell_of(m, "HARDCORE", "BD")
     assert (cell[0].source, cell[0].stars, cell[0].tags) == (last, 1, ["x"])
+
+
+# --- Export (7.J3) ----------------------------------------------------------
+
+def _export_setup(tmp_path: Path) -> tuple[smp.Manifest, Path, Path, Path]:
+    root = tmp_path / "Samples"
+    for i in range(1, 4):
+        _wav(root / "p" / f"fx{i}.wav", seconds=0.1 * i)
+    m = smp.Manifest(source_root=str(root), total=3, entries=[
+        smp.SampleEntry(source=f"p/fx{i}.wav", family="JUNGLE", code="FX", pack="p",
+                        name=f"FX {i} p", duration=0.1 * i, rank=i, selected=i < 3)
+        for i in range(1, 4)])
+    return m, root, tmp_path / "Live" / "samples", tmp_path / "export.json"
+
+
+def test_export_copies_selected_and_is_rerunnable(tmp_path: Path) -> None:
+    m, root, dest, index = _export_setup(tmp_path)
+    dry = smp.export(m, root, dest, index, dry_run=True)
+    assert dry.copied == ["JUNGLE/FX/FX 1 p.wav", "JUNGLE/FX/FX 2 p.wav"] and dry.files == 2
+    assert not dest.exists() and not index.exists()
+    first = smp.export(m, root, dest, index)
+    assert sorted(p.name for p in (dest / "JUNGLE" / "FX").iterdir()) == ["FX 1 p.wav", "FX 2 p.wav"]
+    assert (dest / "JUNGLE/FX/FX 1 p.wav").read_bytes() == (root / "p/fx1.wav").read_bytes()
+    assert first.bytes == sum((root / f"p/fx{i}.wav").stat().st_size for i in (1, 2))
+    again = smp.export(m, root, dest, index)
+    assert (again.copied, again.unchanged, again.removed) == ([], 2, [])
+
+
+def test_export_removes_only_its_own_files(tmp_path: Path) -> None:
+    m, root, dest, index = _export_setup(tmp_path)
+    smp.export(m, root, dest, index)
+    (dest / "JUNGLE/FX/mine.wav").write_bytes(b"x")                 # pose a la main
+    m.entries[0].selected = False
+    m.entries[1].family = "TRIBE"                                    # case changee
+    r = smp.export(m, root, dest, index)
+    assert r.removed == ["JUNGLE/FX/FX 1 p.wav", "JUNGLE/FX/FX 2 p.wav"]
+    assert r.copied == ["TRIBE/FX/FX 2 p.wav"]
+    assert sorted(p.name for p in (dest / "JUNGLE" / "FX").iterdir()) == ["mine.wav"]
+    m.entries[1].family = "JUNGLE"
+    m.entries[0].selected = True
+    (dest / "JUNGLE/FX/FX 1 p.wav").write_bytes(b"autre")          # conflit : pas ecrase
+    r = smp.export(m, root, dest, index)
+    assert r.conflicts == ["JUNGLE/FX/FX 1 p.wav"] and (dest / "JUNGLE/FX/FX 1 p.wav").read_bytes() == b"autre"
+    assert not (dest / "TRIBE").exists()                             # case videe retiree
+
+
+def test_export_resumes_interrupted_copy_and_reports_missing(tmp_path: Path) -> None:
+    m, root, dest, index = _export_setup(tmp_path)
+    (dest / "JUNGLE/FX").mkdir(parents=True)
+    (dest / "JUNGLE/FX/FX 1 p.wav").write_bytes((root / "p/fx1.wav").read_bytes())
+    (root / "p/fx2.wav").unlink()
+    r = smp.export(m, root, dest, index)
+    assert (r.unchanged, r.copied, r.missing, r.conflicts) == (1, [], ["p/fx2.wav"], [])
+    assert list(smp.load_export_index(index)) == ["JUNGLE/FX/FX 1 p.wav"]
+
+
+def test_cli_export(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                    capsys: pytest.CaptureFixture[str]) -> None:
+    m, root, dest, index = _export_setup(tmp_path)
+    monkeypatch.setattr(cli, "MANIFEST_FILE", tmp_path / "manifest.json")
+    monkeypatch.setattr(cli, "EXPORT_INDEX_FILE", index)
+    cli.save_manifest(m, cli.MANIFEST_FILE)
+    assert cli.main(["--export", "--dry-run", "--source", str(root), "--dest", str(dest)]) == 0
+    assert "2 a copier" in capsys.readouterr().out and not dest.exists()
+    assert cli.main(["--export", "--source", str(root), "--dest", str(dest)]) == 0
+    assert "2 copies" in capsys.readouterr().out and (dest / "JUNGLE/FX/FX 2 p.wav").exists()

@@ -321,3 +321,26 @@ def test_samples_trash_restore(samples_client: TestClient):
     assert r.status_code == 200
     assert samples_client.get("/api/samples/loose", params={"which": "trash"}).json() == []
     assert samples_client.get("/api/samples/loose", params={"which": "x"}).status_code == 422
+
+
+def test_samples_export(tmp_path: Path):
+    from analyzer.samples import Manifest, SampleEntry
+
+    src = tmp_path / "Samples"
+    (src / "p").mkdir(parents=True)
+    (src / "p" / "fx1.wav").write_bytes(b"RIFF" + b"x" * 100)
+    path = tmp_path / "manifest.json"
+    api.samples.save_manifest(Manifest(source_root=str(src), total=1, entries=[
+        SampleEntry(source="p/fx1.wav", family="JUNGLE", code="FX", pack="p", name="FX 1 p",
+                    duration=1.0, rank=1, selected=True)]), path)
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    dest = tmp_path / "out"
+    client = TestClient(api.create_app(library_file=lib, samples_manifest=path, samples_src=src,
+                                       samples_overrides=tmp_path / "overrides.json",
+                                       samples_export=dest,
+                                       samples_export_index=tmp_path / "export.json"))
+    dry = client.post("/api/samples/export", json={}).json()
+    assert dry["dry_run"] and dry["copied"] == ["JUNGLE/FX/FX 1 p.wav"] and not dest.exists()
+    r = client.post("/api/samples/export", json={"dry_run": False}).json()
+    assert r["files"] == 1 and (dest / "JUNGLE/FX/FX 1 p.wav").exists()

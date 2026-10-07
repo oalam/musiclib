@@ -246,6 +246,18 @@ export interface LooseSample {
   stars: number | null
 }
 export interface SampleFilter { tag?: string; minStars?: number }
+/** Bilan de l'export vers <MEDIA>/Live/samples (7.J3). */
+export interface SampleExportReport {
+  dest: string
+  dry_run: boolean
+  files: number
+  bytes: number
+  copied: string[]
+  unchanged: number
+  removed: string[]
+  missing: string[]
+  conflicts: string[]
+}
 export interface SampleCell {
   family: string
   code: string
@@ -319,6 +331,9 @@ export const api = {
   sampleTagsEdit: (sources: string[], add: string[], remove: string[] = []) => samplePost('tags', { sources, add, remove }),
   sampleTrash: (sources: string[]) => samplePost('trash', { sources }),
   sampleRestore: (sources: string[]) => samplePost('restore', { sources }),
+  sampleExport: (dryRun: boolean) =>
+    fetch('/api/samples/export', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })
+      .then(r => json<SampleExportReport>(r)),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }

@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J3] Export des samples retenus vers `<MEDIA>/Live/samples/<FAMILLE>/
+  <CODE>/<nom>.wav` (copie telle quelle, Transfer convertit) :
+  `samples.py --export [--dry-run]`, `POST /api/samples/export` et bouton
+  « Exporter… » de l'onglet Samples (bilan puis copie confirmée). Rejouable
+  via l'index `library/samples/export.json` : seuls les fichiers écrits par
+  l'export sont recopiés ou retirés, jamais un fichier posé à la main ; une
+  copie interrompue est reprise. Premier bilan : 1 053 fichiers, 468 Mo.
 - [7.J4] Bibliothèque de samples : tags libres (normalisés, autocomplétion),
   étoiles 1 à 5 (un sample noté passe devant les non-notés de sa case et
   reste candidat hors plafond ; noter ne vaut pas garder) et corbeille,

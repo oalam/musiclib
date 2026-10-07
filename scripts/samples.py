@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bibliotheque de samples DT2 : classement et pre-selection (Phase 7.J1, 7.J2, 7.J4).
+"""Bibliotheque de samples DT2 : classement, pre-selection et export (Phase 7.J).
 
 Lit la copie des packs (`<MEDIA>/Samples`, jamais modifiee), classe chaque
 wav en famille / code, nomme les candidats pour l'ecran de la DT2 et ecrit
@@ -15,9 +15,12 @@ Usage:
     samples.py --report        # grille du manifeste existant
     samples.py --unclassified  # liste les fichiers sans code (a corriger
                                # dans overrides.json)
+    samples.py --export        # copie les retenus vers <MEDIA>/Live/samples (7.J3)
+    samples.py --export --dry-run   # bilan de l'export sans rien ecrire
 
 Fichiers (vault) :
     library/samples/manifest.json   # candidats, noms, statut, selection
+    library/samples/export.json     # fichiers ecrits par l'export (seuls retirables)
     library/samples/overrides.json  # corrections manuelles, cle = chemin source :
         {"rthm/x.wav": {"family": "TRIBE", "code": "BD", "name": "BD Fat 01 rth",
                         "exclude": false, "tags": ["acid"], "stars": 4,
@@ -36,17 +39,20 @@ from pathlib import Path
 from analyzer.samples import (
     CODES,
     FAMILIES,
+    ExportReport,
     Manifest,
     Override,
     SampleError,
     build_manifest,
+    export,
     grid,
     measure,
 )
-from paths import SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
+from paths import DT2_SAMPLES_DIR, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
 
 MANIFEST_FILE = SAMPLES_META_DIR / "manifest.json"
 OVERRIDES_FILE = SAMPLES_META_DIR / "overrides.json"
+EXPORT_INDEX_FILE = SAMPLES_META_DIR / "export.json"
 
 
 def load_overrides(path: Path) -> dict[str, Override]:
@@ -106,11 +112,28 @@ def render_grid(m: Manifest) -> str:
     return "\n".join(lines)
 
 
+def render_export(r: ExportReport) -> str:
+    verb = "a copier" if r.dry_run else "copies"
+    gone = "a retirer" if r.dry_run else "retires"
+    lines = [f"export{' (simulation)' if r.dry_run else ''} -> {r.dest}",
+             f"{r.files} retenus ({r.bytes / 1e6:.0f} Mo) : {len(r.copied)} {verb}, "
+             f"{r.unchanged} inchanges, {len(r.removed)} {gone}"]
+    if r.missing:
+        lines.append(f"sources absentes ({len(r.missing)}) : " + ", ".join(r.missing[:5]))
+    if r.conflicts:
+        lines.append(f"fichiers poses a la main, non ecrases ({len(r.conflicts)}) : "
+                     + ", ".join(r.conflicts[:5]))
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--dry-run", action="store_true", help="n'ecrit pas le manifeste")
     ap.add_argument("--report", action="store_true", help="grille du manifeste existant")
     ap.add_argument("--unclassified", action="store_true", help="liste les fichiers sans code")
+    ap.add_argument("--export", action="store_true",
+                    help="copie les retenus du manifeste vers --dest (avec --dry-run : bilan)")
+    ap.add_argument("--dest", type=Path, default=DT2_SAMPLES_DIR)
     ap.add_argument("--no-measure", action="store_true",
                     help="saute la mesure qualite des nouveaux candidats")
     ap.add_argument("--source", type=Path, default=SAMPLES_SRC_DIR)
@@ -118,6 +141,15 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         previous = load_manifest(MANIFEST_FILE)
+        if args.export:
+            if previous is None:
+                print(f"pas de manifeste : {MANIFEST_FILE}", file=sys.stderr)
+                return 1
+            if args.source == SAMPLES_SRC_DIR and not media_ok():
+                return 1
+            print(render_export(export(previous, args.source, args.dest, EXPORT_INDEX_FILE,
+                                       dry_run=args.dry_run)))
+            return 0
         if args.report or args.unclassified:
             if previous is None:
                 print(f"pas de manifeste : {MANIFEST_FILE}", file=sys.stderr)

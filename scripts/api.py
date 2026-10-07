@@ -2,13 +2,14 @@
 """API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt,
 base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I), envoi d'une
 track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`), ecoute des
-samples DT2 (Phase 7.J2, `samples.py`).
+samples DT2 (Phase 7.J2, `samples.py`) et leur export vers Transfer (7.J3).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
 (`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`), et les
 decisions d'ecoute et le rangement des samples (`POST /api/samples/...`,
-manifeste et overrides.json). L'envoi
+manifeste et overrides.json), et l'export des samples retenus
+(`POST /api/samples/export`, copie vers `<MEDIA>/Live/samples`). L'envoi
 MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
 dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre).
@@ -46,6 +47,7 @@ from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.samples import (
     STARS_MAX,
+    ExportReport,
     LooseSample,
     Override,
     SampleEntry,
@@ -53,6 +55,7 @@ from analyzer.samples import (
     Status,
     all_tags,
     cell_of,
+    export,
     known,
     loose,
     quota,
@@ -68,6 +71,7 @@ from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
 from library_md import parse_library
 from paths import (
     DIGITAKT_DIR,
+    DT2_SAMPLES_DIR,
     LIBRARY_FILE,
     QUALITY_DIR,
     SAMPLES_SRC_DIR,
@@ -205,6 +209,10 @@ class SampleStars(BaseModel):
     stars: int | None = Field(default=None, ge=1, le=STARS_MAX)   # None = retirer
 
 
+class SampleExport(BaseModel):
+    dry_run: bool = True    # bilan d'abord, copie sur confirmation
+
+
 class SampleTags(BaseModel):
     sources: Sources
     add: TagList = Field(default_factory=list, max_length=20)
@@ -249,7 +257,9 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                sender: dt2_midi.Dt2Sender | None = None,
                samples_manifest: Path = samples.MANIFEST_FILE,
                samples_src: Path = SAMPLES_SRC_DIR,
-               samples_overrides: Path = samples.OVERRIDES_FILE) -> FastAPI:
+               samples_overrides: Path = samples.OVERRIDES_FILE,
+               samples_export: Path = DT2_SAMPLES_DIR,
+               samples_export_index: Path = samples.EXPORT_INDEX_FILE) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
@@ -475,15 +485,29 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def sample_restore(req: SampleBatch) -> list[SampleCell]:
         return edit(req.sources, lambda m, ov, src: restore_sample(m, ov, src, samples_src))
 
-    @app.get("/api/samples/audio")
-    def sample_audio(source: str) -> FileResponse:
-        if not known(manifest(), source):
-            raise HTTPException(404, f"sample hors manifeste : {source}")
+    def media_or_503() -> None:
         if samples_src == SAMPLES_SRC_DIR:
             try:
                 require_media()
             except MediaRootUnavailable as exc:
                 raise HTTPException(503, str(exc)) from exc
+
+    @app.post("/api/samples/export", response_model=ExportReport)
+    def sample_export(req: SampleExport) -> ExportReport:
+        """Copie les retenus vers l'arborescence Transfer (7.J3) ; `dry_run` : bilan."""
+        media_or_503()
+        with samples_lock:
+            try:
+                return export(manifest(), samples_src, samples_export, samples_export_index,
+                              dry_run=req.dry_run)
+            except SampleError as exc:
+                raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/samples/audio")
+    def sample_audio(source: str) -> FileResponse:
+        if not known(manifest(), source):
+            raise HTTPException(404, f"sample hors manifeste : {source}")
+        media_or_503()
         path = samples_src / source
         if not path.is_file():
             raise HTTPException(404, f"fichier absent : {source}")
