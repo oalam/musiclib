@@ -663,6 +663,7 @@ Stop de la DT2 avant la fin annule et coupe les notes tenues ; sans Start en
 ```bash
 python dt2_midi.py --list-ports
 python dt2_midi.py <slug> --pattern 1 --track 9 --channel 10   # port DT2 par défaut
+python dt2_midi.py <slug> --pattern 1 --track 9 --channel 10 --octave 2   # basse montée de 2 octaves
 ```
 
 Côté DT2 (fiche [[../digitakt/kb/midi-config]]) : `INPUT FROM` / `OUTPUT TO` =

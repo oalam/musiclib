@@ -77,6 +77,14 @@ def test_clock_schedule_canal_et_cadence():
     assert sched[2 * CLOCKS_PER_STEP][0].note == 60  # drum / note inconnue = 60
 
 
+def test_clock_schedule_transpose_par_octave():
+    sched = dt2_midi.clock_schedule(_track(), channel=10, octave=2)
+    assert sched[0][0].note == 60 and sched[CLOCKS_PER_STEP // 2][0].note == 60
+    assert sched[2 * CLOCKS_PER_STEP][0].note == 84
+    with pytest.raises(dt2_midi.SendTargetError):
+        dt2_midi.clock_schedule(_track(), channel=10, octave=-4)  # 36 - 48 < 0
+
+
 def test_pick_track_refuse_les_cibles_vides():
     bank = DigitaktBank.model_validate({
         "slug": "s", "bpm": 150, "from_stems": True,

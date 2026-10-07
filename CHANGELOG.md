@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.E] Envoi à la DT2 : réglage d'octave (-5 à +5) dans le panneau
+  « Envoyer à la DT2 », mémorisé par track, avec la plage de notes résultante
+  (notation Elektron) ; champ `octave` de `POST /api/dt2/send`, option
+  `--octave` de `dt2_midi.py`. Une basse envoyée à sa hauteur réelle
+  (E1 = 28) sonnait 32 demi-tons sous le sample (60 = hauteur d'origine).
 - [7.C] Front : état retrouvé au rechargement (navigateur) : dernier
   morceau ouvert, et par morceau le pattern, la track DT2, le mode et la page
   de paramètres de la façade, la page de pas, la position de lecture (sans

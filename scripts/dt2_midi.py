@@ -72,6 +72,7 @@ class SendRequest(BaseModel):
     track: int = Field(..., ge=1, le=16)
     port: str = Field(..., min_length=1)
     channel: int = Field(..., ge=1, le=16, description="AUTO CHANNEL de la DT2 (1-16)")
+    octave: int = Field(0, ge=-5, le=5, description="transposition de toutes les notes, en octaves")
 
 
 class SendState(BaseModel):
@@ -151,16 +152,21 @@ def pick_track(bank: DigitaktBank, slot: int, index: int) -> tuple[DigitaktTrack
     return track, pattern.steps
 
 
-def clock_schedule(track: DigitaktTrack, channel: int) -> dict[int, list[Any]]:
+def clock_schedule(track: DigitaktTrack, channel: int, octave: int = 0,
+                   ) -> dict[int, list[Any]]:
     """Messages a envoyer par clock (0 = premier clock apres le Start).
 
     Les note_off passent avant les note_on d'un meme clock (meme regle que le
-    .mid de bank)."""
+    .mid de bank). `octave` transpose toutes les notes (60 = pitch d'origine du
+    sample sur la DT2 : une basse a sa hauteur reelle, E1 = 28, sonne tres bas)."""
     out: dict[int, list[Any]] = {}
     events = sorted(track_note_events(track, CLOCKS_PER_STEP, channel=channel - 1),
                     key=lambda e: (e[0], e[1]))
+    shift = 12 * octave
+    if shift and any(not 0 <= m.note + shift <= 127 for _, _, m in events):
+        raise SendTargetError(f"octave {octave:+d} : notes hors de la plage MIDI 0-127")
     for tick, _prio, msg in events:
-        out.setdefault(tick, []).append(msg)
+        out.setdefault(tick, []).append(msg.copy(note=msg.note + shift) if shift else msg)
     return out
 
 
@@ -197,7 +203,7 @@ class Dt2Sender:
         with self._lock:
             if self._state is not None and self._state.status in ("waiting", "sending"):
                 raise SendBusy("un envoi est deja en cours (l'annuler d'abord)")
-            self._schedule = clock_schedule(track, req.channel)
+            self._schedule = clock_schedule(track, req.channel, req.octave)
             self._total = steps * CLOCKS_PER_STEP
             self._clock = 0
             self._sounding = set()
@@ -341,6 +347,8 @@ def main() -> int:
     parser.add_argument("--pattern", type=int, default=1, help="slot du pattern (1-16)")
     parser.add_argument("--track", type=int, help="track (1-16)")
     parser.add_argument("--channel", type=int, help="AUTO CHANNEL de la DT2 (1-16)")
+    parser.add_argument("--octave", type=int, default=0,
+                        help="transposition en octaves (-5 a +5, ex. +2 pour une basse)")
     parser.add_argument("--port", help="port MIDI (defaut : la DT2 si presente)")
     parser.add_argument("--list-ports", action="store_true")
     args = parser.parse_args()
@@ -356,7 +364,7 @@ def main() -> int:
         print(ports.error or "aucun port MIDI en entree + sortie", file=sys.stderr)
         return 1
     req = SendRequest(slug=args.slug, slot=args.pattern, track=args.track,
-                      port=port, channel=args.channel)
+                      port=port, channel=args.channel, octave=args.octave)
     try:
         track, steps = pick_track(load_bank(req.slug), req.slot, req.track)
         sender = Dt2Sender()
@@ -365,7 +373,7 @@ def main() -> int:
         print(f"ERREUR : {exc}", file=sys.stderr)
         return 1
     print(f"T{req.track:02d} {st.role} · P{req.slot:02d} · {steps} pas · {st.trigs} trigs "
-          f"· canal {req.channel} · {port}")
+          f"· canal {req.channel} · octave {req.octave:+d} · {port}")
     print("Sur la DT2 : selectionner la track, LEN du pattern = "
           f"{steps} pas, puis [RECORD] + [PLAY]. Ctrl-C pour annuler.")
     try:

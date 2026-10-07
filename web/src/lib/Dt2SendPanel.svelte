@@ -13,11 +13,17 @@
   } = $props()
 
   const CHANNEL_KEY = 'dt2-auto-channel'
+  /** Octave memorisee par numero de track (la basse se monte, pas le kick). */
+  const OCTAVE_KEY = 'dt2-octave-T'
+  const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+  // convention Elektron (manuel §8.5) : 60 = C5, comme l'ecran de la DT2
+  const noteName = (n: number) => `${NOTE_NAMES[n % 12]}${Math.floor(n / 12)}`
 
   let open = $state(false)
   let ports = $state<Dt2Ports | null>(null)
   let port = $state('')
   let channel = $state<number | null>(readChannel())
+  let octave = $state(0)
   let send = $state<Dt2SendState | null>(null)
   let error = $state('')
   let timer: ReturnType<typeof setInterval> | undefined
@@ -26,7 +32,14 @@
   const mine = $derived(send !== null && send.request.slug === slug
     && send.request.slot === pattern.slot && send.request.track === track.index)
   const validChannel = $derived(channel !== null && Number.isInteger(channel) && channel >= 1 && channel <= 16)
-  const canSend = $derived(!active && !!port && validChannel && track.trigs.length > 0)
+  // notes de la track (drums / note inconnue = 60, comme l'envoi)
+  const notes = $derived(track.trigs.map(t => t.note ?? 60))
+  const lowest = $derived(notes.length ? Math.min(...notes) + 12 * octave : 60)
+  const highest = $derived(notes.length ? Math.max(...notes) + 12 * octave : 60)
+  const validOctave = $derived(lowest >= 0 && highest <= 127)
+  const canSend = $derived(!active && !!port && validChannel && validOctave && track.trigs.length > 0)
+
+  $effect(() => { octave = readOctave(track.index) })
 
   const STATUS: Record<string, string> = {
     waiting: 'En attente du Start de la DT2…',
@@ -41,6 +54,18 @@
       const v = Number(localStorage.getItem(CHANNEL_KEY))
       return v >= 1 && v <= 16 ? v : null
     } catch { return null }
+  }
+
+  function readOctave(index: number): number {
+    try {
+      const v = Number(localStorage.getItem(OCTAVE_KEY + index) ?? 0)
+      return Number.isInteger(v) && v >= -5 && v <= 5 ? v : 0
+    } catch { return 0 }
+  }
+
+  function setOctave(v: number) {
+    octave = Math.max(-5, Math.min(5, v))
+    try { localStorage.setItem(OCTAVE_KEY + track.index, String(octave)) } catch { /* stockage indisponible */ }
   }
 
   function saveChannel() {
@@ -70,7 +95,7 @@
     error = ''
     saveChannel()
     try {
-      send = await api.dt2Send({ slug, slot: pattern.slot, track: track.index, port, channel })
+      send = await api.dt2Send({ slug, slot: pattern.slot, track: track.index, port, channel, octave })
       poll()
     } catch (err) {
       error = err instanceof Error ? err.message : String(err)
@@ -124,6 +149,12 @@
       <label title="Valeur de [SETTINGS] > MIDI CONFIG > CHANNELS > AUTO CHANNEL, pas le numéro de track : ce canal pilote la track active">AUTO CHANNEL
         <input type="number" min="1" max="16" bind:value={channel} disabled={active} placeholder="1-16" />
       </label>
+      <span class="octave" title="Transpose toutes les notes envoyées. Note 60 (C5) = hauteur d'origine du sample : une basse à sa hauteur réelle sonne très bas. Mémorisé par track.">Octave
+        <button class="small" onclick={() => setOctave(octave - 1)} disabled={active || octave <= -5}>−</button>
+        <span class="mono">{octave > 0 ? '+' : ''}{octave}</span>
+        <button class="small" onclick={() => setOctave(octave + 1)} disabled={active || octave >= 5}>+</button>
+        {#if track.trigs.length}<span class="muted small mono">{noteName(lowest)}–{noteName(highest)}</span>{/if}
+      </span>
       {#if active}
         <button onclick={cancel}>Annuler</button>
       {:else}
@@ -133,6 +164,7 @@
 
     {#if !track.trigs.length}<p class="muted small">Cette track n'a aucun trig dans le pattern.</p>{/if}
     {#if !validChannel}<p class="muted small">Renseigner l'AUTO CHANNEL réglé sur la DT2, pas le numéro de track (mémorisé dans ce navigateur).</p>{/if}
+    {#if !validOctave}<p class="err small">Octave hors de la plage MIDI (0-127) pour cette track.</p>{/if}
     {#if ports?.error}<p class="err small">{ports.error}</p>{/if}
 
     {#if send}
@@ -163,6 +195,7 @@
   .row label { display: flex; gap: 4px; align-items: center; }
   .row input[type='number'] { width: 4.5em; }
   .row select { max-width: 220px; }
+  .octave { display: flex; gap: 4px; align-items: center; }
   .status { margin: 0; display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
   .status.sending, .status.waiting { color: var(--accent); }
   .status.error { color: #dc2626; }

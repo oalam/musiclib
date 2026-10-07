@@ -264,6 +264,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(422, str(exc)) from exc
         try:
             return dt2.start(req, track, steps)
+        except dt2_midi.SendTargetError as exc:  # octave hors plage MIDI
+            raise HTTPException(422, str(exc)) from exc
         except dt2_midi.SendBusy as exc:
             raise HTTPException(409, str(exc)) from exc
         except dt2_midi.MidiUnavailable as exc:

@@ -206,6 +206,7 @@ def test_dt2_send(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     assert client.post("/api/dt2/send", json=body | {"track": 2}).status_code == 422
     assert client.post("/api/dt2/send", json=body | {"slug": "inconnu"}).status_code == 404
     assert client.post("/api/dt2/send", json=body | {"channel": 17}).status_code == 422
+    assert client.post("/api/dt2/send", json=body | {"octave": 6}).status_code == 422
     r = client.post("/api/dt2/send", json=body)
     assert r.status_code == 202 and r.json()["status"] == "waiting" and r.json()["trigs"] == 2
     assert client.post("/api/dt2/send", json=body).status_code == 409

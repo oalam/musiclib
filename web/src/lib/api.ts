@@ -204,7 +204,7 @@ export interface Job {
 
 /** Envoi d'une track a la DT2 (7.E, scripts/dt2_midi.py). */
 export interface Dt2Ports { inputs: string[]; outputs: string[]; default: string | null; error: string | null }
-export interface Dt2SendRequest { slug: string; slot: number; track: number; port: string; channel: number }
+export interface Dt2SendRequest { slug: string; slot: number; track: number; port: string; channel: number; octave: number }
 export type Dt2SendStatus = 'waiting' | 'sending' | 'done' | 'cancelled' | 'error'
 export interface Dt2SendState {
   id: string
