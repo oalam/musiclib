@@ -215,6 +215,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.E] Envoi à la DT2 avec PREROLL : la DT2 envoie un second Start au vrai
+  départ du séquenceur ; il relance désormais l'envoi au pas 0 (l'envoi
+  partait une mesure trop tôt). Le panneau demande `PREROLL = 0`, seul
+  réglage sûr pour un pattern d'une mesure.
 - [7.B] Notes de basse de la bank Digitakt : estimées par pYIN sur le stem
   `bass` (`_pitch_steps`, octave réelle, vote majoritaire `fold_notes`) au
   lieu de l'argmax du chroma, qui prenait les 3e et 5e harmoniques pour la

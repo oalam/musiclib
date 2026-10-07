@@ -5,7 +5,8 @@ Aucun NRPN ne pose de trig sur un pas (annexe B) : on rejoue les notes de la
 track sur l'AUTO CHANNEL pendant que la DT2 enregistre en LIVE RECORDING
 (§10.2.3), une track a la fois. La DT2 mene : le script attend son Start MIDI
 puis cale chaque pas sur son horloge (24 ppqn, 6 clocks par double-croche),
-un seul passage du pattern. Un Stop de la DT2 avant la fin annule l'envoi.
+un seul passage du pattern. Un Stop de la DT2 avant la fin annule l'envoi ;
+un nouveau Start le relance au pas 0 (second Start du PREROLL).
 
 Reglages DT2 (fiche [[digitakt/kb/midi-config]]) : PORT CONFIG `INPUT FROM` et
 `OUTPUT TO` = USB, `RECEIVE NOTES` = on ; SYNC `CLOCK SEND` et
@@ -245,11 +246,20 @@ class Dt2Sender:
     def _on_message(self, msg: Any) -> None:
         kind = getattr(msg, "type", "")
         if kind == "start":
+            # avec PREROLL, la DT2 envoie un Start au debut du decompte puis un
+            # second au vrai depart du sequenceur (constate le 2026-10-07) :
+            # un Start pendant l'envoi le relance au pas 0
             with self._lock:
-                if self._state is None or self._state.status != "waiting":
+                st = self._state
+                if st is None or st.status not in ("waiting", "sending"):
                     return
-                self._state.status = "sending"
-                self._state.detail = "envoi en cours"
+                if st.status == "sending" and self._ports is not None:
+                    for note in sorted(self._sounding):
+                        self._ports[1].send(_note_off(st.request.channel - 1, note))
+                self._sounding = set()
+                st.status = "sending"
+                st.detail = "envoi en cours"
+                st.step = -1
                 self._clock = 0
             return
         if kind == "stop":

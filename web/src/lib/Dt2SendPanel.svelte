@@ -108,6 +108,7 @@
       <li>Sélectionner la track : <span class="mono">[TRK] + [TRIG {track.index}]</span></li>
       <li>Longueur du pattern : <span class="mono">{pattern.steps} pas</span> (page SCALE)</li>
       <li>Track vide : les trigs déjà présents restent en place (seuls les pas joués sont remplacés)</li>
+      <li>Métronome : <span class="mono">PREROLL = 0</span> (le décompte décale l'envoi)</li>
       <li>Armer l'envoi ici, puis <span class="mono">[RECORD] + [PLAY]</span> sur la machine
         (quantize conseillée : <span class="mono">[RECORD]</span> + double <span class="mono">[PLAY]</span>)</li>
     </ol>

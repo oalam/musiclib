@@ -170,3 +170,18 @@ def test_sysex_elektron_leve_un_avertissement():
     cur = sender.current()
     assert cur is not None and "Transfer" in cur.warning
     sender.cancel()
+
+
+def test_second_start_du_preroll_relance_au_pas_0():
+    fake = FakeMidi()
+    sender = Dt2Sender(opener=fake)
+    sender.start(_req(), _track(), steps=4)
+    fake.feed("start")  # debut du decompte
+    fake.feed("clock", 4 * CLOCKS_PER_STEP - 2)  # une mesure de decompte (tronquee)
+    assert sender.current().status == "sending"  # type: ignore[union-attr]
+    n = len(fake.outport.sent)
+    fake.feed("start")  # vrai depart du sequenceur
+    fake.feed("clock")
+    assert (fake.outport.sent[n].type, fake.outport.sent[n].note) == ("note_on", 36)
+    fake.feed("clock", 4 * CLOCKS_PER_STEP - 1)
+    assert sender.current().status == "done"  # type: ignore[union-attr]

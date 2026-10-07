@@ -64,8 +64,14 @@ calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
 - Sans quantize : latence négligeable ; un trig décalé d'un cran une fois,
   pas au second essai (gigue ponctuelle). Quantize conseillée.
 - L'enregistrement ne remplace que les pas joués : partir d'une track vide.
-- Reste à vérifier : NOTE enregistrée pour la note 60 sur une track audio,
-  notes et octaves d'une track mélodique, PREROLL.
+- NOTE : la note 60 s'enregistre `C5` = hauteur d'origine du sample
+  (convention Elektron, 60 = C5, §8.5) ; une basse arrive à la bonne hauteur.
+- PREROLL : la DT2 envoie un Start au début du décompte **et** un second au
+  vrai départ (96 clocks plus tard pour 1 mesure). Envoi depuis le front :
+  `PREROLL = 0` (un Start reçu en cours d'envoi le relance au pas 0, ce qui
+  ne couvre que les patterns plus longs que le décompte).
+- `AUTO CHANNEL` du front = la valeur réglée sur la DT2, pas le numéro de
+  track : c'est la track **active** qui reçoit.
 
 ## Pièges
 
