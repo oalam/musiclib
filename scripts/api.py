@@ -42,7 +42,16 @@ import stems
 from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
-from analyzer.samples import SampleEntry, SampleError, Status, cell_of, quota, set_status
+from analyzer.samples import (
+    Override,
+    SampleEntry,
+    SampleError,
+    Status,
+    cell_of,
+    quota,
+    set_status,
+)
+from analyzer.samples import move as move_sample
 from analyzer.types import CuePoint, DigitaktBank, Segment
 from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
 from library_md import parse_library
@@ -164,6 +173,12 @@ class SampleDecision(BaseModel):
     status: Status
 
 
+class SampleMove(BaseModel):
+    source: str = Field(min_length=1, max_length=500)
+    family: str = Field(min_length=1, max_length=20)
+    code: str = Field(min_length=2, max_length=2)
+
+
 def _sample_cells(m: samples.Manifest) -> list[SampleCell]:
     cells: dict[tuple[str, str], list[SampleEntry]] = {}
     for e in m.entries:
@@ -194,7 +209,8 @@ def _validate_grab(req: GrabRequest) -> None:
 def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                sender: dt2_midi.Dt2Sender | None = None,
                samples_manifest: Path = samples.MANIFEST_FILE,
-               samples_src: Path = SAMPLES_SRC_DIR) -> FastAPI:
+               samples_src: Path = SAMPLES_SRC_DIR,
+               samples_overrides: Path = samples.OVERRIDES_FILE) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
@@ -377,6 +393,25 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                 raise HTTPException(404, str(exc)) from exc
             samples.save_manifest(m, samples_manifest)
         return cell
+
+    @app.post("/api/samples/move", response_model=list[SampleEntry])
+    def sample_move(req: SampleMove) -> list[SampleEntry]:
+        """Deplace un candidat vers une autre case (statut garde) et l'inscrit
+        dans overrides.json ; renvoie l'ancienne case."""
+        with samples_lock:
+            m = manifest()
+            try:
+                overrides = samples.load_overrides(samples_overrides)
+                old_cell, ov = move_sample(m, req.source, req.family, req.code, samples_src)
+            except SampleError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            prev = overrides.get(req.source, Override())
+            # nom regenere avec le nouveau code : un nom force ne suit pas
+            overrides[req.source] = prev.model_copy(update={"family": ov.family,
+                                                            "code": ov.code, "name": None})
+            samples.save_manifest(m, samples_manifest)
+            samples.save_overrides(overrides, samples_overrides)
+        return old_cell
 
     @app.get("/api/samples/audio")
     def sample_audio(source: str) -> FileResponse:

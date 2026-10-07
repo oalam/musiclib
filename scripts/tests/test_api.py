@@ -240,7 +240,8 @@ def samples_client(tmp_path: Path) -> TestClient:
     api.samples.save_manifest(Manifest(source_root=str(src), total=10, entries=entries), path)
     lib = tmp_path / "library.md"
     lib.write_text(LIBRARY, encoding="utf-8")
-    return TestClient(api.create_app(library_file=lib, samples_manifest=path, samples_src=src))
+    return TestClient(api.create_app(library_file=lib, samples_manifest=path, samples_src=src,
+                                     samples_overrides=tmp_path / "overrides.json"))
 
 
 def test_samples_cells(samples_client: TestClient):
@@ -271,3 +272,18 @@ def test_samples_audio_only_from_manifest(samples_client: TestClient):
     assert samples_client.get("/api/samples/audio", params={"source": "p/fx2.wav"}).status_code == 404
     assert samples_client.get("/api/samples/audio",
                               params={"source": "../library.md"}).status_code == 404
+
+
+def test_samples_move_writes_override(samples_client: TestClient, tmp_path: Path,
+                                      monkeypatch: pytest.MonkeyPatch):
+    r = samples_client.post("/api/samples/move",
+                            json={"source": "p/fx1.wav", "family": "TECHNO", "code": "VX"})
+    assert r.status_code == 200
+    assert "p/fx1.wav" not in {e["source"] for e in r.json()}
+    cells = {(c["family"], c["code"]): c for c in samples_client.get("/api/samples").json()}
+    assert cells["TECHNO", "VX"]["selected"] == 1
+    assert cells["JUNGLE", "FX"]["selected"] == 8          # le 9e monte
+    assert json.loads((tmp_path / "overrides.json").read_text()) == {
+        "p/fx1.wav": {"family": "TECHNO", "code": "VX"}}
+    assert samples_client.post("/api/samples/move", json={
+        "source": "p/fx1.wav", "family": "TECHNO", "code": "ZZ"}).status_code == 422

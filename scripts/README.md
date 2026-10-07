@@ -735,7 +735,8 @@ BL basse.
   famille × code (à écouter / retenus), puis dans une case la sélection et
   la réserve, avec la forme d'onde et une lecture automatique. Raccourcis :
   `K` garder, `D` écarter (le candidat suivant monte dans la sélection),
-  `U` annuler, `↑` `↓` sample, `←` `→` case, `Espace` rejouer, `R` réserve.
+  `U` annuler, `↑` `↓` sample, `←` `→` case, `Espace` rejouer, `R` réserve,
+  `M` changer de case (statut gardé, écrit aussi dans `overrides.json`).
   Chaque décision est écrite dans le manifeste.
 - **Rejouable** : relancer après un ajout de pack ou un override ; les statuts
   `keep` / `drop` et les mesures du manifeste précédent sont conservés.
@@ -866,6 +867,7 @@ dans library.md) :
 | GET | `/api/samples` | cases famille × code de la bibliothèque de samples (`SampleCell` : retenus, keep, drop, à écouter, signalés) |
 | GET | `/api/samples/cell?family=&code=` | candidats d'une case par rang (`SampleEntry`) |
 | POST | `/api/samples/status` | `{source, status}` → case avec sa sélection recalculée ; écrit le manifeste |
+| POST | `/api/samples/move` | `{source, family, code}` → ancienne case ; déplace le candidat et écrit l'override |
 | GET | `/api/samples/audio?source=` | wav source (404 hors manifeste, 503 sans disque média) |
 | GET | `/api/manual/outline` | sommaire du manuel, § → page (`ManualRef`) ; `{}` sans PDF |
 | GET | `/api/manual` | manuel PDF (chemin fixe, 404 s'il manque) |

@@ -472,6 +472,13 @@ def _round_robin(raws: list[_Raw]) -> list[_Raw]:
 Measure = Callable[[Path, str], list[str]]
 
 
+def _pinned(source: str, prev_status: dict[str, Status], overrides: dict[str, Override]) -> bool:
+    ov = overrides.get(source)
+    moved = ov is not None and (ov.family is not None or ov.code is not None)
+    return moved or prev_status.get(source, "pending") != "pending"
+
+
+
 def build_manifest(root: Path, overrides: dict[str, Override],
                    previous: Manifest | None = None,
                    measure_fn: Measure | None = measure) -> Manifest:
@@ -493,8 +500,9 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         ordered = _round_robin(items)
         # les decisions d'ecoute restent candidates meme hors du plafond
         cap = len(ordered) if q is None else q * CANDIDATE_FACTOR
-        kept = ordered[:cap] + [r for r in ordered[cap:] if r.source in prev_status
-                                and prev_status[r.source] != "pending"]
+        # les decisions d'ecoute et les deplacements manuels (override de case)
+        # restent candidats meme hors du plafond
+        kept = ordered[:cap] + [r for r in ordered[cap:] if _pinned(r.source, prev_status, overrides)]
         flags: dict[str, list[str] | None] = {}
         for r in kept:
             old = prev.get(r.source)
@@ -548,6 +556,37 @@ def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEn
     cell = cell_of(manifest, entry.family, entry.code)
     select(cell, quota(entry.family, entry.code))
     return cell
+
+
+def move(manifest: Manifest, source: str, family: str, code: str, root: Path,
+         measure_fn: Measure | None = measure) -> tuple[list[SampleEntry], Override]:
+    """Deplace un candidat vers une autre case (correction a l'ecoute).
+
+    Statut garde ; le candidat se range en fin de la nouvelle case, renomme
+    avec le nouveau code et remesure (blanc / long dependent du code). Les deux
+    cases sont reselectionnees. Renvoie l'ancienne case et l'override a
+    enregistrer pour que le deplacement survive a une reconstruction."""
+    if family not in FAMILIES:
+        raise SampleError(f"famille inconnue : {family}")
+    if code not in CODES:
+        raise SampleError(f"code inconnu : {code}")
+    entry = next((e for e in manifest.entries if e.source == source), None)
+    if entry is None:
+        raise SampleError(f"candidat inconnu : {source}")
+    old = (entry.family, entry.code)
+    if old == (family, code):
+        return cell_of(manifest, family, code), Override(family=family, code=code)
+    target = cell_of(manifest, family, code)
+    entry.family, entry.code = family, code
+    entry.rank = max((e.rank for e in target), default=0) + 1
+    entry.name = _unique(short_name(source, code, entry.pack), {e.name for e in target})
+    path = root / source
+    if measure_fn is not None and path.is_file():
+        entry.flags = measure_fn(path, code)
+    select(cell_of(manifest, family, code), quota(family, code))
+    old_cell = cell_of(manifest, *old)
+    select(old_cell, quota(*old))
+    return old_cell, Override(family=family, code=code)
 
 
 def grid(manifest: Manifest) -> dict[str, dict[str, tuple[int, int]]]:

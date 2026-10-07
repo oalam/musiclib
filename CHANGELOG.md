@@ -24,6 +24,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   sélection puis la réserve, drapeaux du pré-filtre, forme d'onde et lecture
   automatique. Raccourcis `K` garder, `D` écarter, `U` annuler, flèches
   pour le sample et la case, `Espace` rejouer, `R` réserve.
+- [7.J2] Changement de case à l'écoute : touche `M` ou bouton « case… »
+  d'une ligne, choix famille × code (`POST /api/samples/move`). Statut
+  gardé, rang en fin de la nouvelle case (un pending y tombe en réserve si
+  elle est pleine), nom refait avec le nouveau code, drapeaux remesurés.
+  Le déplacement est écrit dans `overrides.json` et un fichier déplacé reste
+  candidat à la reconstruction même hors du plafond. Toutes les familles
+  sont affichées dans la grille, même vides (TRIBE).
 - [7.J2] API d'écoute des samples : `GET /api/samples` (cases famille × code
   avec compteurs), `GET /api/samples/cell`, `POST /api/samples/status`
   (`keep` / `drop` / `pending`, sélection de la case recalculée : un drop

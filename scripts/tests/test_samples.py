@@ -309,3 +309,41 @@ def test_set_status_promotes_next_pending() -> None:
     assert [e.source for e in cell if e.selected] == [f"s{i}" for i in range(2, 10)]
     with pytest.raises(smp.SampleError):
         smp.set_status(m, "absent", "keep")
+
+
+def test_move_keeps_status_and_survives_rebuild(tree: Path, tmp_path: Path) -> None:
+    m = smp.build_manifest(tree, {}, measure_fn=None)
+    src = "Hardcore free samples/Kicks/Hard Kick 01.wav"
+    old_cell, ov = smp.move(m, src, "TRIBE", "PC", tree, measure_fn=lambda p, c: [c])
+    assert src not in {e.source for e in old_cell}
+    e = next(x for x in m.entries if x.source == src)
+    assert (e.family, e.code, e.status, e.flags) == ("TRIBE", "PC", "pending", ["PC"])
+    assert e.name.startswith("PC ") and len(e.name) <= NAME_MAX
+    assert e.selected
+    # l'override replace le fichier dans sa nouvelle case au prochain passage
+    again = smp.build_manifest(tree, {src: ov}, previous=m, measure_fn=None)
+    e2 = next(x for x in again.entries if x.source == src)
+    assert (e2.family, e2.code) == ("TRIBE", "PC")
+    with pytest.raises(smp.SampleError):
+        smp.move(m, src, "TRIBE", "ZZ", tree)
+    with pytest.raises(smp.SampleError):
+        smp.move(m, src, "POLKA", "BD", tree)
+
+
+def test_moved_pending_lands_in_reserve_of_full_cell() -> None:
+    m = smp.Manifest(source_root="x", total=10, entries=[
+        smp.SampleEntry(source=f"s{i}", family="JUNGLE", code="FX", pack="p",
+                        name=f"FX {i} p", duration=1.0, rank=i) for i in range(1, 10)]
+        + [smp.SampleEntry(source="v", family="JUNGLE", code="VX", pack="p",
+                           name="VX v p", duration=1.0, rank=1)])
+    smp.select(m.entries[:9], 8)
+    smp.move(m, "v", "JUNGLE", "FX", Path("/absent"), measure_fn=None)
+    v = next(e for e in m.entries if e.source == "v")
+    assert v.rank == 10 and not v.selected
+
+
+def test_save_overrides_roundtrip(tmp_path: Path) -> None:
+    path = tmp_path / "overrides.json"
+    cli.save_overrides({"b.wav": Override(code="PC"), "a.wav": Override(exclude=True)}, path)
+    assert json.loads(path.read_text()) == {"a.wav": {"exclude": True}, "b.wav": {"code": "PC"}}
+    assert cli.load_overrides(path)["b.wav"].code == "PC"

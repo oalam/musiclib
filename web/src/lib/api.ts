@@ -290,6 +290,9 @@ export const api = {
   sampleStatus: (source: string, status: SampleStatus) =>
     fetch('/api/samples/status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source, status }) })
       .then(r => json<SampleEntry[]>(r)),
+  sampleMove: (source: string, family: string, code: string) =>
+    fetch('/api/samples/move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source, family, code }) })
+      .then(r => json<SampleEntry[]>(r)),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }

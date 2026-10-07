@@ -19,6 +19,7 @@
   const LOOPS = ['BR', 'DL', 'PL', 'ML', 'BL']
   const ONESHOTS = ['BD', 'SD', 'CP', 'RS', 'HH', 'OH', 'CY', 'TM', 'PC', 'BS', 'ST', 'PD', 'FX', 'VX']
   const CODE_ORDER = [...ONESHOTS, ...LOOPS]
+  const FAMILIES = ['HARDCORE', 'JUNGLE', 'TRIBE', 'TECHNO', 'DUBSTEP', 'AUTRES', 'UNIVERSEL', 'SAMPLE']
   const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
 
   let cells = $state<SampleCell[]>([])
@@ -29,11 +30,15 @@
   let showReserve = $state(false)
   let busy = $state(false)
   let autoplay = $state(true)
+  // deplacement vers une autre case (M) : statut garde, rang en fin de case
+  let moving = $state<{ source: string; name: string; family: string; code: string } | null>(null)
+  let moveSelect: HTMLSelectElement | undefined = $state()
 
   let container: HTMLDivElement | undefined = $state()
   let ws: WaveSurfer | null = null
 
-  const families = $derived([...new Set(cells.map(c => c.family))])
+  // toutes les familles, meme vides (TRIBE attend son pack) : cible du deplacement
+  const families = $derived([...FAMILIES, ...new Set(cells.map(c => c.family).filter(f => !FAMILIES.includes(f)))])
   const codes = $derived([...new Set(cells.map(c => c.code))].sort((a, b) => codeRank(a) - codeRank(b)))
   const byKey = $derived(new Map(cells.map(c => [`${c.family}/${c.code}`, c])))
   const chosen = $derived(entries.filter(e => e.selected))
@@ -107,9 +112,43 @@
     }
   }
 
+  function startMove(source: string | null) {
+    const e = entries.find(x => x.source === source)
+    if (!e) return
+    pick(e.source)
+    moving = { source: e.source, name: e.name, family: e.family, code: e.code }
+    queueMicrotask(() => moveSelect?.focus())
+  }
+
+  async function confirmMove() {
+    if (!moving || busy) return
+    const m = moving
+    if (current && m.family === current.family && m.code === current.code) { moving = null; return }
+    busy = true
+    try {
+      const before = visible.map(e => e.source)
+      entries = await api.sampleMove(m.source, m.family, m.code)
+      moving = null
+      await loadCells()
+      // suivant : le sample qui suivait celui deplace, sinon le premier a ecouter
+      const next = before.slice(before.indexOf(m.source) + 1).find(s => entries.some(e => e.source === s))
+      pick(next ?? entries.find(e => e.selected && e.status === 'pending')?.source ?? null)
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e)
+    } finally {
+      busy = false
+    }
+  }
+
+  function onMoveKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') { e.preventDefault(); confirmMove() }
+    else if (e.key === 'Escape') { e.preventDefault(); moving = null }
+  }
+
   function onkey(e: KeyboardEvent) {
     const t = e.target as HTMLElement | null
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return
+    if (moving) return
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
     if (e.metaKey || e.ctrlKey || e.altKey || document.querySelector('aside.panel, aside.kb')) return
     const k = e.key
     if (k === 'k' || k === 'K') decide('keep')
@@ -121,6 +160,7 @@
     else if (k === 'ArrowLeft') moveCell(-1)
     else if (k === ' ') { ws?.stop(); ws?.play() }
     else if (k === 'r' || k === 'R') showReserve = !showReserve
+    else if (k === 'm' || k === 'M') startMove(cursor)
     else return
     e.preventDefault()
   }
@@ -163,7 +203,8 @@
       <tbody>
         {#each families as fam}
           <tr>
-            <th>{fam}</th>
+            <th class:empty={!cells.some(c => c.family === fam)}
+              title={cells.some(c => c.family === fam) ? '' : 'aucun sample : déplace-en ici avec M'}>{fam}</th>
             {#each codes as code}
               {@const c = byKey.get(`${fam}/${code}`)}
               <td class:first={code === LOOPS.find(l => codes.includes(l))}>
@@ -193,8 +234,23 @@
     <div class="wave" bind:this={container}></div>
     <p class="keys muted small">
       <kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · <kbd>↑</kbd><kbd>↓</kbd> sample ·
-      <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve
+      <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve · <kbd>M</kbd> changer de case
     </p>
+    {#if moving}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="move" onkeydown={onMoveKey}>
+        <span class="small">Déplacer <span class="name">{moving.name}</span> vers</span>
+        <select bind:this={moveSelect} bind:value={moving.family}>
+          {#each FAMILIES as f}<option value={f}>{f}</option>{/each}
+        </select>
+        <select bind:value={moving.code}>
+          {#each CODE_ORDER as c}<option value={c}>{c}{LOOPS.includes(c) ? ' (boucle)' : ''}</option>{/each}
+        </select>
+        <button class="small" onclick={confirmMove} disabled={busy}>Déplacer</button>
+        <button class="small" onclick={() => (moving = null)}>Annuler</button>
+        <span class="muted small">statut gardé, rangé en fin de case · <kbd>Entrée</kbd> / <kbd>Échap</kbd></span>
+      </div>
+    {/if}
     <ol class="list">
       {#each visible as e, i (e.source)}
         {#if showReserve && i === chosen.length}<li class="sep muted small">Réserve ({reserve.length})</li>{/if}
@@ -206,6 +262,7 @@
             {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
             <span class="src muted small" title={e.source}>{e.source}</span>
           </button>
+          <button class="mv small" title="Changer de case (M)" onclick={() => startMove(e.source)}>case…</button>
           <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : ''}</span>
         </li>
       {/each}
@@ -223,6 +280,7 @@
   th { font-weight: 600; padding: 2px 4px; text-align: left; }
   thead th { text-align: center; font-family: ui-monospace, Menlo, monospace; }
   td { padding: 1px; }
+  th.empty { color: var(--muted); font-weight: 400; }
   th.loop { color: var(--melodic); }
   .first { border-left: 2px solid var(--border); padding-left: 6px; }
   .cell { width: 44px; font: 11px ui-monospace, Menlo, monospace; padding: 3px 0; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 3px; cursor: pointer; }
@@ -248,6 +306,9 @@
   .flag { font-size: 10px; padding: 0 5px; border-radius: 8px; background: #fde68a; color: #713f12; }
   .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
   .status { width: 4em; color: var(--muted); }
+  .move { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px 8px; margin-bottom: 6px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
+  .mv { padding: 1px 6px; opacity: 0; }
+  .row:hover .mv, .row.cur .mv { opacity: 1; }
   .sep { padding: 10px 6px 4px; }
   .small { font-size: 12px; }
   .err { color: #dc2626; font-size: 12px; }
