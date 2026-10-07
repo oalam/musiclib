@@ -163,13 +163,54 @@ export interface KbNote {
 export interface KbEntry { path: string; title: string; ordre: number; statut: string }
 export interface KbLot { number: number; name: string; notes: KbEntry[] }
 
+/** Candidat d'acquisition (7.I), miroir de grab.CandidateInfo. */
+export interface Candidate {
+  source: string
+  url: string
+  title: string
+  uploader: string
+  duration_s: number
+  codec: string
+  abr: number
+  /** Debit pondere par codec, ou LOSSLESS. */
+  quality: string
+  match: number
+  score: number
+}
+
+export interface GrabRequest {
+  url: string
+  analyze_quality: boolean
+  stems: boolean
+  bank: boolean
+  folder?: string | null
+}
+
+export type JobStatus = 'queued' | 'running' | 'done' | 'error' | 'skipped'
+export interface JobStep { name: string; label: string; status: JobStatus; detail: string }
+
+/** Job d'acquisition + analyse, suivi par polling (jobs.Job). */
+export interface Job {
+  id: string
+  request: GrabRequest
+  status: JobStatus
+  steps: JobStep[]
+  slug: string | null
+  created: boolean | null
+  error: string
+  created_at: string
+  finished_at: string | null
+}
+
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
 export const manualUrl = (page = 1) => `/api/manual#page=${page}`
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    throw new Error(body.detail ?? `${res.status} ${res.statusText}`)
+    // 422 de validation FastAPI : liste d'erreurs {loc, msg}
+    const detail = Array.isArray(body.detail) ? body.detail.map((d: { msg: string }) => d.msg).join(' ; ') : body.detail
+    throw new Error(detail ?? `${res.status} ${res.statusText}`)
   }
   return res.json() as Promise<T>
 }
@@ -186,6 +227,13 @@ export const api = {
   kbSearch: (q: string) => fetch(`/api/kb/search?q=${enc(q)}`).then(r => json<KbHit[]>(r)),
   kbNote: (path: string) => fetch(`/api/kb/note?path=${enc(path)}`).then(r => json<KbNote>(r)),
   kbToc: () => fetch('/api/kb/toc').then(r => json<KbLot[]>(r)),
+  grabSearch: (query: string) =>
+    fetch('/api/grab/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query }) })
+      .then(r => json<Candidate[]>(r)),
+  grab: (req: GrabRequest) =>
+    fetch('/api/grab', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(req) })
+      .then(r => json<Job>(r)),
+  job: (id: string) => fetch(`/api/jobs/${enc(id)}`).then(r => json<Job>(r)),
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }
 

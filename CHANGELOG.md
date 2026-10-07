@@ -8,6 +8,24 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.I] Ajout d'un morceau depuis le front : panneau « + Ajouter un
+  morceau » (recherche YT/SC, candidats avec codec / débit / qualité /
+  pertinence, meilleur présélectionné, lien pour écouter la source), options
+  stems Demucs et bank Digitakt + harmonie, dossier facultatif ; suivi des
+  étapes par polling, puis liste rechargée et morceau ouvert.
+- [7.I] API : `POST /api/grab/search` (synchrone), `POST /api/grab` (job,
+  503 sans disque média, 422 si URL invalide, Spotify, dossier hors library
+  ou bank sans analyse), `GET /api/jobs/{id}`. `scripts/jobs.py` : file à un
+  seul worker (jobs sérialisés, écritures de library.md sans concurrence),
+  étapes `queued` / `running` / `done` / `error` / `skipped`.
+- [7.I] `grab.py` découpé : `search()` (candidats triés), `CandidateInfo`
+  (Pydantic), `track_meta()`, `ingest(url | Candidate, IngestOptions,
+  on_step)` et `GrabError` ; `grab_one` (CLI) les réutilise, comportement
+  inchangé.
+- [7.I] Échec de téléchargement lisible : la ligne `ERROR` de yt-dlp est
+  remontée (`GrabError`) au lieu de la commande, avec la piste
+  `brew upgrade yt-dlp` sur un 403.
+
 - [media] Média déplacé sur le SSD externe `xtreme`, dédié au son :
   `Mix/{audio,stems,visuals}` pour le mix (Rekordbox), `Live/{renoise,grooves,
   digitakt}` pour le live ; métadonnées (`library.md`, sidecars, banks, cache
@@ -135,6 +153,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.I] Titre et artiste : le préfixe artiste est retiré du titre quand il
+  diffère seulement par les liaisons (« Limitlezz x Maureen » contre
+  « LIMITLEZZ , Maureen »), espace avant virgule retirée de l'artiste,
+  suffixes `(Clip Officiel)`, `(Audio officiel)`, `[Official Audio]`,
+  `(Lyrics)`, `(Visualizer)`… retirés.
 
 - [7.G] Légende de la façade : le clic épingle le contrôle, le survol n'en
   montre qu'un aperçu (délai 120 ms, effacé en sortie), ce qui permet de

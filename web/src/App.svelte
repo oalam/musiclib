@@ -4,6 +4,7 @@
   import Player from './lib/Player.svelte'
   import BankView from './lib/BankView.svelte'
   import KbPanel from './lib/KbPanel.svelte'
+  import GrabPanel from './lib/GrabPanel.svelte'
 
   let tracks = $state<TrackSummary[]>([])
   let selected = $state<string | null>(null)
@@ -16,6 +17,14 @@
   let listError = $state('')
   let player: Player | undefined = $state()
   let kbPanel: KbPanel | undefined = $state()
+  let grabPanel: GrabPanel | undefined = $state()
+
+  // morceau ajoute (7.I) : liste rechargee, puis ouverture du morceau
+  async function added(slug: string) {
+    tracks = await api.tracks()
+    if (!showList) toggleList()
+    await select(slug)
+  }
 
   // liste des morceaux repliable pour laisser toute la largeur a la DT2 (memorise)
   let showList = $state(true)
@@ -71,6 +80,9 @@
   <strong>Digitakt II</strong>
   <span class="muted small">morceaux → banks → set</span>
   <nav>
+    <button class="small" onclick={() => grabPanel?.show()} title="Recherche YouTube / SoundCloud, téléchargement et analyse">
+      {grabPanel?.busy() ? 'Ajout en cours…' : '+ Ajouter un morceau'}
+    </button>
     <button class="small" onclick={() => kbPanel?.show()} title="Fiches par lot et recherche">
       Base de connaissance <kbd>/</kbd>
     </button>
@@ -129,6 +141,7 @@
 </div>
 </div>
 <KbPanel bind:this={kbPanel} />
+<GrabPanel bind:this={grabPanel} onadded={added} />
 
 <style>
   .app { display: flex; flex-direction: column; height: 100%; }

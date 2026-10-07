@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt,
-base de connaissance (Phase 7.D).
+base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
-qui appelle `digitakt.py` puis `harmony.py` (7.H). Ecoute sur 127.0.0.1 uniquement. Les fichiers ne
-sont servis que pour un slug present dans library.md (pas de chemin libre).
+qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
+(`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`). Ecoute
+sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
+dans library.md (pas de chemin libre).
 
 Usage:
     python api.py                 # http://127.0.0.1:8765 (sert aussi web/dist)
@@ -16,23 +18,35 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import digitakt
+import grab
 import harmony
 import kb
+import stems
 from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.types import CuePoint, DigitaktBank, Segment
+from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
 from library_md import parse_library
-from paths import DIGITAKT_DIR, LIBRARY_FILE, QUALITY_DIR, STEMS_DIR, VAULT_ROOT
+from paths import (
+    DIGITAKT_DIR,
+    LIBRARY_FILE,
+    QUALITY_DIR,
+    STEMS_DIR,
+    VAULT_ROOT,
+    MediaRootUnavailable,
+    require_media,
+)
 from paths import resolve_audio as _resolve_audio_path
 
 WEB_DIST = VAULT_ROOT / "web" / "dist"
@@ -92,8 +106,54 @@ def _bar_times(beats: dict[str, Any]) -> list[float]:
     return [round(float(t), 3) for t in (beats.get("beat_times_s") or [])[::bpb]]
 
 
-def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
-    app = FastAPI(title="music library", version="0.8.0")
+class SearchRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=300)
+    search_n: int = Field(3, ge=1, le=5)
+
+
+def run_grab(req: GrabRequest, ctx: JobContext) -> None:
+    """Pipeline d'un job 7.I (ecrit dans library.md, le sidecar, les stems, la bank)."""
+    require_media()
+    result = grab.ingest(req.url, grab.IngestOptions(folder=req.folder), on_step=ctx.step)
+    slug = result.slug
+    ctx.set_slug(slug, result.created)
+    if req.analyze_quality:
+        ctx.step("quality")
+        grab.run_quality_analysis(result.audio_path, slug)
+    if req.stems:
+        ctx.step("stems")
+        entry = parse_library(LIBRARY_FILE).get(slug, {})
+        msg = stems.process_one(slug, entry, force=False, model="htdemucs",
+                                device="auto", cleanup=True).strip()
+        if msg.startswith(("ERROR", "miss")):
+            raise StepFailed(msg)
+    if req.bank:
+        ctx.step("bank")
+        all_entries = parse_library(LIBRARY_FILE)
+        if digitakt.process(slug, all_entries, phrase_bars=8, threshold=0.5, midi=True):
+            raise StepFailed("generation de la bank impossible (voir les logs d'api.py)")
+        ctx.step("harmony")
+        if harmony.process(slug, all_entries):
+            raise StepFailed("analyse harmonique impossible (voir les logs d'api.py)")
+
+
+def _validate_grab(req: GrabRequest) -> None:
+    if not grab.is_url(req.url):
+        raise HTTPException(422, "url attendue (choisir un candidat de la recherche)")
+    if grab.is_spotify(req.url):
+        raise HTTPException(422, "Spotify ne fournit pas l'audio : chercher le titre")
+    if req.bank and not req.analyze_quality:
+        raise HTTPException(422, "la bank exige l'analyse complete (beats du sidecar)")
+    if req.folder:
+        sub = Path(req.folder)
+        if sub.is_absolute() or ".." in sub.parts:
+            raise HTTPException(422, f"dossier invalide : {req.folder}")
+
+
+def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab) -> FastAPI:
+    app = FastAPI(title="music library", version="0.9.0")
+    jobs = JobStore(runner)
+    app.router.on_shutdown.append(jobs.shutdown)
 
     def entries() -> dict[str, dict[str, str]]:
         return parse_library(library_file)
@@ -154,6 +214,35 @@ def create_app(library_file: Path = LIBRARY_FILE) -> FastAPI:
         # (logue) laisse la bank intacte et l'ancien bloc harmony en place
         harmony.process(slug, all_entries)
         return track_bank(slug)
+
+    @app.post("/api/grab/search", response_model=list[grab.CandidateInfo])
+    def grab_search(req: SearchRequest) -> list[grab.CandidateInfo]:
+        """Candidats YT/SC tries par score (le premier est le choix par defaut)."""
+        if grab.is_spotify(req.query):
+            raise HTTPException(422, "Spotify ne fournit pas l'audio : chercher le titre")
+        try:
+            found = grab.search(req.query.strip(), search_n=req.search_n)
+        except subprocess.CalledProcessError as exc:
+            err = exc.stderr.strip() if isinstance(exc.stderr, str) else str(exc)
+            raise HTTPException(502, f"yt-dlp a echoue : {err}") from exc
+        return [grab.candidate_info(c) for c in found]
+
+    @app.post("/api/grab", response_model=Job, status_code=202)
+    def grab_start(req: GrabRequest) -> Job:
+        """Lance l'acquisition + analyse en arriere-plan ; suivi par GET /api/jobs/{id}."""
+        _validate_grab(req)
+        try:
+            require_media()
+        except MediaRootUnavailable as exc:
+            raise HTTPException(503, str(exc)) from exc
+        return jobs.submit(req)
+
+    @app.get("/api/jobs/{job_id}", response_model=Job)
+    def job_status(job_id: str) -> Job:
+        job = jobs.get(job_id)
+        if job is None:
+            raise HTTPException(404, f"job inconnu : {job_id}")
+        return job
 
     @app.get("/api/kb/search", response_model=list[kb.KbHit])
     def kb_search(q: str = Query(..., min_length=1, max_length=200),

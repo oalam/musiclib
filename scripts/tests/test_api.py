@@ -120,3 +120,61 @@ def test_bank_missing_then_present(client: TestClient):
         "generated_at": "2026-10-06T00:00:00+00:00",
     }), encoding="utf-8")
     assert client.get(f"/api/tracks/{SLUG}/bank").json()["bpm"] == 150
+
+
+# ---------------------------------------------------------------------------
+# Ajout de morceau (7.I)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def grab_client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    monkeypatch.setattr(api, "require_media", lambda: tmp_path)
+
+    def runner(req, ctx) -> None:
+        ctx.step("metadata")
+        ctx.set_slug("x_-_y", created=True)
+
+    return TestClient(api.create_app(library_file=lib, runner=runner))
+
+
+def test_grab_search(grab_client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    import grab
+    fmt = {"acodec": "opus", "abr": 160}
+    cand = grab.Candidate(source="soundcloud", url="https://sc/1", title="T",
+                          info={}, fmt=fmt, match=1.0)
+    monkeypatch.setattr(grab, "search", lambda q, search_n: [cand])
+    res = grab_client.post("/api/grab/search", json={"query": "Limitlezz x Maureen"})
+    assert res.status_code == 200
+    assert res.json()[0]["url"] == "https://sc/1"
+    assert grab_client.post("/api/grab/search", json={"query": ""}).status_code == 422
+
+
+def test_grab_job_puis_polling(grab_client: TestClient):
+    res = grab_client.post("/api/grab", json={"url": "https://yt/1", "stems": True})
+    assert res.status_code == 202
+    job_id = res.json()["id"]
+    for _ in range(200):
+        job = grab_client.get(f"/api/jobs/{job_id}").json()
+        if job["status"] == "done":
+            break
+    assert job["status"] == "done" and job["slug"] == "x_-_y"
+    assert grab_client.get("/api/jobs/inconnu").status_code == 404
+
+
+@pytest.mark.parametrize("body", [
+    {"url": "pas une url"},
+    {"url": "https://open.spotify.com/track/abc"},
+    {"url": "https://yt/1", "bank": True, "analyze_quality": False},
+    {"url": "https://yt/1", "folder": "../hors"},
+])
+def test_grab_requetes_refusees(grab_client: TestClient, body: dict[str, object]):
+    assert grab_client.post("/api/grab", json=body).status_code == 422
+
+
+def test_grab_sans_disque_media(grab_client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    def absent() -> None:
+        raise api.MediaRootUnavailable("disque absent")
+    monkeypatch.setattr(api, "require_media", absent)
+    assert grab_client.post("/api/grab", json={"url": "https://yt/1"}).status_code == 503

@@ -803,6 +803,21 @@ dans library.md) :
 | GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
 | GET | `/api/manual/outline` | sommaire du manuel, § → page (`ManualRef`) ; `{}` sans PDF |
 | GET | `/api/manual` | manuel PDF (chemin fixe, 404 s'il manque) |
+| POST | `/api/grab/search` | `{query}` → candidats YT/SC triés par score (`CandidateInfo`), synchrone (~5-15 s) |
+| POST | `/api/grab` | `{url, analyze_quality, stems, bank, folder}` → `Job` (202) ; 503 sans disque média |
+| GET | `/api/jobs/{id}` | état du job : statut + étapes (`queued` / `running` / `done` / `error` / `skipped`) |
+
+**Ajout d'un morceau (7.I)** : bouton « + Ajouter un morceau » de la barre du
+haut. Recherche (ex. « Limitlezz x Maureen - Shatta Mad », ou une URL YT/SC)
+→ candidats avec source, codec, débit, qualité et pertinence, le meilleur
+présélectionné → job en arrière-plan : `grab.ingest` (metadata,
+téléchargement, BPM/key, library.md) puis analyse complète + visuel
+(`run_quality_analysis`), et en option stems Demucs (`--cleanup`) et bank
+Digitakt + harmonie. `jobs.py` n'a qu'un worker : un job à la fois, les
+suivants attendent (`queued`), ce qui sérialise les écritures de library.md.
+L'état des jobs vit en mémoire (perdu au redémarrage d'`api.py`). La bank
+exige l'analyse complète. À la fin, la liste est rechargée et le morceau
+ouvert. Spotify reste réservé à la CLI (pas d'audio, une tracklist).
 
 **Limites** : la forme d'onde est décodée dans le navigateur (quelques secondes
 sur un morceau long). Le rebouclage se fait sur l'événement `timeupdate` du

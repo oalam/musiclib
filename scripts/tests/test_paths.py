@@ -1,6 +1,7 @@
 """Hub de chemins vault / disque media (paths.py) + choix de format dans grab."""
 from __future__ import annotations
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -55,12 +56,12 @@ def test_download_targets_rekordbox_formats(
 ) -> None:
     calls: list[list[str]] = []
 
-    def fake_call(cmd: list[str]) -> int:
+    def fake_run(cmd: list[str], **kw: object) -> subprocess.CompletedProcess[str]:
         calls.append(cmd)
         (tmp_path / f"t{expected}").write_bytes(b"")
-        return 0
+        return subprocess.CompletedProcess(cmd, 0, stderr="")
 
-    monkeypatch.setattr(grab.subprocess, "check_call", fake_call)
+    monkeypatch.setattr(grab.subprocess, "run", fake_run)
     cand = grab.Candidate(source="youtube", url="https://example.invalid/x",
                           title="t", info={}, fmt={"acodec": codec})
     out = grab.download_candidate(cand, tmp_path / "t")

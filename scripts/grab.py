@@ -31,11 +31,14 @@ import re
 import subprocess
 import sys
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
+
+from pydantic import BaseModel
 
 from library_md import (
     PRESERVED_FIELDS,
@@ -447,7 +450,13 @@ def download_candidate(cand: Candidate, out_stem: Path) -> Path:
         final_ext = "." + ext
     cmd.append(cand.url)
 
-    subprocess.check_call(cmd)
+    proc = subprocess.run(cmd, stderr=subprocess.PIPE, text=True)
+    if proc.returncode != 0:
+        errors = [ln for ln in proc.stderr.splitlines() if ln.startswith("ERROR")]
+        msg = errors[-1] if errors else proc.stderr.strip()[-300:]
+        if "403" in msg:
+            msg += " -- yt-dlp sans doute perime : brew upgrade yt-dlp"
+        raise GrabError(f"yt-dlp : {msg}")
 
     expected = out_stem.with_suffix(final_ext)
     if expected.exists():
@@ -818,31 +827,65 @@ def deduce_folder(folder_arg: str | None, genres: list[str]) -> str | None:
 # Pipeline
 # ---------------------------------------------------------------------------
 
-def grab_one(
-    query_or_url: str,
-    analyze: bool,
-    bpm_override: float | None,
-    key_override: str | None,
-    genre_override: list[str] | None,
-    dry_run: bool,
-    replace: bool,
-    search_n: int,
-    start_bpm: float,
-    analyze_quality_flag: bool = False,
-    folder: str | None = None,
-) -> None:
-    label = "url" if is_url(query_or_url) else "query"
-    print(f"[+] {label}: {query_or_url}")
+class GrabError(Exception):
+    """Acquisition impossible (aucun candidat, source illisible)."""
 
-    candidates = resolve_candidates(query_or_url, search_n=search_n)
-    if not candidates:
-        print("    aucun candidat trouve", file=sys.stderr)
-        return
 
-    picked = max(candidates, key=lambda c: c.score)
-    print_candidate_table(candidates, picked)
+class CandidateInfo(BaseModel):
+    """Candidat serialisable (CLI et API 7.I), sans le JSON yt-dlp brut."""
 
-    info = picked.info
+    source: str
+    url: str
+    title: str
+    uploader: str = ""
+    duration_s: int = 0
+    codec: str
+    abr: int
+    quality: str  # score_str : debit pondere ou LOSSLESS
+    match: float  # 0..1
+    score: float
+
+
+def candidate_info(cand: Candidate) -> CandidateInfo:
+    return CandidateInfo(
+        source=cand.source, url=cand.url, title=cand.title,
+        uploader=cand.info.get("uploader") or cand.info.get("channel") or "",
+        duration_s=int(cand.info.get("duration") or 0),
+        codec=cand.codec, abr=int(cand.abr), quality=score_str(cand.quality),
+        match=round(cand.match, 2), score=round(cand.score, 1),
+    )
+
+
+def search(query_or_url: str, search_n: int = 3) -> list[Candidate]:
+    """Candidats YT/SC tries par score decroissant (le premier est le choix par defaut)."""
+    return sorted(resolve_candidates(query_or_url, search_n=search_n),
+                  key=lambda c: -c.score)
+
+
+@dataclass
+class IngestOptions:
+    analyze: bool = True
+    bpm_override: float | None = None
+    key_override: str | None = None
+    genre_override: list[str] | None = None
+    replace: bool = False
+    start_bpm: float = 140.0
+    folder: str | None = None
+
+
+@dataclass
+class IngestResult:
+    slug: str
+    created: bool
+    audio_path: Path
+
+
+_ARTIST_LINKS = {"x", "feat", "ft", "featuring", "and", "et", "vs", "with"}
+
+
+def track_meta(cand: Candidate, genre_override: list[str] | None) -> TrackMeta:
+    """Artiste / titre / genre / lien d'achat deduits du metadata du candidat."""
+    info = cand.info
     title = info.get("track") or info.get("title") or "untitled"
     artist_meta = info.get("artist") or info.get("creator")
     if artist_meta:
@@ -858,9 +901,13 @@ def grab_one(
     # SoundCloud (et parfois YT) renvoient `title = "Artist - Track - Label"`.
     # Nettoyer : retire le prefixe "<artist> - " et un eventuel suffixe " - <X>"
     # quand <X> matche (en substring) l'uploader/channel/album.
+    artist = re.sub(r"\s+,", ",", artist).strip()  # "LIMITLEZZ , Maureen"
     if " - " in title:
         lead, rest = title.split(" - ", 1)
-        if lead.strip().lower() == artist.strip().lower():
+        # "Limitlezz x Maureen - ..." avec artist "Limitlezz, Maureen" : memes
+        # tokens une fois les liaisons (x, feat, &...) retirees
+        lead_tokens = _tokenize(lead) - _ARTIST_LINKS
+        if lead_tokens and lead_tokens <= _tokenize(artist):
             title = rest.strip()
         suffix_candidates = [
             (info.get("uploader") or "").lower().strip(),
@@ -878,13 +925,12 @@ def grab_one(
     # Retire un suffixe entre parentheses "(Official Audio)", "(Original Mix)"
     # quand il ressemble a un descripteur de version sans info utile
     title = re.sub(
-        r"\s*\((?:official\s+(?:audio|video|music\s+video)|hd|hq)\)\s*$",
+        r"\s*[\(\[](?:official\s+(?:audio|video|music\s+video|lyric\s+video|visualizer)"
+        r"|clip\s+officiel|audio\s+officiel|vid[eé]o\s+officielle|lyrics?|hd|hq)[\)\]]\s*$",
         "",
         title,
         flags=re.IGNORECASE,
     ).strip()
-    album = info.get("album")
-    duration = int(info.get("duration") or 0)
     year: int | None = None
     if info.get("release_year"):
         year = int(info["release_year"])
@@ -899,60 +945,120 @@ def grab_one(
     buy_url = find_buy_url(info, artist, title)
     print(buy_url if buy_url else "(aucun)")
 
-    meta = TrackMeta(
-        title=title, artist=artist, album=album, url=picked.url,
-        source=picked.source, duration_s=duration, year=year, genre=genre,
-        buy_url=buy_url,
+    return TrackMeta(
+        title=title, artist=artist, album=info.get("album"), url=cand.url,
+        source=cand.source, duration_s=int(info.get("duration") or 0),
+        year=year, genre=genre, buy_url=buy_url,
     )
 
-    quality = f"{picked.codec} {int(picked.abr)}kbps"
-    print(f"    selection : {picked.source} | {quality}")
 
+def _dest_dir(folder: str | None, genre: list[str]) -> Path:
     dest_folder = deduce_folder(folder, genre)
     dest_dir = AUDIO_DIR / dest_folder if dest_folder else AUDIO_DIR
     print(f"    dossier   : {dest_dir.relative_to(MIX_DIR).as_posix()}/"
           + ("" if folder else " (deduit)" if dest_folder else " (racine, genre inconnu)"))
+    return dest_dir
 
-    if dry_run:
-        print("    dry-run : pas de telechargement")
-        return
 
-    slug = f"{slugify(artist)}_-_{slugify(title)}"
+def ingest(
+    target: str | Candidate,
+    opts: IngestOptions,
+    on_step: Callable[[str], None] | None = None,
+) -> IngestResult:
+    """Telecharge un candidat (ou une URL), detecte BPM/key, tague et upsert library.md.
+
+    `on_step` recoit le nom de chaque etape au moment ou elle demarre (jobs 7.I)."""
+    step = on_step or (lambda _name: None)
+    if isinstance(target, str):
+        step("metadata")
+        found = resolve_candidates(target, search_n=1)
+        if not found:
+            raise GrabError(f"aucun format audio pour {target}")
+        cand = found[0]
+    else:
+        cand = target
+
+    meta = track_meta(cand, opts.genre_override)
+    quality = f"{cand.codec} {int(cand.abr)}kbps"
+    print(f"    selection : {cand.source} | {quality}")
+    dest_dir = _dest_dir(opts.folder, meta.genre)
+
+    slug = f"{slugify(meta.artist)}_-_{slugify(meta.title)}"
     existing = existing_audio(slug)
-    if existing and not replace:
+    if existing and not opts.replace:
         rel = existing.relative_to(AUDIO_DIR).as_posix()
         print(f"    deja present : {rel} (--replace pour ecraser)")
         audio_path = existing
     else:
-        if existing and replace:
+        step("download")
+        if existing:
             print(f"    --replace : suppression de {existing.name}")
             existing.unlink()
-        out_stem = dest_dir / slug
-        audio_path = download_candidate(picked, out_stem)
+        audio_path = download_candidate(cand, dest_dir / slug)
         print(f"    telecharge : {audio_path.relative_to(AUDIO_DIR).as_posix()}")
 
-    if bpm_override is not None:
-        bpm = float(bpm_override)
-        key = key_override or "?"
+    if opts.bpm_override is not None:
+        bpm = float(opts.bpm_override)
+        key = opts.key_override or "?"
         print(f"    overrides bpm={bpm} key={key}")
-    elif analyze:
+    elif opts.analyze:
+        step("bpm_key")
         print("    analyse bpm/key...")
-        bpm, key = analyze_audio(audio_path, start_bpm=start_bpm)
-        if key_override:
-            key = key_override
+        bpm, key = analyze_audio(audio_path, start_bpm=opts.start_bpm)
+        if opts.key_override:
+            key = opts.key_override
         print(f"    bpm={bpm} key={key}")
     else:
-        bpm, key = 0.0, key_override or "?"
+        bpm, key = 0.0, opts.key_override or "?"
 
+    step("library")
     write_tags(audio_path, meta, bpm, key)
     audio_rel = audio_path.relative_to(MIX_DIR)
     created, slug = upsert_track(LIBRARY_FILE, meta, audio_rel, bpm, key, quality)
-    verb = "ajoute" if created else "mis a jour"
-    print(f"    library.md : {verb}")
+    print(f"    library.md : {'ajoute' if created else 'mis a jour'}")
+    return IngestResult(slug=slug, created=created, audio_path=audio_path)
+
+
+def grab_one(
+    query_or_url: str,
+    analyze: bool,
+    bpm_override: float | None,
+    key_override: str | None,
+    genre_override: list[str] | None,
+    dry_run: bool,
+    replace: bool,
+    search_n: int,
+    start_bpm: float,
+    analyze_quality_flag: bool = False,
+    folder: str | None = None,
+) -> None:
+    """Parcours CLI : search -> meilleur candidat -> ingest (+ analyse qualite)."""
+    label = "url" if is_url(query_or_url) else "query"
+    print(f"[+] {label}: {query_or_url}")
+
+    candidates = search(query_or_url, search_n=search_n)
+    if not candidates:
+        print("    aucun candidat trouve", file=sys.stderr)
+        return
+    picked = candidates[0]
+    print_candidate_table(candidates, picked)
+
+    if dry_run:
+        meta = track_meta(picked, genre_override)
+        print(f"    selection : {picked.source} | {picked.codec} {int(picked.abr)}kbps")
+        _dest_dir(folder, meta.genre)
+        print("    dry-run : pas de telechargement")
+        return
+
+    result = ingest(picked, IngestOptions(
+        analyze=analyze, bpm_override=bpm_override, key_override=key_override,
+        genre_override=genre_override, replace=replace, start_bpm=start_bpm,
+        folder=folder,
+    ))
 
     if analyze_quality_flag:
         try:
-            run_quality_analysis(audio_path, slug)
+            run_quality_analysis(result.audio_path, result.slug)
         except Exception as exc:  # noqa: BLE001
             print(f"    [warn] analyse qualite ignoree : {exc}", file=sys.stderr)
 
