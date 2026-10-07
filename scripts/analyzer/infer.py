@@ -12,6 +12,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from library_md import slugify
+
 
 def load_sidecar(quality_dir: Path, slug: str) -> dict[str, Any] | None:
     path = quality_dir / f"{slug}.json"
@@ -144,6 +146,61 @@ _BPM_GENRES: list[tuple[float, float, str]] = [
     (180, 210, "tribe"),
     (210, 260, "hardcore"),
 ]
+
+
+# Style -> fenetre de tempo plausible (hub, arbitre le 2026-10-07). Sert a
+# corriger les erreurs d'octave de la detection (198.8 -> 99.4 en shatta).
+# Mots-cles au format slug (tokens separes par `_`) ; rapport haut/bas < 2
+# pour qu'une seule correction x2 / /2 tombe dans la fenetre. Styles trop
+# larges (swing, tango, rock, folk) volontairement absents.
+STYLE_BPM_WINDOWS: list[tuple[tuple[str, ...], float, float]] = [
+    (("reggae", "dub", "roots", "one_drop"), 60, 95),
+    (("shatta", "dancehall", "reggaeton", "latino", "afro", "afrobeat",
+      "afrobeats", "dembow", "baile_funk", "kuduro"), 85, 115),
+    (("hip_hop", "hiphop", "rap", "slow", "soul", "rb", "rnb"), 60, 110),
+    (("disco", "funk", "house", "techouse", "tech_house"), 110, 130),
+    (("techno", "hard_techno"), 125, 150),
+    (("dubstep",), 135, 150),
+    (("dnb", "drum_bass", "drum_and_bass", "drum_n_bass", "jungle",
+      "footwork"), 160, 180),
+    (("tribe", "tekno", "mental_tekno", "mentaltekno", "acidcore", "acid_core",
+      "hardtek"), 160, 210),
+    (("hardcore",), 180, 250),
+]
+
+
+def _has_keyword(tokens: list[str], keyword: str) -> bool:
+    kw = keyword.split("_")
+    return any(tokens[i:i + len(kw)] == kw for i in range(len(tokens) - len(kw) + 1))
+
+
+def style_window(texts: list[str]) -> tuple[str, float, float] | None:
+    """Premier texte (ordre de priorite) qui designe un style sans ambiguite.
+
+    Un texte qui matche plusieurs fenetres differentes (« dancehall dubstep
+    remix ») est ignore ; on passe au suivant. Retourne (mot-cle, lo, hi)."""
+    for text in texts:
+        tokens = slugify(text).split("_") if text else []
+        found: dict[tuple[float, float], str] = {}
+        for kws, lo, hi in STYLE_BPM_WINDOWS:
+            for kw in kws:
+                if _has_keyword(tokens, kw):
+                    found.setdefault((lo, hi), kw)
+        if len(found) == 1:
+            (lo, hi), kw = next(iter(found.items()))
+            return kw, lo, hi
+    return None
+
+
+def fold_bpm(bpm: float, lo: float, hi: float) -> float | None:
+    """Ramene `bpm` dans [lo, hi] par x2 / /2 ; None si aucune octave n'y tombe."""
+    if bpm <= 0:
+        return None
+    for factor in (1.0, 0.5, 2.0, 0.25, 4.0):
+        candidate = bpm * factor
+        if lo <= candidate <= hi:
+            return round(candidate, 1)
+    return None
 
 
 def infer_genre(sidecar: dict[str, Any], entry: dict[str, str]) -> str:

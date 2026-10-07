@@ -237,6 +237,17 @@ Le script double automatiquement si <90 BPM. Pour les BPM intermédiaires
 corriger avec `--bpm`, ou éditer le frontmatter de la section. Utiliser
 `--start-bpm 180` comme hint à librosa peut aider sur du tribe.
 
+**Correction par le style** : quand le style est connu, le BPM détecté est
+ramené (×2 / ÷2) dans la plage du style, table `STYLE_BPM_WINDOWS` de
+`analyzer/infer.py` (reggae / dub 60-95, shatta / dancehall 85-115,
+tribe / tekno / acidcore 160-210…). Le style vient, par priorité, de
+`--folder` (champ « Dossier / style » du front), `--genre`, du genre de la
+source, puis du titre et des tags de la source ; un texte qui désigne deux
+styles de plages différentes est ignoré. Exemple : Shatta Mad détecté à
+198.8 avec `--folder shatta` → 99.4. Le BPM corrigé est imposé à l'analyse
+complète (`--analyze-quality`) et le style remplit `genre` s'il est vide.
+Sans style reconnu, rien ne change.
+
 ---
 
 # analyze.py — analyse audiophile (Phase 1)

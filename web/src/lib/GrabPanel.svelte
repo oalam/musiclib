@@ -119,7 +119,8 @@
         <label><input type="checkbox" checked disabled /> Analyse complète + visuel</label>
         <label><input type="checkbox" bind:checked={stems} /> Stems Demucs (quelques minutes)</label>
         <label><input type="checkbox" bind:checked={bank} /> Bank Digitakt + harmonie</label>
-        <label class="folder">Dossier <input bind:value={folder} placeholder="déduit du genre" /></label>
+        <label class="folder" title="Style (ex. shatta, tribe, dub) : range le fichier et corrige le BPM détecté (×2 / ÷2) dans la plage du style">
+          Dossier / style <input bind:value={folder} placeholder="déduit du genre" /></label>
       </fieldset>
       <button class="go" onclick={start} disabled={!picked}>Télécharger et analyser</button>
     {/if}

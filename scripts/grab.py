@@ -878,6 +878,39 @@ class IngestResult:
     slug: str
     created: bool
     audio_path: Path
+    # BPM confirme par la fenetre du style (a imposer a l'analyse complete),
+    # None sans style reconnu ou si le BPM est force
+    style_bpm: float | None = None
+
+
+def style_hints(cand: Candidate, opts: IngestOptions) -> list[str]:
+    """Textes qui designent le style, par priorite : dossier, genre force,
+    genre de la source, titre + tags. Jamais le genre de library.md (souvent
+    deduit du BPM lui-meme)."""
+    info = cand.info
+    return [
+        opts.folder or "",
+        ", ".join(opts.genre_override or []),
+        info.get("genre") or "",
+        " ".join([cand.title, *(info.get("tags") or []), *(info.get("categories") or [])]),
+    ]
+
+
+def correct_bpm(bpm: float, hints: list[str]) -> tuple[float, str | None]:
+    """Ramene le BPM dans la fenetre du style (erreurs d'octave). Retourne
+    (bpm, style) ; style None si aucun style reconnu ou aucune octave plausible."""
+    from analyzer.infer import fold_bpm, style_window
+
+    style = style_window(hints)
+    if style is None:
+        return bpm, None
+    name, lo, hi = style
+    folded = fold_bpm(bpm, lo, hi)
+    if folded is None:
+        return bpm, None
+    if folded != bpm:
+        print(f"    bpm {bpm} -> {folded} (style {name} : {lo:.0f}-{hi:.0f})")
+    return folded, name
 
 
 _ARTIST_LINKS = {"x", "feat", "ft", "featuring", "and", "et", "vs", "with"}
@@ -969,6 +1002,7 @@ def ingest(
 
     `on_step` recoit le nom de chaque etape au moment ou elle demarre (jobs 7.I)."""
     step = on_step or (lambda _name: None)
+    style_bpm: float | None = None
     if isinstance(target, str):
         step("metadata")
         found = resolve_candidates(target, search_n=1)
@@ -1008,6 +1042,11 @@ def ingest(
         if opts.key_override:
             key = opts.key_override
         print(f"    bpm={bpm} key={key}")
+        bpm, style = correct_bpm(bpm, style_hints(cand, opts))
+        if style:
+            style_bpm = bpm
+            if not meta.genre:
+                meta.genre = [style]
     else:
         bpm, key = 0.0, opts.key_override or "?"
 
@@ -1016,7 +1055,8 @@ def ingest(
     audio_rel = audio_path.relative_to(MIX_DIR)
     created, slug = upsert_track(LIBRARY_FILE, meta, audio_rel, bpm, key, quality)
     print(f"    library.md : {'ajoute' if created else 'mis a jour'}")
-    return IngestResult(slug=slug, created=created, audio_path=audio_path)
+    return IngestResult(slug=slug, created=created, audio_path=audio_path,
+                        style_bpm=style_bpm)
 
 
 def grab_one(
@@ -1058,12 +1098,13 @@ def grab_one(
 
     if analyze_quality_flag:
         try:
-            run_quality_analysis(result.audio_path, result.slug)
+            run_quality_analysis(result.audio_path, result.slug, result.style_bpm)
         except Exception as exc:  # noqa: BLE001
             print(f"    [warn] analyse qualite ignoree : {exc}", file=sys.stderr)
 
 
-def run_quality_analysis(audio_path: Path, slug: str) -> None:
+def run_quality_analysis(audio_path: Path, slug: str,
+                         override_bpm: float | None = None) -> None:
     """Lance le pipeline analyzer (Phase 1 + 2) sur un fichier juste telecharge,
     puis populate les champs derives (energy / mood / genre / tags via infer,
     about via MusicBrainz). Skip les champs deja non-vides (preserve les edits)."""
@@ -1080,6 +1121,7 @@ def run_quality_analysis(audio_path: Path, slug: str) -> None:
         slug=slug,
         with_structure=True,
         file_path_str=file_path_str,
+        override_bpm=override_bpm,  # BPM confirme par le style (cf. correct_bpm)
     )
     save_sidecar(report, QUALITY_DIR)
     update_field(LIBRARY_FILE, slug, "quality_score", f"{report.quality.score:.1f}")

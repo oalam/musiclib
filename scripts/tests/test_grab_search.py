@@ -81,7 +81,8 @@ def test_ingest_url_etapes_et_library(media: Path, monkeypatch: pytest.MonkeyPat
     assert res.slug == "limitlezz_-_shatta_mad" and res.created
     assert res.audio_path == media / "Mix/audio/dancehall/limitlezz_-_shatta_mad.flac"
     entry = parse_library(media / "library.md")[res.slug]
-    assert entry["bpm"] == "174.0" and entry["key"] == "A minor"
+    assert entry["bpm"] == "87.0"  # 174 / 2 : genre source Dancehall (85-115)
+    assert entry["key"] == "A minor"
     assert "dancehall/limitlezz_-_shatta_mad.flac" in entry["file"]
 
 
@@ -126,3 +127,20 @@ def test_download_erreur_lisible(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     monkeypatch.setattr(grab.subprocess, "run", fail)
     with pytest.raises(grab.GrabError, match="403.*brew upgrade yt-dlp"):
         grab.download_candidate(_cand("u", "opus", 160), tmp_path / "x")
+
+
+def test_ingest_corrige_le_bpm_par_le_style(media: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(grab, "analyze_audio", lambda p, start_bpm: (198.8, "C minor"))
+    cand = _cand("https://yt/1", "opus", 160, title="Shatta Mad (Clip Officiel)",
+                 creator="LIMITLEZZ , Maureen")
+    res = grab.ingest(cand, grab.IngestOptions(folder="shatta"))
+    assert res.style_bpm == 99.4  # 198.8 / 2, fenetre shatta 85-115
+    entry = parse_library(media / "library.md")[res.slug]
+    assert entry["bpm"] == "99.4" and entry["genre"] == "shatta"
+
+
+def test_ingest_sans_style_garde_le_bpm(media: Path):
+    cand = _cand("https://yt/1", "opus", 160, title="Untitled", artist="X")
+    res = grab.ingest(cand, grab.IngestOptions(folder="mariage"))
+    assert res.style_bpm is None
+    assert parse_library(media / "library.md")[res.slug]["bpm"] == "174.0"

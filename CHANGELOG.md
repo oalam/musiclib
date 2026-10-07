@@ -8,6 +8,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.I] Correction du BPM par le style : le BPM détecté est ramené (×2 / ÷2)
+  dans la plage du style (`STYLE_BPM_WINDOWS`, `analyzer/infer.py` :
+  reggae / dub 60-95, shatta / dancehall 85-115, tribe / tekno / acidcore
+  160-210…). Style lu dans le dossier, le genre forcé, le genre de la source
+  puis le titre et les tags ; BPM corrigé imposé à l'analyse complète, style
+  reporté dans `genre` s'il est vide. Champ « Dossier / style » du front.
 - [7.I] Ajout d'un morceau depuis le front : panneau « + Ajouter un
   morceau » (recherche YT/SC, candidats avec codec / débit / qualité /
   pertinence, meilleur présélectionné, lien pour écouter la source), options

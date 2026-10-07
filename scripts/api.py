@@ -119,7 +119,7 @@ def run_grab(req: GrabRequest, ctx: JobContext) -> None:
     ctx.set_slug(slug, result.created)
     if req.analyze_quality:
         ctx.step("quality")
-        grab.run_quality_analysis(result.audio_path, slug)
+        grab.run_quality_analysis(result.audio_path, slug, result.style_bpm)
     if req.stems:
         ctx.step("stems")
         entry = parse_library(LIBRARY_FILE).get(slug, {})
