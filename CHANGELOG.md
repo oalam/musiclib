@@ -326,6 +326,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.J5] La grille garde les colonnes de la vue non filtrée : choisir un kit
+  (ou un tag) ne redimensionne plus l'interface.
 - [7.J4] Samples : dans un dossier de kicks (`…KICKS 3`), une frappe de
   plus de 4 s reste une frappe au lieu de devenir une boucle DL avec un
   tempo estimé au hasard (7 kicks Vi Ta Lee MILLENNIUM KICKS 3 rendus à

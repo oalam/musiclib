@@ -33,6 +33,8 @@
   type View = { kind: 'cell'; family: string; code: string } | { kind: Loose }
 
   let cells = $state<SampleCell[]>([])
+  // colonnes de la grille non filtree : un filtre (kit, tag) ne la redimensionne pas
+  let gridCodes = $state<string[]>([])
   let counts = $state({ unclassified: 0, trash: 0 })
   let allTags = $state<string[]>([])
   let error = $state('')
@@ -69,7 +71,7 @@
   const current = $derived(view?.kind === 'cell' ? view : null)
   // toutes les familles, meme vides (TRIBE attend son pack) : cibles de rangement
   const families = $derived([...FAMILIES, ...new Set(cells.map(c => c.family).filter(f => !FAMILIES.includes(f)))])
-  const codes = $derived([...new Set(cells.map(c => c.code))].sort((a, b) => codeRank(a) - codeRank(b)))
+  const codes = $derived([...new Set([...gridCodes, ...cells.map(c => c.code)])].sort((a, b) => codeRank(a) - codeRank(b)))
   const byKey = $derived(new Map(cells.map(c => [`${c.family}/${c.code}`, c])))
   const shown = $derived(entries.filter(matches))
   const chosen = $derived(shown.filter(e => e.selected))
@@ -130,6 +132,8 @@
         api.sampleLoose('unclassified', kit), api.sampleLoose('trash', kit), api.sampleTags(), api.sampleKits(),
       ])
       cells = c
+      const all = filterOn() ? await api.sampleCells() : c
+      gridCodes = [...new Set(all.map(x => x.code))]
       counts = { unclassified: u.length, trash: t.length }
       allTags = tags
       kitData = k
