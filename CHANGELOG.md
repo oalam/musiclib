@@ -126,6 +126,17 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- Doctrine Digitakt : points *(à vérifier)* tranchés par le manuel OS 1.17
+  (source de sampling, mode de tempo et `ROW TEMPO`, step recording, FILL,
+  effacement des locks et des trigs, quantize) avec renvois vers la KB ;
+  corrigés : pas de commande pour effacer les locks de toutes les tracks
+  (`[FUNC] + [NO]` = reload temporaire), effacer un trig = `[TRIG] + [PLAY]`,
+  silence en step recording = `[NO]`. Restent à tester sur la machine :
+  affichage en Hz de l'EQ, sidechain d'une track hors main, import `.mid`
+  multi-canal. Nouvelle fiche KB `keyboard-gammes` (KEYBOARD SETUP, gamme,
+  tonique, `KB FOLD`, `NOTE PARAM`) pour le §11 ; `sampling-resampling`
+  (rumble sur le pas du kick), `filtres` et `parameter-preset-locks`
+  complétées.
 - Doctrine Digitakt : nouvelles sections §9 (grave : fabrication du rumble,
   placement tribe, basse en contretemps, partage des fréquences), §10
   (compresseur master : routing, sidechain, kick fantôme), §11 (tonalité et

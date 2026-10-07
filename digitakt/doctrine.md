@@ -221,8 +221,9 @@ La Digitakt II peut sauvegarder l'ensemble des sons des 16 tracks en **kit**, vi
    overdrive poussé, enveloppe d'amplitude très courte pour ne garder que la
    queue.
 2. **Resampler** : la reverb est un envoi partagé, donc on fige le rumble en
-   sample. Muter tout sauf la 2, enregistrer une mesure de la sortie interne
-   *(à vérifier : choix de la source interne au sampling)*.
+   sample. Muter tout sauf la 2, `[SAMPLING]` : `SRC` = MAIN (sortie main,
+   reverb comprise), `R.LEN` = 16 pour une mesure (cf.
+   [[kb/sampling-resampling]]).
 3. **Sculpter** le sample : passe-bas (Lowpass 4) bas avec un peu de résonance,
    overdrive, accordé sur la tonique (cf. §11).
 4. **Le faire respirer** : sidechain du compresseur (cf. §10), attaque lente sur
@@ -264,7 +265,8 @@ grandeur, à ajuster à l'oreille :
 - Les filtres de la DT2 se règlent sur une échelle de valeurs, **pas en Hz**.
   Étalonner une fois via Overbridge + analyseur de spectre (SPAN) et noter
   les repères dans `kb/` ; la machine **Equalizer** est plus adaptée au réglage
-  de bandes *(à vérifier : affichage de la fréquence)*.
+  de bandes *(à vérifier sur la machine : affichage en Hz, le manuel ne le
+  dit pas ; cf. [[kb/filtres]])*.
 
 ## 10. Compresseur master : routing et sidechain
 
@@ -291,8 +293,9 @@ rumble, basse, atmo (et éventuellement percs) dans le routing.
 **Kick fantôme** : dupliquer le kick sur une track libre (16 si non utilisée en
 MIDI), la retirer du main dans l'AUDIO ROUTING, la mettre en source. Le vrai
 kick peut alors être muté / NOT FILL pendant les breaks sans arrêter le
-pompage *(à vérifier : une track hors main déclenche-t-elle encore le
-sidechain ?)*.
+pompage (cf. [[kb/send-fx-compresseur]]) *(à vérifier sur la machine : une
+track hors main déclenche-t-elle encore le sidechain ? le manuel ne le dit
+pas)*.
 
 **Arbitrage** : avec ce routing, le compresseur est un ducker, plus une colle
 globale. Si on veut les deux : pompage par **LFO de volume** sur les tracks, et
@@ -310,7 +313,7 @@ avant le master si on finit dans le DAW (multipiste Overbridge).
 2. **Mesurer sa note** sur la queue (pas l'attaque) : accordeur ou analyseur via
    Overbridge (~55 Hz ≈ La, ~65 Hz ≈ Do), ou à l'oreille contre une sinus.
 3. Fixer la **tonique du morceau** sur cette note : KEYBOARD SETUP de la track →
-   gamme + tonique.
+   gamme + tonique (cf. [[kb/keyboard-gammes]]).
 4. Accorder rumble (même TUNE que le kick au départ), basse (tonique ou quinte),
    puis lead et Id dans la gamme.
 
@@ -420,8 +423,10 @@ pattern modèle.
 - **Pattern pont** sans kick (nappe, reverb, riser) pendant lequel on change de
   tempo.
 - **Rupture assumée** : silence ou impact, puis nouvelle partie franche.
-- Tempo global au projet ou par pattern, et tempo fixable par ligne de song
-  *(à vérifier : réglage du mode de tempo)*.
+- Tempo global au projet ou par pattern : `[TEMPO]`, puis `[FUNC]` + DATA
+  ENTRY E pour changer de mode. En song, `ROW TEMPO` fixe le BPM par ligne ;
+  un tempo de song écrase tous les autres (cf. [[kb/tempo-metronome]],
+  [[kb/song-mode]]).
 
 ### Tribe vs mental (tendances, frontières floues)
 
@@ -440,17 +445,18 @@ mélodique devient acid, l'Id rythmique perd ses percs, mode vers le phrygien.
 
 | Action | Manip | Statut |
 |---|---|---|
+| Mode keyboard, gamme, tonique | [KEYBOARD] ; [FUNC] + [KEYBOARD] = KEYBOARD SETUP (cf. [[kb/keyboard-gammes]]) | manuel §8.5.2 |
 | Trig mode (Tracks / Velocity / Retrigs / Slice / Preset Pool) | [FUNC] + [HAUT] / [BAS] | manuel §8.5.4 |
 | Preset Pool en trig mode | pool vide = toutes les touches jouent le même son ; remplir via PRESET/KIT | forum |
-| Step recording | [RECORD] + [STOP] ; notes au clavier, le curseur avance, flèches = silence / retour | *(à vérifier)* |
+| Step recording | [RECORD] + [STOP] ; choisir le pas ([TRIG] ou [LEFT] / [RIGHT]), [FUNC] + [TRIG n] pose un trig sur la track n, ou [KEYBOARD] maintenu + [TRIG] pour une note ; le pas avance ; [NO] = silence ou effacement ; [RECORD] + double [STOP] = mode JUMP | manuel §10.2.4 |
 | Grid / live recording | [RECORD] / [RECORD] + [PLAY] | |
-| Fill | [PAGE] maintenu hors grid recording ; variante avec [YES] pour verrouiller | *(à vérifier, raccourci DT1)* |
-| Effacer un paramètre locké sur toute la track | LIVE REC : [NO] + appui sur le bouton du paramètre | *(à vérifier)* |
-| Effacer les p-locks de toutes les tracks | LIVE REC : [FUNC] + [NO] (sound locks conservés) | *(à vérifier)* |
-| Effacer trig + locks | GRID REC : trig(s) + [CLEAR] | *(à vérifier)* |
+| Fill | [PAGE] maintenu hors grid recording ; [YES] + [PAGE] = un tour de pattern ; [PAGE] + [YES] en lâchant [PAGE] d'abord = verrouillé, [PAGE] libère | manuel §10.8.4 |
+| Effacer un paramètre locké sur toute la track | LIVE REC : maintenir [NO] + maintenir le bouton du paramètre (efface au fil de la lecture) ; sur un seul trig : [TRIG] + appui sur le bouton | manuel §10.8.1 |
+| Effacer les p-locks de toutes les tracks | Pas de commande dédiée : [FUNC] + [NO] = reload temporaire du pattern (retour au dernier temp save). Un trig effacé puis reposé perd ses locks | manuel §10.8.1, §17 |
+| Effacer trig + locks | GRID REC : [TRIG] + [PLAY] (cf. [[kb/copier-coller]]) | manuel §17 |
 | Factory reset | [FUNC] maintenu à l'allumage → FACTORY RESET ; écrase le slot projet 1, samples d'usine et persos conservés. **Jamais** FORMAT +DRIVE | Elektron |
 | Écouter la DT2 sur le Mac | mode USB Overbridge + Overbridge Engine ; monitoring via DAW, GarageBand ou LadioCast. BlackHole inutile pour ça | |
-| Injecter les `.mid` du §7 | sortie MIDI du DAW → Digitakt II, canal = track (ou auto = track active), horloge + transport depuis le DAW, quantification live, LIVE REC ([RECORD] + [PLAY]) | *(à vérifier : réglage de quantification)* |
+| Injecter les `.mid` du §7 | sortie MIDI du DAW → Digitakt II, canal = track (ou auto = track active), horloge + transport depuis le DAW, LIVE REC ([RECORD] + [PLAY]) ; quantize auto : [RECORD] + double [PLAY] ; après coup : [FUNC] + [TRIG PARAMETERS] | manuel §10.2.3, §10.6 ; import multi-canal *(à vérifier, cf. [[kb/midi-config]])* |
 
 **P-locks** : maintenir un trig + tourner un bouton = valeur pour ce pas
 seulement. **Trig-less lock** : lock sans note, pour modifier un son en cours.

@@ -52,6 +52,9 @@ statut: draft
 - Les paramètres de la page TRIG sont sauvés avec le **pattern**, pas avec
   le preset.
 - Effacer puis reposer une note trig retire tous ses locks.
+- Aucune commande n'efface d'un coup les locks de toutes les tracks : en
+  LIVE REC, `[FUNC] + [NO]` fait un **reload temporaire** du pattern
+  (cf. [[perform-kit-temp-save]]), pas un effacement des locks.
 - Un preset lock ne puise que dans le **pool** du projet (128 presets), pas
   dans le +Drive (cf. [[presets-kits-pool]]).
 

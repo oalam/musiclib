@@ -53,6 +53,10 @@ Page 2 : `BASE`, `WIDTH`, `BW.RT` (avant / après la machine), `KEY.T`,
 ## Pièges
 
 - `BASE` 0 + `WIDTH` 127 = base-width neutre ; `BASE` 0 seul = passe-bas.
+- Le manuel ne donne aucune correspondance en Hz pour `FREQ`, `BASE` ou
+  `WIDTH`. *À vérifier sur la machine* : si l'EQ affiche sa fréquence
+  centrale en Hz. Sinon, étalonner une fois via Overbridge + analyseur de
+  spectre (SPAN) et noter ici les repères kick / rumble / basse (doctrine §9).
 - `RSET` off : l'enveloppe ne repart pas à chaque trig.
 - `RESO` élevée sur un son grave = pics de niveau dans le compresseur.
 

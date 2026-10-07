@@ -2,7 +2,7 @@
 tags: [digitakt, kb, index]
 manuel: "refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf"
 os: "1.17"
-updated: 2026-10-06
+updated: 2026-10-07
 ---
 ok
 # Base de connaissance Digitakt II
@@ -55,6 +55,7 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 8 | [[parameter-preset-locks]] | §10.8 | draft |
 | 9 | [[microtiming-retrigs]] | §10.4, §10.5, §11.3 | draft |
 | 10 | [[euclidien]] | §10.3 | draft |
+| 26 | [[keyboard-gammes]] | §8.5.1, §8.5.2, §14.7.6, annexe D | draft |
 
 ## Lot 3 — Sons et transitions
 

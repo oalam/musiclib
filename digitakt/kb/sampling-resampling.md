@@ -37,7 +37,8 @@ L+R), `R.LEN` (1-128 pas ou MAX = 66 s), `R.STRT` (au `[PLAY]` ou au seuil),
    mesure), `R.STRT` = PLAY.
 3. Armer, `[PLAY]` : la prise dure exactement une mesure au tempo du set.
 4. Retailler (E / H), `[YES]`, nommer `RUMBLE-190`, assigner à la track 2.
-5. Track 2 : filtre passe-bas bas (cf. [[filtres]]), trigs entre les kicks.
+5. Track 2 : filtre passe-bas bas (cf. [[filtres]]), trigs sur les mêmes pas
+   que le kick, avec ducking (cf. [[send-fx-compresseur]], doctrine §9).
 
 ## En live techno
 
