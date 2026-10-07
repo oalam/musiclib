@@ -1,7 +1,7 @@
 ---
 tags: [digitakt, doctrine, live, set, elektron]
 source: "https://youtu.be/y_YijodbZYI"
-updated: 2026-10-06
+updated: 2026-10-07
 status: living document
 ---
 
@@ -29,7 +29,7 @@ coupe la basse. Les mutes et les réflexes en dépendent.
 | Track | Rôle | Bande dominante | Notes |
 |---|---|---|---|
 | 1 | **Kick** | 40-120 Hz + click 2-5 kHz | Même sample, même réglage dans tout le set (cf. §3) |
-| 2 | **Rumble / sub** | 30-80 Hz | Souvent le kick resamplé + reverb + filtre passe-bas ; joue entre les kicks |
+| 2 | **Rumble / sub** | 30-80 Hz | Kick resamplé + reverb + saturation + passe-bas ; même pas que le kick + ducking (cf. §9) |
 | 3 | **Clap / snare** | 200 Hz-2 kHz | Temps 2 et 4 en four-on-floor, plus libre en tribe |
 | 4 | **Hat fermé** | 6-12 kHz | Contretemps, doubles croches |
 | 5 | **Hat ouvert** | 5-10 kHz | Un seul bien placé vaut mieux qu'un empilement |
@@ -41,7 +41,7 @@ coupe la basse. Les mutes et les réflexes en dépendent.
 
 | Track | Rôle | Bande dominante | Notes |
 |---|---|---|---|
-| 9 | **Basse** | 50-300 Hz | Sacrée avec le kick ; joue entre les kicks ou sidechainée |
+| 9 | **Basse** | 80-250 Hz + harmoniques | Sacrée avec le kick ; contretemps, attaque franche, decay court (cf. §9) |
 | 10 | **Séquence / lead** | 300 Hz-4 kHz | Acid line, stabs, arpèges |
 | 11 | **Atmo / drone** | large, faible niveau | Nappe, drone, room tone ; souvent sample Stretch |
 | 12 | **Id1** | variable | Identité du pattern : rythmique, ambiance ou mélodie |
@@ -211,6 +211,251 @@ Hors GRID RECORDING, sélectionne le pattern modèle et fais [FUNC] + [RECORD] (
 La Digitakt II peut sauvegarder l'ensemble des sons des 16 tracks en **kit**, via le menu PRESET/KIT. Sauvegarde ton modèle en kit : tu pourras recharger ces sons dans n'importe quel pattern, même dans un autre projet, sans écraser la séquence. Le pattern modèle donne la structure complète, le kit seulement la palette de sons.
 
 **Astuce** : pour réutiliser ce modèle dans tous tes projets, garde un projet « TEMPLATE » sur le +Drive. Pour chaque nouveau set, charge-le et sauvegarde-le aussitôt sous un nouveau nom.
+
+## 9. Le grave : kick, rumble, basse
+
+### Fabriquer le rumble (track 2)
+
+1. **Source** : le même sample que le kick (track 1), trigs sur chaque temps.
+   Envoi reverb à fond (decay long, un peu de pre-delay, aigus coupés),
+   overdrive poussé, enveloppe d'amplitude très courte pour ne garder que la
+   queue.
+2. **Resampler** : la reverb est un envoi partagé, donc on fige le rumble en
+   sample. Muter tout sauf la 2, enregistrer une mesure de la sortie interne
+   *(à vérifier : choix de la source interne au sampling)*.
+3. **Sculpter** le sample : passe-bas (Lowpass 4) bas avec un peu de résonance,
+   overdrive, accordé sur la tonique (cf. §11).
+4. **Le faire respirer** : sidechain du compresseur (cf. §10), attaque lente sur
+   l'AMP, ou LFO de volume calé sur la noire et relancé à chaque trig.
+5. **Équilibrer** : moins fort que le kick, pan centré, jugé au casque ou sur un
+   vrai sub. Sauvegarder en **preset**.
+
+### Placement en tribe
+
+- **Défaut** : rumble **sur le même pas que le kick**, avec ducking (il gonfle
+  derrière l'attaque) et release courte. Basse en **contretemps**.
+- À 180-200 BPM, une double-croche ≈ 80 ms : un rumble sur le pas suivant crée
+  un galop qui empiète sur la basse en contretemps. À éviter, sauf variante
+  **sans basse** : le rumble roule sur les doubles-croches entre les kicks et
+  joue lui-même le rôle de basse.
+- Rumble en **NOT FILL** : il disparaît avec le kick pendant les breaks.
+
+### Basse en contretemps
+
+- **Attaque franche** (quelques ms pour éviter les clics), **decay court**,
+  retombée avant le kick suivant.
+- **Overdrive** pour le mordant, enveloppe de filtre rapide pour le claquement.
+- La rondeur est une **variation**, pas la base : filtre plus fermé en intro qui
+  s'ouvre avec un LFO lent ou des p-locks.
+
+### Partage des fréquences
+
+Séparation **dans le temps** (contretemps) **et** en fréquences. Ordres de
+grandeur, à ajuster à l'oreille :
+
+| Élément | Zone | Outil DT2 (filtre base-width) |
+|---|---|---|
+| Kick | sub et grave, patron du sub | léger passe-haut contre l'infra |
+| Rumble | sub, entre les coups de kick (ducking) | passe-bas fermé, ne monte pas dans les médiums |
+| Basse | bas-médium + harmoniques de saturation | passe-haut un peu monté, laisse le sub au kick |
+
+- Le chevauchement est normal : éviter seulement la **même zone au même moment**.
+- Kick, rumble et basse **accordés ensemble** se renforcent au lieu de s'annuler.
+- Les filtres de la DT2 se règlent sur une échelle de valeurs, **pas en Hz**.
+  Étalonner une fois via Overbridge + analyseur de spectre (SPAN) et noter
+  les repères dans `kb/` ; la machine **Equalizer** est plus adaptée au réglage
+  de bandes *(à vérifier : affichage de la fréquence)*.
+
+## 10. Compresseur master : routing et sidechain
+
+Deux réglages distincts :
+
+- **Routing** (qui est compressé) : [FUNC] + [FLTR] → COMPRESSOR ROUTING, on
+  ajoute / retire les tracks avec les touches de trig. Page 2 : entrée externe
+  L / R.
+- **Source** (qui déclenche) : sur la page du compresseur, une track, l'ensemble
+  des tracks non routées (« /COMP ») ou l'entrée externe.
+
+**Réglage sidechain du set** : kick (1) **hors** du routing et en **source** ;
+rumble, basse, atmo (et éventuellement percs) dans le routing.
+
+| Paramètre | Départ |
+|---|---|
+| Ratio | ≥ 4:1 |
+| Attaque | la plus rapide |
+| Release | courte à moyenne, remonte juste avant le kick suivant |
+| Seuil | descendre jusqu'au creux audible, puis remonter un peu |
+| Make-up | compenser sans exagérer |
+| Mix | 100 % pour un ducking franc, moins pour adoucir |
+
+**Kick fantôme** : dupliquer le kick sur une track libre (16 si non utilisée en
+MIDI), la retirer du main dans l'AUDIO ROUTING, la mettre en source. Le vrai
+kick peut alors être muté / NOT FILL pendant les breaks sans arrêter le
+pompage *(à vérifier : une track hors main déclenche-t-elle encore le
+sidechain ?)*.
+
+**Arbitrage** : avec ce routing, le compresseur est un ducker, plus une colle
+globale. Si on veut les deux : pompage par **LFO de volume** sur les tracks, et
+compresseur en colle légère (ratio 1,5-2:1, 1-3 dB, attaque lente).
+
+Bonnes pratiques générales : sidechainer d'abord ce qui est grave, ne pas
+écraser les transitoires du kick, comparer à volume égal, garder ~-6 dB de marge
+avant le master si on finit dans le DAW (multipiste Overbridge).
+
+## 11. Tonalité et harmonie
+
+### Le kick donne la tonalité
+
+1. Choisir le kick pour son **son et son impact**.
+2. **Mesurer sa note** sur la queue (pas l'attaque) : accordeur ou analyseur via
+   Overbridge (~55 Hz ≈ La, ~65 Hz ≈ Do), ou à l'oreille contre une sinus.
+3. Fixer la **tonique du morceau** sur cette note : KEYBOARD SETUP de la track →
+   gamme + tonique.
+4. Accorder rumble (même TUNE que le kick au départ), basse (tonique ou quinte),
+   puis lead et Id dans la gamme.
+
+- Ne pas tordre un kick de plus de quelques demi-tons (mou vers le bas, cartoon
+  vers le haut, durée modifiée en Repitch) : **choisir des kicks proches** de la
+  tonalité visée.
+- **Nommer les samples avec leur note** : `kick_tribe_F#.wav`.
+- Un kick court et sec n'a pas de note perceptible : c'est alors la basse qui
+  fixe la tonalité.
+
+### Modes et changements de tonalité
+
+- Harmonie **statique** par défaut : une tonique qui tourne longtemps = transe.
+- **Dans un morceau** : pas de changement de tonalité. Changer de **mode sur la
+  même tonique** pour colorer (dorien → phrygien assombrit : la sixte majeure
+  éclaire, la seconde mineure oppresse), ou faire bouger la basse sur un ou
+  deux degrés quelques mesures.
+- **Entre les parties** : tonalités voisines (quinte, quarte, relatif — Camelot,
+  cf. [[../SPEC]]) ; montée d'un demi-ton / ton pour un coup d'énergie (une ou
+  deux fois max) ; pattern pont sans tonalité marquée ; ou **note pivot**
+  commune tenue par un drone ou un Id.
+- Changer de tonalité = réaccorder le grave : **presets par tonalité**
+  (`rumble_D`, `rumble_F`) ou TUNE dans les patterns concernés.
+
+### Progressions d'accords
+
+- **Pédale** : kick et rumble sur la tonique, les accords bougent au-dessus.
+- Progressions types : dorien i7 → IV7 (Dm7 → G7) ; mineur i → ♭VI → ♭VII ;
+  phrygien i → ♭II (tension, vers le mental). Couleurs min7 / min9 / min11 /
+  sus, noyées de reverb et delay (dub techno).
+- **Changer d'accord lentement** (toutes les 2 à 4 mesures), notes en p-locks,
+  conditions de trig pour alterner sur plusieurs cycles.
+- Track audio = **monophonique**. Accords via : samples d'accords transposés
+  (méthode dub techno), une voix par track, ou track MIDI (4 notes / pas) vers
+  un synthé externe.
+- **Mélodies aléatoires dans le mode** : gamme fixée dans KEYBOARD SETUP, NOTE
+  PARAM (menu PERSONALIZE) réglé pour que le bouton NOTE suive la gamme, puis
+  p-locks de notes + trig chance / conditions + longueur polymétrique. Éviter
+  un LFO random sur le pitch (non quantifié sur la gamme).
+
+## 12. Tracks identité (Id1 / Id2)
+
+Le socle (grille §1) garantit la **stabilité**, les Id portent le
+**caractère** : c'est par elles qu'on reconnaît un pattern et qu'on tient les
+arcs du set.
+
+- **Écrire les Id d'abord** (deux ou trois par partie), le socle vient ensuite
+  les servir.
+- **Introduire → développer → rappeler** : un Id apparaît discrètement,
+  s'impose, disparaît, revient plus tard comme rappel.
+- **Faire voyager un motif** entre les parties : le même Id transformé (lent,
+  filtré, noyé de delay en dub → haché sur la grille en DnB → saturé, martelé
+  en tribe → ligne acid vers le mental).
+- **Ponts** : garder l'Id de la partie précédente pendant que le nouveau socle
+  s'installe, puis faire apparaître le nouvel Id.
+- Outils : **preset locks** (variantes de son par pas via le Preset Pool),
+  **conditions de trig** (1:2, 3:4, FILL), **longueur polymétrique** (12 ou
+  14 pas contre 16), **une version d'Id = un preset**.
+
+## 13. Set multi-styles : kits, banks, presets
+
+### Hiérarchie
+
+| Élément | Contient | Vit où |
+|---|---|---|
+| **Projet** | patterns, songs, slots de samples, Preset Pool, réglages | +Drive (1 set = 1 projet) |
+| **Bank de patterns** | 16 patterns | Dans le projet |
+| **Pattern** | séquence 16 tracks **+ sa copie des sons** | Dans une bank |
+| **Song** | lignes : pattern, répétitions, longueur, mutes, tempo | Dans le projet (patterns du même projet uniquement) |
+| **Kit** | les sons des 16 tracks (photo à un instant donné) | Bibliothèque +Drive |
+| **Preset** | le son d'une track (sample + réglages) | Banks de presets, bibliothèque +Drive |
+| **Preset Pool** | sélection de presets sous la main | Dans le projet |
+
+- Banks de presets et banks de patterns n'ont **aucun rapport** : les premières
+  rangent la bibliothèque de sons, les secondes les séquences du projet.
+- **Charger = copier** : un preset ou kit chargé perd le lien avec l'original.
+  Pour mettre à jour l'original, le réenregistrer.
+
+### Workflow
+
+1. Construire les sons sur les tracks → sauvegarder les réussis en **presets**.
+2. Les 16 tracks validées → sauvegarder en **kit**.
+3. Pattern modèle (§8) = kit + routing compresseur + FILL / NOT FILL préparés.
+4. Copier le modèle dans la bank → développer les patterns.
+5. **Song** pour l'enchaînement. Sauvegarder le projet ([FUNC] + [SETTINGS]) à
+   chaque étape.
+
+### Un kit et une bank par couleur
+
+Exemple : bank A dub → bank B DnB → bank C tribe, chacune avec son kit et son
+pattern modèle.
+
+- **Arbitrage avec §3** : le kick ne bouge pas *à l'intérieur d'un acte* ; il
+  change avec le kit d'un acte à l'autre.
+- La **grille §1 reste identique** dans les trois kits : les réflexes de mutes
+  et de fills restent valables tout le set.
+- **Presets fil rouge** partagés entre kits : une texture retravaillée, les FX
+  de transition (15), une perc signature ou un vocal (14), mêmes réglages de
+  reverb et delay.
+- **Jonctions** : derniers patterns d'une bank et premiers de la suivante pensés
+  comme ponts, en mélangeant des presets des deux kits.
+
+### Transitions de tempo
+
+- **Demi-temps** : une DnB à 172 se sent à 86 ; finir la partie lente en
+  demi-temps, puis doubler l'énergie.
+- **Pattern pont** sans kick (nappe, reverb, riser) pendant lequel on change de
+  tempo.
+- **Rupture assumée** : silence ou impact, puis nouvelle partie franche.
+- Tempo global au projet ou par pattern, et tempo fixable par ligne de song
+  *(à vérifier : réglage du mode de tempo)*.
+
+### Tribe vs mental (tendances, frontières floues)
+
+| | Tribe | Mental |
+|---|---|---|
+| Groove | percussif, toms, motifs tribaux | linéaire, martelé |
+| Kick | dur | encore plus saturé, agressif |
+| Basse | contretemps rebondissante | souvent remplacée par le rumble / acid |
+| Mélodie | motifs tribaux | lignes acid (type 303), sombre, hypnotique |
+
+Le rumble n'est pas le critère distinctif : tempo, traitement du kick, place des
+percs et nature des sons mélodiques le sont. Passage tribe → mental : l'Id
+mélodique devient acid, l'Id rythmique perd ses percs, mode vers le phrygien.
+
+## 14. Aide-mémoire machine
+
+| Action | Manip | Statut |
+|---|---|---|
+| Trig mode (Tracks / Velocity / Retrigs / Slice / Preset Pool) | [FUNC] + [HAUT] / [BAS] | manuel §8.5.4 |
+| Preset Pool en trig mode | pool vide = toutes les touches jouent le même son ; remplir via PRESET/KIT | forum |
+| Step recording | [RECORD] + [STOP] ; notes au clavier, le curseur avance, flèches = silence / retour | *(à vérifier)* |
+| Grid / live recording | [RECORD] / [RECORD] + [PLAY] | |
+| Fill | [PAGE] maintenu hors grid recording ; variante avec [YES] pour verrouiller | *(à vérifier, raccourci DT1)* |
+| Effacer un paramètre locké sur toute la track | LIVE REC : [NO] + appui sur le bouton du paramètre | *(à vérifier)* |
+| Effacer les p-locks de toutes les tracks | LIVE REC : [FUNC] + [NO] (sound locks conservés) | *(à vérifier)* |
+| Effacer trig + locks | GRID REC : trig(s) + [CLEAR] | *(à vérifier)* |
+| Factory reset | [FUNC] maintenu à l'allumage → FACTORY RESET ; écrase le slot projet 1, samples d'usine et persos conservés. **Jamais** FORMAT +DRIVE | Elektron |
+| Écouter la DT2 sur le Mac | mode USB Overbridge + Overbridge Engine ; monitoring via DAW, GarageBand ou LadioCast. BlackHole inutile pour ça | |
+| Injecter les `.mid` du §7 | sortie MIDI du DAW → Digitakt II, canal = track (ou auto = track active), horloge + transport depuis le DAW, quantification live, LIVE REC ([RECORD] + [PLAY]) | *(à vérifier : réglage de quantification)* |
+
+**P-locks** : maintenir un trig + tourner un bouton = valeur pour ce pas
+seulement. **Trig-less lock** : lock sans note, pour modifier un son en cours.
+**Preset lock** : un preset du pool assigné à un pas.
+
 ## Liens
 
 - [[../SPEC]] — Phase 7 (Digitakt)
