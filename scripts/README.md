@@ -703,6 +703,33 @@ ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
 - **Limites** : sur les musiques peu mélodiques (dubstep, tek), beaucoup de
   quintes à vide et de sus2 ; un draft à valider à l'oreille.
 
+# samples.py — bibliothèque de samples DT2 (Phase 7.J1)
+
+Classe la copie des packs faite depuis Transfer (`<MEDIA>/Samples`, jamais
+modifiée) en famille / code, nomme les candidats pour l'écran de la DT2 et
+écrit `library/samples/manifest.json`. Règles et quotas : [[SPEC]] § 7.J,
+tables `FAMILY_RULES`, `PACK_CODES`, `CODE_RULES` de `analyzer/samples.py`.
+
+```bash
+python samples.py                 # (re)construit le manifeste, affiche la grille
+python samples.py --dry-run       # grille seulement
+python samples.py --report        # grille du manifeste existant (retenus/candidats)
+python samples.py --unclassified  # fichiers sans code, à corriger par override
+```
+
+Exemple de noms : `BD G# Overd 02 vtl`, `BR 170 Amen j89`, `HH Schat 17 meg`.
+
+- **Overrides** : `library/samples/overrides.json`, clé = chemin relatif à
+  `Samples/`, champs `family`, `code`, `name`, `exclude`. Une famille forcée
+  n'est jamais repliée dans UNIVERSEL.
+- **Rejouable** : relancer après un ajout de pack ou un override ; les statuts
+  `keep` / `drop` du manifeste précédent sont conservés.
+- **Tests** : `python -m pytest tests/test_samples.py` (unitaires, fausse
+  arborescence) ; `-m integration` vérifie les noms sur le vrai disque.
+- **Limites** : classement par mots-clés du chemin ; environ 500 fichiers sans
+  code (abréviations `MPC_Kit`, packs sans nom de catégorie : `Aotearoa`,
+  `Phaised air`). Le pré-filtre qualité et l'écoute arrivent en 7.J2.
+
 # kb.py — base de connaissance Digitakt II (Phase 7.D, 7.F)
 
 Corpus : `digitakt/kb/*.md` + `digitakt/doctrine.md`, découpés en sections

@@ -411,6 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3) | en cours : 7.J1 fait |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -549,6 +550,30 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   montrent la gamme sur le clavier chromatique (pas de FOLD simulé).
 - (Re)générer la bank depuis le front relance aussi `harmony.py`, sur la grille
   de la nouvelle bank ; un échec de l'harmonie ne bloque pas la bank.
+
+**Décisions 7.J (arbitrées le 2026-10-07)** :
+- 3 niveaux sur le +Drive : famille / code / fichier. Familles : HARDCORE,
+  JUNGLE, DUBSTEP, TECHNO, TRIBE (slot du pack Tribalism Vol. 1, à venir),
+  AUTRES (house, EDM, world), UNIVERSEL (machines, FX, instruments, foley,
+  Native Instruments, minimoog), SAMPLE (samples et resamples maison).
+- Codes à 2 lettres façon Elektron (BD SD CP HH OH CY TM PC BR LP BS ST PD FX
+  VX RS), aussi en tête du nom : `<CODE> [BPM|note] <desc> <pack>`, 18
+  caractères au plus (≈ 14 visibles dans la liste des samples d'une track,
+  où le dossier n'apparaît plus). BPM en tête pour BR / LP, note pour BD /
+  BS / ST / PD.
+- Stéréo conservée (400 Mo de RAM par projet) ; les doublons mono d'un pack
+  livré en mono et stéréo sont écartés. Pas de dossier « set » : la RAM du
+  projet joue ce rôle.
+- Sélection par quotas par case famille × code : 16 drums / BR / LP, 8 le
+  reste, 32 pour BD / BR / LP en HARDCORE, JUNGLE, TRIBE et pour
+  UNIVERSEL/BD, tout SAMPLE. Une case de moins de 4 fichiers (hors UNIVERSEL
+  et SAMPLE) rejoint le même code dans UNIVERSEL.
+- Candidats = 3 × quota, alternés entre sous-dossiers ; l'écoute (7.J2) passe
+  chaque candidat en `keep` / `drop`. Les `keep` priment, puis les `pending`
+  par rang, jamais les `drop`.
+- `<MEDIA>/Samples` n'est jamais modifié. Manifeste et overrides dans le vault
+  (`library/samples/`) ; le manifeste est rejouable et garde les décisions
+  d'écoute.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

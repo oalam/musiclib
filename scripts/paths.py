@@ -15,10 +15,12 @@ Deux racines :
 │   ├── audio/            # <slug>.{flac,m4a,mp3} (+ sous-dossiers de style)
 │   ├── stems/<slug>/     # Demucs
 │   └── visuals/          # PNG Phase 5 + _index.md
+├── Samples/              # copie des samples DT2 (packs bruts, lecture seule)
 └── Live/                 # materiel de set live
     ├── renoise/          # .xrns
     ├── grooves/          # .mid / .tidal
-    └── digitakt/<slug>/  # pNN.mid
+    ├── digitakt/<slug>/  # pNN.mid
+    └── samples/          # <FAMILLE>/<CODE>/<nom>.wav pour Transfer (7.J)
 ```
 
 La colonne `file` de library.md (`[[audio/<slug>.flac]]`) est relative a
@@ -57,6 +59,11 @@ LIVE_DIR = MEDIA_ROOT / "Live"
 RENOISE_DIR = LIVE_DIR / "renoise"
 GROOVES_DIR = LIVE_DIR / "grooves"
 DIGITAKT_MIDI_DIR = LIVE_DIR / "digitakt"
+DT2_SAMPLES_DIR = LIVE_DIR / "samples"   # arborescence famille/code prete pour Transfer
+
+# Copie des samples de la DT2 faite depuis Transfer (packs bruts, lecture seule)
+SAMPLES_SRC_DIR = MEDIA_ROOT / "Samples"
+SAMPLES_META_DIR = LIBRARY / "samples"   # manifeste + overrides (vault)
 
 # Conteneurs lus par Rekordbox : tout le reste (opus, ogg, webm) est
 # transcode en FLAC a l'acquisition.

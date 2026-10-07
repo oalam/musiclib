@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J1] Bibliothèque de samples DT2 : `scripts/samples.py` (logique dans
+  `analyzer/samples.py`) classe les packs de `<MEDIA>/Samples` en famille
+  (HARDCORE, JUNGLE, DUBSTEP, TECHNO, TRIBE, AUTRES, UNIVERSEL, SAMPLE) et code
+  à 2 lettres façon Elektron, nomme chaque candidat pour l'écran de la DT2
+  (`<CODE> [BPM|note] <desc> <pack>`, 18 caractères), applique quotas et
+  repli des petites cases dans UNIVERSEL, écarte les doublons mono. Manifeste
+  rejouable `library/samples/manifest.json` (867 retenus sur 2 215 candidats,
+  11 295 fichiers), overrides manuels `library/samples/overrides.json`.
+  Chemins `SAMPLES_SRC_DIR`, `SAMPLES_META_DIR`, `DT2_SAMPLES_DIR`
+  (`<MEDIA>/Live/samples`) dans `paths.py`.
 - [7.E] Envoi à la DT2 : réglage d'octave (-5 à +5) dans le panneau
   « Envoyer à la DT2 », mémorisé par track, avec la plage de notes résultante
   (notation Elektron) ; champ `octave` de `POST /api/dt2/send`, option
