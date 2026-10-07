@@ -34,10 +34,18 @@
     try { localStorage.setItem('ui:list', showList ? '1' : '0') } catch { /* stockage indisponible */ }
   }
 
-  api.tracks().then(t => (tracks = t)).catch(e => (listError = String(e)))
+  // dernier morceau ouvert, rouvert au chargement s'il est toujours dans la library
+  const LAST_KEY = 'ui:last-slug'
+  api.tracks().then(t => {
+    tracks = t
+    let last: string | null = null
+    try { last = localStorage.getItem(LAST_KEY) } catch { /* stockage indisponible */ }
+    if (last && !selected && t.some(x => x.slug === last)) select(last)
+  }).catch(e => (listError = String(e)))
 
   async function select(slug: string) {
     selected = slug
+    try { localStorage.setItem(LAST_KEY, slug) } catch { /* stockage indisponible */ }
     detail = null
     bank = null
     currentTime = 0

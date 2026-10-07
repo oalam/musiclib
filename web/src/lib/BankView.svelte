@@ -309,6 +309,29 @@
     }
   }
 
+  // etat de la vue memorise par morceau : pattern, track, mode et page de
+  // parametres de la facade, page de pas (FOLLOW reprend la main en lecture)
+  const MODES: Mode[] = ['trig', 'trk', 'mute', 'ptn', 'kb']
+  let restoredFor = ''
+  $effect.pre(() => {
+    const slug = bank.slug
+    if (slug === restoredFor) return
+    restoredFor = slug
+    try {
+      const v = JSON.parse(localStorage.getItem(`dt-view:${slug}`) ?? 'null')
+      if (!v) return
+      if (bank.patterns.some(p => p.slot === v.slot)) selectedSlot = v.slot
+      if (v.track >= 1 && v.track <= 16) selectedTrack = v.track
+      if (MODES.includes(v.mode)) mode = v.mode
+      if (typeof v.pageId === 'string') pageId = v.pageId
+      if (Number.isInteger(v.page) && v.page >= 0) page = v.page
+    } catch { /* stockage indisponible ou valeur invalide */ }
+  })
+  $effect(() => {
+    const v = { slot: selectedSlot, track: selectedTrack, mode, pageId, page }
+    if (restoredFor !== bank.slug) return
+    try { localStorage.setItem(`dt-view:${bank.slug}`, JSON.stringify(v)) } catch { /* stockage indisponible */ }
+  })
 </script>
 
 <section class="bank">

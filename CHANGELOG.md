@@ -8,6 +8,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.C] Front : état retrouvé au rechargement (navigateur) : dernier
+  morceau ouvert, et par morceau le pattern, la track DT2, le mode et la page
+  de paramètres de la façade, la page de pas, la position de lecture (sans
+  relancer la lecture ; FOLLOW reprend la main en lecture).
 - [7.E] Envoi d'une track de pattern à la Digitakt II depuis le front :
   `scripts/dt2_midi.py` (CLI + `Dt2Sender`) rejoue les trigs de la track sur
   l'AUTO CHANNEL, calés sur l'horloge de la DT2 à partir de son Start (un

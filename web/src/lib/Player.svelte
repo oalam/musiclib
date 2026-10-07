@@ -63,6 +63,18 @@
     setZoom(current * Math.exp(-e.deltaY * 0.002))
   }
 
+  const posKey = () => `ui:pos:${track.slug}`
+  let savedPos = 0
+  let posReady = false  // pas d'ecriture avant la restauration (timeupdate a 0 au chargement)
+  function readPos(): number {
+    try { return Number(localStorage.getItem(posKey())) || 0 } catch { return 0 }
+  }
+  function savePos(t: number) {
+    if (!posReady) return
+    savedPos = t
+    try { localStorage.setItem(posKey(), t.toFixed(2)) } catch { /* stockage indisponible */ }
+  }
+
   /** Saute a `t` secondes (appele par la vue bank / la partition de mutes). */
   export function seek(t: number) {
     ws?.setTime(t)
@@ -168,6 +180,10 @@
       duration = inst.getDuration()
       zoom = 0
       updateView(0, duration)
+      // position memorisee par morceau, sans relancer la lecture
+      const saved = readPos()
+      if (saved > 0 && saved < duration) inst.setTime(saved)
+      posReady = true
     })
     inst.on('scroll', (start, end) => updateView(start, end))
     // glisser sur la forme d'onde = nouvelle boucle ; un simple clic = seek
@@ -191,9 +207,10 @@
       }
       prevTime = t
       currentTime = t
+      if (Math.abs(t - savedPos) >= 1 || !inst.isPlaying()) savePos(t)
     })
     inst.on('play', () => { playing = true })
-    inst.on('pause', () => { playing = false })
+    inst.on('pause', () => { playing = false; savePos(inst.getCurrentTime()) })
     inst.on('error', err => { error = String(err); loading = false })
     ws = inst
     regions = reg
