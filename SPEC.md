@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3) | en cours : 7.J1 et 7.J2 faits, 7.J4 (UX de la bibliothèque) arbitrée, 7.J3 à venir |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3) | en cours : 7.J1, 7.J2 et 7.J4 (UX de la bibliothèque) faits, 7.J3 à venir |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -592,7 +592,7 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   mesures, sinon estimé et signalé) ; les doublons exacts entre packs
   (même nom, même taille) n'en gardent qu'une copie.
 
-**Décisions 7.J4 — UX de la bibliothèque (arbitrées le 2026-10-07, à faire)** :
+**Décisions 7.J4 — UX de la bibliothèque (arbitrées le 2026-10-07, faites)** :
 - Non classés (407) : zone « Non classés » avec écoute ; on leur donne une
   case famille × code (glisser vers la matrice ou `M`) et des tags libres ;
   écrit dans `overrides.json`, ils deviennent candidats.
@@ -607,6 +607,11 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   matrice ou vers la corbeille.
 - Sélection multiple (clic, Maj, Cmd) et barre d'outils : garder, écarter,
   corbeille, tagger, étoiles, changer de case.
+- Mise en œuvre : tags, étoiles et corbeille vivent dans `overrides.json`
+  (champs `tags`, `stars`, `trash`) et sont recopiés sur les candidats du
+  manifeste (`trashed` liste la corbeille). Un sample noté reste candidat
+  hors du plafond de 3 × quota, comme un déplacé. La restauration renvoie en
+  fin de sa case d'origine (override ou règles), sinon parmi les non classés.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

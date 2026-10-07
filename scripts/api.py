@@ -7,7 +7,8 @@ samples DT2 (Phase 7.J2, `samples.py`).
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
 (`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`), et les
-decisions d'ecoute des samples (`POST /api/samples/status`, manifeste). L'envoi
+decisions d'ecoute et le rangement des samples (`POST /api/samples/...`,
+manifeste et overrides.json). L'envoi
 MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
 dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre).
@@ -24,8 +25,9 @@ import argparse
 import json
 import subprocess
 import threading
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import Annotated, Any, Literal
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
@@ -43,15 +45,24 @@ from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.samples import (
+    STARS_MAX,
+    LooseSample,
     Override,
     SampleEntry,
     SampleError,
     Status,
+    all_tags,
     cell_of,
+    known,
+    loose,
     quota,
+    set_stars,
     set_status,
+    set_tags,
 )
 from analyzer.samples import move as move_sample
+from analyzer.samples import restore as restore_sample
+from analyzer.samples import trash as trash_sample
 from analyzer.types import CuePoint, DigitaktBank, Segment
 from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
 from library_md import parse_library
@@ -168,20 +179,48 @@ class SampleCell(BaseModel):
     flagged: int        # candidats signales par le pre-filtre
 
 
+Sources = Annotated[list[Annotated[str, Field(min_length=1, max_length=500)]],
+                    Field(min_length=1, max_length=2000)]
+TagList = list[Annotated[str, Field(max_length=100)]]
+
+
 class SampleDecision(BaseModel):
-    source: str = Field(min_length=1, max_length=500)
+    sources: Sources
     status: Status
 
 
 class SampleMove(BaseModel):
-    source: str = Field(min_length=1, max_length=500)
+    sources: Sources
     family: str = Field(min_length=1, max_length=20)
     code: str = Field(min_length=2, max_length=2)
 
 
-def _sample_cells(m: samples.Manifest) -> list[SampleCell]:
+class SampleBatch(BaseModel):
+    """Corbeille / restauration d'une selection (7.J4)."""
+    sources: Sources
+
+
+class SampleStars(BaseModel):
+    sources: Sources
+    stars: int | None = Field(default=None, ge=1, le=STARS_MAX)   # None = retirer
+
+
+class SampleTags(BaseModel):
+    sources: Sources
+    add: TagList = Field(default_factory=list, max_length=20)
+    remove: TagList = Field(default_factory=list, max_length=20)
+
+
+def _sample_cells(m: samples.Manifest, tag: str | None = None,
+                  min_stars: int | None = None) -> list[SampleCell]:
+    """Grille ; avec un filtre, les compteurs ne portent que sur les candidats
+    qui y repondent (cases sans candidat retenu par le filtre omises)."""
     cells: dict[tuple[str, str], list[SampleEntry]] = {}
     for e in m.entries:
+        if tag is not None and tag not in e.tags:
+            continue
+        if min_stars is not None and (e.stars or 0) < min_stars:
+            continue
         cells.setdefault((e.family, e.code), []).append(e)
     return [SampleCell(
         family=fam, code=code, quota=quota(fam, code), candidates=len(es),
@@ -372,8 +411,9 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return FileResponse(kb.MANUAL_PDF, media_type="application/pdf")
 
     @app.get("/api/samples", response_model=list[SampleCell])
-    def sample_cells() -> list[SampleCell]:
-        return _sample_cells(manifest())
+    def sample_cells(tag: str | None = None,
+                     min_stars: int | None = Query(None, ge=1, le=STARS_MAX)) -> list[SampleCell]:
+        return _sample_cells(manifest(), tag, min_stars)
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
     def sample_cell(family: str, code: str) -> list[SampleEntry]:
@@ -382,40 +422,62 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(404, f"case inconnue : {family}/{code}")
         return cell
 
-    @app.post("/api/samples/status", response_model=list[SampleEntry])
-    def sample_status(req: SampleDecision) -> list[SampleEntry]:
-        """Decision d'ecoute ; renvoie la case avec sa selection recalculee."""
-        with samples_lock:
-            m = manifest()
-            try:
-                cell = set_status(m, req.source, req.status)
-            except SampleError as exc:
-                raise HTTPException(404, str(exc)) from exc
-            samples.save_manifest(m, samples_manifest)
-        return cell
+    @app.get("/api/samples/loose", response_model=list[LooseSample])
+    def sample_loose(which: Literal["unclassified", "trash"]) -> list[LooseSample]:
+        """Non classes ou corbeille (7.J4)."""
+        return loose(manifest(), samples.load_overrides(samples_overrides), which)
 
-    @app.post("/api/samples/move", response_model=list[SampleEntry])
-    def sample_move(req: SampleMove) -> list[SampleEntry]:
-        """Deplace un candidat vers une autre case (statut garde) et l'inscrit
-        dans overrides.json ; renvoie l'ancienne case."""
+    @app.get("/api/samples/tags", response_model=list[str])
+    def sample_tags() -> list[str]:
+        return all_tags(samples.load_overrides(samples_overrides))
+
+    def edit(sources: list[str], op: Callable[[samples.Manifest, dict[str, Override], str], object],
+             status_code: int = 404) -> list[SampleCell]:
+        """Applique `op` a chaque source puis ecrit manifeste et overrides ; une
+        erreur sur une source annule tout (rien n'est ecrit). Renvoie la grille."""
         with samples_lock:
             m = manifest()
             try:
                 overrides = samples.load_overrides(samples_overrides)
-                old_cell, ov = move_sample(m, req.source, req.family, req.code, samples_src)
+                for src in dict.fromkeys(sources):
+                    op(m, overrides, src)
             except SampleError as exc:
-                raise HTTPException(422, str(exc)) from exc
-            prev = overrides.get(req.source, Override())
-            # nom regenere avec le nouveau code : un nom force ne suit pas
-            overrides[req.source] = prev.model_copy(update={"family": ov.family,
-                                                            "code": ov.code, "name": None})
+                raise HTTPException(status_code, str(exc)) from exc
             samples.save_manifest(m, samples_manifest)
             samples.save_overrides(overrides, samples_overrides)
-        return old_cell
+        return _sample_cells(m)
+
+    @app.post("/api/samples/status", response_model=list[SampleCell])
+    def sample_status(req: SampleDecision) -> list[SampleCell]:
+        """Decision d'ecoute ; la selection des cases est recalculee."""
+        return edit(req.sources, lambda m, _ov, src: set_status(m, src, req.status))
+
+    @app.post("/api/samples/move", response_model=list[SampleCell])
+    def sample_move(req: SampleMove) -> list[SampleCell]:
+        """Range des candidats ou des non classes dans une case (statut garde)
+        et l'inscrit dans overrides.json."""
+        return edit(req.sources, lambda m, ov, src: move_sample(
+            m, ov, src, req.family, req.code, samples_src), status_code=422)
+
+    @app.post("/api/samples/stars", response_model=list[SampleCell])
+    def sample_stars(req: SampleStars) -> list[SampleCell]:
+        return edit(req.sources, lambda m, ov, src: set_stars(m, ov, src, req.stars))
+
+    @app.post("/api/samples/tags", response_model=list[SampleCell])
+    def sample_tags_edit(req: SampleTags) -> list[SampleCell]:
+        return edit(req.sources, lambda m, ov, src: set_tags(m, ov, src, req.add, req.remove))
+
+    @app.post("/api/samples/trash", response_model=list[SampleCell])
+    def sample_trash(req: SampleBatch) -> list[SampleCell]:
+        return edit(req.sources, trash_sample)
+
+    @app.post("/api/samples/restore", response_model=list[SampleCell])
+    def sample_restore(req: SampleBatch) -> list[SampleCell]:
+        return edit(req.sources, lambda m, ov, src: restore_sample(m, ov, src, samples_src))
 
     @app.get("/api/samples/audio")
     def sample_audio(source: str) -> FileResponse:
-        if not any(e.source == source for e in manifest().entries):
+        if not known(manifest(), source):
             raise HTTPException(404, f"sample hors manifeste : {source}")
         if samples_src == SAMPLES_SRC_DIR:
             try:

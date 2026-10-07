@@ -254,17 +254,27 @@ def test_samples_cells(samples_client: TestClient):
                               params={"family": "JUNGLE", "code": "BD"}).status_code == 404
 
 
+def _post(client: TestClient, path: str, **body: object):
+    return client.post(f"/api/samples/{path}", json=body)
+
+
 def test_samples_drop_promotes_next_and_persists(samples_client: TestClient):
-    r = samples_client.post("/api/samples/status", json={"source": "p/fx1.wav", "status": "drop"})
-    assert r.status_code == 200
-    selected = [e["source"] for e in r.json() if e["selected"]]
+    r = _post(samples_client, "status", sources=["p/fx1.wav"], status="drop")
+    assert r.status_code == 200 and (r.json()[0]["drop"], r.json()[0]["selected"]) == (1, 8)
+    cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
+    selected = [e["source"] for e in cell if e["selected"]]
     assert "p/fx1.wav" not in selected and "p/fx9.wav" in selected
-    cells = samples_client.get("/api/samples").json()
-    assert (cells[0]["drop"], cells[0]["selected"]) == (1, 8)
-    assert samples_client.post("/api/samples/status",
-                               json={"source": "p/absent.wav", "status": "keep"}).status_code == 404
-    assert samples_client.post("/api/samples/status",
-                               json={"source": "p/fx1.wav", "status": "maybe"}).status_code == 422
+    assert _post(samples_client, "status", sources=["p/absent.wav"], status="keep").status_code == 404
+    assert _post(samples_client, "status", sources=["p/fx1.wav"], status="maybe").status_code == 422
+    assert _post(samples_client, "status", sources=[], status="keep").status_code == 422
+
+
+def test_samples_batch_is_all_or_nothing(samples_client: TestClient):
+    r = _post(samples_client, "status", sources=["p/fx1.wav", "p/absent.wav"], status="keep")
+    assert r.status_code == 404
+    assert samples_client.get("/api/samples").json()[0]["keep"] == 0
+    r = _post(samples_client, "status", sources=["p/fx1.wav", "p/fx2.wav", "p/fx1.wav"], status="keep")
+    assert r.json()[0]["keep"] == 2
 
 
 def test_samples_audio_only_from_manifest(samples_client: TestClient):
@@ -274,16 +284,40 @@ def test_samples_audio_only_from_manifest(samples_client: TestClient):
                               params={"source": "../library.md"}).status_code == 404
 
 
-def test_samples_move_writes_override(samples_client: TestClient, tmp_path: Path,
-                                      monkeypatch: pytest.MonkeyPatch):
-    r = samples_client.post("/api/samples/move",
-                            json={"source": "p/fx1.wav", "family": "TECHNO", "code": "VX"})
+def test_samples_move_writes_override(samples_client: TestClient, tmp_path: Path):
+    r = _post(samples_client, "move", sources=["p/fx1.wav"], family="TECHNO", code="VX")
     assert r.status_code == 200
-    assert "p/fx1.wav" not in {e["source"] for e in r.json()}
-    cells = {(c["family"], c["code"]): c for c in samples_client.get("/api/samples").json()}
+    cells = {(c["family"], c["code"]): c for c in r.json()}
     assert cells["TECHNO", "VX"]["selected"] == 1
     assert cells["JUNGLE", "FX"]["selected"] == 8          # le 9e monte
     assert json.loads((tmp_path / "overrides.json").read_text()) == {
         "p/fx1.wav": {"family": "TECHNO", "code": "VX"}}
-    assert samples_client.post("/api/samples/move", json={
-        "source": "p/fx1.wav", "family": "TECHNO", "code": "ZZ"}).status_code == 422
+    assert _post(samples_client, "move", sources=["p/fx1.wav"],
+                 family="TECHNO", code="ZZ").status_code == 422
+
+
+def test_samples_stars_tags_filter(samples_client: TestClient, tmp_path: Path):
+    assert _post(samples_client, "stars", sources=["p/fx10.wav"], stars=4).status_code == 200
+    assert _post(samples_client, "stars", sources=["p/fx1.wav"], stars=9).status_code == 422
+    _post(samples_client, "tags", sources=["p/fx10.wav", "p/fx2.wav"], add=["Dark"])
+    cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
+    assert (cell[0]["source"], cell[0]["stars"], cell[0]["tags"]) == ("p/fx10.wav", 4, ["dark"])
+    assert samples_client.get("/api/samples/tags").json() == ["dark"]
+    only = samples_client.get("/api/samples", params={"tag": "dark", "min_stars": 3}).json()
+    assert [(c["candidates"], c["selected"]) for c in only] == [(1, 1)]
+    assert json.loads((tmp_path / "overrides.json").read_text()) == {
+        "p/fx10.wav": {"stars": 4, "tags": ["dark"]}, "p/fx2.wav": {"tags": ["dark"]}}
+
+
+def test_samples_trash_restore(samples_client: TestClient):
+    r = _post(samples_client, "trash", sources=["p/fx1.wav"])
+    assert r.json()[0]["candidates"] == 9
+    trash = samples_client.get("/api/samples/loose", params={"which": "trash"}).json()
+    assert [t["source"] for t in trash] == ["p/fx1.wav"]
+    # toujours ecoutable depuis la corbeille
+    assert samples_client.get("/api/samples/audio", params={"source": "p/fx1.wav"}).status_code == 200
+    assert _post(samples_client, "status", sources=["p/fx1.wav"], status="keep").status_code == 404
+    r = _post(samples_client, "restore", sources=["p/fx1.wav"])
+    assert r.status_code == 200
+    assert samples_client.get("/api/samples/loose", params={"which": "trash"}).json() == []
+    assert samples_client.get("/api/samples/loose", params={"which": "x"}).status_code == 422

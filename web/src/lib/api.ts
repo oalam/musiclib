@@ -220,7 +220,7 @@ export interface Dt2SendState {
   finished_at: string | null
 }
 
-/** Bibliotheque de samples DT2 (7.J2, scripts/samples.py). */
+/** Bibliotheque de samples DT2 (7.J2, 7.J4, scripts/samples.py). */
 export type SampleStatus = 'pending' | 'keep' | 'drop'
 export interface SampleEntry {
   source: string
@@ -235,7 +235,17 @@ export interface SampleEntry {
   flags: string[] | null
   bpm: number | null       // tempo mesure (boucle sans tempo dans le nom)
   bpm_est: boolean         // librosa seul, non confirme par la duree
+  tags: string[]
+  stars: number | null
 }
+/** Fichier hors des cases : non classe ou en corbeille. */
+export interface LooseSample {
+  source: string
+  pack: string
+  tags: string[]
+  stars: number | null
+}
+export interface SampleFilter { tag?: string; minStars?: number }
 export interface SampleCell {
   family: string
   code: string
@@ -263,6 +273,11 @@ async function json<T>(res: Response): Promise<T> {
 
 const enc = encodeURIComponent
 
+function samplePost(action: string, body: object): Promise<SampleCell[]> {
+  return fetch(`/api/samples/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then(r => json<SampleCell[]>(r))
+}
+
 export const api = {
   tracks: () => fetch('/api/tracks').then(r => json<TrackSummary[]>(r)),
   track: (slug: string) => fetch(`/api/tracks/${enc(slug)}`).then(r => json<TrackDetail>(r)),
@@ -286,15 +301,24 @@ export const api = {
       .then(r => json<Dt2SendState>(r)),
   dt2SendStatus: () => fetch('/api/dt2/send').then(r => json<Dt2SendState | null>(r)),
   dt2SendCancel: () => fetch('/api/dt2/send', { method: 'DELETE' }).then(r => json<Dt2SendState | null>(r)),
-  sampleCells: () => fetch('/api/samples').then(r => json<SampleCell[]>(r)),
+  sampleCells: (f: SampleFilter = {}) => {
+    const q = new URLSearchParams()
+    if (f.tag) q.set('tag', f.tag)
+    if (f.minStars) q.set('min_stars', String(f.minStars))
+    return fetch(`/api/samples?${q}`).then(r => json<SampleCell[]>(r))
+  },
   sampleCell: (family: string, code: string) =>
     fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}`).then(r => json<SampleEntry[]>(r)),
-  sampleStatus: (source: string, status: SampleStatus) =>
-    fetch('/api/samples/status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source, status }) })
-      .then(r => json<SampleEntry[]>(r)),
-  sampleMove: (source: string, family: string, code: string) =>
-    fetch('/api/samples/move', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source, family, code }) })
-      .then(r => json<SampleEntry[]>(r)),
+  sampleLoose: (which: 'unclassified' | 'trash') =>
+    fetch(`/api/samples/loose?which=${which}`).then(r => json<LooseSample[]>(r)),
+  sampleTags: () => fetch('/api/samples/tags').then(r => json<string[]>(r)),
+  // actions par lot : toutes renvoient la grille complete (sans filtre)
+  sampleStatus: (sources: string[], status: SampleStatus) => samplePost('status', { sources, status }),
+  sampleMove: (sources: string[], family: string, code: string) => samplePost('move', { sources, family, code }),
+  sampleStars: (sources: string[], stars: number | null) => samplePost('stars', { sources, stars }),
+  sampleTagsEdit: (sources: string[], add: string[], remove: string[] = []) => samplePost('tags', { sources, add, remove }),
+  sampleTrash: (sources: string[]) => samplePost('trash', { sources }),
+  sampleRestore: (sources: string[]) => samplePost('restore', { sources }),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }

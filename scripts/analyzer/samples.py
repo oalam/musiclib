@@ -13,6 +13,12 @@ des drapeaux et repoussent le candidat en fin de case, sans l'ecarter : la
 decision reste a l'ecoute. Le manifeste garde les decisions d'ecoute (`keep` / `drop`)
 d'un passage a l'autre ; les overrides (famille, code, nom) sont edites a la
 main dans un fichier a part.
+
+Bibliotheque (7.J4) : les overrides portent aussi les tags libres, les etoiles
+(1 a 5 : un sample note passe devant les non-notes de sa case) et la corbeille
+(son rejete partout, distinct de `drop` qui ne vaut que pour la case). Les
+operations du front (`move`, `set_stars`, `set_tags`, `trash`, `restore`)
+modifient le manifeste et les overrides en memoire ; l'appelant les ecrit.
 """
 from __future__ import annotations
 
@@ -183,6 +189,9 @@ _ONESHOT_DIR_RX = re.compile(r"one ?-?shots?")
 _SPLIT_RX = re.compile(r"[\s_\-.()\[\],+&']+")
 _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])")
 
+TAG_MAX = 24
+STARS_MAX = 5
+
 Status = Literal["pending", "keep", "drop"]
 LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
 
@@ -205,6 +214,8 @@ class SampleEntry(BaseModel):
     flags: list[str] | None = None  # defauts du pre-filtre (None = pas mesure)
     bpm: int | None = None          # boucle sans tempo dans le nom : tempo de l'audio
     bpm_est: bool = False           # bpm librosa seul (pas confirme par la duree)
+    tags: list[str] = Field(default_factory=list)   # copie des overrides (7.J4)
+    stars: int | None = None
 
     @property
     def dest(self) -> str:
@@ -217,6 +228,17 @@ class Override(BaseModel):
     code: str | None = None
     name: str | None = None
     exclude: bool = False
+    tags: list[str] = Field(default_factory=list)
+    stars: int | None = Field(default=None, ge=1, le=STARS_MAX)
+    trash: bool = False     # corbeille : hors de toutes les cases, restaurable
+
+
+class LooseSample(BaseModel):
+    """Fichier hors des cases : non classe ou en corbeille."""
+    source: str
+    pack: str
+    tags: list[str] = Field(default_factory=list)
+    stars: int | None = None
 
 
 class Manifest(BaseModel):
@@ -225,6 +247,7 @@ class Manifest(BaseModel):
     entries: list[SampleEntry] = Field(default_factory=list)
     unclassified: list[str] = Field(default_factory=list)
     folded: list[str] = Field(default_factory=list)   # cases "FAM/CODE" repliees
+    trashed: list[str] = Field(default_factory=list)  # corbeille (overrides trash)
 
 
 class _Raw(BaseModel):
@@ -499,15 +522,20 @@ def _unique(name: str, taken: set[str]) -> str:
 
 # --- Pipeline ---------------------------------------------------------------
 
-def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], list[str]]:
-    """Famille, code, pack et duree de chaque wav ; retourne aussi les non classes."""
+def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], list[str], list[str]]:
+    """Famille, code, pack et duree de chaque wav ; retourne aussi les non
+    classes et la corbeille."""
     paths = list(iter_wavs(root))
     rels = [p.relative_to(root).as_posix() for p in paths]
     all_low = {r.lower() for r in rels}
     found: list[tuple[str, float | None, str | None, Override, tuple[str, int]]] = []
+    trashed: list[str] = []
     for p, rel in zip(paths, rels):
         ov = overrides.get(rel, Override())
         if ov.exclude or _is_mono_twin(rel, all_low):
+            continue
+        if ov.trash:
+            trashed.append(rel)
             continue
         dur = wav_duration(p)
         found.append((rel, dur, ov.code or code_of(rel, dur), ov,
@@ -528,7 +556,7 @@ def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], li
             continue
         raws.append(_Raw(source=rel, family=ov.family or family_of(rel),
                          code=code, pack=pack_of(rel), duration=dur))
-    return raws, unclassified
+    return raws, unclassified, sorted(trashed)
 
 
 def fold_small_cells(raws: list[_Raw], overrides: dict[str, Override]) -> list[str]:
@@ -565,8 +593,14 @@ BpmFn = Callable[[Path, float | None], tuple[int | None, bool]]
 
 def _pinned(source: str, prev_status: dict[str, Status], overrides: dict[str, Override]) -> bool:
     ov = overrides.get(source)
-    moved = ov is not None and (ov.family is not None or ov.code is not None)
-    return moved or prev_status.get(source, "pending") != "pending"
+    touched = ov is not None and (ov.family is not None or ov.code is not None
+                                  or ov.stars is not None)
+    return touched or prev_status.get(source, "pending") != "pending"
+
+
+def star_key(stars: int | None) -> int:
+    """Cle de tri : les notes passent devant les non-notes, 5 etoiles d'abord."""
+    return -(stars or 0)
 
 
 
@@ -576,7 +610,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                    bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
     """Manifeste rejouable. Les drapeaux deja mesures sont repris du manifeste
     precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
-    raws, unclassified = classify(root, overrides)
+    raws, unclassified, trashed = classify(root, overrides)
     folded = fold_small_cells(raws, overrides)
     prev = {e.source: e for e in previous.entries} if previous else {}
     prev_status = {k: e.status for k, e in prev.items()}
@@ -615,8 +649,10 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                     tempos[r.source] = (old.bpm, old.bpm_est)
                 elif bpm_fn is not None:
                     tempos[r.source] = bpm_fn(root / r.source, r.duration)
-        # tri stable : les defauts passent en fin de case, le tour de role reste
-        kept.sort(key=lambda r: penalty(flags[r.source]))
+        # tri stable : les notes en tete, les defauts en fin de case, le tour
+        # de role reste
+        stars = {r.source: overrides.get(r.source, Override()).stars for r in kept}
+        kept.sort(key=lambda r: (star_key(stars[r.source]), penalty(flags[r.source])))
         taken: set[str] = set()
         cell_entries: list[SampleEntry] = []
         for rank, r in enumerate(kept, 1):
@@ -628,12 +664,13 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                 source=r.source, family=fam, code=code, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
                 status=prev_status.get(r.source, "pending"), flags=flags[r.source],
-                bpm=bpm, bpm_est=est))
+                bpm=bpm, bpm_est=est, tags=ov.tags, stars=ov.stars))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
-    return Manifest(source_root=str(root), total=len(raws) + len(unclassified),
-                    entries=entries, unclassified=unclassified, folded=folded)
+    return Manifest(source_root=str(root), total=len(raws) + len(unclassified) + len(trashed),
+                    entries=entries, unclassified=unclassified, folded=folded,
+                    trashed=trashed)
 
 
 def select(cell: list[SampleEntry], q: int | None) -> None:
@@ -651,10 +688,45 @@ def cell_of(manifest: Manifest, family: str, code: str) -> list[SampleEntry]:
                   key=lambda e: e.rank)
 
 
+def _entry(manifest: Manifest, source: str) -> SampleEntry | None:
+    return next((e for e in manifest.entries if e.source == source), None)
+
+
+def _reselect(manifest: Manifest, family: str, code: str) -> list[SampleEntry]:
+    """Rang (notes en tete, ordre stable sinon) puis selection d'une case."""
+    cell = cell_of(manifest, family, code)
+    cell.sort(key=lambda e: star_key(e.stars))
+    for rank, e in enumerate(cell, 1):
+        e.rank = rank
+    select(cell, quota(family, code))
+    return cell
+
+
+def _set_override(overrides: dict[str, Override], source: str, **update: object) -> Override:
+    """Met a jour l'override d'un fichier ; un override revenu aux valeurs par
+    defaut est retire (overrides.json reste lisible a la main)."""
+    ov = overrides.get(source, Override()).model_copy(update=update)
+    if ov == Override():
+        overrides.pop(source, None)
+    else:
+        overrides[source] = ov
+    return ov
+
+
+def known(manifest: Manifest, source: str) -> bool:
+    """Fichier du manifeste : candidat, non classe ou en corbeille."""
+    return (_entry(manifest, source) is not None or source in manifest.unclassified
+            or source in manifest.trashed)
+
+
+def norm_tag(tag: str) -> str:
+    return " ".join(tag.lower().split())[:TAG_MAX].strip()
+
+
 def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEntry]:
     """Decision d'ecoute d'un candidat, puis nouvelle selection de sa case
     (un drop fait monter le pending suivant). Renvoie la case."""
-    entry = next((e for e in manifest.entries if e.source == source), None)
+    entry = _entry(manifest, source)
     if entry is None:
         raise SampleError(f"candidat inconnu : {source}")
     entry.status = status
@@ -663,24 +735,53 @@ def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEn
     return cell
 
 
-def move(manifest: Manifest, source: str, family: str, code: str, root: Path,
-         measure_fn: Measure | None = measure) -> tuple[list[SampleEntry], Override]:
-    """Deplace un candidat vers une autre case (correction a l'ecoute).
+def _adopt(manifest: Manifest, source: str, family: str, code: str, ov: Override,
+           root: Path, measure_fn: Measure | None, bpm_fn: BpmFn | None) -> SampleEntry:
+    """Fait entrer un fichier hors case (non classe, restaure) en fin de case."""
+    path = root / source
+    present = path.is_file()
+    dur = wav_duration(path) if present else None
+    bpm, est = None, False
+    if code in TEMPO and tempo_of(source) is None and bpm_fn is not None and present:
+        bpm, est = bpm_fn(path, dur)
+    target = cell_of(manifest, family, code)
+    pack = pack_of(source)
+    entry = SampleEntry(
+        source=source, family=family, code=code, pack=pack,
+        name=_unique(ov.name or short_name(source, code, pack, bpm), {e.name for e in target}),
+        duration=dur, rank=max((e.rank for e in target), default=0) + 1,
+        flags=measure_fn(path, code) if measure_fn is not None and present else None,
+        bpm=bpm, bpm_est=est, tags=ov.tags, stars=ov.stars)
+    manifest.entries.append(entry)
+    _reselect(manifest, family, code)
+    return entry
 
-    Statut garde ; le candidat se range en fin de la nouvelle case, renomme
-    avec le nouveau code et remesure (blanc / long dependent du code). Les deux
-    cases sont reselectionnees. Renvoie l'ancienne case et l'override a
-    enregistrer pour que le deplacement survive a une reconstruction."""
+
+def move(manifest: Manifest, overrides: dict[str, Override], source: str,
+         family: str, code: str, root: Path, measure_fn: Measure | None = measure,
+         bpm_fn: BpmFn | None = estimate_bpm) -> None:
+    """Range un fichier dans une case (correction a l'ecoute, ou case donnee a
+    un non classe, qui devient candidat).
+
+    Statut garde ; le candidat se range en fin de la nouvelle case (apres les
+    notes), renomme avec le nouveau code et remesure (blanc / long dependent du
+    code). Les deux cases sont reselectionnees. L'override (famille, code) fait
+    survivre le deplacement a une reconstruction ; un nom force ne suit pas."""
     if family not in FAMILIES:
         raise SampleError(f"famille inconnue : {family}")
     if code not in CODES:
         raise SampleError(f"code inconnu : {code}")
-    entry = next((e for e in manifest.entries if e.source == source), None)
+    entry = _entry(manifest, source)
+    if entry is None and source not in manifest.unclassified:
+        raise SampleError(f"ni candidat ni non classe : {source}")
+    ov = _set_override(overrides, source, family=family, code=code, name=None)
     if entry is None:
-        raise SampleError(f"candidat inconnu : {source}")
+        manifest.unclassified.remove(source)
+        _adopt(manifest, source, family, code, ov, root, measure_fn, bpm_fn)
+        return
     old = (entry.family, entry.code)
     if old == (family, code):
-        return cell_of(manifest, family, code), Override(family=family, code=code)
+        return
     target = cell_of(manifest, family, code)
     entry.family, entry.code = family, code
     entry.rank = max((e.rank for e in target), default=0) + 1
@@ -689,10 +790,84 @@ def move(manifest: Manifest, source: str, family: str, code: str, root: Path,
     path = root / source
     if measure_fn is not None and path.is_file():
         entry.flags = measure_fn(path, code)
-    select(cell_of(manifest, family, code), quota(family, code))
-    old_cell = cell_of(manifest, *old)
-    select(old_cell, quota(*old))
-    return old_cell, Override(family=family, code=code)
+    _reselect(manifest, family, code)
+    _reselect(manifest, *old)
+
+
+def set_stars(manifest: Manifest, overrides: dict[str, Override], source: str,
+              stars: int | None) -> None:
+    """Note (None = retiree) ; un candidat note remonte dans sa case. Noter ne
+    vaut pas garder : le statut ne change pas."""
+    if stars is not None and not 1 <= stars <= STARS_MAX:
+        raise SampleError(f"etoiles hors 1..{STARS_MAX} : {stars}")
+    if not known(manifest, source):
+        raise SampleError(f"sample inconnu : {source}")
+    _set_override(overrides, source, stars=stars)
+    entry = _entry(manifest, source)
+    if entry is not None:
+        entry.stars = stars
+        _reselect(manifest, entry.family, entry.code)
+
+
+def set_tags(manifest: Manifest, overrides: dict[str, Override], source: str,
+             add: Iterable[str] = (), remove: Iterable[str] = ()) -> list[str]:
+    """Ajoute / retire des tags libres (normalises) ; renvoie les tags du fichier."""
+    if not known(manifest, source):
+        raise SampleError(f"sample inconnu : {source}")
+    gone = {norm_tag(t) for t in remove}
+    tags = set(overrides.get(source, Override()).tags) - gone
+    tags |= {t for t in map(norm_tag, add) if t}
+    _set_override(overrides, source, tags=sorted(tags))
+    entry = _entry(manifest, source)
+    if entry is not None:
+        entry.tags = sorted(tags)
+    return sorted(tags)
+
+
+def trash(manifest: Manifest, overrides: dict[str, Override], source: str) -> None:
+    """Corbeille : sort le fichier de sa case (ou des non classes) ; jamais
+    supprime du disque."""
+    entry = _entry(manifest, source)
+    if entry is not None:
+        manifest.entries.remove(entry)
+        _reselect(manifest, entry.family, entry.code)
+    elif source in manifest.unclassified:
+        manifest.unclassified.remove(source)
+    elif source not in manifest.trashed:
+        raise SampleError(f"sample inconnu : {source}")
+    _set_override(overrides, source, trash=True)
+    manifest.trashed = sorted({*manifest.trashed, source})
+
+
+def restore(manifest: Manifest, overrides: dict[str, Override], source: str, root: Path,
+            measure_fn: Measure | None = measure, bpm_fn: BpmFn | None = estimate_bpm) -> None:
+    """Sort de la corbeille : retour dans sa case (override ou regles) en fin
+    de case, ou parmi les non classes."""
+    if source not in manifest.trashed:
+        raise SampleError(f"pas dans la corbeille : {source}")
+    manifest.trashed.remove(source)
+    ov = _set_override(overrides, source, trash=False)
+    path = root / source
+    code = ov.code or code_of(source, wav_duration(path) if path.is_file() else None)
+    if code is None:
+        manifest.unclassified = sorted({*manifest.unclassified, source})
+        return
+    _adopt(manifest, source, ov.family or family_of(source), code, ov, root, measure_fn, bpm_fn)
+
+
+def loose(manifest: Manifest, overrides: dict[str, Override], which: str) -> list[LooseSample]:
+    """Non classes (`unclassified`) ou corbeille (`trash`), avec tags et etoiles."""
+    sources = manifest.trashed if which == "trash" else manifest.unclassified
+    out = []
+    for src in sources:
+        ov = overrides.get(src, Override())
+        out.append(LooseSample(source=src, pack=pack_of(src), tags=ov.tags, stars=ov.stars))
+    return out
+
+
+def all_tags(overrides: dict[str, Override]) -> list[str]:
+    """Tags deja utilises (autocompletion)."""
+    return sorted({t for ov in overrides.values() for t in ov.tags})
 
 
 def grid(manifest: Manifest) -> dict[str, dict[str, tuple[int, int]]]:

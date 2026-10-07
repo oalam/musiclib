@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bibliotheque de samples DT2 : classement et pre-selection (Phase 7.J1, 7.J2).
+"""Bibliotheque de samples DT2 : classement et pre-selection (Phase 7.J1, 7.J2, 7.J4).
 
 Lit la copie des packs (`<MEDIA>/Samples`, jamais modifiee), classe chaque
 wav en famille / code, nomme les candidats pour l'ecran de la DT2 et ecrit
@@ -20,7 +20,10 @@ Fichiers (vault) :
     library/samples/manifest.json   # candidats, noms, statut, selection
     library/samples/overrides.json  # corrections manuelles, cle = chemin source :
         {"rthm/x.wav": {"family": "TRIBE", "code": "BD", "name": "BD Fat 01 rth",
-                        "exclude": false}}
+                        "exclude": false, "tags": ["acid"], "stars": 4,
+                        "trash": false}}
+        tags, etoiles et corbeille (7.J4) sont poses depuis le front ; `exclude`
+        ignore le fichier, `trash` le garde visible dans la corbeille.
 """
 from __future__ import annotations
 
@@ -94,7 +97,7 @@ def render_grid(m: Manifest) -> str:
         row = " ".join(f"{(f'{cells[c][1]}/{cells[c][0]}' if c in cells else '.'):>7}" for c in codes)
         lines.append(f"{fam:10} {row}  {s:>4}/{n}")
     lines.append(f"retenus/candidats : {tot_s}/{tot_n} ; fichiers sources : {m.total} ; "
-                 f"non classes : {len(m.unclassified)}")
+                 f"non classes : {len(m.unclassified)} ; corbeille : {len(m.trashed)}")
     flagged = Counter(f for e in m.entries for f in e.flags or [])
     if flagged:
         lines.append("drapeaux qualite : " + ", ".join(f"{f} {n}" for f, n in flagged.most_common()))

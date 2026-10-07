@@ -703,7 +703,7 @@ ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
 - **Limites** : sur les musiques peu mélodiques (dubstep, tek), beaucoup de
   quintes à vide et de sus2 ; un draft à valider à l'oreille.
 
-# samples.py — bibliothèque de samples DT2 (Phase 7.J1, 7.J2)
+# samples.py — bibliothèque de samples DT2 (Phase 7.J1, 7.J2, 7.J4)
 
 Classe la copie des packs faite depuis Transfer (`<MEDIA>/Samples`, jamais
 modifiée) en famille / code, nomme les candidats pour l'écran de la DT2 et
@@ -723,8 +723,10 @@ Exemple de noms : `BD G# Overd 02 vtl`, `BR 170 Amen j89`, `HH Schat 17 meg`,
 BL basse.
 
 - **Overrides** : `library/samples/overrides.json`, clé = chemin relatif à
-  `Samples/`, champs `family`, `code`, `name`, `exclude`. Une famille forcée
-  n'est jamais repliée dans UNIVERSEL.
+  `Samples/`, champs `family`, `code`, `name`, `exclude`, et depuis 7.J4
+  `tags`, `stars` (1 à 5), `trash`. Une famille forcée n'est jamais repliée
+  dans UNIVERSEL. `exclude` ignore le fichier ; `trash` (corbeille, posé
+  depuis le front) le garde listé et restaurable.
 - **Pré-filtre qualité (7.J2)** : chaque candidat reçoit des drapeaux
   (`flags`) : `muet` (crête < -40 dBFS), `faible` (< -18 dBFS), `sature`
   (plateaux à pleine échelle sur plus de 0,1 % du fichier), `blanc` (plus de
@@ -738,6 +740,17 @@ BL basse.
   `U` annuler, `↑` `↓` sample, `←` `→` case, `Espace` rejouer, `R` réserve,
   `M` changer de case (statut gardé, écrit aussi dans `overrides.json`).
   Chaque décision est écrite dans le manifeste.
+- **Bibliothèque (7.J4)** : dans le même onglet, filtres par tag et par
+  étoiles (grille et liste), zone **Non classés** (on leur donne une case :
+  ils deviennent candidats) et **Corbeille** (son rejeté partout, distinct
+  de `drop` qui ne vaut que pour la case ; restaurable, jamais supprimé du
+  disque). Sélection multiple (`⌘`-clic, `Maj`-clic, `⌘A`, `Échap`) et barre
+  d'outils : garder, écarter, case, corbeille / restaurer, étoiles, tag.
+  Glisser une ligne (ou la sélection) vers une case de la grille, vide
+  comprise, ou vers la corbeille. Raccourcis en plus : `1`…`5` étoiles, `0`
+  sans note, `T` tag, `Suppr` corbeille, `U` restaurer (corbeille). Un
+  sample noté passe devant les non-notés de sa case ; noter ne vaut pas
+  garder.
 - **Rejouable** : relancer après un ajout de pack ou un override ; les statuts
   `keep` / `drop` et les mesures du manifeste précédent sont conservés.
 - **Tests** : `python -m pytest tests/test_samples.py` (unitaires, fausse
@@ -870,11 +883,19 @@ dans library.md) :
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
 | GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
 | GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
-| GET | `/api/samples` | cases famille × code de la bibliothèque de samples (`SampleCell` : retenus, keep, drop, à écouter, signalés) |
-| GET | `/api/samples/cell?family=&code=` | candidats d'une case par rang (`SampleEntry`) |
-| POST | `/api/samples/status` | `{source, status}` → case avec sa sélection recalculée ; écrit le manifeste |
-| POST | `/api/samples/move` | `{source, family, code}` → ancienne case ; déplace le candidat et écrit l'override |
-| GET | `/api/samples/audio?source=` | wav source (404 hors manifeste, 503 sans disque média) |
+| GET | `/api/samples?tag=&min_stars=` | cases famille × code de la bibliothèque de samples (`SampleCell` : retenus, keep, drop, à écouter, signalés) ; filtres optionnels |
+| GET | `/api/samples/cell?family=&code=` | candidats d'une case par rang (`SampleEntry`, avec `tags` et `stars`) |
+| GET | `/api/samples/loose?which=unclassified\|trash` | non classés ou corbeille (`LooseSample`) |
+| GET | `/api/samples/tags` | tags déjà utilisés (autocomplétion) |
+| POST | `/api/samples/status` | `{sources, status}` → grille ; sélection des cases recalculée |
+| POST | `/api/samples/move` | `{sources, family, code}` → grille ; range des candidats ou des non classés, écrit l'override |
+| POST | `/api/samples/stars` | `{sources, stars}` (1 à 5, `null` retire) → grille |
+| POST | `/api/samples/tags` | `{sources, add, remove}` → grille |
+| POST | `/api/samples/trash`, `/restore` | `{sources}` → grille ; corbeille / retour dans la case ou les non classés |
+| GET | `/api/samples/audio?source=` | wav source (404 hors manifeste, corbeille et non classés compris ; 503 sans disque média) |
+
+Les `POST /api/samples/*` agissent par lot (`sources`, sans doublon) : une
+erreur sur un fichier annule tout le lot, rien n'est écrit.
 | GET | `/api/manual/outline` | sommaire du manuel, § → page (`ManualRef`) ; `{}` sans PDF |
 | GET | `/api/manual` | manuel PDF (chemin fixe, 404 s'il manque) |
 | POST | `/api/grab/search` | `{query}` → candidats YT/SC triés par score (`CandidateInfo`), synchrone (~5-15 s) |

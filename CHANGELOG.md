@@ -8,6 +8,24 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J4] Bibliothèque de samples : tags libres (normalisés, autocomplétion),
+  étoiles 1 à 5 (un sample noté passe devant les non-notés de sa case et
+  reste candidat hors plafond ; noter ne vaut pas garder) et corbeille,
+  statut distinct de `drop` (sorti de toutes les cases et des
+  reclassements, restaurable, jamais supprimé du disque). Stockés dans
+  `overrides.json` (`tags`, `stars`, `trash`), recopiés dans le manifeste
+  (`tags`, `stars` des candidats, liste `trashed`). Les 407 non classés
+  reçoivent une case depuis le front et deviennent candidats.
+- [7.J4] API : `GET /api/samples/loose` (non classés, corbeille),
+  `GET /api/samples/tags`, `POST /api/samples/stars`, `/tags`, `/trash`,
+  `/restore` ; filtres `tag` et `min_stars` sur la grille ; l'audio est
+  servi aussi pour les non classés et la corbeille.
+- [7.J4] Front (onglet Samples) : filtres tag / étoiles, zones Non classés
+  et Corbeille, sélection multiple (`⌘`-clic, `Maj`-clic, `⌘A`), barre
+  d'outils (garder, écarter, case, corbeille / restaurer, étoiles, tag),
+  glisser-déposer d'une ligne ou de la sélection vers une case de la
+  grille (vide comprise) ou la corbeille ; raccourcis `1`…`5`, `0`, `T`,
+  `Suppr`.
 - [7.J2] Pré-filtre qualité des samples DT2 : chaque candidat du manifeste
   est mesuré (`analyzer/samples.measure`) et reçoit des drapeaux `muet`
   (crête < -40 dBFS), `faible` (< -18 dBFS), `sature` (plus de 0,1 % des
@@ -222,6 +240,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.J4] `POST /api/samples/status` et `/move` agissent par lot
+  (`sources` au lieu de `source`) et renvoient la grille ; une erreur sur un
+  fichier annule le lot. `analyzer.samples.move` reçoit les overrides et les
+  met à jour lui-même ; `classify` renvoie aussi la corbeille.
 - [7.E] Noms de notes alignés sur la DT2 (convention Elektron, 60 = C5) dans
   le front et la note de bank : une basse lue D2 auparavant s'affiche D3,
   comme sur la machine (constaté sur l'écran TRIG). Les notes MIDI envoyées

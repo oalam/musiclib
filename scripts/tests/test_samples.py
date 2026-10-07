@@ -1,4 +1,4 @@
-"""Classement des samples DT2 (analyzer/samples.py, samples.py) — Phase 7.J1, 7.J2."""
+"""Classement des samples DT2 (analyzer/samples.py, samples.py) — Phase 7.J1, 7.J2, 7.J4."""
 from __future__ import annotations
 
 import json
@@ -321,20 +321,22 @@ def test_set_status_promotes_next_pending() -> None:
 def test_move_keeps_status_and_survives_rebuild(tree: Path, tmp_path: Path) -> None:
     m = smp.build_manifest(tree, {}, measure_fn=None)
     src = "Hardcore free samples/Kicks/Hard Kick 01.wav"
-    old_cell, ov = smp.move(m, src, "TRIBE", "PC", tree, measure_fn=lambda p, c: [c])
-    assert src not in {e.source for e in old_cell}
+    ovs: dict[str, Override] = {}
+    smp.move(m, ovs, src, "TRIBE", "PC", tree, measure_fn=lambda p, c: [c])
+    assert src not in {e.source for e in smp.cell_of(m, "HARDCORE", "BD")}
     e = next(x for x in m.entries if x.source == src)
     assert (e.family, e.code, e.status, e.flags) == ("TRIBE", "PC", "pending", ["PC"])
     assert e.name.startswith("PC ") and len(e.name) <= NAME_MAX
     assert e.selected
     # l'override replace le fichier dans sa nouvelle case au prochain passage
-    again = smp.build_manifest(tree, {src: ov}, previous=m, measure_fn=None)
+    assert ovs == {src: Override(family="TRIBE", code="PC")}
+    again = smp.build_manifest(tree, ovs, previous=m, measure_fn=None)
     e2 = next(x for x in again.entries if x.source == src)
     assert (e2.family, e2.code) == ("TRIBE", "PC")
     with pytest.raises(smp.SampleError):
-        smp.move(m, src, "TRIBE", "ZZ", tree)
+        smp.move(m, ovs, src, "TRIBE", "ZZ", tree)
     with pytest.raises(smp.SampleError):
-        smp.move(m, src, "POLKA", "BD", tree)
+        smp.move(m, ovs, src, "POLKA", "BD", tree)
 
 
 def test_moved_pending_lands_in_reserve_of_full_cell() -> None:
@@ -344,7 +346,7 @@ def test_moved_pending_lands_in_reserve_of_full_cell() -> None:
         + [smp.SampleEntry(source="v", family="JUNGLE", code="VX", pack="p",
                            name="VX v p", duration=1.0, rank=1)])
     smp.select(m.entries[:9], 8)
-    smp.move(m, "v", "JUNGLE", "FX", Path("/absent"), measure_fn=None)
+    smp.move(m, {}, "v", "JUNGLE", "FX", Path("/absent"), measure_fn=None)
     v = next(e for e in m.entries if e.source == "v")
     assert v.rank == 10 and not v.selected
 
@@ -383,7 +385,7 @@ def test_exact_duplicate_across_packs_keeps_classified_copy(tmp_path: Path) -> N
     _wav(root / "rthm" / "loops" / "zz9_Thing.wav", seconds=3.0)        # ... double classe
     _wav(root / "rthm" / "loops" / "170_HeavyBoiBeat_02.wav", seconds=3.0)
     _wav(root / "rthm" / "loops" / "other" / "Unique Loop.wav", seconds=3.0)
-    raws, unclassified = smp.classify(root, {})
+    raws, unclassified, _ = smp.classify(root, {})
     srcs = sorted(r.source for r in raws) + unclassified
     assert "aaa copy/170_HeavyBoiBeat_02.wav" not in srcs
     assert "rthm/loops/170_HeavyBoiBeat_02.wav" in srcs
@@ -433,3 +435,87 @@ def test_measured_bpm_named_and_cached(tree: Path) -> None:
     assert calls == ["Long Kick.wav"]
     smp.build_manifest(tree, {}, previous=first, measure_fn=None, bpm_fn=fake)
     assert calls == ["Long Kick.wav"]
+
+
+# --- Bibliotheque (7.J4) ----------------------------------------------------
+
+def _cell_manifest(n: int = 10) -> smp.Manifest:
+    m = smp.Manifest(source_root="x", total=n, entries=[
+        smp.SampleEntry(source=f"s{i}", family="JUNGLE", code="FX", pack="p",
+                        name=f"FX {i}", duration=1.0, rank=i) for i in range(1, n + 1)],
+        unclassified=["MPC_Kit/zzz01.wav"])
+    smp.select(m.entries, 8)
+    return m
+
+
+def test_stars_rank_rated_first_without_keeping() -> None:
+    m = _cell_manifest()
+    ovs: dict[str, Override] = {}
+    smp.set_stars(m, ovs, "s10", 2)
+    smp.set_stars(m, ovs, "s9", 5)
+    cell = smp.cell_of(m, "JUNGLE", "FX")
+    assert [e.source for e in cell[:3]] == ["s9", "s10", "s1"]
+    assert cell[0].selected and cell[0].status == "pending"     # noter ne vaut pas garder
+    assert not next(e for e in cell if e.source == "s8").selected
+    smp.set_stars(m, ovs, "s9", None)
+    assert ovs == {"s10": Override(stars=2)}
+    with pytest.raises(smp.SampleError):
+        smp.set_stars(m, ovs, "s1", 6)
+    with pytest.raises(smp.SampleError):
+        smp.set_stars(m, ovs, "absent", 3)
+
+
+def test_tags_normalized_and_listed() -> None:
+    m = _cell_manifest()
+    ovs: dict[str, Override] = {}
+    assert smp.set_tags(m, ovs, "s1", add=["  Acid  Line ", "dark", ""]) == ["acid line", "dark"]
+    assert smp.set_tags(m, ovs, "MPC_Kit/zzz01.wav", add=["Tribe"]) == ["tribe"]
+    assert smp.set_tags(m, ovs, "s1", remove=["DARK"]) == ["acid line"]
+    assert m.entries[0].tags == ["acid line"]
+    assert smp.all_tags(ovs) == ["acid line", "tribe"]
+    loose = smp.loose(m, ovs, "unclassified")
+    assert [(x.source, x.pack, x.tags) for x in loose] == [("MPC_Kit/zzz01.wav", "mpc", ["tribe"])]
+
+
+def test_unclassified_gets_a_cell(tree: Path) -> None:
+    m = smp.build_manifest(tree, {}, measure_fn=None)
+    src = "MPC_Kit/zzz01.wav"
+    assert src in m.unclassified
+    ovs = {src: Override(tags=["perc"])}
+    smp.move(m, ovs, src, "TRIBE", "PC", tree, measure_fn=lambda p, c: [], bpm_fn=None)
+    e = next(x for x in m.entries if x.source == src)
+    assert (e.family, e.code, e.status, e.tags, e.selected) == ("TRIBE", "PC", "pending", ["perc"], True)
+    assert src not in m.unclassified
+    again = smp.build_manifest(tree, ovs, previous=m, measure_fn=None)
+    assert any(x.source == src and x.code == "PC" for x in again.entries)
+
+
+def test_trash_and_restore(tree: Path) -> None:
+    m = smp.build_manifest(tree, {}, measure_fn=None)
+    kick = "Hardcore free samples/Kicks/Hard Kick 01.wav"
+    loose_src = "MPC_Kit/zzz01.wav"
+    ovs: dict[str, Override] = {}
+    smp.set_status(m, kick, "keep")
+    smp.trash(m, ovs, kick)
+    smp.trash(m, ovs, loose_src)
+    assert m.trashed == [kick, loose_src]
+    assert kick not in {e.source for e in m.entries} and loose_src not in m.unclassified
+    # la corbeille survit a une reconstruction, et aux reclassements
+    again = smp.build_manifest(tree, ovs, previous=m, measure_fn=None)
+    assert again.trashed == [kick, loose_src] and loose_src not in again.unclassified
+    with pytest.raises(smp.SampleError):
+        smp.move(again, ovs, kick, "TRIBE", "BD", tree)
+    smp.restore(again, ovs, kick, tree, measure_fn=None, bpm_fn=None)
+    smp.restore(again, ovs, loose_src, tree, measure_fn=None, bpm_fn=None)
+    e = next(x for x in again.entries if x.source == kick)
+    assert (e.family, e.code, e.status) == ("HARDCORE", "BD", "pending")
+    assert loose_src in again.unclassified and again.trashed == [] and ovs == {}
+    with pytest.raises(smp.SampleError):
+        smp.restore(again, ovs, kick, tree)
+
+
+def test_rebuild_ranks_rated_first(tree: Path) -> None:
+    last = "Hardcore free samples/Kicks/Hard Kick 05.wav"
+    m = smp.build_manifest(tree, {last: Override(stars=1, tags=["x"])}, measure_fn=None)
+    cell = smp.cell_of(m, "HARDCORE", "BD")
+    assert (cell[0].source, cell[0].stars, cell[0].tags) == (last, 1, ["x"])
