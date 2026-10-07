@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/free_calotek_archetype_-_multiprise.opus",
+  "file_path": "audio/free_calotek_archetype_-_multiprise.opus",
   "slug": "free_calotek_archetype_-_multiprise",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 0.8560538908646833,
     "true_peak_dbfs": 0.25415325896411384,
     "rms_dbfs": -8.049747624866091,
-    "clipping_ratio": 8.214193993110805e-6,
+    "clipping_ratio": 8.214193993110805e-06,
     "clipping_count": 98
   },
   "loudness": {

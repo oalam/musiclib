@@ -33,11 +33,7 @@ from analyzer.rhythm_signature import cluster, rhythm_distance, to_sparkline
 from analyzer.types import RhythmSignatureReport
 from library_md import parse_library, update_field
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-LIBRARY_FILE = LIBRARY / "library.md"
-QUALITY_DIR = LIBRARY / "quality"
-ARTISTS_DIR = LIBRARY / "artists"
+from paths import ARTISTS_DIR, LIBRARY_FILE, MIX_DIR, QUALITY_DIR
 
 
 def _format_duration(seconds: float) -> str:
@@ -190,7 +186,7 @@ def cmd_playlist(
     if export_m3u8:
         out_path = Path(export_m3u8)
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(to_m3u8(playlist, LIBRARY), encoding="utf-8")
+        out_path.write_text(to_m3u8(playlist, MIX_DIR), encoding="utf-8")
         print(f"\n[export] M3U8 ecrit : {out_path}")
     return 0
 

@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/anarkotek_galmiche_gaetan_-_100_vergognes.opus",
+  "file_path": "audio/anarkotek_galmiche_gaetan_-_100_vergognes.opus",
   "slug": "anarkotek_galmiche_gaetan_-_100_vergognes",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 1.0270513829956893,
     "true_peak_dbfs": 1.1718103237927526,
     "rms_dbfs": -9.724491326673979,
-    "clipping_ratio": 0.0000916670346146241,
+    "clipping_ratio": 9.16670346146241e-05,
     "clipping_count": 1146
   },
   "loudness": {

@@ -31,8 +31,7 @@ from pathlib import Path
 import soundfile as sf
 from pydantic import BaseModel
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_CATALOG = VAULT_ROOT / "library" / "samples" / "catalog.csv"
+from paths import SAMPLES_CATALOG as DEFAULT_CATALOG
 
 AUDIO_EXTS = {".wav", ".aif", ".aiff"}
 MARK_VALUES = {"x", "1", "oui", "yes", "y"}

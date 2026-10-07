@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/naaman_-_karma_own_yourself_outta_road_ft_scars_got_to_try.opus",
+  "file_path": "audio/naaman_-_karma_own_yourself_outta_road_ft_scars_got_to_try.opus",
   "slug": "naaman_-_karma_own_yourself_outta_road_ft_scars_got_to_try",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 1.268335662747121,
     "true_peak_dbfs": 0.8534366984400221,
     "rms_dbfs": -13.531512906847425,
-    "clipping_ratio": 0.00003353579004446462,
+    "clipping_ratio": 3.353579004446462e-05,
     "clipping_count": 2603
   },
   "loudness": {

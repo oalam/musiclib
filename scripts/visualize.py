@@ -3,7 +3,7 @@
 
 Format : 1200x320 px, header + waveform RMS + mel-spectrogram + bande
 de structure colorée + cue points overlay. Stocké dans
-`library/visuals/<slug>.png`.
+`<MEDIA>/Mix/visuals/<slug>.png`.
 
 Usage:
     visualize.py                 # toute la library
@@ -15,28 +15,13 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
 
 from analyzer.visualize import render_track, write_index_md
 from library_md import parse_library
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-AUDIO_DIR = LIBRARY / "audio"
-LIBRARY_FILE = LIBRARY / "library.md"
-QUALITY_DIR = LIBRARY / "quality"
-VISUALS_DIR = LIBRARY / "visuals"
+from paths import LIBRARY_FILE, QUALITY_DIR, VISUALS_DIR, media_ok
+from paths import resolve_audio as _resolve_audio_path
 
-_FILE_REF_RE = __import__("re").compile(r"\[\[(.+?)\]\]")
-
-
-def _resolve_audio_path(entry: dict[str, str]) -> Path | None:
-    file_ref = entry.get("file", "")
-    match = _FILE_REF_RE.search(file_ref)
-    if not match:
-        return None
-    p = LIBRARY / match.group(1)
-    return p if p.exists() else None
 
 
 def _load_sidecar(slug: str) -> dict | None:
@@ -64,7 +49,7 @@ def render_one(slug: str, entry: dict[str, str], force: bool) -> str:
         render_track(audio, entry, sidecar, out_path)
     except Exception as exc:  # noqa: BLE001
         return f"  ERROR  {slug} : {exc}"
-    return f"  ok     {slug} -> {out_path.relative_to(VAULT_ROOT)}"
+    return f"  ok     {slug} -> {out_path}"
 
 
 def main() -> int:
@@ -73,6 +58,8 @@ def main() -> int:
     parser.add_argument("--force", action="store_true",
                         help="Regenere meme si la PNG existe deja")
     args = parser.parse_args()
+    if not media_ok():
+        return 2
 
     entries = parse_library(LIBRARY_FILE)
     if not entries:
@@ -91,7 +78,7 @@ def main() -> int:
         print("Aucun slug a traiter.")
         return 1
 
-    print(f"[visualize] {len(targets)} track(s) -> library/visuals/")
+    print(f"[visualize] {len(targets)} track(s) -> {VISUALS_DIR}/")
     for slug, entry in targets:
         print(render_one(slug, entry, args.force))
 

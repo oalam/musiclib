@@ -65,17 +65,42 @@ music/scripts/
 
 ### Schéma de la library
 
+Deux racines, centralisées dans `scripts/paths.py` (hub unique) : les
+**métadonnées** restent dans le vault (versionnées, disponibles sans le
+disque), le **média** vit sur le SSD externe `xtreme` (`MUSIC_MEDIA_ROOT`,
+défaut `/Volumes/xtreme`), dédié au son.
+
 ```
-music/library/
+music/library/                    # vault (git)
 ├── library.md                    # source de vérité : table markdown unique
 ├── library.md.backup-*           # backups pre-migration
-├── audio/<slug>.{opus,m4a,mp3,flac}
 ├── quality/<slug>.json           # sidecars Phase 1+2+6A+6C (Pydantic)
-├── visuals/<slug>.png            # PNG signatures Phase 5
-├── visuals/_index.md             # index Obsidian auto-généré
-├── stems/<slug>/{drums,bass,other,vocals}.wav  # Phase 6.B Demucs
-└── artists/<slug>.json           # cache MusicBrainz
+├── artists/<slug>.json           # cache MusicBrainz
+├── digitakt/<slug>.{json,md}     # banks Phase 7
+├── samples/catalog.csv
+├── audio   -> <MEDIA>/Mix/audio      # symlinks : wikilinks et embeds Obsidian
+└── visuals -> <MEDIA>/Mix/visuals
+
+<MEDIA>/                          # /Volumes/xtreme
+├── .music-media                  # marqueur (require_media)
+├── Mix/                          # tracks pour le mix (Rekordbox)
+│   ├── audio/<style>/<slug>.{flac,m4a,mp3}
+│   ├── stems/<slug>/{drums,bass,other,vocals}.wav  # Phase 6.B Demucs
+│   └── visuals/<slug>.png + _index.md              # Phase 5
+├── Live/                         # matériel de set live
+│   ├── renoise/*.xrns
+│   ├── grooves/<slug>.{mid,tidal}
+│   └── digitakt/<slug>/pNN.mid
+└── Samples/, Sounds/             # banque de samples (hors pipeline)
 ```
+
+La colonne `file` (`[[audio/<slug>.flac]]`) et le `file_path` des sidecars
+sont relatifs à `<MEDIA>/Mix/`. **Formats audio : uniquement ceux que lit
+Rekordbox** (`.flac`, `.m4a`, `.mp3`) ; `grab.py` transcode opus/vorbis en
+FLAC (décodage sans nouvelle perte). Les commandes media (`grab`, `stems`,
+`visualize`, `groove`, `to_xrns`, `digitakt`, `analyze --all`) sortent en
+code 2 si le disque est absent ; `setbuilder`, `kb`, l'API restent
+utilisables sans lui. Migration one-shot : `scripts/migrate_media.py`.
 
 #### Format de library.md (depuis 2026-05-31)
 
@@ -189,7 +214,7 @@ du pool. Plancher d'énergie auto à `peak - 2 crans` en mode `--peak`.
 
 PNG 1200×320 par track : header texte + waveform RMS + mel-spectrogram
 magma log-freq + bande structure colorée + cues overlay. Stockée dans
-`library/visuals/<slug>.png`. Index Markdown auto `_index.md` pour
+`<MEDIA>/Mix/visuals/<slug>.png`. Index Markdown auto `_index.md` pour
 browser dans Obsidian en vue d'avion.
 
 Couleurs segments : intro=gris clair / build=orange / peak=rouge /
@@ -199,7 +224,7 @@ main=bleu / breakdown=violet / outro=gris foncé.
 
 ```
 recherche YT/SC + sélection meilleure qualité (codec*multiplicateur*match)
-└─ download (codec natif, FLAC seulement si source lossless)
+└─ download dans <MEDIA>/Mix/audio/<style>/ (FLAC si lossless ou opus/vorbis, m4a/mp3 natifs)
    └─ tags audio (mutagen, multi-conteneur)
       └─ analyse BPM/key (librosa)
          └─ library.md upsert (champs préservés)
@@ -261,7 +286,7 @@ fallback CPU (~30-60s/track). Dépendance transitive : `torchcodec`.
 
 **Sortie** :
 ```
-library/stems/<slug>/
+<MEDIA>/Mix/stems/<slug>/
 ├── drums.wav
 ├── bass.wav
 ├── other.wav
@@ -270,7 +295,7 @@ library/stems/<slug>/
 
 Demucs écrit toujours dans `<out>/<model>/<audio_stem>/` malgré le
 flag `--filename`, on **aplatit par move post-traitement** vers
-`library/stems/<slug>/`.
+`<MEDIA>/Mix/stems/<slug>/`.
 
 **Intégration** :
 - Script `scripts/stems.py` CLI standalone (pas dans pipeline `grab`
@@ -297,7 +322,7 @@ empirent pop/rock.
 
 Doc pédagogique détaillée : [[technique/cleanup-stems-techno]].
 
-**Pas implémenté** : index Obsidian `library/stems/_index.md` (skip,
+**Pas implémenté** : index Obsidian `<MEDIA>/Mix/stems/_index.md` (skip,
 les stems sont organisés en dossiers parlants par slug) et export
 `samples.tidal` (à voir si besoin réel — la convention `~dirt.loadSoundFiles`
 dans le startup.scd SuperCollider suffit en pratique). Fine-tune Demucs
@@ -356,9 +381,9 @@ scalaires. Repliage en 4/4 par défaut sauf signature impaire confiante
   dans library.md. Indicatif sur une petite library.
 
 **Export groove jouable** (`groove.py`, opt-in) : transcrit le pattern en hits
-discrets depuis le **stem drums Demucs** (`library/stems/<slug>/drums.wav`,
+discrets depuis le **stem drums Demucs** (`<MEDIA>/Mix/stems/<slug>/drums.wav`,
 fallback mix avec warning), seuillés sur le pattern replié+étiré, calés sur le
-kick le plus fort. Sorties `library/grooves/<slug>.{mid,tidal}` :
+kick le plus fort. Sorties `<MEDIA>/Live/grooves/<slug>.{mid,tidal}` :
 - `.mid` : clip batterie GM (kick=36, snare=38, hat=42) → Renoise / DAW
 - `.tidal` : `d1 $ stack [s "bd ~ ...", ...]` collable en live
 
@@ -386,6 +411,21 @@ mutes, FX de transition, principes d'arc).
 | 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
+| 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | à venir |
+
+**Décisions 7.I** (arbitrées le 2026-10-07) :
+- Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
+  Shatta Mad ») liste les candidats YT/SC (source, codec, débit, pertinence),
+  le meilleur présélectionné ; l'utilisateur valide ou en choisit un autre.
+- `grab_one` découpé en `search(query)` (candidats structurés) et
+  `ingest(url, options)` ; la CLI `grab.py` les réutilise.
+- API : `POST /api/grab/search` (synchrone), `POST /api/grab` (job en
+  arrière-plan, **un à la fois** pour sérialiser les écritures de
+  library.md), `GET /api/jobs/{id}` (étapes + statut, polling). Lève le
+  principe « API en lecture seule » pour cette seule route, comme la bank.
+- Job : téléchargement + analyse complète (`--analyze-quality` + visuel)
+  par défaut ; **stems Demucs** et **bank Digitakt** (+ harmony) en cases à
+  cocher. Exige le disque média (`require_media`).
 
 **Décisions 7.B** :
 - 1 morceau = 1 bank ; 1 section de structure = 1 pattern (<= 16, fusion des
@@ -509,8 +549,10 @@ réutilisable pour eux.
 ## Décisions arbitrées (à NE PAS refaire)
 
 - **Phase 3 (export DJ XML Rekordbox/Traktor)** : skipée intentionnellement.
-  Pas de DJ software dans la chaîne TidalCycles. Si besoin futur de mixer
-  hors Tidal, ressortir Phase 3.
+  Révisé le 2026-10-07 : **Rekordbox** est le logiciel de mix (disque branché
+  au Mac, pas de clé CDJ). La library ne contient donc que des formats lus par
+  Rekordbox (FLAC/M4A/MP3) et les playlists passent par des `.m3u` en chemins
+  absolus vers le disque. L'export XML (cues, beatgrid) reste hors scope.
 - **Plots matplotlib génériques** (waveform standalone, spectrogramme
   isolé) : couverts par Phase 5 visualize. Pas besoin de plots séparés.
 - **Clustering algorithmique GÉNÉRIQUE librosa-only** : peu de valeur vs vue

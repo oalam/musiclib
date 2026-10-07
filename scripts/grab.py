@@ -3,7 +3,8 @@
 
 Source par URL ou par requete texte libre. Le moteur cherche les
 candidats sur YouTube + SoundCloud, compare leurs codecs et debit, et
-telecharge sans recompression. FLAC est reserve aux sources lossless.
+telecharge sans perte supplementaire, dans un format lu par Rekordbox :
+FLAC pour le lossless et l'opus/vorbis, m4a/mp3 natifs.
 
 Usage:
     grab.py URL [URL ...]
@@ -11,12 +12,12 @@ Usage:
     grab.py https://open.spotify.com/playlist/...  # playlist Spotify -> N tracks
     grab.py --dry-run "query"        # voir le candidat retenu sans dl
     grab.py --replace URL            # ecraser un fichier deja present
-    grab.py --folder swing "query"   # ranger dans library/audio/swing/
+    grab.py --folder swing "query"   # ranger dans <MEDIA>/Mix/audio/swing/
 
-Rangement : chaque fichier va dans un sous-dossier de library/audio/ par
+Rangement : chaque fichier va dans un sous-dossier de <MEDIA>/Mix/audio/ par
 style. Le style vient de --folder si fourni, sinon il est deduit du genre
 (--genre ou metadata de la source). Sans genre connu, le fichier reste a
-la racine de library/audio/.
+la racine de <MEDIA>/Mix/audio/.
 
 Une URL Spotify (playlist / album / track) est developpee en autant de requetes
 'artiste titre' qu'elle contient de morceaux : Spotify n'autorise pas le DL audio,
@@ -44,10 +45,17 @@ from library_md import (
     write_library,
 )
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-AUDIO_DIR = LIBRARY / "audio"
-LIBRARY_FILE = LIBRARY / "library.md"
+from paths import (
+    ARTISTS_DIR,
+    AUDIO_DIR,
+    LIBRARY_FILE,
+    MIX_DIR,
+    QUALITY_DIR,
+    REKORDBOX_EXTS,
+    VISUALS_DIR,
+    mix_relative,
+    media_ok,
+)
 
 KNOWN_EXTS = (".flac", ".opus", ".m4a", ".mp3", ".ogg", ".webm")
 
@@ -421,7 +429,7 @@ def print_candidate_table(cands: list[Candidate], picked: Candidate) -> None:
 # ---------------------------------------------------------------------------
 
 def download_candidate(cand: Candidate, out_stem: Path) -> Path:
-    """Telecharge le candidat. FLAC pour lossless, codec natif sinon."""
+    """Telecharge le candidat. FLAC pour lossless et codecs hors Rekordbox, natif sinon."""
     out_stem.parent.mkdir(parents=True, exist_ok=True)
     template = str(out_stem) + ".%(ext)s"
     ext, lossless, _ = codec_info(cand.codec)
@@ -430,7 +438,9 @@ def download_candidate(cand: Candidate, out_stem: Path) -> Path:
         "yt-dlp", "--no-progress", "--no-warnings", *YTDLP_EXTRA_ARGS,
         "-f", "bestaudio", "-x", "-o", template,
     ]
-    if lossless:
+    # FLAC pour le lossless, et pour les codecs que Rekordbox ne lit pas
+    # (opus, vorbis) : le decodage est sans nouvelle perte.
+    if lossless or f".{ext}" not in REKORDBOX_EXTS:
         cmd += ["--audio-format", "flac"]
         final_ext = ".flac"
     else:
@@ -780,7 +790,7 @@ def upsert_track(
 # ---------------------------------------------------------------------------
 
 def existing_audio(slug: str) -> Path | None:
-    """Cherche slug.<ext> a la racine de library/audio/ puis recursivement
+    """Cherche slug.<ext> a la racine de <MEDIA>/Mix/audio/ puis recursivement
     dans ses sous-dossiers de style."""
     for ext in KNOWN_EXTS:
         p = AUDIO_DIR / f"{slug}{ext}"
@@ -793,10 +803,10 @@ def existing_audio(slug: str) -> Path | None:
 
 
 def deduce_folder(folder_arg: str | None, genres: list[str]) -> str | None:
-    """Sous-dossier de rangement dans library/audio/.
+    """Sous-dossier de rangement dans <MEDIA>/Mix/audio/.
 
     --folder prime ; sinon le premier genre connu (slugifie) ; sinon None
-    (racine de library/audio/, comportement historique)."""
+    (racine de <MEDIA>/Mix/audio/, comportement historique)."""
     if folder_arg:
         return folder_arg
     if genres:
@@ -900,7 +910,7 @@ def grab_one(
 
     dest_folder = deduce_folder(folder, genre)
     dest_dir = AUDIO_DIR / dest_folder if dest_folder else AUDIO_DIR
-    print(f"    dossier   : {dest_dir.relative_to(LIBRARY).as_posix()}/"
+    print(f"    dossier   : {dest_dir.relative_to(MIX_DIR).as_posix()}/"
           + ("" if folder else " (deduit)" if dest_folder else " (racine, genre inconnu)"))
 
     if dry_run:
@@ -935,7 +945,7 @@ def grab_one(
         bpm, key = 0.0, key_override or "?"
 
     write_tags(audio_path, meta, bpm, key)
-    audio_rel = audio_path.relative_to(LIBRARY)
+    audio_rel = audio_path.relative_to(MIX_DIR)
     created, slug = upsert_track(LIBRARY_FILE, meta, audio_rel, bpm, key, quality)
     verb = "ajoute" if created else "mis a jour"
     print(f"    library.md : {verb}")
@@ -958,18 +968,14 @@ def run_quality_analysis(audio_path: Path, slug: str) -> None:
     from analyzer.report import save_sidecar
 
     print("    analyse qualite (Phase 1+2)...")
-    file_path_str = (
-        str(audio_path.relative_to(VAULT_ROOT))
-        if VAULT_ROOT in audio_path.parents
-        else str(audio_path)
-    )
+    file_path_str = mix_relative(audio_path)
     report = _analyze(
         path=audio_path,
         slug=slug,
         with_structure=True,
         file_path_str=file_path_str,
     )
-    save_sidecar(report, LIBRARY / "quality")
+    save_sidecar(report, QUALITY_DIR)
     update_field(LIBRARY_FILE, slug, "quality_score", f"{report.quality.score:.1f}")
     if report.frequency_bands:
         from analyzer.frequency_bands import to_compact_string
@@ -1014,7 +1020,7 @@ def run_quality_analysis(audio_path: Path, slug: str) -> None:
     if not entry.get("about", "").strip():
         artist = entry.get("artist") or ""
         if artist:
-            about = describe_artist(artist, LIBRARY / "artists", rate_limit=True)
+            about = describe_artist(artist, ARTISTS_DIR, rate_limit=True)
             if about:
                 update_field(LIBRARY_FILE, slug, "about", about)
                 print(f"    about         : {about}")
@@ -1022,14 +1028,14 @@ def run_quality_analysis(audio_path: Path, slug: str) -> None:
     # Phase 5 : PNG signature + maj index
     try:
         from analyzer.visualize import render_track, write_index_md
-        visuals_dir = LIBRARY / "visuals"
+        visuals_dir = VISUALS_DIR
         png_path = visuals_dir / f"{slug}.png"
         sidecar_data = report.model_dump()
         # Re-read l'entry pour avoir les champs juste mis a jour
         fresh_entry = parse_library(LIBRARY_FILE).get(slug, {})
         render_track(audio_path, fresh_entry, sidecar_data, png_path)
         write_index_md(parse_library(LIBRARY_FILE), visuals_dir)
-        print(f"    visual        : library/visuals/{slug}.png")
+        print(f"    visual        : {png_path}")
     except Exception as exc:  # noqa: BLE001
         print(f"    [warn] rendu PNG ignore : {exc}", file=sys.stderr)
 
@@ -1088,9 +1094,9 @@ def main() -> int:
     parser.add_argument("--key", type=str, help="Force key (ex: 'A minor').")
     parser.add_argument("--genre", type=str, help="Genres separes par virgule.")
     parser.add_argument("--folder", type=str,
-                        help="Sous-dossier de library/audio/ ou ranger le fichier "
+                        help="Sous-dossier de <MEDIA>/Mix/audio/ ou ranger le fichier "
                              "(ex: swing). Si absent, deduit du genre ; sans genre "
-                             "connu, racine de library/audio/.")
+                             "connu, racine de <MEDIA>/Mix/audio/.")
     parser.add_argument("--cookies-from-browser", type=str, metavar="BROWSER",
                         help="Authentifie yt-dlp avec les cookies du navigateur "
                              "(chrome, firefox, safari...). Debloque playlists "
@@ -1107,6 +1113,8 @@ def main() -> int:
                         help="Lance l'analyse audiophile apres download "
                              "(quality_score + sidecar JSON).")
     args = parser.parse_args()
+    if not media_ok():
+        return 2
 
     if args.cookies_from_browser:
         YTDLP_EXTRA_ARGS[:] = ["--cookies-from-browser", args.cookies_from_browser]

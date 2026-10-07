@@ -55,8 +55,10 @@ Kontakt `.nkx` protégées ne sont pas couvertes.
 
 Télécharge un morceau depuis **YouTube / SoundCloud / Bandcamp** en
 choisissant automatiquement la **meilleure qualité disponible**, sans
-recompression. FLAC est réservé aux sources lossless ; un Opus 160 reste
-en `.opus`, un AAC 160 en `.m4a`, un MP3 en `.mp3`. La library est un
+recompression de perte : seuls les formats lus par Rekordbox sont stockés.
+Une source lossless ou un Opus / Vorbis devient `.flac` (décodage sans
+nouvelle perte), un AAC reste en `.m4a`, un MP3 en `.mp3`, dans
+`<MEDIA>/Mix/audio/<style>/`. La library est un
 fichier unique `library/library.md` avec une section par morceau.
 
 ## Prérequis système
@@ -139,15 +141,36 @@ Bandcamp n'est **pas** dans la recherche libre (son stream public plafonne à MP
 
 ## Stockage
 
-- `library/audio/<style>/<artist>_-_<title>.<ext>` — audio sans recompression,
+- `<MEDIA>/Mix/audio/<style>/<artist>_-_<title>.<ext>` — audio sans recompression,
   rangé par style : `--folder` si fourni, sinon premier genre connu (slugifié),
-  sinon racine de `library/audio/` (comportement historique)
-  - `.flac` pour sources lossless (FLAC/ALAC/WAV → recodé en FLAC)
-  - `.opus`, `.m4a`, `.mp3`, `.ogg` pour le reste, codec natif préservé
+  sinon racine de `<MEDIA>/Mix/audio/` (comportement historique)
+  - `.flac` pour sources lossless (FLAC/ALAC/WAV → recodé en FLAC) et pour
+    les codecs que Rekordbox ne lit pas (Opus, Vorbis → décodés en FLAC)
+  - `.m4a`, `.mp3` pour le reste, codec natif préservé
 - `library/library.md` — catalogue unique, une section par morceau ; le champ
-  `file` porte le chemin relatif complet (`[[audio/swing/....opus]]`)
+  `file` porte le chemin relatif à `<MEDIA>/Mix/` (`[[audio/swing/....flac]]`)
+- `<MEDIA>` = disque externe (`MUSIC_MEDIA_ROOT`, défaut `/Volumes/xtreme`),
+  cf. `paths.py` et la section « Schéma de la library » de SPEC
 - Un morceau déjà présent (racine ou sous-dossier) est détecté récursivement
   et n'est pas re-téléchargé sans `--replace`
+
+## Disque média (`paths.py`, `migrate_media.py`)
+
+Tous les chemins viennent de `paths.py` (hub unique). Le média lourd vit sur
+le SSD `xtreme` (`<MEDIA>/Mix/{audio,stems,visuals}`,
+`<MEDIA>/Live/{renoise,grooves,digitakt}`), les métadonnées restent dans le
+vault. Autre disque : `export MUSIC_MEDIA_ROOT=/Volumes/autre`. Le disque doit
+porter le marqueur `.music-media`, sinon les commandes media sortent en code 2.
+
+```bash
+python migrate_media.py --dry-run   # plan
+python migrate_media.py             # rsync + opus->FLAC + library.md/sidecars/m3u
+python migrate_media.py --cleanup   # vérifie, supprime les copies du vault,
+                                    # symlinks library/audio et library/visuals
+```
+
+Rekordbox : importer `<MEDIA>/Mix/audio/` ou les `.m3u` de `sets/` (chemins
+absolus vers le disque).
 
 ## Tags audio
 
@@ -241,7 +264,7 @@ dans `library/quality/<slug>.json`.
 ```bash
 source .venv/bin/activate
 
-# Un fichier (chemin absolu, relatif, ou nom dans library/audio/)
+# Un fichier (chemin absolu, relatif, ou nom dans <MEDIA>/Mix/audio/)
 python analyze.py rvde_-_90s_hammer_original_mix.m4a
 
 # Toute la library
@@ -526,7 +549,7 @@ Transcrit le pattern en hits discrets kick/snare/hat et l'exporte en `.mid`
 avant pour un rendu propre ; fallback sur le mix avec warning).
 
 ```bash
-# Exporte library/grooves/<slug>.{mid,tidal}
+# Exporte <MEDIA>/Live/grooves/<slug>.{mid,tidal}
 python groove.py <slug>
 
 # Réglages : finesse de grille, longueur, format, sensibilité
@@ -795,7 +818,7 @@ Sépare chaque track en 4 stems via Demucs (Meta, modèle htdemucs) :
 - `other.wav` (mélodies, harmonies, FX)
 - `vocals.wav` (voix si présentes)
 
-Stockés dans `library/stems/<slug>/`. Champ `has_stems: yes` dans
+Stockés dans `<MEDIA>/Mix/stems/<slug>/`. Champ `has_stems: yes` dans
 library.md. **Apple Silicon GPU (MPS) détecté en auto** → ~15-25s/track
 (contre ~30-60s en CPU). 1er run = +250 Mo de modèle à télécharger.
 
@@ -859,7 +882,7 @@ vs peak, où vit une bassline techno) : voir
 ```haskell
 -- Charger les stems d'un track dans SuperDirt
 -- (à mettre dans ~/.config/SuperCollider/startup.scd ou en run-time)
-~dirt.loadSoundFiles("/Users/tom/.../library/stems/kodaman_-_beton/*.wav");
+~dirt.loadSoundFiles("/Volumes/xtreme/Mix/stems/kodaman_-_beton/*.wav");
 
 -- Puis dans Tidal :
 d1 $ s "drums:0"     -- drums du Kodaman
@@ -878,7 +901,7 @@ d2 $ s "bass:0" # gain 1.2
 
 # visualize.py — PNG signatures (Phase 5)
 
-Une PNG par track dans `library/visuals/<slug>.png` au format **1200×320 px**.
+Une PNG par track dans `<MEDIA>/Mix/visuals/<slug>.png` au format **1200×320 px**.
 Permet de **browser visuellement la library** : tu reconnais une signature
 spectrale en moins d'1 seconde, plus rapide qu'écouter.
 
@@ -904,7 +927,7 @@ spectrale en moins d'1 seconde, plus rapide qu'écouter.
 ```bash
 source .venv/bin/activate
 
-# Toute la library + génère library/visuals/_index.md
+# Toute la library + génère <MEDIA>/Mix/visuals/_index.md
 python visualize.py
 
 # Tracks spécifiques par slug
@@ -927,7 +950,7 @@ python visualize.py --force
 
 ## Browse dans Obsidian
 
-`library/visuals/_index.md` est auto-généré et embarque toutes les PNG via
+`<MEDIA>/Mix/visuals/_index.md` est auto-généré et embarque toutes les PNG via
 wikilinks. Ouvre-le dans Obsidian et scroll pour scanner toute ta library
 en mode visuel.
 

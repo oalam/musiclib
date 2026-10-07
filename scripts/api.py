@@ -32,13 +32,9 @@ from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.types import CuePoint, DigitaktBank, Segment
 from library_md import parse_library
-from stems import _resolve_audio_path
+from paths import DIGITAKT_DIR, LIBRARY_FILE, QUALITY_DIR, STEMS_DIR, VAULT_ROOT
+from paths import resolve_audio as _resolve_audio_path
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY_FILE = VAULT_ROOT / "library" / "library.md"
-QUALITY_DIR = VAULT_ROOT / "library" / "quality"
-STEMS_DIR = VAULT_ROOT / "library" / "stems"
-DIGITAKT_DIR = VAULT_ROOT / "library" / "digitakt"
 WEB_DIST = VAULT_ROOT / "web" / "dist"
 
 _SUMMARY_FIELDS = ("artist", "title", "bpm", "key", "duration", "genre",

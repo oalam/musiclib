@@ -38,12 +38,8 @@ import soundfile as sf
 from library_md import parse_library
 from analyzer.compatibility import score_transition
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-STEMS_DIR = LIBRARY / "stems"
-QUALITY_DIR = LIBRARY / "quality"
-LIBRARY_FILE = LIBRARY / "library.md"
-DEFAULT_OUTPUT_DIR = LIBRARY / "renoise"
+from paths import LIBRARY_FILE, QUALITY_DIR, STEMS_DIR, media_ok
+from paths import RENOISE_DIR as DEFAULT_OUTPUT_DIR
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 TEMPLATE_BASE = FIXTURES / "one-sample.xrns"
 TEMPLATE_SLICED = FIXTURES / "sliced-sample.xrns"
@@ -494,6 +490,8 @@ def main() -> int:
     parser.add_argument("--bpm", type=float, help="Override BPM song")
     parser.add_argument("-o", "--output", type=Path, help="Chemin de sortie .xrns")
     args = parser.parse_args()
+    if not media_ok():
+        return 2
 
     if args.slugs and len(args.slugs) != 2:
         parser.error("Donne 0 ou 2 slugs (pas plus, pas un seul).")

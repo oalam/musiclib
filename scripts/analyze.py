@@ -28,11 +28,7 @@ from analyzer.report import render_terminal, save_sidecar
 from analyzer.types import QualityReport
 from library_md import find_entry_by_file, update_field
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-AUDIO_DIR = LIBRARY / "audio"
-LIBRARY_FILE = LIBRARY / "library.md"
-QUALITY_DIR = LIBRARY / "quality"
+from paths import AUDIO_DIR, LIBRARY_FILE, QUALITY_DIR, VAULT_ROOT, media_ok, mix_relative
 
 KNOWN_EXTS = (".flac", ".opus", ".m4a", ".mp3", ".ogg", ".wav", ".aiff", ".webm")
 
@@ -53,11 +49,7 @@ def analyze_file(path: Path, with_structure: bool = True) -> QualityReport:
                     override_bpm = v
             except ValueError:
                 pass
-    file_path_str = (
-        str(path.relative_to(VAULT_ROOT))
-        if path.is_absolute() and VAULT_ROOT in path.parents
-        else str(path)
-    )
+    file_path_str = mix_relative(path)
     return _analyze(
         path=path,
         slug=slug,
@@ -114,6 +106,8 @@ def main() -> int:
                         help="Phase 1 seulement (skip beats / structure / cues).")
     args = parser.parse_args()
 
+    if args.all and not media_ok():
+        return 2
     files = resolve_files(args.files, args.all)
     if not files:
         if not args.files and not args.all:

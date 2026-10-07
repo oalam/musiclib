@@ -8,6 +8,17 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [media] Média déplacé sur le SSD externe `xtreme`, dédié au son :
+  `Mix/{audio,stems,visuals}` pour le mix (Rekordbox), `Live/{renoise,grooves,
+  digitakt}` pour le live ; métadonnées (`library.md`, sidecars, banks, cache
+  artistes) inchangées dans le vault. Hub `scripts/paths.py`
+  (`MUSIC_MEDIA_ROOT`, marqueur `.music-media`, `MediaRootUnavailable`) importé
+  par tous les scripts ; les commandes media sortent en code 2 sans le disque.
+- [media] `scripts/migrate_media.py` (one-shot, rejouable, `--dry-run`,
+  `--cleanup`) : rsync, transcodage opus→FLAC, réécriture `library.md`,
+  `file_path` des sidecars et `.m3u`, symlinks Obsidian `library/audio` et
+  `library/visuals`.
+
 - [7.F] Fiches KB : section **Vidéos** (tutos YouTube horodatés au chapitre :
   XNB, True Cuckoo, Synthackers…) sur les 25 fiches (lots 1 à 5) ;
   liens externes du panneau KB ouverts dans un nouvel onglet.
@@ -91,6 +102,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [media] `grab.py` transcode en FLAC les codecs non lus par Rekordbox (Opus,
+  Vorbis) ; `file` et `file_path` sont relatifs à `<MEDIA>/Mix/`.
+- [media] SPEC : décision Phase 3 révisée (Rekordbox est le logiciel de mix,
+  export XML toujours hors scope).
+
 - [7.G] Vue d'ensemble et partition de mutes en onglets sous le lecteur
   (choix mémorisé) ; l'onglet vue d'ensemble donne le pattern, son nombre de
   mesures et ses répétitions (`A01 · 8 mesures · joué ×2`), l'onglet mutes le
@@ -118,6 +134,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   aucun NRPN ne pose un trig sur un pas (annexe B du manuel).
 
 ### Corrigé
+
 
 - [7.G] Légende de la façade : le clic épingle le contrôle, le survol n'en
   montre qu'un aperçu (délai 120 ms, effacé en sortie), ce qui permet de

@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/axolotl_-_remix_psylotribe_lemon_preview_x_le_char_italian_tribe.m4a",
+  "file_path": "audio/axolotl_-_remix_psylotribe_lemon_preview_x_le_char_italian_tribe.m4a",
   "slug": "axolotl_-_remix_psylotribe_lemon_preview_x_le_char_italian_tribe",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 0.0,
     "true_peak_dbfs": 0.6581657650558824,
     "rms_dbfs": -11.014826243536547,
-    "clipping_ratio": 0.000013782416508674875,
+    "clipping_ratio": 1.3782416508674875e-05,
     "clipping_count": 143
   },
   "loudness": {

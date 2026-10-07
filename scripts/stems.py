@@ -7,7 +7,7 @@ Pour chaque track de la library, separe en 4 stems via Demucs (Meta) :
 - other.wav  : melodie / harmonie / FX
 - vocals.wav : voix (si presentes)
 
-Sortie : `library/stems/<slug>/{drums,bass,other,vocals}.wav`. Met a jour
+Sortie : `<MEDIA>/Mix/stems/<slug>/{drums,bass,other,vocals}.wav`. Met a jour
 le champ `has_stems` dans library.md.
 
 Usage:
@@ -26,13 +26,9 @@ from pathlib import Path
 
 from library_md import parse_library, update_field
 
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-AUDIO_DIR = LIBRARY / "audio"
-LIBRARY_FILE = LIBRARY / "library.md"
-STEMS_DIR = LIBRARY / "stems"
+from paths import LIBRARY_FILE, STEMS_DIR, media_ok
+from paths import resolve_audio as _resolve_audio_path
 
-_FILE_REF_RE = __import__("re").compile(r"\[\[(.+?)\]\]")
 STEM_NAMES = ("drums", "bass", "other", "vocals")
 
 
@@ -47,15 +43,6 @@ def _autodetect_device() -> str:
     except Exception:
         pass
     return "cpu"
-
-
-def _resolve_audio_path(entry: dict[str, str]) -> Path | None:
-    file_ref = entry.get("file", "")
-    match = _FILE_REF_RE.search(file_ref)
-    if not match:
-        return None
-    p = LIBRARY / match.group(1)
-    return p if p.exists() else None
 
 
 def _stems_exist(slug: str) -> bool:
@@ -155,7 +142,7 @@ def process_one(
             cleanup_summary = f"  [warn] cleanup echec : {exc}"
 
     update_field(LIBRARY_FILE, slug, "has_stems", has_stems_value)
-    return f"  ok     {slug} -> library/stems/{slug}/*.wav{cleanup_summary}"
+    return f"  ok     {slug} -> {STEMS_DIR / slug}/*.wav{cleanup_summary}"
 
 
 def main() -> int:
@@ -176,6 +163,8 @@ def main() -> int:
                              "apres demucs (highpass bass 60Hz, lowpass 500Hz, "
                              "merge vocals si silence). A activer pour tribe/techno.")
     args = parser.parse_args()
+    if not media_ok():
+        return 2
 
     entries = parse_library(LIBRARY_FILE)
     if not entries:

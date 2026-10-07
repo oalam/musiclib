@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/p3b3_-_le_retour_du_soleil_live_extract.m4a",
+  "file_path": "audio/p3b3_-_le_retour_du_soleil_live_extract.m4a",
   "slug": "p3b3_-_le_retour_du_soleil_live_extract",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": -0.00026507636037961915,
     "true_peak_dbfs": 0.005262575960478772,
     "rms_dbfs": -8.45211110564165,
-    "clipping_ratio": 5.035150701745806e-7,
+    "clipping_ratio": 5.035150701745806e-07,
     "clipping_count": 8
   },
   "loudness": {

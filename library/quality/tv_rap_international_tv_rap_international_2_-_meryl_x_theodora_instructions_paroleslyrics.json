@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/tv_rap_international_tv_rap_international_2_-_meryl_x_theodora_instructions_paroleslyrics.opus",
+  "file_path": "audio/tv_rap_international_tv_rap_international_2_-_meryl_x_theodora_instructions_paroleslyrics.opus",
   "slug": "tv_rap_international_tv_rap_international_2_-_meryl_x_theodora_instructions_paroleslyrics",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 0.7765794732176751,
     "true_peak_dbfs": 0.42653153094801216,
     "rms_dbfs": -10.239069937671557,
-    "clipping_ratio": 7.79540258337243e-6,
+    "clipping_ratio": 7.79540258337243e-06,
     "clipping_count": 65
   },
   "loudness": {

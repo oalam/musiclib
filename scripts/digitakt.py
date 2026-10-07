@@ -12,13 +12,12 @@ Usage:
 Sorties :
     library/digitakt/<slug>.json         # DigitaktBank (Pydantic) → front
     library/digitakt/<slug>.md           # note Obsidian : mutes + grilles
-    library/digitakt/<slug>/pNN.mid      # 1 .mid par pattern, canal = track
+    <MEDIA>/Live/digitakt/<slug>/pNN.mid # 1 .mid par pattern, canal = track
 """
 from __future__ import annotations
 
 import argparse
 import sys
-from pathlib import Path
 
 import numpy as np
 
@@ -39,14 +38,16 @@ from analyzer.harmony import Harmony
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import _SIG_CONF_THRESHOLD, beats_per_bar
 from library_md import parse_library
-from stems import _resolve_audio_path
-
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-LIBRARY_FILE = LIBRARY / "library.md"
-QUALITY_DIR = LIBRARY / "quality"
-STEMS_DIR = LIBRARY / "stems"
-DIGITAKT_DIR = LIBRARY / "digitakt"
+from paths import (
+    DIGITAKT_DIR,
+    DIGITAKT_MIDI_DIR,
+    LIBRARY_FILE,
+    QUALITY_DIR,
+    STEMS_DIR,
+    VAULT_ROOT,
+    media_ok,
+)
+from paths import resolve_audio as _resolve_audio_path
 _STEMS = ("drums", "bass", "other", "vocals")
 
 
@@ -128,7 +129,7 @@ def process(slug: str, entries: dict[str, dict[str, str]], phrase_bars: int,
     written = [json_path, md_path]
     if midi:
         for p in bank.patterns:
-            out = DIGITAKT_DIR / slug / f"p{p.slot:02d}.mid"
+            out = DIGITAKT_MIDI_DIR / slug / f"p{p.slot:02d}.mid"
             write_pattern_midi(p, bank.bpm, out)
             written.append(out)
 
@@ -143,7 +144,7 @@ def process(slug: str, entries: dict[str, dict[str, str]], phrase_bars: int,
         print(f"[export] {path.relative_to(VAULT_ROOT)}")
     if midi:
         print(f"[export] {len(bank.patterns)} .mid dans "
-              f"{(DIGITAKT_DIR / slug).relative_to(VAULT_ROOT)}/")
+              f"{DIGITAKT_MIDI_DIR / slug}/")
     return 0
 
 
@@ -160,6 +161,8 @@ def main() -> int:
     parser.add_argument("--no-midi", dest="midi", action="store_false",
                         help="Ne pas ecrire les .mid par pattern.")
     args = parser.parse_args()
+    if not media_ok():
+        return 2
     if not args.slug and not args.all:
         parser.error("donner un slug ou --all")
 

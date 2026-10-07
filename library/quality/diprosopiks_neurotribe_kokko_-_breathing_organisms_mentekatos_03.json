@@ -1,5 +1,5 @@
 {
-  "file_path": "library/audio/diprosopiks_neurotribe_kokko_-_breathing_organisms_mentekatos_03.m4a",
+  "file_path": "audio/diprosopiks_neurotribe_kokko_-_breathing_organisms_mentekatos_03.m4a",
   "slug": "diprosopiks_neurotribe_kokko_-_breathing_organisms_mentekatos_03",
   "artist": null,
   "title": null,
@@ -19,7 +19,7 @@
     "sample_peak_dbfs": 0.0,
     "true_peak_dbfs": 0.23489416714132016,
     "rms_dbfs": -7.827246486164706,
-    "clipping_ratio": 3.1257516198796485e-6,
+    "clipping_ratio": 3.1257516198796485e-06,
     "clipping_count": 57
   },
   "loudness": {

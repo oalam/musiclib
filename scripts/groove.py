@@ -16,7 +16,7 @@ Usage:
     groove.py <slug> [--steps 16|32] [--bars N] [--format both|mid|tidal]
     groove.py <slug> --threshold 0.25     # sensibilite des hits
 
-Sortie : `library/grooves/<slug>.{mid,tidal}`.
+Sortie : `<MEDIA>/Live/grooves/<slug>.{mid,tidal}`.
 """
 from __future__ import annotations
 
@@ -34,14 +34,8 @@ from analyzer.rhythm_signature import (
     beats_per_bar,
 )
 from library_md import parse_library
-from stems import _resolve_audio_path
-
-VAULT_ROOT = Path(__file__).resolve().parent.parent
-LIBRARY = VAULT_ROOT / "library"
-LIBRARY_FILE = LIBRARY / "library.md"
-QUALITY_DIR = LIBRARY / "quality"
-STEMS_DIR = LIBRARY / "stems"
-GROOVES_DIR = LIBRARY / "grooves"
+from paths import GROOVES_DIR, LIBRARY_FILE, QUALITY_DIR, STEMS_DIR, media_ok
+from paths import resolve_audio as _resolve_audio_path
 
 # Bande de rhythm_signature → (note GM, nom sample Tidal)
 _VOICES: dict[str, tuple[int, str]] = {
@@ -55,7 +49,7 @@ _PPQ = 480  # ticks par noire
 def _resolve_source(slug: str, entries: dict[str, dict[str, str]]) -> tuple[Path, bool]:
     """Retourne (chemin audio, from_stem). Prefere le stem drums Demucs.
 
-    Le fallback mix reutilise `stems._resolve_audio_path` (parse le wikilink
+    Le fallback mix reutilise `paths.resolve_audio` (parse le wikilink
     `[[audio/...]]` du champ `file`)."""
     drums = STEMS_DIR / slug / "drums.wav"
     if drums.exists():
@@ -296,7 +290,7 @@ def export_groove(
         viz = "".join("x" if h else "." for h in hits)
         print(f"  {sample:<3} {viz}")
     for p in written:
-        print(f"[export] {p.relative_to(VAULT_ROOT)}")
+        print(f"[export] {p}")
     return 0
 
 
@@ -317,6 +311,8 @@ def main() -> int:
     parser.add_argument("--no-align", dest="align", action="store_false",
                         help="Ne pas caler le pattern sur le kick le plus fort.")
     args = parser.parse_args()
+    if not media_ok():
+        return 2
     if args.bars < 1:
         print("[ERROR] --bars doit etre >= 1", file=sys.stderr)
         return 1

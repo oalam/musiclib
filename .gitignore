@@ -5,13 +5,14 @@ __pycache__/
 *.pyo
 
 # Données binaires lourdes (régénérables via le pipeline)
-library/audio/
-library/stems/
-library/visuals/
+# audio/visuals : symlinks vers le disque media (cf. scripts/paths.py)
+library/audio
+library/stems
+library/visuals
 
 # Artefacts générés (régénérables via groove.py / visualize.py / to_xrns.py)
-library/grooves/
-library/renoise/
+library/grooves
+library/renoise
 
 # État de session Obsidian (config conservée, workspace ignoré)
 .obsidian/workspace.json
