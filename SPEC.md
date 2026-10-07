@@ -639,6 +639,13 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   entrer comme candidat en fin de case (mesuré à ce moment). Sans kit, un
   second appui sur `R` ajoute la réserve hors plafond de la case (demande du
   2026-10-07) ; le nombre de fichiers hors plafond s'affiche dans l'en-tête de la case.
+- Vue kit (demande du 2026-10-07) : choisir un kit ouvre à droite son
+  arborescence par classement final, FAMILLE / CODE / fichiers (dossiers
+  repliables, « retenus / total »), avec tous ses fichiers marqués (retenu,
+  réserve, hors plafond, gardé, écarté ; corbeille exclue), nom DT2 et
+  chemin source, puis un dernier dossier « Non classés ». L'écoute et les
+  actions (K / D, M, étoiles, tags) y restent actives ; un clic sur une case
+  de la grille revient à la liste de la case.
 - Corbeille d'un kit ou d'un pack = règle dans `overrides.json` (clé
   `<préfixe>/`, `trash`), qui exclut tous ses fichiers, y compris à venir ;
   reconstruction du manifeste (les cases se remplissent depuis la réserve),

@@ -340,6 +340,8 @@ export const api = {
     fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}${overflow ? '&overflow=true' : ''}`).then(r => json<SampleEntry[]>(r)),
   sampleLoose: (which: 'unclassified' | 'trash', kit = '') =>
     fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}`).then(r => json<LooseSample[]>(r)),
+  sampleKitTree: (kit: string) =>
+    fetch(`/api/samples/kit/tree?kit=${enc(kit)}`).then(r => json<{ entries: SampleEntry[]; unclassified: LooseSample[] }>(r)),
   sampleKits: () => fetch('/api/samples/kits').then(r => json<SampleKits>(r)),
   sampleKitTrash: (kit: string) => samplePost('kit/trash', { kit }),
   sampleKitRestore: (kit: string) => samplePost('kit/restore', { kit }),

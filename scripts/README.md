@@ -761,6 +761,9 @@ BL basse.
   corbeille sur le kit ; la réserve hors plafond du kit apparaît (`+N` sur
   les cases, lignes « hors plafond », liste `reserve` du manifeste) : la
   garder, l'écarter, la noter ou la ranger la fait entrer comme candidat.
+  Choisir un kit ouvre à droite son arborescence FAMILLE / CODE / fichiers
+  (case finale, dossiers repliables, retenus / total, tous les fichiers
+  marqués), puis un dossier « Non classés » (`GET /api/samples/kit/tree`).
   Sans kit, `R` déplie la réserve, puis au second appui les fichiers hors
   plafond de la case (`GET /api/samples/cell?overflow=true`), puis replie.
   Barre du kit : tags du kit (hérités par ses fichiers, à venir compris) et

@@ -354,6 +354,10 @@ def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
     assert cells["SD"]["reserve"] == 1 and cells["SD"]["candidates"] == 0
     rows = client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX", "kit": "k/a"}).json()
     assert [(r["source"], r["overflow"]) for r in rows] == [("k/a/fx1.wav", False), ("k/a/fx2.wav", True)]
+    tree = client.get("/api/samples/kit/tree", params={"kit": "k"}).json()
+    assert [(r["code"], r["source"], r["overflow"]) for r in tree["entries"]] == [
+        ("FX", "k/a/fx1.wav", False), ("FX", "k/a/fx2.wav", True), ("SD", "k/b/sd1.wav", True)]
+    assert tree["unclassified"] == []
     # garder un fichier de la reserve le fait entrer comme candidat
     r = _post(client, "status", sources=["k/a/fx2.wav"], status="keep")
     assert r.status_code == 200 and r.json()[0]["keep"] == 1

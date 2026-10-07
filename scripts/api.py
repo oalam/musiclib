@@ -59,6 +59,7 @@ from analyzer.samples import (
     cell_of,
     export,
     in_kit,
+    kit_rows,
     kit_tags,
     kits,
     known,
@@ -238,6 +239,12 @@ class SampleKits(BaseModel):
     """Pads du front : bilan par kit, tags poses sur un kit ou un pack."""
     kits: list[KitInfo]
     tags: dict[str, list[str]]
+
+
+class SampleKitTree(BaseModel):
+    """Arborescence d'un kit : fichiers classes (case finale) et non classes."""
+    entries: list[SampleEntry]
+    unclassified: list[LooseSample]
 
 
 class SampleExport(BaseModel):
@@ -493,6 +500,14 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                      kit: str | None = None) -> list[LooseSample]:
         """Non classes ou corbeille (7.J4), d'un kit (7.J5)."""
         return loose(manifest(), samples.load_overrides(samples_overrides), which, kit or None)
+
+    @app.get("/api/samples/kit/tree", response_model=SampleKitTree)
+    def sample_kit_tree(kit: KitPath) -> SampleKitTree:
+        """Tous les fichiers d'un kit par case finale (candidats et hors
+        plafond), puis ses non classes ; la corbeille n'y est pas."""
+        m = manifest()
+        return SampleKitTree(entries=kit_rows(m, kit), unclassified=loose(
+            m, samples.load_overrides(samples_overrides), "unclassified", kit))
 
     @app.get("/api/samples/kits", response_model=SampleKits)
     def sample_kits() -> SampleKits:

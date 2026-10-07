@@ -18,6 +18,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   kit entier (règle `"<préfixe>/"` dans `overrides.json`, restaurable d'un
   bloc). API : `GET /api/samples/kits`, paramètre `kit`,
   `POST /api/samples/kit/tags`, `/kit/trash`, `/kit/restore`.
+- [7.J5] Arborescence du kit : choisir un kit ouvre à droite ses fichiers
+  par classement final FAMILLE / CODE (dossiers repliables, retenus / total,
+  marques retenu / réserve / hors plafond), puis un dossier « Non classés » ;
+  écoute et actions actives (`GET /api/samples/kit/tree`).
 - [7.J5] Hors plafond sans kit : un second appui sur `R` (ou le bouton
   « Afficher les hors plafond ») ajoute toute la réserve de la case
   (`GET /api/samples/cell?overflow=true`) ; le nombre de fichiers hors plafond

@@ -8,6 +8,8 @@
   // Kits (7.J5) : pads des packs sous la grille, puis des sous-kits du pack
   // choisi ; un pad filtre grille et listes sur le kit (reserve hors plafond
   // comprise), porte ses tags (herites par ses fichiers) et sa corbeille.
+  // Vue kit : arborescence FAMILLE / CODE / fichiers (case finale, retenus,
+  // reserve, hors plafond), puis un dossier des non classes du kit.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
   import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus } from './api'
@@ -30,7 +32,7 @@
   const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
 
   type Loose = 'unclassified' | 'trash'
-  type View = { kind: 'cell'; family: string; code: string } | { kind: Loose }
+  type View = { kind: 'cell'; family: string; code: string } | { kind: Loose } | { kind: 'kit' }
 
   let cells = $state<SampleCell[]>([])
   // colonnes de la grille non filtree : un filtre (kit, tag) ne la redimensionne pas
@@ -79,7 +81,40 @@
   const chosen = $derived(shown.filter(e => e.selected))
   const reserve = $derived(shown.filter(e => !e.selected))
   // ordre de navigation : la selection, puis la reserve si elle est depliee
-  const visible = $derived(showReserve ? [...chosen, ...reserve] : chosen)
+  // arborescence du kit : familles (ordre de la grille), codes, puis non classes
+  type Folder = { key: string; code: string; rows: SampleEntry[]; selected: number }
+  type FamFolder = { key: string; label: string; folders: Folder[]; selected: number; total: number }
+  let collapsed = $state<Set<string>>(new Set())
+  const tree = $derived.by((): FamFolder[] => {
+    if (view?.kind !== 'kit') return []
+    const fams = new Map<string, Map<string, SampleEntry[]>>()
+    for (const e of shown) {
+      const codesOf = fams.get(e.family) ?? new Map<string, SampleEntry[]>()
+      codesOf.set(e.code, [...(codesOf.get(e.code) ?? []), e])
+      fams.set(e.family, codesOf)
+    }
+    const famRank = (f: string) => (f === '' ? 1e3 : FAMILIES.includes(f) ? FAMILIES.indexOf(f) : FAMILIES.length)
+    return [...fams.entries()].sort(([a], [b]) => famRank(a) - famRank(b)).map(([fam, codesOf]) => {
+      const folders = [...codesOf.entries()].sort(([a], [b]) => codeRank(a) - codeRank(b)).map(([code, rows]) => ({
+        key: `${fam}/${code}`, code, rows, selected: fam ? rows.filter(r => r.selected).length : 0,
+      }))
+      return {
+        key: fam || ':nc', label: fam || 'Non classés', folders,
+        selected: folders.reduce((n, f) => n + f.selected, 0),
+        total: folders.reduce((n, f) => n + f.rows.length, 0),
+      }
+    })
+  })
+  const visible = $derived(view?.kind === 'kit'
+    ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
+    : showReserve ? [...chosen, ...reserve] : chosen)
+
+  function toggleFolder(key: string) {
+    const s = new Set(collapsed)
+    if (s.has(key)) s.delete(key)
+    else s.add(key)
+    collapsed = s
+  }
   const totals = $derived(cells.reduce((a, c) => ({
     selected: a.selected + c.selected, keep: a.keep + c.keep, toListen: a.toListen + c.to_listen,
   }), { selected: 0, keep: 0, toListen: 0 }))
@@ -149,6 +184,11 @@
     const v = view
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
+    if (v.kind === 'kit') {
+      const t = await api.sampleKitTree(kit).catch(() => ({ entries: [], unclassified: [] }))
+      entries = [...t.entries, ...t.unclassified.map(looseRow)]
+      return
+    }
     entries = v.kind === 'cell'
       ? await api.sampleCell(v.family, v.code, kit, showOverflow).catch(() => [])
       : (await api.sampleLoose(v.kind, kit)).map(looseRow)
@@ -217,9 +257,11 @@
   }
 
   async function decide(status: SampleStatus) {
-    if (!current) return
+    if (!current && view?.kind !== 'kit') return
+    // vue kit : les non classes n'ont pas de case (M pour leur en donner une)
+    const sources = targets().filter(s => entries.find(e => e.source === s)?.family)
     const single = sel.size ? null : cursor
-    if (!(await act(s => api.sampleStatus(s, status))) || !single || status === 'pending') return
+    if (!(await act(s => api.sampleStatus(s, status), sources)) || !single || status === 'pending') return
     // ecoute : prochain retenu encore a ecouter apres celui-ci, sinon le premier
     const pend = entries.filter(e => e.selected && e.status === 'pending')
     const order = entries.map(e => e.source)
@@ -245,8 +287,8 @@
     moving = {
       sources,
       label: sources.length > 1 ? `${sources.length} samples` : one?.name ?? sources[0],
-      family: current?.family ?? 'UNIVERSEL',
-      code: current?.code ?? 'PC',
+      family: current?.family ?? (one?.family || 'UNIVERSEL'),
+      code: current?.code ?? (one?.code || 'PC'),
     }
     queueMicrotask(() => moveSelect?.focus())
   }
@@ -340,8 +382,13 @@
     showReserve = kit !== ''
     showOverflow = false
     try { localStorage.setItem(KIT_KEY, kit) } catch { /* stockage indisponible */ }
+    collapsed = new Set()
     await refresh()
-    if (view) await open(view)
+    if (kit) await open({ kind: 'kit' })
+    else if (view?.kind === 'kit') {
+      const c = cells.find(x => x.to_listen > 0) ?? cells[0]
+      if (c) await open({ kind: 'cell', family: c.family, code: c.code })
+    } else if (view) await open(view)
   }
 
   async function kitAct(fn: () => Promise<unknown>) {
@@ -434,6 +481,7 @@
     if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
     let last: string | null = null
     try { last = localStorage.getItem(VIEW_KEY) } catch { /* stockage indisponible */ }
+    if (last === ':kit' && kit) return open({ kind: 'kit' })
     if (last === ':unclassified' || last === ':trash') return open({ kind: last.slice(1) as Loose })
     const c = (last && byKey.get(last)) || cells.find(x => x.to_listen > 0) || cells[0]
     if (c) await open({ kind: 'cell', family: c.family, code: c.code })
@@ -576,7 +624,7 @@
 
   <section class="detail">
     <header>
-      <strong>{current ? `${current.family} / ${current.code}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
+      <strong>{current ? `${current.family} / ${current.code}` : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
       {#if current}
         {@const c = byKey.get(`${current.family}/${current.code}`)}
         {#if c}<span class="muted small">quota {c.quota ?? 'tout'} · {c.keep} gardés · {c.drop} écartés · {c.candidates} candidats{c.reserve ? ` · ${c.reserve} hors plafond` : ''}</span>{/if}
@@ -591,7 +639,7 @@
       {#if view?.kind === 'trash'}
         <button class="small" disabled={!targetCount || busy} onclick={restore}>Restaurer</button>
       {:else}
-        {#if current}
+        {#if current || view?.kind === 'kit'}
           <button class="small" disabled={!targetCount || busy} onclick={() => decide('keep')}>Garder</button>
           <button class="small" disabled={!targetCount || busy} onclick={() => decide('drop')}>Écarter</button>
         {/if}
@@ -608,7 +656,7 @@
       <button class="small" disabled={!targetCount || !tagInput.trim() || busy} onclick={addTag}>Tagger</button>
     </div>
     <p class="keys muted small">
-      {#if current}<kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · {/if}
+      {#if current || view?.kind === 'kit'}<kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · {/if}
       {#if view?.kind === 'trash'}<kbd>U</kbd> restaurer · {:else}<kbd>Suppr</kbd> corbeille · <kbd>M</kbd> case · {/if}
       <kbd>1</kbd>…<kbd>5</kbd> étoiles, <kbd>0</kbd> sans · <kbd>T</kbd> tag ·
       <kbd>↑</kbd><kbd>↓</kbd> sample · <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve, puis hors plafond ·
@@ -637,30 +685,61 @@
         {/each}
       </ul>
     {/if}
-    <ol class="list">
-      {#each visible as e, i (e.source)}
-        {#if showReserve && i === chosen.length && reserve.length}<li class="sep muted small">Réserve ({reserve.length})</li>{/if}
-        <li id="s-{e.source}" class="row {e.status}" class:cur={e.source === cursor} class:out={!e.selected}
-          class:sel={sel.has(e.source)} draggable={view?.kind !== 'trash'}
-          ondragstart={ev => onDragStart(ev, e.source)} ondragend={onDragEnd}>
-          <button class="pick" onclick={ev => onRowClick(ev, e.source)}>
-            {#if current}<span class="rank muted">{e.rank}</span>{/if}
-            <span class="name">{e.name}</span>
-            {#if e.stars}<span class="stars" title="{e.stars} étoile{e.stars > 1 ? 's' : ''}">{'★'.repeat(e.stars)}</span>{/if}
-            <span class="dur muted small">{fmt(e.duration)}</span>
-            {#if e.overflow}<span class="est" title="au-delà du plafond de candidats : garder, écarter, noter ou ranger le fait entrer">hors plafond</span>{/if}
-            {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
-            {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
-            <span class="src muted small" title={e.source}>{e.source}</span>
-          </button>
-          {#each e.tags as t}
-            <span class="tag small">{t}<button class="untag" title="Retirer le tag {t}"
-              onclick={() => act(s => api.sampleTagsEdit(s, [], [t]), [e.source])}>×</button></span>
-          {/each}
-          <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : ''}</span>
-        </li>
-      {/each}
-    </ol>
+    {#snippet sampleRow(e: SampleEntry)}
+      <li id="s-{e.source}" class="row {e.status}" class:cur={e.source === cursor} class:out={!e.selected}
+        class:sel={sel.has(e.source)} draggable={view?.kind !== 'trash'}
+        ondragstart={ev => onDragStart(ev, e.source)} ondragend={onDragEnd}>
+        <button class="pick" onclick={ev => onRowClick(ev, e.source)}>
+          {#if current}<span class="rank muted">{e.rank}</span>{/if}
+          <span class="name">{e.name}</span>
+          {#if e.stars}<span class="stars" title="{e.stars} étoile{e.stars > 1 ? 's' : ''}">{'★'.repeat(e.stars)}</span>{/if}
+          <span class="dur muted small">{fmt(e.duration)}</span>
+          {#if e.overflow}<span class="est" title="au-delà du plafond de candidats : garder, écarter, noter ou ranger le fait entrer">hors plafond</span>{/if}
+          {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
+          {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
+          <span class="src muted small" title={e.source}>{e.source}</span>
+        </button>
+        {#each e.tags as t}
+          <span class="tag small">{t}<button class="untag" title="Retirer le tag {t}"
+            onclick={() => act(s => api.sampleTagsEdit(s, [], [t]), [e.source])}>×</button></span>
+        {/each}
+        <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : view?.kind === 'kit' && e.family && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
+      </li>
+    {/snippet}
+    {#if view?.kind === 'kit'}
+      <ol class="list tree">
+        {#each tree as f (f.key)}
+          <li class="folder fam">
+            <button class="fold" onclick={() => toggleFolder(f.key)}>
+              <span class="caret">{collapsed.has(f.key) ? '▸' : '▾'}</span> {f.label}
+              <span class="muted small">{f.key === ':nc' ? f.total : `${f.selected} / ${f.total}`}</span>
+            </button>
+          </li>
+          {#if !collapsed.has(f.key)}
+            {#each f.folders as c (c.key)}
+              {#if f.key !== ':nc'}
+                <li class="folder code">
+                  <button class="fold" onclick={() => toggleFolder(c.key)}>
+                    <span class="caret">{collapsed.has(c.key) ? '▸' : '▾'}</span> {c.code}
+                    <span class="muted small">{c.selected} / {c.rows.length}</span>
+                  </button>
+                </li>
+              {/if}
+              {#if !collapsed.has(c.key)}
+                {#each c.rows as e (e.source)}{@render sampleRow(e)}{/each}
+              {/if}
+            {/each}
+          {/if}
+        {/each}
+      </ol>
+    {:else}
+      <ol class="list">
+        {#each visible as e, i (e.source)}
+          {#if showReserve && i === chosen.length && reserve.length}<li class="sep muted small">Réserve ({reserve.length})</li>{/if}
+          {@render sampleRow(e)}
+        {/each}
+      </ol>
+    {/if}
     {#if current && !showReserve && reserve.length}
       <button class="small" onclick={toggleReserve}>Afficher la réserve ({reserve.length})</button>
     {:else if current && showReserve && !showOverflow && !kit && byKey.get(`${current.family}/${current.code}`)?.reserve}
@@ -745,6 +824,11 @@
   .status { width: 4em; color: var(--muted); }
   .move { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px 8px; margin-bottom: 6px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
   .sep { padding: 10px 6px 4px; }
+  .folder .fold { display: flex; gap: 6px; align-items: baseline; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--border); padding: 5px 6px; text-align: left; color: var(--text); cursor: pointer; font-weight: 600; }
+  .folder.fam .fold { background: var(--panel); font-size: 13px; }
+  .folder.code .fold { padding-left: 22px; font: 600 12px ui-monospace, Menlo, monospace; }
+  .caret { width: 1em; color: var(--muted); }
+  .tree .row { padding-left: 34px; }
   .small { font-size: 12px; }
   .err { color: #dc2626; font-size: 12px; }
   @media (max-width: 900px) {

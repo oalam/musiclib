@@ -1040,6 +1040,18 @@ def overflow_of(manifest: Manifest, family: str, code: str,
             for i, r in enumerate(rows, 1)]
 
 
+def kit_rows(manifest: Manifest, kit: str) -> list[SampleEntry]:
+    """Fichiers classes d'un kit, case par case : candidats par rang, puis la
+    reserve hors plafond (`overflow`). Arborescence du front (7.J5)."""
+    out: list[SampleEntry] = []
+    cells = sorted({(e.family, e.code) for e in manifest.entries if in_kit(e.source, kit)}
+                   | {(r.family, r.code) for r in manifest.reserve if in_kit(r.source, kit)})
+    for fam, code in cells:
+        out += [e for e in cell_of(manifest, fam, code) if in_kit(e.source, kit)]
+        out += overflow_of(manifest, fam, code, kit)
+    return out
+
+
 def kits(manifest: Manifest) -> list[KitInfo]:
     """Bilan par kit (prefixe), kits a la corbeille compris, tries par chemin."""
     out: dict[str, KitInfo] = {}
