@@ -77,7 +77,6 @@ music/library/                    # vault (git)
 ├── quality/<slug>.json           # sidecars Phase 1+2+6A+6C (Pydantic)
 ├── artists/<slug>.json           # cache MusicBrainz
 ├── digitakt/<slug>.{json,md}     # banks Phase 7
-├── samples/catalog.csv
 ├── audio   -> <MEDIA>/Mix/audio      # symlinks : wikilinks et embeds Obsidian
 └── visuals -> <MEDIA>/Mix/visuals
 

@@ -14,40 +14,9 @@ Cinq outils :
   (waveform + mel-spectrogram + structure + cues overlay + tonal profile)
 - **`stems.py`** : Phase 6.B, sépare en 4 stems via Demucs
   (drums/bass/other/vocals) pour sampling TidalCycles
-- **`samples.py`** : catalogue de banques de samples wav (Maschine, Battery,
-  Blastwave...) : dédoublonnage par contenu audio + copie sélective
 
 Format library.md : **table markdown unique** (migration de 2026-05-31).
 Voir `../SPEC.md` (source of truth) pour l'état détaillé.
-
----
-
-# samples.py — catalogue de banques de samples
-
-Scanne des dossiers de samples wav/aiff, dédoublonne **sur le PCM décodé**
-(Maschine et Maschine 2 livrent les mêmes sons avec des en-têtes différents,
-un hash de fichier ne les voit pas) et écrit un catalogue CSV. On copie
-ensuite ce qu'on veut garder, par filtre ou par marquage.
-
-```bash
-S=/Volumes/tanathos/Samples
-# l'ordre fixe la priorité : en cas de doublon, l'exemplaire du 1er dossier gagne
-python samples.py scan "$S/Maschine 2 Library" "$S/Maschine Library" \
-    "$S/Battery 3 Library" "$S/Blastwave FX - Haunted FX Sound Effects Library"
-# -> library/samples/catalog.csv (+ catalog.duplicates.csv pour l'audit)
-
-# Copie par filtres (globs insensibles à la casse), toujours tester en --dry-run
-python samples.py copy --dest ~/Samples/keep --category 'drums/kick' --dry-run
-python samples.py copy --dest ~/Samples/keep --source 'maschine 2' --name '*909*'
-python samples.py copy --dest ~/Samples/keep --category 'one shots/*' --max-duration 2
-
-# Copie par marquage : mettre x (ou 1/oui) dans la colonne keep du CSV
-python samples.py copy --dest ~/Samples/keep --marked
-```
-
-Destination : `<dest>/<source>/<arborescence d'origine sans le préfixe Samples>`. La copie est rejouable
-(les fichiers déjà présents à la même taille sont sautés). Les banques
-Kontakt `.nkx` protégées ne sont pas couvertes.
 
 ---
 

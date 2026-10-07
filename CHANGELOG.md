@@ -166,6 +166,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.E] Requalifiée en enregistrement assisté + pré-réglage CC / NRPN :
   aucun NRPN ne pose un trig sur un pas (annexe B du manuel).
 
+### Supprimé
+
+- `samples.py` (catalogue et dédoublonnage de banques de samples) abandonné :
+  script, tests, `SAMPLES_CATALOG` de `paths.py` et documentation retirés.
+
 ### Corrigé
 
 - [7.I] Titre et artiste : le préfixe artiste est retiré du titre quand il

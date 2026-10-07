@@ -3,8 +3,8 @@
 Deux racines :
 
 - **Vault** (`music/library/`) : metadonnees texte versionnees — `library.md`,
-  sidecars `quality/`, cache `artists/`, banks Digitakt (`.json`/`.md`),
-  catalogue samples. Toujours disponible.
+  sidecars `quality/`, cache `artists/`, banks Digitakt (`.json`/`.md`).
+  Toujours disponible.
 - **Media** (`MUSIC_MEDIA_ROOT`, defaut `/Volumes/xtreme`) : binaires lourds sur
   le SSD externe, dedie au son.
 
@@ -43,7 +43,6 @@ LIBRARY_FILE = LIBRARY / "library.md"
 QUALITY_DIR = LIBRARY / "quality"
 ARTISTS_DIR = LIBRARY / "artists"
 DIGITAKT_DIR = LIBRARY / "digitakt"
-SAMPLES_CATALOG = LIBRARY / "samples" / "catalog.csv"
 
 # --- Disque media --------------------------------------------------------
 MEDIA_ROOT = Path(os.environ.get("MUSIC_MEDIA_ROOT", "/Volumes/xtreme"))
