@@ -152,12 +152,13 @@ _BPM_GENRES: list[tuple[float, float, str]] = [
 # corriger les erreurs d'octave de la detection (198.8 -> 99.4 en shatta).
 # Mots-cles au format slug (tokens separes par `_`) ; rapport haut/bas < 2
 # pour qu'une seule correction x2 / /2 tombe dans la fenetre. Styles trop
-# larges (swing, tango, rock, folk) volontairement absents.
+# larges (swing, tango, rock, folk, soul) volontairement absents, comme
+# « roots » (titre de morceaux tekno).
 STYLE_BPM_WINDOWS: list[tuple[tuple[str, ...], float, float]] = [
-    (("reggae", "dub", "roots", "one_drop"), 60, 95),
+    (("reggae", "dub", "one_drop"), 60, 95),
     (("shatta", "dancehall", "reggaeton", "latino", "afro", "afrobeat",
       "afrobeats", "dembow", "baile_funk", "kuduro"), 85, 115),
-    (("hip_hop", "hiphop", "rap", "slow", "soul", "rb", "rnb"), 60, 110),
+    (("hip_hop", "hiphop", "rap", "slow", "rb", "rnb"), 60, 110),
     (("disco", "funk", "house", "techouse", "tech_house"), 110, 130),
     (("techno", "hard_techno"), 125, 150),
     (("dubstep",), 135, 150),

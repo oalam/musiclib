@@ -12,7 +12,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   dans la plage du style (`STYLE_BPM_WINDOWS`, `analyzer/infer.py` :
   reggae / dub 60-95, shatta / dancehall 85-115, tribe / tekno / acidcore
   160-210…). Style lu dans le dossier, le genre forcé, le genre de la source
-  puis le titre et les tags ; BPM corrigé imposé à l'analyse complète, style
+  puis ses tags (pas le titre ; soul et roots hors table, trop ambigus) ; BPM corrigé imposé à l'analyse complète, style
   reporté dans `genre` s'il est vide. Champ « Dossier / style » du front.
 - [7.I] Ajout d'un morceau depuis le front : panneau « + Ajouter un
   morceau » (recherche YT/SC, candidats avec codec / débit / qualité /
@@ -126,6 +126,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- Doctrine Digitakt : nouvelles sections §9 (grave : fabrication du rumble,
+  placement tribe, basse en contretemps, partage des fréquences), §10
+  (compresseur master : routing, sidechain, kick fantôme), §11 (tonalité et
+  harmonie : le kick donne la tonique, modes, progressions), §12 (tracks
+  Id1 / Id2), §13 (set multi-styles : hiérarchie projet / kit / preset,
+  un kit par acte, transitions de tempo, tribe vs mental), §14
+  (aide-mémoire machine). Grille §1 : rumble sur le même pas que le kick
+  avec ducking (et non entre les kicks), basse 80-250 Hz + harmoniques en
+  contretemps.
 - [media] `grab.py` transcode en FLAC les codecs non lus par Rekordbox (Opus,
   Vorbis) ; `file` et `file_path` sont relatifs à `<MEDIA>/Mix/`.
 - [media] SPEC : décision Phase 3 révisée (Rekordbox est le logiciel de mix,

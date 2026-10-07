@@ -885,14 +885,14 @@ class IngestResult:
 
 def style_hints(cand: Candidate, opts: IngestOptions) -> list[str]:
     """Textes qui designent le style, par priorite : dossier, genre force,
-    genre de la source, titre + tags. Jamais le genre de library.md (souvent
-    deduit du BPM lui-meme)."""
+    genre de la source, tags de la source. Ni le titre (« Roots », « Mental
+    in Dub » sur du tekno), ni le genre de library.md (souvent deduit du BPM)."""
     info = cand.info
     return [
         opts.folder or "",
         ", ".join(opts.genre_override or []),
         info.get("genre") or "",
-        " ".join([cand.title, *(info.get("tags") or []), *(info.get("categories") or [])]),
+        ", ".join([*(info.get("tags") or []), *(info.get("categories") or [])]),
     ]
 
 

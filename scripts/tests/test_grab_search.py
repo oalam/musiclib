@@ -144,3 +144,11 @@ def test_ingest_sans_style_garde_le_bpm(media: Path):
     res = grab.ingest(cand, grab.IngestOptions(folder="mariage"))
     assert res.style_bpm is None
     assert parse_library(media / "library.md")[res.slug]["bpm"] == "174.0"
+
+
+def test_style_ignore_le_titre(media: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(grab, "analyze_audio", lambda p, start_bpm: (161.5, "A minor"))
+    cand = _cand("https://yt/1", "opus", 160, title="Roots", artist="floxytek",
+                 tags=["tekno", "free party"])
+    res = grab.ingest(cand, grab.IngestOptions())
+    assert res.style_bpm == 161.5  # style tekno (tags), pas « roots » du titre

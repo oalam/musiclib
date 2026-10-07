@@ -19,12 +19,13 @@ def test_fenetres_sans_ambiguite_d_octave():
     (["shatta"], ("shatta", 85, 115)),
     (["Mental Tekno live"], ("tekno", 160, 210)),  # 1er mot-cle de la table
     (["", "Drum & Bass"], ("drum_bass", 160, 180)),
-    (["R&B & Soul"], ("soul", 60, 110)),  # deux mots-cles, meme fenetre
+    (["R&B & Soul"], ("rb", 60, 110)),  # soul hors table (trop large)
     (["Roots Reggae"], ("reggae", 60, 95)),
     (["dub"], ("dub", 60, 95)),
     (["dubstep"], ("dubstep", 135, 150)),  # pas confondu avec dub
     (["janes_fifty", "Dancehall Dubstep remix", "techno"], ("techno", 125, 150)),
     (["mariage", "Alternative Rock"], None),
+    (["soul", "roots"], None),
 ])
 def test_style_window(texts: list[str], expected: tuple[str, float, float] | None):
     assert style_window(texts) == expected
