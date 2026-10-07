@@ -308,6 +308,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.J4] Samples : dans un dossier de kicks (`…KICKS 3`), une frappe de
+  plus de 4 s reste une frappe au lieu de devenir une boucle DL avec un
+  tempo estimé au hasard (7 kicks Vi Ta Lee MILLENNIUM KICKS 3 rendus à
+  HARDCORE/BD, renommés `BD A Millen NN vtl`). Les boucles de ces dossiers
+  qui le disent dans leur nom (`Loop`, tempo) ne changent pas.
 - [7.B] Trigs de basse de la bank Digitakt : posés aux débuts de note pYIN
   (`note_segments`, `place_starts`, vote `fold_note_starts`) au lieu du
   seuil sur l'onset de la bande 40-400 Hz, qui ne voyait pas un riff joué

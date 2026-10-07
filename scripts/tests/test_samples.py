@@ -404,6 +404,14 @@ def test_tempo_from_name(stem: str, tempo: int | None) -> None:
     assert smp.tempo_from_name(stem) == tempo
 
 
+def test_long_kick_in_kicks_pack_stays_oneshot() -> None:
+    mk = "Vi Ta Lee /MILLENNIUM KICKS 3/Vi Ta Lee - MILLENNIUM KICKS 3 - 45 XTRMRAW_MLNM3_KICK_A_045.wav"
+    assert smp.code_of(mk, 4.8) == "BD"
+    # les vraies boucles d'un dossier de kicks le disent dans leur nom
+    assert smp.code_of("SAMPLES MEGABIT/Ultra Kicks Vol. 2/LS-UK2 Bonus Loop 14.wav", 1.8) == "DL"
+    assert smp.code_of("Drumbrute kick/KIK DB 160 (16).wav", 3.0) == "DL"
+
+
 def test_long_drum_in_oneshot_folder_stays_oneshot() -> None:
     assert smp.code_of("NI/arcane/one shot/Drums/Cymbal/Crash FourHundred.wav", 4.4) == "CY"
     assert smp.code_of("rthm/kick/Long Kick.wav", 5.0) == "DL"

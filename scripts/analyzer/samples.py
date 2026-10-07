@@ -186,6 +186,8 @@ _BPM_RX = re.compile(r"(\d{2,3}) ?bpm")
 # tempo dans le nom sans "bpm" : 170_HeavyBoiBeat, CPCT_120_C_Gamelan, vb6_drm120
 _TEMPO_NAME_RX = re.compile(r"(?:^|[_ ]|drm)(\d{2,3})(?=[_ ])")
 _ONESHOT_DIR_RX = re.compile(r"one ?-?shots?")
+# pack de frappes (MILLENNIUM KICKS 3) : une frappe longue y reste une frappe
+_KICKS_DIR_RX = re.compile(r"kicks\b")
 _SPLIT_RX = re.compile(r"[\s_\-.()\[\],+&']+")
 _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])")
 
@@ -366,9 +368,11 @@ def code_of(rel: str, duration: float | None) -> str | None:
     loop = bool(_LOOP_RX.search(low) or _BPM_RX.search(low.rsplit("/", 1)[-1]))
     # replis : BPM dans le dossier (Cyclick/110bpm/), one-shot drum trop long
     loop = loop or (code is None and bool(_BPM_RX.search(low)))
-    # replis hors dossier one-shot (un crash de 4 s y reste un crash) : drum
-    # trop long, tempo en tete ou au milieu du nom (sans "bpm") et assez long
-    if not _ONESHOT_DIR_RX.search(low):
+    # replis hors dossier one-shot ou de kicks (un crash de 4 s y reste un
+    # crash) : drum trop long, tempo en tete ou au milieu du nom (sans "bpm")
+    # et assez long
+    folder = low.rsplit("/", 1)[0] if "/" in low else ""
+    if not (_ONESHOT_DIR_RX.search(low) or _KICKS_DIR_RX.search(folder)):
         loop = loop or (code in DRUMS and (duration or 0) > LONG_ONESHOT_S)
         loop = loop or ((duration or 0) >= TEMPO_LOOP_S
                         and tempo_from_name(low.rsplit("/", 1)[-1]) is not None)
