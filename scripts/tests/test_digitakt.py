@@ -1,25 +1,31 @@
 """Tests unitaires du draft de bank Digitakt (analyzer/digitakt.py).
 
-Aucun audio reel : features par pas synthetiques.
+Unitaires : features par pas synthetiques, signal synthetique pour pYIN.
+Integration (`-m integration`) : stem basse reel de Riders on the Storm,
+saute si le SSD media n'est pas monte.
 
 Lancer (depuis scripts/) :
     python -m pytest tests/test_digitakt.py
     python -m pytest tests/test_digitakt.py::test_build_bank_four_on_floor
+    python -m pytest tests/test_digitakt.py -m integration
 """
 from __future__ import annotations
 
 from pathlib import Path
 
 import numpy as np
+import pytest
 
 from analyzer.digitakt import (
     StepFeatures,
+    _pitch_steps,
     active_mask,
     beat_changes,
     build_bank,
     classify_hats,
     detect_sections,
     downbeat_offset,
+    fold_notes,
     fold_steps,
     grid_line,
     kick_shift,
@@ -258,3 +264,86 @@ def test_mute_phrases_restart_at_section_boundary():
     # section 1 = mesures 0-4, section 2 = 4-16 : phrases a 0, puis 4 et 12
     assert [ph.bar for ph in bank.mutes] == [0, 4, 12]
     assert [ph.pattern_slot for ph in bank.mutes] == [1, 2, 2]
+
+
+# --- notes de basse (pYIN) ---------------------------------------------------
+
+def test_fold_notes_votes_per_step():
+    notes = np.full(3 * SPB, np.nan)
+    notes[0], notes[SPB], notes[2 * SPB] = 28.2, 28.0, 33.0  # E1, E1, A1
+    notes[5] = 40.0
+    out = fold_notes(notes, [0, 1, 2], SPB, 1)
+    assert out[0] == 28.0      # vote majoritaire, pas la moyenne (29.7)
+    assert out[5] == 40.0
+    assert np.isnan(out[1])
+
+
+def _saw(freq: float, sr: int, seconds: float) -> np.ndarray:
+    """Dent de scie : riche en harmoniques, comme une basse."""
+    t = np.arange(int(sr * seconds)) / sr
+    k = np.arange(1, 30)[:, None]
+    return (np.sin(2 * np.pi * freq * k * t[None, :]) / k).sum(axis=0) * 0.2
+
+
+def test_pitch_steps_finds_fundamental_not_harmonics():
+    sr = 22050
+    # E1 (41,2 Hz) puis G1 (49 Hz) : 1 s chacun, pas de 0,25 s
+    y = np.concatenate([_saw(41.2, sr, 1.0), _saw(49.0, sr, 1.0)])
+    bounds = np.arange(0, 2.01, 0.25)
+    notes = _pitch_steps(y, sr, (35.0, 300.0), bounds)
+    assert [int(round(n)) for n in notes[1:3]] == [28, 28]  # E1, octave reelle
+    assert [int(round(n)) for n in notes[5:7]] == [31, 31]  # G1, pas G#
+
+
+def test_build_bank_bass_notes_from_pitch_over_chroma():
+    feat = _features(16)
+    bass = np.full(16 * SPB, 1.0)
+    bass[::4] = 10.0
+    feat.onset[9] = bass
+    feat.energy[9] = bass
+    chroma = np.zeros((16 * SPB, 12))
+    chroma[:, 8] = 1.0  # le chroma dit G# (harmonique)
+    feat.chroma[9] = chroma
+    pitch = np.full(16 * SPB, 28.0)  # pYIN dit E1
+    pitch[4::SPB] = np.nan           # pas sans note fiable → repli chroma
+    feat.pitch[9] = pitch
+    bank = build_bank("x", {}, 120, "4/4", 4, feat, from_stems=True)
+    trigs = bank.patterns[0].tracks[8].trigs
+    by_step = {t.step: t.note for t in trigs}
+    assert by_step[0] == 28
+    assert by_step[4] == 36 + 8
+
+
+# Riders on the Storm : riff en mi dorien, E1 B1 G1 B1 | E1 A1 C#2 A1 … (tab
+# basse + pYIN). L'ancien chroma lisait B2 / G#2 (3e et 5e harmoniques de E).
+_DOORS = "the_doors_-_riders_on_the_storm_new_stereo_mix"
+_E_DORIAN = {4, 6, 7, 9, 11, 1, 2}   # E F# G A B C# D
+_DOORS_PEAK = (56.58, 93.96)         # section peak (sidecar digitakt)
+_DOORS_BPM = 103.4
+
+
+def _doors_bass() -> Path:
+    from paths import STEMS_DIR
+
+    return STEMS_DIR / _DOORS / "bass.wav"
+
+
+@pytest.mark.integration
+@pytest.mark.skipif(not _doors_bass().exists(), reason="stem Demucs absent (SSD media)")
+def test_doors_bass_line_regression():
+    import librosa
+
+    start, end = _DOORS_PEAK
+    y, sr = librosa.load(_doors_bass(), sr=None, mono=True, offset=start,
+                         duration=end - start)
+    step = 60.0 / _DOORS_BPM / 4
+    bounds = np.arange(0.0, end - start, step)
+    notes = _pitch_steps(y, int(sr), (35.0, 300.0), bounds)
+    played = np.round(notes[np.isfinite(notes)]).astype(int)
+    assert played.size > 0.5 * notes.size
+    pcs = played % 12
+    assert np.mean([pc in _E_DORIAN for pc in pcs]) >= 0.9
+    assert np.mean(pcs == 8) < 0.02                    # pas de G#
+    assert 28 <= int(np.median(played)) <= 40          # registre E1-E2
+    top = {int(pc) for pc in np.bincount(pcs, minlength=12).argsort()[-3:]}
+    assert {4, 9} <= top                               # E et A dominent

@@ -622,7 +622,13 @@ Exemple réel (`2hot2play_-_keep_the_balance`, un pattern, 1re page, génératio
 - Par section : repliage des mesures actives modulo 1/2/4/8 mesures,
   normalisation robuste (médiane → 95e percentile), seuil → trigs. Hats
   ventilés ouvert / fermé / ride par décroissance et rapport de bandes.
-  Notes basse / lead estimées par chroma.
+  Notes de basse par pYIN (35-300 Hz, stem `bass` rééchantillonné à 11 kHz) :
+  note médiane par pas, octave réelle, vote majoritaire entre les mesures
+  repliées ; le chroma STFT confondait la fondamentale avec ses harmoniques
+  (E1 lu B / G#). Repli sur le chroma quand le pas n'a pas de note fiable.
+  Notes de lead (polyphonique) toujours par chroma. Test de non-régression
+  sur le stem de *Riders on the Storm* : `python -m pytest
+  tests/test_digitakt.py -m integration` (sauté sans le SSD media).
 - Track 15 : impact au pas 0 d'un drop (retour du kick après une section sans
   kick), riser figuré sur la dernière mesure d'avant. Un slot réutilisé porte
   ses FX à chaque passage, comme sur la DT.

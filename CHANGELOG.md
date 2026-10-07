@@ -197,6 +197,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.B] Notes de basse de la bank Digitakt : estimées par pYIN sur le stem
+  `bass` (`_pitch_steps`, octave réelle, vote majoritaire `fold_notes`) au
+  lieu de l'argmax du chroma, qui prenait les 3e et 5e harmoniques pour la
+  fondamentale (Riders on the Storm : B2 / G#2 au lieu du riff E1 B1 G1 B1
+  en mi dorien). Chroma conservé en repli et pour le lead. Test de
+  non-régression marqué `integration` sur le stem réel.
 - [7.I] Titre et artiste : le préfixe artiste est retiré du titre quand il
   diffère seulement par les liaisons (« Limitlezz x Maureen » contre
   « LIMITLEZZ , Maureen »), espace avant virgule retirée de l'artiste,

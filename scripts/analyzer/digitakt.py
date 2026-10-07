@@ -17,7 +17,8 @@ Pipeline :
 4. Structure deduite des tracks : decoupe sur une grille de 4 mesures la ou
    l'ensemble des tracks actives change, labels deduits du contenu.
 5. Pour chaque section : repliage des pas actifs sur la longueur du pattern,
-   seuillage en trigs (notes estimees par chroma pour basse / lead). Deux
+   seuillage en trigs (notes : pYIN pour la basse, monophonique, avec son
+   octave ; chroma pour le lead, polyphonique). Deux
    sections au contenu proche partagent le meme slot (ordre de jeu = chaine).
 6. Partition de mutes : activite de chaque track par phrase de N mesures.
 
@@ -26,7 +27,7 @@ bank. Id1 / Id2 (12-13) restent vides, c'est a l'oreille de les choisir.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,13 @@ _SECTION_GRID = 4           # structure decoupee sur une grille de 4 mesures
 _CLAP_WEIGHT = 0.5          # poids du clap sur 2 et 4 dans le choix du premier temps
 _CHANGE_MIN = 0.25          # saut d'activite minimal (0-1) compte comme changement
 _REUSE_SIM = 0.3            # similarite de grille (trigs bruites) pour reutiliser un slot
+# pYIN (tracks monophoniques) : le chroma STFT confond la fondamentale d'une
+# basse avec ses harmoniques (E1 lu B / G#, 3e et 5e harmoniques) et une case
+# STFT de 21,5 Hz ne separe pas E1 / G1 / G#1 (41 / 49 / 52 Hz).
+_PYIN_SR = 11025            # le grave n'a pas besoin de plus, pYIN est lent
+_PYIN_FRAME = 1024          # ~93 ms : >= 2 periodes a 35 Hz
+_PYIN_HOP = 128             # ~12 ms : une dizaine de frames par double-croche
+_PYIN_MIN_VOICED = 0.3      # part de frames voisees pour qu'un pas ait une note
 
 
 @dataclass(frozen=True)
@@ -67,6 +75,7 @@ class TrackSpec:
     kind: str = "hit"           # hit / tonal / rumble / sustain / fx / none
     base_note: int = 60         # note MIDI de base (60 = pitch d'origine du sample)
     exclude: tuple[int, ...] = ()  # tracks dont les pas sont exclus
+    pitch_range: tuple[float, float] | None = None  # Hz, pYIN si monophonique
 
 
 TRACKS: tuple[TrackSpec, ...] = (
@@ -78,7 +87,8 @@ TRACKS: tuple[TrackSpec, ...] = (
     TrackSpec(6, "Ride", "drums", 3000, 6000),
     TrackSpec(7, "Perc A", "drums", 120, 400, exclude=(1, 3)),
     TrackSpec(8, "Perc B", "drums", 400, 1500, exclude=(3,)),
-    TrackSpec(9, "Basse", "bass", 40, 400, kind="tonal", base_note=36),
+    TrackSpec(9, "Basse", "bass", 40, 400, kind="tonal", base_note=36,
+              pitch_range=(35.0, 300.0)),
     TrackSpec(10, "Lead", "other", 300, 4000, kind="tonal", base_note=60),
     TrackSpec(11, "Atmo", "other", 100, 8000, kind="sustain"),
     TrackSpec(12, "Id1", None, kind="none"),
@@ -97,6 +107,8 @@ class StepFeatures:
     onset: dict[int, np.ndarray]           # track -> (n_steps,)
     energy: dict[int, np.ndarray]          # track -> (n_steps,)
     chroma: dict[int, np.ndarray]          # track tonale -> (n_steps, 12)
+    # track monophonique -> (n_steps,) note MIDI (nan = pas de note fiable)
+    pitch: dict[int, np.ndarray] = field(default_factory=dict)
 
 
 # --- grille ------------------------------------------------------------------
@@ -179,6 +191,7 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
         onset: dict[int, np.ndarray] = {}
         energy: dict[int, np.ndarray] = {}
         chroma: dict[int, np.ndarray] = {}
+        pitch: dict[int, np.ndarray] = {}
         for stem, (y, sr) in stems.items():
             if y.size == 0:
                 continue
@@ -209,7 +222,34 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
                     chroma[spec_t.index] = np.stack(
                         [_reduce_to_steps(c, times, bounds, "mean")
                          for c in stem_chroma], axis=1)
-    return StepFeatures(bounds, onset, energy, chroma)
+                if spec_t.pitch_range is not None:
+                    pitch[spec_t.index] = _pitch_steps(y, sr, spec_t.pitch_range,
+                                                       bounds)
+    return StepFeatures(bounds, onset, energy, chroma, pitch)
+
+
+def _pitch_steps(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
+                 bounds: np.ndarray) -> np.ndarray:
+    """Note MIDI mediane (pYIN) par pas, nan si trop peu de frames voisees.
+
+    Garde l'octave reelle (E1 = 28), contrairement au chroma."""
+    import librosa
+
+    y_low = librosa.resample(y, orig_sr=sr, target_sr=_PYIN_SR)
+    f0, voiced, _ = librosa.pyin(y_low, fmin=pitch_range[0], fmax=pitch_range[1],
+                                 sr=_PYIN_SR, frame_length=_PYIN_FRAME,
+                                 hop_length=_PYIN_HOP)
+    midi = np.where(voiced, librosa.hz_to_midi(np.nan_to_num(f0, nan=1.0)), np.nan)
+    times = librosa.frames_to_time(np.arange(midi.size), sr=_PYIN_SR,
+                                   hop_length=_PYIN_HOP)
+    n_steps = len(bounds) - 1
+    out = np.full(n_steps, np.nan)
+    idx = np.searchsorted(bounds, times, side="right") - 1
+    for s in range(n_steps):
+        frames = midi[idx == s]
+        if frames.size and np.isfinite(frames).mean() >= _PYIN_MIN_VOICED:
+            out[s] = float(np.nanmedian(frames))
+    return out
 
 
 def kick_shift(kick_onset: np.ndarray, steps_per_bar: int) -> int:
@@ -234,6 +274,7 @@ def shift_features(feat: StepFeatures, shift: int) -> StepFeatures:
         {k: v[shift:] for k, v in feat.onset.items()},
         {k: v[shift:] for k, v in feat.energy.items()},
         {k: v[shift:] for k, v in feat.chroma.items()},
+        {k: v[shift:] for k, v in feat.pitch.items()},
     )
 
 
@@ -436,6 +477,29 @@ def fold_steps(values: np.ndarray, bars: list[int], steps_per_bar: int,
     return acc
 
 
+def fold_notes(notes: np.ndarray, bars: list[int], steps_per_bar: int,
+               p_bars: int) -> np.ndarray:
+    """Note la plus frequente par pas sur les mesures `bars` repliees modulo
+    `p_bars` (nan si aucune). Un vote, pas une moyenne : moyenner E1 et A1
+    donnerait une note qui n'est jouee nulle part."""
+    n = p_bars * steps_per_bar
+    votes: list[list[int]] = [[] for _ in range(n)]
+    for b in bars:
+        chunk = notes[b * steps_per_bar:(b + 1) * steps_per_bar]
+        if len(chunk) < steps_per_bar:
+            continue
+        base = (b % p_bars) * steps_per_bar
+        for i, v in enumerate(chunk):
+            if np.isfinite(v):
+                votes[base + i].append(int(round(float(v))))
+    out = np.full(n, np.nan)
+    for i, vs in enumerate(votes):
+        if vs:
+            vals, counts = np.unique(vs, return_counts=True)
+            out[i] = float(vals[np.argmax(counts)])
+    return out
+
+
 def pick_hits(pattern: np.ndarray, threshold: float) -> tuple[list[int], np.ndarray]:
     """Pas au-dessus du seuil relatif apres etirement robuste.
 
@@ -600,11 +664,17 @@ def _section_pattern(slot: int, label: str, b0: int, b1: int, feat: StepFeatures
             if spec.kind == "tonal" and spec.index in feat.chroma:
                 chroma = fold_steps(feat.chroma[spec.index][b0 * spb:b1 * spb],
                                     list(range(b1 - b0)), spb, p_bars)
+            pitch = None
+            if spec.index in feat.pitch:
+                pitch = fold_notes(feat.pitch[spec.index][b0 * spb:b1 * spb],
+                                   list(range(b1 - b0)), spb, p_bars)
             for s in steps:
                 if s in blocked or s >= length:
                     continue
                 note = None
-                if chroma is not None:
+                if pitch is not None and np.isfinite(pitch[s]):
+                    note = int(pitch[s])
+                elif chroma is not None:
                     note = spec.base_note + int(np.argmax(chroma[s]))
                 trigs.append(DigitaktTrig(
                     step=s, velocity=_velocity(float(stretched[s])), note=note))
