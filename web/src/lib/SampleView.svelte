@@ -15,6 +15,11 @@
     illisible: 'fichier non décodable',
   }
   const CELL_KEY = 'ui:sample-cell'
+  // colonnes : one-shots puis boucles en dernier (memes codes qu'analyzer/samples.py)
+  const LOOPS = ['BR', 'DL', 'PL', 'ML', 'BL']
+  const ONESHOTS = ['BD', 'SD', 'CP', 'RS', 'HH', 'OH', 'CY', 'TM', 'PC', 'BS', 'ST', 'PD', 'FX', 'VX']
+  const CODE_ORDER = [...ONESHOTS, ...LOOPS]
+  const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
 
   let cells = $state<SampleCell[]>([])
   let error = $state('')
@@ -29,7 +34,7 @@
   let ws: WaveSurfer | null = null
 
   const families = $derived([...new Set(cells.map(c => c.family))])
-  const codes = $derived([...new Set(cells.map(c => c.code))])
+  const codes = $derived([...new Set(cells.map(c => c.code))].sort((a, b) => codeRank(a) - codeRank(b)))
   const byKey = $derived(new Map(cells.map(c => [`${c.family}/${c.code}`, c])))
   const chosen = $derived(entries.filter(e => e.selected))
   const reserve = $derived(entries.filter(e => !e.selected))
@@ -74,10 +79,12 @@
     pick(visible[j].source)
   }
 
+  const ordered = $derived(families.flatMap(f => codes.map(c => byKey.get(`${f}/${c}`)).filter((c): c is SampleCell => c !== undefined)))
+
   function moveCell(delta: number) {
-    if (!cells.length) return
-    const i = current ? cells.findIndex(c => c.family === current!.family && c.code === current!.code) : -1
-    const c = cells[(i + delta + cells.length) % cells.length]
+    if (!ordered.length) return
+    const i = current ? ordered.findIndex(c => c.family === current!.family && c.code === current!.code) : -1
+    const c = ordered[(i + delta + ordered.length) % ordered.length]
     openCell(c.family, c.code)
   }
 
@@ -152,14 +159,14 @@
     </p>
     {#if error}<p class="err">{error}</p>{/if}
     <table>
-      <thead><tr><th></th>{#each codes as code}<th>{code}</th>{/each}</tr></thead>
+      <thead><tr><th></th>{#each codes as code}<th class:loop={LOOPS.includes(code)} class:first={code === LOOPS.find(l => codes.includes(l))}>{code}</th>{/each}</tr></thead>
       <tbody>
         {#each families as fam}
           <tr>
             <th>{fam}</th>
             {#each codes as code}
               {@const c = byKey.get(`${fam}/${code}`)}
-              <td>
+              <td class:first={code === LOOPS.find(l => codes.includes(l))}>
                 {#if c}
                   <button class="cell" class:done={c.to_listen === 0}
                     class:on={current?.family === fam && current?.code === code}
@@ -216,6 +223,8 @@
   th { font-weight: 600; padding: 2px 4px; text-align: left; }
   thead th { text-align: center; font-family: ui-monospace, Menlo, monospace; }
   td { padding: 1px; }
+  th.loop { color: var(--melodic); }
+  .first { border-left: 2px solid var(--border); padding-left: 6px; }
   .cell { width: 44px; font: 11px ui-monospace, Menlo, monospace; padding: 3px 0; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 3px; cursor: pointer; }
   .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }
