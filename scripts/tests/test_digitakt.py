@@ -19,15 +19,19 @@ import pytest
 from analyzer.digitakt import (
     StepFeatures,
     _pitch_steps,
+    _pyin_frames,
     active_mask,
     beat_changes,
     build_bank,
     classify_hats,
     detect_sections,
     downbeat_offset,
+    fold_note_starts,
     fold_notes,
     fold_steps,
     grid_line,
+    note_segments,
+    place_starts,
     kick_shift,
     label_sections,
     median_bpm,
@@ -314,6 +318,53 @@ def test_build_bank_bass_notes_from_pitch_over_chroma():
     assert by_step[4] == 36 + 8
 
 
+def test_note_segments_absorbs_glitch_and_splits_repeats():
+    times = np.arange(60) * 0.01
+    midi = np.full(60, 28.1)                 # E1 tenu 0,6 s
+    midi[20:22] = 40.0                       # glitch de 20 ms (harmonique)
+    midi[40:] = 33.0                         # A1 legato, sans silence
+    assert note_segments(midi, times) == [(0.0, 28), (0.4, 33)]
+    # E1 E1 legato : un seul segment de hauteur, coupe par l'onset d'amplitude
+    assert note_segments(midi, times, np.array([0.3])) == \
+        [(0.0, 28), (0.3, 28), (0.4, 33)]
+
+
+def test_place_starts_snaps_to_nearest_step():
+    bounds = np.arange(0, 1.01, 0.25)        # 4 pas
+    out = place_starts([(0.22, 28), (0.49, 35), (0.98, 31)], bounds)
+    assert out[1] == 28                      # un peu en avance : sur le temps
+    assert out[2] == 35
+    assert np.isnan(out[0]) and np.isnan(out[3])  # 0,98 → borne de fin, ecarte
+
+
+def test_fold_note_starts_needs_majority_and_votes_octave():
+    note_on = np.full(4 * SPB, np.nan)
+    for b, n in enumerate((31, 31, 43, 31)):  # G1, une erreur d'octave G2
+        note_on[b * SPB + 4] = n
+    note_on[2 * SPB + 9] = 40.0               # note isolee : 1 mesure sur 4
+    out = fold_note_starts(note_on, [0, 1, 2, 3], SPB, 1)
+    assert out[4] == 31
+    assert np.isnan(out[9])
+
+
+def test_build_bank_bass_trigs_from_note_starts():
+    feat = _features(16)
+    bass = np.full(16 * SPB, 1.0)
+    bass[3::SPB] = 10.0                      # attaque d'amplitude hors riff
+    feat.onset[9] = bass
+    feat.energy[9] = bass
+    note_on = np.full(16 * SPB, np.nan)
+    riff = (28, 35, 31, 35, 28, 33, 37, 33)  # croches legato, sans attaque
+    for b in range(16):
+        for i, n in enumerate(riff):
+            note_on[b * SPB + 2 * i] = n
+    feat.note_on[9] = note_on
+    bank = build_bank("x", {}, 120, "4/4", 4, feat, from_stems=True)
+    trigs = bank.patterns[0].tracks[8].trigs
+    assert [(t.step, t.note) for t in trigs if t.step < SPB] == \
+        [(2 * i, n) for i, n in enumerate(riff)]
+
+
 # Riders on the Storm : riff en mi dorien, E1 B1 G1 B1 | E1 A1 C#2 A1 … (tab
 # basse + pYIN). L'ancien chroma lisait B2 / G#2 (3e et 5e harmoniques de E).
 _DOORS = "the_doors_-_riders_on_the_storm_new_stereo_mix"
@@ -347,3 +398,26 @@ def test_doors_bass_line_regression():
     assert 28 <= int(np.median(played)) <= 40          # registre E1-E2
     top = {int(pc) for pc in np.bincount(pcs, minlength=12).argsort()[-3:]}
     assert {4, 9} <= top                               # E et A dominent
+
+
+_DOORS_RIFF = [28, 35, 31, 35, 28, 33, 37, 33]   # E1 B1 G1 B1 E1 A1 C#2 A1
+_DOORS_BREAKDOWN = (20.0, 29.0)                  # riff seul, croches legato
+
+
+@pytest.mark.integration
+@pytest.mark.skipif(not _doors_bass().exists(), reason="stem Demucs absent (SSD media)")
+def test_doors_bass_riff_note_starts():
+    """Les debuts de note pYIN redonnent le riff, en croches, sans grille."""
+    import librosa
+
+    start, end = _DOORS_BREAKDOWN
+    y, sr = librosa.load(_doors_bass(), sr=None, mono=True, offset=start,
+                         duration=end - start)
+    _, midi, times = _pyin_frames(y, int(sr), (35.0, 300.0))
+    segs = note_segments(midi, times)
+    notes = [n for _, n in segs]
+    riffs = sum(notes[i:i + 8] == _DOORS_RIFF for i in range(len(notes)))
+    assert riffs >= 3
+    ioi = np.diff([t for t, _ in segs])
+    eighth = 60.0 / _DOORS_BPM / 2
+    assert abs(float(np.median(ioi)) - eighth) < 0.03

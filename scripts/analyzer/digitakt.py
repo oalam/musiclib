@@ -62,6 +62,10 @@ _PYIN_SR = 11025            # le grave n'a pas besoin de plus, pYIN est lent
 _PYIN_FRAME = 1024          # ~93 ms : >= 2 periodes a 35 Hz
 _PYIN_HOP = 128             # ~12 ms : une dizaine de frames par double-croche
 _PYIN_MIN_VOICED = 0.3      # part de frames voisees pour qu'un pas ait une note
+# Trigs de basse : une note jouee legato (clavier-basse) n'a presque pas
+# d'attaque d'amplitude, les trigs viennent donc des debuts de note pYIN.
+_NOTE_MIN_S = 0.04          # segment pYIN plus court = glitch (transition, harmonique)
+_START_SHARE = 0.5          # part des mesures jouees ou une note demarre a ce pas
 
 
 @dataclass(frozen=True)
@@ -109,6 +113,8 @@ class StepFeatures:
     chroma: dict[int, np.ndarray]          # track tonale -> (n_steps, 12)
     # track monophonique -> (n_steps,) note MIDI (nan = pas de note fiable)
     pitch: dict[int, np.ndarray] = field(default_factory=dict)
+    # track monophonique -> (n_steps,) note qui demarre a ce pas (nan sinon)
+    note_on: dict[int, np.ndarray] = field(default_factory=dict)
 
 
 # --- grille ------------------------------------------------------------------
@@ -192,6 +198,7 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
         energy: dict[int, np.ndarray] = {}
         chroma: dict[int, np.ndarray] = {}
         pitch: dict[int, np.ndarray] = {}
+        note_on: dict[int, np.ndarray] = {}
         for stem, (y, sr) in stems.items():
             if y.size == 0:
                 continue
@@ -223,16 +230,17 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
                         [_reduce_to_steps(c, times, bounds, "mean")
                          for c in stem_chroma], axis=1)
                 if spec_t.pitch_range is not None:
-                    pitch[spec_t.index] = _pitch_steps(y, sr, spec_t.pitch_range,
-                                                       bounds)
-    return StepFeatures(bounds, onset, energy, chroma, pitch)
+                    y_low, midi, f_times = _pyin_frames(y, sr, spec_t.pitch_range)
+                    pitch[spec_t.index] = _steps_from_frames(midi, f_times, bounds)
+                    note_on[spec_t.index] = _note_starts(y_low, midi, f_times,
+                                                         bounds)
+    return StepFeatures(bounds, onset, energy, chroma, pitch, note_on)
 
 
-def _pitch_steps(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
-                 bounds: np.ndarray) -> np.ndarray:
-    """Note MIDI mediane (pYIN) par pas, nan si trop peu de frames voisees.
-
-    Garde l'octave reelle (E1 = 28), contrairement au chroma."""
+def _pyin_frames(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
+                 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """pYIN sur le signal reechantillonne : (signal a _PYIN_SR, note MIDI par
+    frame (nan = non voisee), temps des frames)."""
     import librosa
 
     y_low = librosa.resample(y, orig_sr=sr, target_sr=_PYIN_SR)
@@ -242,6 +250,20 @@ def _pitch_steps(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
     midi = np.where(voiced, librosa.hz_to_midi(np.nan_to_num(f0, nan=1.0)), np.nan)
     times = librosa.frames_to_time(np.arange(midi.size), sr=_PYIN_SR,
                                    hop_length=_PYIN_HOP)
+    return y_low, midi, times
+
+
+def _pitch_steps(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
+                 bounds: np.ndarray) -> np.ndarray:
+    """Note MIDI mediane (pYIN) par pas, nan si trop peu de frames voisees.
+
+    Garde l'octave reelle (E1 = 28), contrairement au chroma."""
+    _, midi, times = _pyin_frames(y, sr, pitch_range)
+    return _steps_from_frames(midi, times, bounds)
+
+
+def _steps_from_frames(midi: np.ndarray, times: np.ndarray,
+                       bounds: np.ndarray) -> np.ndarray:
     n_steps = len(bounds) - 1
     out = np.full(n_steps, np.nan)
     idx = np.searchsorted(bounds, times, side="right") - 1
@@ -249,6 +271,60 @@ def _pitch_steps(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
         frames = midi[idx == s]
         if frames.size and np.isfinite(frames).mean() >= _PYIN_MIN_VOICED:
             out[s] = float(np.nanmedian(frames))
+    return out
+
+
+def note_segments(midi: np.ndarray, times: np.ndarray,
+                  splits: np.ndarray | None = None) -> list[tuple[float, int]]:
+    """(debut s, note) de chaque note : suite de frames voisees de meme note
+    arrondie. Les segments < _NOTE_MIN_S (glitchs de transition) sont absorbes
+    par la note qu'ils interrompent ; `splits` (onsets d'amplitude, s) coupe
+    une note repetee (E1 E1 legato = un seul segment de hauteur)."""
+    notes = np.where(np.isfinite(midi), np.round(np.nan_to_num(midi)), np.nan)
+    runs: list[list[float]] = []   # [debut, fin, note]
+    for t, n in zip(times, notes):
+        if runs and (n == runs[-1][2] or (np.isnan(n) and np.isnan(runs[-1][2]))):
+            runs[-1][1] = t
+        else:
+            runs.append([t, t, n])
+    kept: list[list[float]] = []
+    for r in runs:
+        if r[1] - r[0] < _NOTE_MIN_S:
+            continue
+        if kept and r[2] == kept[-1][2] and r[0] - kept[-1][1] < 2 * _NOTE_MIN_S:
+            kept[-1][1] = r[1]     # meme note de part et d'autre d'un glitch
+        else:
+            kept.append(r)
+    out: list[tuple[float, int]] = []
+    cuts = np.sort(np.asarray(splits if splits is not None else [], dtype=float))
+    for start, end, n in kept:
+        if np.isnan(n):
+            continue
+        out.append((float(start), int(n)))
+        inner = cuts[(cuts > start + _NOTE_MIN_S) & (cuts < end - _NOTE_MIN_S)]
+        out.extend((float(c), int(n)) for c in inner)
+    return sorted(out)
+
+
+def _note_starts(y_low: np.ndarray, midi: np.ndarray, times: np.ndarray,
+                 bounds: np.ndarray) -> np.ndarray:
+    """Note qui demarre a chaque pas (nan sinon), au pas le plus proche : une
+    note jouee un peu en avance du temps tombe sur le temps, pas sur le pas
+    d'avant."""
+    import librosa
+
+    onsets = librosa.onset.onset_detect(y=y_low, sr=_PYIN_SR, hop_length=_PYIN_HOP,
+                                        units="time")
+    return place_starts(note_segments(midi, times, onsets), bounds)
+
+
+def place_starts(segments: list[tuple[float, int]], bounds: np.ndarray) -> np.ndarray:
+    n_steps = len(bounds) - 1
+    out = np.full(n_steps, np.nan)
+    for t, n in segments:
+        i = int(np.argmin(np.abs(bounds - t)))
+        if i < n_steps and np.isnan(out[i]):
+            out[i] = float(n)
     return out
 
 
@@ -275,6 +351,7 @@ def shift_features(feat: StepFeatures, shift: int) -> StepFeatures:
         {k: v[shift:] for k, v in feat.energy.items()},
         {k: v[shift:] for k, v in feat.chroma.items()},
         {k: v[shift:] for k, v in feat.pitch.items()},
+        {k: v[shift:] for k, v in feat.note_on.items()},
     )
 
 
@@ -500,6 +577,32 @@ def fold_notes(notes: np.ndarray, bars: list[int], steps_per_bar: int,
     return out
 
 
+def fold_note_starts(note_on: np.ndarray, bars: list[int], steps_per_bar: int,
+                     p_bars: int, share: float = _START_SHARE) -> np.ndarray:
+    """Note posee a un pas replie si une note y demarre dans au moins `share`
+    des mesures jouees de ce slot (nan sinon) ; note = vote majoritaire, qui
+    ecarte les erreurs d'octave isolees de pYIN."""
+    n = p_bars * steps_per_bar
+    votes: list[list[int]] = [[] for _ in range(n)]
+    seen = np.zeros(p_bars)
+    for b in bars:
+        chunk = note_on[b * steps_per_bar:(b + 1) * steps_per_bar]
+        if len(chunk) < steps_per_bar:
+            continue
+        slot = b % p_bars
+        seen[slot] += 1
+        for i, v in enumerate(chunk):
+            if np.isfinite(v):
+                votes[slot * steps_per_bar + i].append(int(v))
+    out = np.full(n, np.nan)
+    for i, vs in enumerate(votes):
+        total = seen[i // steps_per_bar]
+        if vs and len(vs) >= share * total:
+            vals, counts = np.unique(vs, return_counts=True)
+            out[i] = float(vals[np.argmax(counts)])
+    return out
+
+
 def pick_hits(pattern: np.ndarray, threshold: float) -> tuple[list[int], np.ndarray]:
     """Pas au-dessus du seuil relatif apres etirement robuste.
 
@@ -660,6 +763,15 @@ def _section_pattern(slot: int, label: str, b0: int, b1: int, feat: StepFeatures
                        for s in hits_by_track[j][0]}
             if spec.kind == "sustain":
                 steps = [0] if steps else []
+            starts = None
+            if spec.index in feat.note_on:
+                rel = [b - b0 for b in range(b0, b1) if bar_on[spec.index][b]]
+                starts = fold_note_starts(feat.note_on[spec.index][b0 * spb:b1 * spb],
+                                          rel, spb, p_bars)
+                if np.isfinite(starts).any():
+                    steps = [int(i) for i in np.where(np.isfinite(starts))[0]]
+                else:
+                    starts = None
             chroma = None
             if spec.kind == "tonal" and spec.index in feat.chroma:
                 chroma = fold_steps(feat.chroma[spec.index][b0 * spb:b1 * spb],
@@ -672,7 +784,9 @@ def _section_pattern(slot: int, label: str, b0: int, b1: int, feat: StepFeatures
                 if s in blocked or s >= length:
                     continue
                 note = None
-                if pitch is not None and np.isfinite(pitch[s]):
+                if starts is not None:
+                    note = int(starts[s])
+                elif pitch is not None and np.isfinite(pitch[s]):
                     note = int(pitch[s])
                 elif chroma is not None:
                     note = spec.base_note + int(np.argmax(chroma[s]))

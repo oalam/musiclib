@@ -215,6 +215,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.B] Trigs de basse de la bank Digitakt : posés aux débuts de note pYIN
+  (`note_segments`, `place_starts`, vote `fold_note_starts`) au lieu du
+  seuil sur l'onset de la bande 40-400 Hz, qui ne voyait pas un riff joué
+  legato (Riders on the Storm : trigs épars au lieu des croches
+  E1 B1 G1 B1 E1 A1 C#2 A1). Début de note arrondi au pas le plus proche,
+  erreurs d'octave isolées écartées par le vote. Test d'intégration du riff
+  sur le stem réel.
 - [7.E] Envoi à la DT2 avec PREROLL : la DT2 envoie un second Start au vrai
   départ du séquenceur ; il relance désormais l'envoi au pas 0 (l'envoi
   partait une mesure trop tôt). Le panneau demande `PREROLL = 0`, seul

@@ -626,6 +626,12 @@ Exemple réel (`2hot2play_-_keep_the_balance`, un pattern, 1re page, génératio
   note médiane par pas, octave réelle, vote majoritaire entre les mesures
   repliées ; le chroma STFT confondait la fondamentale avec ses harmoniques
   (E1 lu B / G#). Repli sur le chroma quand le pas n'a pas de note fiable.
+  Trigs de basse posés aux débuts de note pYIN (changement de note, ou
+  onset d'amplitude pour une note répétée), au pas le plus proche, retenus
+  si une note y démarre dans au moins la moitié des mesures repliées : un
+  riff legato (clavier-basse) n'a presque pas d'attaque d'amplitude et le
+  seuil d'onset de la bande ne le retrouvait pas. Repli sur l'onset si pYIN
+  ne donne aucune note.
   Notes de lead (polyphonique) toujours par chroma. Test de non-régression
   sur le stem de *Riders on the Storm* : `python -m pytest
   tests/test_digitakt.py -m integration` (sauté sans le SSD media).
