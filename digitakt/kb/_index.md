@@ -56,6 +56,7 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 9 | [[microtiming-retrigs]] | §10.4, §10.5, §11.3 | draft |
 | 10 | [[euclidien]] | §10.3 | draft |
 | 26 | [[keyboard-gammes]] | §8.5.1, §8.5.2, §14.7.6, annexe D | draft |
+| 29 | [[polymetrie]] | §10.7, §10.3 | draft |
 
 ## Lot 3 — Sons et transitions
 
@@ -69,6 +70,8 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 16 | [[send-fx-compresseur]] | §12 | draft |
 | 17 | [[mixer-setup]] | §6.2.2, §9.8, §12.6-12.9 | draft |
 | 18 | [[fill-conditions]] | §10.7.3, §10.8.4 | draft |
+| 28 | [[rumble-grave]] | §11.5-11.8, §12.3, §12.5, §13 | draft |
+| 30 | [[slice-breaks]] | A.2.5, A.2.6, §8.5.4 | draft |
 
 ## Lot 4 — Structurer le set, puis le jouer
 
@@ -78,6 +81,7 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 20 | [[patterns-chaines]] | §10.1, §10.7 | draft |
 | 21 | [[mutes]] | §8.5.3 | draft |
 | 22 | [[perform-kit-temp-save]] | §10.10, §10.8.6 | draft |
+| 27 | [[live-looping]] | §13.1, §13.2, A.2.3 | draft |
 
 ## Lot 5 — MIDI et intégration
 

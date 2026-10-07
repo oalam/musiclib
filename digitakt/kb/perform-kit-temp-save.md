@@ -81,3 +81,7 @@ Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait
 - [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3413) : « The perform kit » (56:53) · DT2, 2024
 - [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=420) : « Perform kit » (7:00) · DT2, 2024
 - [XNB — Digitakt II deep dive guide](https://youtu.be/8zXBNqRstxQ?t=6906) : « Page loop » (1:55:06) · DT2, 2024
+
+Ajoutée depuis [[../veille-live]] (2026-10-07), non visionnée :
+
+- [Perform Kit mode, quirks and tips (Digitakt / Digitone 2)](https://www.youtube.com/watch?v=PNtuCAqFnqs) (vidéo entière) · DT2

@@ -8,6 +8,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- KB Digitakt, veille live (lot 1, Digitakt seule) : note de curation
+  `digitakt/veille-live.md` (recherche web, périmètre DT2 + Mac via
+  Overbridge) ; fiches `live-looping` (resampling du main en jeu),
+  `rumble-grave` (gestes machine du §9), `polymetrie` (recettes avec cycles
+  ppcm), `slice-breaks` (SLICE / GRID, ouvertures DnB) ;
+  `patterns-chaines` (patterns pont, bank 4 × 4) et `fill-conditions`
+  (Control All sur `PROB`, lock trigs en réserve) complétées ; vidéos de la
+  veille ajoutées (non visionnées).
 - [7.I] Correction du BPM par le style : le BPM détecté est ramené (×2 / ÷2)
   dans la plage du style (`STYLE_BPM_WINDOWS`, `analyzer/infer.py` :
   reggae / dub 60-95, shatta / dancehall 85-115, tribe / tekno / acidcore

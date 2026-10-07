@@ -53,6 +53,14 @@ sur un cycle de B, ex. `4:4` = un tour sur quatre).
   fait.
 - Préparer les fills dans le **pattern modèle** : ils sont recopiés dans
   chaque pattern du set (cf. [[copier-coller]]).
+- **Control All sur `PROB`** : maintenir `[TRK]` et baisser `PROB` vide tout
+  le kit d'un geste (les tracks se raréfient puis se taisent) ; `[NO]` avant
+  de relâcher `[TRK]` annule. Combiné au temp reload (`[FUNC] + [NO]`, cf.
+  [[perform-kit-temp-save]]) pour un retour net sur le 1 *(astuce de forum,
+  à tester)*.
+- **Lock trigs en réserve** : poser des lock trigs (`[FUNC] + [TRIG]` en
+  GRID) là où on voudra des ghost notes ; ils ne jouent pas mais gardent
+  leurs locks, prêts à devenir des note trigs.
 
 ## Pièges
 
@@ -78,3 +86,7 @@ Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait
 - [XNB — DIGITAKT II Conditions & Fill](https://youtu.be/WvuW8m9zrCI?t=1093) : « Fill » (18:13) · DT2, 2024
 - [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=2969) : « Conditional trigs » (49:29) · DT2, 2024
 - [loopop — DIGITAKT II vs OG Digitakt, detailed tutorial](https://youtu.be/nepWmWsq84g?t=1440) : « Trig conditions » (24:00) · DT2, 2024
+
+Ajoutée depuis [[../veille-live]] (2026-10-07), non visionnée :
+
+- [Digitakt II trig parameters explained (full tutorial)](https://www.youtube.com/watch?v=ajhX48LWIo0) (vidéo entière) · DT2

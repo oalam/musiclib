@@ -57,6 +57,15 @@ l'écran.
   [[perform-kit-temp-save]]).
 - Un séquenceur externe peut changer de pattern par program change (cf.
   [[midi-config]]).
+- **Patterns pont** entre deux morceaux : un pattern dédié, pensé comme
+  jonction (kit du morceau suivant, Id du précédent, doctrine §13), rangé
+  juste avant le premier pattern du morceau B. On ne bascule jamais d'un
+  plein régime à un autre : plein A → pont → intro B.
+- **Bank en 4 × 4** si les morceaux sont courts : 4 patterns = 1 morceau
+  (intro, plein, break, sortie), donc 4 morceaux par bank, le pont étant
+  la sortie du précédent. Variante de la convention de slots (doctrine §2).
+- Une seule chose change à la bascule (doctrine §6, principe 3) : le pont
+  garde kick et basse, le pattern suivant change le reste.
 
 ## Pièges
 
@@ -83,3 +92,8 @@ Repérées par les chapitres YouTube (non visionnées en entier) ; la fiche fait
 - [True Cuckoo — Digitakt 2 Beginner's MEGA TUTORIAL](https://youtu.be/651_lCCJ1-w?t=3831) : « Queue up pattern change » (1:03:51) · DT2, 2024
 - [Synthackers — Optimise Your Workflow with Sequencer Page Setup](https://youtu.be/5zCFR5911zY?t=291) : « Pattern Change » (4:51) · DT2, 2024
 - [Hexwave — New Conditional Trigs For Easy Hands-Free Transitions](https://youtu.be/DLi1B6ia-_M) (vidéo entière) · DT2, 2024
+
+Ajoutées depuis [[../veille-live]] (2026-10-07), non visionnées :
+
+- [3 steps to make your musical transitions more impactful](https://www.youtube.com/watch?v=lqz_ptoYzd4) (vidéo entière) · machine non précisée
+- [Gearspace — Live techno transitions](https://gearspace.com/threads/live-techno-transitions.965788/) (forum) · multi-machines, principes seulement
