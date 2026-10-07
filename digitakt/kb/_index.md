@@ -72,6 +72,7 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 18 | [[fill-conditions]] | §10.7.3, §10.8.4 | draft |
 | 28 | [[rumble-grave]] | §11.5-11.8, §12.3, §12.5, §13 | draft |
 | 30 | [[slice-breaks]] | A.2.5, A.2.6, §8.5.4 | draft |
+| 31 | [[kick-mental-vst]] | §13.1.1, §13.6.7, A.2.1 | draft |
 
 ## Lot 4 — Structurer le set, puis le jouer
 
@@ -90,3 +91,5 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 23 | [[cc-nrpn]] | annexe B, §14.4.2-14.4.3 | draft (numéros à tester) |
 | 24 | [[tracks-midi]] | §5.3.2, §16.3, A.2.7 | draft |
 | 25 | [[audio-routing-overbridge]] | §6.6, §14.6, §14.8.1 | draft |
+| 32 | [[overbridge-live-vst]] | §6.6, §13.1.1, §14.6, §14.8.1 | draft |
+| 33 | [[midi-vst]] | §16.3, A.2.7, §14.4, §14.6.3 | draft |

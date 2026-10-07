@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- KB Digitakt, veille live (lot 2, DT2 + Mac) : fiches `kick-mental-vst`
+  (kickbass fabriqué en VST, nommé avec sa note, Transfer ou `SRC` = USB),
+  `overbridge-live-vst` (multipiste, VST sur les tracks hautes, latence),
+  `midi-vst` (ligne acid et accords sur synthés VST par USB) ; lives tekno
+  de la veille ajoutés à `inspirations/sets.md`.
 - KB Digitakt, veille live (lot 1, Digitakt seule) : note de curation
   `digitakt/veille-live.md` (recherche web, périmètre DT2 + Mac via
   Overbridge) ; fiches `live-looping` (resampling du main en jeu),

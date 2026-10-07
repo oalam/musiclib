@@ -1,7 +1,7 @@
 ---
 tags: [digitakt, veille, live, curation]
 updated: 2026-10-07
-status: lot 1 rédigé, lot 2 (B2, E1, E2, F) à venir
+status: rédigé (lots 1 et 2)
 ---
 
 # Veille — techniques de live tekno à creuser
@@ -52,7 +52,7 @@ Recettes concurrentes de la nôtre, pour valider ou amender §9.
 - [x] [Techno rumble kick tutorial / Elektron Digitakt jam (Almec Beats #27)](https://www.youtube.com/watch?v=eqXsdujBUoQ)
 - [x] [Techno kick with rumble — Digitakt](https://www.youtube.com/watch?v=lfKkU0DWYy0)
 
-### [ ] B2. Kick mental / acidcore fabriqué en VST puis échantillonné
+### [x] B2. Kick mental / acidcore fabriqué en VST puis échantillonné → [[kb/kick-mental-vst]]
 
 Fabriquer le kickbass mental au Mac (synthé VST + distorsion), puis le
 charger dans la DT2 nommé avec sa note (doctrine §11). Le cœur du son
@@ -105,7 +105,7 @@ forum à tester). À rattacher à [[kb/fill-conditions]] et
 
 ## E. Digitakt II + Mac : Overbridge, DAW, VST
 
-### [ ] E1. Overbridge en live : multipiste et effets VST par track
+### [x] E1. Overbridge en live : multipiste et effets VST par track → [[kb/overbridge-live-vst]]
 
 Streamer les 16 tracks dans le DAW, traiter certaines tracks avec des VST
 (delay dub, distorsion, sidechain plus fin que le compresseur interne),
@@ -118,7 +118,7 @@ enregistrer le set en multipiste (doctrine §6, principe 12). Prolonge
 - [x] [Configuring Overbridge for Digitakt in Logic Pro with FX](https://www.youtube.com/watch?v=EosDRHyf0Ug) (DT1, Logic)
 - [x] [Using automation to control Digitakt via Ableton Live and Overbridge](https://www.youtube.com/watch?v=t7mig0QU0qI) (DT1)
 
-### [ ] E2. Tracks MIDI de la DT2 vers des synthés VST (acid line)
+### [x] E2. Tracks MIDI de la DT2 vers des synthés VST (acid line) → [[kb/midi-vst]]
 
 Séquencer depuis la DT2 un synthé VST sur le Mac (émulation 303 pour la
 ligne acid de la track 10, ou nappe polyphonique pour les accords du §11,
@@ -131,7 +131,7 @@ Overbridge. Prolonge [[kb/tracks-midi]].
 - [x] [Découverte du plugin Acid V — Arturia (émulation TB-303)](https://www.youtube.com/watch?v=zseHGJg1ugI) (payant, FR)
 - [x] [How to make a TB-303 acid line in Ableton Live (stock plugin)](https://www.youtube.com/watch?v=P_gpsUKY3ng)
 
-## F. Écoute : lives tekno (inspiration, pas de fiche)
+## F. Écoute : lives tekno (inspiration, pas de fiche) → [[../inspirations/sets]]
 
 À regarder comme matériau, pas comme tuto : partitions de mutes, tempos,
 gestes. Le matériel joué n'a pas d'importance ici. Candidats pour

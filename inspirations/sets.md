@@ -28,6 +28,17 @@ Sets à étudier — non pour copier mais pour comprendre **comment ça se const
 - **[Venetian Snares — Amµnition 2005 (Boiler Room 4:3)](https://fourthree.boilerroom.tv/film/v-snares/)** — Breakcore live, time signatures impaires. Trésor pour Tidal (`bd(3,8)`, `bd(5,11)`).
 - **[Drumcorps — Live at Breakcore Gives Me Wood](https://soundcloud.com/drumcorps/live-at-wood)** — Hybride hardcore / breakcore guitare + breaks, sound design agressif.
 
+## Lives tekno hardware (veille 2026-10-07)
+
+Repérés par la veille [[../digitakt/veille-live]], **pas encore écoutés** :
+« ce qu'on en garde » à écrire à l'écoute. Matériau pour les partitions de
+mutes (doctrine Digitakt §4).
+
+- **[Dave Mech — live @ About Blank Berlin](https://www.elektronauts.com/t/dave-mech-live-about-blank-berlin/232158)** — Deux Digitakt II, un groove = un pattern, arrangement aux mutes.
+- **[Live tekno hardware — mental acid tribe](https://www.youtube.com/watch?v=c3ob6SSKbDE)** — Mental / acid tribe en live hardware.
+- **[Foatwenti3 — Mental Disorder (hardware live set)](https://www.youtube.com/watch?v=XXizN2wS-gk)** — Mental en live hardware.
+- **[Alien J — underground acid tribe live set](https://www.youtube.com/watch?v=W9zIOAlL3tA)** — Acid tribe, contexte free party.
+
 ## Dub techno
 
 - **[Deadbeat ft. Tikiman — Boiler Room Berlin Live Set](https://www.youtube.com/watch?v=j8W8emgC3Y8)** — Dub techno live avec dub vocal. Pour les passages atmosphériques du set hybride.
