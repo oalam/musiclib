@@ -24,6 +24,18 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   sélection puis la réserve, drapeaux du pré-filtre, forme d'onde et lecture
   automatique. Raccourcis `K` garder, `D` écarter, `U` annuler, flèches
   pour le sample et la case, `Espace` rejouer, `R` réserve.
+- [7.J2] Tempo des boucles : lu dans le nom quel que soit le séparateur
+  (`120 Sklep Break`, `02_…_Fill_175_…` : premier nombre plausible, plus
+  seulement le premier nombre) ; sinon mesuré (`estimate_bpm` : tempo
+  librosa calé sur 1 à 16 mesures 4/4 quand la durée le confirme, à ×2 / ÷2
+  près, zone 80-200 préférée ; librosa seul sinon, marqué `bpm_est` et
+  affiché « ~N bpm » dans le front). Champs `bpm` / `bpm_est` du manifeste,
+  repris d'un passage à l'autre. Retenues sans BPM : 124 → 6 sur 301
+  (62 estimées).
+- [7.J2] Classement : dans un dossier one-shot, une frappe de plus de 4 s ou
+  un tempo dans le nom ne font plus une boucle (crash de 4,4 s → CY) ; un
+  « loop », « fill » ou « break » de moins d'une seconde reprend le code de
+  frappe de son nom (`BreakApartKick` neurotek → BD).
 - [7.J2] Pack `rthm/packs/neurotek` (360 one-shots) basculé de JUNGLE en
   TRIBE : TRIBE passe à 96 retenus (BD 32, SD 16, HH 16, CY 16, PC 16) ;
   JUNGLE perd l'essentiel de ses kicks (BD 10/10). Ses cases de moins de

@@ -233,6 +233,8 @@ export interface SampleEntry {
   status: SampleStatus
   selected: boolean
   flags: string[] | null
+  bpm: number | null       // tempo mesure (boucle sans tempo dans le nom)
+  bpm_est: boolean         // librosa seul, non confirme par la duree
 }
 export interface SampleCell {
   family: string

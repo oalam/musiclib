@@ -86,6 +86,10 @@ def test_bpm_in_folder_does_not_make_a_loop() -> None:
 
 def test_long_drum_becomes_loop() -> None:
     assert smp.code_of("rthm/kick/Long Kick.wav", 5.0) == "DL"
+    assert smp.code_of("rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav", 0.38) == "BD"
+    assert smp.code_of("Jungle 89  to 99/Breaks/Adrift Break.wav", 6.0) == "BR"
+    # un "fill" de 0,3 s est une frappe
+    assert smp.code_of("NI/caribean/oneshot/Drums/Percussion/Fill Papayera 1.wav", 0.28) == "PC"
 
 
 @pytest.mark.parametrize("rel, code, pack, expected", [
@@ -384,3 +388,48 @@ def test_exact_duplicate_across_packs_keeps_classified_copy(tmp_path: Path) -> N
     assert "aaa copy/170_HeavyBoiBeat_02.wav" not in srcs
     assert "rthm/loops/170_HeavyBoiBeat_02.wav" in srcs
     assert "rthm/loops/zz9_Thing.wav" in srcs and "aaa copy/zz9_Thing.wav" not in srcs
+
+
+@pytest.mark.parametrize(("stem", "tempo"), [
+    ("120 sklep break", 120),
+    ("02_cbdnb_bassdrum_fill_175_multitrack(2)", 175),
+    ("hndnb_drums_full_loop07_176_multitrack", 176),
+    ("wp_beangourd_110-01", None),            # Cyclick : tempo du dossier, pas du nom
+    ("feedback rough bass 110hz top", None),
+    ("kick_09_406", None),
+])
+def test_tempo_from_name(stem: str, tempo: int | None) -> None:
+    assert smp.tempo_from_name(stem) == tempo
+
+
+def test_long_drum_in_oneshot_folder_stays_oneshot() -> None:
+    assert smp.code_of("NI/arcane/one shot/Drums/Cymbal/Crash FourHundred.wav", 4.4) == "CY"
+    assert smp.code_of("rthm/kick/Long Kick.wav", 5.0) == "DL"
+    assert smp.code_of("rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav", 0.38) == "BD"
+    assert smp.code_of("Jungle 89  to 99/Breaks/Adrift Break.wav", 6.0) == "BR"
+    # un "fill" de 0,3 s est une frappe
+    assert smp.code_of("NI/caribean/oneshot/Drums/Percussion/Fill Papayera 1.wav", 0.28) == "PC"
+
+
+@pytest.mark.parametrize(("tempo", "dur", "expected"), [
+    (140.0, 3.429, 140),     # 2 mesures
+    (70.0, 3.429, 140),      # librosa a la moitie
+    (172.0, 11.163, 172),    # 8 mesures
+    (128.0, 3.429, None),    # incoherent avec la duree
+])
+def test_snap_to_bars(tempo: float, dur: float, expected: int | None) -> None:
+    assert smp.snap_to_bars(tempo, dur) == expected
+
+
+def test_measured_bpm_named_and_cached(tree: Path) -> None:
+    calls: list[str] = []
+
+    def fake(path: Path, dur: float | None) -> tuple[int | None, bool]:
+        calls.append(path.name)
+        return 140, True
+    first = smp.build_manifest(tree, {}, measure_fn=None, bpm_fn=fake)
+    e = next(x for x in first.entries if x.source == "rthm/kick/Long Kick.wav")
+    assert (e.bpm, e.bpm_est) == (140, True) and e.name.startswith("DL 140 ")
+    assert calls == ["Long Kick.wav"]
+    smp.build_manifest(tree, {}, previous=first, measure_fn=None, bpm_fn=fake)
+    assert calls == ["Long Kick.wav"]

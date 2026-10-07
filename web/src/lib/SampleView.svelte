@@ -259,6 +259,7 @@
             <span class="rank muted">{e.rank}</span>
             <span class="name">{e.name}</span>
             <span class="dur muted small">{fmt(e.duration)}</span>
+            {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
             {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
             <span class="src muted small" title={e.source}>{e.source}</span>
           </button>
@@ -303,6 +304,7 @@
   .rank { width: 2.5em; text-align: right; font: 11px ui-monospace, Menlo, monospace; }
   .name { font-family: ui-monospace, Menlo, monospace; white-space: pre; }
   .dur { width: 5em; }
+  .est { font-size: 10px; padding: 0 5px; border-radius: 8px; border: 1px dashed var(--muted); color: var(--muted); }
   .flag { font-size: 10px; padding: 0 5px; border-radius: 8px; background: #fde68a; color: #713f12; }
   .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
   .status { width: 4em; color: var(--muted); }

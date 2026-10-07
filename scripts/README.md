@@ -742,6 +742,9 @@ BL basse.
   `keep` / `drop` et les mesures du manifeste précédent sont conservés.
 - **Tests** : `python -m pytest tests/test_samples.py` (unitaires, fausse
   arborescence) ; `-m integration` vérifie les noms sur le vrai disque.
+- **Tempo des boucles** : lu dans le chemin (`NNN bpm`, `170_…`, `… 120 …`),
+  sinon mesuré par librosa et calé sur 1 à 16 mesures quand la durée le
+  confirme ; à défaut, tempo estimé (`bpm_est`, « ~N bpm » dans le front).
 - **Doublons** : mono d'un fichier livré aussi en stéréo, et copies exactes
   entre packs (même nom, même taille : on garde la copie classée, puis la
   plus profonde).

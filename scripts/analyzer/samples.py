@@ -32,6 +32,10 @@ FOLD_MIN = 4          # en dessous, la case rejoint le meme code dans UNIVERSEL
 CANDIDATE_FACTOR = 3  # candidats par case = 3 x quota (pre-selection d'ecoute)
 LONG_ONESHOT_S = 4.0  # un "kick" de plus de 4 s est une boucle
 TEMPO_LOOP_S = 2.0    # tempo dans le nom + au moins 2 s : boucle (piano, synth...)
+TEMPO_RANGE = (60, 229)
+MIN_LOOP_S = 1.0      # plus court : one-shot, si le chemin donne un code
+BAR_COUNTS = (1, 2, 4, 8, 16)   # longueurs de boucle plausibles, en mesures 4/4
+BAR_TOL = 0.04                  # ecart toléré entre tempo librosa et tempo des mesures
 
 # Pre-filtre qualite (7.J2) : seuils des drapeaux, poids pour le reclassement.
 MUTE_PEAK_DB = -40.0     # crete sous ce niveau : fichier quasi muet
@@ -174,7 +178,7 @@ beat beats openhh closedhh hihat ohh chh xtrmraw
 _NOTE_RX = re.compile(r"^([A-G][#b]?)(m|min|maj)?$")
 _BPM_RX = re.compile(r"(\d{2,3}) ?bpm")
 # tempo dans le nom sans "bpm" : 170_HeavyBoiBeat, CPCT_120_C_Gamelan, vb6_drm120
-_TEMPO_NAME_RX = re.compile(r"(?:^|_|drm)(\d{2,3})_")
+_TEMPO_NAME_RX = re.compile(r"(?:^|[_ ]|drm)(\d{2,3})(?=[_ ])")
 _ONESHOT_DIR_RX = re.compile(r"one ?-?shots?")
 _SPLIT_RX = re.compile(r"[\s_\-.()\[\],+&']+")
 _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])")
@@ -199,6 +203,8 @@ class SampleEntry(BaseModel):
     status: Status = "pending"
     selected: bool = False          # retenu pour l'export (7.J3)
     flags: list[str] | None = None  # defauts du pre-filtre (None = pas mesure)
+    bpm: int | None = None          # boucle sans tempo dans le nom : tempo de l'audio
+    bpm_est: bool = False           # bpm librosa seul (pas confirme par la duree)
 
     @property
     def dest(self) -> str:
@@ -329,21 +335,79 @@ def code_of(rel: str, duration: float | None) -> str | None:
     low = rel.lower()
     code = next((c for c, rx in _CODE_RX if rx.search(low)), None)
     if code == "BR":
-        return code
+        # BreakApartKick de 0,4 s : une frappe, on prend le code suivant du nom
+        other = next((c for c, rx in _CODE_RX if c != "BR" and rx.search(low)), None)
+        short = duration is not None and duration < MIN_LOOP_S
+        return other if short and other is not None else code
     # boucle : mot-cle du chemin ou BPM dans le nom du fichier (pas du dossier)
     loop = bool(_LOOP_RX.search(low) or _BPM_RX.search(low.rsplit("/", 1)[-1]))
     # replis : BPM dans le dossier (Cyclick/110bpm/), one-shot drum trop long
     loop = loop or (code is None and bool(_BPM_RX.search(low)))
-    loop = loop or (code in DRUMS and (duration or 0) > LONG_ONESHOT_S)
-    # tempo en tete ou au milieu du nom (sans "bpm"), assez long, hors dossier one-shot
-    loop = loop or ((duration or 0) >= TEMPO_LOOP_S and tempo_in_name(low)
-                    and not _ONESHOT_DIR_RX.search(low))
+    # replis hors dossier one-shot (un crash de 4 s y reste un crash) : drum
+    # trop long, tempo en tete ou au milieu du nom (sans "bpm") et assez long
+    if not _ONESHOT_DIR_RX.search(low):
+        loop = loop or (code in DRUMS and (duration or 0) > LONG_ONESHOT_S)
+        loop = loop or ((duration or 0) >= TEMPO_LOOP_S
+                        and tempo_from_name(low.rsplit("/", 1)[-1]) is not None)
+    # moins d'une seconde : un one-shot, meme dans un dossier de boucles ou de fills
+    if loop and code is not None and duration is not None and duration < MIN_LOOP_S:
+        return code
     return loop_code(low) if loop else code
 
 
-def tempo_in_name(low: str) -> bool:
-    m = _TEMPO_NAME_RX.search(low.rsplit("/", 1)[-1])
-    return m is not None and 60 <= int(m.group(1)) <= 229
+def _in_range(n: int) -> bool:
+    return TEMPO_RANGE[0] <= n <= TEMPO_RANGE[1]
+
+
+def tempo_from_name(stem_low: str) -> int | None:
+    """Premier nombre plausible du nom isole par `_` ou espace (02_..._175_ -> 175)."""
+    return next((int(m.group(1)) for m in _TEMPO_NAME_RX.finditer(stem_low)
+                 if _in_range(int(m.group(1)))), None)
+
+
+def tempo_of(rel: str) -> int | None:
+    """Tempo ecrit dans le chemin : `NNN bpm` n'importe ou, sinon dans le nom."""
+    m = _BPM_RX.search(rel.lower())
+    if m and _in_range(int(m.group(1))):
+        return int(m.group(1))
+    return tempo_from_name(Path(rel).stem.lower())
+
+
+def snap_to_bars(tempo: float, duration: float) -> int | None:
+    """Tempo d'une boucle de 1 a 16 mesures 4/4 coherent avec l'estimation
+    (a x2 ou /2 pres, BAR_TOL) : 240 x mesures / duree."""
+    if duration <= 0 or tempo <= 0:
+        return None
+    hits: list[tuple[bool, bool, int]] = []   # (hors 80-200, pas x1, tempo)
+    for n in BAR_COUNTS:
+        cand = 240 * n / duration
+        if not _in_range(round(cand)):
+            continue
+        for k, t in enumerate((tempo, tempo * 2, tempo / 2)):
+            if abs(cand - t) / t <= BAR_TOL:
+                hits.append((not 80 <= cand <= 200, k > 0, round(cand)))
+    # 70 ou 140 pour la meme boucle : la zone 80-200 d'abord, puis l'estimation telle quelle
+    return min(hits)[2] if hits else None
+
+
+def estimate_bpm(path: Path, duration: float | None) -> tuple[int | None, bool]:
+    """Tempo d'une boucle sans tempo ecrit : librosa, cale sur un nombre entier
+    de mesures si la duree le confirme (exact), sinon librosa seul (estime)."""
+    import librosa   # lourd : seulement quand une boucle doit etre mesuree
+
+    try:
+        y, sr = librosa.load(str(path), sr=22050, mono=True, duration=30.0)
+    except Exception:  # noqa: BLE001 - fichier illisible : pas de tempo
+        return None, False
+    if y.size < sr // 2:
+        return None, False
+    tempo = float(np.atleast_1d(librosa.feature.tempo(y=y, sr=sr))[0])
+    snapped = snap_to_bars(tempo, duration or y.size / sr)
+    if snapped is not None:
+        return snapped, False
+    while tempo and tempo < 80:
+        tempo *= 2
+    return (round(tempo), True) if tempo and _in_range(round(tempo)) else (None, False)
 
 
 def _is_mono_twin(rel: str, all_low: set[str]) -> bool:
@@ -372,8 +436,9 @@ def _tokens(text: str) -> list[str]:
     return [t for chunk in _SPLIT_RX.split(text) for t in _CAMEL_RX.split(chunk) if t]
 
 
-def short_name(rel: str, code: str, pack: str) -> str:
-    """`<CODE> [BPM|note] <desc> <num> <pack>`, NAME_MAX caracteres au plus."""
+def short_name(rel: str, code: str, pack: str, bpm: int | None = None) -> str:
+    """`<CODE> [BPM|note] <desc> <num> <pack>`, NAME_MAX caracteres au plus.
+    `bpm` : tempo mesure, utilise si le chemin n'en donne pas."""
     parts = rel.split("/")
     stem = Path(parts[-1]).stem
     folder_words = {t.lower() for d in parts[:-1] for t in _tokens(d)}
@@ -381,11 +446,9 @@ def short_name(rel: str, code: str, pack: str) -> str:
 
     head: list[str] = []
     if code in TEMPO:
-        m = _BPM_RX.search(rel.lower())
-        lead = _TEMPO_NAME_RX.search(stem.lower())
-        bpm = m.group(1) if m else (lead.group(1) if lead else None)
-        if bpm and 60 <= int(bpm) <= 220:
-            head.append(bpm)
+        tempo = tempo_of(rel) or bpm
+        if tempo:
+            head.append(str(tempo))
     note = None
     if code in TONAL:
         note = next((t for t in toks if _NOTE_RX.match(t)), None)
@@ -497,6 +560,7 @@ def _round_robin(raws: list[_Raw]) -> list[_Raw]:
 
 
 Measure = Callable[[Path, str], list[str]]
+BpmFn = Callable[[Path, float | None], tuple[int | None, bool]]
 
 
 def _pinned(source: str, prev_status: dict[str, Status], overrides: dict[str, Override]) -> bool:
@@ -508,7 +572,8 @@ def _pinned(source: str, prev_status: dict[str, Status], overrides: dict[str, Ov
 
 def build_manifest(root: Path, overrides: dict[str, Override],
                    previous: Manifest | None = None,
-                   measure_fn: Measure | None = measure) -> Manifest:
+                   measure_fn: Measure | None = measure,
+                   bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
     """Manifeste rejouable. Les drapeaux deja mesures sont repris du manifeste
     precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
     raws, unclassified = classify(root, overrides)
@@ -539,18 +604,31 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                 flags[r.source] = measure_fn(root / r.source, code)
             else:
                 flags[r.source] = None
+        # tempo des boucles qui ne l'ecrivent pas (repris du manifeste precedent)
+        tempos: dict[str, tuple[int | None, bool]] = {}
+        if code in TEMPO:
+            for r in kept:
+                old = prev.get(r.source)
+                if tempo_of(r.source) is not None:
+                    continue
+                if old is not None and old.bpm is not None:
+                    tempos[r.source] = (old.bpm, old.bpm_est)
+                elif bpm_fn is not None:
+                    tempos[r.source] = bpm_fn(root / r.source, r.duration)
         # tri stable : les defauts passent en fin de case, le tour de role reste
         kept.sort(key=lambda r: penalty(flags[r.source]))
         taken: set[str] = set()
         cell_entries: list[SampleEntry] = []
         for rank, r in enumerate(kept, 1):
             ov = overrides.get(r.source, Override())
-            name = _unique(ov.name or short_name(r.source, code, r.pack), taken)
+            bpm, est = tempos.get(r.source, (None, False))
+            name = _unique(ov.name or short_name(r.source, code, r.pack, bpm), taken)
             taken.add(name)
             cell_entries.append(SampleEntry(
                 source=r.source, family=fam, code=code, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
-                status=prev_status.get(r.source, "pending"), flags=flags[r.source]))
+                status=prev_status.get(r.source, "pending"), flags=flags[r.source],
+                bpm=bpm, bpm_est=est))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
@@ -606,7 +684,8 @@ def move(manifest: Manifest, source: str, family: str, code: str, root: Path,
     target = cell_of(manifest, family, code)
     entry.family, entry.code = family, code
     entry.rank = max((e.rank for e in target), default=0) + 1
-    entry.name = _unique(short_name(source, code, entry.pack), {e.name for e in target})
+    entry.name = _unique(short_name(source, code, entry.pack, entry.bpm),
+                         {e.name for e in target})
     path = root / source
     if measure_fn is not None and path.is_file():
         entry.flags = measure_fn(path, code)

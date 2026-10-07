@@ -587,7 +587,9 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   vue Samples du front pilotée au clavier (K keep, D drop, flèches) avec
   forme d'onde. Changement de case à l'écoute (M) : statut gardé, écrit dans
   `overrides.json`. Un tempo dans le nom (`170_…`, `_120_`) sur 2 s ou plus,
-  hors dossier one-shot, fait une boucle ; les doublons exacts entre packs
+  hors dossier one-shot, fait une boucle (moins d'une seconde : one-shot) ;
+  une boucle sans tempo écrit reçoit le tempo de l'audio (calé sur les
+  mesures, sinon estimé et signalé) ; les doublons exacts entre packs
   (même nom, même taille) n'en gardent qu'une copie.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
