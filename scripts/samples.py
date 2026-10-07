@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Bibliotheque de samples DT2 : classement et pre-selection (Phase 7.J1).
+"""Bibliotheque de samples DT2 : classement et pre-selection (Phase 7.J1, 7.J2).
 
 Lit la copie des packs (`<MEDIA>/Samples`, jamais modifiee), classe chaque
 wav en famille / code, nomme les candidats pour l'ecran de la DT2 et ecrit
-le manifeste. Rejouable : les decisions d'ecoute (`keep` / `drop`) du
-manifeste precedent sont conservees.
+le manifeste. Chaque candidat est mesure (pre-filtre 7.J2 : drapeaux muet,
+faible, sature, blanc, long, illisible) et les candidats a defauts passent en
+fin de case. Rejouable : les decisions d'ecoute (`keep` / `drop`, prises dans
+le front) et les mesures du manifeste precedent sont conservees.
 
 Usage:
     samples.py                 # (re)construit le manifeste et affiche la grille
     samples.py --dry-run       # grille seulement, rien n'est ecrit
+    samples.py --no-measure    # sans pre-filtre qualite (pas de lecture audio)
     samples.py --report        # grille du manifeste existant
     samples.py --unclassified  # liste les fichiers sans code (a corriger
                                # dans overrides.json)
@@ -24,6 +27,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections import Counter
 from pathlib import Path
 
 from analyzer.samples import (
@@ -34,6 +38,7 @@ from analyzer.samples import (
     SampleError,
     build_manifest,
     grid,
+    measure,
 )
 from paths import SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
 
@@ -57,6 +62,13 @@ def load_manifest(path: Path) -> Manifest | None:
     return Manifest.model_validate_json(path.read_text(encoding="utf-8"))
 
 
+def save_manifest(m: Manifest, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    tmp.write_text(m.model_dump_json(indent=1) + "\n", encoding="utf-8")
+    tmp.replace(path)   # ecriture atomique : le front ecrit pendant l'ecoute
+
+
 def render_grid(m: Manifest) -> str:
     """Tableau candidats/retenus par famille x code, totaux en bout de ligne."""
     g = grid(m)
@@ -74,6 +86,9 @@ def render_grid(m: Manifest) -> str:
         lines.append(f"{fam:10} {row}  {s:>4}/{n}")
     lines.append(f"retenus/candidats : {tot_s}/{tot_n} ; fichiers sources : {m.total} ; "
                  f"non classes : {len(m.unclassified)}")
+    flagged = Counter(f for e in m.entries for f in e.flags or [])
+    if flagged:
+        lines.append("drapeaux qualite : " + ", ".join(f"{f} {n}" for f, n in flagged.most_common()))
     if m.folded:
         lines.append("cases repliees dans UNIVERSEL : " + ", ".join(m.folded))
     return "\n".join(lines)
@@ -84,6 +99,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="n'ecrit pas le manifeste")
     ap.add_argument("--report", action="store_true", help="grille du manifeste existant")
     ap.add_argument("--unclassified", action="store_true", help="liste les fichiers sans code")
+    ap.add_argument("--no-measure", action="store_true",
+                    help="saute la mesure qualite des nouveaux candidats")
     ap.add_argument("--source", type=Path, default=SAMPLES_SRC_DIR)
     args = ap.parse_args(argv)
 
@@ -101,15 +118,15 @@ def main(argv: list[str] | None = None) -> int:
         if not args.source.is_dir():
             print(f"source introuvable : {args.source}", file=sys.stderr)
             return 1
-        manifest = build_manifest(args.source, load_overrides(OVERRIDES_FILE), previous)
+        manifest = build_manifest(args.source, load_overrides(OVERRIDES_FILE), previous,
+                                  measure_fn=None if args.no_measure else measure)
     except SampleError as exc:
         print(f"[samples] {exc}", file=sys.stderr)
         return 1
 
     print(render_grid(manifest))
     if not args.dry_run:
-        MANIFEST_FILE.parent.mkdir(parents=True, exist_ok=True)
-        MANIFEST_FILE.write_text(manifest.model_dump_json(indent=1) + "\n", encoding="utf-8")
+        save_manifest(manifest, MANIFEST_FILE)
         print(f"manifeste : {MANIFEST_FILE}")
     return 0
 

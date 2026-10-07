@@ -1,4 +1,4 @@
-"""Classement des samples DT2 (analyzer/samples.py, samples.py) — Phase 7.J1."""
+"""Classement des samples DT2 (analyzer/samples.py, samples.py) — Phase 7.J1, 7.J2."""
 from __future__ import annotations
 
 import json
@@ -6,7 +6,9 @@ import sys
 import wave
 from pathlib import Path
 
+import numpy as np
 import pytest
+import soundfile as sf
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -202,7 +204,7 @@ def test_real_samples_names_fit() -> None:
     from paths import SAMPLES_SRC_DIR, media_available
     if not media_available() or not SAMPLES_SRC_DIR.is_dir():
         pytest.skip("SSD media absent")
-    m = smp.build_manifest(SAMPLES_SRC_DIR, {})
+    m = smp.build_manifest(SAMPLES_SRC_DIR, {}, measure_fn=None)
     assert all(len(e.name) <= NAME_MAX for e in m.entries)
     assert len({e.dest for e in m.entries}) == len(m.entries)
 
@@ -235,3 +237,75 @@ def test_loop_name_keeps_bpm_and_note() -> None:
 def test_name_without_room_for_desc() -> None:
     name = smp.short_name("instru/synth/170_F#_Synthloop 045_516.wav", "ML", "ins")
     assert name == "ML 170 F# 516 ins" and len(name) <= NAME_MAX
+
+
+# --- Pre-filtre qualite (7.J2) ----------------------------------------------
+
+def _tone(path: Path, seconds: float = 0.3, amp: float = 0.5, lead_s: float = 0.0,
+          clip: bool = False, rate: int = 8000) -> Path:
+    t = np.arange(int(seconds * rate)) / rate
+    y = amp * np.sin(2 * np.pi * 100 * t)
+    if clip:
+        y = np.clip(4 * y, -1.0, 1.0)
+    y = np.concatenate([np.zeros(int(lead_s * rate)), y])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    sf.write(str(path), y, rate, subtype="FLOAT")
+    return path
+
+
+@pytest.mark.parametrize(("kwargs", "code", "flags"), [
+    ({}, "BD", []),
+    ({"amp": 0.001}, "BD", ["muet"]),
+    ({"amp": 0.05}, "BD", ["faible"]),
+    ({"clip": True}, "BD", ["sature"]),
+    ({"lead_s": 0.1}, "BD", ["blanc"]),
+    ({"lead_s": 0.1}, "DL", []),                 # une boucle peut commencer par un silence
+    ({"seconds": 3.0}, "SD", ["long"]),
+    ({"seconds": 3.0}, "FX", []),
+])
+def test_measure_flags(tmp_path: Path, kwargs: dict[str, float], code: str,
+                       flags: list[str]) -> None:
+    assert smp.measure(_tone(tmp_path / "x.wav", **kwargs), code) == flags
+
+
+def test_measure_unreadable(tmp_path: Path) -> None:
+    bad = tmp_path / "bad.wav"
+    bad.write_bytes(b"RIFF0000WAVEnope")
+    assert smp.measure(bad, "BD") == ["illisible"]
+
+
+def test_isolated_full_scale_peak_is_not_clipping() -> None:
+    a = np.zeros(1000)
+    a[10] = a[500] = 1.0
+    assert smp.clipped_share(a) == 0.0
+    a[600:610] = 1.0
+    assert smp.clipped_share(a) == pytest.approx(0.01)
+
+
+def test_flagged_candidates_go_last_and_measures_are_reused(tmp_path: Path) -> None:
+    root = tmp_path / "Samples"
+    _tone(root / "Hardcore free samples" / "Kicks" / "Kick 01.wav", amp=0.001)
+    for i in range(2, 6):
+        _tone(root / "Hardcore free samples" / "Kicks" / f"Kick {i:02d}.wav")
+    first = smp.build_manifest(root, {})
+    cell = smp.cell_of(first, "HARDCORE", "BD")
+    assert cell[-1].source.endswith("Kick 01.wav")
+    assert cell[-1].flags == ["muet"]
+    assert [e.flags for e in cell[:-1]] == [[]] * 4
+
+    def boom(path: Path, code: str) -> list[str]:
+        raise AssertionError("mesure deja faite")
+    second = smp.build_manifest(root, {}, previous=first, measure_fn=boom)
+    assert [e.source for e in smp.cell_of(second, "HARDCORE", "BD")] == [e.source for e in cell]
+
+
+def test_set_status_promotes_next_pending() -> None:
+    m = smp.Manifest(source_root="x", total=20, entries=[
+        smp.SampleEntry(source=f"s{i}", family="JUNGLE", code="FX", pack="p",
+                        name=f"FX {i}", duration=1.0, rank=i) for i in range(1, 11)])
+    smp.select(m.entries, 8)
+    assert not m.entries[8].selected
+    cell = smp.set_status(m, "s1", "drop")
+    assert [e.source for e in cell if e.selected] == [f"s{i}" for i in range(2, 10)]
+    with pytest.raises(smp.SampleError):
+        smp.set_status(m, "absent", "keep")

@@ -220,3 +220,54 @@ def test_dt2_ports(client: TestClient, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(api.dt2_midi, "list_ports",
                         lambda: api.dt2_midi.Dt2Ports(inputs=["X"], outputs=["X"], default="X"))
     assert client.get("/api/dt2/ports").json()["default"] == "X"
+
+
+# --- Samples DT2 (7.J2) -------------------------------------------------------
+
+@pytest.fixture
+def samples_client(tmp_path: Path) -> TestClient:
+    from analyzer.samples import Manifest, SampleEntry, select
+
+    src = tmp_path / "Samples"
+    (src / "p").mkdir(parents=True)
+    (src / "p" / "fx1.wav").write_bytes(b"RIFF" + b"x" * 100)
+    entries = [SampleEntry(source=f"p/fx{i}.wav", family="JUNGLE", code="FX", pack="p",
+                           name=f"FX {i}", duration=1.0, rank=i,
+                           flags=["sature"] if i == 10 else [])
+               for i in range(1, 11)]
+    select(entries, 8)
+    path = tmp_path / "manifest.json"
+    api.samples.save_manifest(Manifest(source_root=str(src), total=10, entries=entries), path)
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    return TestClient(api.create_app(library_file=lib, samples_manifest=path, samples_src=src))
+
+
+def test_samples_cells(samples_client: TestClient):
+    cells = samples_client.get("/api/samples").json()
+    assert cells == [{"family": "JUNGLE", "code": "FX", "quota": 8, "candidates": 10,
+                      "selected": 8, "keep": 0, "drop": 0, "to_listen": 8, "flagged": 1}]
+    cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
+    assert [e["rank"] for e in cell] == list(range(1, 11))
+    assert samples_client.get("/api/samples/cell",
+                              params={"family": "JUNGLE", "code": "BD"}).status_code == 404
+
+
+def test_samples_drop_promotes_next_and_persists(samples_client: TestClient):
+    r = samples_client.post("/api/samples/status", json={"source": "p/fx1.wav", "status": "drop"})
+    assert r.status_code == 200
+    selected = [e["source"] for e in r.json() if e["selected"]]
+    assert "p/fx1.wav" not in selected and "p/fx9.wav" in selected
+    cells = samples_client.get("/api/samples").json()
+    assert (cells[0]["drop"], cells[0]["selected"]) == (1, 8)
+    assert samples_client.post("/api/samples/status",
+                               json={"source": "p/absent.wav", "status": "keep"}).status_code == 404
+    assert samples_client.post("/api/samples/status",
+                               json={"source": "p/fx1.wav", "status": "maybe"}).status_code == 422
+
+
+def test_samples_audio_only_from_manifest(samples_client: TestClient):
+    assert samples_client.get("/api/samples/audio", params={"source": "p/fx1.wav"}).status_code == 200
+    assert samples_client.get("/api/samples/audio", params={"source": "p/fx2.wav"}).status_code == 404
+    assert samples_client.get("/api/samples/audio",
+                              params={"source": "../library.md"}).status_code == 404

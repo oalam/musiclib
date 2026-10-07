@@ -578,6 +578,11 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - `<MEDIA>/Samples` n'est jamais modifié. Manifeste et overrides dans le vault
   (`library/samples/`) ; le manifeste est rejouable et garde les décisions
   d'écoute.
+- 7.J2 (arbitré le 2026-10-07) : le pré-filtre qualité reclasse et signale
+  (drapeaux), il n'écarte rien ; l'écoute porte d'abord sur les sélectionnés,
+  un drop faisant monter le candidat suivant, la réserve restant consultable ;
+  vue Samples du front pilotée au clavier (K keep, D drop, flèches) avec
+  forme d'onde.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

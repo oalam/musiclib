@@ -7,7 +7,10 @@ court `<CODE> [BPM|note] <desc> <pack>` de 18 caracteres au plus : l'ecran de
 choix du sample d'une track n'en montre qu'environ 14.
 
 Selection : quota par case famille x code, candidats = 3 x quota repartis
-entre sous-packs. Le manifeste garde les decisions d'ecoute (`keep` / `drop`)
+entre sous-packs. Pre-filtre qualite (7.J2) : chaque candidat est mesure
+(niveau, saturation, blanc en tete, longueur) ; les defauts sont signales par
+des drapeaux et repoussent le candidat en fin de case, sans l'ecarter : la
+decision reste a l'ecoute. Le manifeste garde les decisions d'ecoute (`keep` / `drop`)
 d'un passage a l'autre ; les overrides (famille, code, nom) sont edites a la
 main dans un fichier a part.
 """
@@ -16,16 +19,29 @@ from __future__ import annotations
 import re
 import struct
 from collections import defaultdict
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Literal
 
+import numpy as np
+import soundfile as sf
 from pydantic import BaseModel, Field
 
 NAME_MAX = 18
 FOLD_MIN = 4          # en dessous, la case rejoint le meme code dans UNIVERSEL
 CANDIDATE_FACTOR = 3  # candidats par case = 3 x quota (pre-selection d'ecoute)
 LONG_ONESHOT_S = 4.0  # un "kick" de plus de 4 s est une boucle
+
+# Pre-filtre qualite (7.J2) : seuils des drapeaux, poids pour le reclassement.
+MUTE_PEAK_DB = -40.0     # crete sous ce niveau : fichier quasi muet
+LOW_PEAK_DB = -18.0      # crete sous ce niveau : sample faible (gain a remonter)
+CLIP_LEVEL = 0.999       # echantillon pleine echelle
+CLIP_RUN = 3             # au moins 3 echantillons consecutifs a pleine echelle...
+CLIP_SHARE = 0.001       # ... sur plus de 0,1 % du fichier
+LEAD_DB = -40.0          # relatif a la crete : en dessous, c'est du blanc
+LEAD_MAX_S = 0.03        # blanc en tete d'un one-shot au-dela duquel le trig traine
+LONG_HIT_S = 2.0         # frappe de drums plus longue (queue, reverb, boucle mal rangee)
+FLAG_WEIGHT = {"illisible": 3, "muet": 3, "sature": 1, "blanc": 1, "faible": 1, "long": 1}
 
 FAMILIES = ("AUTRES", "DUBSTEP", "HARDCORE", "JUNGLE", "SAMPLE", "TECHNO", "TRIBE", "UNIVERSEL")
 CODES = ("BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC",
@@ -160,6 +176,7 @@ _SPLIT_RX = re.compile(r"[\s_\-.()\[\],+&']+")
 _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])")
 
 Status = Literal["pending", "keep", "drop"]
+LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
 
 
 class SampleError(Exception):
@@ -177,6 +194,7 @@ class SampleEntry(BaseModel):
     rank: int                       # ordre dans la case (1 = premier propose)
     status: Status = "pending"
     selected: bool = False          # retenu pour l'export (7.J3)
+    flags: list[str] | None = None  # defauts du pre-filtre (None = pas mesure)
 
     @property
     def dest(self) -> str:
@@ -233,6 +251,44 @@ def wav_duration(path: Path) -> float | None:
                     f.seek(size + size % 2, 1)
     except (OSError, struct.error):
         return None
+
+
+def measure(path: Path, code: str) -> list[str]:
+    """Drapeaux qualite d'un fichier : illisible, muet, faible, sature, blanc
+    (en tete d'un one-shot), long (frappe de drums de plus de LONG_HIT_S)."""
+    try:
+        y, sr = sf.read(str(path), dtype="float32", always_2d=True)
+    except (sf.LibsndfileError, RuntimeError, ValueError):
+        return ["illisible"]
+    a = np.abs(y).max(axis=1) if y.size else np.zeros(0, dtype=np.float32)
+    peak = float(a.max()) if a.size else 0.0
+    if peak <= 10 ** (MUTE_PEAK_DB / 20):
+        return ["muet"]
+    flags: list[str] = []
+    if peak < 10 ** (LOW_PEAK_DB / 20):
+        flags.append("faible")
+    if clipped_share(a) > CLIP_SHARE:
+        flags.append("sature")
+    if code not in LOOPS:
+        first = int(np.argmax(a >= peak * 10 ** (LEAD_DB / 20)))
+        if first / sr > LEAD_MAX_S:
+            flags.append("blanc")
+    if code in DRUMS and a.size / sr > LONG_HIT_S:
+        flags.append("long")
+    return flags
+
+
+def clipped_share(a: np.ndarray) -> float:
+    """Part des echantillons pris dans une suite d'au moins CLIP_RUN valeurs
+    a pleine echelle (un pic isole a 0 dBFS n'est pas une saturation)."""
+    hot = np.concatenate(([0], (a >= CLIP_LEVEL).astype(np.int8), [0]))
+    edges = np.flatnonzero(np.diff(hot))
+    runs = edges[1::2] - edges[::2]
+    return float(runs[runs >= CLIP_RUN].sum()) / max(a.size, 1)
+
+
+def penalty(flags: list[str] | None) -> int:
+    return sum(FLAG_WEIGHT.get(f, 1) for f in flags or [])
 
 
 def iter_wavs(root: Path) -> Iterable[Path]:
@@ -413,11 +469,18 @@ def _round_robin(raws: list[_Raw]) -> list[_Raw]:
     return out
 
 
+Measure = Callable[[Path, str], list[str]]
+
+
 def build_manifest(root: Path, overrides: dict[str, Override],
-                   previous: Manifest | None = None) -> Manifest:
+                   previous: Manifest | None = None,
+                   measure_fn: Measure | None = measure) -> Manifest:
+    """Manifeste rejouable. Les drapeaux deja mesures sont repris du manifeste
+    precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
     raws, unclassified = classify(root, overrides)
     folded = fold_small_cells(raws, overrides)
-    prev_status = {e.source: e.status for e in previous.entries} if previous else {}
+    prev = {e.source: e for e in previous.entries} if previous else {}
+    prev_status = {k: e.status for k, e in prev.items()}
 
     cells: dict[tuple[str, str], list[_Raw]] = defaultdict(list)
     for r in raws:
@@ -432,6 +495,17 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         cap = len(ordered) if q is None else q * CANDIDATE_FACTOR
         kept = ordered[:cap] + [r for r in ordered[cap:] if r.source in prev_status
                                 and prev_status[r.source] != "pending"]
+        flags: dict[str, list[str] | None] = {}
+        for r in kept:
+            old = prev.get(r.source)
+            if old is not None and old.flags is not None and old.code == code:
+                flags[r.source] = old.flags
+            elif measure_fn is not None:
+                flags[r.source] = measure_fn(root / r.source, code)
+            else:
+                flags[r.source] = None
+        # tri stable : les defauts passent en fin de case, le tour de role reste
+        kept.sort(key=lambda r: penalty(flags[r.source]))
         taken: set[str] = set()
         cell_entries: list[SampleEntry] = []
         for rank, r in enumerate(kept, 1):
@@ -441,7 +515,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
             cell_entries.append(SampleEntry(
                 source=r.source, family=fam, code=code, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
-                status=prev_status.get(r.source, "pending")))
+                status=prev_status.get(r.source, "pending"), flags=flags[r.source]))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
@@ -457,6 +531,23 @@ def select(cell: list[SampleEntry], q: int | None) -> None:
     chosen = {id(e) for e in keeps + pend[:room]}
     for e in cell:
         e.selected = id(e) in chosen
+
+
+def cell_of(manifest: Manifest, family: str, code: str) -> list[SampleEntry]:
+    return sorted((e for e in manifest.entries if e.family == family and e.code == code),
+                  key=lambda e: e.rank)
+
+
+def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEntry]:
+    """Decision d'ecoute d'un candidat, puis nouvelle selection de sa case
+    (un drop fait monter le pending suivant). Renvoie la case."""
+    entry = next((e for e in manifest.entries if e.source == source), None)
+    if entry is None:
+        raise SampleError(f"candidat inconnu : {source}")
+    entry.status = status
+    cell = cell_of(manifest, entry.family, entry.code)
+    select(cell, quota(entry.family, entry.code))
+    return cell
 
 
 def grid(manifest: Manifest) -> dict[str, dict[str, tuple[int, int]]]:

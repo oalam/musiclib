@@ -8,6 +8,22 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J2] Pré-filtre qualité des samples DT2 : chaque candidat du manifeste
+  est mesuré (`analyzer/samples.measure`) et reçoit des drapeaux `muet`
+  (crête < -40 dBFS), `faible` (< -18 dBFS), `sature` (plus de 0,1 % des
+  échantillons en plateaux d'au moins 3 valeurs à pleine échelle), `blanc`
+  (plus de 30 ms de silence en tête d'un one-shot), `long` (frappe de drums
+  de plus de 2 s), `illisible`. Les candidats signalés passent en fin de
+  case (tri stable, le tour de rôle entre sous-packs est gardé) sans être
+  écartés : la décision reste à l'oreille. Mesures reprises du manifeste
+  précédent, option `--no-measure`. Premier passage : 197 drapeaux sur
+  2 423 candidats (sature 87, long 67, blanc 33, faible 10).
+- [7.J2] API d'écoute des samples : `GET /api/samples` (cases famille × code
+  avec compteurs), `GET /api/samples/cell`, `POST /api/samples/status`
+  (`keep` / `drop` / `pending`, sélection de la case recalculée : un drop
+  fait monter le candidat suivant, écriture atomique du manifeste),
+  `GET /api/samples/audio` (fichier servi seulement s'il figure au
+  manifeste).
 - [7.J1] Bibliothèque de samples DT2 : `scripts/samples.py` (logique dans
   `analyzer/samples.py`) classe les packs de `<MEDIA>/Samples` en famille
   (HARDCORE, JUNGLE, DUBSTEP, TECHNO, TRIBE, AUTRES, UNIVERSEL, SAMPLE) et code

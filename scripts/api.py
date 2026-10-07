@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt,
 base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I), envoi d'une
-track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`).
+track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`), ecoute des
+samples DT2 (Phase 7.J2, `samples.py`).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
-(`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`). L'envoi
+(`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`), et les
+decisions d'ecoute des samples (`POST /api/samples/status`, manifeste). L'envoi
 MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
-dans library.md (pas de chemin libre).
+dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre).
 
 Usage:
     python api.py                 # http://127.0.0.1:8765 (sert aussi web/dist)
@@ -21,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import threading
 from pathlib import Path
 from typing import Any
 
@@ -34,10 +37,12 @@ import dt2_midi
 import grab
 import harmony
 import kb
+import samples
 import stems
 from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
+from analyzer.samples import SampleEntry, SampleError, Status, cell_of, quota, set_status
 from analyzer.types import CuePoint, DigitaktBank, Segment
 from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
 from library_md import parse_library
@@ -45,6 +50,7 @@ from paths import (
     DIGITAKT_DIR,
     LIBRARY_FILE,
     QUALITY_DIR,
+    SAMPLES_SRC_DIR,
     STEMS_DIR,
     VAULT_ROOT,
     MediaRootUnavailable,
@@ -140,6 +146,38 @@ def run_grab(req: GrabRequest, ctx: JobContext) -> None:
             raise StepFailed("analyse harmonique impossible (voir les logs d'api.py)")
 
 
+class SampleCell(BaseModel):
+    """Case famille x code de la bibliotheque de samples, vue d'ecoute (7.J2)."""
+    family: str
+    code: str
+    quota: int | None
+    candidates: int
+    selected: int
+    keep: int
+    drop: int
+    to_listen: int      # retenus encore pending
+    flagged: int        # candidats signales par le pre-filtre
+
+
+class SampleDecision(BaseModel):
+    source: str = Field(min_length=1, max_length=500)
+    status: Status
+
+
+def _sample_cells(m: samples.Manifest) -> list[SampleCell]:
+    cells: dict[tuple[str, str], list[SampleEntry]] = {}
+    for e in m.entries:
+        cells.setdefault((e.family, e.code), []).append(e)
+    return [SampleCell(
+        family=fam, code=code, quota=quota(fam, code), candidates=len(es),
+        selected=sum(e.selected for e in es),
+        keep=sum(e.status == "keep" for e in es),
+        drop=sum(e.status == "drop" for e in es),
+        to_listen=sum(e.selected and e.status == "pending" for e in es),
+        flagged=sum(bool(e.flags) for e in es),
+    ) for (fam, code), es in sorted(cells.items())]
+
+
 def _validate_grab(req: GrabRequest) -> None:
     if not grab.is_url(req.url):
         raise HTTPException(422, "url attendue (choisir un candidat de la recherche)")
@@ -154,12 +192,22 @@ def _validate_grab(req: GrabRequest) -> None:
 
 
 def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
-               sender: dt2_midi.Dt2Sender | None = None) -> FastAPI:
+               sender: dt2_midi.Dt2Sender | None = None,
+               samples_manifest: Path = samples.MANIFEST_FILE,
+               samples_src: Path = SAMPLES_SRC_DIR) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
     app.router.on_shutdown.append(dt2.shutdown)
     app.router.on_shutdown.append(jobs.shutdown)
+
+    samples_lock = threading.Lock()
+
+    def manifest() -> samples.Manifest:
+        m = samples.load_manifest(samples_manifest)
+        if m is None:
+            raise HTTPException(404, "pas de manifeste de samples (lancer samples.py)")
+        return m
 
     def entries() -> dict[str, dict[str, str]]:
         return parse_library(library_file)
@@ -306,6 +354,43 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         if not kb.MANUAL_PDF.exists():
             raise HTTPException(404, "manuel PDF absent de refs/")
         return FileResponse(kb.MANUAL_PDF, media_type="application/pdf")
+
+    @app.get("/api/samples", response_model=list[SampleCell])
+    def sample_cells() -> list[SampleCell]:
+        return _sample_cells(manifest())
+
+    @app.get("/api/samples/cell", response_model=list[SampleEntry])
+    def sample_cell(family: str, code: str) -> list[SampleEntry]:
+        cell = cell_of(manifest(), family, code)
+        if not cell:
+            raise HTTPException(404, f"case inconnue : {family}/{code}")
+        return cell
+
+    @app.post("/api/samples/status", response_model=list[SampleEntry])
+    def sample_status(req: SampleDecision) -> list[SampleEntry]:
+        """Decision d'ecoute ; renvoie la case avec sa selection recalculee."""
+        with samples_lock:
+            m = manifest()
+            try:
+                cell = set_status(m, req.source, req.status)
+            except SampleError as exc:
+                raise HTTPException(404, str(exc)) from exc
+            samples.save_manifest(m, samples_manifest)
+        return cell
+
+    @app.get("/api/samples/audio")
+    def sample_audio(source: str) -> FileResponse:
+        if not any(e.source == source for e in manifest().entries):
+            raise HTTPException(404, f"sample hors manifeste : {source}")
+        if samples_src == SAMPLES_SRC_DIR:
+            try:
+                require_media()
+            except MediaRootUnavailable as exc:
+                raise HTTPException(503, str(exc)) from exc
+        path = samples_src / source
+        if not path.is_file():
+            raise HTTPException(404, f"fichier absent : {source}")
+        return FileResponse(path, media_type="audio/wav")
 
     if WEB_DIST.exists():
         app.mount("/", StaticFiles(directory=WEB_DIST, html=True), name="web")
