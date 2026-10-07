@@ -178,3 +178,44 @@ def test_grab_sans_disque_media(grab_client: TestClient, monkeypatch: pytest.Mon
         raise api.MediaRootUnavailable("disque absent")
     monkeypatch.setattr(api, "require_media", absent)
     assert grab_client.post("/api/grab", json={"url": "https://yt/1"}).status_code == 503
+
+
+# ---------------------------------------------------------------------------
+# Envoi d'une track a la DT2 (7.E)
+# ---------------------------------------------------------------------------
+
+def test_dt2_send(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    from test_dt2_midi import FakeMidi
+
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    monkeypatch.setattr(api, "DIGITAKT_DIR", tmp_path / "digitakt")
+    api.DIGITAKT_DIR.mkdir()
+    (api.DIGITAKT_DIR / f"{SLUG}.json").write_text(json.dumps({
+        "slug": SLUG, "bpm": 150, "from_stems": True,
+        "generated_at": "2026-10-07T00:00:00+00:00",
+        "patterns": [{"slot": 1, "label": "intro", "start_s": 0, "end_s": 4, "bars": 1,
+                      "steps": 16, "repeats": 1, "tracks": [
+                          {"index": 1, "role": "kick", "trigs": [{"step": 0}, {"step": 4}]}]}],
+    }), encoding="utf-8")
+    fake = FakeMidi()
+    client = TestClient(api.create_app(library_file=lib, sender=api.dt2_midi.Dt2Sender(opener=fake)))
+    body = {"slug": SLUG, "slot": 1, "track": 1, "port": "DT2", "channel": 10}
+
+    assert client.get("/api/dt2/send").json() is None
+    assert client.post("/api/dt2/send", json=body | {"track": 2}).status_code == 422
+    assert client.post("/api/dt2/send", json=body | {"slug": "inconnu"}).status_code == 404
+    assert client.post("/api/dt2/send", json=body | {"channel": 17}).status_code == 422
+    r = client.post("/api/dt2/send", json=body)
+    assert r.status_code == 202 and r.json()["status"] == "waiting" and r.json()["trigs"] == 2
+    assert client.post("/api/dt2/send", json=body).status_code == 409
+    fake.feed("start")
+    fake.feed("clock")
+    assert client.get("/api/dt2/send").json()["status"] == "sending"
+    assert client.delete("/api/dt2/send").json()["status"] == "cancelled"
+
+
+def test_dt2_ports(client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setattr(api.dt2_midi, "list_ports",
+                        lambda: api.dt2_midi.Dt2Ports(inputs=["X"], outputs=["X"], default="X"))
+    assert client.get("/api/dt2/ports").json()["default"] == "X"

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt,
-base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I).
+base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I), envoi d'une
+track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
-(`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`). Ecoute
+(`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`). L'envoi
+MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
 dans library.md (pas de chemin libre).
 
@@ -28,6 +30,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 import digitakt
+import dt2_midi
 import grab
 import harmony
 import kb
@@ -150,9 +153,12 @@ def _validate_grab(req: GrabRequest) -> None:
             raise HTTPException(422, f"dossier invalide : {req.folder}")
 
 
-def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab) -> FastAPI:
+def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
+               sender: dt2_midi.Dt2Sender | None = None) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
+    dt2 = sender or dt2_midi.Dt2Sender()
+    app.router.on_shutdown.append(dt2.shutdown)
     app.router.on_shutdown.append(jobs.shutdown)
 
     def entries() -> dict[str, dict[str, str]]:
@@ -243,6 +249,33 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab) -> 
         if job is None:
             raise HTTPException(404, f"job inconnu : {job_id}")
         return job
+
+    @app.get("/api/dt2/ports", response_model=dt2_midi.Dt2Ports)
+    def dt2_ports() -> dt2_midi.Dt2Ports:
+        return dt2_midi.list_ports()
+
+    @app.post("/api/dt2/send", response_model=dt2_midi.SendState, status_code=202)
+    def dt2_send(req: dt2_midi.SendRequest) -> dt2_midi.SendState:
+        """Arme l'envoi d'une track ; part au Start de la DT2 (suivi par GET)."""
+        bank = track_bank(req.slug)  # 404 sans slug ni bank
+        try:
+            track, steps = dt2_midi.pick_track(bank, req.slot, req.track)
+        except dt2_midi.SendTargetError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        try:
+            return dt2.start(req, track, steps)
+        except dt2_midi.SendBusy as exc:
+            raise HTTPException(409, str(exc)) from exc
+        except dt2_midi.MidiUnavailable as exc:
+            raise HTTPException(503, str(exc)) from exc
+
+    @app.get("/api/dt2/send", response_model=dt2_midi.SendState | None)
+    def dt2_send_status() -> dt2_midi.SendState | None:
+        return dt2.current()
+
+    @app.delete("/api/dt2/send", response_model=dt2_midi.SendState | None)
+    def dt2_send_cancel() -> dt2_midi.SendState | None:
+        return dt2.cancel()
 
     @app.get("/api/kb/search", response_model=list[kb.KbHit])
     def kb_search(q: str = Query(..., min_length=1, max_length=200),

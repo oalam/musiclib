@@ -406,7 +406,7 @@ mutes, FX de transition, principes d'arc).
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | fait : recherche + panneau, 25 fiches en 5 lots (statut draft, à tester sur la machine) |
-| 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | à venir |
+| 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | en cours : envoi d'une track depuis le front fait (`dt2_midi.py`, à valider sur la machine) ; pré-réglage CC / NRPN à venir |
 | 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
@@ -490,6 +490,18 @@ abandonné ; 7.E devient un enregistrement assisté (le script rejoue chaque
 piste du `.mid` sur l'AUTO CHANNEL pendant que la DT2 enregistre, une track à
 la fois) et un pré-réglage des sons par CC / NRPN. Piste non retenue : le
 SYSEX DUMP de pattern (§14.5), format non documenté.
+
+**Décisions 7.E, envoi d'une track (arbitrées le 2026-10-07)** :
+- **La DT2 mène** : l'utilisateur lance `[RECORD] + [PLAY]`, le script attend
+  le Start MIDI et cale les notes sur l'horloge reçue (`CLOCK SEND` +
+  `TRANSPORT SEND` en USB). Pas d'horloge envoyée par le Mac.
+- Notes sur l'**AUTO CHANNEL**, saisi dans le front (mémorisé par le
+  navigateur), pas sur le canal de la track.
+- **Un seul passage** du pattern ; un Stop reçu avant la fin annule.
+- Périmètre : la track sélectionnée du pattern affiché, un envoi à la fois.
+  Enchaînement guidé des 16 tracks et pré-réglage CC / NRPN hors slice.
+- Notes, vélocités et gate identiques au `.mid` de bank (helper partagé
+  `track_note_events`). L'envoi n'écrit rien sur disque.
 
 **Décisions 7.G (arbitrées le 2026-10-06)** :
 - Les 23 contrôles du §3.1 sont dessinés à l'échelle et aux emplacements du

@@ -36,6 +36,11 @@ Mac et les enregistrer dans les patterns.
 4. Vérifier en GRID, recaler si besoin (cf. [[enregistrement-quantize]]),
    sauver.
 
+Depuis le front (7.E) : panneau « Envoyer à la DT2 » de la vue bank. Il
+faut en plus `OUTPUT TO` = USB, `CLOCK SEND` et `TRANSPORT SEND` = on : la
+DT2 mène, le Mac attend son Start et envoie la track sur l'AUTO CHANNEL,
+calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
+
 ## En live techno
 
 - Les `.mid` générés mettent la track `n` sur le canal `n` (doctrine §7) et
@@ -48,8 +53,26 @@ Mac et les enregistrer dans les patterns.
 - `PRG CH RECEIVE` permet de changer de pattern depuis l'extérieur (program
   change), utile plus tard pour piloter la chaîne d'une bank.
 
+## Vérifié sur la machine (2026-10-07, envoi depuis le front)
+
+- Start / Stop et clocks reçus par USB (24 ppqn exacts : 48 clocks/s à
+  120 BPM, gigue ±1 ms) ; la DT2 envoie ses clocks **en continu**, même à
+  l'arrêt.
+- AUTO CHANNEL : les notes jouent et s'enregistrent sur la track active.
+- LIVE RECORDING avec quantize : 13 trigs sur 13 au bon pas, sur 64 pas
+  (4 pages), premier temps compris.
+- Sans quantize : latence négligeable ; un trig décalé d'un cran une fois,
+  pas au second essai (gigue ponctuelle). Quantize conseillée.
+- L'enregistrement ne remplace que les pas joués : partir d'une track vide.
+- Reste à vérifier : NOTE enregistrée pour la note 60 sur une track audio,
+  notes et octaves d'une track mélodique, PREROLL.
+
 ## Pièges
 
+- **Fermer Transfer** pendant un envoi depuis le Mac : son dialogue sysex
+  avec la DT2 fait perdre la moitié des clocks USB (constaté le 2026-10-07 :
+  58 BPM lus pour 120 affichés, 48 clocks/s exacts une fois Transfer
+  fermé). Overbridge Engine ne gêne pas.
 - `OUTPUT TO` = MIDI+USB bride la vitesse USB : USB seul pour les gros
   transferts.
 - Les canaux de track (CHANNELS) servent aux **paramètres** ; les notes d'une

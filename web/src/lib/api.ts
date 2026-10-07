@@ -202,6 +202,24 @@ export interface Job {
   finished_at: string | null
 }
 
+/** Envoi d'une track a la DT2 (7.E, scripts/dt2_midi.py). */
+export interface Dt2Ports { inputs: string[]; outputs: string[]; default: string | null; error: string | null }
+export interface Dt2SendRequest { slug: string; slot: number; track: number; port: string; channel: number }
+export type Dt2SendStatus = 'waiting' | 'sending' | 'done' | 'cancelled' | 'error'
+export interface Dt2SendState {
+  id: string
+  request: Dt2SendRequest
+  role: string
+  steps: number
+  trigs: number
+  status: Dt2SendStatus
+  step: number
+  detail: string
+  warning: string
+  created_at: string
+  finished_at: string | null
+}
+
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
 export const manualUrl = (page = 1) => `/api/manual#page=${page}`
 
@@ -234,6 +252,12 @@ export const api = {
     fetch('/api/grab', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(req) })
       .then(r => json<Job>(r)),
   job: (id: string) => fetch(`/api/jobs/${enc(id)}`).then(r => json<Job>(r)),
+  dt2Ports: () => fetch('/api/dt2/ports').then(r => json<Dt2Ports>(r)),
+  dt2Send: (req: Dt2SendRequest) =>
+    fetch('/api/dt2/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(req) })
+      .then(r => json<Dt2SendState>(r)),
+  dt2SendStatus: () => fetch('/api/dt2/send').then(r => json<Dt2SendState | null>(r)),
+  dt2SendCancel: () => fetch('/api/dt2/send', { method: 'DELETE' }).then(r => json<Dt2SendState | null>(r)),
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }
 

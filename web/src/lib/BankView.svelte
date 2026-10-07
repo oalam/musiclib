@@ -2,6 +2,7 @@
   import { tick, type Snippet } from 'svelte'
   import { api, chordAt, mmss, SEGMENT_COLORS, type Bank, type BankTrack, type Harmony, type ManualRef, type Pattern } from './api'
   import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
+  import Dt2SendPanel from './Dt2SendPanel.svelte'
 
   let { bank, harmony = null, currentTime, playing, player, onseek, onloop, onplay, onstop, onhelp }: {
     bank: Bank
@@ -25,7 +26,8 @@
   let follow = $state(true)
 
   const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-  const noteName = (n: number) => `${NOTE_NAMES[n % 12]}${Math.floor(n / 12) - 1}`
+  // convention Elektron (manuel §8.5) : 60 = C5, comme l'ecran de la DT2
+  const noteName = (n: number) => `${NOTE_NAMES[n % 12]}${Math.floor(n / 12)}`
 
   // repli sans grille de mesures (ancienne bank) : tempo median, leger flottement
   // possible si le morceau accelere
@@ -306,6 +308,7 @@
       if (p) { selectedSlot = p.slot; follow = false; onseek(p.start_s) }
     }
   }
+
 </script>
 
 <section class="bank">
@@ -544,6 +547,8 @@
       {/each}
     </div>
   {/if}
+
+  <Dt2SendPanel slug={bank.slug} {pattern} {track} patternName={patName(pattern.slot)} {onhelp} />
 
   <div class="tabs" role="tablist" aria-label="Vue de la bank">
     <button role="tab" aria-selected={tab === 'grid'} class:on={tab === 'grid'} onclick={() => setTab('grid')}>

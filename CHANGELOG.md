@@ -8,6 +8,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.E] Envoi d'une track de pattern à la Digitakt II depuis le front :
+  `scripts/dt2_midi.py` (CLI + `Dt2Sender`) rejoue les trigs de la track sur
+  l'AUTO CHANNEL, calés sur l'horloge de la DT2 à partir de son Start (un
+  passage, Stop = annulation, délai de 120 s sans Start) ; routes
+  `GET /api/dt2/ports`, `POST|GET|DELETE /api/dt2/send` (un envoi à la fois) ;
+  panneau « Envoyer à la DT2 » dans la vue bank (port, AUTO CHANNEL, pas à
+  pas côté machine, progression). Dépendance `python-rtmidi`. Notes du `.mid`
+  de bank factorisées dans `track_note_events` (`analyzer/digitakt.py`).
 - KB Digitakt, veille live (lot 2, DT2 + Mac) : fiches `kick-mental-vst`
   (kickbass fabriqué en VST, nommé avec sa note, Transfer ou `SRC` = USB),
   `overbridge-live-vst` (multipiste, VST sur les tracks hautes, latence),
@@ -138,6 +146,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   pompage pendant les breaks, ducker vs colle master.
 
 ### Modifié
+
+- [7.E] Noms de notes alignés sur la DT2 (convention Elektron, 60 = C5) dans
+  le front et la note de bank : une basse lue D2 auparavant s'affiche D3,
+  comme sur la machine (constaté sur l'écran TRIG). Les notes MIDI envoyées
+  ne changent pas ; les notes de bank existantes gardent l'ancien nommage
+  jusqu'à leur régénération.
 
 - Doctrine Digitakt : points *(à vérifier)* tranchés par le manuel OS 1.17
   (source de sampling, mode de tempo et `ROW TEMPO`, step recording, FILL,

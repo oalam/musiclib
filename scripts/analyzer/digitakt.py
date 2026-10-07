@@ -840,6 +840,26 @@ def render_markdown(bank: DigitaktBank, harmony: Harmony | None = None) -> str:
     return "\n".join(lines) + "\n"
 
 
+def track_note_events(track: DigitaktTrack, ticks_per_step: int,
+                      channel: int) -> list[tuple[int, int, Any]]:
+    """(tick, priorite, message) des trigs d'une track : note_on au debut du pas,
+    note_off a la moitie (priorite 0 = off, passe avant un on au meme tick).
+
+    Drums a la note 60 (pitch d'origine du sample), tonales a la note estimee.
+    Partage par l'export .mid et l'envoi a la DT2 (`dt2_midi.py`, 7.E)."""
+    import mido
+
+    events: list[tuple[int, int, Any]] = []
+    for tr in track.trigs:
+        note = tr.note if tr.note is not None else 60
+        on = tr.step * ticks_per_step
+        events.append((on, 1, mido.Message("note_on", channel=channel,
+                                           note=note, velocity=tr.velocity)))
+        events.append((on + ticks_per_step // 2, 0,
+                       mido.Message("note_off", channel=channel, note=note, velocity=0)))
+    return events
+
+
 def write_pattern_midi(pattern: DigitaktPattern, bpm: float, out_path: Path,
                        ppq: int = 480) -> None:
     """Un .mid par pattern, canal = track - 1 (Digitakt : canaux auto 1-16).
@@ -855,14 +875,7 @@ def write_pattern_midi(pattern: DigitaktPattern, bpm: float, out_path: Path,
     trk.append(mido.MetaMessage("track_name", name=f"pattern {pattern.slot:02d}", time=0))
     events: list[tuple[int, int, Any]] = []
     for t in pattern.tracks:
-        for tr in t.trigs:
-            note = tr.note if tr.note is not None else 60
-            on = tr.step * ticks_per_step
-            events.append((on, 1, mido.Message("note_on", channel=t.index - 1,
-                                               note=note, velocity=tr.velocity)))
-            events.append((on + ticks_per_step // 2, 0,
-                           mido.Message("note_off", channel=t.index - 1,
-                                        note=note, velocity=0)))
+        events += track_note_events(t, ticks_per_step, channel=t.index - 1)
     events.append((pattern.steps * ticks_per_step, 2, mido.MetaMessage("end_of_track")))
     events.sort(key=lambda e: (e[0], e[1]))
     prev = 0
@@ -878,7 +891,8 @@ _NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 
 
 def _note_name(note: int) -> str:
-    return f"{_NOTE_NAMES[note % 12]}{note // 12 - 1}"
+    """Convention Elektron (manuel §8.5) : 60 = C5, comme l'ecran de la DT2."""
+    return f"{_NOTE_NAMES[note % 12]}{note // 12}"
 
 
 def _mmss(seconds: float) -> str:

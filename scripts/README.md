@@ -644,6 +644,30 @@ hats ouverts sur-détectés quand la reverb tient. Id1 / Id2 sont à choisir à
 l'oreille. Les mutes à l'intérieur d'une section diluent le repliage (trous
 dans le kick).
 
+# dt2_midi.py — envoi d'une track à la Digitakt II (Phase 7.E)
+
+Rejoue les trigs d'**une track d'un pattern** de bank sur l'**AUTO CHANNEL**
+pendant que la DT2 enregistre en LIVE RECORDING (aucun NRPN ne pose un trig,
+cf. [[../digitakt/kb/cc-nrpn]]). **La DT2 mène** : le script attend son Start
+MIDI puis cale chaque pas sur son horloge (24 ppqn, 6 clocks par
+double-croche ; pas 0 = premier clock après le Start), un seul passage. Un
+Stop de la DT2 avant la fin annule et coupe les notes tenues ; sans Start en
+120 s, l'envoi passe en erreur.
+
+```bash
+python dt2_midi.py --list-ports
+python dt2_midi.py <slug> --pattern 1 --track 9 --channel 10   # port DT2 par défaut
+```
+
+Côté DT2 (fiche [[../digitakt/kb/midi-config]]) : `INPUT FROM` / `OUTPUT TO` =
+USB, `RECEIVE NOTES`, `CLOCK SEND`, `TRANSPORT SEND`, `AUTO CHANNEL` = le
+canal passé ; sélectionner la track, LEN du pattern = nombre de pas de la
+bank, puis `[RECORD] + [PLAY]`. Notes et longueur identiques au `.mid` de bank
+(`track_note_events`, `analyzer/digitakt.py` : note 60 pour les drums, gate
+d'une demi-double-croche). Backend : `python-rtmidi`. Les ports restent ouverts d'un envoi à l'autre : fermer l'entrée depuis le callback MIDI gèle le processus (la DT2 envoie ses clocks en continu, interblocage CoreMIDI / GIL reproduit le 2026-10-07). Dans le front : panneau
+« Envoyer à la DT2 » de la vue bank (routes `GET /api/dt2/ports`,
+`POST|GET|DELETE /api/dt2/send`, un envoi à la fois).
+
 # harmony.py — gamme et accords (Phase 7.H)
 
 Gamme du morceau sous son nom **KB SCALE** de la DT2 (7 modes, mineurs
