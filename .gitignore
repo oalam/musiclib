@@ -30,3 +30,6 @@ web/dist/
 
 # Manuel Elektron (PDF tiers, sert le front en local via /api/manual)
 refs/*.pdf
+
+# IDE JetBrains
+.idea/
