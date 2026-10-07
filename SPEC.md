@@ -636,7 +636,9 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Tout le kit est visible, plafond compris : le manifeste liste la réserve
   (`reserve`, fichiers classés au-delà de 3 × quota, non mesurés, environ
   8 000). Garder, écarter, noter ou ranger un fichier de la réserve le fait
-  entrer comme candidat en fin de case (mesuré à ce moment).
+  entrer comme candidat en fin de case (mesuré à ce moment). Sans kit, un
+  second appui sur `R` ajoute la réserve hors plafond de la case (demande du
+  2026-10-07) ; le nombre de fichiers hors plafond s'affiche dans l'en-tête de la case.
 - Corbeille d'un kit ou d'un pack = règle dans `overrides.json` (clé
   `<préfixe>/`, `trash`), qui exclut tous ses fichiers, y compris à venir ;
   reconstruction du manifeste (les cases se remplissent depuis la réserve),

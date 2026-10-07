@@ -191,7 +191,7 @@ class SampleCell(BaseModel):
     drop: int
     to_listen: int      # retenus encore pending
     flagged: int        # candidats signales par le pre-filtre
-    reserve: int = 0    # hors plafond, compte seulement avec le filtre kit (7.J5)
+    reserve: int = 0    # hors plafond (7.J5)
 
 
 Sources = Annotated[list[Annotated[str, Field(min_length=1, max_length=500)]],
@@ -253,9 +253,9 @@ class SampleTags(BaseModel):
 def _sample_cells(m: samples.Manifest, tag: str | None = None,
                   min_stars: int | None = None, kit: str | None = None) -> list[SampleCell]:
     """Grille ; avec un filtre, les compteurs ne portent que sur les candidats
-    qui y repondent (cases sans candidat retenu par le filtre omises). Avec
-    `kit`, la reserve du kit est comptee et une case qui n'a que de la reserve
-    apparait."""
+    qui y repondent (cases sans candidat retenu par le filtre omises). La
+    reserve hors plafond est comptee ; avec `kit`, une case qui n'a que de la
+    reserve du kit apparait."""
     cells: dict[tuple[str, str], list[SampleEntry]] = {}
     spare: dict[tuple[str, str], int] = {}
     for e in m.entries:
@@ -266,11 +266,16 @@ def _sample_cells(m: samples.Manifest, tag: str | None = None,
         if kit is not None and not in_kit(e.source, kit):
             continue
         cells.setdefault((e.family, e.code), []).append(e)
-    if kit is not None and min_stars is None:
+    if min_stars is None:
         for r in m.reserve:
-            if in_kit(r.source, kit) and (tag is None or tag in r.tags):
-                spare[r.family, r.code] = spare.get((r.family, r.code), 0) + 1
+            if kit is not None and not in_kit(r.source, kit):
+                continue
+            if tag is not None and tag not in r.tags:
+                continue
+            if kit is not None:
                 cells.setdefault((r.family, r.code), [])
+            if (r.family, r.code) in cells:
+                spare[r.family, r.code] = spare.get((r.family, r.code), 0) + 1
     return [SampleCell(
         family=fam, code=code, quota=quota(fam, code), candidates=len(es),
         selected=sum(e.selected for e in es),
@@ -469,13 +474,16 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return _sample_cells(manifest(), tag, min_stars, kit or None)
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
-    def sample_cell(family: str, code: str, kit: str | None = None) -> list[SampleEntry]:
+    def sample_cell(family: str, code: str, kit: str | None = None,
+                    overflow: bool = False) -> list[SampleEntry]:
         """Candidats d'une case ; avec `kit`, ceux du kit puis sa reserve
-        (lignes `overflow`)."""
+        (lignes `overflow`) ; `overflow` ajoute toute la reserve de la case."""
         m = manifest()
         cell = cell_of(m, family, code)
         if kit:
             cell = [e for e in cell if in_kit(e.source, kit)] + overflow_of(m, family, code, kit)
+        elif overflow:
+            cell = cell + overflow_of(m, family, code)
         if not cell:
             raise HTTPException(404, f"case inconnue : {family}/{code}")
         return cell

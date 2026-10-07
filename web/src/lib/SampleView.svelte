@@ -44,6 +44,8 @@
   let sel = $state<Set<string>>(new Set())    // selection multiple (Cmd / Maj)
   let anchor: string | null = null            // origine d'une plage Maj-clic
   let showReserve = $state(false)
+  // hors plafond de toute la case (2e appui sur R) ; avec un kit, toujours la
+  let showOverflow = $state(false)
   let busy = $state(false)
   let autoplay = $state(true)
   // filtres (grille et liste) : tag exact, etoiles minimum
@@ -148,7 +150,7 @@
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
     entries = v.kind === 'cell'
-      ? await api.sampleCell(v.family, v.code, kit).catch(() => [])
+      ? await api.sampleCell(v.family, v.code, kit, showOverflow).catch(() => [])
       : (await api.sampleLoose(v.kind, kit)).map(looseRow)
   }
 
@@ -336,6 +338,7 @@
     kit = kit === k ? '' : k
     kitTagInput = ''
     showReserve = kit !== ''
+    showOverflow = false
     try { localStorage.setItem(KIT_KEY, kit) } catch { /* stockage indisponible */ }
     await refresh()
     if (view) await open(view)
@@ -373,6 +376,16 @@
     else if (e.key === 'Escape') { e.preventDefault(); (e.target as HTMLElement).blur() }
   }
 
+  /** R : reserve, puis hors plafond (sans kit), puis tout replie. */
+  async function toggleReserve() {
+    const c = current ? byKey.get(`${current.family}/${current.code}`) : undefined
+    if (!showReserve) showReserve = true
+    else if (!showOverflow && !kit && c?.reserve) showOverflow = true
+    else { showReserve = kit !== ''; showOverflow = false }
+    await loadEntries()
+    if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
+  }
+
   async function setFilter() {
     await refresh()
     if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
@@ -395,7 +408,7 @@
     else if (k === 'ArrowRight') stepCell(1)
     else if (k === 'ArrowLeft') stepCell(-1)
     else if (k === ' ') { ws?.stop(); ws?.play() }
-    else if (k === 'r' || k === 'R') showReserve = !showReserve
+    else if (k === 'r' || k === 'R') toggleReserve()
     else if (k === 'm' || k === 'M') startMove()
     else if (k === 't' || k === 'T') tagField?.focus()
     else if (k >= '0' && k <= '5') stars(k === '0' ? null : Number(k))
@@ -473,7 +486,7 @@
                   <button class="cell" class:done={c.to_listen === 0}
                     class:on={current?.family === fam && current?.code === code}
                     title="{fam}/{code} : {c.candidates} candidats, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
-                    onclick={() => open({ kind: 'cell', family: fam, code })}>{c.to_listen}/{c.selected}{#if c.reserve}<sup>+{c.reserve}</sup>{/if}</button>
+                    onclick={() => open({ kind: 'cell', family: fam, code })}>{c.to_listen}/{c.selected}{#if c.reserve && kit}<sup>+{c.reserve}</sup>{/if}</button>
                 {:else}
                   <span class="slot" title="{fam}/{code}"></span>
                 {/if}
@@ -566,7 +579,7 @@
       <strong>{current ? `${current.family} / ${current.code}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
       {#if current}
         {@const c = byKey.get(`${current.family}/${current.code}`)}
-        {#if c}<span class="muted small">quota {c.quota ?? 'tout'} · {c.keep} gardés · {c.drop} écartés · {c.candidates} candidats</span>{/if}
+        {#if c}<span class="muted small">quota {c.quota ?? 'tout'} · {c.keep} gardés · {c.drop} écartés · {c.candidates} candidats{c.reserve ? ` · ${c.reserve} hors plafond` : ''}</span>{/if}
       {:else if view}
         <span class="muted small">{shown.length} fichiers</span>
       {/if}
@@ -598,7 +611,7 @@
       {#if current}<kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · {/if}
       {#if view?.kind === 'trash'}<kbd>U</kbd> restaurer · {:else}<kbd>Suppr</kbd> corbeille · <kbd>M</kbd> case · {/if}
       <kbd>1</kbd>…<kbd>5</kbd> étoiles, <kbd>0</kbd> sans · <kbd>T</kbd> tag ·
-      <kbd>↑</kbd><kbd>↓</kbd> sample · <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve ·
+      <kbd>↑</kbd><kbd>↓</kbd> sample · <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve, puis hors plafond ·
       <kbd>⌘</kbd>/<kbd>Maj</kbd>-clic sélection, <kbd>⌘A</kbd> tout, <kbd>Échap</kbd> aucun · glisser vers une case ou la corbeille
     </p>
     {#if moving}
@@ -649,7 +662,9 @@
       {/each}
     </ol>
     {#if current && !showReserve && reserve.length}
-      <button class="small" onclick={() => (showReserve = true)}>Afficher la réserve ({reserve.length})</button>
+      <button class="small" onclick={toggleReserve}>Afficher la réserve ({reserve.length})</button>
+    {:else if current && showReserve && !showOverflow && !kit && byKey.get(`${current.family}/${current.code}`)?.reserve}
+      <button class="small" onclick={toggleReserve}>Afficher les hors plafond ({byKey.get(`${current.family}/${current.code}`)?.reserve})</button>
     {/if}
     {#if view && !visible.length}<p class="muted small">{filterOn() ? 'Aucun sample ne répond au filtre.' : 'Liste vide.'}</p>{/if}
   </section>

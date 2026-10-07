@@ -1025,13 +1025,15 @@ def promote(manifest: Manifest, overrides: dict[str, Override], source: str, roo
     return True
 
 
-def overflow_of(manifest: Manifest, family: str, code: str, kit: str) -> list[SampleEntry]:
-    """Reserve d'une case pour un kit, en lignes de liste (`overflow`), apres
-    les candidats ; noms calcules a l'affichage."""
+def overflow_of(manifest: Manifest, family: str, code: str,
+                kit: str | None = None) -> list[SampleEntry]:
+    """Reserve d'une case (d'un kit, ou toute avec `kit=None`), en lignes de
+    liste (`overflow`), apres les candidats ; noms calcules a l'affichage."""
     start = max((e.rank for e in manifest.entries
                  if e.family == family and e.code == code), default=0)
     rows = [r for r in manifest.reserve
-            if r.family == family and r.code == code and in_kit(r.source, kit)]
+            if r.family == family and r.code == code
+            and (kit is None or in_kit(r.source, kit))]
     return [SampleEntry(source=r.source, family=family, code=code, pack=r.pack,
                         name=short_name(r.source, code, r.pack, tempo_of(r.source)),
                         duration=r.duration, rank=start + i, tags=r.tags, overflow=True)

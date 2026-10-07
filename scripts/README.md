@@ -761,6 +761,8 @@ BL basse.
   corbeille sur le kit ; la réserve hors plafond du kit apparaît (`+N` sur
   les cases, lignes « hors plafond », liste `reserve` du manifeste) : la
   garder, l'écarter, la noter ou la ranger la fait entrer comme candidat.
+  Sans kit, `R` déplie la réserve, puis au second appui les fichiers hors
+  plafond de la case (`GET /api/samples/cell?overflow=true`), puis replie.
   Barre du kit : tags du kit (hérités par ses fichiers, à venir compris) et
   « Corbeille du kit » (règle, reconstruction du manifeste, décisions
   d'écoute du kit perdues), restaurable d'un bloc depuis la corbeille. API :

@@ -345,8 +345,11 @@ def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
     kits = client.get("/api/samples/kits").json()
     assert [(k["kit"], k["candidates"], k["reserve"]) for k in kits["kits"]] == [
         ("k/a", 1, 1), ("k/b", 0, 1)]
-    # sans filtre kit : la reserve n'apparait pas ; avec : comptee, case SD visible
-    assert [c["code"] for c in client.get("/api/samples").json()] == ["FX"]
+    # sans filtre kit : reserve comptee, case sans candidat absente ; avec : case SD visible
+    assert [(c["code"], c["reserve"]) for c in client.get("/api/samples").json()] == [("FX", 1)]
+    rows = client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX",
+                                                   "overflow": True}).json()
+    assert [r["overflow"] for r in rows] == [False, True]
     cells = {c["code"]: c for c in client.get("/api/samples", params={"kit": "k/b"}).json()}
     assert cells["SD"]["reserve"] == 1 and cells["SD"]["candidates"] == 0
     rows = client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX", "kit": "k/a"}).json()

@@ -283,7 +283,7 @@ export interface SampleCell {
   drop: number
   to_listen: number
   flagged: number
-  reserve: number          // hors plafond, avec le filtre kit
+  reserve: number          // hors plafond
 }
 
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
@@ -336,8 +336,8 @@ export const api = {
     if (f.kit) q.set('kit', f.kit)
     return fetch(`/api/samples?${q}`).then(r => json<SampleCell[]>(r))
   },
-  sampleCell: (family: string, code: string, kit = '') =>
-    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}`).then(r => json<SampleEntry[]>(r)),
+  sampleCell: (family: string, code: string, kit = '', overflow = false) =>
+    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}${overflow ? '&overflow=true' : ''}`).then(r => json<SampleEntry[]>(r)),
   sampleLoose: (which: 'unclassified' | 'trash', kit = '') =>
     fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}`).then(r => json<LooseSample[]>(r)),
   sampleKits: () => fetch('/api/samples/kits').then(r => json<SampleKits>(r)),

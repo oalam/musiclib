@@ -18,6 +18,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   kit entier (règle `"<préfixe>/"` dans `overrides.json`, restaurable d'un
   bloc). API : `GET /api/samples/kits`, paramètre `kit`,
   `POST /api/samples/kit/tags`, `/kit/trash`, `/kit/restore`.
+- [7.J5] Hors plafond sans kit : un second appui sur `R` (ou le bouton
+  « Afficher les hors plafond ») ajoute toute la réserve de la case
+  (`GET /api/samples/cell?overflow=true`) ; le nombre de fichiers hors plafond
+  s'affiche dans l'en-tête de la case.
 
 - [7.J3] Export des samples retenus vers `<MEDIA>/Live/samples/<FAMILLE>/
   <CODE>/<nom>.wav` (copie telle quelle, Transfer convertit) :
