@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3) | en cours : 7.J1 fait |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3) | en cours : 7.J1 et 7.J2 faits, 7.J3 à venir |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -

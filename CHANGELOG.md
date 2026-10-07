@@ -18,6 +18,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   écartés : la décision reste à l'oreille. Mesures reprises du manifeste
   précédent, option `--no-measure`. Premier passage : 197 drapeaux sur
   2 423 candidats (sature 87, long 67, blanc 33, faible 10).
+- [7.J2] Front : onglet **Samples** (`web/src/lib/SampleView.svelte`),
+  vue mémorisée. Grille famille × code (à écouter / retenus), case avec la
+  sélection puis la réserve, drapeaux du pré-filtre, forme d'onde et lecture
+  automatique. Raccourcis `K` garder, `D` écarter, `U` annuler, flèches
+  pour le sample et la case, `Espace` rejouer, `R` réserve.
 - [7.J2] API d'écoute des samples : `GET /api/samples` (cases famille × code
   avec compteurs), `GET /api/samples/cell`, `POST /api/samples/status`
   (`keep` / `drop` / `pending`, sélection de la case recalculée : un drop

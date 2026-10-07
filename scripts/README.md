@@ -703,7 +703,7 @@ ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
 - **Limites** : sur les musiques peu mélodiques (dubstep, tek), beaucoup de
   quintes à vide et de sus2 ; un draft à valider à l'oreille.
 
-# samples.py — bibliothèque de samples DT2 (Phase 7.J1)
+# samples.py — bibliothèque de samples DT2 (Phase 7.J1, 7.J2)
 
 Classe la copie des packs faite depuis Transfer (`<MEDIA>/Samples`, jamais
 modifiée) en famille / code, nomme les candidats pour l'écran de la DT2 et
@@ -715,6 +715,7 @@ python samples.py                 # (re)construit le manifeste, affiche la grill
 python samples.py --dry-run       # grille seulement
 python samples.py --report        # grille du manifeste existant (retenus/candidats)
 python samples.py --unclassified  # fichiers sans code, à corriger par override
+python samples.py --no-measure    # sans pré-filtre qualité (pas de lecture audio)
 ```
 
 Exemple de noms : `BD G# Overd 02 vtl`, `BR 170 Amen j89`, `HH Schat 17 meg`,
@@ -724,13 +725,27 @@ BL basse.
 - **Overrides** : `library/samples/overrides.json`, clé = chemin relatif à
   `Samples/`, champs `family`, `code`, `name`, `exclude`. Une famille forcée
   n'est jamais repliée dans UNIVERSEL.
+- **Pré-filtre qualité (7.J2)** : chaque candidat reçoit des drapeaux
+  (`flags`) : `muet` (crête < -40 dBFS), `faible` (< -18 dBFS), `sature`
+  (plateaux à pleine échelle sur plus de 0,1 % du fichier), `blanc` (plus de
+  30 ms de silence en tête d'un one-shot), `long` (frappe de drums de plus de
+  2 s), `illisible`. Un candidat signalé passe en fin de case, sans être
+  écarté. Environ 1 min pour mesurer les 2 423 candidats au premier passage.
+- **Écoute (7.J2)** : onglet **Samples** du front (`api.py`). Grille
+  famille × code (à écouter / retenus), puis dans une case la sélection et
+  la réserve, avec la forme d'onde et une lecture automatique. Raccourcis :
+  `K` garder, `D` écarter (le candidat suivant monte dans la sélection),
+  `U` annuler, `↑` `↓` sample, `←` `→` case, `Espace` rejouer, `R` réserve.
+  Chaque décision est écrite dans le manifeste.
 - **Rejouable** : relancer après un ajout de pack ou un override ; les statuts
-  `keep` / `drop` du manifeste précédent sont conservés.
+  `keep` / `drop` et les mesures du manifeste précédent sont conservés.
 - **Tests** : `python -m pytest tests/test_samples.py` (unitaires, fausse
   arborescence) ; `-m integration` vérifie les noms sur le vrai disque.
 - **Limites** : classement par mots-clés du chemin ; environ 500 fichiers sans
   code (abréviations `MPC_Kit`, packs sans nom de catégorie : `Aotearoa`,
-  `Phaised air`). Le pré-filtre qualité et l'écoute arrivent en 7.J2.
+  `Phaised air`). Les seuils du pré-filtre sont fixes, pas réglés par style
+  (un kick hardcore écrêté exprès est signalé `sature`). L'export renommé
+  arrive en 7.J3.
 
 # kb.py — base de connaissance Digitakt II (Phase 7.D, 7.F)
 
@@ -848,6 +863,10 @@ dans library.md) :
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
 | GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
 | GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
+| GET | `/api/samples` | cases famille × code de la bibliothèque de samples (`SampleCell` : retenus, keep, drop, à écouter, signalés) |
+| GET | `/api/samples/cell?family=&code=` | candidats d'une case par rang (`SampleEntry`) |
+| POST | `/api/samples/status` | `{source, status}` → case avec sa sélection recalculée ; écrit le manifeste |
+| GET | `/api/samples/audio?source=` | wav source (404 hors manifeste, 503 sans disque média) |
 | GET | `/api/manual/outline` | sommaire du manuel, § → page (`ManualRef`) ; `{}` sans PDF |
 | GET | `/api/manual` | manuel PDF (chemin fixe, 404 s'il manque) |
 | POST | `/api/grab/search` | `{query}` → candidats YT/SC triés par score (`CandidateInfo`), synchrone (~5-15 s) |

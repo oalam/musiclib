@@ -5,6 +5,7 @@
   import BankView from './lib/BankView.svelte'
   import KbPanel from './lib/KbPanel.svelte'
   import GrabPanel from './lib/GrabPanel.svelte'
+  import SampleView from './lib/SampleView.svelte'
 
   let tracks = $state<TrackSummary[]>([])
   let selected = $state<string | null>(null)
@@ -24,6 +25,14 @@
     tracks = await api.tracks()
     if (!showList) toggleList()
     await select(slug)
+  }
+
+  // vue principale : morceaux (banks) ou ecoute des samples DT2 (7.J2), memorisee
+  let view = $state<'tracks' | 'samples'>('tracks')
+  try { if (localStorage.getItem('ui:view') === 'samples') view = 'samples' } catch { /* stockage indisponible */ }
+  function setView(v: 'tracks' | 'samples') {
+    view = v
+    try { localStorage.setItem('ui:view', v) } catch { /* stockage indisponible */ }
   }
 
   // liste des morceaux repliable pour laisser toute la largeur a la DT2 (memorise)
@@ -83,10 +92,16 @@
 
 <div class="app">
 <header class="topbar">
+  {#if view === 'tracks'}
   <button class="small" onclick={toggleList} aria-pressed={showList}
     title="Afficher / masquer la liste des morceaux">{showList ? '◀ Morceaux' : '▶ Morceaux'}</button>
+  {/if}
   <strong>Digitakt II</strong>
-  <span class="muted small">morceaux → banks → set</span>
+  <div class="tabs">
+    <button class="small" aria-pressed={view === 'tracks'} onclick={() => setView('tracks')}>Morceaux</button>
+    <button class="small" aria-pressed={view === 'samples'} onclick={() => setView('samples')}
+      title="Écoute garder / écarter des samples DT2">Samples</button>
+  </div>
   <nav>
     <button class="small" onclick={() => grabPanel?.show()} title="Recherche YouTube / SoundCloud, téléchargement et analyse">
       {grabPanel?.busy() ? 'Ajout en cours…' : '+ Ajouter un morceau'}
@@ -97,6 +112,9 @@
     <button class="small" onclick={() => kbPanel?.openManual(1)}>Manuel PDF</button>
   </nav>
 </header>
+{#if view === 'samples'}
+<div class="samples-main"><SampleView /></div>
+{:else}
 <div class="layout" class:full={!showList}>
   {#if showList}
   <aside>
@@ -147,6 +165,7 @@
     {/if}
   </main>
 </div>
+{/if}
 </div>
 <KbPanel bind:this={kbPanel} />
 <GrabPanel bind:this={grabPanel} onadded={added} />
@@ -154,6 +173,9 @@
 <style>
   .app { display: flex; flex-direction: column; height: 100%; }
   .topbar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  .tabs { display: flex; gap: 2px; }
+  .tabs button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+  .samples-main { flex: 1; min-height: 0; overflow: hidden; }
   .topbar nav { margin-left: auto; display: flex; gap: 6px; }
   kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; margin-left: 4px; }
   .layout { display: grid; grid-template-columns: 320px 1fr; flex: 1; min-height: 0; }

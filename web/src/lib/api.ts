@@ -220,6 +220,32 @@ export interface Dt2SendState {
   finished_at: string | null
 }
 
+/** Bibliotheque de samples DT2 (7.J2, scripts/samples.py). */
+export type SampleStatus = 'pending' | 'keep' | 'drop'
+export interface SampleEntry {
+  source: string
+  family: string
+  code: string
+  pack: string
+  name: string
+  duration: number | null
+  rank: number
+  status: SampleStatus
+  selected: boolean
+  flags: string[] | null
+}
+export interface SampleCell {
+  family: string
+  code: string
+  quota: number | null
+  candidates: number
+  selected: number
+  keep: number
+  drop: number
+  to_listen: number
+  flagged: number
+}
+
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
 export const manualUrl = (page = 1) => `/api/manual#page=${page}`
 
@@ -258,6 +284,13 @@ export const api = {
       .then(r => json<Dt2SendState>(r)),
   dt2SendStatus: () => fetch('/api/dt2/send').then(r => json<Dt2SendState | null>(r)),
   dt2SendCancel: () => fetch('/api/dt2/send', { method: 'DELETE' }).then(r => json<Dt2SendState | null>(r)),
+  sampleCells: () => fetch('/api/samples').then(r => json<SampleCell[]>(r)),
+  sampleCell: (family: string, code: string) =>
+    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}`).then(r => json<SampleEntry[]>(r)),
+  sampleStatus: (source: string, status: SampleStatus) =>
+    fetch('/api/samples/status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source, status }) })
+      .then(r => json<SampleEntry[]>(r)),
+  sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
 }
 
