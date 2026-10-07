@@ -54,6 +54,7 @@ def test_wav_duration_reads_header(tmp_path: Path) -> None:
     ("Vi Ta Lee /DARKTECHNO/x.wav", "TECHNO"),
     ("rthm/loops/histibe/x.wav", "AUTRES"),
     ("rthm/loops/hardcore/x.wav", "HARDCORE"),
+    ("rthm/packs/neurotek/Kicks/x.wav", "TRIBE"),
     ("Tribalism Vol 1/x.wav", "TRIBE"),
     ("minimoog synth/x.wav", "UNIVERSEL"),
     ("Native instrument/arcane/x.wav", "UNIVERSEL"),

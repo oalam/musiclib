@@ -553,7 +553,8 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 
 **Décisions 7.J (arbitrées le 2026-10-07)** :
 - 3 niveaux sur le +Drive : famille / code / fichier. Familles : HARDCORE,
-  JUNGLE, DUBSTEP, TECHNO, TRIBE (slot du pack Tribalism Vol. 1, à venir),
+  JUNGLE, DUBSTEP, TECHNO, TRIBE (pack Tribalism Vol. 1 à venir, kit
+  neurotek depuis le 2026-10-07),
   AUTRES (house, EDM, world), UNIVERSEL (machines, FX, instruments, foley,
   Native Instruments, minimoog), SAMPLE (samples et resamples maison).
 - Codes à 2 lettres façon Elektron (BD SD CP HH OH CY TM PC, boucles BR DL

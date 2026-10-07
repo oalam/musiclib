@@ -69,7 +69,7 @@ FAMILY_RULES: dict[str, str] = {
     "rthm/loops/jungle": "JUNGLE",
     "rthm/loops/breakbeat": "JUNGLE",
     "rthm/packs/nightmares": "JUNGLE",
-    "rthm/packs/neurotek": "JUNGLE",
+    "rthm/packs/neurotek": "TRIBE",     # kit one-shots, choisi pour la tribe
     "rthm/loops/dubstep": "DUBSTEP",
     "rthm/packs/tortured": "DUBSTEP",
     "bass graves": "DUBSTEP",

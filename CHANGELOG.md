@@ -24,6 +24,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   sélection puis la réserve, drapeaux du pré-filtre, forme d'onde et lecture
   automatique. Raccourcis `K` garder, `D` écarter, `U` annuler, flèches
   pour le sample et la case, `Espace` rejouer, `R` réserve.
+- [7.J2] Pack `rthm/packs/neurotek` (360 one-shots) basculé de JUNGLE en
+  TRIBE : TRIBE passe à 96 retenus (BD 32, SD 16, HH 16, CY 16, PC 16) ;
+  JUNGLE perd l'essentiel de ses kicks (BD 10/10). Ses cases de moins de
+  4 fichiers (BR, CP, DL) sont repliées dans UNIVERSEL.
 - [7.J2] Plus de boucles : un tempo dans le nom sans « bpm » (`170_…`,
   `CPCT_120_…`, `drm120`) sur 2 s ou plus, hors dossier one-shot, fait une
   boucle (`instru/piano`, `instru/synth` passent de ST à ML) ; tempo repris
