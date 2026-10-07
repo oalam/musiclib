@@ -726,7 +726,10 @@ BL basse.
   `Samples/`, champs `family`, `code`, `name`, `exclude`, et depuis 7.J4
   `tags`, `stars` (1 à 5), `trash`. Une famille forcée n'est jamais repliée
   dans UNIVERSEL. `exclude` ignore le fichier ; `trash` (corbeille, posé
-  depuis le front) le garde listé et restaurable.
+  depuis le front) le garde listé et restaurable. Une clé terminée par `/`
+  vise un kit ou un pack entier (7.J5) : `{"rthm/packs/neurotek/": {"tags":
+  ["tribe"], "trash": false}}` ; ses tags sont hérités par tous ses fichiers,
+  `trash` l'exclut d'un bloc.
 - **Pré-filtre qualité (7.J2)** : chaque candidat reçoit des drapeaux
   (`flags`) : `muet` (crête < -40 dBFS), `faible` (< -18 dBFS), `sature`
   (plateaux à pleine échelle sur plus de 0,1 % du fichier), `blanc` (plus de
@@ -751,6 +754,18 @@ BL basse.
   sans note, `T` tag, `Suppr` corbeille, `U` restaurer (corbeille). Un
   sample noté passe devant les non-notés de sa case ; noter ne vaut pas
   garder.
+- **Kits (7.J5)** : sous la grille, un pad par pack (dossier de premier
+  niveau, retenus / fichiers), puis un pad par sous-kit du pack choisi
+  (`Native instrument/caribean`, `rthm/packs/neurotek` : le dossier `packs`
+  est traversé). Un pad filtre la grille, les cases, les non classés et la
+  corbeille sur le kit ; la réserve hors plafond du kit apparaît (`+N` sur
+  les cases, lignes « hors plafond », liste `reserve` du manifeste) : la
+  garder, l'écarter, la noter ou la ranger la fait entrer comme candidat.
+  Barre du kit : tags du kit (hérités par ses fichiers, à venir compris) et
+  « Corbeille du kit » (règle, reconstruction du manifeste, décisions
+  d'écoute du kit perdues), restaurable d'un bloc depuis la corbeille. API :
+  `GET /api/samples/kits`, paramètre `kit` sur `/api/samples`, `/cell`,
+  `/loose`, `POST /api/samples/kit/tags`, `/kit/trash`, `/kit/restore`.
 - **Export (7.J3)** : `samples.py --export --dry-run` (bilan), puis
   `samples.py --export`, ou le bouton « Exporter… » de l'onglet Samples.
   Copie les retenus tels quels vers

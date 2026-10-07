@@ -385,7 +385,7 @@ def test_exact_duplicate_across_packs_keeps_classified_copy(tmp_path: Path) -> N
     _wav(root / "rthm" / "loops" / "zz9_Thing.wav", seconds=3.0)        # ... double classe
     _wav(root / "rthm" / "loops" / "170_HeavyBoiBeat_02.wav", seconds=3.0)
     _wav(root / "rthm" / "loops" / "other" / "Unique Loop.wav", seconds=3.0)
-    raws, unclassified, _ = smp.classify(root, {})
+    raws, unclassified, _, _ = smp.classify(root, {})
     srcs = sorted(r.source for r in raws) + unclassified
     assert "aaa copy/170_HeavyBoiBeat_02.wav" not in srcs
     assert "rthm/loops/170_HeavyBoiBeat_02.wav" in srcs
@@ -527,6 +527,101 @@ def test_rebuild_ranks_rated_first(tree: Path) -> None:
     m = smp.build_manifest(tree, {last: Override(stars=1, tags=["x"])}, measure_fn=None)
     cell = smp.cell_of(m, "HARDCORE", "BD")
     assert (cell[0].source, cell[0].stars, cell[0].tags) == (last, 1, ["x"])
+
+
+# --- Kits (7.J5) ---------------------------------------------------------------
+
+@pytest.mark.parametrize(("rel", "kit"), [
+    ("Native instrument/caribean/oneshot/Drums/Kick/K 1.wav", "Native instrument/caribean"),
+    ("rthm/packs/neurotek/kick/bd.wav", "rthm/packs/neurotek"),
+    ("rthm/loops/a.wav", "rthm/loops"),
+    ("MPC_Kit/zzz01.wav", "MPC_Kit"),
+    ("take.wav", ""),
+])
+def test_kit_of(rel: str, kit: str) -> None:
+    assert smp.kit_of(rel) == kit
+
+
+def _big_cell(tmp_path: Path, n: int = 60) -> Path:
+    """Une case HARDCORE/SD (quota 16 -> 48 candidats) qui deborde, sur deux kits."""
+    root = tmp_path / "Samples"
+    for i in range(n):
+        kit = "A" if i % 2 else "B"
+        _wav(root / "Hardcore free samples" / kit / f"Snare {i:02d}.wav")
+    return root
+
+
+def test_reserve_lists_files_beyond_cap_and_promotes(tmp_path: Path) -> None:
+    root = _big_cell(tmp_path)
+    m = smp.build_manifest(root, {}, measure_fn=None)
+    assert (len(m.entries), len(m.reserve)) == (48, 12)
+    spare = m.reserve[0].source
+    assert smp.known(m, spare)
+    rows = smp.overflow_of(m, "HARDCORE", "SD", "Hardcore free samples/" + spare.split("/")[1])
+    assert rows and all(r.overflow and not r.selected for r in rows)
+    ovs: dict[str, Override] = {}
+    assert smp.promote(m, ovs, spare, root, measure_fn=lambda p, c: [], bpm_fn=None)
+    smp.set_status(m, spare, "keep")
+    assert spare not in {r.source for r in m.reserve}
+    # garde : epingle, reste candidat a la reconstruction
+    again = smp.build_manifest(root, ovs, previous=m, measure_fn=None)
+    e = next(x for x in again.entries if x.source == spare)
+    assert e.status == "keep" and e.selected and len(again.reserve) == 11
+    # corbeille directe depuis la reserve
+    other = again.reserve[0].source
+    smp.trash(again, ovs, other)
+    assert other in again.trashed and not smp.promote(again, ovs, other, root)
+
+
+def test_kit_tags_are_inherited(tmp_path: Path) -> None:
+    root = _big_cell(tmp_path)
+    m = smp.build_manifest(root, {}, measure_fn=None)
+    ovs: dict[str, Override] = {}
+    kit = "Hardcore free samples/A"
+    assert smp.set_kit_tags(m, ovs, kit, add=["Gabber", "acid"]) == ["acid", "gabber"]
+    rows = [*m.entries, *m.reserve]
+    assert all(r.tags == ["acid", "gabber"] for r in rows if smp.in_kit(r.source, kit))
+    assert all(r.tags == [] for r in rows if not smp.in_kit(r.source, kit))
+    src = next(r.source for r in m.entries if smp.in_kit(r.source, kit))
+    assert smp.set_tags(m, ovs, src, add=["sec"]) == ["acid", "gabber", "sec"]
+    assert smp.kit_tags(ovs) == {kit: ["acid", "gabber"]}
+    again = smp.build_manifest(root, ovs, previous=m, measure_fn=None)
+    assert next(x for x in again.entries if x.source == src).tags == ["acid", "gabber", "sec"]
+    smp.set_kit_tags(again, ovs, kit, remove=["acid", "gabber"])
+    assert f"{kit}/" not in ovs
+    with pytest.raises(smp.SampleError):
+        smp.set_kit_tags(again, ovs, "Hardcore free samples/Z", add=["x"])
+
+
+def test_trash_and_restore_kit(tmp_path: Path) -> None:
+    root = _big_cell(tmp_path)
+    m = smp.build_manifest(root, {}, measure_fn=None)
+    ovs: dict[str, Override] = {}
+    kit = "Hardcore free samples/A"
+    m = smp.trash_kit(m, ovs, kit, root, measure_fn=None, bpm_fn=None)
+    assert m.trashed_kits == {kit: 30} and ovs[f"{kit}/"].trash
+    assert not any(smp.in_kit(s, kit) for s in [e.source for e in m.entries]
+                   + [r.source for r in m.reserve])
+    assert len(m.entries) == 30 and not m.reserve      # B remonte de la reserve
+    info = {k.kit: k for k in smp.kits(m)}
+    assert info[kit].trashed_kit and info[kit].files == 30
+    with pytest.raises(smp.SampleError):
+        smp.trash_kit(m, ovs, kit, root, measure_fn=None, bpm_fn=None)
+    m = smp.restore_kit(m, ovs, kit, root, measure_fn=None, bpm_fn=None)
+    assert not m.trashed_kits and ovs == {} and len(m.entries) + len(m.reserve) == 60
+    with pytest.raises(smp.SampleError):
+        smp.restore_kit(m, ovs, kit, root)
+    with pytest.raises(smp.SampleError):
+        smp.trash_kit(m, ovs, "nope", root)
+
+
+def test_kits_summary_and_loose_filter(tree: Path) -> None:
+    m = smp.build_manifest(tree, {}, measure_fn=None)
+    info = {k.kit: k for k in smp.kits(m)}
+    assert info["Hardcore free samples/Kicks"].candidates == 5
+    assert info["MPC_Kit"].unclassified == 1 and info["MPC_Kit"].pack == "MPC_Kit"
+    assert [x.source for x in smp.loose(m, {}, "unclassified", kit="MPC_Kit")] == ["MPC_Kit/zzz01.wav"]
+    assert smp.loose(m, {}, "unclassified", kit="909") == []
 
 
 # --- Export (7.J3) ----------------------------------------------------------

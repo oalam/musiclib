@@ -8,6 +8,17 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J5] Vue par kit de la bibliothèque de samples : un kit est un préfixe
+  de chemin (pack puis sous-dossier, `rthm/packs/neurotek`). Pads sous la
+  grille (packs, puis sous-kits du pack choisi) qui filtrent grille, cases,
+  non classés et corbeille. Le manifeste liste la réserve hors plafond
+  (`reserve`, environ 8 000 fichiers, manifeste de 0,9 à 2,3 Mo) : un
+  fichier de la réserve devient candidat dès qu'on le garde, l'écarte, le
+  note ou le range. Tags de kit hérités par ses fichiers et corbeille d'un
+  kit entier (règle `"<préfixe>/"` dans `overrides.json`, restaurable d'un
+  bloc). API : `GET /api/samples/kits`, paramètre `kit`,
+  `POST /api/samples/kit/tags`, `/kit/trash`, `/kit/restore`.
+
 - [7.J3] Export des samples retenus vers `<MEDIA>/Live/samples/<FAMILLE>/
   <CODE>/<nom>.wav` (copie telle quelle, Transfer convertit) :
   `samples.py --export [--dry-run]`, `POST /api/samples/export` et bouton

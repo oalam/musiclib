@@ -220,7 +220,7 @@ export interface Dt2SendState {
   finished_at: string | null
 }
 
-/** Bibliotheque de samples DT2 (7.J2, 7.J4, scripts/samples.py). */
+/** Bibliotheque de samples DT2 (7.J2, 7.J4, 7.J5, scripts/samples.py). */
 export type SampleStatus = 'pending' | 'keep' | 'drop'
 export interface SampleEntry {
   source: string
@@ -235,8 +235,9 @@ export interface SampleEntry {
   flags: string[] | null
   bpm: number | null       // tempo mesure (boucle sans tempo dans le nom)
   bpm_est: boolean         // librosa seul, non confirme par la duree
-  tags: string[]
+  tags: string[]           // ceux du fichier et de son kit
   stars: number | null
+  overflow: boolean        // reserve hors plafond, vue par kit (7.J5)
 }
 /** Fichier hors des cases : non classe ou en corbeille. */
 export interface LooseSample {
@@ -245,7 +246,21 @@ export interface LooseSample {
   tags: string[]
   stars: number | null
 }
-export interface SampleFilter { tag?: string; minStars?: number }
+export interface SampleFilter { tag?: string; minStars?: number; kit?: string }
+/** Kit = prefixe de chemin (pack / sous-dossier), bilan pour les pads (7.J5). */
+export interface SampleKit {
+  kit: string
+  pack: string
+  label: string
+  candidates: number
+  selected: number
+  keep: number
+  reserve: number
+  unclassified: number
+  trashed: number
+  trashed_kit: boolean
+}
+export interface SampleKits { kits: SampleKit[]; tags: Record<string, string[]> }
 /** Bilan de l'export vers <MEDIA>/Live/samples (7.J3). */
 export interface SampleExportReport {
   dest: string
@@ -268,6 +283,7 @@ export interface SampleCell {
   drop: number
   to_listen: number
   flagged: number
+  reserve: number          // hors plafond, avec le filtre kit
 }
 
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
@@ -317,12 +333,17 @@ export const api = {
     const q = new URLSearchParams()
     if (f.tag) q.set('tag', f.tag)
     if (f.minStars) q.set('min_stars', String(f.minStars))
+    if (f.kit) q.set('kit', f.kit)
     return fetch(`/api/samples?${q}`).then(r => json<SampleCell[]>(r))
   },
-  sampleCell: (family: string, code: string) =>
-    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}`).then(r => json<SampleEntry[]>(r)),
-  sampleLoose: (which: 'unclassified' | 'trash') =>
-    fetch(`/api/samples/loose?which=${which}`).then(r => json<LooseSample[]>(r)),
+  sampleCell: (family: string, code: string, kit = '') =>
+    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}`).then(r => json<SampleEntry[]>(r)),
+  sampleLoose: (which: 'unclassified' | 'trash', kit = '') =>
+    fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}`).then(r => json<LooseSample[]>(r)),
+  sampleKits: () => fetch('/api/samples/kits').then(r => json<SampleKits>(r)),
+  sampleKitTrash: (kit: string) => samplePost('kit/trash', { kit }),
+  sampleKitRestore: (kit: string) => samplePost('kit/restore', { kit }),
+  sampleKitTags: (kit: string, add: string[], remove: string[] = []) => samplePost('kit/tags', { kit, add, remove }),
   sampleTags: () => fetch('/api/samples/tags').then(r => json<string[]>(r)),
   // actions par lot : toutes renvoient la grille complete (sans filtre)
   sampleStatus: (sources: string[], status: SampleStatus) => samplePost('status', { sources, status }),

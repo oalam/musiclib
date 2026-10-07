@@ -20,6 +20,17 @@ Bibliotheque (7.J4) : les overrides portent aussi les tags libres, les etoiles
 operations du front (`move`, `set_stars`, `set_tags`, `trash`, `restore`)
 modifient le manifeste et les overrides en memoire ; l'appelant les ecrit.
 
+Kits (7.J5) : un kit est un prefixe de chemin, le dossier de premier niveau
+(pack) puis son sous-dossier (`Native instrument/caribean`, `rthm/packs/neurotek` :
+un dossier `packs` regroupe des kits, on descend d'un cran). Le manifeste liste
+aussi la reserve (`reserve` : fichiers classes au-dela du plafond de 3 x quota,
+non mesures) pour voir tout un kit ; garder, ecarter, noter ou ranger un
+fichier de la reserve le fait entrer comme candidat (`promote`). Un kit (ou un
+pack) mis a la corbeille est une regle : override `"<prefixe>/": {"trash": true}`,
+tous ses fichiers sont exclus, et il se restaure d'un bloc. Les tags d'un kit
+(`"<prefixe>/": {"tags": [...]}`) sont herites par tous ses fichiers, reserve
+et fichiers a venir compris.
+
 Export (7.J3) : les retenus (`selected`) sont copies tels quels sous
 `<dest>/<FAMILLE>/<CODE>/<nom>.wav`, arborescence que Transfer envoie sur le
 +Drive de la DT2. Rejouable : un index (`export.json`) liste les fichiers
@@ -203,6 +214,8 @@ _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za
 TAG_MAX = 24
 STARS_MAX = 5
 
+KIT_CONTAINERS = frozenset({"packs"})   # dossier qui regroupe des kits (rthm/packs)
+
 Status = Literal["pending", "keep", "drop"]
 LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
 
@@ -227,6 +240,7 @@ class SampleEntry(BaseModel):
     bpm_est: bool = False           # bpm librosa seul (pas confirme par la duree)
     tags: list[str] = Field(default_factory=list)   # copie des overrides (7.J4)
     stars: int | None = None
+    overflow: bool = False          # reserve hors plafond, vue par kit (7.J5), jamais stocke
 
     @property
     def dest(self) -> str:
@@ -252,13 +266,45 @@ class LooseSample(BaseModel):
     stars: int | None = None
 
 
+class ReserveSample(BaseModel):
+    """Fichier classe au-dela du plafond de candidats (7.J5) : visible par kit,
+    pas mesure ; il devient candidat des qu'on le garde, l'ecarte, le note ou
+    le range."""
+    source: str
+    family: str
+    code: str
+    pack: str
+    duration: float | None
+    tags: list[str] = Field(default_factory=list)
+
+
+class KitInfo(BaseModel):
+    """Bilan d'un kit (prefixe de chemin) pour les pads du front (7.J5)."""
+    kit: str
+    pack: str                       # dossier de premier niveau
+    label: str                      # dernier element du prefixe
+    candidates: int = 0
+    selected: int = 0
+    keep: int = 0
+    reserve: int = 0
+    unclassified: int = 0
+    trashed: int = 0                # fichiers du kit a la corbeille (un par un)
+    trashed_kit: bool = False       # kit entier a la corbeille (regle)
+
+    @property
+    def files(self) -> int:
+        return self.candidates + self.reserve + self.unclassified + self.trashed
+
+
 class Manifest(BaseModel):
     source_root: str
     total: int
     entries: list[SampleEntry] = Field(default_factory=list)
+    reserve: list[ReserveSample] = Field(default_factory=list)   # hors plafond (7.J5)
     unclassified: list[str] = Field(default_factory=list)
     folded: list[str] = Field(default_factory=list)   # cases "FAM/CODE" repliees
     trashed: list[str] = Field(default_factory=list)  # corbeille (overrides trash)
+    trashed_kits: dict[str, int] = Field(default_factory=dict)  # prefixe -> fichiers
 
 
 class ExportItem(BaseModel):
@@ -382,6 +428,40 @@ def pack_of(rel: str) -> str:
 def loop_code(low: str) -> str:
     """Code d'une boucle selon son contenu ; drums par defaut."""
     return next((c for c, rx in _LOOP_CODE_RX if rx.search(low)), "DL")
+
+
+def kit_of(rel: str) -> str:
+    """Prefixe du kit d'un fichier : pack, puis son sous-dossier (on traverse
+    un dossier `packs`). Un fichier pose a la racine du pack : le pack."""
+    parts = rel.split("/")[:-1]
+    if not parts:
+        return ""
+    out = [parts[0]]
+    for p in parts[1:]:
+        out.append(p)
+        if p.lower() not in KIT_CONTAINERS:
+            break
+    return "/".join(out)
+
+
+def in_kit(source: str, kit: str) -> bool:
+    """`kit` : prefixe de kit ou de pack."""
+    return source.startswith(kit + "/")
+
+
+def tags_of(overrides: dict[str, Override], source: str) -> list[str]:
+    """Tags effectifs : ceux du fichier et ceux des kits (prefixes) qui le
+    contiennent."""
+    tags = set(overrides.get(source, Override()).tags)
+    for k, ov in overrides.items():
+        if k.endswith("/") and ov.tags and source.startswith(k):
+            tags.update(ov.tags)
+    return sorted(tags)
+
+
+def kit_rules(overrides: dict[str, Override]) -> list[str]:
+    """Kits (ou packs) a la corbeille : overrides de cle `<prefixe>/`."""
+    return sorted(k[:-1] for k, ov in overrides.items() if k.endswith("/") and ov.trash)
 
 
 def code_of(rel: str, duration: float | None) -> str | None:
@@ -554,9 +634,12 @@ def _unique(name: str, taken: set[str]) -> str:
 
 # --- Pipeline ---------------------------------------------------------------
 
-def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], list[str], list[str]]:
+def classify(root: Path, overrides: dict[str, Override]
+             ) -> tuple[list[_Raw], list[str], list[str], dict[str, int]]:
     """Famille, code, pack et duree de chaque wav ; retourne aussi les non
-    classes et la corbeille."""
+    classes, la corbeille et les kits a la corbeille (fichiers par prefixe)."""
+    rules = kit_rules(overrides)
+    trashed_kits: dict[str, int] = {k: 0 for k in rules}
     paths = list(iter_wavs(root))
     rels = [p.relative_to(root).as_posix() for p in paths]
     all_low = {r.lower() for r in rels}
@@ -565,6 +648,10 @@ def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], li
     for p, rel in zip(paths, rels):
         ov = overrides.get(rel, Override())
         if ov.exclude or _is_mono_twin(rel, all_low):
+            continue
+        rule = next((k for k in rules if in_kit(rel, k)), None)
+        if rule is not None:
+            trashed_kits[rule] += 1
             continue
         if ov.trash:
             trashed.append(rel)
@@ -588,7 +675,7 @@ def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], li
             continue
         raws.append(_Raw(source=rel, family=ov.family or family_of(rel),
                          code=code, pack=pack_of(rel), duration=dur))
-    return raws, unclassified, sorted(trashed)
+    return raws, unclassified, sorted(trashed), trashed_kits
 
 
 def fold_small_cells(raws: list[_Raw], overrides: dict[str, Override]) -> list[str]:
@@ -642,7 +729,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                    bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
     """Manifeste rejouable. Les drapeaux deja mesures sont repris du manifeste
     precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
-    raws, unclassified, trashed = classify(root, overrides)
+    raws, unclassified, trashed, trashed_kits = classify(root, overrides)
     folded = fold_small_cells(raws, overrides)
     prev = {e.source: e for e in previous.entries} if previous else {}
     prev_status = {k: e.status for k, e in prev.items()}
@@ -653,6 +740,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         cells[r.family, r.code].append(r)
 
     entries: list[SampleEntry] = []
+    reserve: list[ReserveSample] = []
     for (fam, code), items in sorted(cells.items()):
         q = quota(fam, code)
         ordered = _round_robin(items)
@@ -661,6 +749,11 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         # les decisions d'ecoute et les deplacements manuels (override de case)
         # restent candidats meme hors du plafond
         kept = ordered[:cap] + [r for r in ordered[cap:] if _pinned(r.source, prev_status, overrides)]
+        held = {r.source for r in kept}
+        reserve.extend(ReserveSample(source=r.source, family=fam, code=code, pack=r.pack,
+                                     duration=r.duration,
+                                     tags=tags_of(overrides, r.source))
+                       for r in ordered[cap:] if r.source not in held)
         flags: dict[str, list[str] | None] = {}
         for r in kept:
             old = prev.get(r.source)
@@ -696,13 +789,13 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                 source=r.source, family=fam, code=code, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
                 status=prev_status.get(r.source, "pending"), flags=flags[r.source],
-                bpm=bpm, bpm_est=est, tags=ov.tags, stars=ov.stars))
+                bpm=bpm, bpm_est=est, tags=tags_of(overrides, r.source), stars=ov.stars))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
     return Manifest(source_root=str(root), total=len(raws) + len(unclassified) + len(trashed),
-                    entries=entries, unclassified=unclassified, folded=folded,
-                    trashed=trashed)
+                    entries=entries, reserve=reserve, unclassified=unclassified,
+                    folded=folded, trashed=trashed, trashed_kits=trashed_kits)
 
 
 def select(cell: list[SampleEntry], q: int | None) -> None:
@@ -745,10 +838,14 @@ def _set_override(overrides: dict[str, Override], source: str, **update: object)
     return ov
 
 
+def _reserved(manifest: Manifest, source: str) -> ReserveSample | None:
+    return next((r for r in manifest.reserve if r.source == source), None)
+
+
 def known(manifest: Manifest, source: str) -> bool:
-    """Fichier du manifeste : candidat, non classe ou en corbeille."""
+    """Fichier du manifeste : candidat, reserve, non classe ou en corbeille."""
     return (_entry(manifest, source) is not None or source in manifest.unclassified
-            or source in manifest.trashed)
+            or source in manifest.trashed or _reserved(manifest, source) is not None)
 
 
 def norm_tag(tag: str) -> str:
@@ -767,9 +864,11 @@ def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEn
     return cell
 
 
-def _adopt(manifest: Manifest, source: str, family: str, code: str, ov: Override,
-           root: Path, measure_fn: Measure | None, bpm_fn: BpmFn | None) -> SampleEntry:
+def _adopt(manifest: Manifest, source: str, family: str, code: str,
+           overrides: dict[str, Override], root: Path, measure_fn: Measure | None,
+           bpm_fn: BpmFn | None) -> SampleEntry:
     """Fait entrer un fichier hors case (non classe, restaure) en fin de case."""
+    ov = overrides.get(source, Override())
     path = root / source
     present = path.is_file()
     dur = wav_duration(path) if present else None
@@ -783,7 +882,7 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str, ov: Override
         name=_unique(ov.name or short_name(source, code, pack, bpm), {e.name for e in target}),
         duration=dur, rank=max((e.rank for e in target), default=0) + 1,
         flags=measure_fn(path, code) if measure_fn is not None and present else None,
-        bpm=bpm, bpm_est=est, tags=ov.tags, stars=ov.stars)
+        bpm=bpm, bpm_est=est, tags=tags_of(overrides, source), stars=ov.stars)
     manifest.entries.append(entry)
     _reselect(manifest, family, code)
     return entry
@@ -803,13 +902,14 @@ def move(manifest: Manifest, overrides: dict[str, Override], source: str,
         raise SampleError(f"famille inconnue : {family}")
     if code not in CODES:
         raise SampleError(f"code inconnu : {code}")
+    promote(manifest, overrides, source, root, measure_fn, bpm_fn)
     entry = _entry(manifest, source)
     if entry is None and source not in manifest.unclassified:
         raise SampleError(f"ni candidat ni non classe : {source}")
-    ov = _set_override(overrides, source, family=family, code=code, name=None)
+    _set_override(overrides, source, family=family, code=code, name=None)
     if entry is None:
         manifest.unclassified.remove(source)
-        _adopt(manifest, source, family, code, ov, root, measure_fn, bpm_fn)
+        _adopt(manifest, source, family, code, overrides, root, measure_fn, bpm_fn)
         return
     old = (entry.family, entry.code)
     if old == (family, code):
@@ -843,26 +943,50 @@ def set_stars(manifest: Manifest, overrides: dict[str, Override], source: str,
 
 def set_tags(manifest: Manifest, overrides: dict[str, Override], source: str,
              add: Iterable[str] = (), remove: Iterable[str] = ()) -> list[str]:
-    """Ajoute / retire des tags libres (normalises) ; renvoie les tags du fichier."""
+    """Ajoute / retire des tags libres (normalises) du fichier ; renvoie ses
+    tags effectifs (ceux de son kit compris, qu'on retire sur le kit)."""
     if not known(manifest, source):
         raise SampleError(f"sample inconnu : {source}")
-    gone = {norm_tag(t) for t in remove}
-    tags = set(overrides.get(source, Override()).tags) - gone
-    tags |= {t for t in map(norm_tag, add) if t}
-    _set_override(overrides, source, tags=sorted(tags))
-    entry = _entry(manifest, source)
+    _set_override(overrides, source, tags=_edit_tags(
+        overrides.get(source, Override()).tags, add, remove))
+    tags = tags_of(overrides, source)
+    entry = _entry(manifest, source) or _reserved(manifest, source)
     if entry is not None:
-        entry.tags = sorted(tags)
-    return sorted(tags)
+        entry.tags = tags
+    return tags
+
+
+def _edit_tags(tags: Iterable[str], add: Iterable[str], remove: Iterable[str]) -> list[str]:
+    gone = {norm_tag(t) for t in remove}
+    return sorted((set(tags) - gone) | {t for t in map(norm_tag, add) if t})
+
+
+def set_kit_tags(manifest: Manifest, overrides: dict[str, Override], kit: str,
+                 add: Iterable[str] = (), remove: Iterable[str] = ()) -> list[str]:
+    """Tags d'un kit (ou d'un pack), herites par tous ses fichiers ; les
+    candidats et la reserve du manifeste sont mis a jour. Renvoie les tags du kit."""
+    kit = kit.strip("/")
+    if not kit or not _kit_exists(manifest, kit):
+        raise SampleError(f"kit inconnu : {kit}")
+    key = f"{kit}/"
+    tags = _edit_tags(overrides.get(key, Override()).tags, add, remove)
+    _set_override(overrides, key, tags=tags)
+    for row in (*manifest.entries, *manifest.reserve):
+        if in_kit(row.source, kit):
+            row.tags = tags_of(overrides, row.source)
+    return tags
 
 
 def trash(manifest: Manifest, overrides: dict[str, Override], source: str) -> None:
     """Corbeille : sort le fichier de sa case (ou des non classes) ; jamais
     supprime du disque."""
     entry = _entry(manifest, source)
+    spare = _reserved(manifest, source)
     if entry is not None:
         manifest.entries.remove(entry)
         _reselect(manifest, entry.family, entry.code)
+    elif spare is not None:
+        manifest.reserve.remove(spare)
     elif source in manifest.unclassified:
         manifest.unclassified.remove(source)
     elif source not in manifest.trashed:
@@ -884,16 +1008,114 @@ def restore(manifest: Manifest, overrides: dict[str, Override], source: str, roo
     if code is None:
         manifest.unclassified = sorted({*manifest.unclassified, source})
         return
-    _adopt(manifest, source, ov.family or family_of(source), code, ov, root, measure_fn, bpm_fn)
+    _adopt(manifest, source, ov.family or family_of(source), code, overrides, root,
+           measure_fn, bpm_fn)
 
 
-def loose(manifest: Manifest, overrides: dict[str, Override], which: str) -> list[LooseSample]:
-    """Non classes (`unclassified`) ou corbeille (`trash`), avec tags et etoiles."""
+def promote(manifest: Manifest, overrides: dict[str, Override], source: str, root: Path,
+            measure_fn: Measure | None = measure, bpm_fn: BpmFn | None = estimate_bpm) -> bool:
+    """Fait entrer un fichier de la reserve dans sa case, comme candidat en fin
+    de case (mesure, tempo). Sans effet hors reserve ; renvoie True s'il y etait.
+    Une decision ou une note l'y epingle ensuite d'une reconstruction a l'autre."""
+    spare = _reserved(manifest, source)
+    if spare is None:
+        return False
+    manifest.reserve.remove(spare)
+    _adopt(manifest, source, spare.family, spare.code, overrides, root, measure_fn, bpm_fn)
+    return True
+
+
+def overflow_of(manifest: Manifest, family: str, code: str, kit: str) -> list[SampleEntry]:
+    """Reserve d'une case pour un kit, en lignes de liste (`overflow`), apres
+    les candidats ; noms calcules a l'affichage."""
+    start = max((e.rank for e in manifest.entries
+                 if e.family == family and e.code == code), default=0)
+    rows = [r for r in manifest.reserve
+            if r.family == family and r.code == code and in_kit(r.source, kit)]
+    return [SampleEntry(source=r.source, family=family, code=code, pack=r.pack,
+                        name=short_name(r.source, code, r.pack, tempo_of(r.source)),
+                        duration=r.duration, rank=start + i, tags=r.tags, overflow=True)
+            for i, r in enumerate(rows, 1)]
+
+
+def kits(manifest: Manifest) -> list[KitInfo]:
+    """Bilan par kit (prefixe), kits a la corbeille compris, tries par chemin."""
+    out: dict[str, KitInfo] = {}
+
+    def info(kit: str) -> KitInfo:
+        if kit not in out:
+            out[kit] = KitInfo(kit=kit, pack=kit.split("/")[0], label=kit.rsplit("/", 1)[-1])
+        return out[kit]
+
+    for e in manifest.entries:
+        k = info(kit_of(e.source))
+        k.candidates += 1
+        k.selected += int(e.selected)
+        k.keep += int(e.status == "keep")
+    for r in manifest.reserve:
+        info(kit_of(r.source)).reserve += 1
+    for src in manifest.unclassified:
+        info(kit_of(src)).unclassified += 1
+    for src in manifest.trashed:
+        info(kit_of(src)).trashed += 1
+    for kit, n in manifest.trashed_kits.items():
+        k = info(kit)
+        k.trashed_kit, k.trashed = True, k.trashed + n
+    return sorted(out.values(), key=lambda k: k.kit.lower())
+
+
+def kit_tags(overrides: dict[str, Override]) -> dict[str, list[str]]:
+    """Tags poses sur un kit ou un pack (prefixe -> tags)."""
+    return {k[:-1]: ov.tags for k, ov in sorted(overrides.items())
+            if k.endswith("/") and ov.tags}
+
+
+def _kit_exists(manifest: Manifest, kit: str) -> bool:
+    return kit in manifest.trashed_kits or any(
+        in_kit(s, kit) for s in (*(e.source for e in manifest.entries),
+                                 *(r.source for r in manifest.reserve),
+                                 *manifest.unclassified, *manifest.trashed))
+
+
+def trash_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, root: Path,
+              measure_fn: Measure | None = measure,
+              bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
+    """Kit (ou pack) entier a la corbeille : regle dans les overrides, puis
+    reconstruction (les cases se remplissent depuis la reserve). Les decisions
+    d'ecoute de ses fichiers sont perdues ; tags et etoiles restent."""
+    kit = kit.strip("/")
+    if not kit or not _kit_exists(manifest, kit):
+        raise SampleError(f"kit inconnu : {kit}")
+    if kit in manifest.trashed_kits:
+        raise SampleError(f"kit deja a la corbeille : {kit}")
+    _set_override(overrides, f"{kit}/", trash=True)
+    return build_manifest(root, overrides, manifest, measure_fn, bpm_fn)
+
+
+def restore_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, root: Path,
+                measure_fn: Measure | None = measure,
+                bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
+    """Sort un kit de la corbeille : ses fichiers reviennent comme a un premier
+    classement (candidats en attente, reserve, non classes)."""
+    kit = kit.strip("/")
+    if kit not in manifest.trashed_kits:
+        raise SampleError(f"kit pas dans la corbeille : {kit}")
+    _set_override(overrides, f"{kit}/", trash=False)
+    return build_manifest(root, overrides, manifest, measure_fn, bpm_fn)
+
+
+def loose(manifest: Manifest, overrides: dict[str, Override], which: str,
+          kit: str | None = None) -> list[LooseSample]:
+    """Non classes (`unclassified`) ou corbeille (`trash`), avec tags et etoiles ;
+    `kit` restreint a un kit (ou un pack)."""
     sources = manifest.trashed if which == "trash" else manifest.unclassified
     out = []
     for src in sources:
+        if kit and not in_kit(src, kit):
+            continue
         ov = overrides.get(src, Override())
-        out.append(LooseSample(source=src, pack=pack_of(src), tags=ov.tags, stars=ov.stars))
+        out.append(LooseSample(source=src, pack=pack_of(src), tags=tags_of(overrides, src),
+                               stars=ov.stars))
     return out
 
 

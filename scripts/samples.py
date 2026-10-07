@@ -26,7 +26,10 @@ Fichiers (vault) :
                         "exclude": false, "tags": ["acid"], "stars": 4,
                         "trash": false}}
         tags, etoiles et corbeille (7.J4) sont poses depuis le front ; `exclude`
-        ignore le fichier, `trash` le garde visible dans la corbeille.
+        ignore le fichier, `trash` le garde visible dans la corbeille. Une cle
+        terminee par `/` vise un kit ou un pack (7.J5) : tags herites par ses
+        fichiers, `trash` l'exclut d'un bloc :
+        {"rthm/packs/neurotek/": {"tags": ["tribe"], "trash": true}}
 """
 from __future__ import annotations
 

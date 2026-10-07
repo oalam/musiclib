@@ -247,7 +247,8 @@ def samples_client(tmp_path: Path) -> TestClient:
 def test_samples_cells(samples_client: TestClient):
     cells = samples_client.get("/api/samples").json()
     assert cells == [{"family": "JUNGLE", "code": "FX", "quota": 8, "candidates": 10,
-                      "selected": 8, "keep": 0, "drop": 0, "to_listen": 8, "flagged": 1}]
+                      "selected": 8, "keep": 0, "drop": 0, "to_listen": 8, "flagged": 1,
+                      "reserve": 0}]
     cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
     assert [e["rank"] for e in cell] == list(range(1, 11))
     assert samples_client.get("/api/samples/cell",
@@ -321,6 +322,45 @@ def test_samples_trash_restore(samples_client: TestClient):
     assert r.status_code == 200
     assert samples_client.get("/api/samples/loose", params={"which": "trash"}).json() == []
     assert samples_client.get("/api/samples/loose", params={"which": "x"}).status_code == 422
+
+
+def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
+    from analyzer.samples import Manifest, ReserveSample, SampleEntry
+
+    src = tmp_path / "Samples"
+    path = tmp_path / "manifest.json"
+    m = Manifest(
+        source_root=str(src), total=3,
+        entries=[SampleEntry(source="k/a/fx1.wav", family="JUNGLE", code="FX", pack="k",
+                             name="FX 1", duration=1.0, rank=1, selected=True)],
+        reserve=[ReserveSample(source="k/a/fx2.wav", family="JUNGLE", code="FX", pack="k",
+                               duration=1.0),
+                 ReserveSample(source="k/b/sd1.wav", family="JUNGLE", code="SD", pack="k",
+                               duration=0.3)])
+    api.samples.save_manifest(m, path)
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    client = TestClient(api.create_app(library_file=lib, samples_manifest=path, samples_src=src,
+                                       samples_overrides=tmp_path / "overrides.json"))
+    kits = client.get("/api/samples/kits").json()
+    assert [(k["kit"], k["candidates"], k["reserve"]) for k in kits["kits"]] == [
+        ("k/a", 1, 1), ("k/b", 0, 1)]
+    # sans filtre kit : la reserve n'apparait pas ; avec : comptee, case SD visible
+    assert [c["code"] for c in client.get("/api/samples").json()] == ["FX"]
+    cells = {c["code"]: c for c in client.get("/api/samples", params={"kit": "k/b"}).json()}
+    assert cells["SD"]["reserve"] == 1 and cells["SD"]["candidates"] == 0
+    rows = client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX", "kit": "k/a"}).json()
+    assert [(r["source"], r["overflow"]) for r in rows] == [("k/a/fx1.wav", False), ("k/a/fx2.wav", True)]
+    # garder un fichier de la reserve le fait entrer comme candidat
+    r = _post(client, "status", sources=["k/a/fx2.wav"], status="keep")
+    assert r.status_code == 200 and r.json()[0]["keep"] == 1
+    # tags de kit herites
+    r = _post(client, "kit/tags", kit="k", add=["Acid"])
+    assert r.status_code == 200
+    assert client.get("/api/samples/kits").json()["tags"] == {"k": ["acid"]}
+    cells = {c["code"]: c for c in client.get("/api/samples", params={"kit": "k", "tag": "acid"}).json()}
+    assert cells["FX"]["candidates"] == 2 and cells["SD"]["reserve"] == 1
+    assert _post(client, "kit/tags", kit="zz", add=["x"]).status_code == 422
 
 
 def test_samples_export(tmp_path: Path):

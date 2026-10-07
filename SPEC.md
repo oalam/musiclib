@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3) | fait (7.J1 à 7.J4) ; reste l'écoute elle-même, l'export se rejoue après |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5) | fait (7.J1 à 7.J5) ; reste l'écoute elle-même, l'export se rejoue après |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -624,6 +624,27 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   manifeste (`trashed` liste la corbeille). Un sample noté reste candidat
   hors du plafond de 3 × quota, comme un déplacé. La restauration renvoie en
   fin de sa case d'origine (override ou règles), sinon parmi les non classés.
+
+**Décisions 7.J5 — vue par kit (arbitrées et faites le 2026-10-07)** :
+- Un kit est un préfixe de chemin déduit de l'arborescence, sans table à
+  tenir : le pack (dossier de premier niveau) puis son sous-dossier
+  (`Native instrument/caribean`) ; un dossier `packs` regroupe des kits et
+  est traversé (`rthm/packs/neurotek`). 29 packs, 125 kits.
+- Front : pads assez gros sous la grille (zone vide de la colonne de
+  gauche), un par pack, puis ceux des sous-kits du pack choisi ; re-clic
+  pour tout revoir. Un pad filtre grille, cases, non classés et corbeille.
+- Tout le kit est visible, plafond compris : le manifeste liste la réserve
+  (`reserve`, fichiers classés au-delà de 3 × quota, non mesurés, environ
+  8 000). Garder, écarter, noter ou ranger un fichier de la réserve le fait
+  entrer comme candidat en fin de case (mesuré à ce moment).
+- Corbeille d'un kit ou d'un pack = règle dans `overrides.json` (clé
+  `<préfixe>/`, `trash`), qui exclut tous ses fichiers, y compris à venir ;
+  reconstruction du manifeste (les cases se remplissent depuis la réserve),
+  restauration d'un bloc. Les décisions d'écoute des fichiers du kit sont
+  perdues ; tags et étoiles restent.
+- Tags de kit (ajout demandé le 2026-10-07) : même clé `<préfixe>/`, tags
+  multiples hérités par tous les fichiers du kit (filtre par tag compris) ;
+  ils se retirent sur le kit, pas sur un fichier.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

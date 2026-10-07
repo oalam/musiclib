@@ -5,9 +5,12 @@
   // candidat suivant (selection recalculee par l'API). Selection multiple
   // (Cmd, Maj), barre d'outils, glisser-deposer vers une case ou la corbeille.
   // Export des retenus vers Transfer (7.J3) : bilan, puis copie confirmee.
+  // Kits (7.J5) : pads des packs sous la grille, puis des sous-kits du pack
+  // choisi ; un pad filtre grille et listes sur le kit (reserve hors plafond
+  // comprise), porte ses tags (herites par ses fichiers) et sa corbeille.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleStatus } from './api'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -18,6 +21,7 @@
     illisible: 'fichier non décodable',
   }
   const VIEW_KEY = 'ui:sample-cell'
+  const KIT_KEY = 'ui:sample-kit'
   // colonnes : one-shots puis boucles en dernier (memes codes qu'analyzer/samples.py)
   const LOOPS = ['BR', 'DL', 'PL', 'ML', 'BL']
   const ONESHOTS = ['BD', 'SD', 'CP', 'RS', 'HH', 'OH', 'CY', 'TM', 'PC', 'BS', 'ST', 'PD', 'FX', 'VX']
@@ -54,6 +58,10 @@
   let exportReport = $state<SampleExportReport | null>(null)
   let exporting = $state(false)
   let dropKey = $state<string | null>(null)
+  // kit (prefixe de chemin : pack ou pack/sous-kit), '' = tous
+  let kit = $state('')
+  let kitData = $state<SampleKits>({ kits: [], tags: {} })
+  let kitTagInput = $state('')
 
   let container: HTMLDivElement | undefined = $state()
   let ws: WaveSurfer | null = null
@@ -73,7 +81,27 @@
   }), { selected: 0, keep: 0, toListen: 0 }))
   const targetCount = $derived(sel.size || (cursor ? 1 : 0))
 
-  function filterOn(): boolean { return filterTag !== '' || minStars > 0 }
+  type Pad = { kit: string; label: string; selected: number; files: number; trashed: boolean }
+  const files = (k: SampleKit) => k.candidates + k.reserve + k.unclassified + k.trashed
+  // pads de packs (sommes des sous-kits) ; un pack est barre si tout est a la corbeille
+  const packs = $derived.by(() => {
+    const out = new Map<string, Pad>()
+    for (const k of kitData.kits) {
+      const p = out.get(k.pack) ?? { kit: k.pack, label: k.pack, selected: 0, files: 0, trashed: true }
+      p.selected += k.selected
+      p.files += files(k)
+      p.trashed &&= k.trashed_kit
+      out.set(k.pack, p)
+    }
+    return [...out.values()].sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }))
+  })
+  const activePack = $derived(kit.split('/')[0])
+  const subKits = $derived(kitData.kits.filter(k => k.pack === activePack && k.kit !== activePack))
+  const kitInfo = $derived(kitData.kits.find(k => k.kit === kit))
+  const kitTrashed = $derived(kitInfo?.trashed_kit ?? (kit !== '' && packs.find(p => p.kit === kit)?.trashed === true))
+  const trashedKits = $derived(kitData.kits.filter(k => k.trashed_kit))
+
+  function filterOn(): boolean { return filterTag !== '' || minStars > 0 || kit !== '' }
 
   function matches(e: SampleEntry): boolean {
     return (!filterTag || e.tags.includes(filterTag)) && (e.stars ?? 0) >= minStars
@@ -90,19 +118,21 @@
   function looseRow(l: LooseSample, i: number): SampleEntry {
     const name = (l.source.split('/').pop() ?? l.source).replace(/\.wav$/i, '')
     return { source: l.source, family: '', code: '', pack: l.pack, name, duration: null, rank: i + 1,
-      status: 'pending', selected: true, flags: null, bpm: null, bpm_est: false, tags: l.tags, stars: l.stars }
+      status: 'pending', selected: true, flags: null, bpm: null, bpm_est: false, tags: l.tags, stars: l.stars,
+      overflow: false }
   }
 
   // grille (filtree), compteurs hors case et tags connus
   async function refresh() {
     try {
-      const [c, u, t, tags] = await Promise.all([
-        api.sampleCells({ tag: filterTag || undefined, minStars: minStars || undefined }),
-        api.sampleLoose('unclassified'), api.sampleLoose('trash'), api.sampleTags(),
+      const [c, u, t, tags, k] = await Promise.all([
+        api.sampleCells({ tag: filterTag || undefined, minStars: minStars || undefined, kit: kit || undefined }),
+        api.sampleLoose('unclassified', kit), api.sampleLoose('trash', kit), api.sampleTags(), api.sampleKits(),
       ])
       cells = c
       counts = { unclassified: u.length, trash: t.length }
       allTags = tags
+      kitData = k
       error = ''
     } catch (e) {
       fail(e)
@@ -114,8 +144,8 @@
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
     entries = v.kind === 'cell'
-      ? await api.sampleCell(v.family, v.code).catch(() => [])
-      : (await api.sampleLoose(v.kind)).map(looseRow)
+      ? await api.sampleCell(v.family, v.code, kit).catch(() => [])
+      : (await api.sampleLoose(v.kind, kit)).map(looseRow)
   }
 
   async function open(v: View) {
@@ -297,6 +327,48 @@
 
   const mo = (b: number) => `${Math.round(b / 1e6)} Mo`
 
+  /** Choisit un kit (re-clic : retour a tous) ; la reserve du kit est depliee. */
+  async function chooseKit(k: string) {
+    kit = kit === k ? '' : k
+    kitTagInput = ''
+    showReserve = kit !== ''
+    try { localStorage.setItem(KIT_KEY, kit) } catch { /* stockage indisponible */ }
+    await refresh()
+    if (view) await open(view)
+  }
+
+  async function kitAct(fn: () => Promise<unknown>) {
+    if (busy) return
+    busy = true
+    try {
+      await fn()
+      await Promise.all([refresh(), loadEntries()])
+      if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
+    } catch (e) {
+      fail(e)
+    } finally {
+      busy = false
+    }
+  }
+
+  function trashKit() {
+    const n = kitInfo ? files(kitInfo) : packs.find(p => p.kit === kit)?.files ?? 0
+    if (!confirm(`Mettre ${kit} à la corbeille (${n} fichiers) ? Les décisions d’écoute de ses fichiers seront perdues ; restaurable d’un bloc.`)) return
+    kitAct(() => api.sampleKitTrash(kit))
+  }
+
+  async function addKitTag() {
+    const t = kitTagInput.trim()
+    if (!t) return
+    await kitAct(() => api.sampleKitTags(kit, [t]))
+    kitTagInput = ''
+  }
+
+  function onKitTagKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') { e.preventDefault(); addKitTag() }
+    else if (e.key === 'Escape') { e.preventDefault(); (e.target as HTMLElement).blur() }
+  }
+
   async function setFilter() {
     await refresh()
     if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
@@ -340,7 +412,9 @@
       normalize: true,
     })
     ws.on('ready', () => { if (autoplay) ws?.play() })
+    try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
     await refresh()
+    if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
     let last: string | null = null
     try { last = localStorage.getItem(VIEW_KEY) } catch { /* stockage indisponible */ }
     if (last === ':unclassified' || last === ':trash') return open({ kind: last.slice(1) as Loose })
@@ -394,8 +468,8 @@
                 {#if c}
                   <button class="cell" class:done={c.to_listen === 0}
                     class:on={current?.family === fam && current?.code === code}
-                    title="{fam}/{code} : {c.candidates} candidats, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés"
-                    onclick={() => open({ kind: 'cell', family: fam, code })}>{c.to_listen}/{c.selected}</button>
+                    title="{fam}/{code} : {c.candidates} candidats, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
+                    onclick={() => open({ kind: 'cell', family: fam, code })}>{c.to_listen}/{c.selected}{#if c.reserve}<sup>+{c.reserve}</sup>{/if}</button>
                 {:else}
                   <span class="slot" title="{fam}/{code}"></span>
                 {/if}
@@ -439,6 +513,48 @@
         <button class="small" onclick={() => (exportReport = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
       </div>
     {/if}
+    <section class="kits">
+      <h3 class="small">Kits <span class="muted">· retenus / fichiers · re-clic pour tout voir</span></h3>
+      {#if kit}
+        <div class="kit-bar small">
+          <strong title={kit}>{kit}</strong>
+          {#if kitInfo}<span class="muted">{kitInfo.candidates} candidats · {kitInfo.reserve} hors plafond · {kitInfo.unclassified} non classés</span>{/if}
+          {#each kitData.tags[kit] ?? [] as t}
+            <span class="tag">{t}<button class="untag" title="Retirer le tag {t} du kit"
+              onclick={() => kitAct(() => api.sampleKitTags(kit, [], [t]))}>×</button></span>
+          {/each}
+          {#if kitTrashed}
+            <button class="small" disabled={busy} onclick={() => kitAct(() => api.sampleKitRestore(kit))}>Restaurer le kit</button>
+          {:else}
+            <input class="tag-in" list="sample-tags" placeholder="tag du kit" bind:value={kitTagInput} onkeydown={onKitTagKey} />
+            <button class="small" disabled={!kitTagInput.trim() || busy} onclick={addKitTag}>Tagger le kit</button>
+            <button class="small danger" disabled={busy} onclick={trashKit}>Corbeille du kit</button>
+          {/if}
+        </div>
+      {/if}
+      <div class="pads">
+        {#each packs as p (p.kit)}
+          <button class="pad" class:on={activePack === p.kit} class:gone={p.trashed}
+            title={p.kit} onclick={() => chooseKit(p.kit)}>
+            <span class="pad-name">{p.label}</span>
+            <span class="pad-n">{p.trashed ? 'corbeille' : `${p.selected} / ${p.files}`}</span>
+            {#if kitData.tags[p.kit]?.length}<span class="pad-tags">{kitData.tags[p.kit].join(' · ')}</span>{/if}
+          </button>
+        {/each}
+      </div>
+      {#if subKits.length}
+        <div class="pads subs">
+          {#each subKits as k (k.kit)}
+            <button class="pad sub" class:on={kit === k.kit} class:gone={k.trashed_kit}
+              title={k.kit} onclick={() => chooseKit(kit === k.kit ? activePack : k.kit)}>
+              <span class="pad-name">{k.label}</span>
+              <span class="pad-n">{k.trashed_kit ? 'corbeille' : `${k.selected} / ${files(k)}`}{k.unclassified ? ` · ${k.unclassified} nc` : ''}</span>
+              {#if kitData.tags[k.kit]?.length}<span class="pad-tags">{kitData.tags[k.kit].join(' · ')}</span>{/if}
+            </button>
+          {/each}
+        </div>
+      {/if}
+    </section>
   </section>
 
   <section class="detail">
@@ -496,6 +612,14 @@
         <span class="muted small">statut gardé, rangé en fin de case · <kbd>Entrée</kbd> / <kbd>Échap</kbd></span>
       </div>
     {/if}
+    {#if view?.kind === 'trash' && trashedKits.length}
+      <ul class="trashed-kits small">
+        {#each trashedKits as k (k.kit)}
+          <li><span class="name">{k.kit}</span> <span class="muted">kit entier, {k.trashed} fichiers</span>
+            <button class="small" disabled={busy} onclick={() => kitAct(() => api.sampleKitRestore(k.kit))}>Restaurer le kit</button></li>
+        {/each}
+      </ul>
+    {/if}
     <ol class="list">
       {#each visible as e, i (e.source)}
         {#if showReserve && i === chosen.length && reserve.length}<li class="sep muted small">Réserve ({reserve.length})</li>{/if}
@@ -507,6 +631,7 @@
             <span class="name">{e.name}</span>
             {#if e.stars}<span class="stars" title="{e.stars} étoile{e.stars > 1 ? 's' : ''}">{'★'.repeat(e.stars)}</span>{/if}
             <span class="dur muted small">{fmt(e.duration)}</span>
+            {#if e.overflow}<span class="est" title="au-delà du plafond de candidats : garder, écarter, noter ou ranger le fait entrer">hors plafond</span>{/if}
             {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
             {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
             <span class="src muted small" title={e.source}>{e.source}</span>
@@ -548,6 +673,26 @@
   .export-btn { margin-left: auto; }
   .export { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); max-width: 60ch; }
   .export p { margin: 6px 0; }
+  /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
+  .kits { margin-top: 14px; width: 0; min-width: 100%; }
+  .kits h3 { margin: 0 0 6px; font-weight: 600; }
+  .pads { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+  .pad { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; width: 128px; min-height: 58px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); color: var(--text); cursor: pointer; text-align: left; }
+  .pad.sub { width: 116px; min-height: 50px; }
+  .pad:hover { background: var(--panel-2); }
+  .pad.on { outline: 2px solid var(--accent); background: var(--panel-2); }
+  .pad.gone { opacity: 0.5; }
+  .pad.gone .pad-name { text-decoration: line-through; }
+  .pad-name { font-size: 13px; font-weight: 600; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
+  .pad-n { font: 11px ui-monospace, Menlo, monospace; color: var(--muted); }
+  .pad-tags { font-size: 10px; color: var(--melodic); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .kit-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; padding: 6px 8px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
+  .danger { color: #dc2626; }
+  .trashed-kits { list-style: none; margin: 0 0 6px; padding: 0; }
+  .trashed-kits li { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-bottom: 1px solid var(--border); }
+  .cell { position: relative; }
+  .cell sup { position: absolute; top: -7px; right: -3px; font-size: 9px; line-height: 1; padding: 1px 2px; border-radius: 6px; background: var(--panel-2); color: var(--muted); pointer-events: none; }
   .trash-drop.over { outline: 2px dashed #dc2626; }
   .detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .detail header { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }

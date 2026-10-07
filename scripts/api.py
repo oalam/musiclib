@@ -2,7 +2,8 @@
 """API locale du front (Phase 7.C) : library, audio, structure, banks Digitakt,
 base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I), envoi d'une
 track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`), ecoute des
-samples DT2 (Phase 7.J2, `samples.py`) et leur export vers Transfer (7.J3).
+samples DT2 (Phase 7.J2, `samples.py`), leur export vers Transfer (7.J3) et
+la vue par kit (7.J5 : filtre, tags et corbeille d'un kit entier).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
@@ -48,6 +49,7 @@ from analyzer.rhythm_signature import beats_per_bar
 from analyzer.samples import (
     STARS_MAX,
     ExportReport,
+    KitInfo,
     LooseSample,
     Override,
     SampleEntry,
@@ -56,12 +58,20 @@ from analyzer.samples import (
     all_tags,
     cell_of,
     export,
+    in_kit,
+    kit_tags,
+    kits,
     known,
     loose,
+    overflow_of,
+    promote,
     quota,
+    restore_kit,
+    set_kit_tags,
     set_stars,
     set_status,
     set_tags,
+    trash_kit,
 )
 from analyzer.samples import move as move_sample
 from analyzer.samples import restore as restore_sample
@@ -181,6 +191,7 @@ class SampleCell(BaseModel):
     drop: int
     to_listen: int      # retenus encore pending
     flagged: int        # candidats signales par le pre-filtre
+    reserve: int = 0    # hors plafond, compte seulement avec le filtre kit (7.J5)
 
 
 Sources = Annotated[list[Annotated[str, Field(min_length=1, max_length=500)]],
@@ -209,6 +220,26 @@ class SampleStars(BaseModel):
     stars: int | None = Field(default=None, ge=1, le=STARS_MAX)   # None = retirer
 
 
+KitPath = Annotated[str, Field(min_length=1, max_length=500)]
+
+
+class SampleKit(BaseModel):
+    """Kit ou pack (prefixe de chemin) mis a la corbeille / restaure (7.J5)."""
+    kit: KitPath
+
+
+class SampleKitTags(BaseModel):
+    kit: KitPath
+    add: TagList = Field(default_factory=list, max_length=20)
+    remove: TagList = Field(default_factory=list, max_length=20)
+
+
+class SampleKits(BaseModel):
+    """Pads du front : bilan par kit, tags poses sur un kit ou un pack."""
+    kits: list[KitInfo]
+    tags: dict[str, list[str]]
+
+
 class SampleExport(BaseModel):
     dry_run: bool = True    # bilan d'abord, copie sur confirmation
 
@@ -220,16 +251,26 @@ class SampleTags(BaseModel):
 
 
 def _sample_cells(m: samples.Manifest, tag: str | None = None,
-                  min_stars: int | None = None) -> list[SampleCell]:
+                  min_stars: int | None = None, kit: str | None = None) -> list[SampleCell]:
     """Grille ; avec un filtre, les compteurs ne portent que sur les candidats
-    qui y repondent (cases sans candidat retenu par le filtre omises)."""
+    qui y repondent (cases sans candidat retenu par le filtre omises). Avec
+    `kit`, la reserve du kit est comptee et une case qui n'a que de la reserve
+    apparait."""
     cells: dict[tuple[str, str], list[SampleEntry]] = {}
+    spare: dict[tuple[str, str], int] = {}
     for e in m.entries:
         if tag is not None and tag not in e.tags:
             continue
         if min_stars is not None and (e.stars or 0) < min_stars:
             continue
+        if kit is not None and not in_kit(e.source, kit):
+            continue
         cells.setdefault((e.family, e.code), []).append(e)
+    if kit is not None and min_stars is None:
+        for r in m.reserve:
+            if in_kit(r.source, kit) and (tag is None or tag in r.tags):
+                spare[r.family, r.code] = spare.get((r.family, r.code), 0) + 1
+                cells.setdefault((r.family, r.code), [])
     return [SampleCell(
         family=fam, code=code, quota=quota(fam, code), candidates=len(es),
         selected=sum(e.selected for e in es),
@@ -237,6 +278,7 @@ def _sample_cells(m: samples.Manifest, tag: str | None = None,
         drop=sum(e.status == "drop" for e in es),
         to_listen=sum(e.selected and e.status == "pending" for e in es),
         flagged=sum(bool(e.flags) for e in es),
+        reserve=spare.get((fam, code), 0),
     ) for (fam, code), es in sorted(cells.items())]
 
 
@@ -422,20 +464,33 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
 
     @app.get("/api/samples", response_model=list[SampleCell])
     def sample_cells(tag: str | None = None,
-                     min_stars: int | None = Query(None, ge=1, le=STARS_MAX)) -> list[SampleCell]:
-        return _sample_cells(manifest(), tag, min_stars)
+                     min_stars: int | None = Query(None, ge=1, le=STARS_MAX),
+                     kit: str | None = None) -> list[SampleCell]:
+        return _sample_cells(manifest(), tag, min_stars, kit or None)
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
-    def sample_cell(family: str, code: str) -> list[SampleEntry]:
-        cell = cell_of(manifest(), family, code)
+    def sample_cell(family: str, code: str, kit: str | None = None) -> list[SampleEntry]:
+        """Candidats d'une case ; avec `kit`, ceux du kit puis sa reserve
+        (lignes `overflow`)."""
+        m = manifest()
+        cell = cell_of(m, family, code)
+        if kit:
+            cell = [e for e in cell if in_kit(e.source, kit)] + overflow_of(m, family, code, kit)
         if not cell:
             raise HTTPException(404, f"case inconnue : {family}/{code}")
         return cell
 
     @app.get("/api/samples/loose", response_model=list[LooseSample])
-    def sample_loose(which: Literal["unclassified", "trash"]) -> list[LooseSample]:
-        """Non classes ou corbeille (7.J4)."""
-        return loose(manifest(), samples.load_overrides(samples_overrides), which)
+    def sample_loose(which: Literal["unclassified", "trash"],
+                     kit: str | None = None) -> list[LooseSample]:
+        """Non classes ou corbeille (7.J4), d'un kit (7.J5)."""
+        return loose(manifest(), samples.load_overrides(samples_overrides), which, kit or None)
+
+    @app.get("/api/samples/kits", response_model=SampleKits)
+    def sample_kits() -> SampleKits:
+        """Bilan par kit pour les pads (7.J5), kits a la corbeille compris."""
+        return SampleKits(kits=kits(manifest()),
+                          tags=kit_tags(samples.load_overrides(samples_overrides)))
 
     @app.get("/api/samples/tags", response_model=list[str])
     def sample_tags() -> list[str]:
@@ -459,8 +514,12 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
 
     @app.post("/api/samples/status", response_model=list[SampleCell])
     def sample_status(req: SampleDecision) -> list[SampleCell]:
-        """Decision d'ecoute ; la selection des cases est recalculee."""
-        return edit(req.sources, lambda m, _ov, src: set_status(m, src, req.status))
+        """Decision d'ecoute ; la selection des cases est recalculee. Un fichier
+        de la reserve devient d'abord candidat (7.J5)."""
+        def op(m: samples.Manifest, ov: dict[str, Override], src: str) -> None:
+            promote(m, ov, src, samples_src)
+            set_status(m, src, req.status)
+        return edit(req.sources, op)
 
     @app.post("/api/samples/move", response_model=list[SampleCell])
     def sample_move(req: SampleMove) -> list[SampleCell]:
@@ -471,7 +530,11 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
 
     @app.post("/api/samples/stars", response_model=list[SampleCell])
     def sample_stars(req: SampleStars) -> list[SampleCell]:
-        return edit(req.sources, lambda m, ov, src: set_stars(m, ov, src, req.stars))
+        def op(m: samples.Manifest, ov: dict[str, Override], src: str) -> None:
+            if req.stars is not None:
+                promote(m, ov, src, samples_src)
+            set_stars(m, ov, src, req.stars)
+        return edit(req.sources, op)
 
     @app.post("/api/samples/tags", response_model=list[SampleCell])
     def sample_tags_edit(req: SampleTags) -> list[SampleCell]:
@@ -484,6 +547,42 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     @app.post("/api/samples/restore", response_model=list[SampleCell])
     def sample_restore(req: SampleBatch) -> list[SampleCell]:
         return edit(req.sources, lambda m, ov, src: restore_sample(m, ov, src, samples_src))
+
+    def kit_edit(kit: str, rebuild: Callable[..., samples.Manifest]) -> list[SampleCell]:
+        """Corbeille / restauration d'un kit : regle dans overrides.json puis
+        reconstruction du manifeste (mesure des nouveaux candidats)."""
+        media_or_503()
+        with samples_lock:
+            overrides = samples.load_overrides(samples_overrides)
+            try:
+                m = rebuild(manifest(), overrides, kit, samples_src)
+            except SampleError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            samples.save_manifest(m, samples_manifest)
+            samples.save_overrides(overrides, samples_overrides)
+        return _sample_cells(m)
+
+    @app.post("/api/samples/kit/trash", response_model=list[SampleCell])
+    def sample_kit_trash(req: SampleKit) -> list[SampleCell]:
+        return kit_edit(req.kit, trash_kit)
+
+    @app.post("/api/samples/kit/restore", response_model=list[SampleCell])
+    def sample_kit_restore(req: SampleKit) -> list[SampleCell]:
+        return kit_edit(req.kit, restore_kit)
+
+    @app.post("/api/samples/kit/tags", response_model=list[SampleCell])
+    def sample_kit_tags(req: SampleKitTags) -> list[SampleCell]:
+        """Tags d'un kit ou d'un pack, herites par tous ses fichiers."""
+        with samples_lock:
+            m = manifest()
+            overrides = samples.load_overrides(samples_overrides)
+            try:
+                set_kit_tags(m, overrides, req.kit, req.add, req.remove)
+            except SampleError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            samples.save_manifest(m, samples_manifest)
+            samples.save_overrides(overrides, samples_overrides)
+        return _sample_cells(m)
 
     def media_or_503() -> None:
         if samples_src == SAMPLES_SRC_DIR:
