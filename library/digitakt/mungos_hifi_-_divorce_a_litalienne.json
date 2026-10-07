@@ -1,0 +1,2162 @@
+{
+  "slug": "mungos_hifi_-_divorce_a_litalienne",
+  "artist": "Mungo's Hifi",
+  "title": "Divorce a l'Italienne",
+  "bpm": 123.0,
+  "time_signature": "4/4",
+  "steps_per_bar": 16,
+  "from_stems": false,
+  "phrase_bars": 8,
+  "bar_times_s": [
+    4.032,
+    5.973,
+    7.915,
+    9.845,
+    11.776,
+    13.717,
+    15.648,
+    17.589,
+    19.531,
+    21.461,
+    23.392,
+    25.333,
+    27.264,
+    29.205,
+    31.136,
+    33.077,
+    35.008,
+    36.949,
+    38.88,
+    40.821,
+    42.741,
+    44.683,
+    46.613,
+    48.565,
+    50.485,
+    52.427,
+    54.357,
+    56.299,
+    58.229,
+    60.171,
+    62.101,
+    64.043,
+    65.973,
+    67.915,
+    69.845,
+    71.787,
+    73.707,
+    75.659,
+    77.6,
+    79.531,
+    81.451,
+    83.403,
+    85.312,
+    87.253,
+    89.205,
+    91.136,
+    93.077,
+    94.997,
+    96.949,
+    98.88,
+    100.811,
+    102.741,
+    104.693,
+    106.624,
+    108.555,
+    110.496,
+    112.427,
+    114.368,
+    116.299,
+    118.24,
+    120.16,
+    122.112,
+    124.043,
+    125.984,
+    127.904,
+    129.845,
+    131.776,
+    133.728,
+    135.648,
+    137.6,
+    139.531,
+    141.472,
+    143.392,
+    145.312,
+    147.243,
+    149.205,
+    151.136,
+    153.077,
+    155.008,
+    156.96,
+    158.88,
+    160.811,
+    162.741,
+    164.693,
+    166.613,
+    168.555,
+    170.485,
+    172.437,
+    174.357,
+    176.299,
+    178.229,
+    180.171,
+    182.101,
+    184.043,
+    185.973,
+    187.915,
+    189.845,
+    191.787,
+    193.717,
+    195.499,
+    197.344,
+    199.275,
+    201.216,
+    203.147,
+    205.088,
+    207.019,
+    208.949,
+    210.891,
+    212.832,
+    214.763
+  ],
+  "patterns": [
+    {
+      "slot": 1,
+      "label": "peak",
+      "start_s": 4.03,
+      "end_s": 205.09,
+      "bars": 8,
+      "steps": 128,
+      "repeats": 13.0,
+      "tracks": [
+        {
+          "index": 1,
+          "role": "Kick",
+          "source": "drums 30-120 Hz",
+          "active": true,
+          "level": 0.98,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 119,
+              "note": null
+            },
+            {
+              "step": 4,
+              "velocity": 106,
+              "note": null
+            },
+            {
+              "step": 8,
+              "velocity": 85,
+              "note": null
+            },
+            {
+              "step": 9,
+              "velocity": 100,
+              "note": null
+            },
+            {
+              "step": 12,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 17,
+              "velocity": 86,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 31,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 126,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 40,
+              "velocity": 97,
+              "note": null
+            },
+            {
+              "step": 49,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 52,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 64,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 68,
+              "velocity": 99,
+              "note": null
+            },
+            {
+              "step": 72,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 73,
+              "velocity": 96,
+              "note": null
+            },
+            {
+              "step": 76,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 80,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 84,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 88,
+              "velocity": 119,
+              "note": null
+            },
+            {
+              "step": 95,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 96,
+              "velocity": 92,
+              "note": null
+            },
+            {
+              "step": 100,
+              "velocity": 96,
+              "note": null
+            },
+            {
+              "step": 104,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 121,
+              "velocity": 94,
+              "note": null
+            },
+            {
+              "step": 125,
+              "velocity": 85,
+              "note": null
+            },
+            {
+              "step": 127,
+              "velocity": 113,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "role": "Rumble",
+          "source": "drums 30-90 Hz",
+          "active": true,
+          "level": 0.95,
+          "trigs": [
+            {
+              "step": 24,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 26,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 42,
+              "velocity": 123,
+              "note": null
+            },
+            {
+              "step": 43,
+              "velocity": 112,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 58,
+              "velocity": 119,
+              "note": null
+            },
+            {
+              "step": 78,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 90,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 106,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 107,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 108,
+              "velocity": 113,
+              "note": null
+            },
+            {
+              "step": 110,
+              "velocity": 92,
+              "note": null
+            },
+            {
+              "step": 112,
+              "velocity": 93,
+              "note": null
+            },
+            {
+              "step": 120,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 122,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 124,
+              "velocity": 94,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "role": "Clap / snare",
+          "source": "drums 300-3000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 3,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 11,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 19,
+              "velocity": 97,
+              "note": null
+            },
+            {
+              "step": 25,
+              "velocity": 85,
+              "note": null
+            },
+            {
+              "step": 27,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 35,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 43,
+              "velocity": 112,
+              "note": null
+            },
+            {
+              "step": 51,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 59,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 67,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 91,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 99,
+              "velocity": 108,
+              "note": null
+            },
+            {
+              "step": 107,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 115,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 123,
+              "velocity": 127,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "role": "Hat ferme",
+          "source": "drums 7000-16000 Hz",
+          "active": true,
+          "level": 0.94,
+          "trigs": [
+            {
+              "step": 105,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 113,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 117,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 125,
+              "velocity": 120,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "role": "Hat ouvert",
+          "source": "drums 5000-12000 Hz",
+          "active": true,
+          "level": 0.98,
+          "trigs": [
+            {
+              "step": 1,
+              "velocity": 121,
+              "note": null
+            },
+            {
+              "step": 3,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 9,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 11,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 13,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 17,
+              "velocity": 94,
+              "note": null
+            },
+            {
+              "step": 21,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 25,
+              "velocity": 105,
+              "note": null
+            },
+            {
+              "step": 27,
+              "velocity": 54,
+              "note": null
+            },
+            {
+              "step": 41,
+              "velocity": 114,
+              "note": null
+            },
+            {
+              "step": 45,
+              "velocity": 106,
+              "note": null
+            },
+            {
+              "step": 49,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 53,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 57,
+              "velocity": 108,
+              "note": null
+            },
+            {
+              "step": 59,
+              "velocity": 67,
+              "note": null
+            },
+            {
+              "step": 69,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 83,
+              "velocity": 42,
+              "note": null
+            },
+            {
+              "step": 91,
+              "velocity": 43,
+              "note": null
+            },
+            {
+              "step": 93,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 99,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 101,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 107,
+              "velocity": 46,
+              "note": null
+            },
+            {
+              "step": 109,
+              "velocity": 120,
+              "note": null
+            },
+            {
+              "step": 115,
+              "velocity": 52,
+              "note": null
+            },
+            {
+              "step": 121,
+              "velocity": 127,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "role": "Ride",
+          "source": "drums 3000-6000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 19,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 35,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 43,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 51,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 67,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 123,
+              "velocity": 42,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "role": "Perc A",
+          "source": "drums 120-400 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 61,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 79,
+              "velocity": 83,
+              "note": null
+            },
+            {
+              "step": 87,
+              "velocity": 88,
+              "note": null
+            },
+            {
+              "step": 103,
+              "velocity": 94,
+              "note": null
+            },
+            {
+              "step": 111,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 113,
+              "velocity": 96,
+              "note": null
+            },
+            {
+              "step": 119,
+              "velocity": 91,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "role": "Perc B",
+          "source": "drums 400-1500 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 83,
+              "velocity": 89,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "role": "Basse",
+          "source": "bass 40-400 Hz",
+          "active": true,
+          "level": 0.99,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 127,
+              "note": 46
+            },
+            {
+              "step": 3,
+              "velocity": 127,
+              "note": 46
+            },
+            {
+              "step": 11,
+              "velocity": 97,
+              "note": 46
+            },
+            {
+              "step": 12,
+              "velocity": 103,
+              "note": 37
+            },
+            {
+              "step": 17,
+              "velocity": 95,
+              "note": 44
+            },
+            {
+              "step": 20,
+              "velocity": 123,
+              "note": 42
+            },
+            {
+              "step": 32,
+              "velocity": 127,
+              "note": 46
+            },
+            {
+              "step": 36,
+              "velocity": 83,
+              "note": 42
+            },
+            {
+              "step": 49,
+              "velocity": 95,
+              "note": 41
+            },
+            {
+              "step": 51,
+              "velocity": 92,
+              "note": 46
+            },
+            {
+              "step": 61,
+              "velocity": 127,
+              "note": 47
+            },
+            {
+              "step": 64,
+              "velocity": 127,
+              "note": 38
+            },
+            {
+              "step": 67,
+              "velocity": 103,
+              "note": 46
+            },
+            {
+              "step": 76,
+              "velocity": 127,
+              "note": 37
+            },
+            {
+              "step": 84,
+              "velocity": 117,
+              "note": 40
+            },
+            {
+              "step": 96,
+              "velocity": 116,
+              "note": 41
+            },
+            {
+              "step": 103,
+              "velocity": 84,
+              "note": 46
+            },
+            {
+              "step": 113,
+              "velocity": 97,
+              "note": 39
+            },
+            {
+              "step": 115,
+              "velocity": 111,
+              "note": 38
+            },
+            {
+              "step": 121,
+              "velocity": 89,
+              "note": 46
+            },
+            {
+              "step": 123,
+              "velocity": 102,
+              "note": 37
+            },
+            {
+              "step": 125,
+              "velocity": 127,
+              "note": 47
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "role": "Lead",
+          "source": "other 300-4000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 3,
+              "velocity": 127,
+              "note": 70
+            },
+            {
+              "step": 11,
+              "velocity": 97,
+              "note": 70
+            },
+            {
+              "step": 19,
+              "velocity": 101,
+              "note": 70
+            },
+            {
+              "step": 27,
+              "velocity": 127,
+              "note": 61
+            },
+            {
+              "step": 35,
+              "velocity": 99,
+              "note": 65
+            },
+            {
+              "step": 43,
+              "velocity": 106,
+              "note": 61
+            },
+            {
+              "step": 51,
+              "velocity": 127,
+              "note": 70
+            },
+            {
+              "step": 59,
+              "velocity": 127,
+              "note": 61
+            },
+            {
+              "step": 67,
+              "velocity": 127,
+              "note": 70
+            },
+            {
+              "step": 75,
+              "velocity": 89,
+              "note": 61
+            },
+            {
+              "step": 91,
+              "velocity": 122,
+              "note": 61
+            },
+            {
+              "step": 99,
+              "velocity": 109,
+              "note": 65
+            },
+            {
+              "step": 107,
+              "velocity": 113,
+              "note": 63
+            },
+            {
+              "step": 115,
+              "velocity": 127,
+              "note": 62
+            },
+            {
+              "step": 123,
+              "velocity": 127,
+              "note": 61
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "role": "Atmo",
+          "source": "other 100-8000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 86,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "role": "Id1",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 13,
+          "role": "Id2",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 14,
+          "role": "Vocal",
+          "source": "vocals 200-5000 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 15,
+          "role": "FX",
+          "source": "structure (heuristique)",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 16,
+          "role": "Reserve",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        }
+      ]
+    },
+    {
+      "slot": 2,
+      "label": "main",
+      "start_s": 205.09,
+      "end_s": 212.83,
+      "bars": 4,
+      "steps": 64,
+      "repeats": 1.0,
+      "tracks": [
+        {
+          "index": 1,
+          "role": "Kick",
+          "source": "drums 30-120 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 4,
+              "velocity": 105,
+              "note": null
+            },
+            {
+              "step": 6,
+              "velocity": 89,
+              "note": null
+            },
+            {
+              "step": 8,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 9,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 12,
+              "velocity": 114,
+              "note": null
+            },
+            {
+              "step": 13,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 124,
+              "note": null
+            },
+            {
+              "step": 21,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 24,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 35,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 104,
+              "note": null
+            },
+            {
+              "step": 40,
+              "velocity": 99,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 110,
+              "note": null
+            },
+            {
+              "step": 51,
+              "velocity": 121,
+              "note": null
+            },
+            {
+              "step": 54,
+              "velocity": 90,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "role": "Rumble",
+          "source": "drums 30-90 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 14,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 15,
+              "velocity": 111,
+              "note": null
+            },
+            {
+              "step": 26,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 28,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 42,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 45,
+              "velocity": 111,
+              "note": null
+            },
+            {
+              "step": 46,
+              "velocity": 125,
+              "note": null
+            },
+            {
+              "step": 47,
+              "velocity": 115,
+              "note": null
+            },
+            {
+              "step": 60,
+              "velocity": 125,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "role": "Clap / snare",
+          "source": "drums 300-3000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 5,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 37,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 45,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 53,
+              "velocity": 99,
+              "note": null
+            },
+            {
+              "step": 55,
+              "velocity": 98,
+              "note": null
+            },
+            {
+              "step": 60,
+              "velocity": 84,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "role": "Hat ferme",
+          "source": "drums 7000-16000 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 5,
+          "role": "Hat ouvert",
+          "source": "drums 5000-12000 Hz",
+          "active": true,
+          "level": 0.25,
+          "trigs": [
+            {
+              "step": 13,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 17,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 49,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 55,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 61,
+              "velocity": 84,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 6,
+          "role": "Ride",
+          "source": "drums 3000-6000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 1,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 5,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 16,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 21,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 29,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 33,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 37,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 42,
+              "velocity": 59,
+              "note": null
+            },
+            {
+              "step": 45,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 48,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 53,
+              "velocity": 118,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "role": "Perc A",
+          "source": "drums 120-400 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 19,
+              "velocity": 115,
+              "note": null
+            },
+            {
+              "step": 27,
+              "velocity": 86,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 39,
+              "velocity": 92,
+              "note": null
+            },
+            {
+              "step": 52,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 56,
+              "velocity": 115,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "role": "Perc B",
+          "source": "drums 400-1500 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 29,
+              "velocity": 86,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 9,
+          "role": "Basse",
+          "source": "bass 40-400 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 111,
+              "note": 41
+            },
+            {
+              "step": 4,
+              "velocity": 89,
+              "note": 42
+            },
+            {
+              "step": 8,
+              "velocity": 117,
+              "note": 41
+            },
+            {
+              "step": 12,
+              "velocity": 122,
+              "note": 46
+            },
+            {
+              "step": 13,
+              "velocity": 127,
+              "note": 46
+            },
+            {
+              "step": 19,
+              "velocity": 106,
+              "note": 44
+            },
+            {
+              "step": 20,
+              "velocity": 127,
+              "note": 42
+            },
+            {
+              "step": 21,
+              "velocity": 85,
+              "note": 44
+            },
+            {
+              "step": 24,
+              "velocity": 127,
+              "note": 42
+            },
+            {
+              "step": 32,
+              "velocity": 87,
+              "note": 41
+            },
+            {
+              "step": 36,
+              "velocity": 127,
+              "note": 42
+            },
+            {
+              "step": 40,
+              "velocity": 111,
+              "note": 46
+            },
+            {
+              "step": 44,
+              "velocity": 106,
+              "note": 36
+            },
+            {
+              "step": 51,
+              "velocity": 121,
+              "note": 36
+            },
+            {
+              "step": 52,
+              "velocity": 121,
+              "note": 42
+            },
+            {
+              "step": 56,
+              "velocity": 98,
+              "note": 42
+            },
+            {
+              "step": 60,
+              "velocity": 100,
+              "note": 38
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "role": "Lead",
+          "source": "other 300-4000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 91,
+              "note": 65
+            },
+            {
+              "step": 5,
+              "velocity": 127,
+              "note": 68
+            },
+            {
+              "step": 12,
+              "velocity": 96,
+              "note": 70
+            },
+            {
+              "step": 13,
+              "velocity": 127,
+              "note": 70
+            },
+            {
+              "step": 21,
+              "velocity": 94,
+              "note": 68
+            },
+            {
+              "step": 32,
+              "velocity": 83,
+              "note": 65
+            },
+            {
+              "step": 36,
+              "velocity": 86,
+              "note": 66
+            },
+            {
+              "step": 37,
+              "velocity": 127,
+              "note": 65
+            },
+            {
+              "step": 44,
+              "velocity": 96,
+              "note": 60
+            },
+            {
+              "step": 45,
+              "velocity": 127,
+              "note": 61
+            },
+            {
+              "step": 53,
+              "velocity": 104,
+              "note": 61
+            },
+            {
+              "step": 55,
+              "velocity": 113,
+              "note": 66
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "role": "Atmo",
+          "source": "other 100-8000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 53,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "role": "Id1",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 13,
+          "role": "Id2",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 14,
+          "role": "Vocal",
+          "source": "vocals 200-5000 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 15,
+          "role": "FX",
+          "source": "structure (heuristique)",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 16,
+          "role": "Reserve",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        }
+      ]
+    },
+    {
+      "slot": 3,
+      "label": "outro",
+      "start_s": 212.83,
+      "end_s": 214.76,
+      "bars": 1,
+      "steps": 16,
+      "repeats": 1.0,
+      "tracks": [
+        {
+          "index": 1,
+          "role": "Kick",
+          "source": "drums 30-120 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 4,
+              "velocity": 94,
+              "note": null
+            },
+            {
+              "step": 8,
+              "velocity": 114,
+              "note": null
+            },
+            {
+              "step": 10,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 11,
+              "velocity": 115,
+              "note": null
+            },
+            {
+              "step": 13,
+              "velocity": 117,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "role": "Rumble",
+          "source": "drums 30-90 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 14,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 15,
+              "velocity": 119,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "role": "Clap / snare",
+          "source": "drums 300-3000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 2,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 6,
+              "velocity": 119,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "role": "Hat ferme",
+          "source": "drums 7000-16000 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 5,
+          "role": "Hat ouvert",
+          "source": "drums 5000-12000 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 6,
+          "role": "Ride",
+          "source": "drums 3000-6000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 2,
+              "velocity": 115,
+              "note": null
+            },
+            {
+              "step": 12,
+              "velocity": 127,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 7,
+          "role": "Perc A",
+          "source": "drums 120-400 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 5,
+              "velocity": 120,
+              "note": null
+            },
+            {
+              "step": 9,
+              "velocity": 83,
+              "note": null
+            },
+            {
+              "step": 14,
+              "velocity": 103,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 8,
+          "role": "Perc B",
+          "source": "drums 400-1500 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 9,
+          "role": "Basse",
+          "source": "bass 40-400 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 8,
+              "velocity": 114,
+              "note": 45
+            },
+            {
+              "step": 10,
+              "velocity": 127,
+              "note": 46
+            },
+            {
+              "step": 11,
+              "velocity": 103,
+              "note": 37
+            },
+            {
+              "step": 13,
+              "velocity": 106,
+              "note": 46
+            }
+          ]
+        },
+        {
+          "index": 10,
+          "role": "Lead",
+          "source": "other 300-4000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 2,
+              "velocity": 127,
+              "note": 68
+            },
+            {
+              "step": 6,
+              "velocity": 117,
+              "note": 65
+            },
+            {
+              "step": 10,
+              "velocity": 87,
+              "note": 70
+            },
+            {
+              "step": 12,
+              "velocity": 93,
+              "note": 70
+            },
+            {
+              "step": 14,
+              "velocity": 85,
+              "note": 62
+            }
+          ]
+        },
+        {
+          "index": 11,
+          "role": "Atmo",
+          "source": "other 100-8000 Hz",
+          "active": true,
+          "level": 1.0,
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 40,
+              "note": null
+            }
+          ]
+        },
+        {
+          "index": 12,
+          "role": "Id1",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 13,
+          "role": "Id2",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 14,
+          "role": "Vocal",
+          "source": "vocals 200-5000 Hz",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 15,
+          "role": "FX",
+          "source": "structure (heuristique)",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        },
+        {
+          "index": 16,
+          "role": "Reserve",
+          "source": "",
+          "active": false,
+          "level": 0.0,
+          "trigs": []
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "index": 0,
+      "label": "peak",
+      "bar": 0,
+      "bars": 104,
+      "start_s": 4.03,
+      "end_s": 205.09,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "index": 1,
+      "label": "main",
+      "bar": 104,
+      "bars": 4,
+      "start_s": 205.09,
+      "end_s": 212.83,
+      "pattern_slot": 2,
+      "active": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "index": 2,
+      "label": "outro",
+      "bar": 108,
+      "bars": 1,
+      "start_s": 212.83,
+      "end_s": 214.76,
+      "pattern_slot": 3,
+      "active": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        9,
+        10,
+        11
+      ]
+    }
+  ],
+  "mutes": [
+    {
+      "start_s": 4.03,
+      "bar": 0,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 19.53,
+      "bar": 8,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 35.01,
+      "bar": 16,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 50.49,
+      "bar": 24,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 65.97,
+      "bar": 32,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 81.45,
+      "bar": 40,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 96.95,
+      "bar": 48,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 112.43,
+      "bar": 56,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 127.9,
+      "bar": 64,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 143.39,
+      "bar": 72,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 158.88,
+      "bar": 80,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 174.36,
+      "bar": 88,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 189.85,
+      "bar": 96,
+      "pattern_slot": 1,
+      "active": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 205.09,
+      "bar": 104,
+      "pattern_slot": 2,
+      "active": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "start_s": 212.83,
+      "bar": 108,
+      "pattern_slot": 3,
+      "active": [
+        1,
+        2,
+        3,
+        6,
+        7,
+        9,
+        10,
+        11
+      ]
+    }
+  ],
+  "generated_at": "2026-10-06T15:09:47+00:00",
+  "method": "stem_band_fold_v2",
+  "chain": [
+    1,
+    2,
+    3
+  ]
+}

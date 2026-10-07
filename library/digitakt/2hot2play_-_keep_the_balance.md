@@ -2,12 +2,37 @@
 tags: [digitakt, bank, draft]
 slug: 2hot2play_-_keep_the_balance
 bpm: 152.0
-generated: 2026-10-06T11:19:26+00:00
+scale: "F BLUES"
+generated: 2026-10-06T13:44:03+00:00
 ---
 
 # Bank — 2HOT2PLAY — Keep The Balance
 
 Draft genere par `digitakt.py` (stems Demucs), 152.0 BPM, 4/4. Grille des tracks : [[../../digitakt/doctrine|doctrine]]. Point de depart, pas une transcription.
+
+## Harmonie
+
+Gamme : **F blues** (F G# A# B C D#), score 0.731, marge 0.264 (stems). Alternatives : F pentatonique mineure (0.717), F phrygien (0.677), F pentatonique majeure (0.651).
+
+Sur la DT2 : `[FUNC]` + `[KEYBOARD]` > KB SCALE = BLUES, ROOT NOTE = F (manuel §8.5.2).
+
+| Section | Debut | Accords |
+|---|---|---|
+| intro | 0:04 | Fsus2 |
+| breakdown | 0:29 | Fsus2 |
+| breakdown | 0:42 | Fsus2 |
+| breakdown | 0:48 | F5 - Fm |
+| main | 1:07 | Fm |
+| peak | 1:20 | Fm - Fsus2 - Fm - F |
+| breakdown | 1:58 | Fsus2 |
+| breakdown | 2:11 | Fsus2 |
+| breakdown | 2:17 | F |
+| breakdown | 2:30 | - |
+| breakdown | 2:36 | F#sus2 - Asus2 |
+| peak | 2:49 | Fm - F5 - Fm - F5 - Fm |
+| main | 3:15 | Fm - F5 - Fm - Fsus2 - Fm - Fsus2 |
+| peak | 3:40 | Fm - Fsus2 |
+| outro | 3:53 | Fm |
 
 ## Patterns
 
