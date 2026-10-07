@@ -31,6 +31,7 @@ NAME_MAX = 18
 FOLD_MIN = 4          # en dessous, la case rejoint le meme code dans UNIVERSEL
 CANDIDATE_FACTOR = 3  # candidats par case = 3 x quota (pre-selection d'ecoute)
 LONG_ONESHOT_S = 4.0  # un "kick" de plus de 4 s est une boucle
+TEMPO_LOOP_S = 2.0    # tempo dans le nom + au moins 2 s : boucle (piano, synth...)
 
 # Pre-filtre qualite (7.J2) : seuils des drapeaux, poids pour le reclassement.
 MUTE_PEAK_DB = -40.0     # crete sous ce niveau : fichier quasi muet
@@ -172,6 +173,9 @@ beat beats openhh closedhh hihat ohh chh xtrmraw
 """.split())
 _NOTE_RX = re.compile(r"^([A-G][#b]?)(m|min|maj)?$")
 _BPM_RX = re.compile(r"(\d{2,3}) ?bpm")
+# tempo dans le nom sans "bpm" : 170_HeavyBoiBeat, CPCT_120_C_Gamelan, vb6_drm120
+_TEMPO_NAME_RX = re.compile(r"(?:^|_|drm)(\d{2,3})_")
+_ONESHOT_DIR_RX = re.compile(r"one ?-?shots?")
 _SPLIT_RX = re.compile(r"[\s_\-.()\[\],+&']+")
 _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za-z])")
 
@@ -331,7 +335,15 @@ def code_of(rel: str, duration: float | None) -> str | None:
     # replis : BPM dans le dossier (Cyclick/110bpm/), one-shot drum trop long
     loop = loop or (code is None and bool(_BPM_RX.search(low)))
     loop = loop or (code in DRUMS and (duration or 0) > LONG_ONESHOT_S)
+    # tempo en tete ou au milieu du nom (sans "bpm"), assez long, hors dossier one-shot
+    loop = loop or ((duration or 0) >= TEMPO_LOOP_S and tempo_in_name(low)
+                    and not _ONESHOT_DIR_RX.search(low))
     return loop_code(low) if loop else code
+
+
+def tempo_in_name(low: str) -> bool:
+    m = _TEMPO_NAME_RX.search(low.rsplit("/", 1)[-1])
+    return m is not None and 60 <= int(m.group(1)) <= 229
 
 
 def _is_mono_twin(rel: str, all_low: set[str]) -> bool:
@@ -348,7 +360,9 @@ def quota(family: str, code: str) -> int | None:
         return 32
     if family == "UNIVERSEL" and code == "BD":
         return 32
-    return 16 if code in DRUMS | {"BR", "DL", "PL"} else 8
+    if code == "PL" and family in {"JUNGLE", "TRIBE"}:
+        return 32
+    return 16 if code in DRUMS | LOOPS else 8
 
 
 # --- Nommage ----------------------------------------------------------------
@@ -368,7 +382,7 @@ def short_name(rel: str, code: str, pack: str) -> str:
     head: list[str] = []
     if code in TEMPO:
         m = _BPM_RX.search(rel.lower())
-        lead = re.match(r"^(\d{2,3})(?!\d)", stem)
+        lead = _TEMPO_NAME_RX.search(stem.lower())
         bpm = m.group(1) if m else (lead.group(1) if lead else None)
         if bpm and 60 <= int(bpm) <= 220:
             head.append(bpm)
@@ -378,7 +392,9 @@ def short_name(rel: str, code: str, pack: str) -> str:
         if note:
             head.append(_NOTE_RX.match(note).group(1))  # type: ignore[union-attr]
 
-    nums = [t for t in toks if t.isdigit() and t not in head]
+    # numero de variante : 1-2 chiffres ; 406, 516... sont des references de label
+    nums = [t for t in toks if t.isdigit() and (len(t) <= 2 or t.startswith("0"))
+            and t not in head]
     num = f"{int(nums[-1]):02d}" if nums else ""
     # abreviations de pack en capitales (LS-CVP, PXXL) ignorees si le nom a
     # aussi des minuscules ; les lettres isolees ne disent rien
@@ -396,7 +412,7 @@ def short_name(rel: str, code: str, pack: str) -> str:
     fixed = " ".join([code, *head])
     budget = NAME_MAX - len(fixed) - len(pack) - 2           # deux espaces
     desc_budget = budget - (len(num) + 1 if num else 0)
-    if num and desc_budget < 1:       # BPM + note + numero : plus de place
+    if num and desc_budget < 2:       # BPM + note + numero : plus de place
         body = num[-budget:]
     else:
         desc = " ".join(words)[:max(desc_budget, 1)].rstrip()
@@ -425,14 +441,25 @@ def classify(root: Path, overrides: dict[str, Override]) -> tuple[list[_Raw], li
     paths = list(iter_wavs(root))
     rels = [p.relative_to(root).as_posix() for p in paths]
     all_low = {r.lower() for r in rels}
-    raws: list[_Raw] = []
-    unclassified: list[str] = []
+    found: list[tuple[str, float | None, str | None, Override, tuple[str, int]]] = []
     for p, rel in zip(paths, rels):
         ov = overrides.get(rel, Override())
         if ov.exclude or _is_mono_twin(rel, all_low):
             continue
         dur = wav_duration(p)
-        code = ov.code or code_of(rel, dur)
+        found.append((rel, dur, ov.code or code_of(rel, dur), ov,
+                      (p.name.lower(), p.stat().st_size)))
+    # doublon exact entre packs (meme nom, meme taille) : une seule copie, la
+    # classee de preference, puis la plus profonde (plus de contexte de dossier :
+    # jungle dnb rthm/ est une copie de rthm/loops/jungle dnb/)
+    keeper: dict[tuple[str, int], str] = {}
+    for rel, _, code, _, key in sorted(found, key=lambda f: (f[2] is None, -f[0].count("/"), f[0])):
+        keeper.setdefault(key, rel)
+    raws: list[_Raw] = []
+    unclassified: list[str] = []
+    for rel, dur, code, ov, key in found:
+        if keeper[key] != rel:
+            continue
         if code is None:
             unclassified.append(rel)
             continue

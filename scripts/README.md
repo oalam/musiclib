@@ -742,7 +742,10 @@ BL basse.
   `keep` / `drop` et les mesures du manifeste précédent sont conservés.
 - **Tests** : `python -m pytest tests/test_samples.py` (unitaires, fausse
   arborescence) ; `-m integration` vérifie les noms sur le vrai disque.
-- **Limites** : classement par mots-clés du chemin ; environ 500 fichiers sans
+- **Doublons** : mono d'un fichier livré aussi en stéréo, et copies exactes
+  entre packs (même nom, même taille : on garde la copie classée, puis la
+  plus profonde).
+- **Limites** : classement par mots-clés du chemin ; environ 400 fichiers sans
   code (abréviations `MPC_Kit`, packs sans nom de catégorie : `Aotearoa`,
   `Phaised air`). Les seuils du pré-filtre sont fixes, pas réglés par style
   (un kick hardcore écrêté exprès est signalé `sature`). L'export renommé

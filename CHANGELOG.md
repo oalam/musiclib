@@ -24,6 +24,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   sélection puis la réserve, drapeaux du pré-filtre, forme d'onde et lecture
   automatique. Raccourcis `K` garder, `D` écarter, `U` annuler, flèches
   pour le sample et la case, `Espace` rejouer, `R` réserve.
+- [7.J2] Plus de boucles : un tempo dans le nom sans « bpm » (`170_…`,
+  `CPCT_120_…`, `drm120`) sur 2 s ou plus, hors dossier one-shot, fait une
+  boucle (`instru/piano`, `instru/synth` passent de ST à ML) ; tempo repris
+  en tête du nom DT2, références de label à 3 chiffres (406, 516) ignorées
+  comme numéro. Doublons exacts entre packs (même nom, même taille) écartés
+  en gardant la copie classée puis la plus profonde (`jungle dnb rthm/` est
+  une copie de `rthm/loops/jungle dnb/`). Quotas ML et BL de 8 à 16, PL à 32
+  en JUNGLE et TRIBE. Boucles retenues : 260 → 300 (DL 122 + PL 66 + ML 51
+  + BR 40 + BL 21) sur 996 ; non classés 496 → 407.
 - [7.J2] Changement de case à l'écoute : touche `M` ou bouton « case… »
   d'une ligne, choix famille × code (`POST /api/samples/move`). Statut
   gardé, rang en fin de la nouvelle case (un pending y tombe en réserve si

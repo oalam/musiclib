@@ -568,9 +568,11 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Stéréo conservée (400 Mo de RAM par projet) ; les doublons mono d'un pack
   livré en mono et stéréo sont écartés. Pas de dossier « set » : la RAM du
   projet joue ce rôle.
-- Sélection par quotas par case famille × code : 16 drums / BR / DL / PL,
-  8 le reste, 32 pour BD / BR / DL en HARDCORE, JUNGLE, TRIBE et pour
-  UNIVERSEL/BD, tout SAMPLE. Une case de moins de 4 fichiers (hors UNIVERSEL
+- Sélection par quotas par case famille × code : 16 drums et boucles
+  (BR / DL / PL / ML / BL), 8 le reste, 32 pour BD / BR / DL / PL en
+  HARDCORE, JUNGLE, TRIBE (PL : JUNGLE et TRIBE) et pour UNIVERSEL/BD, tout
+  SAMPLE. Révisé le 2026-10-07 : ML et BL de 8 à 16, PL à 32 en JUNGLE et
+  TRIBE (trop peu de boucles retenues). Une case de moins de 4 fichiers (hors UNIVERSEL
   et SAMPLE) rejoint le même code dans UNIVERSEL.
 - Candidats = 3 × quota, alternés entre sous-dossiers ; l'écoute (7.J2) passe
   chaque candidat en `keep` / `drop`. Les `keep` priment, puis les `pending`
@@ -582,7 +584,10 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   (drapeaux), il n'écarte rien ; l'écoute porte d'abord sur les sélectionnés,
   un drop faisant monter le candidat suivant, la réserve restant consultable ;
   vue Samples du front pilotée au clavier (K keep, D drop, flèches) avec
-  forme d'onde.
+  forme d'onde. Changement de case à l'écoute (M) : statut gardé, écrit dans
+  `overrides.json`. Un tempo dans le nom (`170_…`, `_120_`) sur 2 s ou plus,
+  hors dossier one-shot, fait une boucle ; les doublons exacts entre packs
+  (même nom, même taille) n'en gardent qu'une copie.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

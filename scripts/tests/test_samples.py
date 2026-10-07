@@ -109,8 +109,10 @@ def test_unique_suffix_keeps_length() -> None:
 def test_quota() -> None:
     assert smp.quota("HARDCORE", "BD") == 32
     assert smp.quota("TRIBE", "DL") == 32
-    assert smp.quota("JUNGLE", "PL") == 16
-    assert smp.quota("UNIVERSEL", "ML") == 8
+    assert smp.quota("JUNGLE", "PL") == 32
+    assert smp.quota("AUTRES", "PL") == 16
+    assert smp.quota("UNIVERSEL", "ML") == 16
+    assert smp.quota("HARDCORE", "BL") == 16
     assert smp.quota("UNIVERSEL", "BD") == 32
     assert smp.quota("UNIVERSEL", "SD") == 16
     assert smp.quota("JUNGLE", "FX") == 8
@@ -236,7 +238,7 @@ def test_loop_name_keeps_bpm_and_note() -> None:
 
 def test_name_without_room_for_desc() -> None:
     name = smp.short_name("instru/synth/170_F#_Synthloop 045_516.wav", "ML", "ins")
-    assert name == "ML 170 F# 516 ins" and len(name) <= NAME_MAX
+    assert name == "ML 170 F# 45 ins" and len(name) <= NAME_MAX
 
 
 # --- Pre-filtre qualite (7.J2) ----------------------------------------------
@@ -347,3 +349,37 @@ def test_save_overrides_roundtrip(tmp_path: Path) -> None:
     cli.save_overrides({"b.wav": Override(code="PC"), "a.wav": Override(exclude=True)}, path)
     assert json.loads(path.read_text()) == {"a.wav": {"exclude": True}, "b.wav": {"code": "PC"}}
     assert cli.load_overrides(path)["b.wav"].code == "PC"
+
+
+
+@pytest.mark.parametrize(("rel", "dur", "code"), [
+    ("instru/piano/100_Cm_Lofipiano_SP_09_406.wav", 19.2, "ML"),
+    ("rthm/loops/jungle dnb/170_HeavyBoiBeat_02_516.wav", 5.6, "DL"),
+    ("instru/key/CPCT_120_C_Gamelan_01.wav", 4.0, "ML"),
+    ("jungle/vb6_drm120_megadrive2.wav", 3.0, "DL"),
+    ("instru/oneshot/170_F_BumbleBeeSynth_02_516.wav", 2.8, "ST"),   # dossier one-shot
+    ("instru/piano/100_Cm_Piano_Hit.wav", 1.0, "ST"),                # trop court
+    ("drums/Kick_120_Hard.wav", 0.4, "BD"),
+])
+def test_tempo_in_name_makes_a_loop(rel: str, dur: float, code: str) -> None:
+    assert smp.code_of(rel, dur) == code
+
+
+def test_loop_name_tempo_without_bpm_and_label_ids() -> None:
+    assert smp.short_name("instru/key/CPCT_120_C_Gamelan_01.wav", "ML", "ins").startswith("ML 120 C ")
+    name = smp.short_name("rthm/loops/jungle dnb/170_HeavyBoiBeat_02_516.wav", "DL", "rth")
+    assert name.startswith("DL 170 ") and "516" not in name and name.endswith(" 02 rth")
+
+
+def test_exact_duplicate_across_packs_keeps_classified_copy(tmp_path: Path) -> None:
+    root = tmp_path / "Samples"
+    _wav(root / "aaa copy" / "170_HeavyBoiBeat_02.wav", seconds=3.0)
+    _wav(root / "aaa copy" / "zz9_Thing.wav", seconds=3.0)              # non classe...
+    _wav(root / "rthm" / "loops" / "zz9_Thing.wav", seconds=3.0)        # ... double classe
+    _wav(root / "rthm" / "loops" / "170_HeavyBoiBeat_02.wav", seconds=3.0)
+    _wav(root / "rthm" / "loops" / "other" / "Unique Loop.wav", seconds=3.0)
+    raws, unclassified = smp.classify(root, {})
+    srcs = sorted(r.source for r in raws) + unclassified
+    assert "aaa copy/170_HeavyBoiBeat_02.wav" not in srcs
+    assert "rthm/loops/170_HeavyBoiBeat_02.wav" in srcs
+    assert "rthm/loops/zz9_Thing.wav" in srcs and "aaa copy/zz9_Thing.wav" not in srcs
