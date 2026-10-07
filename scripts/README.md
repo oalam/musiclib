@@ -717,7 +717,9 @@ python samples.py --report        # grille du manifeste existant (retenus/candid
 python samples.py --unclassified  # fichiers sans code, à corriger par override
 ```
 
-Exemple de noms : `BD G# Overd 02 vtl`, `BR 170 Amen j89`, `HH Schat 17 meg`.
+Exemple de noms : `BD G# Overd 02 vtl`, `BR 170 Amen j89`, `HH Schat 17 meg`,
+`ML 140 A Acid lpk`. Boucles : BR break, DL drums, PL percussions, ML mélodie,
+BL basse.
 
 - **Overrides** : `library/samples/overrides.json`, clé = chemin relatif à
   `Samples/`, champs `family`, `code`, `name`, `exclude`. Une famille forcée

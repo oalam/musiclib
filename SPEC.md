@@ -556,16 +556,20 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   JUNGLE, DUBSTEP, TECHNO, TRIBE (slot du pack Tribalism Vol. 1, à venir),
   AUTRES (house, EDM, world), UNIVERSEL (machines, FX, instruments, foley,
   Native Instruments, minimoog), SAMPLE (samples et resamples maison).
-- Codes à 2 lettres façon Elektron (BD SD CP HH OH CY TM PC BR LP BS ST PD FX
-  VX RS), aussi en tête du nom : `<CODE> [BPM|note] <desc> <pack>`, 18
-  caractères au plus (≈ 14 visibles dans la liste des samples d'une track,
-  où le dossier n'apparaît plus). BPM en tête pour BR / LP, note pour BD /
-  BS / ST / PD.
+- Codes à 2 lettres façon Elektron (BD SD CP HH OH CY TM PC, boucles BR DL
+  PL ML BL, puis BS ST PD FX VX RS), aussi en tête du nom :
+  `<CODE> [BPM|note] <desc> <pack>`, 18 caractères au plus (≈ 14 visibles
+  dans la liste des samples d'une track, où le dossier n'apparaît plus).
+  BPM en tête pour les boucles, note pour BD / BS / ST / PD / ML / BL.
+- Boucles découpées au niveau 2 (pas de 4e niveau, le code reste lisible à
+  l'écran) : BR break, DL drums (défaut), PL percussions / hats / tops, ML
+  mélodie (synthé, lead, accords, séquences), BL basse ; une boucle de nappe
+  va en PD, de voix en VX, un build en FX.
 - Stéréo conservée (400 Mo de RAM par projet) ; les doublons mono d'un pack
   livré en mono et stéréo sont écartés. Pas de dossier « set » : la RAM du
   projet joue ce rôle.
-- Sélection par quotas par case famille × code : 16 drums / BR / LP, 8 le
-  reste, 32 pour BD / BR / LP en HARDCORE, JUNGLE, TRIBE et pour
+- Sélection par quotas par case famille × code : 16 drums / BR / DL / PL,
+  8 le reste, 32 pour BD / BR / DL en HARDCORE, JUNGLE, TRIBE et pour
   UNIVERSEL/BD, tout SAMPLE. Une case de moins de 4 fichiers (hors UNIVERSEL
   et SAMPLE) rejoint le même code dans UNIVERSEL.
 - Candidats = 3 × quota, alternés entre sous-dossiers ; l'écoute (7.J2) passe

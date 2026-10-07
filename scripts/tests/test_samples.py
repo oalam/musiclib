@@ -78,11 +78,11 @@ def test_code_rules(rel: str, code: str | None) -> None:
 def test_bpm_in_folder_does_not_make_a_loop() -> None:
     rel = "SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/Closed Hihat 28.wav"
     assert smp.code_of(rel, 0.3) == "HH"
-    assert smp.code_of("x/Groovy thing 126 bpm.wav", 2.0) == "LP"
+    assert smp.code_of("x/Groovy thing 126 bpm.wav", 2.0) == "DL"
 
 
 def test_long_drum_becomes_loop() -> None:
-    assert smp.code_of("rthm/kick/Long Kick.wav", 5.0) == "LP"
+    assert smp.code_of("rthm/kick/Long Kick.wav", 5.0) == "DL"
 
 
 @pytest.mark.parametrize("rel, code, pack, expected", [
@@ -106,7 +106,9 @@ def test_unique_suffix_keeps_length() -> None:
 
 def test_quota() -> None:
     assert smp.quota("HARDCORE", "BD") == 32
-    assert smp.quota("TRIBE", "LP") == 32
+    assert smp.quota("TRIBE", "DL") == 32
+    assert smp.quota("JUNGLE", "PL") == 16
+    assert smp.quota("UNIVERSEL", "ML") == 8
     assert smp.quota("UNIVERSEL", "BD") == 32
     assert smp.quota("UNIVERSEL", "SD") == 16
     assert smp.quota("JUNGLE", "FX") == 8
@@ -124,7 +126,7 @@ def test_build_manifest(tree: Path) -> None:
     assert "HARDCORE/SD" in m.folded
     # HARDCORE/BD a 5 fichiers : reste en famille
     assert by_src["Hardcore free samples/Kicks/Hard Kick 01.wav"].family == "HARDCORE"
-    assert by_src["rthm/kick/Long Kick.wav"].code == "LP"
+    assert by_src["rthm/kick/Long Kick.wav"].code == "DL"
     assert m.unclassified == ["MPC_Kit/zzz01.wav"]
     # SAMPLE n'est jamais replie ni plafonne
     assert by_src["recorded/take.wav"].family == "SAMPLE"
@@ -207,4 +209,29 @@ def test_real_samples_names_fit() -> None:
 
 def test_bpm_folder_is_loop_fallback() -> None:
     assert smp.code_of("Music Radar/Cyclick/110bpm/WP_BeanGourd_110-01.wav", 2.0) == "PC"
-    assert smp.code_of("Music Radar/Cyclick/110bpm/WP_Thing_110-01.wav", 2.0) == "LP"
+    assert smp.code_of("Music Radar/Cyclick/110bpm/WP_Thing_110-01.wav", 2.0) == "PL"
+
+
+@pytest.mark.parametrize("rel, code", [
+    ("rthm/loops/breakbeat/Think 170.wav", "BR"),
+    ("Loops Pack/Drum Loops/Rolling 01.wav", "DL"),
+    ("rthm/loops/hh loops/Hats 120 bpm.wav", "PL"),
+    ("jungle dnb rthm/Tops/Top 03.wav", "PL"),
+    ("Loops Pack/Synth Loops/Acid 140 bpm.wav", "ML"),
+    ("Hardcore free samples/HSI/LS-HSI Hardcore Sequence Wet [142 BPM] 01-03.wav", "ML"),
+    ("Loops Pack/Sample Packs/Reese Loop 01.wav", "BL"),
+    ("Jungle 89  to 99/Pads/Groove Therapy Pad.wav", "PD"),
+    ("x/loops/Vocal Loop 2.wav", "VX"),
+    ("jungle dnb rthm/Builds/Build 04.wav", "FX"),
+])
+def test_loop_codes(rel: str, code: str) -> None:
+    assert smp.code_of(rel, 4.0) == code
+
+
+def test_loop_name_keeps_bpm_and_note() -> None:
+    assert smp.short_name("Loops Pack/Synth Loops/Acid A 140 bpm.wav", "ML", "lpk") == "ML 140 A Acid lpk"
+
+
+def test_name_without_room_for_desc() -> None:
+    name = smp.short_name("instru/synth/170_F#_Synthloop 045_516.wav", "ML", "ins")
+    assert name == "ML 170 F# 516 ins" and len(name) <= NAME_MAX

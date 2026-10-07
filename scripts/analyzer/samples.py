@@ -29,10 +29,11 @@ LONG_ONESHOT_S = 4.0  # un "kick" de plus de 4 s est une boucle
 
 FAMILIES = ("AUTRES", "DUBSTEP", "HARDCORE", "JUNGLE", "SAMPLE", "TECHNO", "TRIBE", "UNIVERSEL")
 CODES = ("BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC",
-         "BR", "LP", "BS", "ST", "PD", "FX", "VX", "RS")
+         "BR", "DL", "PL", "ML", "BL", "BS", "ST", "PD", "FX", "VX", "RS")
 DRUMS = frozenset({"BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC"})
-TONAL = frozenset({"BD", "BS", "ST", "PD"})   # note gardee dans le nom
-TEMPO = frozenset({"BR", "LP"})               # BPM garde dans le nom
+TONAL = frozenset({"BD", "BS", "ST", "PD", "ML", "BL"})   # note gardee dans le nom
+# Boucles : BR break, DL drums, PL percussions / hats, ML melodie, BL basse
+TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL"})         # BPM garde dans le nom
 NO_FOLD = frozenset({"UNIVERSEL", "SAMPLE"})
 
 # Prefixe de chemin (minuscules, relatif a Samples/) -> famille. Le plus long
@@ -113,7 +114,6 @@ PACK_CODES: dict[str, str] = {
 _B, _E = r"(?<![a-z])", r"(?![a-z])"   # bornes : _ et chiffres separent les mots
 CODE_RULES: tuple[tuple[str, str], ...] = (
     ("BR", r"break|amen"),
-    ("LP", rf"loop|groove|sequence|{_B}tops?{_E}|{_B}fill|{_B}builds?{_E}"),
     ("BD", rf"kick|{_B}bd|bassdrum|basedrum|bass ?drum|{_B}kik"),
     ("SD", rf"snare|{_B}sd{_E}|{_B}sd\d|{_B}snr|{_B}rim|{_B}rs\d"),
     ("CP", rf"clap|{_B}cp{_E}|{_B}cp\d|snap"),
@@ -130,6 +130,20 @@ CODE_RULES: tuple[tuple[str, str], ...] = (
     ("RS", r"recorded|resample|transfers"),
 )
 _CODE_RX = tuple((c, re.compile(p)) for c, p in CODE_RULES)
+
+# Une boucle se reconnait au chemin ; son code depend ensuite de son contenu.
+_LOOP_RX = re.compile(rf"loop|{_B}grooves?{_E}|sequence|{_B}tops?{_E}|{_B}fill|{_B}builds?{_E}")
+LOOP_RULES: tuple[tuple[str, str], ...] = (
+    ("VX", r"vox|vocal|voice|chant|adlib|acapella"),
+    ("PD", r"pad|drone|atmos|ambien|texture"),            # une nappe n'est pas une boucle
+    ("FX", rf"{_B}fx|sfx|rise|sweep|noise|glitch|{_B}builds?{_E}"),
+    ("BL", rf"bass|{_B}sub{_E}|reese|808"),
+    ("ML", rf"synth|lead|{_B}arp|chord|piano|{_B}keys?{_E}|guitar|riff|melod|stab|organ"
+           rf"|string|brass|minimoog|sequence"),
+    ("PL", rf"perc|conga|bongo|shaker|tamb|{_B}hats?{_E}|hihat|{_B}hh|{_B}tops?{_E}"
+           rf"|cyclick|gourd|{_B}ride"),
+)
+_LOOP_CODE_RX = tuple((c, re.compile(p)) for c, p in LOOP_RULES)
 
 # Mots retires de la description : categories (deja dans le code) et bruit
 # recurrent des packs.
@@ -246,18 +260,22 @@ def pack_of(rel: str) -> str:
     return top[:3] or "pk"
 
 
+def loop_code(low: str) -> str:
+    """Code d'une boucle selon son contenu ; drums par defaut."""
+    return next((c for c, rx in _LOOP_CODE_RX if rx.search(low)), "DL")
+
+
 def code_of(rel: str, duration: float | None) -> str | None:
     low = rel.lower()
     code = next((c for c, rx in _CODE_RX if rx.search(low)), None)
-    # un BPM dans le nom du fichier (pas du dossier) signe une boucle
-    if code not in {"BR", "LP"} and _BPM_RX.search(low.rsplit("/", 1)[-1]):
-        code = "LP"
-    # sinon, BPM dans le dossier (Cyclick/110bpm/) : repli en boucle
-    if code is None and _BPM_RX.search(low):
-        code = "LP"
-    if code in DRUMS and (duration or 0) > LONG_ONESHOT_S:
-        return "LP"
-    return code
+    if code == "BR":
+        return code
+    # boucle : mot-cle du chemin ou BPM dans le nom du fichier (pas du dossier)
+    loop = bool(_LOOP_RX.search(low) or _BPM_RX.search(low.rsplit("/", 1)[-1]))
+    # replis : BPM dans le dossier (Cyclick/110bpm/), one-shot drum trop long
+    loop = loop or (code is None and bool(_BPM_RX.search(low)))
+    loop = loop or (code in DRUMS and (duration or 0) > LONG_ONESHOT_S)
+    return loop_code(low) if loop else code
 
 
 def _is_mono_twin(rel: str, all_low: set[str]) -> bool:
@@ -270,11 +288,11 @@ def quota(family: str, code: str) -> int | None:
     """Nombre de samples retenus par case ; None = tout (SAMPLE)."""
     if family == "SAMPLE":
         return None
-    if code in {"BD", "BR", "LP"} and family in {"HARDCORE", "JUNGLE", "TRIBE"}:
+    if code in {"BD", "BR", "DL"} and family in {"HARDCORE", "JUNGLE", "TRIBE"}:
         return 32
     if family == "UNIVERSEL" and code == "BD":
         return 32
-    return 16 if code in DRUMS | TEMPO else 8
+    return 16 if code in DRUMS | {"BR", "DL", "PL"} else 8
 
 
 # --- Nommage ----------------------------------------------------------------
@@ -322,8 +340,11 @@ def short_name(rel: str, code: str, pack: str) -> str:
     fixed = " ".join([code, *head])
     budget = NAME_MAX - len(fixed) - len(pack) - 2           # deux espaces
     desc_budget = budget - (len(num) + 1 if num else 0)
-    desc = " ".join(words)[:max(desc_budget, 1)].rstrip()
-    body = f"{desc} {num}" if num else desc
+    if num and desc_budget < 1:       # BPM + note + numero : plus de place
+        body = num[-budget:]
+    else:
+        desc = " ".join(words)[:max(desc_budget, 1)].rstrip()
+        body = f"{desc} {num}" if num else desc
     return f"{fixed} {body} {pack}"
 
 
