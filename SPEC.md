@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7) | fait (7.J1 à 7.J6), 7.J7 à venir (session dédiée) ; reste l'écoute elle-même, l'export se rejoue après |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7) | fait (7.J1 à 7.J7) ; reste l'écoute elle-même, l'export se rejoue après |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -676,7 +676,7 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   dans `overrides.json`, affichés en pointillé et cliquables (ajout au
   filtre) ; `no_auto` (fichier ou `<préfixe>/`) en masque un.
 
-**Décisions 7.J7 — tonalité des one-shots tonals (arbitrées le 2026-10-08, à coder en session dédiée)** :
+**Décisions 7.J7 — tonalité des one-shots tonals (arbitrées et faites le 2026-10-08)** :
 - Constat : la note ne vient aujourd'hui que du nom de fichier (79 BD
   candidats sur 418), rien n'est mesuré dans l'audio.
 - Périmètre : tous les one-shots tonals, BD, BS, ST, PD ; les boucles ML / BL
@@ -688,12 +688,22 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Filtre par tonalité : facette « note » dans la barre de recherche (OU entre
   notes, comme les autres facettes) et une roue chromatique cliquable (12
   notes, nombre de samples par note, clic = ajout / retrait du filtre).
-- Pistes de mise en œuvre (à confirmer en session) : mesure de la
-  fondamentale sur le corps du son après l'attaque (pyin ou pic spectral,
-  plage basse pour BD / BS) avec seuil de confiance ; champs `note`,
-  `note_hz`, `note_src` (nom / mesure) sur les candidats, mesurés comme les
-  drapeaux qualité et repris du manifeste précédent ; réserve hors plafond
-  non mesurée (mesure à la promotion) ; `SampleFilter.notes`.
+- Mise en œuvre : fondamentale pyin (médiane des trames voisées) sur le
+  corps du son, après l'attaque (50 ms pour BD, 30 ms sinon), plage par code
+  (BD 30-250 Hz, BS 27-500, PD 40-1500) ; la note n'est retenue que si le
+  pic spectral donne la même, sinon `note_src = incertaine` (Hz gardés, pas
+  de note dans le nom). Champs `note` (dièses), `note_hz`, `note_src` (nom /
+  mesure / incertaine) sur les candidats, mesurés comme les drapeaux et
+  repris du manifeste précédent ; réserve non mesurée (note du nom seule,
+  mesure à la promotion) ; `SampleFilter.notes`, `GET /api/samples/notes`.
+- Arbitrage en session (prototype sur les 142 one-shots notés par leur nom) :
+  pyin juste pour 61/79 BD, 27/45 BS, 5/6 PD, 2/12 ST (accords : la quinte
+  sort). **ST n'est pas mesuré** (note du nom seule) ; règle d'accord pyin +
+  pic spectral (45/56 BD justes quand ils s'accordent, contre 16/23 sinon).
+  Une note mesurée est signalée « ~G# » dans le front, pas dans le nom DT2.
+- Premier passage : BD 111 mesurées / 228 incertaines / 79 lues, BS 45 / 26
+  / 45, PD 14 / 28 / 6, ST 12 lues sur 76. Les notes lues des boucles ML / BL
+  comptent dans la roue et le filtre (rien n'y est mesuré).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

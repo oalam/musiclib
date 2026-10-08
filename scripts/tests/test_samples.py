@@ -1,4 +1,4 @@
-"""Classement des samples DT2 (analyzer/samples.py, samples.py) — Phase 7.J1, 7.J2, 7.J4."""
+"""Classement des samples DT2 (analyzer/samples.py, samples.py) — Phase 7.J1 a 7.J7."""
 from __future__ import annotations
 
 import json
@@ -211,7 +211,7 @@ def test_real_samples_names_fit() -> None:
     from paths import SAMPLES_SRC_DIR, media_available
     if not media_available() or not SAMPLES_SRC_DIR.is_dir():
         pytest.skip("SSD media absent")
-    m = smp.build_manifest(SAMPLES_SRC_DIR, {}, measure_fn=None)
+    m = smp.build_manifest(SAMPLES_SRC_DIR, {}, measure_fn=None, note_fn=None)
     assert all(len(e.name) <= NAME_MAX for e in m.entries)
     assert len({e.dest for e in m.entries}) == len(m.entries)
 
@@ -669,6 +669,93 @@ def test_filter_facets_and_or(tmp_path: Path) -> None:
     assert smp.filter_manifest(m, F(q="zzz"), {}).unclassified == ["MPC_Kit/zzz01.wav"]
     facets = {t: (g, n) for t, g, n in smp.facet_tags(m, {})}
     assert facets["hardcore"] == ("genre", 60) and facets["jungle"][0] == "genre"
+
+
+# --- Tonalite (7.J7) --------------------------------------------------------
+
+def _pitched(path: Path, hz: float, seconds: float = 0.8, rate: int = 22050) -> Path:
+    """One-shot a fondamentale fixe, attaque franche et decroissance."""
+    t = np.arange(int(seconds * rate)) / rate
+    y = 0.8 * np.exp(-3 * t) * (np.sin(2 * np.pi * hz * t) + 0.3 * np.sin(4 * np.pi * hz * t))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    sf.write(str(path), y, rate, subtype="FLOAT")
+    return path
+
+
+@pytest.mark.parametrize(("hz", "code", "note"), [
+    (55.0, "BD", "A"), (49.0, "BD", "G"), (41.2, "BS", "E"), (261.6, "PD", "C")])
+def test_measure_note(tmp_path: Path, hz: float, code: str, note: str) -> None:
+    got, got_hz = smp.measure_note(_pitched(tmp_path / "x.wav", hz), code)
+    assert got == note and got_hz is not None and abs(got_hz - hz) / hz < 0.03
+
+
+def test_measure_note_silence_and_unreadable(tmp_path: Path) -> None:
+    _wav(tmp_path / "s.wav", seconds=0.5, rate=22050)
+    assert smp.measure_note(tmp_path / "s.wav", "BD") == (None, None)
+    bad = tmp_path / "bad.wav"
+    bad.write_bytes(b"RIFFxxxx")
+    assert smp.measure_note(bad, "BD") == (None, None)
+
+
+def test_pitch_helpers() -> None:
+    assert smp.pitch_class(440.0) == "A" and smp.pitch_class(51.9) == "G#"
+    assert smp.sharp("Bb") == "A#" and smp.sharp("C#") == "C#"
+    assert smp.name_note("x/LS-HK Bounce Kick 21 F#.wav", "BD") == "F#"
+    assert smp.name_note("x/LS-HK Bounce Kick 21 F#.wav", "SD") is None
+
+
+def test_measured_note_in_name() -> None:
+    assert smp.short_name("p/Overd 02.wav", "BD", "vtl", note="G#") == "BD G# Overd 02 vtl"
+    # la note du nom reste prioritaire
+    assert smp.short_name("p/Kick A 02.wav", "BD", "vtl", note="G#").startswith("BD A ")
+
+
+def test_build_manifest_notes(tree: Path) -> None:
+    _wav(tree / "909" / "clean" / "bd03 Bb.wav")
+    calls: list[str] = []
+
+    def fake(path: Path, code: str) -> tuple[str | None, float | None]:
+        calls.append(path.name)
+        return ("G#", 51.5) if path.name == "bd01.wav" else (None, 80.0)
+    first = smp.build_manifest(tree, {}, measure_fn=None, bpm_fn=None, note_fn=fake)
+    by = {e.source.rsplit("/", 1)[-1]: e for e in first.entries}
+    assert (by["bd01.wav"].note, by["bd01.wav"].note_src) == ("G#", "mesure")
+    assert by["bd01.wav"].name.startswith("BD G# ")
+    assert (by["bd02.wav"].note, by["bd02.wav"].note_hz, by["bd02.wav"].note_src) == (None, 80.0, "incertaine")
+    assert by["bd03 Bb.wav"].note == "A#" and by["bd03 Bb.wav"].note_src == "nom"
+    assert "bd03 Bb.wav" not in calls and "take.wav" not in calls
+    # reprise du manifeste precedent : rien n'est remesure
+    n = len(calls)
+    again = smp.build_manifest(tree, {}, previous=first, measure_fn=None, bpm_fn=None, note_fn=fake)
+    assert len(calls) == n and next(e for e in again.entries if e.source.endswith("bd01.wav")).note == "G#"
+
+
+def test_move_remeasures_note(tree: Path) -> None:
+    m = smp.build_manifest(tree, {}, measure_fn=None, bpm_fn=None, note_fn=None)
+    src = "recorded/take.wav"
+    smp.move(m, {}, src, "SAMPLE", "BS", tree, measure_fn=None, bpm_fn=None,
+             note_fn=lambda p, c: ("E", 41.2))
+    e = next(x for x in m.entries if x.source == src)
+    assert (e.code, e.note, e.note_src) == ("BS", "E", "mesure") and e.name.startswith("BS E ")
+    smp.move(m, {}, src, "SAMPLE", "FX", tree, measure_fn=None, bpm_fn=None, note_fn=None)
+    assert (e.note, e.note_src) == (None, None) and e.name.startswith("FX ")
+
+
+def test_filter_by_note_and_wheel() -> None:
+    entries = [smp.SampleEntry(source=f"p/bd{i}.wav", family="JUNGLE", code="BD", pack="p",
+                               name=f"BD {i}", duration=0.3, rank=i, note=n)
+               for i, n in enumerate(["A", "G#", None], 1)]
+    m = smp.Manifest(source_root="/x", total=5, entries=entries, unclassified=["p/u.wav"],
+                     reserve=[smp.ReserveSample(source="p/Kick A 09.wav", family="JUNGLE",
+                                                code="BD", pack="p", duration=0.3)])
+    got = smp.filter_manifest(m, smp.SampleFilter(notes=["A", "C"]), {})
+    assert [e.note for e in got.entries] == ["A"] and len(got.reserve) == 1
+    assert got.unclassified == []
+    wheel = dict(smp.facet_notes(m))
+    assert list(wheel) == list(smp.PITCH_CLASSES)
+    assert (wheel["A"], wheel["G#"], wheel["C"]) == (2, 1, 0)
+    rows = smp.overflow_of(m, "JUNGLE", "BD")
+    assert (rows[0].note, rows[0].note_src) == ("A", "nom")
 
 
 # --- Export (7.J3) ----------------------------------------------------------

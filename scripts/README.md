@@ -776,10 +776,19 @@ BL basse.
   packs, instruments, rythmique / mélodique, one-shot / boucle, étoiles ;
   ET entre facettes, OU dedans. Mêmes paramètres sur `GET /api/samples`,
   `/cell`, `/loose`, `/kits`, `/kit/tree` (`q`, `tags`, `kits`, `codes`,
-  `section`, `kind`, `min_stars`) ; `GET /api/samples/facets` liste les tags
+  `section`, `kind`, `min_stars`, `notes`) ; `GET /api/samples/facets` liste les tags
   et leur groupe. Tags inférés des dossiers (`auto_tags`, dictionnaire
   `TAG_GROUPS` de `analyzer/samples.py`) : `samples.py --tag-report` montre
   les mots fréquents non couverts ; `no_auto` dans `overrides.json` en masque.
+- **Tonalité (7.J7)** : la note d'un one-shot tonal vient du nom de fichier
+  (prioritaire), sinon, pour BD / BS / PD, de l'audio : fondamentale pyin
+  sur le corps du son après l'attaque, retenue seulement si le pic spectral
+  donne la même note (sinon `note_src = incertaine`, pas de note). La note
+  mesurée entre dans le nom DT2 (`BD G# Overd 02 vtl`) et s'affiche « ~G# »
+  dans le front. ST n'est pas mesuré (accords). Roue chromatique dans la
+  barre de recherche (clic = ajout / retrait du filtre), facette note (`g#`,
+  `ab`) ; API : paramètre `notes`, `GET /api/samples/notes`.
+  `--no-measure` saute aussi la note.
 - **Export (7.J3)** : `samples.py --export --dry-run` (bilan), puis
   `samples.py --export`, ou le bouton « Exporter… » de l'onglet Samples.
   Copie les retenus tels quels vers

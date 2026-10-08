@@ -37,6 +37,14 @@ genre / instrument / mot-cle) ; recalcules a chaque reconstruction, jamais
 ecrits dans les overrides ; `no_auto` (sur un fichier ou un `<prefixe>/`) en
 masque. `tag_report` liste les mots frequents non couverts.
 
+Tonalite (7.J7) : la note d'un one-shot tonal vient du nom de fichier
+(prioritaire, `note_src="nom"`) ou, pour BD / BS / PD, de l'audio
+(`measure_note` : fondamentale pyin du corps du son apres l'attaque, retenue
+seulement si le pic spectral donne la meme note ; sinon `incertaine`). La
+note mesuree entre dans le nom DT2 comme une note lue. Mesuree comme les
+drapeaux (candidats seulement, reprise du manifeste precedent) ; la reserve
+n'a que la note du nom. `SampleFilter.notes` filtre par note.
+
 Export (7.J3) : les retenus (`selected`) sont copies tels quels sous
 `<dest>/<FAMILLE>/<CODE>/<nom>.wav`, arborescence que Transfer envoie sur le
 +Drive de la DT2. Rejouable : un index (`export.json`) liste les fichiers
@@ -78,6 +86,15 @@ CLIP_SHARE = 0.001       # ... sur plus de 0,1 % du fichier
 LEAD_DB = -40.0          # relatif a la crete : en dessous, c'est du blanc
 LEAD_MAX_S = 0.03        # blanc en tete d'un one-shot au-dela duquel le trig traine
 LONG_HIT_S = 2.0         # frappe de drums plus longue (queue, reverb, boucle mal rangee)
+# Tonalite (7.J7) : plage de la fondamentale par code, attaque sautee.
+NOTE_RANGE_HZ = {"BD": (30.0, 250.0), "BS": (27.0, 500.0), "PD": (40.0, 1500.0)}
+NOTE_ATTACK_S = {"BD": 0.05}    # glissando du kick ; autres codes : NOTE_ATTACK_DEFAULT_S
+NOTE_ATTACK_DEFAULT_S = 0.03
+NOTE_BODY_S = 2.0               # duree lue
+NOTE_MIN_FRAMES = 3             # trames voisees minimum
+PITCH_CLASSES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+_FLAT_TO_SHARP = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#", "Cb": "B", "Fb": "E",
+                  "E#": "F", "B#": "C"}
 FLAG_WEIGHT = {"illisible": 3, "muet": 3, "sature": 1, "blanc": 1, "faible": 1, "long": 1}
 
 FAMILIES = ("AUTRES", "DUBSTEP", "HARDCORE", "JUNGLE", "SAMPLE", "TECHNO", "TRIBE", "UNIVERSEL")
@@ -85,6 +102,7 @@ CODES = ("BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC",
          "BR", "DL", "PL", "ML", "BL", "BS", "ST", "PD", "FX", "VX", "RS")
 DRUMS = frozenset({"BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC"})
 TONAL = frozenset({"BD", "BS", "ST", "PD", "ML", "BL"})   # note gardee dans le nom
+PITCHED = frozenset({"BD", "BS", "PD"})   # note mesuree dans l'audio (7.J7 ; ST : accords)
 # Boucles : BR break, DL drums, PL percussions / hats, ML melodie, BL basse
 TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL"})         # BPM garde dans le nom
 RHYTHM = DRUMS | {"BR", "DL", "PL"}   # tracks 1 a 8 de la doctrine ; le reste : melodique
@@ -262,6 +280,8 @@ TAG_WORDS: dict[str, str] = {w: tag for tags in TAG_GROUPS.values() for tag, wor
 TAG_GROUP: dict[str, str] = {tag: g for g, tags in TAG_GROUPS.items() for tag in tags}
 
 Status = Literal["pending", "keep", "drop"]
+# nom : lue dans le nom ; mesure : mesuree ; incertaine : mesuree sans note sure
+NoteSrc = Literal["nom", "mesure", "incertaine"]
 LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
 
 
@@ -286,6 +306,9 @@ class SampleEntry(BaseModel):
     tags: list[str] = Field(default_factory=list)   # copie des overrides (7.J4)
     stars: int | None = None
     auto_tags: list[str] = Field(default_factory=list)  # inferes des dossiers (7.J6)
+    note: str | None = None         # classe de hauteur en dieses (7.J7)
+    note_hz: float | None = None    # fondamentale mesuree (pyin)
+    note_src: NoteSrc | None = None  # None : pas mesuree (ou code non tonal)
     overflow: bool = False          # reserve hors plafond, vue par kit (7.J5), jamais stocke
 
     @property
@@ -434,6 +457,51 @@ def measure(path: Path, code: str) -> list[str]:
     if code in DRUMS and a.size / sr > LONG_HIT_S:
         flags.append("long")
     return flags
+
+
+def pitch_class(hz: float) -> str:
+    """Classe de hauteur (dieses) d'une frequence, au demi-ton le plus proche."""
+    return PITCH_CLASSES[round(12 * np.log2(hz / 440.0) + 69) % 12]
+
+
+def spectral_peak(y: np.ndarray, sr: int, lo: float, hi: float) -> float | None:
+    """Frequence du plus fort pic du spectre (1 s au plus, fenetre de Hann)
+    entre `lo` et `hi`."""
+    w = y[:sr] * np.hanning(min(y.size, sr))
+    spec = np.abs(np.fft.rfft(w, 1 << 16))
+    freqs = np.fft.rfftfreq(1 << 16, 1 / sr)
+    band = (freqs >= lo) & (freqs <= hi)
+    return float(freqs[band][np.argmax(spec[band])]) if band.any() else None
+
+
+def measure_note(path: Path, code: str) -> tuple[str | None, float | None]:
+    """(note, fondamentale en Hz) d'un one-shot BD / BS / PD : mediane pyin
+    sur le corps du son, apres l'attaque. La note n'est donnee que si le pic
+    spectral tombe sur la meme ; sinon (None, Hz) : note incertaine."""
+    import librosa   # lourd : seulement quand un one-shot doit etre mesure
+
+    lo, hi = NOTE_RANGE_HZ[code]
+    try:
+        y, sr = librosa.load(str(path), sr=22050, mono=True, duration=NOTE_BODY_S)
+    except Exception:  # noqa: BLE001 - fichier illisible : pas de note
+        return None, None
+    if not y.size:
+        return None, None
+    frame = 4096 if code in {"BD", "BS"} else 2048
+    start = int(np.argmax(np.abs(y)))
+    body = y[start + int(NOTE_ATTACK_S.get(code, NOTE_ATTACK_DEFAULT_S) * sr):]
+    if body.size < frame:       # son tres court : tout depuis la crete
+        body = y[start:]
+    if body.size < frame:
+        return None, None
+    f0, voiced, _ = librosa.pyin(body, fmin=lo, fmax=hi, sr=sr, frame_length=frame)
+    ok = voiced & np.isfinite(f0)
+    if ok.sum() < NOTE_MIN_FRAMES:
+        return None, None
+    hz = float(np.median(f0[ok]))
+    peak = spectral_peak(body, sr, lo, hi)
+    note = pitch_class(hz)
+    return (note if peak and pitch_class(peak) == note else None), round(hz, 1)
 
 
 def clipped_share(a: np.ndarray) -> float:
@@ -645,9 +713,24 @@ def _tokens(text: str) -> list[str]:
     return [t for chunk in _SPLIT_RX.split(text) for t in _CAMEL_RX.split(chunk) if t]
 
 
-def short_name(rel: str, code: str, pack: str, bpm: int | None = None) -> str:
+def name_note(rel: str, code: str) -> str | None:
+    """Note ecrite dans le nom d'un fichier tonal, telle quelle (`Bb`, `C#`)."""
+    if code not in TONAL:
+        return None
+    tok = next((t for t in _tokens(Path(rel).stem) if _NOTE_RX.match(t)), None)
+    return _NOTE_RX.match(tok).group(1) if tok else None  # type: ignore[union-attr]
+
+
+def sharp(note: str) -> str:
+    """`Bb` -> `A#` : les notes du filtre et de la roue sont en dieses."""
+    return _FLAT_TO_SHARP.get(note, note)
+
+
+def short_name(rel: str, code: str, pack: str, bpm: int | None = None,
+               note: str | None = None) -> str:
     """`<CODE> [BPM|note] <desc> <num> <pack>`, NAME_MAX caracteres au plus.
-    `bpm` : tempo mesure, utilise si le chemin n'en donne pas."""
+    `bpm` : tempo mesure, utilise si le chemin n'en donne pas ; `note` : note
+    mesuree, utilisee si le nom n'en donne pas (7.J7)."""
     parts = rel.split("/")
     stem = Path(parts[-1]).stem
     folder_words = {t.lower() for d in parts[:-1] for t in _tokens(d)}
@@ -658,11 +741,13 @@ def short_name(rel: str, code: str, pack: str, bpm: int | None = None) -> str:
         tempo = tempo_of(rel) or bpm
         if tempo:
             head.append(str(tempo))
-    note = None
+    note_tok = None
     if code in TONAL:
-        note = next((t for t in toks if _NOTE_RX.match(t)), None)
-        if note:
-            head.append(_NOTE_RX.match(note).group(1))  # type: ignore[union-attr]
+        note_tok = next((t for t in toks if _NOTE_RX.match(t)), None)
+        if note_tok:
+            head.append(_NOTE_RX.match(note_tok).group(1))  # type: ignore[union-attr]
+        elif note:
+            head.append(note)
 
     # numero de variante : 1-2 chiffres ; 406, 516... sont des references de label
     nums = [t for t in toks if t.isdigit() and (len(t) <= 2 or t.startswith("0"))
@@ -673,7 +758,7 @@ def short_name(rel: str, code: str, pack: str, bpm: int | None = None) -> str:
     has_lower = any(c.islower() for c in stem)
     words = [
         t.capitalize() for t in toks
-        if t.isalpha() and t != note and len(t) > 1
+        if t.isalpha() and t != note_tok and len(t) > 1
         and not (has_lower and t.isupper() and len(t) <= 5)
         and t.lower() not in _NOISE and t.lower() not in folder_words
     ]
@@ -782,6 +867,30 @@ def _round_robin(raws: list[_Raw]) -> list[_Raw]:
 
 Measure = Callable[[Path, str], list[str]]
 BpmFn = Callable[[Path, float | None], tuple[int | None, bool]]
+NoteFn = Callable[[Path, str], tuple[str | None, float | None]]
+NoteFields = tuple[str | None, float | None, NoteSrc | None]
+
+
+def note_fields(source: str, code: str, path: Path, old: SampleEntry | None,
+                note_fn: NoteFn | None) -> NoteFields:
+    """(note, Hz, origine) d'un candidat : la note du nom d'abord, sinon la
+    mesure du manifeste precedent (meme code), sinon `note_fn` (BD / BS / PD)."""
+    written = name_note(source, code)
+    if written:
+        return sharp(written), None, "nom"
+    if code not in PITCHED:
+        return None, None, None
+    if old is not None and old.code == code and old.note_src in ("mesure", "incertaine"):
+        return old.note, old.note_hz, old.note_src
+    if note_fn is None or not path.is_file():
+        return None, None, None
+    note, hz = note_fn(path, code)
+    return note, hz, "mesure" if note else "incertaine"
+
+
+def measured_note(fields: NoteFields) -> str | None:
+    """Note a ecrire dans le nom : la mesuree ; celle du nom y est deja."""
+    return fields[0] if fields[2] == "mesure" else None
 
 
 def _pinned(source: str, prev_status: dict[str, Status], overrides: dict[str, Override]) -> bool:
@@ -800,9 +909,10 @@ def star_key(stars: int | None) -> int:
 def build_manifest(root: Path, overrides: dict[str, Override],
                    previous: Manifest | None = None,
                    measure_fn: Measure | None = measure,
-                   bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
-    """Manifeste rejouable. Les drapeaux deja mesures sont repris du manifeste
-    precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
+                   bpm_fn: BpmFn | None = estimate_bpm,
+                   note_fn: NoteFn | None = measure_note) -> Manifest:
+    """Manifeste rejouable. Les drapeaux et notes deja mesures sont repris du
+    manifeste precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
     raws, unclassified, trashed, trashed_kits = classify(root, overrides)
     folded = fold_small_cells(raws, overrides)
     prev = {e.source: e for e in previous.entries} if previous else {}
@@ -849,6 +959,8 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                     tempos[r.source] = (old.bpm, old.bpm_est)
                 elif bpm_fn is not None:
                     tempos[r.source] = bpm_fn(root / r.source, r.duration)
+        notes = {r.source: note_fields(r.source, code, root / r.source, prev.get(r.source), note_fn)
+                 for r in kept}
         # tri stable : les notes en tete, les defauts en fin de case, le tour
         # de role reste
         stars = {r.source: overrides.get(r.source, Override()).stars for r in kept}
@@ -858,14 +970,17 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         for rank, r in enumerate(kept, 1):
             ov = overrides.get(r.source, Override())
             bpm, est = tempos.get(r.source, (None, False))
-            name = _unique(ov.name or short_name(r.source, code, r.pack, bpm), taken)
+            note, note_hz, note_src = notes[r.source]
+            name = _unique(ov.name or short_name(r.source, code, r.pack, bpm,
+                                                 measured_note(notes[r.source])), taken)
             taken.add(name)
             cell_entries.append(SampleEntry(
                 source=r.source, family=fam, code=code, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
                 status=prev_status.get(r.source, "pending"), flags=flags[r.source],
                 bpm=bpm, bpm_est=est, tags=tags_of(overrides, r.source), stars=ov.stars,
-                auto_tags=auto_tags_of(overrides, r.source)))
+                auto_tags=auto_tags_of(overrides, r.source),
+                note=note, note_hz=note_hz, note_src=note_src))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
@@ -942,7 +1057,7 @@ def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEn
 
 def _adopt(manifest: Manifest, source: str, family: str, code: str,
            overrides: dict[str, Override], root: Path, measure_fn: Measure | None,
-           bpm_fn: BpmFn | None) -> SampleEntry:
+           bpm_fn: BpmFn | None, note_fn: NoteFn | None) -> SampleEntry:
     """Fait entrer un fichier hors case (non classe, restaure) en fin de case."""
     ov = overrides.get(source, Override())
     path = root / source
@@ -951,15 +1066,18 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str,
     bpm, est = None, False
     if code in TEMPO and tempo_of(source) is None and bpm_fn is not None and present:
         bpm, est = bpm_fn(path, dur)
+    notes = note_fields(source, code, path, None, note_fn)
     target = cell_of(manifest, family, code)
     pack = pack_of(source)
     entry = SampleEntry(
         source=source, family=family, code=code, pack=pack,
-        name=_unique(ov.name or short_name(source, code, pack, bpm), {e.name for e in target}),
+        name=_unique(ov.name or short_name(source, code, pack, bpm, measured_note(notes)),
+                     {e.name for e in target}),
         duration=dur, rank=max((e.rank for e in target), default=0) + 1,
         flags=measure_fn(path, code) if measure_fn is not None and present else None,
         bpm=bpm, bpm_est=est, tags=tags_of(overrides, source), stars=ov.stars,
-        auto_tags=auto_tags_of(overrides, source))
+        auto_tags=auto_tags_of(overrides, source),
+        note=notes[0], note_hz=notes[1], note_src=notes[2])
     manifest.entries.append(entry)
     _reselect(manifest, family, code)
     return entry
@@ -967,36 +1085,39 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str,
 
 def move(manifest: Manifest, overrides: dict[str, Override], source: str,
          family: str, code: str, root: Path, measure_fn: Measure | None = measure,
-         bpm_fn: BpmFn | None = estimate_bpm) -> None:
+         bpm_fn: BpmFn | None = estimate_bpm, note_fn: NoteFn | None = measure_note) -> None:
     """Range un fichier dans une case (correction a l'ecoute, ou case donnee a
     un non classe, qui devient candidat).
 
     Statut garde ; le candidat se range en fin de la nouvelle case (apres les
     notes), renomme avec le nouveau code et remesure (blanc / long dependent du
-    code). Les deux cases sont reselectionnees. L'override (famille, code) fait
+    code), note comprise. Les deux cases sont reselectionnees. L'override (famille, code) fait
     survivre le deplacement a une reconstruction ; un nom force ne suit pas."""
     if family not in FAMILIES:
         raise SampleError(f"famille inconnue : {family}")
     if code not in CODES:
         raise SampleError(f"code inconnu : {code}")
-    promote(manifest, overrides, source, root, measure_fn, bpm_fn)
+    promote(manifest, overrides, source, root, measure_fn, bpm_fn, note_fn)
     entry = _entry(manifest, source)
     if entry is None and source not in manifest.unclassified:
         raise SampleError(f"ni candidat ni non classe : {source}")
     _set_override(overrides, source, family=family, code=code, name=None)
     if entry is None:
         manifest.unclassified.remove(source)
-        _adopt(manifest, source, family, code, overrides, root, measure_fn, bpm_fn)
+        _adopt(manifest, source, family, code, overrides, root, measure_fn, bpm_fn, note_fn)
         return
     old = (entry.family, entry.code)
     if old == (family, code):
         return
     target = cell_of(manifest, family, code)
+    old_entry = entry.model_copy()
     entry.family, entry.code = family, code
     entry.rank = max((e.rank for e in target), default=0) + 1
-    entry.name = _unique(short_name(source, code, entry.pack, entry.bpm),
-                         {e.name for e in target})
     path = root / source
+    notes = note_fields(source, code, path, old_entry, note_fn)
+    entry.note, entry.note_hz, entry.note_src = notes
+    entry.name = _unique(short_name(source, code, entry.pack, entry.bpm, measured_note(notes)),
+                         {e.name for e in target})
     if measure_fn is not None and path.is_file():
         entry.flags = measure_fn(path, code)
     _reselect(manifest, family, code)
@@ -1073,7 +1194,8 @@ def trash(manifest: Manifest, overrides: dict[str, Override], source: str) -> No
 
 
 def restore(manifest: Manifest, overrides: dict[str, Override], source: str, root: Path,
-            measure_fn: Measure | None = measure, bpm_fn: BpmFn | None = estimate_bpm) -> None:
+            measure_fn: Measure | None = measure, bpm_fn: BpmFn | None = estimate_bpm,
+            note_fn: NoteFn | None = measure_note) -> None:
     """Sort de la corbeille : retour dans sa case (override ou regles) en fin
     de case, ou parmi les non classes."""
     if source not in manifest.trashed:
@@ -1086,11 +1208,12 @@ def restore(manifest: Manifest, overrides: dict[str, Override], source: str, roo
         manifest.unclassified = sorted({*manifest.unclassified, source})
         return
     _adopt(manifest, source, ov.family or family_of(source), code, overrides, root,
-           measure_fn, bpm_fn)
+           measure_fn, bpm_fn, note_fn)
 
 
 def promote(manifest: Manifest, overrides: dict[str, Override], source: str, root: Path,
-            measure_fn: Measure | None = measure, bpm_fn: BpmFn | None = estimate_bpm) -> bool:
+            measure_fn: Measure | None = measure, bpm_fn: BpmFn | None = estimate_bpm,
+            note_fn: NoteFn | None = measure_note) -> bool:
     """Fait entrer un fichier de la reserve dans sa case, comme candidat en fin
     de case (mesure, tempo). Sans effet hors reserve ; renvoie True s'il y etait.
     Une decision ou une note l'y epingle ensuite d'une reconstruction a l'autre."""
@@ -1098,7 +1221,8 @@ def promote(manifest: Manifest, overrides: dict[str, Override], source: str, roo
     if spare is None:
         return False
     manifest.reserve.remove(spare)
-    _adopt(manifest, source, spare.family, spare.code, overrides, root, measure_fn, bpm_fn)
+    _adopt(manifest, source, spare.family, spare.code, overrides, root, measure_fn, bpm_fn,
+           note_fn)
     return True
 
 
@@ -1111,11 +1235,13 @@ def overflow_of(manifest: Manifest, family: str, code: str,
     rows = [r for r in manifest.reserve
             if r.family == family and r.code == code
             and (kit is None or in_kit(r.source, kit))]
+    notes = [_reserve_note(r) for r in rows]
     return [SampleEntry(source=r.source, family=family, code=code, pack=r.pack,
                         name=short_name(r.source, code, r.pack, tempo_of(r.source)),
                         duration=r.duration, rank=start + i, tags=r.tags,
-                        auto_tags=r.auto_tags, overflow=True)
-            for i, r in enumerate(rows, 1)]
+                        auto_tags=r.auto_tags, overflow=True,
+                        note=note, note_src="nom" if note else None)
+            for i, (r, note) in enumerate(zip(rows, notes), 1)]
 
 
 class SampleFilter(BaseModel):
@@ -1127,12 +1253,15 @@ class SampleFilter(BaseModel):
     codes: list[str] = Field(default_factory=list)
     kind: Literal["oneshot", "loop"] | None = None
     min_stars: int | None = None
+    notes: list[str] = Field(default_factory=list)  # classes de hauteur, en dieses (7.J7)
 
     def active(self) -> bool:
         return self != SampleFilter()
 
     def keep(self, source: str, code: str | None, tags: Iterable[str], auto: Iterable[str],
-             stars: int | None = None, name: str = "") -> bool:
+             stars: int | None = None, name: str = "", note: str | None = None) -> bool:
+        if self.notes and note not in self.notes:
+            return False
         if self.q and not all(w in f"{name} {source}".lower() for w in self.q.lower().split()):
             return False
         if self.tags and not set(self.tags) & {*tags, *auto}:
@@ -1164,9 +1293,9 @@ def filter_manifest(manifest: Manifest, f: SampleFilter,
                           overrides.get(src, Override()).stars)]
     return manifest.model_copy(update={
         "entries": [e for e in manifest.entries
-                    if f.keep(e.source, e.code, e.tags, e.auto_tags, e.stars, e.name)],
+                    if f.keep(e.source, e.code, e.tags, e.auto_tags, e.stars, e.name, e.note)],
         "reserve": [r for r in manifest.reserve
-                    if f.keep(r.source, r.code, r.tags, r.auto_tags)],
+                    if f.keep(r.source, r.code, r.tags, r.auto_tags, note=_reserve_note(r))],
         "unclassified": loose_ok, "trashed": trash_ok,
     })
 
@@ -1183,6 +1312,22 @@ def facet_tags(manifest: Manifest, overrides: dict[str, Override]) -> list[tuple
             counts[t] += 1
     return sorted(((t, TAG_GROUP.get(t, "manuel"), n) for t, n in counts.items()),
                   key=lambda x: (-x[2], x[0]))
+
+
+def _reserve_note(r: ReserveSample) -> str | None:
+    """Reserve non mesuree : seule la note du nom compte."""
+    written = name_note(r.source, r.code)
+    return sharp(written) if written else None
+
+
+def facet_notes(manifest: Manifest) -> list[tuple[str, int]]:
+    """(note, fichiers) des 12 classes de hauteur, candidats et reserve, pour
+    la roue chromatique (7.J7)."""
+    counts = dict.fromkeys(PITCH_CLASSES, 0)
+    for note in [e.note for e in manifest.entries] + [_reserve_note(r) for r in manifest.reserve]:
+        if note in counts:
+            counts[note] += 1
+    return list(counts.items())
 
 
 def kit_rows(manifest: Manifest, kit: str) -> list[SampleEntry]:
@@ -1238,7 +1383,8 @@ def _kit_exists(manifest: Manifest, kit: str) -> bool:
 
 def trash_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, root: Path,
               measure_fn: Measure | None = measure,
-              bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
+              bpm_fn: BpmFn | None = estimate_bpm,
+              note_fn: NoteFn | None = measure_note) -> Manifest:
     """Kit (ou pack) entier a la corbeille : regle dans les overrides, puis
     reconstruction (les cases se remplissent depuis la reserve). Les decisions
     d'ecoute de ses fichiers sont perdues ; tags et etoiles restent."""
@@ -1248,19 +1394,20 @@ def trash_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, root
     if kit in manifest.trashed_kits:
         raise SampleError(f"kit deja a la corbeille : {kit}")
     _set_override(overrides, f"{kit}/", trash=True)
-    return build_manifest(root, overrides, manifest, measure_fn, bpm_fn)
+    return build_manifest(root, overrides, manifest, measure_fn, bpm_fn, note_fn)
 
 
 def restore_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, root: Path,
                 measure_fn: Measure | None = measure,
-                bpm_fn: BpmFn | None = estimate_bpm) -> Manifest:
+                bpm_fn: BpmFn | None = estimate_bpm,
+                note_fn: NoteFn | None = measure_note) -> Manifest:
     """Sort un kit de la corbeille : ses fichiers reviennent comme a un premier
     classement (candidats en attente, reserve, non classes)."""
     kit = kit.strip("/")
     if kit not in manifest.trashed_kits:
         raise SampleError(f"kit pas dans la corbeille : {kit}")
     _set_override(overrides, f"{kit}/", trash=False)
-    return build_manifest(root, overrides, manifest, measure_fn, bpm_fn)
+    return build_manifest(root, overrides, manifest, measure_fn, bpm_fn, note_fn)
 
 
 def loose(manifest: Manifest, overrides: dict[str, Override], which: str,

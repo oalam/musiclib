@@ -4,7 +4,8 @@ base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I), envoi d'une
 track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`), ecoute des
 samples DT2 (Phase 7.J2, `samples.py`), leur export vers Transfer (7.J3) et
 la vue par kit (7.J5 : filtre, tags et corbeille d'un kit entier) et la barre
-de recherche (7.J6 : memes filtres sur toutes les lectures de samples).
+de recherche (7.J6 : memes filtres sur toutes les lectures de samples ; 7.J7 :
+filtre par note et roue chromatique `GET /api/samples/notes`).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
@@ -48,6 +49,7 @@ from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.samples import (
+    PITCH_CLASSES,
     STARS_MAX,
     ExportReport,
     KitInfo,
@@ -60,6 +62,7 @@ from analyzer.samples import (
     all_tags,
     cell_of,
     export,
+    facet_notes,
     facet_tags,
     filter_manifest,
     in_kit,
@@ -251,16 +254,26 @@ class FacetTag(BaseModel):
     count: int
 
 
+class FacetNote(BaseModel):
+    """Part de la roue chromatique (7.J7) : note en dieses, fichiers."""
+    note: str
+    count: int
+
+
 def sample_filter(q: Annotated[str | None, Query(max_length=200)] = None,
                   tags: Annotated[list[str] | None, Query(max_length=50)] = None,
                   kits: Annotated[list[str] | None, Query(max_length=50)] = None,
                   section: Literal["rhythm", "melodic"] | None = None,
                   codes: Annotated[list[str] | None, Query(max_length=30)] = None,
                   kind: Literal["oneshot", "loop"] | None = None,
-                  min_stars: Annotated[int | None, Query(ge=1, le=STARS_MAX)] = None) -> SampleFilter:
+                  min_stars: Annotated[int | None, Query(ge=1, le=STARS_MAX)] = None,
+                  notes: Annotated[list[str] | None, Query(max_length=12)] = None) -> SampleFilter:
     """Barre de recherche (7.J6), commune a toutes les lectures de samples."""
+    bad = sorted(set(notes or []) - set(PITCH_CLASSES))
+    if bad:
+        raise HTTPException(422, f"note inconnue : {', '.join(bad)}")
     return SampleFilter(q=q or None, tags=tags or [], kits=kits or [], section=section,
-                        codes=codes or [], kind=kind, min_stars=min_stars)
+                        codes=codes or [], kind=kind, min_stars=min_stars, notes=notes or [])
 
 
 SampleQuery = Annotated[SampleFilter, Depends(sample_filter)]
@@ -505,6 +518,11 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def sample_facets() -> list[FacetTag]:
         """Tags proposes par la barre de recherche, avec leur groupe (7.J6)."""
         return [FacetTag(tag=t, group=g, count=n) for t, g, n in facet_tags(manifest(), overrides())]
+
+    @app.get("/api/samples/notes", response_model=list[FacetNote])
+    def sample_notes() -> list[FacetNote]:
+        """Roue chromatique : fichiers par note, candidats et reserve (7.J7)."""
+        return [FacetNote(note=n, count=c) for n, c in facet_notes(manifest())]
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
     def sample_cell(family: str, code: str, f: SampleQuery, kit: str | None = None,

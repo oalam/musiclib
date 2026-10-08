@@ -5,13 +5,14 @@ Lit la copie des packs (`<MEDIA>/Samples`, jamais modifiee), classe chaque
 wav en famille / code, nomme les candidats pour l'ecran de la DT2 et ecrit
 le manifeste. Chaque candidat est mesure (pre-filtre 7.J2 : drapeaux muet,
 faible, sature, blanc, long, illisible) et les candidats a defauts passent en
-fin de case. Rejouable : les decisions d'ecoute (`keep` / `drop`, prises dans
+fin de case ; les one-shots BD / BS / PD sans note dans le nom recoivent
+leur note mesuree (7.J7). Rejouable : les decisions d'ecoute (`keep` / `drop`, prises dans
 le front) et les mesures du manifeste precedent sont conservees.
 
 Usage:
     samples.py                 # (re)construit le manifeste et affiche la grille
     samples.py --dry-run       # grille seulement, rien n'est ecrit
-    samples.py --no-measure    # sans pre-filtre qualite (pas de lecture audio)
+    samples.py --no-measure    # sans pre-filtre qualite ni note (pas de lecture audio)
     samples.py --report        # grille du manifeste existant
     samples.py --unclassified  # liste les fichiers sans code (a corriger
                                # dans overrides.json)
@@ -53,6 +54,7 @@ from analyzer.samples import (
     export,
     grid,
     measure,
+    measure_note,
     tag_report,
 )
 from paths import DT2_SAMPLES_DIR, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
@@ -180,7 +182,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"source introuvable : {args.source}", file=sys.stderr)
             return 1
         manifest = build_manifest(args.source, load_overrides(OVERRIDES_FILE), previous,
-                                  measure_fn=None if args.no_measure else measure)
+                                  measure_fn=None if args.no_measure else measure,
+                                  note_fn=None if args.no_measure else measure_note)
     except SampleError as exc:
         print(f"[samples] {exc}", file=sys.stderr)
         return 1

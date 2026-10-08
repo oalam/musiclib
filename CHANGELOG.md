@@ -8,6 +8,17 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J7] Tonalité des one-shots tonals : note mesurée dans l'audio pour BD,
+  BS et PD (`measure_note` : fondamentale pyin après l'attaque, retenue si le
+  pic spectral s'accorde, sinon « incertaine »), écrite dans le nom DT2
+  (`BD G# Overd 02 vtl`) ; la note lue dans le nom reste prioritaire, ST
+  n'est pas mesuré. Champs `note`, `note_hz`, `note_src` au manifeste,
+  repris d'une reconstruction à l'autre. Barre de recherche : facette note
+  (puce, saisie `g#` ou `ab`) et roue chromatique cliquable avec le nombre
+  de samples par note ; badge « ~G# » sur une note mesurée. API :
+  paramètre `notes`, `GET /api/samples/notes`. Les noms d'export changent au
+  prochain export.
+
 - [7.J6] Barre de recherche de l'onglet Samples, qui filtre toute la page :
   texte, tags, kits / packs, instruments, rythmique / mélodique, one-shot /
   boucle, étoiles (ET entre facettes, OU dedans), avec suggestions et puces.
