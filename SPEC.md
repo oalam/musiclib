@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6) | fait (7.J1 à 7.J6) ; reste l'écoute elle-même, l'export se rejoue après |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7) | fait (7.J1 à 7.J6), 7.J7 à venir (session dédiée) ; reste l'écoute elle-même, l'export se rejoue après |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -675,6 +675,25 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Statut : `auto_tags`, recalculés à chaque reconstruction, jamais écrits
   dans `overrides.json`, affichés en pointillé et cliquables (ajout au
   filtre) ; `no_auto` (fichier ou `<préfixe>/`) en masque un.
+
+**Décisions 7.J7 — tonalité des one-shots tonals (arbitrées le 2026-10-08, à coder en session dédiée)** :
+- Constat : la note ne vient aujourd'hui que du nom de fichier (79 BD
+  candidats sur 418), rien n'est mesuré dans l'audio.
+- Périmètre : tous les one-shots tonals, BD, BS, ST, PD ; les boucles ML / BL
+  restent exclues.
+- La note mesurée entre dans le nom DT2 comme une note lue
+  (`BD G# Overd 02 vtl`) ; une note lue dans le nom reste prioritaire. Les
+  noms d'export changent au prochain export (rejouable, l'index retire les
+  anciens).
+- Filtre par tonalité : facette « note » dans la barre de recherche (OU entre
+  notes, comme les autres facettes) et une roue chromatique cliquable (12
+  notes, nombre de samples par note, clic = ajout / retrait du filtre).
+- Pistes de mise en œuvre (à confirmer en session) : mesure de la
+  fondamentale sur le corps du son après l'attaque (pyin ou pic spectral,
+  plage basse pour BD / BS) avec seuil de confiance ; champs `note`,
+  `note_hz`, `note_src` (nom / mesure) sur les candidats, mesurés comme les
+  drapeaux qualité et repris du manifeste précédent ; réserve hors plafond
+  non mesurée (mesure à la promotion) ; `SampleFilter.notes`.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient
