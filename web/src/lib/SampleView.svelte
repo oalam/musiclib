@@ -25,9 +25,23 @@
   const VIEW_KEY = 'ui:sample-cell'
   const KIT_KEY = 'ui:sample-kit'
   // colonnes : one-shots puis boucles en dernier (memes codes qu'analyzer/samples.py)
+  // ordre des tracks de la doctrine (digitakt/doctrine.md § 1) : rythmique
+  // (tracks 1 a 8, boucles rythmiques en fin), puis melodique (9 a 16)
   const LOOPS = ['BR', 'DL', 'PL', 'ML', 'BL']
-  const ONESHOTS = ['BD', 'SD', 'CP', 'RS', 'HH', 'OH', 'CY', 'TM', 'PC', 'BS', 'ST', 'PD', 'FX', 'VX']
-  const CODE_ORDER = [...ONESHOTS, ...LOOPS]
+  const RHYTHM = ['BD', 'SD', 'CP', 'HH', 'OH', 'CY', 'TM', 'PC', 'BR', 'DL', 'PL']
+  const MELODIC = ['BS', 'BL', 'ST', 'ML', 'PD', 'VX', 'FX', 'RS']
+  const CODE_ORDER = [...RHYTHM, ...MELODIC]
+  const CODE_HELP: Record<string, string> = {
+    BD: 'Kick (bass drum) · track 1', SD: 'Snare (caisse claire) · track 3', CP: 'Clap · track 3',
+    HH: 'Hat fermé · track 4', OH: 'Hat ouvert · track 5', CY: 'Cymbale, ride, crash · track 6',
+    TM: 'Tom · track 7 (perc A)', PC: 'Percussion (conga, shaker, cowbell…) · tracks 7-8',
+    BR: 'Boucle break (amen…) · rythmique', DL: 'Boucle drums · rythmique', PL: 'Boucle percussions, hats, tops · rythmique',
+    BS: 'Basse one-shot · track 9', BL: 'Boucle de basse · track 9', ST: 'Stab, accord, synthé, instrument · track 10',
+    ML: 'Boucle mélodique (lead, séquence, accords) · track 10', PD: 'Nappe, pad, drone · track 11',
+    VX: 'Voix, samples parlés · track 14', FX: 'FX de transition (riser, impact, noise…) · track 15',
+    RS: 'Resample, enregistrement maison · track 16 (joker)',
+  }
+  const codeTitle = (c: string) => `${c} : ${CODE_HELP[c] ?? c}${LOOPS.includes(c) ? ' (boucle)' : ''}`
   const FAMILIES = ['HARDCORE', 'JUNGLE', 'TRIBE', 'TECHNO', 'DUBSTEP', 'AUTRES', 'UNIVERSEL', 'SAMPLE']
   const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
 
@@ -76,6 +90,8 @@
   // toutes les familles, meme vides (TRIBE attend son pack) : cibles de rangement
   const families = $derived([...FAMILIES, ...new Set(cells.map(c => c.family).filter(f => !FAMILIES.includes(f)))])
   const codes = $derived([...new Set([...gridCodes, ...cells.map(c => c.code)])].sort((a, b) => codeRank(a) - codeRank(b)))
+  const rhythmCols = $derived(codes.filter(c => RHYTHM.includes(c)).length)
+  const firstMelodic = $derived(codes.find(c => !RHYTHM.includes(c)))
   const byKey = $derived(new Map(cells.map(c => [`${c.family}/${c.code}`, c])))
   const shown = $derived(entries.filter(matches))
   const chosen = $derived(shown.filter(e => e.selected))
@@ -139,6 +155,11 @@
   const kitInfo = $derived(kitData.kits.find(k => k.kit === kit))
   const kitTrashed = $derived(kitInfo?.trashed_kit ?? (kit !== '' && packs.find(p => p.kit === kit)?.trashed === true))
   const trashedKits = $derived(kitData.kits.filter(k => k.trashed_kit))
+
+  /** Tags herites d'un kit ou d'un pack : ils se retirent sur le kit. */
+  function inherited(source: string, tag: string): string | undefined {
+    return Object.keys(kitData.tags).find(k => source.startsWith(`${k}/`) && kitData.tags[k].includes(tag))
+  }
 
   function filterOn(): boolean { return filterTag !== '' || minStars > 0 || kit !== '' }
 
@@ -497,6 +518,7 @@
 
 <div class="samples">
   <section class="grid">
+   <div class="zone matrix">
     <p class="muted small">
       {totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus.
       Les chiffres d’une case : à écouter / retenus{filterOn() ? ' (filtrés)' : ''}.
@@ -517,7 +539,15 @@
     </div>
     {#if error}<p class="err">{error}</p>{/if}
     <table class:dragging={dragging !== null}>
-      <thead><tr><th></th>{#each codes as code}<th class:loop={LOOPS.includes(code)} class:first={code === LOOPS.find(l => codes.includes(l))}>{code}</th>{/each}</tr></thead>
+      <thead>
+        <tr class="sections">
+          <th></th>
+          {#if rhythmCols}<th colspan={rhythmCols} class="sec rhythm" title="Tracks 1 à 8 de la doctrine">Rythmique</th>{/if}
+          {#if codes.length - rhythmCols}<th colspan={codes.length - rhythmCols} class="sec melodic first" title="Tracks 9 à 16 de la doctrine">Mélodique</th>{/if}
+        </tr>
+        <tr><th></th>{#each codes as code}<th class:loop={LOOPS.includes(code)} class:mel={!RHYTHM.includes(code)} class:first={code === firstMelodic}
+          title={codeTitle(code)}>{code}</th>{/each}</tr>
+      </thead>
       <tbody>
         {#each families as fam}
           <tr>
@@ -527,7 +557,7 @@
               {@const c = byKey.get(`${fam}/${code}`)}
               {@const key = `${fam}/${code}`}
               <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <td class:first={code === LOOPS.find(l => codes.includes(l))} class:over={dropKey === key}
+              <td class:first={code === firstMelodic} class:over={dropKey === key}
                 ondragover={e => onDragOver(e, key)} ondragleave={() => { if (dropKey === key) dropKey = null }}
                 ondrop={e => onDrop(e, { family: fam, code })}>
                 {#if c}
@@ -578,7 +608,8 @@
         <button class="small" onclick={() => (exportReport = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
       </div>
     {/if}
-    <section class="kits">
+   </div>
+    <section class="kits zone">
       <h3 class="small">Kits <span class="muted">· retenus / fichiers · re-clic pour tout voir</span></h3>
       {#if kit}
         <div class="kit-bar small">
@@ -670,7 +701,7 @@
           {#each FAMILIES as f}<option value={f}>{f}</option>{/each}
         </select>
         <select bind:value={moving.code}>
-          {#each CODE_ORDER as c}<option value={c}>{c}{LOOPS.includes(c) ? ' (boucle)' : ''}</option>{/each}
+          {#each CODE_ORDER as c}<option value={c} title={codeTitle(c)}>{c} · {CODE_HELP[c]?.split(' · ')[0] ?? ''}</option>{/each}
         </select>
         <button class="small" onclick={confirmMove} disabled={busy}>Ranger</button>
         <button class="small" onclick={() => (moving = null)}>Annuler</button>
@@ -700,8 +731,13 @@
           <span class="src muted small" title={e.source}>{e.source}</span>
         </button>
         {#each e.tags as t}
-          <span class="tag small">{t}<button class="untag" title="Retirer le tag {t}"
-            onclick={() => act(s => api.sampleTagsEdit(s, [], [t]), [e.source])}>×</button></span>
+          {@const from = inherited(e.source, t)}
+          {#if from}
+            <span class="tag small kit-tag" title="Tag du kit {from} (à retirer sur le kit)">{t}</span>
+          {:else}
+            <span class="tag small">{t}<button class="untag" title="Retirer le tag {t}"
+              onclick={() => act(s => api.sampleTagsEdit(s, [], [t]), [e.source])}>×</button></span>
+          {/if}
         {/each}
         <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : view?.kind === 'kit' && e.family && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
       </li>
@@ -718,8 +754,8 @@
           {#if !collapsed.has(f.key)}
             {#each f.folders as c (c.key)}
               {#if f.key !== ':nc'}
-                <li class="folder code">
-                  <button class="fold" onclick={() => toggleFolder(c.key)}>
+                <li class="folder code" class:mel={!RHYTHM.includes(c.code)}>
+                  <button class="fold" title={codeTitle(c.code)} onclick={() => toggleFolder(c.key)}>
                     <span class="caret">{collapsed.has(c.key) ? '▸' : '▾'}</span> {c.code}
                     <span class="muted small">{c.selected} / {c.rows.length}</span>
                   </button>
@@ -758,8 +794,14 @@
   thead th { text-align: center; font-family: ui-monospace, Menlo, monospace; }
   td { padding: 1px; }
   th.empty { color: var(--muted); font-weight: 400; }
-  th.loop { color: var(--melodic); }
+  thead th { color: var(--rhythm); cursor: help; }
+  thead th.mel { color: var(--melodic); }
+  thead th.loop { font-style: italic; text-decoration: underline dotted; }
+  tr.sections th { font: 600 10px system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; padding: 0 4px 2px; border-bottom: 1px solid var(--border); }
+  tr.sections th.rhythm { color: var(--rhythm); }
+  tr.sections th.melodic { color: var(--melodic); }
   .first { border-left: 2px solid var(--border); padding-left: 6px; }
+  .zone { box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .cell { width: 44px; font: 11px ui-monospace, Menlo, monospace; padding: 3px 0; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 3px; cursor: pointer; }
   .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }
@@ -772,7 +814,7 @@
   .export { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); max-width: 60ch; }
   .export p { margin: 6px 0; }
   /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
-  .kits { margin-top: 14px; width: 0; min-width: 100%; }
+  .kits { margin-top: 12px; width: 0; min-width: 100%; }
   .kits h3 { margin: 0 0 6px; font-weight: 600; }
   .pads { display: flex; flex-wrap: wrap; gap: 6px; }
   .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
@@ -792,7 +834,7 @@
   .cell { position: relative; }
   .cell sup { position: absolute; top: -7px; right: -3px; font-size: 9px; line-height: 1; padding: 1px 2px; border-radius: 6px; background: var(--panel-2); color: var(--muted); pointer-events: none; }
   .trash-drop.over { outline: 2px dashed #dc2626; }
-  .detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .detail header { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
   .detail header label { margin-left: auto; }
   .wave { margin: 8px 0 4px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); min-height: 80px; }
@@ -819,6 +861,7 @@
   .est { font-size: 10px; padding: 0 5px; border-radius: 8px; border: 1px dashed var(--muted); color: var(--muted); }
   .flag { font-size: 10px; padding: 0 5px; border-radius: 8px; background: #fde68a; color: #713f12; }
   .tag { display: inline-flex; align-items: center; gap: 2px; font-size: 10px; padding: 0 2px 0 6px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+  .kit-tag { padding-right: 6px; border-style: dashed; }
   .untag { border: 0; background: none; color: var(--muted); padding: 0 3px; cursor: pointer; font-size: 10px; }
   .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
   .status { width: 4em; color: var(--muted); }
@@ -826,9 +869,10 @@
   .sep { padding: 10px 6px 4px; }
   .folder .fold { display: flex; gap: 6px; align-items: baseline; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--border); padding: 5px 6px; text-align: left; color: var(--text); cursor: pointer; font-weight: 600; }
   .folder.fam .fold { background: var(--panel); font-size: 13px; }
-  .folder.code .fold { padding-left: 22px; font: 600 12px ui-monospace, Menlo, monospace; }
+  .folder.code .fold { padding-left: 22px; font: 600 12px ui-monospace, Menlo, monospace; background: color-mix(in srgb, var(--rhythm) 12%, var(--panel)); color: var(--rhythm); }
+  .folder.code.mel .fold { background: color-mix(in srgb, var(--melodic) 12%, var(--panel)); color: var(--melodic); }
   .caret { width: 1em; color: var(--muted); }
-  .tree .row { padding-left: 34px; }
+  .tree .row { padding-left: 52px; }
   .small { font-size: 12px; }
   .err { color: #dc2626; font-size: 12px; }
   @media (max-width: 900px) {

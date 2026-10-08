@@ -266,6 +266,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.J5] Onglet Samples : colonnes de la grille dans l'ordre des tracks de la
+  doctrine (rythmique puis mélodique, bandeaux de section, infobulle par
+  code) ; arbre du kit plus lisible (samples en retrait, dossiers de code
+  colorés par section) ; zones matrice / kits / samples encadrées ; les tags
+  hérités du kit (bordure en tirets) ne se retirent plus sur le fichier.
 - [7.J4] `POST /api/samples/status` et `/move` agissent par lot
   (`sources` au lieu de `source`) et renvoient la grille ; une erreur sur un
   fichier annule le lot. `analyzer.samples.move` reçoit les overrides et les

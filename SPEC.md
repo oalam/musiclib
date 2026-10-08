@@ -646,6 +646,12 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   chemin source, puis un dernier dossier « Non classés ». L'écoute et les
   actions (K / D, M, étoiles, tags) y restent actives ; un clic sur une case
   de la grille revient à la liste de la case.
+- Grille (2026-10-08) : colonnes dans l'ordre des tracks de la doctrine,
+  section rythmique (BD SD CP HH OH CY TM PC, boucles BR DL PL) puis
+  mélodique (BS BL ST ML PD VX FX RS, `RS` = resamples maison, track 16
+  joker) ; infobulle par code (rôle et track). Dans l'arbre, dossiers de code
+  colorés par section et samples en retrait ; zones matrice / kits / samples
+  encadrées ; un tag hérité du kit n'est pas retirable sur le fichier.
 - Corbeille d'un kit ou d'un pack = règle dans `overrides.json` (clé
   `<préfixe>/`, `trash`), qui exclut tous ses fichiers, y compris à venir ;
   reconstruction du manifeste (les cases se remplissent depuis la réserve),
