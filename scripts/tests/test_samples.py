@@ -689,6 +689,15 @@ def test_measure_note(tmp_path: Path, hz: float, code: str, note: str) -> None:
     assert got == note and got_hz is not None and abs(got_hz - hz) / hz < 0.03
 
 
+def test_measure_note_peak_check_bs_only(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """BD : pyin seul ; BS : note incertaine si le pic spectral diverge."""
+    monkeypatch.setattr(smp, "spectral_peak", lambda *a: 70.0)   # C#, loin de A
+    path = _pitched(tmp_path / "x.wav", 55.0)
+    assert smp.measure_note(path, "BD")[0] == "A"
+    note, hz = smp.measure_note(path, "BS")
+    assert note is None and hz is not None
+
+
 def test_measure_note_silence_and_unreadable(tmp_path: Path) -> None:
     _wav(tmp_path / "s.wav", seconds=0.5, rate=22050)
     assert smp.measure_note(tmp_path / "s.wav", "BD") == (None, None)

@@ -782,8 +782,9 @@ BL basse.
   les mots fréquents non couverts ; `no_auto` dans `overrides.json` en masque.
 - **Tonalité (7.J7)** : la note d'un one-shot tonal vient du nom de fichier
   (prioritaire), sinon, pour BD / BS / PD, de l'audio : fondamentale pyin
-  sur le corps du son après l'attaque, retenue seulement si le pic spectral
-  donne la même note (sinon `note_src = incertaine`, pas de note). La note
+  sur le corps du son après l'attaque ; BD : pyin seul ; BS / PD : retenue
+  seulement si le pic spectral donne la même note (sinon
+  `note_src = incertaine`, pas de note). La note
   mesurée entre dans le nom DT2 (`BD G# Overd 02 vtl`) et s'affiche « ~G# »
   dans le front. ST n'est pas mesuré (accords). Roue chromatique dans la
   barre de recherche (clic = ajout / retrait du filtre), facette note (`g#`,

@@ -690,9 +690,9 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   notes, nombre de samples par note, clic = ajout / retrait du filtre).
 - Mise en œuvre : fondamentale pyin (médiane des trames voisées) sur le
   corps du son, après l'attaque (50 ms pour BD, 30 ms sinon), plage par code
-  (BD 30-250 Hz, BS 27-500, PD 40-1500) ; la note n'est retenue que si le
-  pic spectral donne la même, sinon `note_src = incertaine` (Hz gardés, pas
-  de note dans le nom). Champs `note` (dièses), `note_hz`, `note_src` (nom /
+  (BD 30-250 Hz, BS 27-500, PD 40-1500) ; BD en pyin seul ; BS / PD : la
+  note n'est retenue que si le pic spectral donne la même, sinon
+  `note_src = incertaine` (Hz gardés, pas de note dans le nom). Champs `note` (dièses), `note_hz`, `note_src` (nom /
   mesure / incertaine) sur les candidats, mesurés comme les drapeaux et
   repris du manifeste précédent ; réserve non mesurée (note du nom seule,
   mesure à la promotion) ; `SampleFilter.notes`, `GET /api/samples/notes`.
@@ -701,8 +701,16 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   sort). **ST n'est pas mesuré** (note du nom seule) ; règle d'accord pyin +
   pic spectral (45/56 BD justes quand ils s'accordent, contre 16/23 sinon).
   Une note mesurée est signalée « ~G# » dans le front, pas dans le nom DT2.
-- Premier passage : BD 111 mesurées / 228 incertaines / 79 lues, BS 45 / 26
-  / 45, PD 14 / 28 / 6, ST 12 lues sur 76. Les notes lues des boucles ML / BL
+- BD repassés en pyin seul (arbitré le 2026-10-08, même session) : la règle
+  d'accord ne notait que 111 BD sur 339 sans note dans le nom. Variantes
+  testées sans gain sur les 142 notés : pic FFT seul (47/77 BD), FFT de la
+  queue avec interpolation (45/77), produit spectral harmonique (41/77), note
+  de fin de glissando pyin (55 à 58/76 contre 62/76 pour la médiane : en
+  sautant 50 ms, la médiane mesure déjà la queue, écart médian 0,00
+  demi-ton). Les kicks distordus ont des harmoniques plus fortes que la
+  fondamentale et des étiquettes souvent fausses d'un demi-ton.
+- Passage actuel : BD 246 mesurées / 93 incertaines (pyin sans hauteur) / 79
+  lues, BS 45 / 26 / 45, PD 14 / 28 / 6, ST 12 lues sur 76. Les notes lues des boucles ML / BL
   comptent dans la roue et le filtre (rien n'y est mesuré).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant

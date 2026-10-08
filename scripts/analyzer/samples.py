@@ -40,7 +40,8 @@ masque. `tag_report` liste les mots frequents non couverts.
 Tonalite (7.J7) : la note d'un one-shot tonal vient du nom de fichier
 (prioritaire, `note_src="nom"`) ou, pour BD / BS / PD, de l'audio
 (`measure_note` : fondamentale pyin du corps du son apres l'attaque, retenue
-seulement si le pic spectral donne la meme note ; sinon `incertaine`). La
+retenue telle quelle pour BD, seulement si le pic spectral donne la meme
+note pour BS / PD ; sinon `incertaine`). La
 note mesuree entre dans le nom DT2 comme une note lue. Mesuree comme les
 drapeaux (candidats seulement, reprise du manifeste precedent) ; la reserve
 n'a que la note du nom. `SampleFilter.notes` filtre par note.
@@ -90,6 +91,7 @@ LONG_HIT_S = 2.0         # frappe de drums plus longue (queue, reverb, boucle ma
 NOTE_RANGE_HZ = {"BD": (30.0, 250.0), "BS": (27.0, 500.0), "PD": (40.0, 1500.0)}
 NOTE_ATTACK_S = {"BD": 0.05}    # glissando du kick ; autres codes : NOTE_ATTACK_DEFAULT_S
 NOTE_ATTACK_DEFAULT_S = 0.03
+NOTE_PEAK_CHECK = frozenset({"BS", "PD"})   # note retenue si le pic spectral s'accorde (BD : pyin seul)
 NOTE_BODY_S = 2.0               # duree lue
 NOTE_MIN_FRAMES = 3             # trames voisees minimum
 PITCH_CLASSES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
@@ -476,8 +478,9 @@ def spectral_peak(y: np.ndarray, sr: int, lo: float, hi: float) -> float | None:
 
 def measure_note(path: Path, code: str) -> tuple[str | None, float | None]:
     """(note, fondamentale en Hz) d'un one-shot BD / BS / PD : mediane pyin
-    sur le corps du son, apres l'attaque. La note n'est donnee que si le pic
-    spectral tombe sur la meme ; sinon (None, Hz) : note incertaine."""
+    sur le corps du son, apres l'attaque. BD : pyin seul (le pic spectral des
+    kicks distordus tombe sur un harmonique) ; BS / PD : la note n'est donnee
+    que si le pic spectral tombe sur la meme, sinon (None, Hz) : incertaine."""
     import librosa   # lourd : seulement quand un one-shot doit etre mesure
 
     lo, hi = NOTE_RANGE_HZ[code]
@@ -499,9 +502,12 @@ def measure_note(path: Path, code: str) -> tuple[str | None, float | None]:
     if ok.sum() < NOTE_MIN_FRAMES:
         return None, None
     hz = float(np.median(f0[ok]))
-    peak = spectral_peak(body, sr, lo, hi)
     note = pitch_class(hz)
-    return (note if peak and pitch_class(peak) == note else None), round(hz, 1)
+    if code in NOTE_PEAK_CHECK:
+        peak = spectral_peak(body, sr, lo, hi)
+        if not peak or pitch_class(peak) != note:
+            return None, round(hz, 1)
+    return note, round(hz, 1)
 
 
 def clipped_share(a: np.ndarray) -> float:
