@@ -15,7 +15,7 @@
   // etoiles ; ET entre facettes, OU dans une facette ; filtre toute la page.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type SampleFilter } from './api'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type SampleFilter } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -71,6 +71,7 @@
   const SEARCH_KEY = 'ui:sample-search'
   let search = $state<SampleFilter>({})
   let facets = $state<FacetTag[]>([])
+  let wheel = $state<FacetNote[]>([])   // roue chromatique (7.J7)
   let allKits = $state<SampleKit[]>([])     // kits sans filtre (suggestions)
   let query = $state('')
   let suggestIdx = $state(0)
@@ -171,11 +172,31 @@
 
   function searchOn(): boolean {
     const f = search
-    return !!(f.q || f.tags?.length || f.kits?.length || f.codes?.length || f.section || f.kind || f.minStars)
+    return !!(f.q || f.tags?.length || f.kits?.length || f.codes?.length || f.notes?.length || f.section || f.kind || f.minStars)
   }
   function filterOn(): boolean { return searchOn() || kit !== '' }
 
-  type Sug = { kind: 'text' | 'tag' | 'kit' | 'code'; value: string; hint: string }
+  type Sug = { kind: 'text' | 'tag' | 'kit' | 'code' | 'note'; value: string; hint: string }
+
+  // roue chromatique (7.J7) : C en haut, sens horaire, 12 parts de 30 degres
+  const FLAT_TO_SHARP: Record<string, string> = { DB: 'C#', EB: 'D#', GB: 'F#', AB: 'G#', BB: 'A#' }
+  const W_OUT = 46, W_IN = 15
+  function polar(r: number, deg: number): [number, number] {
+    const a = (deg - 90) * Math.PI / 180
+    return [50 + r * Math.cos(a), 50 + r * Math.sin(a)]
+  }
+  function wedge(i: number): string {
+    const [a, b] = [i * 30 - 15, i * 30 + 15]
+    const [x1, y1] = polar(W_OUT, a), [x2, y2] = polar(W_OUT, b)
+    const [x3, y3] = polar(W_IN, b), [x4, y4] = polar(W_IN, a)
+    return `M${x1},${y1} A${W_OUT},${W_OUT} 0 0 1 ${x2},${y2} L${x3},${y3} A${W_IN},${W_IN} 0 0 0 ${x4},${y4} Z`
+  }
+  const wheelMax = $derived(Math.max(1, ...wheel.map(w => w.count)))
+  function toggleNote(n: string) {
+    const cur = search.notes ?? []
+    const notes = cur.includes(n) ? cur.filter(x => x !== n) : [...cur, n]
+    setSearch({ ...search, notes: notes.length ? notes : undefined })
+  }
   const GROUP_LABEL: Record<string, string> = { genre: 'genre', instrument: 'instrument', mot: 'mot-clé', manuel: 'tag' }
   const suggestions = $derived.by((): Sug[] => {
     const t = query.trim().toLowerCase()
@@ -185,6 +206,10 @@
       if (!search.codes?.includes(c) && (c.toLowerCase() === t || CODE_HELP[c].toLowerCase().includes(t)))
         out.push({ kind: 'code', value: c, hint: CODE_HELP[c] })
     }
+    const nt = query.trim().toUpperCase()
+    const note = FLAT_TO_SHARP[nt] ?? nt
+    const w = wheel.find(x => x.note === note)
+    if (w && !search.notes?.includes(note)) out.push({ kind: 'note', value: note, hint: `note · ${w.count}` })
     for (const f of facets) {
       if (f.tag.includes(t) && !search.tags?.includes(f.tag))
         out.push({ kind: 'tag', value: f.tag, hint: `${GROUP_LABEL[f.group] ?? f.group} · ${f.count}` })
@@ -215,6 +240,7 @@
     if (sg.kind === 'text') f.q = sg.value
     else if (sg.kind === 'tag') f.tags = [...(f.tags ?? []), sg.value]
     else if (sg.kind === 'kit') f.kits = [...(f.kits ?? []), sg.value]
+    else if (sg.kind === 'note') f.notes = [...(f.notes ?? []), sg.value]
     else f.codes = [...(f.codes ?? []), sg.value]
     query = ''
     suggestIdx = 0
@@ -226,6 +252,7 @@
     if (kind === 'text') delete f.q
     else if (kind === 'tag') f.tags = f.tags?.filter(x => x !== value)
     else if (kind === 'kit') f.kits = f.kits?.filter(x => x !== value)
+    else if (kind === 'note') f.notes = f.notes?.filter(x => x !== value)
     else f.codes = f.codes?.filter(x => x !== value)
     setSearch(f)
   }
@@ -235,6 +262,7 @@
     ...(search.tags ?? []).map(v => ({ kind: 'tag' as const, value: v })),
     ...(search.kits ?? []).map(v => ({ kind: 'kit' as const, value: v })),
     ...(search.codes ?? []).map(v => ({ kind: 'code' as const, value: v })),
+    ...(search.notes ?? []).map(v => ({ kind: 'note' as const, value: v })),
   ])
 
   function onSearchKey(e: KeyboardEvent) {
@@ -266,13 +294,14 @@
   // grille (filtree), compteurs hors case et tags connus
   async function refresh() {
     try {
-      const [c, u, t, tags, k, fa] = await Promise.all([
+      const [c, u, t, tags, k, fa, wh] = await Promise.all([
         api.sampleCells(search, kit),
         api.sampleLoose('unclassified', kit, search), api.sampleLoose('trash', kit, search), api.sampleTags(),
-        api.sampleKits(search), api.sampleFacets(),
+        api.sampleKits(search), api.sampleFacets(), api.sampleNotes(),
       ])
       cells = c
       facets = fa
+      wheel = wh
       const [all, ak] = filterOn() ? await Promise.all([api.sampleCells(), api.sampleKits()]) : [c, k]
       gridCodes = [...new Set(all.map(x => x.code))]
       allKits = ak.kits
@@ -629,6 +658,19 @@
       <option value={0}>étoiles : toutes</option>
       {#each [1, 2, 3, 4, 5] as n}<option value={n}>{'★'.repeat(n)}{n < 5 ? ' et +' : ''}</option>{/each}
     </select>
+    <svg class="wheel" viewBox="0 0 100 100" role="group" aria-label="Filtrer par note">
+      {#each wheel as w, i (w.note)}
+        {@const [lx, ly] = polar(37, i * 30)}
+        {@const [cx, cy] = polar(24, i * 30)}
+        <g role="button" tabindex="-1" class:on={search.notes?.includes(w.note)} class:empty={!w.count}
+          onclick={() => toggleNote(w.note)} onkeydown={() => {}}>
+          <title>{w.note} : {w.count} sample{w.count > 1 ? 's' : ''}</title>
+          <path d={wedge(i)} style="fill-opacity: {0.08 + 0.5 * w.count / wheelMax}" />
+          <text x={lx} y={ly} class="wl">{w.note}</text>
+          <text x={cx} y={cy} class="wc">{w.count}</text>
+        </g>
+      {/each}
+    </svg>
     {#if searchOn()}<button class="small" onclick={() => setSearch({})}>Tout effacer</button>{/if}
   </div>
   <section class="grid">
@@ -827,6 +869,7 @@
           <span class="dur muted small">{fmt(e.duration)}</span>
           {#if e.overflow}<span class="est" title="au-delà du plafond de candidats : garder, écarter, noter ou ranger le fait entrer">hors plafond</span>{/if}
           {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
+          {#if e.note_src === 'mesure'}<span class="est" title="note mesurée dans l’audio ({e.note_hz} Hz), à vérifier à l’oreille">~{e.note}</span>{/if}
           {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
           <span class="src muted small" title={e.source}>{e.source}</span>
         </button>
@@ -903,6 +946,7 @@
   .chip.kit { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
   .chip.code { font-family: ui-monospace, Menlo, monospace; border-color: var(--rhythm); color: var(--rhythm); }
   .chip.text { font-style: italic; }
+  .chip.note { font-weight: 600; border-color: var(--accent); color: var(--accent); }
   .seg { display: inline-flex; }
   .seg button { border-radius: 0; margin-left: -1px; }
   .seg button:first-child { border-radius: 4px 0 0 4px; }
@@ -982,6 +1026,15 @@
   .name { font-family: ui-monospace, Menlo, monospace; white-space: pre; }
   .stars { color: #b45309; font-size: 11px; }
   .dur { width: 5em; }
+  .wheel { width: 96px; height: 96px; flex: none; }
+  .wheel g { cursor: pointer; outline: none; }
+  .wheel path { fill: var(--accent); stroke: var(--border); stroke-width: 0.6; }
+  .wheel g.on path { fill: var(--accent); fill-opacity: 1 !important; stroke: var(--text); }
+  .wheel g.empty { opacity: 0.45; }
+  .wheel text { text-anchor: middle; dominant-baseline: central; pointer-events: none; fill: var(--text); }
+  .wheel .wl { font-size: 8px; font-weight: 600; }
+  .wheel .wc { font-size: 5.5px; fill: var(--muted); }
+  .wheel g.on text { fill: var(--panel); }
   .est { font-size: 10px; padding: 0 5px; border-radius: 8px; border: 1px dashed var(--muted); color: var(--muted); }
   .flag { font-size: 10px; padding: 0 5px; border-radius: 8px; background: #fde68a; color: #713f12; }
   .tag { display: inline-flex; align-items: center; gap: 2px; font-size: 10px; padding: 0 2px 0 6px; border-radius: 8px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }

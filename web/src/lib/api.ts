@@ -238,6 +238,9 @@ export interface SampleEntry {
   tags: string[]           // ceux du fichier et de son kit
   stars: number | null
   auto_tags: string[]      // inferes des dossiers (7.J6)
+  note?: string | null     // classe de hauteur en dieses (7.J7)
+  note_hz?: number | null  // fondamentale mesuree
+  note_src?: 'nom' | 'mesure' | 'incertaine' | null
   overflow: boolean        // reserve hors plafond, vue par kit (7.J5)
 }
 /** Fichier hors des cases : non classe ou en corbeille. */
@@ -257,9 +260,12 @@ export interface SampleFilter {
   codes?: string[]
   kind?: 'oneshot' | 'loop'
   minStars?: number
+  notes?: string[]         // classes de hauteur en dieses (7.J7)
 }
 /** Tag propose par la barre : groupe genre / instrument / mot (inferes) ou manuel. */
 export interface FacetTag { tag: string; group: string; count: number }
+/** Part de la roue chromatique (7.J7). */
+export interface FacetNote { note: string; count: number }
 /** Kit = prefixe de chemin (pack / sous-dossier), bilan pour les pads (7.J5). */
 export interface SampleKit {
   kit: string
@@ -321,6 +327,7 @@ function fq(f: SampleFilter = {}): string {
   for (const t of f.tags ?? []) q.append('tags', t)
   for (const k of f.kits ?? []) q.append('kits', k)
   for (const c of f.codes ?? []) q.append('codes', c)
+  for (const n of f.notes ?? []) q.append('notes', n)
   if (f.section) q.set('section', f.section)
   if (f.kind) q.set('kind', f.kind)
   if (f.minStars) q.set('min_stars', String(f.minStars))
@@ -366,6 +373,7 @@ export const api = {
     fetch(`/api/samples/kit/tree?kit=${enc(kit)}${fq(f)}`).then(r => json<{ entries: SampleEntry[]; unclassified: LooseSample[] }>(r)),
   sampleKits: (f: SampleFilter = {}) => fetch(`/api/samples/kits?${fq(f)}`).then(r => json<SampleKits>(r)),
   sampleFacets: () => fetch('/api/samples/facets').then(r => json<FacetTag[]>(r)),
+  sampleNotes: () => fetch('/api/samples/notes').then(r => json<FacetNote[]>(r)),
   sampleKitTrash: (kit: string) => samplePost('kit/trash', { kit }),
   sampleKitRestore: (kit: string) => samplePost('kit/restore', { kit }),
   sampleKitTags: (kit: string, add: string[], remove: string[] = []) => samplePost('kit/tags', { kit, add, remove }),
