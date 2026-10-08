@@ -31,6 +31,12 @@ tous ses fichiers sont exclus, et il se restaure d'un bloc. Les tags d'un kit
 (`"<prefixe>/": {"tags": [...]}`) sont herites par tous ses fichiers, reserve
 et fichiers a venir compris.
 
+Tags inferes (7.J6) : les mots des dossiers d'un fichier donnent des tags
+automatiques (`auto_tags`) via un dictionnaire cure (`TAG_WORDS`, groupes
+genre / instrument / mot-cle) ; recalcules a chaque reconstruction, jamais
+ecrits dans les overrides ; `no_auto` (sur un fichier ou un `<prefixe>/`) en
+masque. `tag_report` liste les mots frequents non couverts.
+
 Export (7.J3) : les retenus (`selected`) sont copies tels quels sous
 `<dest>/<FAMILLE>/<CODE>/<nom>.wav`, arborescence que Transfer envoie sur le
 +Drive de la DT2. Rejouable : un index (`export.json`) liste les fichiers
@@ -81,6 +87,7 @@ DRUMS = frozenset({"BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC"})
 TONAL = frozenset({"BD", "BS", "ST", "PD", "ML", "BL"})   # note gardee dans le nom
 # Boucles : BR break, DL drums, PL percussions / hats, ML melodie, BL basse
 TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL"})         # BPM garde dans le nom
+RHYTHM = DRUMS | {"BR", "DL", "PL"}   # tracks 1 a 8 de la doctrine ; le reste : melodique
 NO_FOLD = frozenset({"UNIVERSEL", "SAMPLE"})
 
 # Prefixe de chemin (minuscules, relatif a Samples/) -> famille. Le plus long
@@ -216,6 +223,44 @@ STARS_MAX = 5
 
 KIT_CONTAINERS = frozenset({"packs"})   # dossier qui regroupe des kits (rthm/packs)
 
+# Tags inferes des noms de dossiers (7.J6) : groupe -> tag -> mots (minuscules).
+TAG_GROUPS: dict[str, dict[str, tuple[str, ...]]] = {
+    "genre": {
+        "jungle": ("jungle",), "dnb": ("dnb", "drumnbass"), "breakbeat": ("breakbeat", "breaks", "break"),
+        "hardcore": ("hardcore", "gabber", "xtrmraw"), "hardstyle": ("hardstyle",),
+        "dubstep": ("dubstep",), "techno": ("techno", "darktechno", "tech"), "house": ("house",),
+        "tribe": ("tribe", "tribal", "tribalism", "tekno", "neurotek"), "oldskool": ("oldskool", "oldschool"),
+        "industrial": ("industrial",), "minimal": ("minimal",), "acid": ("acid",), "trance": ("trance",),
+        "hiphop": ("hiphop",), "world": ("world", "african", "caribean", "caribbean"),
+        "cinematic": ("cinematic", "trailer"),
+    },
+    "instrument": {
+        "kick": ("kick", "kicks", "basedrums", "bassdrum", "bassdrums"), "snare": ("snare", "snares", "snaredrums"),
+        "hat": ("hat", "hats", "hihat", "hihats"), "clap": ("clap", "claps"),
+        "cymbal": ("cymbal", "cymbals", "ride", "crash"), "tom": ("tom", "toms"),
+        "percussion": ("perc", "percu", "percussion", "percussive", "percs"), "shaker": ("shaker", "shakers"),
+        "conga": ("conga", "congas"), "bongo": ("bongo", "bongos"), "cajon": ("cajon",), "djembe": ("djembe",),
+        "udu": ("udu",), "bodhran": ("bodhran",), "tabla": ("tabla",), "cowbell": ("cowbell",),
+        "bass": ("bass", "bassline", "basses", "sub"), "synth": ("synth", "synths"), "piano": ("piano",),
+        "keys": ("key", "keys", "organ"), "guitar": ("guitar", "guitars"), "strings": ("string", "strings"),
+        "orchestral": ("orch", "orchestral"), "pad": ("pad", "pads", "nappe"), "vocal": ("vocal", "vocals", "vox", "voice"),
+        "arp": ("arp", "arps"), "chord": ("chord", "chords"), "riff": ("riff", "riffs"), "stab": ("stab", "stabs"),
+        "lead": ("lead", "leads"), "minimoog": ("minimoog",), "909": ("909",), "808": ("808",),
+        "linndrum": ("linndrum",), "mpc": ("mpc",),
+    },
+    "mot": {
+        "cassette": ("cassette",), "foley": ("foley",), "glitch": ("glitch",), "noise": ("noise",),
+        "ambient": ("ambience", "ambient", "atmos", "atmo", "atmosphere"), "riser": ("riser", "risers", "rise", "sweep", "swell"),
+        "impact": ("impact", "impacts", "thumps"), "transition": ("transition", "transitions", "whoosh", "whooshes", "downlifter", "downlifters"),
+        "cartoon": ("cartoon",), "vinyl": ("vinyl",), "lofi": ("lofi",), "analog": ("analog", "analogue"),
+        "dark": ("dark",), "clean": ("clean",), "classic": ("classic",), "fx": ("fx", "sfx"),
+        "hit": ("hit", "hits"), "sting": ("sting", "stings"), "top": ("top", "tops"), "cut": ("cut", "cuts"),
+        "documentary": ("documentary",), "resample": ("resample", "resamples", "recorded"),
+    },
+}
+TAG_WORDS: dict[str, str] = {w: tag for tags in TAG_GROUPS.values() for tag, words in tags.items() for w in words}
+TAG_GROUP: dict[str, str] = {tag: g for g, tags in TAG_GROUPS.items() for tag in tags}
+
 Status = Literal["pending", "keep", "drop"]
 LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
 
@@ -240,6 +285,7 @@ class SampleEntry(BaseModel):
     bpm_est: bool = False           # bpm librosa seul (pas confirme par la duree)
     tags: list[str] = Field(default_factory=list)   # copie des overrides (7.J4)
     stars: int | None = None
+    auto_tags: list[str] = Field(default_factory=list)  # inferes des dossiers (7.J6)
     overflow: bool = False          # reserve hors plafond, vue par kit (7.J5), jamais stocke
 
     @property
@@ -256,6 +302,7 @@ class Override(BaseModel):
     tags: list[str] = Field(default_factory=list)
     stars: int | None = Field(default=None, ge=1, le=STARS_MAX)
     trash: bool = False     # corbeille : hors de toutes les cases, restaurable
+    no_auto: list[str] = Field(default_factory=list)   # tags inferes masques (7.J6)
 
 
 class LooseSample(BaseModel):
@@ -264,6 +311,7 @@ class LooseSample(BaseModel):
     pack: str
     tags: list[str] = Field(default_factory=list)
     stars: int | None = None
+    auto_tags: list[str] = Field(default_factory=list)
 
 
 class ReserveSample(BaseModel):
@@ -276,6 +324,7 @@ class ReserveSample(BaseModel):
     pack: str
     duration: float | None
     tags: list[str] = Field(default_factory=list)
+    auto_tags: list[str] = Field(default_factory=list)
 
 
 class KitInfo(BaseModel):
@@ -457,6 +506,31 @@ def tags_of(overrides: dict[str, Override], source: str) -> list[str]:
         if k.endswith("/") and ov.tags and source.startswith(k):
             tags.update(ov.tags)
     return sorted(tags)
+
+
+def _dir_words(rel: str) -> set[str]:
+    return {t.lower() for d in rel.split("/")[:-1] for t in _tokens(d)}
+
+
+def auto_tags_of(overrides: dict[str, Override], source: str) -> list[str]:
+    """Tags inferes des dossiers (dictionnaire `TAG_WORDS`), moins ceux que
+    masque `no_auto` sur le fichier ou sur un prefixe qui le contient."""
+    hidden = set(overrides.get(source, Override()).no_auto)
+    for k, ov in overrides.items():
+        if k.endswith("/") and ov.no_auto and source.startswith(k):
+            hidden.update(ov.no_auto)
+    return sorted({TAG_WORDS[w] for w in _dir_words(source) if w in TAG_WORDS} - hidden)
+
+
+def tag_report(sources: Iterable[str], min_files: int = 20) -> list[tuple[str, int]]:
+    """Mots de dossiers frequents (au moins `min_files` fichiers) absents du
+    dictionnaire : candidats pour enrichir `TAG_WORDS`."""
+    counts: dict[str, int] = defaultdict(int)
+    for src in sources:
+        for w in _dir_words(src):
+            if len(w) > 2 and not w.isdigit() and w not in TAG_WORDS:
+                counts[w] += 1
+    return sorted(((w, n) for w, n in counts.items() if n >= min_files), key=lambda x: (-x[1], x[0]))
 
 
 def kit_rules(overrides: dict[str, Override]) -> list[str]:
@@ -752,7 +826,8 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         held = {r.source for r in kept}
         reserve.extend(ReserveSample(source=r.source, family=fam, code=code, pack=r.pack,
                                      duration=r.duration,
-                                     tags=tags_of(overrides, r.source))
+                                     tags=tags_of(overrides, r.source),
+                                     auto_tags=auto_tags_of(overrides, r.source))
                        for r in ordered[cap:] if r.source not in held)
         flags: dict[str, list[str] | None] = {}
         for r in kept:
@@ -789,7 +864,8 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                 source=r.source, family=fam, code=code, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
                 status=prev_status.get(r.source, "pending"), flags=flags[r.source],
-                bpm=bpm, bpm_est=est, tags=tags_of(overrides, r.source), stars=ov.stars))
+                bpm=bpm, bpm_est=est, tags=tags_of(overrides, r.source), stars=ov.stars,
+                auto_tags=auto_tags_of(overrides, r.source)))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
@@ -882,7 +958,8 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str,
         name=_unique(ov.name or short_name(source, code, pack, bpm), {e.name for e in target}),
         duration=dur, rank=max((e.rank for e in target), default=0) + 1,
         flags=measure_fn(path, code) if measure_fn is not None and present else None,
-        bpm=bpm, bpm_est=est, tags=tags_of(overrides, source), stars=ov.stars)
+        bpm=bpm, bpm_est=est, tags=tags_of(overrides, source), stars=ov.stars,
+        auto_tags=auto_tags_of(overrides, source))
     manifest.entries.append(entry)
     _reselect(manifest, family, code)
     return entry
@@ -1036,8 +1113,76 @@ def overflow_of(manifest: Manifest, family: str, code: str,
             and (kit is None or in_kit(r.source, kit))]
     return [SampleEntry(source=r.source, family=family, code=code, pack=r.pack,
                         name=short_name(r.source, code, r.pack, tempo_of(r.source)),
-                        duration=r.duration, rank=start + i, tags=r.tags, overflow=True)
+                        duration=r.duration, rank=start + i, tags=r.tags,
+                        auto_tags=r.auto_tags, overflow=True)
             for i, r in enumerate(rows, 1)]
+
+
+class SampleFilter(BaseModel):
+    """Barre de recherche (7.J6) : ET entre facettes, OU dans une facette."""
+    q: str | None = None                    # mots du nom DT2 ou du chemin (tous)
+    tags: list[str] = Field(default_factory=list)   # manuels, de kit ou inferes
+    kits: list[str] = Field(default_factory=list)   # prefixes de kit ou de pack
+    section: Literal["rhythm", "melodic"] | None = None
+    codes: list[str] = Field(default_factory=list)
+    kind: Literal["oneshot", "loop"] | None = None
+    min_stars: int | None = None
+
+    def active(self) -> bool:
+        return self != SampleFilter()
+
+    def keep(self, source: str, code: str | None, tags: Iterable[str], auto: Iterable[str],
+             stars: int | None = None, name: str = "") -> bool:
+        if self.q and not all(w in f"{name} {source}".lower() for w in self.q.lower().split()):
+            return False
+        if self.tags and not set(self.tags) & {*tags, *auto}:
+            return False
+        if self.kits and not any(in_kit(source, k) for k in self.kits):
+            return False
+        if code is None:        # non classe : aucune case, exclu des facettes de case
+            return not (self.section or self.codes or self.kind)
+        if self.section and (code in RHYTHM) != (self.section == "rhythm"):
+            return False
+        if self.codes and code not in self.codes:
+            return False
+        if self.kind and (code in LOOPS) != (self.kind == "loop"):
+            return False
+        return not self.min_stars or (stars or 0) >= self.min_stars
+
+
+def filter_manifest(manifest: Manifest, f: SampleFilter,
+                    overrides: dict[str, Override]) -> Manifest:
+    """Copie du manifeste reduite aux fichiers qui passent le filtre ; grille,
+    kits, cases et listes se calculent dessus (rangs et selection d'origine)."""
+    if not f.active():
+        return manifest
+    loose_ok = [src for src in manifest.unclassified
+                if f.keep(src, None, tags_of(overrides, src), auto_tags_of(overrides, src),
+                          overrides.get(src, Override()).stars)]
+    trash_ok = [src for src in manifest.trashed
+                if f.keep(src, None, tags_of(overrides, src), auto_tags_of(overrides, src),
+                          overrides.get(src, Override()).stars)]
+    return manifest.model_copy(update={
+        "entries": [e for e in manifest.entries
+                    if f.keep(e.source, e.code, e.tags, e.auto_tags, e.stars, e.name)],
+        "reserve": [r for r in manifest.reserve
+                    if f.keep(r.source, r.code, r.tags, r.auto_tags)],
+        "unclassified": loose_ok, "trashed": trash_ok,
+    })
+
+
+def facet_tags(manifest: Manifest, overrides: dict[str, Override]) -> list[tuple[str, str, int]]:
+    """(tag, groupe, fichiers) pour la barre de recherche : groupes du
+    dictionnaire (genre, instrument, mot), sinon `manuel`."""
+    counts: dict[str, int] = defaultdict(int)
+    rows = [(e.tags, e.auto_tags) for e in manifest.entries] + \
+           [(r.tags, r.auto_tags) for r in manifest.reserve] + \
+           [(tags_of(overrides, s), auto_tags_of(overrides, s)) for s in manifest.unclassified]
+    for tags, auto in rows:
+        for t in {*tags, *auto}:
+            counts[t] += 1
+    return sorted(((t, TAG_GROUP.get(t, "manuel"), n) for t, n in counts.items()),
+                  key=lambda x: (-x[2], x[0]))
 
 
 def kit_rows(manifest: Manifest, kit: str) -> list[SampleEntry]:
@@ -1129,7 +1274,7 @@ def loose(manifest: Manifest, overrides: dict[str, Override], which: str,
             continue
         ov = overrides.get(src, Override())
         out.append(LooseSample(source=src, pack=pack_of(src), tags=tags_of(overrides, src),
-                               stars=ov.stars))
+                               stars=ov.stars, auto_tags=auto_tags_of(overrides, src)))
     return out
 
 

@@ -15,6 +15,8 @@ Usage:
     samples.py --report        # grille du manifeste existant
     samples.py --unclassified  # liste les fichiers sans code (a corriger
                                # dans overrides.json)
+    samples.py --tag-report    # mots de dossiers frequents hors du dictionnaire
+                               # de tags inferes (7.J6)
     samples.py --export        # copie les retenus vers <MEDIA>/Live/samples (7.J3)
     samples.py --export --dry-run   # bilan de l'export sans rien ecrire
 
@@ -30,6 +32,7 @@ Fichiers (vault) :
         terminee par `/` vise un kit ou un pack (7.J5) : tags herites par ses
         fichiers, `trash` l'exclut d'un bloc :
         {"rthm/packs/neurotek/": {"tags": ["tribe"], "trash": true}}
+        `no_auto` (fichier ou prefixe) masque des tags inferes des dossiers (7.J6).
 """
 from __future__ import annotations
 
@@ -50,6 +53,7 @@ from analyzer.samples import (
     export,
     grid,
     measure,
+    tag_report,
 )
 from paths import DT2_SAMPLES_DIR, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
 
@@ -134,6 +138,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--dry-run", action="store_true", help="n'ecrit pas le manifeste")
     ap.add_argument("--report", action="store_true", help="grille du manifeste existant")
     ap.add_argument("--unclassified", action="store_true", help="liste les fichiers sans code")
+    ap.add_argument("--tag-report", action="store_true",
+                    help="mots de dossiers frequents non couverts par les tags inferes")
     ap.add_argument("--export", action="store_true",
                     help="copie les retenus du manifeste vers --dest (avec --dry-run : bilan)")
     ap.add_argument("--dest", type=Path, default=DT2_SAMPLES_DIR)
@@ -152,6 +158,14 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
             print(render_export(export(previous, args.source, args.dest, EXPORT_INDEX_FILE,
                                        dry_run=args.dry_run)))
+            return 0
+        if args.tag_report:
+            if previous is None:
+                print(f"pas de manifeste : {MANIFEST_FILE}", file=sys.stderr)
+                return 1
+            srcs = ([e.source for e in previous.entries] + [r.source for r in previous.reserve]
+                    + previous.unclassified)
+            print("\n".join(f"{n:6} {w}" for w, n in tag_report(srcs)))
             return 0
         if args.report or args.unclassified:
             if previous is None:

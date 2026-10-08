@@ -237,6 +237,7 @@ export interface SampleEntry {
   bpm_est: boolean         // librosa seul, non confirme par la duree
   tags: string[]           // ceux du fichier et de son kit
   stars: number | null
+  auto_tags: string[]      // inferes des dossiers (7.J6)
   overflow: boolean        // reserve hors plafond, vue par kit (7.J5)
 }
 /** Fichier hors des cases : non classe ou en corbeille. */
@@ -245,8 +246,20 @@ export interface LooseSample {
   pack: string
   tags: string[]
   stars: number | null
+  auto_tags: string[]
 }
-export interface SampleFilter { tag?: string; minStars?: number; kit?: string }
+/** Barre de recherche (7.J6) : ET entre facettes, OU dans une facette. */
+export interface SampleFilter {
+  q?: string
+  tags?: string[]
+  kits?: string[]
+  section?: 'rhythm' | 'melodic'
+  codes?: string[]
+  kind?: 'oneshot' | 'loop'
+  minStars?: number
+}
+/** Tag propose par la barre : groupe genre / instrument / mot (inferes) ou manuel. */
+export interface FacetTag { tag: string; group: string; count: number }
 /** Kit = prefixe de chemin (pack / sous-dossier), bilan pour les pads (7.J5). */
 export interface SampleKit {
   kit: string
@@ -301,6 +314,20 @@ async function json<T>(res: Response): Promise<T> {
 
 const enc = encodeURIComponent
 
+/** Parametres de la barre de recherche, prefixes de `&` (vide sans filtre). */
+function fq(f: SampleFilter = {}): string {
+  const q = new URLSearchParams()
+  if (f.q) q.set('q', f.q)
+  for (const t of f.tags ?? []) q.append('tags', t)
+  for (const k of f.kits ?? []) q.append('kits', k)
+  for (const c of f.codes ?? []) q.append('codes', c)
+  if (f.section) q.set('section', f.section)
+  if (f.kind) q.set('kind', f.kind)
+  if (f.minStars) q.set('min_stars', String(f.minStars))
+  const s = q.toString()
+  return s ? `&${s}` : ''
+}
+
 function samplePost(action: string, body: object): Promise<SampleCell[]> {
   return fetch(`/api/samples/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
     .then(r => json<SampleCell[]>(r))
@@ -329,20 +356,16 @@ export const api = {
       .then(r => json<Dt2SendState>(r)),
   dt2SendStatus: () => fetch('/api/dt2/send').then(r => json<Dt2SendState | null>(r)),
   dt2SendCancel: () => fetch('/api/dt2/send', { method: 'DELETE' }).then(r => json<Dt2SendState | null>(r)),
-  sampleCells: (f: SampleFilter = {}) => {
-    const q = new URLSearchParams()
-    if (f.tag) q.set('tag', f.tag)
-    if (f.minStars) q.set('min_stars', String(f.minStars))
-    if (f.kit) q.set('kit', f.kit)
-    return fetch(`/api/samples?${q}`).then(r => json<SampleCell[]>(r))
-  },
-  sampleCell: (family: string, code: string, kit = '', overflow = false) =>
-    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}${overflow ? '&overflow=true' : ''}`).then(r => json<SampleEntry[]>(r)),
-  sampleLoose: (which: 'unclassified' | 'trash', kit = '') =>
-    fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}`).then(r => json<LooseSample[]>(r)),
-  sampleKitTree: (kit: string) =>
-    fetch(`/api/samples/kit/tree?kit=${enc(kit)}`).then(r => json<{ entries: SampleEntry[]; unclassified: LooseSample[] }>(r)),
-  sampleKits: () => fetch('/api/samples/kits').then(r => json<SampleKits>(r)),
+  sampleCells: (f: SampleFilter = {}, kit = '') =>
+    fetch(`/api/samples?${kit ? `kit=${enc(kit)}` : ''}${fq(f)}`).then(r => json<SampleCell[]>(r)),
+  sampleCell: (family: string, code: string, kit = '', overflow = false, f: SampleFilter = {}) =>
+    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}${overflow ? '&overflow=true' : ''}${fq(f)}`).then(r => json<SampleEntry[]>(r)),
+  sampleLoose: (which: 'unclassified' | 'trash', kit = '', f: SampleFilter = {}) =>
+    fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}${fq(f)}`).then(r => json<LooseSample[]>(r)),
+  sampleKitTree: (kit: string, f: SampleFilter = {}) =>
+    fetch(`/api/samples/kit/tree?kit=${enc(kit)}${fq(f)}`).then(r => json<{ entries: SampleEntry[]; unclassified: LooseSample[] }>(r)),
+  sampleKits: (f: SampleFilter = {}) => fetch(`/api/samples/kits?${fq(f)}`).then(r => json<SampleKits>(r)),
+  sampleFacets: () => fetch('/api/samples/facets').then(r => json<FacetTag[]>(r)),
   sampleKitTrash: (kit: string) => samplePost('kit/trash', { kit }),
   sampleKitRestore: (kit: string) => samplePost('kit/restore', { kit }),
   sampleKitTags: (kit: string, add: string[], remove: string[] = []) => samplePost('kit/tags', { kit, add, remove }),

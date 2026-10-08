@@ -304,8 +304,12 @@ def test_samples_stars_tags_filter(samples_client: TestClient, tmp_path: Path):
     cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
     assert (cell[0]["source"], cell[0]["stars"], cell[0]["tags"]) == ("p/fx10.wav", 4, ["dark"])
     assert samples_client.get("/api/samples/tags").json() == ["dark"]
-    only = samples_client.get("/api/samples", params={"tag": "dark", "min_stars": 3}).json()
+    only = samples_client.get("/api/samples", params={"tags": "dark", "min_stars": 3}).json()
     assert [(c["candidates"], c["selected"]) for c in only] == [(1, 1)]
+    two = samples_client.get("/api/samples", params={"tags": ["dark", "x"]}).json()
+    assert [c["candidates"] for c in two] == [2]
+    assert samples_client.get("/api/samples", params={"section": "rhythm"}).json() == []
+    assert samples_client.get("/api/samples", params={"section": "solo"}).status_code == 422
     assert json.loads((tmp_path / "overrides.json").read_text()) == {
         "p/fx10.wav": {"stars": 4, "tags": ["dark"]}, "p/fx2.wav": {"tags": ["dark"]}}
 
@@ -365,9 +369,14 @@ def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
     r = _post(client, "kit/tags", kit="k", add=["Acid"])
     assert r.status_code == 200
     assert client.get("/api/samples/kits").json()["tags"] == {"k": ["acid"]}
-    cells = {c["code"]: c for c in client.get("/api/samples", params={"kit": "k", "tag": "acid"}).json()}
+    cells = {c["code"]: c for c in client.get("/api/samples", params={"kit": "k", "tags": "acid"}).json()}
     assert cells["FX"]["candidates"] == 2 and cells["SD"]["reserve"] == 1
     assert _post(client, "kit/tags", kit="zz", add=["x"]).status_code == 422
+    assert client.get("/api/samples", params={"kit": "k", "tags": "nope"}).json() == []
+    facets = {x["tag"]: (x["group"], x["count"]) for x in client.get("/api/samples/facets").json()}
+    assert facets["acid"] == ("genre", 3)
+    tree = client.get("/api/samples/kit/tree", params={"kit": "k", "kind": "loop"}).json()
+    assert tree["entries"] == []
 
 
 def test_samples_export(tmp_path: Path):

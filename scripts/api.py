@@ -3,7 +3,8 @@
 base de connaissance (Phase 7.D), ajout de morceaux (Phase 7.I), envoi d'une
 track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`), ecoute des
 samples DT2 (Phase 7.J2, `samples.py`), leur export vers Transfer (7.J3) et
-la vue par kit (7.J5 : filtre, tags et corbeille d'un kit entier).
+la vue par kit (7.J5 : filtre, tags et corbeille d'un kit entier) et la barre
+de recherche (7.J6 : memes filtres sur toutes les lectures de samples).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
@@ -31,7 +32,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -52,12 +53,15 @@ from analyzer.samples import (
     KitInfo,
     LooseSample,
     Override,
+    SampleFilter,
     SampleEntry,
     SampleError,
     Status,
     all_tags,
     cell_of,
     export,
+    facet_tags,
+    filter_manifest,
     in_kit,
     kit_rows,
     kit_tags,
@@ -241,6 +245,27 @@ class SampleKits(BaseModel):
     tags: dict[str, list[str]]
 
 
+class FacetTag(BaseModel):
+    tag: str
+    group: str          # genre, instrument, mot (inferes) ou manuel
+    count: int
+
+
+def sample_filter(q: Annotated[str | None, Query(max_length=200)] = None,
+                  tags: Annotated[list[str] | None, Query(max_length=50)] = None,
+                  kits: Annotated[list[str] | None, Query(max_length=50)] = None,
+                  section: Literal["rhythm", "melodic"] | None = None,
+                  codes: Annotated[list[str] | None, Query(max_length=30)] = None,
+                  kind: Literal["oneshot", "loop"] | None = None,
+                  min_stars: Annotated[int | None, Query(ge=1, le=STARS_MAX)] = None) -> SampleFilter:
+    """Barre de recherche (7.J6), commune a toutes les lectures de samples."""
+    return SampleFilter(q=q or None, tags=tags or [], kits=kits or [], section=section,
+                        codes=codes or [], kind=kind, min_stars=min_stars)
+
+
+SampleQuery = Annotated[SampleFilter, Depends(sample_filter)]
+
+
 class SampleKitTree(BaseModel):
     """Arborescence d'un kit : fichiers classes (case finale) et non classes."""
     entries: list[SampleEntry]
@@ -257,32 +282,23 @@ class SampleTags(BaseModel):
     remove: TagList = Field(default_factory=list, max_length=20)
 
 
-def _sample_cells(m: samples.Manifest, tag: str | None = None,
-                  min_stars: int | None = None, kit: str | None = None) -> list[SampleCell]:
-    """Grille ; avec un filtre, les compteurs ne portent que sur les candidats
-    qui y repondent (cases sans candidat retenu par le filtre omises). La
-    reserve hors plafond est comptee ; avec `kit`, une case qui n'a que de la
-    reserve du kit apparait."""
+def _sample_cells(m: samples.Manifest, kit: str | None = None) -> list[SampleCell]:
+    """Grille du manifeste (deja filtre par la barre de recherche) ; la reserve
+    hors plafond est comptee ; avec `kit`, une case qui n'a que de la reserve
+    du kit apparait."""
     cells: dict[tuple[str, str], list[SampleEntry]] = {}
     spare: dict[tuple[str, str], int] = {}
     for e in m.entries:
-        if tag is not None and tag not in e.tags:
-            continue
-        if min_stars is not None and (e.stars or 0) < min_stars:
-            continue
         if kit is not None and not in_kit(e.source, kit):
             continue
         cells.setdefault((e.family, e.code), []).append(e)
-    if min_stars is None:
-        for r in m.reserve:
-            if kit is not None and not in_kit(r.source, kit):
-                continue
-            if tag is not None and tag not in r.tags:
-                continue
-            if kit is not None:
-                cells.setdefault((r.family, r.code), [])
-            if (r.family, r.code) in cells:
-                spare[r.family, r.code] = spare.get((r.family, r.code), 0) + 1
+    for r in m.reserve:
+        if kit is not None and not in_kit(r.source, kit):
+            continue
+        if kit is not None:
+            cells.setdefault((r.family, r.code), [])
+        if (r.family, r.code) in cells:
+            spare[r.family, r.code] = spare.get((r.family, r.code), 0) + 1
     return [SampleCell(
         family=fam, code=code, quota=quota(fam, code), candidates=len(es),
         selected=sum(e.selected for e in es),
@@ -474,18 +490,28 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(404, "manuel PDF absent de refs/")
         return FileResponse(kb.MANUAL_PDF, media_type="application/pdf")
 
+    def overrides() -> dict[str, Override]:
+        return samples.load_overrides(samples_overrides)
+
+    def view(f: SampleFilter) -> samples.Manifest:
+        """Manifeste reduit par la barre de recherche."""
+        return filter_manifest(manifest(), f, overrides())
+
     @app.get("/api/samples", response_model=list[SampleCell])
-    def sample_cells(tag: str | None = None,
-                     min_stars: int | None = Query(None, ge=1, le=STARS_MAX),
-                     kit: str | None = None) -> list[SampleCell]:
-        return _sample_cells(manifest(), tag, min_stars, kit or None)
+    def sample_cells(f: SampleQuery, kit: str | None = None) -> list[SampleCell]:
+        return _sample_cells(view(f), kit or None)
+
+    @app.get("/api/samples/facets", response_model=list[FacetTag])
+    def sample_facets() -> list[FacetTag]:
+        """Tags proposes par la barre de recherche, avec leur groupe (7.J6)."""
+        return [FacetTag(tag=t, group=g, count=n) for t, g, n in facet_tags(manifest(), overrides())]
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
-    def sample_cell(family: str, code: str, kit: str | None = None,
+    def sample_cell(family: str, code: str, f: SampleQuery, kit: str | None = None,
                     overflow: bool = False) -> list[SampleEntry]:
         """Candidats d'une case ; avec `kit`, ceux du kit puis sa reserve
         (lignes `overflow`) ; `overflow` ajoute toute la reserve de la case."""
-        m = manifest()
+        m = view(f)
         cell = cell_of(m, family, code)
         if kit:
             cell = [e for e in cell if in_kit(e.source, kit)] + overflow_of(m, family, code, kit)
@@ -496,23 +522,24 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return cell
 
     @app.get("/api/samples/loose", response_model=list[LooseSample])
-    def sample_loose(which: Literal["unclassified", "trash"],
+    def sample_loose(which: Literal["unclassified", "trash"], f: SampleQuery,
                      kit: str | None = None) -> list[LooseSample]:
         """Non classes ou corbeille (7.J4), d'un kit (7.J5)."""
-        return loose(manifest(), samples.load_overrides(samples_overrides), which, kit or None)
+        return loose(view(f), overrides(), which, kit or None)
 
     @app.get("/api/samples/kit/tree", response_model=SampleKitTree)
-    def sample_kit_tree(kit: KitPath) -> SampleKitTree:
+    def sample_kit_tree(kit: KitPath, f: SampleQuery) -> SampleKitTree:
         """Tous les fichiers d'un kit par case finale (candidats et hors
         plafond), puis ses non classes ; la corbeille n'y est pas."""
-        m = manifest()
+        m = view(f)
         return SampleKitTree(entries=kit_rows(m, kit), unclassified=loose(
             m, samples.load_overrides(samples_overrides), "unclassified", kit))
 
     @app.get("/api/samples/kits", response_model=SampleKits)
-    def sample_kits() -> SampleKits:
-        """Bilan par kit pour les pads (7.J5), kits a la corbeille compris."""
-        return SampleKits(kits=kits(manifest()),
+    def sample_kits(f: SampleQuery) -> SampleKits:
+        """Bilan par kit pour les pads (7.J5), kits a la corbeille compris ;
+        compteurs reduits par la barre de recherche."""
+        return SampleKits(kits=kits(view(f)),
                           tags=kit_tags(samples.load_overrides(samples_overrides)))
 
     @app.get("/api/samples/tags", response_model=list[str])

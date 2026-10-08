@@ -624,6 +624,53 @@ def test_kits_summary_and_loose_filter(tree: Path) -> None:
     assert smp.loose(m, {}, "unclassified", kit="909") == []
 
 
+# --- Tags inferes (7.J6) -------------------------------------------------------
+
+def test_auto_tags_from_folders_and_masking() -> None:
+    src = "Jungle 89 to 99/Breaks/HiHats Classic/x.wav"
+    assert smp.auto_tags_of({}, src) == ["breakbeat", "classic", "hat", "jungle"]
+    ovs = {"Jungle 89 to 99/": Override(no_auto=["classic"]), src: Override(no_auto=["hat"])}
+    assert smp.auto_tags_of(ovs, src) == ["breakbeat", "jungle"]
+    assert smp.TAG_GROUP["jungle"] == "genre" and smp.TAG_GROUP["hat"] == "instrument"
+    # le nom du fichier n'entre pas en compte, seulement les dossiers
+    assert smp.auto_tags_of({}, "misc/kick snare.wav") == []
+
+
+def test_tag_report_lists_uncovered_words() -> None:
+    srcs = [f"Native instrument/caribean/oneshot/k{i}.wav" for i in range(3)]
+    report = dict(smp.tag_report(srcs, min_files=3))
+    assert report["native"] == 3 and "caribean" not in report
+
+
+def test_build_manifest_fills_auto_tags(tree: Path) -> None:
+    m = smp.build_manifest(tree, {}, measure_fn=None)
+    e = next(x for x in m.entries if x.source.startswith("Hardcore free samples/Kicks/"))
+    assert e.auto_tags == ["hardcore", "kick"]
+
+
+def test_filter_facets_and_or(tmp_path: Path) -> None:
+    root = _big_cell(tmp_path)
+    _wav(root / "jungle dnb rthm" / "loops" / "170_break.wav", seconds=3.0)
+    _wav(root / "MPC_Kit" / "zzz01.wav")
+    m = smp.build_manifest(root, {}, measure_fn=None, bpm_fn=None)
+    F = smp.SampleFilter
+    assert not F().active()
+    loops = smp.filter_manifest(m, F(kind="loop"), {})
+    assert {e.code for e in loops.entries} == {"BR"} and loops.unclassified == []
+    rhythm = smp.filter_manifest(m, F(section="rhythm", kits=["Hardcore free samples/A"]), {})
+    assert len(rhythm.entries) + len(rhythm.reserve) == 30
+    melodic = smp.filter_manifest(m, F(section="melodic"), {})
+    assert melodic.entries == [] and melodic.reserve == []
+    # OU dans la facette tags, ET avec le texte
+    both = smp.filter_manifest(m, F(tags=["jungle", "hardcore"]), {})
+    assert len(both.entries) + len(both.reserve) == 61
+    text = smp.filter_manifest(m, F(tags=["jungle", "hardcore"], q="170"), {})
+    assert [e.code for e in text.entries] == ["BR"]
+    assert smp.filter_manifest(m, F(q="zzz"), {}).unclassified == ["MPC_Kit/zzz01.wav"]
+    facets = {t: (g, n) for t, g, n in smp.facet_tags(m, {})}
+    assert facets["hardcore"] == ("genre", 60) and facets["jungle"][0] == "genre"
+
+
 # --- Export (7.J3) ----------------------------------------------------------
 
 def _export_setup(tmp_path: Path) -> tuple[smp.Manifest, Path, Path, Path]:

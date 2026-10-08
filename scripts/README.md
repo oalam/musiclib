@@ -771,6 +771,15 @@ BL basse.
   d'écoute du kit perdues), restaurable d'un bloc depuis la corbeille. API :
   `GET /api/samples/kits`, paramètre `kit` sur `/api/samples`, `/cell`,
   `/loose`, `POST /api/samples/kit/tags`, `/kit/trash`, `/kit/restore`.
+- **Recherche (7.J6)** : barre en tête de l'onglet, qui filtre toute la
+  page : texte (nom DT2, chemin), tags (manuels, de kit, inférés), kits ou
+  packs, instruments, rythmique / mélodique, one-shot / boucle, étoiles ;
+  ET entre facettes, OU dedans. Mêmes paramètres sur `GET /api/samples`,
+  `/cell`, `/loose`, `/kits`, `/kit/tree` (`q`, `tags`, `kits`, `codes`,
+  `section`, `kind`, `min_stars`) ; `GET /api/samples/facets` liste les tags
+  et leur groupe. Tags inférés des dossiers (`auto_tags`, dictionnaire
+  `TAG_GROUPS` de `analyzer/samples.py`) : `samples.py --tag-report` montre
+  les mots fréquents non couverts ; `no_auto` dans `overrides.json` en masque.
 - **Export (7.J3)** : `samples.py --export --dry-run` (bilan), puis
   `samples.py --export`, ou le bouton « Exporter… » de l'onglet Samples.
   Copie les retenus tels quels vers

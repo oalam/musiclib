@@ -10,9 +10,12 @@
   // comprise), porte ses tags (herites par ses fichiers) et sa corbeille.
   // Vue kit : arborescence FAMILLE / CODE / fichiers (case finale, retenus,
   // reserve, hors plafond), puis un dossier des non classes du kit.
+  // Barre de recherche (7.J6) : texte, tags (manuels, de kit, inferes des
+  // dossiers), kits, instruments, rythmique / melodique, one-shot / boucle,
+  // etoiles ; ET entre facettes, OU dans une facette ; filtre toute la page.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus } from './api'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type SampleFilter } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -64,9 +67,14 @@
   let showOverflow = $state(false)
   let busy = $state(false)
   let autoplay = $state(true)
-  // filtres (grille et liste) : tag exact, etoiles minimum
-  let filterTag = $state('')
-  let minStars = $state(0)
+  // barre de recherche : filtre applique cote API a toutes les lectures
+  const SEARCH_KEY = 'ui:sample-search'
+  let search = $state<SampleFilter>({})
+  let facets = $state<FacetTag[]>([])
+  let allKits = $state<SampleKit[]>([])     // kits sans filtre (suggestions)
+  let query = $state('')
+  let suggestIdx = $state(0)
+  let searchField: HTMLInputElement | undefined = $state()
   let tagInput = $state('')
   let tagField: HTMLInputElement | undefined = $state()
   // changement de case (M) : statut garde, rang en fin de case
@@ -93,7 +101,7 @@
   const rhythmCols = $derived(codes.filter(c => RHYTHM.includes(c)).length)
   const firstMelodic = $derived(codes.find(c => !RHYTHM.includes(c)))
   const byKey = $derived(new Map(cells.map(c => [`${c.family}/${c.code}`, c])))
-  const shown = $derived(entries.filter(matches))
+  const shown = $derived(entries)
   const chosen = $derived(shown.filter(e => e.selected))
   const reserve = $derived(shown.filter(e => !e.selected))
   // ordre de navigation : la selection, puis la reserve si elle est depliee
@@ -161,11 +169,84 @@
     return Object.keys(kitData.tags).find(k => source.startsWith(`${k}/`) && kitData.tags[k].includes(tag))
   }
 
-  function filterOn(): boolean { return filterTag !== '' || minStars > 0 || kit !== '' }
-
-  function matches(e: SampleEntry): boolean {
-    return (!filterTag || e.tags.includes(filterTag)) && (e.stars ?? 0) >= minStars
+  function searchOn(): boolean {
+    const f = search
+    return !!(f.q || f.tags?.length || f.kits?.length || f.codes?.length || f.section || f.kind || f.minStars)
   }
+  function filterOn(): boolean { return searchOn() || kit !== '' }
+
+  type Sug = { kind: 'text' | 'tag' | 'kit' | 'code'; value: string; hint: string }
+  const GROUP_LABEL: Record<string, string> = { genre: 'genre', instrument: 'instrument', mot: 'mot-clé', manuel: 'tag' }
+  const suggestions = $derived.by((): Sug[] => {
+    const t = query.trim().toLowerCase()
+    if (!t) return []
+    const out: Sug[] = [{ kind: 'text', value: query.trim(), hint: 'texte : nom DT2 ou chemin' }]
+    for (const c of CODE_ORDER) {
+      if (!search.codes?.includes(c) && (c.toLowerCase() === t || CODE_HELP[c].toLowerCase().includes(t)))
+        out.push({ kind: 'code', value: c, hint: CODE_HELP[c] })
+    }
+    for (const f of facets) {
+      if (f.tag.includes(t) && !search.tags?.includes(f.tag))
+        out.push({ kind: 'tag', value: f.tag, hint: `${GROUP_LABEL[f.group] ?? f.group} · ${f.count}` })
+    }
+    const kitNames = new Set([...allKits.map(k => k.pack), ...allKits.map(k => k.kit)])
+    for (const k of kitNames) {
+      if (k.toLowerCase().includes(t) && !search.kits?.includes(k))
+        out.push({ kind: 'kit', value: k, hint: k.includes('/') ? 'kit' : 'pack' })
+    }
+    return out.slice(0, 14)
+  })
+
+  async function setSearch(f: SampleFilter) {
+    search = f
+    try { localStorage.setItem(SEARCH_KEY, JSON.stringify(f)) } catch { /* stockage indisponible */ }
+    await refresh()
+    // la case ouverte ne repond plus au filtre : premiere case qui y repond
+    if (current && !byKey.has(`${current.family}/${current.code}`) && ordered.length) {
+      await open({ kind: 'cell', family: ordered[0].family, code: ordered[0].code })
+      return
+    }
+    await loadEntries()
+    if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
+  }
+
+  function addSug(sg: Sug) {
+    const f = { ...search }
+    if (sg.kind === 'text') f.q = sg.value
+    else if (sg.kind === 'tag') f.tags = [...(f.tags ?? []), sg.value]
+    else if (sg.kind === 'kit') f.kits = [...(f.kits ?? []), sg.value]
+    else f.codes = [...(f.codes ?? []), sg.value]
+    query = ''
+    suggestIdx = 0
+    setSearch(f)
+  }
+
+  function dropChip(kind: Sug['kind'], value: string) {
+    const f = { ...search }
+    if (kind === 'text') delete f.q
+    else if (kind === 'tag') f.tags = f.tags?.filter(x => x !== value)
+    else if (kind === 'kit') f.kits = f.kits?.filter(x => x !== value)
+    else f.codes = f.codes?.filter(x => x !== value)
+    setSearch(f)
+  }
+
+  const chips = $derived([
+    ...(search.q ? [{ kind: 'text' as const, value: search.q }] : []),
+    ...(search.tags ?? []).map(v => ({ kind: 'tag' as const, value: v })),
+    ...(search.kits ?? []).map(v => ({ kind: 'kit' as const, value: v })),
+    ...(search.codes ?? []).map(v => ({ kind: 'code' as const, value: v })),
+  ])
+
+  function onSearchKey(e: KeyboardEvent) {
+    if (e.key === 'ArrowDown') { suggestIdx = Math.min(suggestIdx + 1, suggestions.length - 1); e.preventDefault() }
+    else if (e.key === 'ArrowUp') { suggestIdx = Math.max(suggestIdx - 1, 0); e.preventDefault() }
+    else if (e.key === 'Enter' && suggestions.length) { addSug(suggestions[suggestIdx] ?? suggestions[0]); e.preventDefault() }
+    else if (e.key === 'Escape') { query = ''; searchField?.blur(); e.preventDefault() }
+    else if (e.key === 'Backspace' && !query && chips.length) { const c = chips[chips.length - 1]; dropChip(c.kind, c.value) }
+  }
+
+  const toggle = <K extends 'section' | 'kind'>(key: K, value: SampleFilter[K]) =>
+    setSearch({ ...search, [key]: search[key] === value ? undefined : value })
 
   function cssVar(name: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
@@ -179,19 +260,22 @@
     const name = (l.source.split('/').pop() ?? l.source).replace(/\.wav$/i, '')
     return { source: l.source, family: '', code: '', pack: l.pack, name, duration: null, rank: i + 1,
       status: 'pending', selected: true, flags: null, bpm: null, bpm_est: false, tags: l.tags, stars: l.stars,
-      overflow: false }
+      auto_tags: l.auto_tags, overflow: false }
   }
 
   // grille (filtree), compteurs hors case et tags connus
   async function refresh() {
     try {
-      const [c, u, t, tags, k] = await Promise.all([
-        api.sampleCells({ tag: filterTag || undefined, minStars: minStars || undefined, kit: kit || undefined }),
-        api.sampleLoose('unclassified', kit), api.sampleLoose('trash', kit), api.sampleTags(), api.sampleKits(),
+      const [c, u, t, tags, k, fa] = await Promise.all([
+        api.sampleCells(search, kit),
+        api.sampleLoose('unclassified', kit, search), api.sampleLoose('trash', kit, search), api.sampleTags(),
+        api.sampleKits(search), api.sampleFacets(),
       ])
       cells = c
-      const all = filterOn() ? await api.sampleCells() : c
+      facets = fa
+      const [all, ak] = filterOn() ? await Promise.all([api.sampleCells(), api.sampleKits()]) : [c, k]
       gridCodes = [...new Set(all.map(x => x.code))]
+      allKits = ak.kits
       counts = { unclassified: u.length, trash: t.length }
       allTags = tags
       kitData = k
@@ -206,13 +290,13 @@
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
     if (v.kind === 'kit') {
-      const t = await api.sampleKitTree(kit).catch(() => ({ entries: [], unclassified: [] }))
+      const t = await api.sampleKitTree(kit, search).catch(() => ({ entries: [], unclassified: [] }))
       entries = [...t.entries, ...t.unclassified.map(looseRow)]
       return
     }
     entries = v.kind === 'cell'
-      ? await api.sampleCell(v.family, v.code, kit, showOverflow).catch(() => [])
-      : (await api.sampleLoose(v.kind, kit)).map(looseRow)
+      ? await api.sampleCell(v.family, v.code, kit, showOverflow, search).catch(() => [])
+      : (await api.sampleLoose(v.kind, kit, search)).map(looseRow)
   }
 
   async function open(v: View) {
@@ -454,10 +538,6 @@
     if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
   }
 
-  async function setFilter() {
-    await refresh()
-    if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
-  }
 
   function onkey(e: KeyboardEvent) {
     const t = e.target as HTMLElement | null
@@ -498,6 +578,7 @@
     })
     ws.on('ready', () => { if (autoplay) ws?.play() })
     try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
+    try { search = JSON.parse(localStorage.getItem(SEARCH_KEY) ?? '{}') as SampleFilter } catch { search = {} }
     await refresh()
     if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
     let last: string | null = null
@@ -517,26 +598,45 @@
 <svelte:window onkeydown={onkey} />
 
 <div class="samples">
+  <div class="searchbar zone">
+    <div class="search-in">
+      {#each chips as c (c.kind + c.value)}
+        <span class="chip {c.kind}" title={c.kind === 'code' ? codeTitle(c.value) : c.kind}>{c.kind === 'text' ? `« ${c.value} »` : c.value}<button
+          class="untag" title="Retirer" onclick={() => dropChip(c.kind, c.value)}>×</button></span>
+      {/each}
+      <input bind:this={searchField} bind:value={query} onkeydown={onSearchKey} oninput={() => (suggestIdx = 0)}
+        placeholder={chips.length ? 'affiner…' : 'Rechercher : texte, tag, genre, instrument (BD, kick…), kit…'} />
+      {#if suggestions.length}
+        <ul class="suggest">
+          {#each suggestions as sg, i (sg.kind + sg.value)}
+            <li><button class:on={i === suggestIdx} onmousedown={ev => { ev.preventDefault(); addSug(sg) }}>
+              <span class="chip {sg.kind}">{sg.kind === 'text' ? `« ${sg.value} »` : sg.value}</span>
+              <span class="muted small">{sg.hint}</span></button></li>
+          {/each}
+        </ul>
+      {/if}
+    </div>
+    <div class="seg small">
+      <button aria-pressed={search.section === 'rhythm'} class="rhythm" onclick={() => toggle('section', 'rhythm')}>Rythmique</button>
+      <button aria-pressed={search.section === 'melodic'} class="melodic" onclick={() => toggle('section', 'melodic')}>Mélodique</button>
+    </div>
+    <div class="seg small">
+      <button aria-pressed={search.kind === 'oneshot'} onclick={() => toggle('kind', 'oneshot')}>One-shot</button>
+      <button aria-pressed={search.kind === 'loop'} onclick={() => toggle('kind', 'loop')}>Boucle</button>
+    </div>
+    <select class="small" value={search.minStars ?? 0}
+      onchange={ev => setSearch({ ...search, minStars: Number((ev.target as HTMLSelectElement).value) || undefined })}>
+      <option value={0}>étoiles : toutes</option>
+      {#each [1, 2, 3, 4, 5] as n}<option value={n}>{'★'.repeat(n)}{n < 5 ? ' et +' : ''}</option>{/each}
+    </select>
+    {#if searchOn()}<button class="small" onclick={() => setSearch({})}>Tout effacer</button>{/if}
+  </div>
   <section class="grid">
    <div class="zone matrix">
     <p class="muted small">
       {totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus.
       Les chiffres d’une case : à écouter / retenus{filterOn() ? ' (filtrés)' : ''}.
     </p>
-    <div class="filters small">
-      <label>tag
-        <select bind:value={filterTag} onchange={setFilter}>
-          <option value="">tous</option>
-          {#each allTags as t}<option value={t}>{t}</option>{/each}
-        </select>
-      </label>
-      <label>étoiles
-        <select bind:value={minStars} onchange={setFilter}>
-          <option value={0}>toutes</option>
-          {#each [1, 2, 3, 4, 5] as n}<option value={n}>{'★'.repeat(n)}{n < 5 ? ' et +' : ''}</option>{/each}
-        </select>
-      </label>
-    </div>
     {#if error}<p class="err">{error}</p>{/if}
     <table class:dragging={dragging !== null}>
       <thead>
@@ -739,6 +839,10 @@
               onclick={() => act(s => api.sampleTagsEdit(s, [], [t]), [e.source])}>×</button></span>
           {/if}
         {/each}
+        {#each e.auto_tags.filter(t => !e.tags.includes(t)) as t}
+          <button class="tag small auto" title="Tag inféré des dossiers : filtrer dessus"
+            onclick={() => { if (!search.tags?.includes(t)) setSearch({ ...search, tags: [...(search.tags ?? []), t] }) }}>{t}</button>
+        {/each}
         <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : view?.kind === 'kit' && e.family && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
       </li>
     {/snippet}
@@ -786,7 +890,27 @@
 </div>
 
 <style>
-  .samples { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .samples { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .searchbar { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .search-in { position: relative; flex: 1; min-width: 280px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
+  .search-in input { flex: 1; min-width: 12em; border: 0; outline: none; background: none; color: var(--text); font-size: 13px; padding: 3px 0; }
+  .suggest { position: absolute; z-index: 5; top: 100%; left: 0; right: 0; margin: 2px 0 0; padding: 4px 0; list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.15); max-height: 22em; overflow-y: auto; }
+  .suggest button { display: flex; gap: 8px; align-items: center; width: 100%; border: 0; background: none; padding: 4px 8px; text-align: left; color: var(--text); cursor: pointer; }
+  .suggest button.on, .suggest button:hover { background: var(--panel-2); }
+  .chip { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; padding: 1px 2px 1px 7px; border-radius: 9px; border: 1px solid var(--border); white-space: nowrap; }
+  .suggest .chip { padding-right: 7px; }
+  .chip.tag { border-color: var(--melodic); }
+  .chip.kit { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+  .chip.code { font-family: ui-monospace, Menlo, monospace; border-color: var(--rhythm); color: var(--rhythm); }
+  .chip.text { font-style: italic; }
+  .seg { display: inline-flex; }
+  .seg button { border-radius: 0; margin-left: -1px; }
+  .seg button:first-child { border-radius: 4px 0 0 4px; }
+  .seg button:last-child { border-radius: 0 4px 4px 0; }
+  .seg button[aria-pressed='true'] { background: var(--panel-2); outline: 1px solid var(--accent); z-index: 1; }
+  .seg button.rhythm[aria-pressed='true'] { color: var(--rhythm); }
+  .seg button.melodic[aria-pressed='true'] { color: var(--melodic); }
+  .tag.auto { border-style: dotted; background: none; cursor: pointer; padding: 0 6px; }
   .grid { overflow: auto; }
   .filters { display: flex; gap: 10px; margin: 0 0 6px; }
   table { border-collapse: collapse; font-size: 12px; }

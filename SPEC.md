@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5) | fait (7.J1 à 7.J5) ; reste l'écoute elle-même, l'export se rejoue après |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6) | fait (7.J1 à 7.J6) ; reste l'écoute elle-même, l'export se rejoue après |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -660,6 +660,21 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Tags de kit (ajout demandé le 2026-10-07) : même clé `<préfixe>/`, tags
   multiples hérités par tous les fichiers du kit (filtre par tag compris) ;
   ils se retirent sur le kit, pas sur un fichier.
+
+**Décisions 7.J6 — recherche et tags inférés (arbitrées et faites le 2026-10-08)** :
+- Barre de recherche en tête de l'onglet Samples, qui filtre toute la page
+  (grille, pads de kits, cases, arbre, non classés, corbeille) : texte libre
+  (nom DT2 et chemin), tags, kits ou packs, instruments (codes), rythmique /
+  mélodique, one-shot / boucle, étoiles. ET entre facettes, OU dans une
+  facette ; puces retirables, suggestions au clavier. Les non classés ne
+  passent pas un filtre de case (section, code, type).
+- Tags inférés des noms de dossiers par un dictionnaire curé (`TAG_GROUPS` :
+  genre, instrument, mot-clé ; synonymes regroupés), pas de mots fréquents
+  automatiques (trop de noms de packs). `samples.py --tag-report` liste les
+  mots fréquents non couverts pour enrichir le dictionnaire.
+- Statut : `auto_tags`, recalculés à chaque reconstruction, jamais écrits
+  dans `overrides.json`, affichés en pointillé et cliquables (ajout au
+  filtre) ; `no_auto` (fichier ou `<préfixe>/`) en masque un.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

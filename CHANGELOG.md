@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J6] Barre de recherche de l'onglet Samples, qui filtre toute la page :
+  texte, tags, kits / packs, instruments, rythmique / mélodique, one-shot /
+  boucle, étoiles (ET entre facettes, OU dedans), avec suggestions et puces.
+  API : filtre commun (`SampleFilter`) sur `/api/samples`, `/cell`, `/loose`,
+  `/kits`, `/kit/tree`, et `GET /api/samples/facets`. Remplace les anciens
+  filtres tag / étoiles.
+- [7.J6] Tags inférés des noms de dossiers (`auto_tags`, dictionnaire curé
+  genre / instrument / mot-clé), recalculés à chaque reconstruction, masquables
+  par `no_auto` ; `samples.py --tag-report` liste les mots non couverts.
+
 - [7.J5] Vue par kit de la bibliothèque de samples : un kit est un préfixe
   de chemin (pack puis sous-dossier, `rthm/packs/neurotek`). Pads sous la
   grille (packs, puis sous-kits du pack choisi) qui filtrent grille, cases,
