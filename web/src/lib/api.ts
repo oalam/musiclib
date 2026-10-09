@@ -12,6 +12,10 @@ export interface TrackSummary {
   mood: string
   quality_score: string
   groove_cluster: string
+  /** Date d'ajout ISO (AAAA-MM-JJ). */
+  added: string
+  /** Tags manuels de library.md, separes par des virgules. */
+  tags: string
   has_audio: boolean
   has_stems: boolean
   has_bank: boolean

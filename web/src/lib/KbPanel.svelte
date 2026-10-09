@@ -3,6 +3,9 @@
   import { Marked } from 'marked'
   import { api, manualUrl, normalize, slugify, type KbHit, type KbLot, type KbNote } from './api'
 
+  // page : vue Knowledge du panneau lateral, toujours ouverte ; sinon overlay
+  // contextuel (aide de la facade DT2)
+  let { page = false }: { page?: boolean } = $props()
   let open = $state(false)
   // sommaire par lot, fiche, ou manuel PDF (7.F)
   let view = $state<'toc' | 'note' | 'manual'>('toc')
@@ -135,14 +138,9 @@
     try { toc = await api.kbToc() } catch (e) { error = e instanceof Error ? e.message : String(e) }
   }
 
+  // « / » est gere par App (bascule sur la vue Knowledge)
   function onkey(e: KeyboardEvent) {
-    const tag = (e.target as HTMLElement).tagName
-    if (e.key === '/' && tag !== 'INPUT' && tag !== 'SELECT' && tag !== 'TEXTAREA') {
-      e.preventDefault()
-      show()
-    } else if (e.key === 'Escape' && open && e.target === input) {
-      open = false
-    }
+    if (!page && e.key === 'Escape' && open && e.target === input) open = false
   }
 
   export async function show() {
@@ -152,6 +150,10 @@
     input?.focus()
     input?.select()
   }
+
+  $effect(() => {
+    if (page && !open) { open = true; loadToc() }
+  })
 
   function onInput() {
     clearTimeout(timer)
@@ -203,13 +205,13 @@
 <svelte:window onkeydown={onkey} />
 
 {#if open}
-  <aside class="kb" class:wide={view === 'manual'} aria-label="Base de connaissance">
+  <svelte:element this={page ? 'section' : 'aside'} class="kb" class:page class:wide={view === 'manual'} aria-label="Base de connaissance">
     <header>
       <input bind:this={input} bind:value={q} oninput={onInput} type="search"
         placeholder="Chercher dans la KB et la doctrine…" aria-label="Recherche" />
       <button class="small" class:on={view === 'toc'} onclick={() => { view = 'toc'; loadToc() }}>Sommaire</button>
       <button class="small" class:on={view === 'manual'} onclick={() => openManual(view === 'manual' ? manualPage : 1)}>Manuel</button>
-      <button class="small" onclick={() => (open = false)} title="Fermer (Échap)">×</button>
+      {#if !page}<button class="small" onclick={() => (open = false)} title="Fermer (Échap)">×</button>{/if}
     </header>
     {#if error}<p class="err">{error}</p>{/if}
     {#if q.trim()}
@@ -275,7 +277,7 @@
         {/key}
       </div>
     {/if}
-  </aside>
+  </svelte:element>
 {/if}
 
 <style>
@@ -285,6 +287,9 @@
     border-left: 1px solid var(--border); box-shadow: -8px 0 24px rgb(0 0 0 / 0.15);
   }
   .kb.wide { width: min(960px, 100vw); }
+  .kb.page { position: static; z-index: auto; width: auto; height: 100%; border-left: 0; box-shadow: none; }
+  .kb.page > :not(iframe, .manual) { width: 100%; max-width: 920px; margin: 0 auto; }
+  .kb.page header { max-width: none; }
   header { display: flex; gap: 6px; padding: 10px; border-bottom: 1px solid var(--border); }
   header input { flex: 1; min-width: 0; }
   .hits { list-style: none; margin: 0; padding: 0; max-height: 38%; overflow-y: auto; border-bottom: 1px solid var(--border); }

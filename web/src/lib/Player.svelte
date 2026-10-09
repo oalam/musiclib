@@ -3,7 +3,8 @@
   import RegionsPlugin, { type Region } from 'wavesurfer.js/plugins/regions'
   import { api, chordAt, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
 
-  let { track, bars = [], sections, currentTime = $bindable(0), playing = $bindable(false) }: {
+  let { track, bars = [], sections, currentTime = $bindable(0), playing = $bindable(false),
+    looping = $bindable(false), autoplay = false }: {
     track: TrackDetail
     /** Debuts de mesure (s) : la boucle se cale dessus. Vide = pas de calage. */
     bars?: number[]
@@ -12,6 +13,10 @@
     currentTime?: number
     /** Etat de lecture, lu par le transport de la facade (7.G). */
     playing?: boolean
+    /** Boucle active (region calee, sinon morceau entier), lue par la telecommande. */
+    looping?: boolean
+    /** Lecture des le chargement (prev / next de la telecommande en cours de lecture). */
+    autoplay?: boolean
   } = $props()
 
   let container: HTMLDivElement
@@ -25,6 +30,19 @@
   // boucle : bornes calees sur les mesures
   let loop = $state<{ start: number; end: number; nBars: number } | null>(null)
   let loopOn = $state(true)
+  // sans region : boucle sur le morceau entier (bouton boucle de la telecommande)
+  let wholeLoop = $state(false)
+  $effect(() => { looping = loop ? loopOn : wholeLoop })
+
+  /** Boucle de la telecommande : region si elle existe, sinon morceau entier. */
+  export function toggleLoop() {
+    if (loop) loopOn = !loopOn
+    else wholeLoop = !wholeLoop
+  }
+
+  export function pause() {
+    ws?.pause()
+  }
   let prevTime = 0
 
   // zoom molette : px par seconde (0 = ajuste a la largeur)
@@ -242,6 +260,7 @@
       const saved = readPos()
       if (saved > 0 && saved < duration) inst.setTime(saved)
       posReady = true
+      if (autoplay) inst.play()
     })
     inst.on('scroll', (start, end) => updateView(start, end))
     // glisser sur la forme d'onde = nouvelle boucle ; un simple clic = seek
@@ -268,6 +287,7 @@
       if (Math.abs(t - savedPos) >= 1 || !inst.isPlaying()) savePos(t)
     })
     inst.on('play', () => { playing = true })
+    inst.on('finish', () => { if (!loop && wholeLoop) { inst.setTime(0); inst.play() } })
     inst.on('pause', () => { playing = false; savePos(inst.getCurrentTime()) })
     inst.on('error', err => { error = String(err); loading = false })
     ws = inst
@@ -279,6 +299,7 @@
   function onkey(e: KeyboardEvent) {
     const target = e.target as HTMLElement
     if (target.tagName === 'INPUT' || target.tagName === 'SELECT') return
+    if (!container?.offsetParent) return  // vue masquee (autre section du panneau lateral)
     if (e.code === 'Space') { e.preventDefault(); ws?.playPause() }
     if (e.code === 'ArrowLeft') ws?.setTime(Math.max(0, (ws?.getCurrentTime() ?? 0) - 10))
     if (e.code === 'ArrowRight') ws?.setTime((ws?.getCurrentTime() ?? 0) + 10)

@@ -31,6 +31,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.K] Coquille du front : barre générale avec télécommande (Morceau ou
+  Sample : précédent, lecture / pause, boucle, suivant ; une seule source
+  joue à la fois) et panneau latéral minimisable à icônes (Morceaux,
+  Samples, Knowledge en pleine page, `/` y mène). Les vues visitées restent
+  montées. Morceaux : tags multiples en puces (genre, energy, mood, tags ;
+  ET), tri Date / A→Z, historique des filtres et « Chercher en ligne » dans
+  les propositions, ajout dans un panneau sous la liste. Samples : historique
+  des filtres dans les propositions. API : `added` et `tags` dans
+  `TrackSummary`.
 - [7.E] Sortie audio du lecteur au choix (`setSinkId`) : le morceau part
   vers la Digitakt II (USB AUDIO/MIDI) pour l'échantillonner en `SRC` = USB.
   Sélecteur dans le transport, mémorisé par libellé, réappliqué au

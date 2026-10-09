@@ -14,8 +14,12 @@
   // Barre de recherche (7.J6) : texte, tags (manuels, de kit, inferes des
   // dossiers), kits, instruments, rythmique / melodique, one-shot / boucle,
   // etoiles ; ET entre facettes, OU dans une facette ; filtre toute la page.
+  // Propositions : historique des filtres en plus des facettes ; deck de la
+  // telecommande de la barre generale (lecture, boucle, sample precedent / suivant).
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
+  import { remote } from './remote.svelte'
+  import { loadHistory, pushHistory } from './history'
   import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type SampleFilter } from './api'
 
   const FLAG_HELP: Record<string, string> = {
@@ -210,7 +214,25 @@
   }
   function filterOn(): boolean { return searchOn() || kit !== '' }
 
-  type Sug = { kind: 'text' | 'tag' | 'kit' | 'code' | 'note'; value: string; hint: string }
+  type Sug = { kind: 'text' | 'tag' | 'kit' | 'code' | 'note' | 'history'; value: string; hint: string; recall?: SampleFilter }
+
+  // historique des filtres (propositions), jetons lisibles = libelle de l'entree
+  const HISTORY_KEY = 'ui:sample-history'
+  let history = $state<SampleFilter[]>(loadHistory<SampleFilter>(HISTORY_KEY))
+  let searchFocused = $state(false)
+  function filterTokens(f: SampleFilter): string[] {
+    return [
+      ...(f.q ? [`« ${f.q} »`] : []), ...(f.tags ?? []), ...(f.kits ?? []), ...(f.codes ?? []), ...(f.notes ?? []),
+      ...(f.section ? [f.section === 'rhythm' ? 'rythmique' : 'mélodique'] : []),
+      ...(f.kind ? [f.kind === 'loop' ? 'boucle' : 'one-shot'] : []),
+      ...(f.minStars ? [`${'★'.repeat(f.minStars)}+`] : []),
+    ]
+  }
+  const historySugs = (t: string, n: number): Sug[] => history
+    .map(h => ({ h, label: filterTokens(h).join(' · ') }))
+    .filter(x => x.label && (!t || x.label.toLowerCase().includes(t)))
+    .slice(0, n)
+    .map(x => ({ kind: 'history' as const, value: x.label, hint: 'filtre récent', recall: x.h }))
 
   // roue chromatique (7.J7) : C en haut, sens horaire, 12 parts de 30 degres
   const FLAT_TO_SHARP: Record<string, string> = { DB: 'C#', EB: 'D#', GB: 'F#', AB: 'G#', BB: 'A#' }
@@ -234,7 +256,7 @@
   const GROUP_LABEL: Record<string, string> = { genre: 'genre', instrument: 'instrument', mot: 'mot-clé', manuel: 'tag' }
   const suggestions = $derived.by((): Sug[] => {
     const t = query.trim().toLowerCase()
-    if (!t) return []
+    if (!t) return searchFocused ? historySugs('', 6) : []
     const out: Sug[] = [{ kind: 'text', value: query.trim(), hint: 'texte : nom DT2 ou chemin' }]
     for (const c of CODE_ORDER) {
       if (!search.codes?.includes(c) && (c.toLowerCase() === t || CODE_HELP[c].toLowerCase().includes(t)))
@@ -253,11 +275,12 @@
       if (k.toLowerCase().includes(t) && !search.kits?.includes(k))
         out.push({ kind: 'kit', value: k, hint: k.includes('/') ? 'kit' : 'pack' })
     }
-    return out.slice(0, 14)
+    return [...out.slice(0, 14), ...historySugs(t, 3)]
   })
 
   async function setSearch(f: SampleFilter) {
     search = f
+    history = pushHistory(HISTORY_KEY, history, f, filterTokens)
     try { localStorage.setItem(SEARCH_KEY, JSON.stringify(f)) } catch { /* stockage indisponible */ }
     await refresh()
     // la case ouverte ne repond plus au filtre : premiere case qui y repond
@@ -270,6 +293,12 @@
   }
 
   function addSug(sg: Sug) {
+    if (sg.kind === 'history' && sg.recall) {
+      query = ''
+      suggestIdx = 0
+      setSearch({ ...sg.recall })
+      return
+    }
     const f = { ...search }
     if (sg.kind === 'text') f.q = sg.value
     else if (sg.kind === 'tag') f.tags = [...(f.tags ?? []), sg.value]
@@ -611,6 +640,7 @@
     if (moving) return
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
     if (document.querySelector('aside.panel, aside.kb')) return
+    if (!container?.offsetParent) return  // vue masquee (autre section du panneau lateral)
     const k = e.key
     if ((e.metaKey || e.ctrlKey) && (k === 'a' || k === 'A')) { sel = new Set(visible.map(x => x.source)); e.preventDefault(); return }
     if (e.metaKey || e.ctrlKey || e.altKey) return
@@ -644,6 +674,9 @@
       normalize: true,
     })
     ws.on('ready', () => { if (autoplay) ws?.play() })
+    ws.on('play', () => { playing = true; remote.played('samples') })
+    ws.on('pause', () => { playing = false })
+    ws.on('finish', () => { if (looping) ws?.play(); else playing = false })
     try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
     try { search = JSON.parse(localStorage.getItem(SEARCH_KEY) ?? '{}') as SampleFilter } catch { search = {} }
     await refresh()
@@ -656,6 +689,21 @@
     if (c) await open({ kind: 'cell', folder: c.folder })
   })
   onDestroy(() => ws?.destroy())
+
+  // deck de la telecommande
+  let playing = $state(false)
+  let looping = $state(false)
+  const cursorName = $derived(visible.find(e => e.source === cursor)?.name ?? '')
+  onDestroy(remote.register('samples', {
+    get label() { return cursorName },
+    get playing() { return playing },
+    get looping() { return looping },
+    playPause: () => ws?.playPause(),
+    pause: () => ws?.pause(),
+    toggleLoop: () => { looping = !looping },
+    prev: () => step(-1),
+    next: () => step(1),
+  }))
 
   function fmt(d: number | null): string {
     return d == null ? '' : d < 10 ? `${d.toFixed(2)} s` : `${d.toFixed(1)} s`
@@ -672,12 +720,14 @@
           class="untag" title="Retirer" onclick={() => dropChip(c.kind, c.value)}>×</button></span>
       {/each}
       <input bind:this={searchField} bind:value={query} onkeydown={onSearchKey} oninput={() => (suggestIdx = 0)}
+        onfocus={() => (searchFocused = true)} onblur={() => (searchFocused = false)}
         placeholder={chips.length ? 'affiner…' : 'Rechercher : texte, tag, genre, instrument (BD, kick…), kit…'} />
       {#if suggestions.length}
         <ul class="suggest">
           {#each suggestions as sg, i (sg.kind + sg.value)}
             <li><button class:on={i === suggestIdx} onmousedown={ev => { ev.preventDefault(); addSug(sg) }}>
-              <span class="chip {sg.kind}">{sg.kind === 'text' ? `« ${sg.value} »` : sg.value}</span>
+              {#if sg.kind === 'history'}<span class="muted" aria-hidden="true">↺</span> <span>{sg.value}</span>
+              {:else}<span class="chip {sg.kind}">{sg.kind === 'text' ? `« ${sg.value} »` : sg.value}</span>{/if}
               <span class="muted small">{sg.hint}</span></button></li>
           {/each}
         </ul>

@@ -106,7 +106,7 @@ from paths import resolve_audio as _resolve_audio_path
 WEB_DIST = VAULT_ROOT / "web" / "dist"
 
 _SUMMARY_FIELDS = ("artist", "title", "bpm", "key", "duration", "genre",
-                   "energy", "mood", "quality_score", "groove_cluster")
+                   "energy", "mood", "quality_score", "groove_cluster", "added", "tags")
 
 
 class TrackSummary(BaseModel):
@@ -121,6 +121,8 @@ class TrackSummary(BaseModel):
     mood: str = ""
     quality_score: str = ""
     groove_cluster: str = ""
+    added: str = ""  # date d'ajout ISO (tri par date du front)
+    tags: str = ""  # tags manuels de library.md, separes par des virgules
     has_audio: bool = False
     has_stems: bool = False
     has_bank: bool = False

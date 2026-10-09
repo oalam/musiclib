@@ -18,9 +18,9 @@ LIBRARY = f"""---
 count: 1
 ---
 
-| slug | artist | title | bpm | key | file |
-|---|---|---|---|---|---|
-| {SLUG} | "Artist" | Title | 150.0 | A minor | [[audio/{SLUG}.opus]] |
+| slug | artist | title | bpm | key | file | added | tags |
+|---|---|---|---|---|---|---|---|
+| {SLUG} | "Artist" | Title | 150.0 | A minor | [[audio/{SLUG}.opus]] | 2026-10-09 | lo-fi, tribe |
 """
 
 
@@ -53,6 +53,7 @@ def test_list_tracks(client: TestClient):
     t = tracks[0]
     assert t["slug"] == SLUG and t["artist"] == "Artist"  # guillemets retires
     assert t["has_audio"] is True and t["has_bank"] is False
+    assert t["added"] == "2026-10-09" and t["tags"] == "lo-fi, tribe"  # tri / filtre du front
 
 
 def test_track_detail(client: TestClient):

@@ -412,6 +412,7 @@ mutes, FX de transition, principes d'arc).
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
 | 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7), arbre du +Drive par type / code / sous-catégorie et plafond par dossier (7.J8) | fait (7.J1 à 7.J8) ; reste l'écoute elle-même, l'export se rejoue après |
+| 7.K | Coquille du front : barre générale avec télécommande (morceau ou sample : précédent, lecture / pause, boucle, suivant), panneau latéral minimisable à icônes (Morceaux, Samples, Knowledge), filtre des morceaux par tags multiples, tri date / alpha, historique et recherche en ligne dans les propositions | fait (à valider à l'usage) |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -807,6 +808,31 @@ révisés par 7.J8) :
     de dépôt. L'arbre d'un kit suit le même ordre. `M` choisit un dossier.
   - Aucun projet DT2 n'existe encore : le déplacement sur le +Drive est
     sans effet.
+
+**Décisions 7.K — coquille du front (arbitrées et faites le 2026-10-09)** :
+- Barre générale : télécommande du deck en focus (Morceau / Sample,
+  commutable) ; le focus suit la vue Morceaux ou Samples, et reste sur la
+  dernière en Knowledge. Une seule source joue à la fois (`remote.svelte.ts`).
+  Morceaux : précédent / suivant dans l'ordre de la liste filtrée, la lecture
+  continue si elle était en cours ; boucle = région calée si elle existe,
+  sinon morceau entier. Samples : sample précédent / suivant de la liste,
+  boucle du sample.
+- Panneau latéral : icônes + libellés, réductible aux icônes (mémorisé).
+  Second clic sur Morceaux : replie / déplie la liste. Les vues visitées
+  restent montées (masquées) : la lecture continue en lisant une fiche ; le
+  clavier d'une vue masquée est ignoré.
+- Knowledge : vue pleine page (sommaire, recherche, fiche, manuel) ; `/` y
+  mène. L'overlay reste pour l'aide contextuelle de la façade DT2.
+- Filtre des morceaux : tags = genre + energy + mood (sans le « ? »
+  d'inférence) + colonne `tags` de `library.md` ; plusieurs tags en ET.
+  Tri Date (champ `added`, plus récents d'abord) ou A→Z, BPM / Key / Energy
+  en second choix. API : `added` et `tags` exposés par `GET /api/tracks`.
+- Ajout (7.I) fusionné dans le filtre : dernière proposition « Chercher
+  « … » en ligne » (et bouton si aucun résultat), recherche lancée dans un
+  panneau sous la liste, plus de bouton dans la barre.
+- Historique des filtres dans les propositions (morceaux et samples) : 8
+  entrées, sans doublon, un filtre qui affine le précédent le remplace.
+  Retenu à la sélection d'un morceau, à l'ajout d'un tag, à Entrée.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

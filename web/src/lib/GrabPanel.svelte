@@ -1,4 +1,6 @@
 <script lang="ts">
+  // Ajout d'un morceau (7.I), integre sous la liste : ouvert par la derniere
+  // proposition du filtre (« chercher en ligne »), recherche pre-remplie.
   import { api, mmss, type Candidate, type Job } from './api'
 
   let { onadded }: { onadded: (slug: string, created: boolean) => void } = $props()
@@ -24,8 +26,17 @@
     queueMicrotask(() => input?.focus())
   }
 
-  async function search(e: Event) {
-    e.preventDefault()
+  /** Ouvre le panneau sur `q` et lance la recherche (sauf ajout en cours). */
+  export function searchFor(q: string) {
+    open = true
+    if (running) return
+    query = q
+    job = null
+    search()
+  }
+
+  async function search(e?: Event) {
+    e?.preventDefault()
     if (!query.trim() || searching) return
     searching = true
     error = ''
@@ -80,9 +91,9 @@
 </script>
 
 {#if open}
-<aside class="panel" aria-label="Ajouter un morceau">
+<section class="grab" aria-label="Ajouter un morceau">
   <header>
-    <strong>Ajouter un morceau</strong>
+    <strong>Ajouter en ligne</strong>
     <button class="small" onclick={() => (open = false)} title="Fermer (le job continue)">Fermer</button>
   </header>
 
@@ -142,14 +153,14 @@
   {/if}
 
   {#if error}<p class="err">{error}</p>{/if}
-</aside>
+</section>
 {/if}
 
 <style>
-  .panel {
-    position: fixed; top: 0; right: 0; bottom: 0; z-index: 20; width: min(520px, 100vw);
-    background: var(--panel); border-left: 1px solid var(--border); box-shadow: -4px 0 16px rgb(0 0 0 / 0.15);
-    padding: 12px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  .grab {
+    flex: 0 1 auto; max-height: 60%; min-height: 0; overflow-y: auto;
+    background: var(--panel); border-top: 2px solid var(--accent);
+    padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;
   }
   header { display: flex; align-items: center; justify-content: space-between; }
   form { display: flex; gap: 6px; }
