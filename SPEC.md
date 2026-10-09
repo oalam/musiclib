@@ -411,7 +411,7 @@ mutes, FX de transition, principes d'arc).
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
-| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7) | fait (7.J1 à 7.J7) ; reste l'écoute elle-même, l'export se rejoue après |
+| 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7), arbre du +Drive par type / code / sous-catégorie et plafond par dossier (7.J8) | fait (7.J1 à 7.J8) ; reste l'écoute elle-même, l'export se rejoue après |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -562,7 +562,8 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - (Re)générer la bank depuis le front relance aussi `harmony.py`, sur la grille
   de la nouvelle bank ; un échec de l'harmonie ne bloque pas la bank.
 
-**Décisions 7.J (arbitrées le 2026-10-07)** :
+**Décisions 7.J (arbitrées le 2026-10-07)** (arbre du +Drive et quotas
+révisés par 7.J8) :
 - 3 niveaux sur le +Drive : famille / code / fichier. Familles : HARDCORE,
   JUNGLE, DUBSTEP, TECHNO, TRIBE (pack Tribalism Vol. 1 à venir, kit
   neurotek depuis le 2026-10-07),
@@ -723,6 +724,89 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
 - Passage actuel : BD 246 mesurées / 93 incertaines (pyin sans hauteur) / 79
   lues, BS 45 / 26 / 45, PD 14 / 28 / 6, ST 12 lues sur 76. Les notes lues des boucles ML / BL
   comptent dans la roue et le filtre (rien n'y est mesuré).
+
+**Décisions 7.J8 — arbre par type et plafond par dossier (arbitrées et faites le 2026-10-08)** :
+- Constat : l'arbre famille / code éclate un même instrument dans 7 dossiers
+  et impose des quotas par case famille × code. Le total retenu plafonne
+  vers 1 000 (1 056 au 2026-10-08) et pèse surtout sur les kicks : 156 BD
+  contre 51 ML pour piano, nappes, atmosphères et guitare réunis. Sur la
+  machine, on cherche d'abord un instrument (« il me faut un kick »), pas un
+  genre.
+- Arbre de l'export : `<MEDIA>/Live/samples/<BRANCHE>/<CODE>/[<SOUS>/]<nom>.wav`,
+  avec six branches :
+  - DRUMS : one-shots percussifs, BD SD CP HH OH CY TM PC ;
+  - TONAL : one-shots avec note (7.J7), BS ST PD ;
+  - LOOPS : BR DL PL ML BL ;
+  - FX : `FX/<SOUS>/` ;
+  - VX : `VX/` ;
+  - SAMPLE : samples et resamples maison, par code, inchangé.
+
+  Le préfixe `<CODE>` reste dans le nom de fichier, même sous un dossier du
+  même code : la liste des samples d'une track n'affiche que le nom. Le
+  format du nom (`<CODE> [BPM|note] <desc> <pack>`, 18 caractères) ne change
+  pas.
+- La famille sort de l'arbre et des quotas. Elle devient un tag de genre
+  (hardcore, jungle, dubstep, techno, tribe…), filtrable dans le front comme
+  les autres tags. La règle « case de moins de 4 fichiers vers UNIVERSEL »
+  disparaît.
+- Quota = plafond par dossier final, de 16 à 32 selon le code ; les
+  candidats restent à 3 × plafond. Le total retenu vaut nombre de dossiers
+  finaux × plafond, et dépasser 1 000 passe par plus de sous-catégories, pas
+  par des dossiers plus gros. Plafonds proposés : 32 pour BR, DL et PL
+  (boucles rythmiques), 16 pour le reste. À ajuster à la mise en œuvre.
+- Sous-catégories inférées par les tags (dictionnaire `TAG_GROUPS` enrichi),
+  puis corrigées à l'écoute : `M` permet aussi de changer de sous-catégorie,
+  avec un override dans `overrides.json`. Un fichier sans sous-catégorie
+  inférée reste à la racine de son code, qui compte comme un dossier final.
+  Une sous-catégorie de moins de 4 fichiers remonte à la racine du code.
+- Sous-niveaux de départ (liste à étendre via `--tag-report`, en commençant
+  par les gros codes du catalogue : PC 1 168, SD 854, ST 745, DL 588,
+  VX 574) :
+  - BD : HARD (distordu), CLEAN (909, propre), SUB (boom, long), ACOU ;
+  - ML : KEYS (piano, orgue), PADS, ATMOS, GUITAR ;
+  - FX : RISE, HIT, NOISE, REV.
+
+  Révision de 7.J : une boucle de nappe passe en `LOOPS/ML/PADS` au lieu de
+  PD ; PD ne garde que les one-shots.
+- Continuité : les décisions d'écoute (keep, drop), les étoiles, les tags et
+  la corbeille sont conservés par fichier. Un override de case famille × code
+  devient un override de code, et la famille passe en tag. L'export reste
+  rejouable : `export.json` retire l'ancienne arborescence `<FAMILLE>/` de
+  `<MEDIA>/Live/samples`. Le +Drive se nettoie à part, dans Transfer.
+- Arbitrages en session de code (2026-10-08) :
+  - Avec les seuls BD, ML et FX en sous-niveaux, on ne retenait que 519
+    fichiers. On a donc ajouté des sous-catégories inférées (règles testées
+    sur le catalogue) :
+    - PC : SHAKER, SKIN, METAL, WOOD, FOLEY ;
+    - PL : SKIN, TOPS, SHAKER ;
+    - ST : CHORD, STAB, METAL, ANALOG (minimoog, modular…), BELL (bell,
+      blip, pluck), ORCH (cordes, cuivres, sax, piano) ; sans mot reconnu,
+      par durée comme BS ;
+    - PD : AMBIENT, CHORD, DRONE ; sans mot reconnu, par durée : SHORT
+      (moins de 4 s), LONG ;
+    - VX : SPEECH, CHANT, MC, CUT ;
+    - BS : SUB, WOB, DIST, ANALOG par mots ; sans mot reconnu, par durée
+      (lue dans l'en-tête, sans décoder) : SHORT (moins de 0,6 s), MID,
+      LONG (2 s ou plus). Les noms des BS décrivent peu le son, d'où ce
+      repli ; mesurer le timbre a été écarté pour l'instant (il faudrait
+      mesurer toute la réserve BS) ;
+    - SD : RIM ;
+    - BR et DL par tranche de tempo, nommée par sa borne basse pour le tri
+      de la DT2 (`060` moins de 120, `120`, `150`, `180`) : tempo du nom,
+      sinon tempo mesuré. Un tempo mesuré à un passage range la boucle au
+      passage suivant.
+
+    - Les `Low End Thumps` et `Transitions` de cinematic Noiiz (39
+      fichiers) étaient classés en PD à cause du mot « cinematic ». Ils
+      passent en FX (`FX/HIT` et `FX/RISE`).
+
+    Résultat : 1 215 retenus sur 3 191 candidats, 74 dossiers.
+  - Plafond : 32 pour BR, DL et PL, 16 pour le reste.
+  - Front : arbre par branche (repliable), une ligne par code, une case
+    par sous-catégorie ; les dossiers vides restent visibles comme cibles
+    de dépôt. L'arbre d'un kit suit le même ordre. `M` choisit un dossier.
+  - Aucun projet DT2 n'existe encore : le déplacement sur le +Drive est
+    sans effet.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

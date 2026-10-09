@@ -61,6 +61,8 @@ from analyzer.samples import (
     Status,
     all_tags,
     cell_of,
+    folder_key,
+    folder_parts,
     export,
     facet_notes,
     facet_tags,
@@ -74,6 +76,7 @@ from analyzer.samples import (
     overflow_of,
     promote,
     quota,
+    target_folders,
     restore_kit,
     set_kit_tags,
     set_stars,
@@ -189,9 +192,12 @@ def run_grab(req: GrabRequest, ctx: JobContext) -> None:
 
 
 class SampleCell(BaseModel):
-    """Case famille x code de la bibliotheque de samples, vue d'ecoute (7.J2)."""
-    family: str
+    """Case de la bibliotheque de samples = dossier final du +Drive (7.J8),
+    vue d'ecoute (7.J2)."""
+    folder: str         # DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX, SAMPLE/BD
+    branch: str
     code: str
+    sub: str            # "" = racine du code
     quota: int | None
     candidates: int
     selected: int
@@ -214,8 +220,8 @@ class SampleDecision(BaseModel):
 
 class SampleMove(BaseModel):
     sources: Sources
-    family: str = Field(min_length=1, max_length=20)
     code: str = Field(min_length=2, max_length=2)
+    sub: str = Field(default="", max_length=10)     # "" = racine du code
 
 
 class SampleBatch(BaseModel):
@@ -299,28 +305,33 @@ def _sample_cells(m: samples.Manifest, kit: str | None = None) -> list[SampleCel
     """Grille du manifeste (deja filtre par la barre de recherche) ; la reserve
     hors plafond est comptee ; avec `kit`, une case qui n'a que de la reserve
     du kit apparait."""
-    cells: dict[tuple[str, str], list[SampleEntry]] = {}
-    spare: dict[tuple[str, str], int] = {}
+    cells: dict[str, list[SampleEntry]] = {}
+    spare: dict[str, int] = {}
     for e in m.entries:
         if kit is not None and not in_kit(e.source, kit):
             continue
-        cells.setdefault((e.family, e.code), []).append(e)
+        cells.setdefault(e.folder, []).append(e)
     for r in m.reserve:
         if kit is not None and not in_kit(r.source, kit):
             continue
         if kit is not None:
-            cells.setdefault((r.family, r.code), [])
-        if (r.family, r.code) in cells:
-            spare[r.family, r.code] = spare.get((r.family, r.code), 0) + 1
-    return [SampleCell(
-        family=fam, code=code, quota=quota(fam, code), candidates=len(es),
-        selected=sum(e.selected for e in es),
-        keep=sum(e.status == "keep" for e in es),
-        drop=sum(e.status == "drop" for e in es),
-        to_listen=sum(e.selected and e.status == "pending" for e in es),
-        flagged=sum(bool(e.flags) for e in es),
-        reserve=spare.get((fam, code), 0),
-    ) for (fam, code), es in sorted(cells.items())]
+            cells.setdefault(r.folder, [])
+        if r.folder in cells:
+            spare[r.folder] = spare.get(r.folder, 0) + 1
+    out: list[SampleCell] = []
+    for folder, es in sorted(cells.items(), key=lambda kv: folder_key(kv[0])):
+        branch, code, sub = folder_parts(folder)
+        out.append(SampleCell(
+            folder=folder, branch=branch, code=code, sub=sub, quota=quota(folder),
+            candidates=len(es),
+            selected=sum(e.selected for e in es),
+            keep=sum(e.status == "keep" for e in es),
+            drop=sum(e.status == "drop" for e in es),
+            to_listen=sum(e.selected and e.status == "pending" for e in es),
+            flagged=sum(bool(e.flags) for e in es),
+            reserve=spare.get(folder, 0),
+        ))
+    return out
 
 
 def _validate_grab(req: GrabRequest) -> None:
@@ -525,18 +536,18 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return [FacetNote(note=n, count=c) for n, c in facet_notes(manifest())]
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
-    def sample_cell(family: str, code: str, f: SampleQuery, kit: str | None = None,
+    def sample_cell(folder: str, f: SampleQuery, kit: str | None = None,
                     overflow: bool = False) -> list[SampleEntry]:
-        """Candidats d'une case ; avec `kit`, ceux du kit puis sa reserve
-        (lignes `overflow`) ; `overflow` ajoute toute la reserve de la case."""
+        """Candidats d'une case (dossier final) ; avec `kit`, ceux du kit puis
+        sa reserve (lignes `overflow`) ; `overflow` ajoute toute la reserve."""
         m = view(f)
-        cell = cell_of(m, family, code)
+        cell = cell_of(m, folder)
         if kit:
-            cell = [e for e in cell if in_kit(e.source, kit)] + overflow_of(m, family, code, kit)
+            cell = [e for e in cell if in_kit(e.source, kit)] + overflow_of(m, folder, kit)
         elif overflow:
-            cell = cell + overflow_of(m, family, code)
+            cell = cell + overflow_of(m, folder)
         if not cell:
-            raise HTTPException(404, f"case inconnue : {family}/{code}")
+            raise HTTPException(404, f"case inconnue : {folder}")
         return cell
 
     @app.get("/api/samples/loose", response_model=list[LooseSample])
@@ -559,6 +570,11 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         compteurs reduits par la barre de recherche."""
         return SampleKits(kits=kits(view(f)),
                           tags=kit_tags(samples.load_overrides(samples_overrides)))
+
+    @app.get("/api/samples/folders", response_model=list[str])
+    def sample_folders() -> list[str]:
+        """Dossiers cibles d'un rangement (7.J8) : racine du code et sous-categories."""
+        return target_folders()
 
     @app.get("/api/samples/tags", response_model=list[str])
     def sample_tags() -> list[str]:
@@ -594,7 +610,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Range des candidats ou des non classes dans une case (statut garde)
         et l'inscrit dans overrides.json."""
         return edit(req.sources, lambda m, ov, src: move_sample(
-            m, ov, src, req.family, req.code, samples_src), status_code=422)
+            m, ov, src, req.code, req.sub, samples_src), status_code=422)
 
     @app.post("/api/samples/stars", response_model=list[SampleCell])
     def sample_stars(req: SampleStars) -> list[SampleCell]:

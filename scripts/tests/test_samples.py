@@ -31,7 +31,7 @@ def tree(tmp_path: Path) -> Path:
     root = tmp_path / "Samples"
     for i in range(1, 6):
         _wav(root / "Hardcore free samples" / "Kicks" / f"Hard Kick {i:02d}.wav")
-    _wav(root / "Hardcore free samples" / "Snare 01.wav")          # case de 1 -> repliee
+    _wav(root / "Hardcore free samples" / "Snare 01.wav")
     _wav(root / "909" / "clean" / "bd01.wav")
     _wav(root / "909" / "clean" / "bd02.wav")
     _wav(root / "rthm" / "kick" / "Long Kick.wav", seconds=5.0)    # > 4 s -> LP
@@ -112,16 +112,82 @@ def test_unique_suffix_keeps_length() -> None:
 
 
 def test_quota() -> None:
-    assert smp.quota("HARDCORE", "BD") == 32
-    assert smp.quota("TRIBE", "DL") == 32
-    assert smp.quota("JUNGLE", "PL") == 32
-    assert smp.quota("AUTRES", "PL") == 16
-    assert smp.quota("UNIVERSEL", "ML") == 16
-    assert smp.quota("HARDCORE", "BL") == 16
-    assert smp.quota("UNIVERSEL", "BD") == 32
-    assert smp.quota("UNIVERSEL", "SD") == 16
-    assert smp.quota("JUNGLE", "FX") == 8
-    assert smp.quota("SAMPLE", "RS") is None
+    assert smp.quota("LOOPS/DL/150") == 32
+    assert smp.quota("LOOPS/BR") == 32
+    assert smp.quota("LOOPS/PL/SKIN") == 32
+    assert smp.quota("LOOPS/ML/KEYS") == 16
+    assert smp.quota("DRUMS/BD/HARD") == 16
+    assert smp.quota("FX/RISE") == 16
+    assert smp.quota("VX") == 16
+    assert smp.quota("SAMPLE/BD") is None
+
+
+@pytest.mark.parametrize("family, code, sub, folder", [
+    ("HARDCORE", "BD", "HARD", "DRUMS/BD/HARD"),
+    ("UNIVERSEL", "BD", "", "DRUMS/BD"),
+    ("JUNGLE", "BR", "150", "LOOPS/BR/150"),
+    ("AUTRES", "PD", "", "TONAL/PD"),
+    ("UNIVERSEL", "FX", "RISE", "FX/RISE"),
+    ("UNIVERSEL", "VX", "", "VX"),
+    ("SAMPLE", "BD", "HARD", "SAMPLE/BD"),     # SAMPLE : pas de sous-categorie
+    ("UNIVERSEL", "RS", "", "SAMPLE/RS"),
+    ("UNIVERSEL", "HH", "HARD", "DRUMS/HH"),   # code sans sous-categorie
+])
+def test_folder_of(family: str, code: str, sub: str, folder: str) -> None:
+    assert smp.folder_of(family, code, sub) == folder
+    assert smp.folder_code(folder) == code
+
+
+@pytest.mark.parametrize("rel, code, sub", [
+    ("Hardcore free samples/Kicks/Kick 01.wav", "BD", "HARD"),
+    ("909/clean/bd01.wav", "BD", "CLEAN"),
+    ("Music Radar/Percussion/Conga Hit 02.wav", "PC", "SKIN"),
+    ("instru/piano/Soft Piano C.wav", "ML", "KEYS"),
+    ("rthm/loops/jungle/170_Think.wav", "BR", "150"),
+    ("rthm/loops/jungle/Think.wav", "BR", ""),
+    ("x/y/Thing.wav", "BD", ""),
+    ("minimoog synth/Moog Bass 03.wav", "BS", "ANALOG"),
+])
+def test_sub_of(rel: str, code: str, sub: str) -> None:
+    assert smp.sub_of(rel, code) == sub
+
+
+@pytest.mark.parametrize("rel, dur, sub", [
+    ("bass/oneshot/Invaders 01.wav", 0.3, "SHORT"),
+    ("bass/oneshot/Invaders 02.wav", 1.1, "MID"),
+    ("bass/oneshot/Invaders 03.wav", 4.0, "LONG"),
+    ("bass/oneshot/Sub Invaders.wav", 4.0, "SUB"),      # le mot passe avant la duree
+    ("bass/oneshot/Invaders 04.wav", None, ""),
+])
+def test_bass_sub_by_duration(rel: str, dur: float | None, sub: str) -> None:
+    assert smp.sub_of(rel, "BS", dur) == sub
+    assert sub == "" or sub in smp.SUBS["BS"]
+
+
+@pytest.mark.parametrize("rel, code, dur, sub", [
+    ("minimoog synth/Lead 03.wav", "ST", 1.0, "ANALOG"),
+    ("x/oneshot/Bell Blip 02.wav", "ST", 0.3, "BELL"),
+    ("x/oneshot/Weird 02.wav", "ST", 3.0, "LONG"),
+    ("Jungle 89  to 99/Pads/Ambience 04.wav", "PD", 8.0, "AMBIENT"),
+    ("Native instrument/lone forest/oneshot/Valley.wav", "PD", 2.5, "SHORT"),
+    ("Native instrument/lone forest/oneshot/Dune.wav", "PD", 6.0, "LONG"),
+])
+def test_tonal_subs(rel: str, code: str, dur: float, sub: str) -> None:
+    assert smp.sub_of(rel, code, dur) == sub
+
+
+def test_cinematic_thumps_and_transitions_are_fx() -> None:
+    assert smp.code_of("cinematic Noiiz/Low End Thumps/Thump 03.wav", 2.0) == "FX"
+    assert smp.code_of("cinematic Noiiz/Transitions/Swoosh 01.wav", 3.0) == "FX"
+    assert smp.sub_of("cinematic Noiiz/Transitions/Swoosh 01.wav", "FX") == "RISE"
+    assert smp.sub_of("cinematic Noiiz/Low End Thumps/Thump 03.wav", "FX") == "HIT"
+
+
+def test_target_folders() -> None:
+    folders = smp.target_folders()
+    assert folders[0] == "DRUMS/BD" and "DRUMS/BD/HARD" in folders
+    assert "LOOPS/DL/180" in folders and "FX/RISE" in folders and "VX/MC" in folders
+    assert not any(f.startswith("SAMPLE") for f in folders)
 
 
 def test_build_manifest(tree: Path) -> None:
@@ -130,15 +196,18 @@ def test_build_manifest(tree: Path) -> None:
     # mono ecarte au profit de la stereo
     assert not any("/Mono/" in s for s in by_src)
     assert any("/Stereo/" in s for s in by_src)
-    # case HARDCORE/SD (1 fichier) repliee dans UNIVERSEL
-    assert by_src["Hardcore free samples/Snare 01.wav"].family == "UNIVERSEL"
-    assert "HARDCORE/SD" in m.folded
-    # HARDCORE/BD a 5 fichiers : reste en famille
-    assert by_src["Hardcore free samples/Kicks/Hard Kick 01.wav"].family == "HARDCORE"
-    assert by_src["rthm/kick/Long Kick.wav"].code == "DL"
+    # BD/CLEAN (2 fichiers) remonte a la racine du code
+    assert by_src["909/clean/bd01.wav"].folder == "DRUMS/BD"
+    assert m.folded == ["DRUMS/BD/CLEAN"]
+    # BD/HARD a 5 fichiers : reste ; la famille devient un tag de genre
+    kick = by_src["Hardcore free samples/Kicks/Hard Kick 01.wav"]
+    assert (kick.folder, kick.family) == ("DRUMS/BD/HARD", "HARDCORE")
+    assert "hardcore" in kick.auto_tags
+    assert by_src["Hardcore free samples/Snare 01.wav"].folder == "DRUMS/SD"
+    assert by_src["rthm/kick/Long Kick.wav"].folder == "LOOPS/DL"
     assert m.unclassified == ["MPC_Kit/zzz01.wav"]
-    # SAMPLE n'est jamais replie ni plafonne
-    assert by_src["recorded/take.wav"].family == "SAMPLE"
+    # SAMPLE n'est jamais plafonne
+    assert by_src["recorded/take.wav"].folder == "SAMPLE/RS"
     assert all(e.selected for e in m.entries)          # tout tient dans les quotas
     names = [e.dest for e in m.entries]
     assert len(names) == len(set(names))
@@ -152,8 +221,9 @@ def test_overrides(tree: Path) -> None:
     m = smp.build_manifest(tree, ov)
     by_src = {e.source: e for e in m.entries}
     e = by_src["MPC_Kit/zzz01.wav"]
-    # famille forcee : pas de repli meme seule dans sa case
-    assert (e.family, e.code, e.name) == ("TRIBE", "PC", "PC Zzz 01 mpc")
+    # famille forcee : genre du fichier, sans effet sur le dossier
+    assert (e.family, e.folder, e.name) == ("TRIBE", "DRUMS/PC", "PC Zzz 01 mpc")
+    assert "tribe" in e.auto_tags
     assert "909/clean/bd02.wav" not in by_src
     assert m.unclassified == []
 
@@ -194,7 +264,7 @@ def test_cli_writes_manifest(tree: Path, tmp_path: Path,
     data = json.loads((meta / "manifest.json").read_text())
     assert data["unclassified"] == ["MPC_Kit/zzz01.wav"]
     assert cli.main(["--report"]) == 0
-    assert "HARDCORE" in capsys.readouterr().out
+    assert "BD/HARD" in capsys.readouterr().out
 
 
 def test_cli_rejects_bad_overrides(tree: Path, tmp_path: Path,
@@ -229,7 +299,7 @@ def test_bpm_folder_is_loop_fallback() -> None:
     ("Loops Pack/Synth Loops/Acid 140 bpm.wav", "ML"),
     ("Hardcore free samples/HSI/LS-HSI Hardcore Sequence Wet [142 BPM] 01-03.wav", "ML"),
     ("Loops Pack/Sample Packs/Reese Loop 01.wav", "BL"),
-    ("Jungle 89  to 99/Pads/Groove Therapy Pad.wav", "PD"),
+    ("Jungle 89  to 99/Pads/Groove Therapy Pad.wav", "ML"),    # LOOPS/ML/PADS (7.J8)
     ("x/loops/Vocal Loop 2.wav", "VX"),
     ("jungle dnb rthm/Builds/Build 04.wav", "FX"),
 ])
@@ -295,7 +365,7 @@ def test_flagged_candidates_go_last_and_measures_are_reused(tmp_path: Path) -> N
     for i in range(2, 6):
         _tone(root / "Hardcore free samples" / "Kicks" / f"Kick {i:02d}.wav")
     first = smp.build_manifest(root, {})
-    cell = smp.cell_of(first, "HARDCORE", "BD")
+    cell = smp.cell_of(first, "DRUMS/BD/HARD")
     assert cell[-1].source.endswith("Kick 01.wav")
     assert cell[-1].flags == ["muet"]
     assert [e.flags for e in cell[:-1]] == [[]] * 4
@@ -303,17 +373,17 @@ def test_flagged_candidates_go_last_and_measures_are_reused(tmp_path: Path) -> N
     def boom(path: Path, code: str) -> list[str]:
         raise AssertionError("mesure deja faite")
     second = smp.build_manifest(root, {}, previous=first, measure_fn=boom)
-    assert [e.source for e in smp.cell_of(second, "HARDCORE", "BD")] == [e.source for e in cell]
+    assert [e.source for e in smp.cell_of(second, "DRUMS/BD/HARD")] == [e.source for e in cell]
 
 
 def test_set_status_promotes_next_pending() -> None:
     m = smp.Manifest(source_root="x", total=20, entries=[
         smp.SampleEntry(source=f"s{i}", family="JUNGLE", code="FX", pack="p",
-                        name=f"FX {i}", duration=1.0, rank=i) for i in range(1, 11)])
-    smp.select(m.entries, 8)
-    assert not m.entries[8].selected
+                        name=f"FX {i}", duration=1.0, rank=i) for i in range(1, 19)])
+    smp.select(m.entries, 16)
+    assert not m.entries[16].selected
     cell = smp.set_status(m, "s1", "drop")
-    assert [e.source for e in cell if e.selected] == [f"s{i}" for i in range(2, 10)]
+    assert [e.source for e in cell if e.selected] == [f"s{i}" for i in range(2, 18)]
     with pytest.raises(smp.SampleError):
         smp.set_status(m, "absent", "keep")
 
@@ -322,33 +392,40 @@ def test_move_keeps_status_and_survives_rebuild(tree: Path, tmp_path: Path) -> N
     m = smp.build_manifest(tree, {}, measure_fn=None)
     src = "Hardcore free samples/Kicks/Hard Kick 01.wav"
     ovs: dict[str, Override] = {}
-    smp.move(m, ovs, src, "TRIBE", "PC", tree, measure_fn=lambda p, c: [c])
-    assert src not in {e.source for e in smp.cell_of(m, "HARDCORE", "BD")}
+    smp.move(m, ovs, src, "PC", "SKIN", tree, measure_fn=lambda p, c: [c])
+    assert src not in {e.source for e in smp.cell_of(m, "DRUMS/BD/HARD")}
     e = next(x for x in m.entries if x.source == src)
-    assert (e.family, e.code, e.status, e.flags) == ("TRIBE", "PC", "pending", ["PC"])
+    assert (e.family, e.folder, e.status, e.flags) == ("HARDCORE", "DRUMS/PC/SKIN", "pending", ["PC"])
     assert e.name.startswith("PC ") and len(e.name) <= NAME_MAX
     assert e.selected
-    # l'override replace le fichier dans sa nouvelle case au prochain passage
-    assert ovs == {src: Override(family="TRIBE", code="PC")}
+    # l'override replace le fichier dans sa nouvelle case au prochain passage,
+    # sous-categorie forcee comprise (pas de repli, meme seule)
+    assert ovs == {src: Override(code="PC", sub="SKIN")}
     again = smp.build_manifest(tree, ovs, previous=m, measure_fn=None)
     e2 = next(x for x in again.entries if x.source == src)
-    assert (e2.family, e2.code) == ("TRIBE", "PC")
+    assert e2.folder == "DRUMS/PC/SKIN"
+    # racine forcee : la sous-categorie inferee ne revient pas
+    smp.move(again, ovs, "Hardcore free samples/Kicks/Hard Kick 02.wav", "BD", "", tree,
+             measure_fn=None)
+    third = smp.build_manifest(tree, ovs, previous=again, measure_fn=None)
+    assert {e.source: e.folder for e in third.entries}[
+        "Hardcore free samples/Kicks/Hard Kick 02.wav"] == "DRUMS/BD"
     with pytest.raises(smp.SampleError):
-        smp.move(m, ovs, src, "TRIBE", "ZZ", tree)
+        smp.move(m, ovs, src, "ZZ", "", tree)
     with pytest.raises(smp.SampleError):
-        smp.move(m, ovs, src, "POLKA", "BD", tree)
+        smp.move(m, ovs, src, "HH", "HARD", tree)
 
 
 def test_moved_pending_lands_in_reserve_of_full_cell() -> None:
     m = smp.Manifest(source_root="x", total=10, entries=[
         smp.SampleEntry(source=f"s{i}", family="JUNGLE", code="FX", pack="p",
-                        name=f"FX {i} p", duration=1.0, rank=i) for i in range(1, 10)]
+                        name=f"FX {i} p", duration=1.0, rank=i) for i in range(1, 18)]
         + [smp.SampleEntry(source="v", family="JUNGLE", code="VX", pack="p",
                            name="VX v p", duration=1.0, rank=1)])
-    smp.select(m.entries[:9], 8)
-    smp.move(m, {}, "v", "JUNGLE", "FX", Path("/absent"), measure_fn=None)
+    smp.select(m.entries[:17], 16)
+    smp.move(m, {}, "v", "FX", "", Path("/absent"), measure_fn=None)
     v = next(e for e in m.entries if e.source == "v")
-    assert v.rank == 10 and not v.selected
+    assert v.rank == 18 and not v.selected
 
 
 def test_save_overrides_roundtrip(tmp_path: Path) -> None:
@@ -447,26 +524,26 @@ def test_measured_bpm_named_and_cached(tree: Path) -> None:
 
 # --- Bibliotheque (7.J4) ----------------------------------------------------
 
-def _cell_manifest(n: int = 10) -> smp.Manifest:
+def _cell_manifest(n: int = 20) -> smp.Manifest:
     m = smp.Manifest(source_root="x", total=n, entries=[
         smp.SampleEntry(source=f"s{i}", family="JUNGLE", code="FX", pack="p",
                         name=f"FX {i}", duration=1.0, rank=i) for i in range(1, n + 1)],
         unclassified=["MPC_Kit/zzz01.wav"])
-    smp.select(m.entries, 8)
+    smp.select(m.entries, 16)
     return m
 
 
 def test_stars_rank_rated_first_without_keeping() -> None:
     m = _cell_manifest()
     ovs: dict[str, Override] = {}
-    smp.set_stars(m, ovs, "s10", 2)
-    smp.set_stars(m, ovs, "s9", 5)
-    cell = smp.cell_of(m, "JUNGLE", "FX")
-    assert [e.source for e in cell[:3]] == ["s9", "s10", "s1"]
+    smp.set_stars(m, ovs, "s20", 2)
+    smp.set_stars(m, ovs, "s19", 5)
+    cell = smp.cell_of(m, "FX")
+    assert [e.source for e in cell[:3]] == ["s19", "s20", "s1"]
     assert cell[0].selected and cell[0].status == "pending"     # noter ne vaut pas garder
-    assert not next(e for e in cell if e.source == "s8").selected
-    smp.set_stars(m, ovs, "s9", None)
-    assert ovs == {"s10": Override(stars=2)}
+    assert not next(e for e in cell if e.source == "s15").selected
+    smp.set_stars(m, ovs, "s19", None)
+    assert ovs == {"s20": Override(stars=2)}
     with pytest.raises(smp.SampleError):
         smp.set_stars(m, ovs, "s1", 6)
     with pytest.raises(smp.SampleError):
@@ -490,9 +567,10 @@ def test_unclassified_gets_a_cell(tree: Path) -> None:
     src = "MPC_Kit/zzz01.wav"
     assert src in m.unclassified
     ovs = {src: Override(tags=["perc"])}
-    smp.move(m, ovs, src, "TRIBE", "PC", tree, measure_fn=lambda p, c: [], bpm_fn=None)
+    smp.move(m, ovs, src, "PC", "", tree, measure_fn=lambda p, c: [], bpm_fn=None)
     e = next(x for x in m.entries if x.source == src)
-    assert (e.family, e.code, e.status, e.tags, e.selected) == ("TRIBE", "PC", "pending", ["perc"], True)
+    assert (e.family, e.folder, e.status, e.tags, e.selected) == (
+        "UNIVERSEL", "DRUMS/PC", "pending", ["perc"], True)
     assert src not in m.unclassified
     again = smp.build_manifest(tree, ovs, previous=m, measure_fn=None)
     assert any(x.source == src and x.code == "PC" for x in again.entries)
@@ -512,11 +590,11 @@ def test_trash_and_restore(tree: Path) -> None:
     again = smp.build_manifest(tree, ovs, previous=m, measure_fn=None)
     assert again.trashed == [kick, loose_src] and loose_src not in again.unclassified
     with pytest.raises(smp.SampleError):
-        smp.move(again, ovs, kick, "TRIBE", "BD", tree)
+        smp.move(again, ovs, kick, "BD", "", tree)
     smp.restore(again, ovs, kick, tree, measure_fn=None, bpm_fn=None)
     smp.restore(again, ovs, loose_src, tree, measure_fn=None, bpm_fn=None)
     e = next(x for x in again.entries if x.source == kick)
-    assert (e.family, e.code, e.status) == ("HARDCORE", "BD", "pending")
+    assert (e.family, e.folder, e.status) == ("HARDCORE", "DRUMS/BD/HARD", "pending")
     assert loose_src in again.unclassified and again.trashed == [] and ovs == {}
     with pytest.raises(smp.SampleError):
         smp.restore(again, ovs, kick, tree)
@@ -525,7 +603,7 @@ def test_trash_and_restore(tree: Path) -> None:
 def test_rebuild_ranks_rated_first(tree: Path) -> None:
     last = "Hardcore free samples/Kicks/Hard Kick 05.wav"
     m = smp.build_manifest(tree, {last: Override(stars=1, tags=["x"])}, measure_fn=None)
-    cell = smp.cell_of(m, "HARDCORE", "BD")
+    cell = smp.cell_of(m, "DRUMS/BD/HARD")
     assert (cell[0].source, cell[0].stars, cell[0].tags) == (last, 1, ["x"])
 
 
@@ -543,7 +621,7 @@ def test_kit_of(rel: str, kit: str) -> None:
 
 
 def _big_cell(tmp_path: Path, n: int = 60) -> Path:
-    """Une case HARDCORE/SD (quota 16 -> 48 candidats) qui deborde, sur deux kits."""
+    """Une case DRUMS/SD (quota 16 -> 48 candidats) qui deborde, sur deux kits."""
     root = tmp_path / "Samples"
     for i in range(n):
         kit = "A" if i % 2 else "B"
@@ -557,7 +635,7 @@ def test_reserve_lists_files_beyond_cap_and_promotes(tmp_path: Path) -> None:
     assert (len(m.entries), len(m.reserve)) == (48, 12)
     spare = m.reserve[0].source
     assert smp.known(m, spare)
-    rows = smp.overflow_of(m, "HARDCORE", "SD", "Hardcore free samples/" + spare.split("/")[1])
+    rows = smp.overflow_of(m, "DRUMS/SD", "Hardcore free samples/" + spare.split("/")[1])
     assert rows and all(r.overflow and not r.selected for r in rows)
     ovs: dict[str, Override] = {}
     assert smp.promote(m, ovs, spare, root, measure_fn=lambda p, c: [], bpm_fn=None)
@@ -742,11 +820,11 @@ def test_build_manifest_notes(tree: Path) -> None:
 def test_move_remeasures_note(tree: Path) -> None:
     m = smp.build_manifest(tree, {}, measure_fn=None, bpm_fn=None, note_fn=None)
     src = "recorded/take.wav"
-    smp.move(m, {}, src, "SAMPLE", "BS", tree, measure_fn=None, bpm_fn=None,
+    smp.move(m, {}, src, "BS", "", tree, measure_fn=None, bpm_fn=None,
              note_fn=lambda p, c: ("E", 41.2))
     e = next(x for x in m.entries if x.source == src)
-    assert (e.code, e.note, e.note_src) == ("BS", "E", "mesure") and e.name.startswith("BS E ")
-    smp.move(m, {}, src, "SAMPLE", "FX", tree, measure_fn=None, bpm_fn=None, note_fn=None)
+    assert (e.folder, e.note, e.note_src) == ("SAMPLE/BS", "E", "mesure") and e.name.startswith("BS E ")
+    smp.move(m, {}, src, "FX", "", tree, measure_fn=None, bpm_fn=None, note_fn=None)
     assert (e.note, e.note_src) == (None, None) and e.name.startswith("FX ")
 
 
@@ -763,7 +841,7 @@ def test_filter_by_note_and_wheel() -> None:
     wheel = dict(smp.facet_notes(m))
     assert list(wheel) == list(smp.PITCH_CLASSES)
     assert (wheel["A"], wheel["G#"], wheel["C"]) == (2, 1, 0)
-    rows = smp.overflow_of(m, "JUNGLE", "BD")
+    rows = smp.overflow_of(m, "DRUMS/BD")
     assert (rows[0].note, rows[0].note_src) == ("A", "nom")
 
 
@@ -783,11 +861,11 @@ def _export_setup(tmp_path: Path) -> tuple[smp.Manifest, Path, Path, Path]:
 def test_export_copies_selected_and_is_rerunnable(tmp_path: Path) -> None:
     m, root, dest, index = _export_setup(tmp_path)
     dry = smp.export(m, root, dest, index, dry_run=True)
-    assert dry.copied == ["JUNGLE/FX/FX 1 p.wav", "JUNGLE/FX/FX 2 p.wav"] and dry.files == 2
+    assert dry.copied == ["FX/FX 1 p.wav", "FX/FX 2 p.wav"] and dry.files == 2
     assert not dest.exists() and not index.exists()
     first = smp.export(m, root, dest, index)
-    assert sorted(p.name for p in (dest / "JUNGLE" / "FX").iterdir()) == ["FX 1 p.wav", "FX 2 p.wav"]
-    assert (dest / "JUNGLE/FX/FX 1 p.wav").read_bytes() == (root / "p/fx1.wav").read_bytes()
+    assert sorted(p.name for p in (dest / "FX").iterdir()) == ["FX 1 p.wav", "FX 2 p.wav"]
+    assert (dest / "FX/FX 1 p.wav").read_bytes() == (root / "p/fx1.wav").read_bytes()
     assert first.bytes == sum((root / f"p/fx{i}.wav").stat().st_size for i in (1, 2))
     again = smp.export(m, root, dest, index)
     assert (again.copied, again.unchanged, again.removed) == ([], 2, [])
@@ -796,29 +874,29 @@ def test_export_copies_selected_and_is_rerunnable(tmp_path: Path) -> None:
 def test_export_removes_only_its_own_files(tmp_path: Path) -> None:
     m, root, dest, index = _export_setup(tmp_path)
     smp.export(m, root, dest, index)
-    (dest / "JUNGLE/FX/mine.wav").write_bytes(b"x")                 # pose a la main
+    (dest / "FX/mine.wav").write_bytes(b"x")                 # pose a la main
     m.entries[0].selected = False
-    m.entries[1].family = "TRIBE"                                    # case changee
+    m.entries[1].sub = "RISE"                                        # case changee
     r = smp.export(m, root, dest, index)
-    assert r.removed == ["JUNGLE/FX/FX 1 p.wav", "JUNGLE/FX/FX 2 p.wav"]
-    assert r.copied == ["TRIBE/FX/FX 2 p.wav"]
-    assert sorted(p.name for p in (dest / "JUNGLE" / "FX").iterdir()) == ["mine.wav"]
-    m.entries[1].family = "JUNGLE"
+    assert r.removed == ["FX/FX 1 p.wav", "FX/FX 2 p.wav"]
+    assert r.copied == ["FX/RISE/FX 2 p.wav"]
+    assert sorted(p.name for p in (dest / "FX").iterdir() if p.is_file()) == ["mine.wav"]
+    m.entries[1].sub = ""
     m.entries[0].selected = True
-    (dest / "JUNGLE/FX/FX 1 p.wav").write_bytes(b"autre")          # conflit : pas ecrase
+    (dest / "FX/FX 1 p.wav").write_bytes(b"autre")          # conflit : pas ecrase
     r = smp.export(m, root, dest, index)
-    assert r.conflicts == ["JUNGLE/FX/FX 1 p.wav"] and (dest / "JUNGLE/FX/FX 1 p.wav").read_bytes() == b"autre"
-    assert not (dest / "TRIBE").exists()                             # case videe retiree
+    assert r.conflicts == ["FX/FX 1 p.wav"] and (dest / "FX/FX 1 p.wav").read_bytes() == b"autre"
+    assert not (dest / "FX" / "RISE").exists()                       # case videe retiree
 
 
 def test_export_resumes_interrupted_copy_and_reports_missing(tmp_path: Path) -> None:
     m, root, dest, index = _export_setup(tmp_path)
-    (dest / "JUNGLE/FX").mkdir(parents=True)
-    (dest / "JUNGLE/FX/FX 1 p.wav").write_bytes((root / "p/fx1.wav").read_bytes())
+    (dest / "FX").mkdir(parents=True)
+    (dest / "FX/FX 1 p.wav").write_bytes((root / "p/fx1.wav").read_bytes())
     (root / "p/fx2.wav").unlink()
     r = smp.export(m, root, dest, index)
     assert (r.unchanged, r.copied, r.missing, r.conflicts) == (1, [], ["p/fx2.wav"], [])
-    assert list(smp.load_export_index(index)) == ["JUNGLE/FX/FX 1 p.wav"]
+    assert list(smp.load_export_index(index)) == ["FX/FX 1 p.wav"]
 
 
 def test_cli_export(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
@@ -830,4 +908,4 @@ def test_cli_export(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
     assert cli.main(["--export", "--dry-run", "--source", str(root), "--dest", str(dest)]) == 0
     assert "2 a copier" in capsys.readouterr().out and not dest.exists()
     assert cli.main(["--export", "--source", str(root), "--dest", str(dest)]) == 0
-    assert "2 copies" in capsys.readouterr().out and (dest / "JUNGLE/FX/FX 2 p.wav").exists()
+    assert "2 copies" in capsys.readouterr().out and (dest / "FX/FX 2 p.wav").exists()

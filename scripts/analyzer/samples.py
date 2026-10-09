@@ -6,7 +6,7 @@ de categorie a 2 lettres facon Elektron (`BD`, `SD`, `BR`...), puis un nom
 court `<CODE> [BPM|note] <desc> <pack>` de 18 caracteres au plus : l'ecran de
 choix du sample d'une track n'en montre qu'environ 14.
 
-Selection : quota par case famille x code, candidats = 3 x quota repartis
+Selection : quota par case (dossier final), candidats = 3 x quota repartis
 entre sous-packs. Pre-filtre qualite (7.J2) : chaque candidat est mesure
 (niveau, saturation, blanc en tete, longueur) ; les defauts sont signales par
 des drapeaux et repoussent le candidat en fin de case, sans l'ecarter : la
@@ -46,8 +46,16 @@ note mesuree entre dans le nom DT2 comme une note lue. Mesuree comme les
 drapeaux (candidats seulement, reprise du manifeste precedent) ; la reserve
 n'a que la note du nom. `SampleFilter.notes` filtre par note.
 
+Arbre par type (7.J8) : une case est un dossier final du +Drive,
+`<BRANCHE>/<CODE>/[<SOUS>]` (`DRUMS/BD/HARD`, `LOOPS/BR`, `FX/RISE`, `VX`,
+`SAMPLE/<CODE>`), avec un plafond par dossier (`quota`). La famille ne range
+plus : elle repere SAMPLE et donne un tag de genre (`GENRE_TAGS`). La
+sous-categorie est inferee des mots du chemin (`SUB_RULES`), corrigee a
+l'ecoute (override `sub`) ; une sous-categorie de moins de FOLD_MIN fichiers
+remonte a la racine de son code.
+
 Export (7.J3) : les retenus (`selected`) sont copies tels quels sous
-`<dest>/<FAMILLE>/<CODE>/<nom>.wav`, arborescence que Transfer envoie sur le
+`<dest>/<dossier final>/<nom>.wav`, arborescence que Transfer envoie sur le
 +Drive de la DT2. Rejouable : un index (`export.json`) liste les fichiers
 ecrits par l'export ; un relancement ne recopie que ce qui a change et ne
 retire que des fichiers de l'index, jamais un fichier pose a la main.
@@ -66,10 +74,10 @@ from typing import Literal
 
 import numpy as np
 import soundfile as sf
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 
 NAME_MAX = 18
-FOLD_MIN = 4          # en dessous, la case rejoint le meme code dans UNIVERSEL
+FOLD_MIN = 4          # en dessous, la sous-categorie remonte a la racine de son code
 CANDIDATE_FACTOR = 3  # candidats par case = 3 x quota (pre-selection d'ecoute)
 LONG_ONESHOT_S = 4.0  # un "kick" de plus de 4 s est une boucle
 TEMPO_LOOP_S = 2.0    # tempo dans le nom + au moins 2 s : boucle (piano, synth...)
@@ -108,7 +116,71 @@ PITCHED = frozenset({"BD", "BS", "PD"})   # note mesuree dans l'audio (7.J7 ; ST
 # Boucles : BR break, DL drums, PL percussions / hats, ML melodie, BL basse
 TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL"})         # BPM garde dans le nom
 RHYTHM = DRUMS | {"BR", "DL", "PL"}   # tracks 1 a 8 de la doctrine ; le reste : melodique
-NO_FOLD = frozenset({"UNIVERSEL", "SAMPLE"})
+BIG_CAP = frozenset({"BR", "DL", "PL"})   # boucles rythmiques : 32 par dossier, le reste 16
+
+# Arbre du +Drive (7.J8) : BRANCHE / CODE / [SOUS] ; FX et VX sans niveau code.
+BRANCHES = ("DRUMS", "TONAL", "LOOPS", "FX", "VX", "SAMPLE")
+# Sous-categories par code : debuts de mots du chemin (minuscules), dans
+# l'ordre de priorite ; sans mot reconnu, le fichier reste a la racine du code.
+SUB_RULES: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
+    "BD": (("HARD", ("hard", "distort", "gabber", "overdrive", "xtrmraw", "rough", "crunch")),
+           ("SUB", ("sub", "boom", "808", "long")),
+           ("ACOU", ("acou", "live", "real", "jazz", "vintage")),
+           ("CLEAN", ("909", "clean", "tight", "punch", "short"))),
+    "ML": (("KEYS", ("piano", "key", "organ", "rhodes", "epiano")),
+           ("PADS", ("pad", "drone", "nappe", "string")),
+           ("ATMOS", ("atmo", "ambien", "texture", "spher", "cinematic")),
+           ("GUITAR", ("guitar",))),
+    "FX": (("RISE", ("rise", "riser", "uplift", "downlift", "sweep", "swell", "build", "fall",
+                     "transition")),
+           ("REV", ("revers",)),
+           ("HIT", ("impact", "hit", "thump", "boom", "drop", "crash")),
+           ("NOISE", ("noise", "glitch", "static", "white"))),
+    "PC": (("SHAKER", ("shaker", "tamb", "cabasa", "maraca")),
+           ("SKIN", ("conga", "bongo", "djembe", "cajon", "tabla", "udu", "bodhran", "hand", "darbuk")),
+           ("METAL", ("cowbell", "bell", "metal", "agogo", "triang", "chime")),
+           ("WOOD", ("block", "clave", "stick", "rim", "wood", "click", "tick")),
+           ("FOLEY", ("foley", "cartoon", "orch", "sting"))),
+    "PL": (("SKIN", ("conga", "bongo", "djembe", "cajon", "tabla", "udu", "bodhran", "hand")),
+           ("TOPS", ("top", "hat", "ride", "cym")),
+           ("SHAKER", ("shaker", "tamb"))),
+    "ST": (("CHORD", ("chord",)), ("STAB", ("stab", "hit")), ("METAL", ("metal",)),
+           ("ANALOG", ("minimoog", "moog", "modular", "analog", "minibrute")),
+           ("BELL", ("bell", "blip", "blop", "pluck", "zap")),
+           ("ORCH", ("string", "brass", "sax", "horn", "orch", "acoustic", "piano", "organ"))),
+    "PD": (("AMBIENT", ("ambien", "atmo", "texture", "shimmer")),
+           ("CHORD", ("chord",)),
+           ("DRONE", ("drone", "rumble"))),
+    "VX": (("SPEECH", ("documentary", "speech", "talk", "spoken", "news")),
+           ("CHANT", ("chant", "choir", "african", "sing")),
+           ("MC", ("mc", "shout", "hype", "party", "adlib", "control")),
+           ("CUT", ("cut", "mouth", "chop"))),
+    "BS": (("SUB", ("sub", "808")),
+           ("WOB", ("wob", "dubstep", "growl")),
+           ("DIST", ("dist", "filth", "buzz", "dirt", "grit", "crunch", "acid", "303")),
+           ("ANALOG", ("minimoog", "moog", "analog", "minibrute", "buchla"))),
+    "SD": (("RIM", ("rim",)),),
+}
+# Boucles BR / DL : sous-categorie = tranche de tempo, nommee par sa borne
+# basse pour le tri alphabetique de la DT2 (tempo du nom, sinon mesure).
+TEMPO_SUBS = frozenset({"BR", "DL"})
+TEMPO_BANDS = (("060", 0), ("120", 120), ("150", 150), ("180", 180))
+# Sans mot reconnu, sous-categorie par duree (lue dans l'en-tete, gratuite) :
+# nom, duree minimale en secondes.
+DURATION_SUBS: dict[str, tuple[tuple[str, float], ...]] = {
+    "BS": (("SHORT", 0.0), ("MID", 0.6), ("LONG", 2.0)),
+    "ST": (("SHORT", 0.0), ("MID", 0.6), ("LONG", 2.0)),
+    "PD": (("SHORT", 0.0), ("LONG", 4.0)),      # nappes : mediane 5,4 s
+}
+SUBS: dict[str, tuple[str, ...]] = {
+    **{c: tuple(s for s, _ in rules) for c, rules in SUB_RULES.items()},
+    **{c: tuple(name for name, _ in TEMPO_BANDS) for c in TEMPO_SUBS},
+}
+for _c, _bands in DURATION_SUBS.items():
+    SUBS[_c] = (*SUBS.get(_c, ()), *(name for name, _ in _bands))
+# Famille -> tag de genre : la famille sort de l'arbre, elle reste filtrable.
+GENRE_TAGS = {"HARDCORE": "hardcore", "JUNGLE": "jungle", "DUBSTEP": "dubstep",
+              "TECHNO": "techno", "TRIBE": "tribe"}
 
 # Prefixe de chemin (minuscules, relatif a Samples/) -> famille. Le plus long
 # gagne ; tout ce qui n'est pas liste va dans UNIVERSEL.
@@ -198,7 +270,8 @@ CODE_RULES: tuple[tuple[str, str], ...] = (
     ("PC", rf"perc|conga|bongo|shaker|tamb|cowbell|clave|block|cabasa|{_B}pc{_E}|gourd|stick|tick"),
     ("BS", rf"bass|{_B}sub{_E}|reese|808"),
     ("VX", r"vox|vocal|voice|shout|chant|speech|acapella|adlib"),
-    ("FX", rf"{_B}fx|sfx|rise|riser|downlift|uplift|impact|sweep|noise|glitch|cartoon|whoosh|reverse|drop"),
+    ("FX", rf"{_B}fx|sfx|rise|riser|downlift|uplift|impact|sweep|noise|glitch|cartoon|whoosh|reverse|drop"
+           r"|thump|transition"),   # cinematic Noiiz : Low End Thumps, Transitions
     ("PD", r"pad|drone|texture|ambien|atmos|cinematic"),
     ("ST", r"stab|chord|hit|riff|arp|lead|synth|key|piano|organ|instru|minimoog|brass|string|guitar|shot"),
     ("RS", r"recorded|resample|transfers"),
@@ -209,7 +282,7 @@ _CODE_RX = tuple((c, re.compile(p)) for c, p in CODE_RULES)
 _LOOP_RX = re.compile(rf"loop|{_B}grooves?{_E}|sequence|{_B}tops?{_E}|{_B}fill|{_B}builds?{_E}")
 LOOP_RULES: tuple[tuple[str, str], ...] = (
     ("VX", r"vox|vocal|voice|chant|adlib|acapella"),
-    ("PD", r"pad|drone|atmos|ambien|texture"),            # une nappe n'est pas une boucle
+    ("ML", r"pad|drone|atmos|ambien|texture"),            # boucle de nappe : LOOPS/ML/PADS (7.J8)
     ("FX", rf"{_B}fx|sfx|rise|sweep|noise|glitch|{_B}builds?{_E}"),
     ("BL", rf"bass|{_B}sub{_E}|reese|808"),
     ("ML", rf"synth|lead|{_B}arp|chord|piano|{_B}keys?{_E}|guitar|riff|melod|stab|organ"
@@ -294,7 +367,7 @@ class SampleError(Exception):
 class SampleEntry(BaseModel):
     """Un candidat : fichier source, case, nom DT2 et decision d'ecoute."""
     source: str                     # relatif a Samples/
-    family: str
+    family: str                     # genre (tag) ou SAMPLE
     code: str
     pack: str
     name: str                       # sans extension, <= NAME_MAX
@@ -312,10 +385,17 @@ class SampleEntry(BaseModel):
     note_hz: float | None = None    # fondamentale mesuree (pyin)
     note_src: NoteSrc | None = None  # None : pas mesuree (ou code non tonal)
     overflow: bool = False          # reserve hors plafond, vue par kit (7.J5), jamais stocke
+    sub: str = ""                   # sous-categorie (7.J8), "" = racine du code
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def folder(self) -> str:
+        """Dossier final (case), serialise pour le front."""
+        return folder_of(self.family, self.code, self.sub)
 
     @property
     def dest(self) -> str:
-        return f"{self.family}/{self.code}/{self.name}.wav"
+        return f"{self.folder}/{self.name}.wav"
 
 
 class Override(BaseModel):
@@ -328,6 +408,7 @@ class Override(BaseModel):
     stars: int | None = Field(default=None, ge=1, le=STARS_MAX)
     trash: bool = False     # corbeille : hors de toutes les cases, restaurable
     no_auto: list[str] = Field(default_factory=list)   # tags inferes masques (7.J6)
+    sub: str | None = None  # sous-categorie forcee, "" = racine du code (7.J8)
 
 
 class LooseSample(BaseModel):
@@ -350,6 +431,11 @@ class ReserveSample(BaseModel):
     duration: float | None
     tags: list[str] = Field(default_factory=list)
     auto_tags: list[str] = Field(default_factory=list)
+    sub: str = ""
+
+    @property
+    def folder(self) -> str:
+        return folder_of(self.family, self.code, self.sub)
 
 
 class KitInfo(BaseModel):
@@ -376,7 +462,7 @@ class Manifest(BaseModel):
     entries: list[SampleEntry] = Field(default_factory=list)
     reserve: list[ReserveSample] = Field(default_factory=list)   # hors plafond (7.J5)
     unclassified: list[str] = Field(default_factory=list)
-    folded: list[str] = Field(default_factory=list)   # cases "FAM/CODE" repliees
+    folded: list[str] = Field(default_factory=list)   # sous-categories remontees a la racine
     trashed: list[str] = Field(default_factory=list)  # corbeille (overrides trash)
     trashed_kits: dict[str, int] = Field(default_factory=dict)  # prefixe -> fichiers
 
@@ -406,6 +492,7 @@ class _Raw(BaseModel):
     code: str | None
     pack: str
     duration: float | None
+    sub: str = ""
 
 
 # --- Lecture --------------------------------------------------------------
@@ -587,13 +674,19 @@ def _dir_words(rel: str) -> set[str]:
 
 
 def auto_tags_of(overrides: dict[str, Override], source: str) -> list[str]:
-    """Tags inferes des dossiers (dictionnaire `TAG_WORDS`), moins ceux que
+    """Tags inferes des dossiers (dictionnaire `TAG_WORDS`) et le genre de la
+    famille (`GENRE_TAGS`), moins ceux que
     masque `no_auto` sur le fichier ou sur un prefixe qui le contient."""
-    hidden = set(overrides.get(source, Override()).no_auto)
+    own = overrides.get(source, Override())
+    hidden = set(own.no_auto)
     for k, ov in overrides.items():
         if k.endswith("/") and ov.no_auto and source.startswith(k):
             hidden.update(ov.no_auto)
-    return sorted({TAG_WORDS[w] for w in _dir_words(source) if w in TAG_WORDS} - hidden)
+    tags = {TAG_WORDS[w] for w in _dir_words(source) if w in TAG_WORDS}
+    genre = GENRE_TAGS.get(own.family or family_of(source))   # la famille en tag (7.J8)
+    if genre:
+        tags.add(genre)
+    return sorted(tags - hidden)
 
 
 def tag_report(sources: Iterable[str], min_files: int = 20) -> list[tuple[str, int]]:
@@ -699,17 +792,87 @@ def _is_mono_twin(rel: str, all_low: set[str]) -> bool:
     return "mono" in low and low.replace("mono", "stereo") in all_low
 
 
-def quota(family: str, code: str) -> int | None:
-    """Nombre de samples retenus par case ; None = tout (SAMPLE)."""
-    if family == "SAMPLE":
+def branch_of(family: str, code: str) -> str:
+    """Branche du +Drive (7.J8) : SAMPLE pour la famille SAMPLE et les resamples."""
+    if family == "SAMPLE" or code == "RS":
+        return "SAMPLE"
+    if code in DRUMS:
+        return "DRUMS"
+    if code in LOOPS:
+        return "LOOPS"
+    if code in ("FX", "VX"):
+        return code
+    return "TONAL"
+
+
+def folder_of(family: str, code: str, sub: str = "") -> str:
+    """Dossier final : `DRUMS/BD/HARD`, `LOOPS/BR`, `FX/RISE`, `VX`, `SAMPLE/BD`
+    (SAMPLE et VX sans sous-categorie)."""
+    branch = branch_of(family, code)
+    if branch == "SAMPLE":
+        return f"SAMPLE/{code}"
+    parts = [branch] if branch == code else [branch, code]
+    return "/".join(parts + [sub] if sub and code in SUBS else parts)
+
+
+def folder_parts(folder: str) -> tuple[str, str, str]:
+    """(branche, code, sous-categorie) d'un dossier final."""
+    parts = folder.split("/")
+    if parts[0] in ("FX", "VX"):
+        return parts[0], parts[0], parts[1] if len(parts) > 1 else ""
+    return parts[0], parts[1], parts[2] if len(parts) > 2 else ""
+
+
+def folder_code(folder: str) -> str:
+    return folder_parts(folder)[1]
+
+
+def folder_key(folder: str) -> tuple[int, int, str]:
+    """Tri des dossiers : branche, code dans l'ordre des tracks, sous-categorie."""
+    branch, code, sub = folder_parts(folder)
+    return BRANCHES.index(branch), CODES.index(code), sub
+
+
+def target_folders() -> list[str]:
+    """Dossiers ou ranger un fichier (hors SAMPLE, qui suit la famille), dans
+    l'ordre des branches puis des codes : racine du code, puis ses sous-categories."""
+    return sorted((folder_of("", code, sub) for code in CODES if branch_of("", code) != "SAMPLE"
+                   for sub in ("", *SUBS.get(code, ()))), key=folder_key)
+
+
+def quota(folder: str) -> int | None:
+    """Plafond de retenus d'un dossier final ; None = tout (SAMPLE)."""
+    if folder.startswith("SAMPLE/"):
         return None
-    if code in {"BD", "BR", "DL"} and family in {"HARDCORE", "JUNGLE", "TRIBE"}:
-        return 32
-    if family == "UNIVERSEL" and code == "BD":
-        return 32
-    if code == "PL" and family in {"JUNGLE", "TRIBE"}:
-        return 32
-    return 16 if code in DRUMS | LOOPS else 8
+    return 32 if folder_code(folder) in BIG_CAP else 16
+
+
+def tempo_band(bpm: int | None) -> str:
+    """Tranche de tempo d'une boucle BR / DL, "" sans tempo."""
+    if not bpm:
+        return ""
+    return [name for name, lo in TEMPO_BANDS if bpm >= lo][-1]
+
+
+def sub_of(rel: str, code: str, duration: float | None = None) -> str:
+    """Sous-categorie inferee des mots du chemin (`SUB_RULES`), sinon de la
+    duree (`DURATION_SUBS`) ; pour BR / DL, du tempo ecrit dans le nom ; ""
+    sinon."""
+    if code in TEMPO_SUBS:
+        return tempo_band(tempo_of(rel))
+    words = [t.lower() for t in _tokens(rel.rsplit(".", 1)[0].replace("/", " "))]
+    by_word = next((sub for sub, starts in SUB_RULES.get(code, ())
+                    if any(w.startswith(starts) for w in words)), "")
+    if by_word or duration is None or code not in DURATION_SUBS:
+        return by_word
+    return [name for name, lo in DURATION_SUBS[code] if duration >= lo][-1]
+
+
+def _sub_for(rel: str, family: str, code: str, ov: Override, duration: float | None) -> str:
+    """Sous-categorie forcee par l'override, sinon inferee ; aucune en SAMPLE."""
+    if branch_of(family, code) == "SAMPLE":
+        return ""
+    return ov.sub if ov.sub is not None else sub_of(rel, code, duration)
 
 
 # --- Nommage ----------------------------------------------------------------
@@ -838,22 +1001,29 @@ def classify(root: Path, overrides: dict[str, Override]
         if code is None:
             unclassified.append(rel)
             continue
-        raws.append(_Raw(source=rel, family=ov.family or family_of(rel),
-                         code=code, pack=pack_of(rel), duration=dur))
+        fam = ov.family or family_of(rel)
+        raws.append(_Raw(source=rel, family=fam, code=code, pack=pack_of(rel), duration=dur,
+                         sub=_sub_for(rel, fam, code, ov, dur)))
     return raws, unclassified, sorted(trashed), trashed_kits
 
 
-def fold_small_cells(raws: list[_Raw], overrides: dict[str, Override]) -> list[str]:
-    """Replie dans UNIVERSEL les cases de moins de FOLD_MIN fichiers."""
-    counts: dict[tuple[str, str | None], int] = defaultdict(int)
+def _raw_folder(r: _Raw) -> str:
+    assert r.code is not None
+    return folder_of(r.family, r.code, r.sub)
+
+
+def fold_small_subs(raws: list[_Raw], overrides: dict[str, Override]) -> list[str]:
+    """Remonte a la racine de leur code les sous-categories de moins de
+    FOLD_MIN fichiers (sauf sous-categorie forcee)."""
+    counts: dict[str, int] = defaultdict(int)
     for r in raws:
-        counts[r.family, r.code] += 1
-    folded = sorted(f"{f}/{c}" for (f, c), n in counts.items()
-                    if n < FOLD_MIN and f not in NO_FOLD)
+        if r.sub:
+            counts[_raw_folder(r)] += 1
+    folded = sorted(f for f, n in counts.items() if n < FOLD_MIN)
     for r in raws:
-        forced = overrides.get(r.source, Override()).family is not None
-        if f"{r.family}/{r.code}" in folded and not forced:
-            r.family = "UNIVERSEL"
+        forced = overrides.get(r.source, Override()).sub is not None
+        if r.sub and not forced and _raw_folder(r) in folded:
+            r.sub = ""
     return folded
 
 
@@ -902,7 +1072,7 @@ def measured_note(fields: NoteFields) -> str | None:
 def _pinned(source: str, prev_status: dict[str, Status], overrides: dict[str, Override]) -> bool:
     ov = overrides.get(source)
     touched = ov is not None and (ov.family is not None or ov.code is not None
-                                  or ov.stars is not None)
+                                  or ov.sub is not None or ov.stars is not None)
     return touched or prev_status.get(source, "pending") != "pending"
 
 
@@ -920,19 +1090,27 @@ def build_manifest(root: Path, overrides: dict[str, Override],
     """Manifeste rejouable. Les drapeaux et notes deja mesures sont repris du
     manifeste precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
     raws, unclassified, trashed, trashed_kits = classify(root, overrides)
-    folded = fold_small_cells(raws, overrides)
     prev = {e.source: e for e in previous.entries} if previous else {}
+    # boucle BR / DL sans tempo dans le nom : tranche du tempo deja mesure (un
+    # tempo mesure a ce passage la range au suivant)
+    for r in raws:
+        old = prev.get(r.source)
+        if (r.code in TEMPO_SUBS and not r.sub and old is not None and old.bpm
+                and branch_of(r.family, r.code) != "SAMPLE"
+                and overrides.get(r.source, Override()).sub is None):
+            r.sub = tempo_band(old.bpm)
+    folded = fold_small_subs(raws, overrides)
     prev_status = {k: e.status for k, e in prev.items()}
 
-    cells: dict[tuple[str, str], list[_Raw]] = defaultdict(list)
+    cells: dict[str, list[_Raw]] = defaultdict(list)
     for r in raws:
-        assert r.code is not None
-        cells[r.family, r.code].append(r)
+        cells[_raw_folder(r)].append(r)
 
     entries: list[SampleEntry] = []
     reserve: list[ReserveSample] = []
-    for (fam, code), items in sorted(cells.items()):
-        q = quota(fam, code)
+    for folder, items in sorted(cells.items()):
+        code = folder_code(folder)
+        q = quota(folder)
         ordered = _round_robin(items)
         # les decisions d'ecoute restent candidates meme hors du plafond
         cap = len(ordered) if q is None else q * CANDIDATE_FACTOR
@@ -940,8 +1118,8 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         # restent candidats meme hors du plafond
         kept = ordered[:cap] + [r for r in ordered[cap:] if _pinned(r.source, prev_status, overrides)]
         held = {r.source for r in kept}
-        reserve.extend(ReserveSample(source=r.source, family=fam, code=code, pack=r.pack,
-                                     duration=r.duration,
+        reserve.extend(ReserveSample(source=r.source, family=r.family, code=code, sub=r.sub,
+                                     pack=r.pack, duration=r.duration,
                                      tags=tags_of(overrides, r.source),
                                      auto_tags=auto_tags_of(overrides, r.source))
                        for r in ordered[cap:] if r.source not in held)
@@ -981,7 +1159,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                                                  measured_note(notes[r.source])), taken)
             taken.add(name)
             cell_entries.append(SampleEntry(
-                source=r.source, family=fam, code=code, pack=r.pack, name=name,
+                source=r.source, family=r.family, code=code, sub=r.sub, pack=r.pack, name=name,
                 duration=r.duration, rank=rank,
                 status=prev_status.get(r.source, "pending"), flags=flags[r.source],
                 bpm=bpm, bpm_est=est, tags=tags_of(overrides, r.source), stars=ov.stars,
@@ -1005,22 +1183,22 @@ def select(cell: list[SampleEntry], q: int | None) -> None:
         e.selected = id(e) in chosen
 
 
-def cell_of(manifest: Manifest, family: str, code: str) -> list[SampleEntry]:
-    return sorted((e for e in manifest.entries if e.family == family and e.code == code),
-                  key=lambda e: e.rank)
+def cell_of(manifest: Manifest, folder: str) -> list[SampleEntry]:
+    """Candidats d'une case (dossier final), par rang."""
+    return sorted((e for e in manifest.entries if e.folder == folder), key=lambda e: e.rank)
 
 
 def _entry(manifest: Manifest, source: str) -> SampleEntry | None:
     return next((e for e in manifest.entries if e.source == source), None)
 
 
-def _reselect(manifest: Manifest, family: str, code: str) -> list[SampleEntry]:
+def _reselect(manifest: Manifest, folder: str) -> list[SampleEntry]:
     """Rang (notes en tete, ordre stable sinon) puis selection d'une case."""
-    cell = cell_of(manifest, family, code)
+    cell = cell_of(manifest, folder)
     cell.sort(key=lambda e: star_key(e.stars))
     for rank, e in enumerate(cell, 1):
         e.rank = rank
-    select(cell, quota(family, code))
+    select(cell, quota(folder))
     return cell
 
 
@@ -1056,12 +1234,12 @@ def set_status(manifest: Manifest, source: str, status: Status) -> list[SampleEn
     if entry is None:
         raise SampleError(f"candidat inconnu : {source}")
     entry.status = status
-    cell = cell_of(manifest, entry.family, entry.code)
-    select(cell, quota(entry.family, entry.code))
+    cell = cell_of(manifest, entry.folder)
+    select(cell, quota(entry.folder))
     return cell
 
 
-def _adopt(manifest: Manifest, source: str, family: str, code: str,
+def _adopt(manifest: Manifest, source: str, family: str, code: str, sub: str,
            overrides: dict[str, Override], root: Path, measure_fn: Measure | None,
            bpm_fn: BpmFn | None, note_fn: NoteFn | None) -> SampleEntry:
     """Fait entrer un fichier hors case (non classe, restaure) en fin de case."""
@@ -1073,10 +1251,14 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str,
     if code in TEMPO and tempo_of(source) is None and bpm_fn is not None and present:
         bpm, est = bpm_fn(path, dur)
     notes = note_fields(source, code, path, None, note_fn)
-    target = cell_of(manifest, family, code)
+    if (not sub and code in TEMPO_SUBS and ov.sub is None
+            and branch_of(family, code) != "SAMPLE"):
+        sub = tempo_band(bpm)
+    folder = folder_of(family, code, sub)
+    target = cell_of(manifest, folder)
     pack = pack_of(source)
     entry = SampleEntry(
-        source=source, family=family, code=code, pack=pack,
+        source=source, family=family, code=code, sub=sub, pack=pack,
         name=_unique(ov.name or short_name(source, code, pack, bpm, measured_note(notes)),
                      {e.name for e in target}),
         duration=dur, rank=max((e.rank for e in target), default=0) + 1,
@@ -1085,39 +1267,44 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str,
         auto_tags=auto_tags_of(overrides, source),
         note=notes[0], note_hz=notes[1], note_src=notes[2])
     manifest.entries.append(entry)
-    _reselect(manifest, family, code)
+    _reselect(manifest, folder)
     return entry
 
 
 def move(manifest: Manifest, overrides: dict[str, Override], source: str,
-         family: str, code: str, root: Path, measure_fn: Measure | None = measure,
+         code: str, sub: str, root: Path, measure_fn: Measure | None = measure,
          bpm_fn: BpmFn | None = estimate_bpm, note_fn: NoteFn | None = measure_note) -> None:
-    """Range un fichier dans une case (correction a l'ecoute, ou case donnee a
-    un non classe, qui devient candidat).
+    """Range un fichier dans une case : code et sous-categorie ("" = racine du
+    code), correction a l'ecoute ou case donnee a un non classe, qui devient
+    candidat. La famille (genre, SAMPLE) ne change pas.
 
     Statut garde ; le candidat se range en fin de la nouvelle case (apres les
     notes), renomme avec le nouveau code et remesure (blanc / long dependent du
-    code), note comprise. Les deux cases sont reselectionnees. L'override (famille, code) fait
-    survivre le deplacement a une reconstruction ; un nom force ne suit pas."""
-    if family not in FAMILIES:
-        raise SampleError(f"famille inconnue : {family}")
+    code), note comprise. Les deux cases sont reselectionnees. L'override
+    (code, sous-categorie) fait survivre le deplacement a une reconstruction ;
+    un nom force ne suit pas."""
     if code not in CODES:
         raise SampleError(f"code inconnu : {code}")
+    if sub and sub not in SUBS.get(code, ()):
+        raise SampleError(f"sous-categorie inconnue pour {code} : {sub}")
     promote(manifest, overrides, source, root, measure_fn, bpm_fn, note_fn)
     entry = _entry(manifest, source)
     if entry is None and source not in manifest.unclassified:
         raise SampleError(f"ni candidat ni non classe : {source}")
-    _set_override(overrides, source, family=family, code=code, name=None)
+    _set_override(overrides, source, code=code, sub=sub, name=None)
     if entry is None:
         manifest.unclassified.remove(source)
-        _adopt(manifest, source, family, code, overrides, root, measure_fn, bpm_fn, note_fn)
+        family = overrides.get(source, Override()).family or family_of(source)
+        _adopt(manifest, source, family, code, sub, overrides, root, measure_fn, bpm_fn,
+               note_fn)
         return
-    old = (entry.family, entry.code)
-    if old == (family, code):
+    old = entry.folder
+    folder = folder_of(entry.family, code, sub)
+    if old == folder and entry.code == code:
         return
-    target = cell_of(manifest, family, code)
+    target = cell_of(manifest, folder)
     old_entry = entry.model_copy()
-    entry.family, entry.code = family, code
+    entry.code, entry.sub = code, sub
     entry.rank = max((e.rank for e in target), default=0) + 1
     path = root / source
     notes = note_fields(source, code, path, old_entry, note_fn)
@@ -1126,8 +1313,8 @@ def move(manifest: Manifest, overrides: dict[str, Override], source: str,
                          {e.name for e in target})
     if measure_fn is not None and path.is_file():
         entry.flags = measure_fn(path, code)
-    _reselect(manifest, family, code)
-    _reselect(manifest, *old)
+    _reselect(manifest, folder)
+    _reselect(manifest, old)
 
 
 def set_stars(manifest: Manifest, overrides: dict[str, Override], source: str,
@@ -1142,7 +1329,7 @@ def set_stars(manifest: Manifest, overrides: dict[str, Override], source: str,
     entry = _entry(manifest, source)
     if entry is not None:
         entry.stars = stars
-        _reselect(manifest, entry.family, entry.code)
+        _reselect(manifest, entry.folder)
 
 
 def set_tags(manifest: Manifest, overrides: dict[str, Override], source: str,
@@ -1188,7 +1375,7 @@ def trash(manifest: Manifest, overrides: dict[str, Override], source: str) -> No
     spare = _reserved(manifest, source)
     if entry is not None:
         manifest.entries.remove(entry)
-        _reselect(manifest, entry.family, entry.code)
+        _reselect(manifest, entry.folder)
     elif spare is not None:
         manifest.reserve.remove(spare)
     elif source in manifest.unclassified:
@@ -1209,11 +1396,13 @@ def restore(manifest: Manifest, overrides: dict[str, Override], source: str, roo
     manifest.trashed.remove(source)
     ov = _set_override(overrides, source, trash=False)
     path = root / source
-    code = ov.code or code_of(source, wav_duration(path) if path.is_file() else None)
+    dur = wav_duration(path) if path.is_file() else None
+    code = ov.code or code_of(source, dur)
     if code is None:
         manifest.unclassified = sorted({*manifest.unclassified, source})
         return
-    _adopt(manifest, source, ov.family or family_of(source), code, overrides, root,
+    family = ov.family or family_of(source)
+    _adopt(manifest, source, family, code, _sub_for(source, family, code, ov, dur), overrides, root,
            measure_fn, bpm_fn, note_fn)
 
 
@@ -1227,23 +1416,21 @@ def promote(manifest: Manifest, overrides: dict[str, Override], source: str, roo
     if spare is None:
         return False
     manifest.reserve.remove(spare)
-    _adopt(manifest, source, spare.family, spare.code, overrides, root, measure_fn, bpm_fn,
-           note_fn)
+    _adopt(manifest, source, spare.family, spare.code, spare.sub, overrides, root, measure_fn,
+           bpm_fn, note_fn)
     return True
 
 
-def overflow_of(manifest: Manifest, family: str, code: str,
+def overflow_of(manifest: Manifest, folder: str,
                 kit: str | None = None) -> list[SampleEntry]:
     """Reserve d'une case (d'un kit, ou toute avec `kit=None`), en lignes de
     liste (`overflow`), apres les candidats ; noms calcules a l'affichage."""
-    start = max((e.rank for e in manifest.entries
-                 if e.family == family and e.code == code), default=0)
+    start = max((e.rank for e in manifest.entries if e.folder == folder), default=0)
     rows = [r for r in manifest.reserve
-            if r.family == family and r.code == code
-            and (kit is None or in_kit(r.source, kit))]
+            if r.folder == folder and (kit is None or in_kit(r.source, kit))]
     notes = [_reserve_note(r) for r in rows]
-    return [SampleEntry(source=r.source, family=family, code=code, pack=r.pack,
-                        name=short_name(r.source, code, r.pack, tempo_of(r.source)),
+    return [SampleEntry(source=r.source, family=r.family, code=r.code, sub=r.sub, pack=r.pack,
+                        name=short_name(r.source, r.code, r.pack, tempo_of(r.source)),
                         duration=r.duration, rank=start + i, tags=r.tags,
                         auto_tags=r.auto_tags, overflow=True,
                         note=note, note_src="nom" if note else None)
@@ -1340,11 +1527,11 @@ def kit_rows(manifest: Manifest, kit: str) -> list[SampleEntry]:
     """Fichiers classes d'un kit, case par case : candidats par rang, puis la
     reserve hors plafond (`overflow`). Arborescence du front (7.J5)."""
     out: list[SampleEntry] = []
-    cells = sorted({(e.family, e.code) for e in manifest.entries if in_kit(e.source, kit)}
-                   | {(r.family, r.code) for r in manifest.reserve if in_kit(r.source, kit)})
-    for fam, code in cells:
-        out += [e for e in cell_of(manifest, fam, code) if in_kit(e.source, kit)]
-        out += overflow_of(manifest, fam, code, kit)
+    cells = sorted({e.folder for e in manifest.entries if in_kit(e.source, kit)}
+                   | {r.folder for r in manifest.reserve if in_kit(r.source, kit)}, key=folder_key)
+    for folder in cells:
+        out += [e for e in cell_of(manifest, folder) if in_kit(e.source, kit)]
+        out += overflow_of(manifest, folder, kit)
     return out
 
 
@@ -1436,13 +1623,13 @@ def all_tags(overrides: dict[str, Override]) -> list[str]:
     return sorted({t for ov in overrides.values() for t in ov.tags})
 
 
-def grid(manifest: Manifest) -> dict[str, dict[str, tuple[int, int]]]:
-    """famille -> code -> (candidats, retenus)."""
-    out: dict[str, dict[str, tuple[int, int]]] = defaultdict(dict)
+def grid(manifest: Manifest) -> dict[str, tuple[int, int]]:
+    """dossier final -> (candidats, retenus), dans l'ordre des chemins."""
+    out: dict[str, tuple[int, int]] = {}
     for e in manifest.entries:
-        n, s = out[e.family].get(e.code, (0, 0))
-        out[e.family][e.code] = (n + 1, s + int(e.selected))
-    return out
+        n, s = out.get(e.folder, (0, 0))
+        out[e.folder] = (n + 1, s + int(e.selected))
+    return dict(sorted(out.items(), key=lambda kv: folder_key(kv[0])))
 
 
 # --- Export (7.J3) ----------------------------------------------------------
@@ -1470,7 +1657,7 @@ def export_plan(manifest: Manifest) -> dict[str, str]:
     sont uniques par case ; la casse est ignoree (disque macOS)."""
     plan: dict[str, str] = {}
     seen: set[str] = set()
-    for e in sorted(manifest.entries, key=lambda e: (e.family, e.code, e.rank)):
+    for e in sorted(manifest.entries, key=lambda e: (e.folder, e.rank)):
         if e.selected and e.dest.lower() not in seen:
             seen.add(e.dest.lower())
             plan[e.dest] = e.source

@@ -1,5 +1,6 @@
 <script lang="ts">
-  // Bibliotheque des samples DT2 (7.J2, 7.J4) : grille famille x code, puis
+  // Bibliotheque des samples DT2 (7.J2, 7.J4) : arbre des dossiers du +Drive
+  // (7.J8 : branche, puis une ligne par code, une case par sous-categorie), puis
   // une liste (case, non classes ou corbeille). Dans une case : les retenus a
   // ecouter (keep / drop au clavier) et la reserve ; un drop fait monter le
   // candidat suivant (selection recalculee par l'API). Selection multiple
@@ -8,7 +9,7 @@
   // Kits (7.J5) : pads des packs sous la grille, puis des sous-kits du pack
   // choisi ; un pad filtre grille et listes sur le kit (reserve hors plafond
   // comprise), porte ses tags (herites par ses fichiers) et sa corbeille.
-  // Vue kit : arborescence FAMILLE / CODE / fichiers (case finale, retenus,
+  // Vue kit : arborescence BRANCHE / dossier / fichiers (case finale, retenus,
   // reserve, hors plafond), puis un dossier des non classes du kit.
   // Barre de recherche (7.J6) : texte, tags (manuels, de kit, inferes des
   // dossiers), kits, instruments, rythmique / melodique, one-shot / boucle,
@@ -45,15 +46,27 @@
     RS: 'Resample, enregistrement maison · track 16 (joker)',
   }
   const codeTitle = (c: string) => `${c} : ${CODE_HELP[c] ?? c}${LOOPS.includes(c) ? ' (boucle)' : ''}`
-  const FAMILIES = ['HARDCORE', 'JUNGLE', 'TRIBE', 'TECHNO', 'DUBSTEP', 'AUTRES', 'UNIVERSEL', 'SAMPLE']
   const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
+  // branches du +Drive (memes noms qu'analyzer/samples.py) ; FX et VX sans niveau code
+  const BRANCHES = ['DRUMS', 'TONAL', 'LOOPS', 'FX', 'VX', 'SAMPLE']
+  const BRANCH_HELP: Record<string, string> = {
+    DRUMS: 'One-shots percussifs', TONAL: 'One-shots avec note (basse, stab, nappe)',
+    LOOPS: 'Boucles (BR / DL : sous-dossier = tranche de tempo)', FX: 'FX de transition',
+    VX: 'Voix', SAMPLE: 'Samples et resamples maison, sans plafond',
+  }
+  /** (code, sous-categorie) d'un dossier final : FX/RISE -> FX, RISE ; DRUMS/BD -> BD, ''. */
+  function splitFolder(folder: string): { branch: string; code: string; sub: string } {
+    const [branch, a = '', b = ''] = folder.split('/')
+    return branch === 'FX' || branch === 'VX' ? { branch, code: branch, sub: a } : { branch, code: a, sub: b }
+  }
 
   type Loose = 'unclassified' | 'trash'
-  type View = { kind: 'cell'; family: string; code: string } | { kind: Loose } | { kind: 'kit' }
+  type View = { kind: 'cell'; folder: string } | { kind: Loose } | { kind: 'kit' }
 
   let cells = $state<SampleCell[]>([])
-  // colonnes de la grille non filtree : un filtre (kit, tag) ne la redimensionne pas
-  let gridCodes = $state<string[]>([])
+  // dossiers cibles (tous, meme vides) : l'arbre ne bouge pas avec un filtre
+  let allFolders = $state<string[]>([])
+  let closedBranches = $state<Set<string>>(new Set())
   let counts = $state({ unclassified: 0, trash: 0 })
   let allTags = $state<string[]>([])
   let error = $state('')
@@ -79,9 +92,9 @@
   let tagInput = $state('')
   let tagField: HTMLInputElement | undefined = $state()
   // changement de case (M) : statut garde, rang en fin de case
-  let moving = $state<{ sources: string[]; label: string; family: string; code: string } | null>(null)
+  let moving = $state<{ sources: string[]; label: string; folder: string } | null>(null)
   let moveSelect: HTMLSelectElement | undefined = $state()
-  // glisser-deposer : sources tirees, cible survolee ("FAM/CODE" ou "trash")
+  // glisser-deposer : sources tirees, cible survolee (dossier ou "trash")
   let dragging = $state<string[] | null>(null)
   // export (7.J3) : bilan (dry_run) puis rapport de la copie
   let exportReport = $state<SampleExportReport | null>(null)
@@ -96,35 +109,49 @@
   let ws: WaveSurfer | null = null
 
   const current = $derived(view?.kind === 'cell' ? view : null)
-  // toutes les familles, meme vides (TRIBE attend son pack) : cibles de rangement
-  const families = $derived([...FAMILIES, ...new Set(cells.map(c => c.family).filter(f => !FAMILIES.includes(f)))])
-  const codes = $derived([...new Set([...gridCodes, ...cells.map(c => c.code)])].sort((a, b) => codeRank(a) - codeRank(b)))
-  const rhythmCols = $derived(codes.filter(c => RHYTHM.includes(c)).length)
-  const firstMelodic = $derived(codes.find(c => !RHYTHM.includes(c)))
-  const byKey = $derived(new Map(cells.map(c => [`${c.family}/${c.code}`, c])))
+  // ordre : celui des dossiers cibles (branche, code, racine puis sous-categories),
+  // les dossiers SAMPLE (hors cibles) en fin, par code
+  const folderRank = (f: string) => {
+    const i = allFolders.indexOf(f)
+    return i >= 0 ? i : 1e3 + codeRank(splitFolder(f).code)
+  }
+  const folderList = $derived([...new Set([...allFolders, ...cells.map(c => c.folder)])]
+    .sort((a, b) => folderRank(a) - folderRank(b)))
+  const byKey = $derived(new Map(cells.map(c => [c.folder, c])))
+  const branchRows = $derived(BRANCHES.map(branch => {
+    const fs = folderList.filter(f => splitFolder(f).branch === branch)
+    const cs = fs.map(f => byKey.get(f)).filter((c): c is SampleCell => c !== undefined)
+    const codesIn = [...new Set(fs.map(f => splitFolder(f).code))]
+    return {
+      branch, codes: codesIn.map(code => ({ code, folders: fs.filter(f => splitFolder(f).code === code) })),
+      selected: cs.reduce((n, c) => n + c.selected, 0), toListen: cs.reduce((n, c) => n + c.to_listen, 0),
+    }
+  }).filter(b => b.codes.length))
   const shown = $derived(entries)
   const chosen = $derived(shown.filter(e => e.selected))
   const reserve = $derived(shown.filter(e => !e.selected))
   // ordre de navigation : la selection, puis la reserve si elle est depliee
-  // arborescence du kit : familles (ordre de la grille), codes, puis non classes
-  type Folder = { key: string; code: string; rows: SampleEntry[]; selected: number }
+  // arborescence du kit : branches (ordre de l'arbre), dossiers, puis non classes
+  type Folder = { key: string; label: string; code: string; rows: SampleEntry[]; selected: number }
   type FamFolder = { key: string; label: string; folders: Folder[]; selected: number; total: number }
   let collapsed = $state<Set<string>>(new Set())
   const tree = $derived.by((): FamFolder[] => {
     if (view?.kind !== 'kit') return []
-    const fams = new Map<string, Map<string, SampleEntry[]>>()
+    const branches = new Map<string, Map<string, SampleEntry[]>>()
     for (const e of shown) {
-      const codesOf = fams.get(e.family) ?? new Map<string, SampleEntry[]>()
-      codesOf.set(e.code, [...(codesOf.get(e.code) ?? []), e])
-      fams.set(e.family, codesOf)
+      const branch = e.folder ? splitFolder(e.folder).branch : ''
+      const byFolder = branches.get(branch) ?? new Map<string, SampleEntry[]>()
+      byFolder.set(e.folder, [...(byFolder.get(e.folder) ?? []), e])
+      branches.set(branch, byFolder)
     }
-    const famRank = (f: string) => (f === '' ? 1e3 : FAMILIES.includes(f) ? FAMILIES.indexOf(f) : FAMILIES.length)
-    return [...fams.entries()].sort(([a], [b]) => famRank(a) - famRank(b)).map(([fam, codesOf]) => {
-      const folders = [...codesOf.entries()].sort(([a], [b]) => codeRank(a) - codeRank(b)).map(([code, rows]) => ({
-        key: `${fam}/${code}`, code, rows, selected: fam ? rows.filter(r => r.selected).length : 0,
+    const branchRank = (b: string) => (b === '' ? 1e3 : BRANCHES.indexOf(b))
+    return [...branches.entries()].sort(([a], [b]) => branchRank(a) - branchRank(b)).map(([branch, byFolder]) => {
+      const folders = [...byFolder.entries()].sort(([a], [b]) => folderRank(a) - folderRank(b)).map(([folder, rows]) => ({
+        key: folder || ':nc/', label: folder.split('/').slice(1).join('/') || folder, code: splitFolder(folder).code,
+        rows, selected: branch ? rows.filter(r => r.selected).length : 0,
       }))
       return {
-        key: fam || ':nc', label: fam || 'Non classés', folders,
+        key: branch || ':nc', label: branch || 'Non classés', folders,
         selected: folders.reduce((n, f) => n + f.selected, 0),
         total: folders.reduce((n, f) => n + f.rows.length, 0),
       }
@@ -133,6 +160,13 @@
   const visible = $derived(view?.kind === 'kit'
     ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
     : showReserve ? [...chosen, ...reserve] : chosen)
+
+  function toggleBranch(branch: string) {
+    const s = new Set(closedBranches)
+    if (s.has(branch)) s.delete(branch)
+    else s.add(branch)
+    closedBranches = s
+  }
 
   function toggleFolder(key: string) {
     const s = new Set(collapsed)
@@ -227,8 +261,8 @@
     try { localStorage.setItem(SEARCH_KEY, JSON.stringify(f)) } catch { /* stockage indisponible */ }
     await refresh()
     // la case ouverte ne repond plus au filtre : premiere case qui y repond
-    if (current && !byKey.has(`${current.family}/${current.code}`) && ordered.length) {
-      await open({ kind: 'cell', family: ordered[0].family, code: ordered[0].code })
+    if (current && !byKey.has(current.folder) && ordered.length) {
+      await open({ kind: 'cell', folder: ordered[0].folder })
       return
     }
     await loadEntries()
@@ -286,7 +320,7 @@
 
   function looseRow(l: LooseSample, i: number): SampleEntry {
     const name = (l.source.split('/').pop() ?? l.source).replace(/\.wav$/i, '')
-    return { source: l.source, family: '', code: '', pack: l.pack, name, duration: null, rank: i + 1,
+    return { source: l.source, family: '', code: '', sub: '', folder: '', pack: l.pack, name, duration: null, rank: i + 1,
       status: 'pending', selected: true, flags: null, bpm: null, bpm_est: false, tags: l.tags, stars: l.stars,
       auto_tags: l.auto_tags, overflow: false }
   }
@@ -302,8 +336,8 @@
       cells = c
       facets = fa
       wheel = wh
-      const [all, ak] = filterOn() ? await Promise.all([api.sampleCells(), api.sampleKits()]) : [c, k]
-      gridCodes = [...new Set(all.map(x => x.code))]
+      const ak = filterOn() ? await api.sampleKits() : k
+      if (!allFolders.length) allFolders = await api.sampleFolders()
       allKits = ak.kits
       counts = { unclassified: u.length, trash: t.length }
       allTags = tags
@@ -324,7 +358,7 @@
       return
     }
     entries = v.kind === 'cell'
-      ? await api.sampleCell(v.family, v.code, kit, showOverflow, search).catch(() => [])
+      ? await api.sampleCell(v.folder, kit, showOverflow, search).catch(() => [])
       : (await api.sampleLoose(v.kind, kit, search)).map(looseRow)
   }
 
@@ -332,7 +366,7 @@
     view = v
     sel = new Set()
     moving = null
-    const key = v.kind === 'cell' ? `${v.family}/${v.code}` : `:${v.kind}`
+    const key = v.kind === 'cell' ? v.folder : `:${v.kind}`
     try { localStorage.setItem(VIEW_KEY, key) } catch { /* stockage indisponible */ }
     await loadEntries()
     const first = visible.find(e => e.status === 'pending') ?? visible[0]
@@ -353,13 +387,13 @@
     pick(visible[j].source)
   }
 
-  const ordered = $derived(families.flatMap(f => codes.map(c => byKey.get(`${f}/${c}`)).filter((c): c is SampleCell => c !== undefined)))
+  const ordered = $derived(folderList.map(f => byKey.get(f)).filter((c): c is SampleCell => c !== undefined))
 
   function stepCell(delta: number) {
     if (!ordered.length) return
-    const i = current ? ordered.findIndex(c => c.family === current.family && c.code === current.code) : -1
+    const i = current ? ordered.findIndex(c => c.folder === current.folder) : -1
     const c = ordered[(i + delta + ordered.length) % ordered.length]
-    open({ kind: 'cell', family: c.family, code: c.code })
+    open({ kind: 'cell', folder: c.folder })
   }
 
   function targets(): string[] {
@@ -393,7 +427,7 @@
   async function decide(status: SampleStatus) {
     if (!current && view?.kind !== 'kit') return
     // vue kit : les non classes n'ont pas de case (M pour leur en donner une)
-    const sources = targets().filter(s => entries.find(e => e.source === s)?.family)
+    const sources = targets().filter(s => entries.find(e => e.source === s)?.folder)
     const single = sel.size ? null : cursor
     if (!(await act(s => api.sampleStatus(s, status), sources)) || !single || status === 'pending') return
     // ecoute : prochain retenu encore a ecouter apres celui-ci, sinon le premier
@@ -421,8 +455,7 @@
     moving = {
       sources,
       label: sources.length > 1 ? `${sources.length} samples` : one?.name ?? sources[0],
-      family: current?.family ?? (one?.family || 'UNIVERSEL'),
-      code: current?.code ?? (one?.code || 'PC'),
+      folder: current?.folder ?? (one?.folder && !one.folder.startsWith('SAMPLE/') ? one.folder : 'DRUMS/PC'),
     }
     queueMicrotask(() => moveSelect?.focus())
   }
@@ -430,8 +463,9 @@
   async function confirmMove() {
     if (!moving) return
     const m = moving
-    if (current && m.family === current.family && m.code === current.code) { moving = null; return }
-    if (await act(s => api.sampleMove(s, m.family, m.code), m.sources)) moving = null
+    if (current && m.folder === current.folder) { moving = null; return }
+    const { code, sub } = splitFolder(m.folder)
+    if (await act(s => api.sampleMove(s, code, sub), m.sources)) moving = null
   }
 
   function onMoveKey(e: KeyboardEvent) {
@@ -485,13 +519,17 @@
     dropKey = key
   }
 
-  function onDrop(ev: DragEvent, target: { family: string; code: string } | 'trash') {
+  /** Depot sur un dossier (rangement) ou sur la corbeille. */
+  function onDrop(ev: DragEvent, target: string) {
     ev.preventDefault()
     const sources = dragging
     onDragEnd()
     if (!sources) return
     if (target === 'trash') toTrash(sources)
-    else act(s => api.sampleMove(s, target.family, target.code), sources)
+    else {
+      const { code, sub } = splitFolder(target)
+      act(s => api.sampleMove(s, code, sub), sources)
+    }
   }
 
   async function runExport(dryRun: boolean) {
@@ -521,7 +559,7 @@
     if (kit) await open({ kind: 'kit' })
     else if (view?.kind === 'kit') {
       const c = cells.find(x => x.to_listen > 0) ?? cells[0]
-      if (c) await open({ kind: 'cell', family: c.family, code: c.code })
+      if (c) await open({ kind: 'cell', folder: c.folder })
     } else if (view) await open(view)
   }
 
@@ -559,7 +597,7 @@
 
   /** R : reserve, puis hors plafond (sans kit), puis tout replie. */
   async function toggleReserve() {
-    const c = current ? byKey.get(`${current.family}/${current.code}`) : undefined
+    const c = current ? byKey.get(current.folder) : undefined
     if (!showReserve) showReserve = true
     else if (!showOverflow && !kit && c?.reserve) showOverflow = true
     else { showReserve = kit !== ''; showOverflow = false }
@@ -615,7 +653,7 @@
     if (last === ':kit' && kit) return open({ kind: 'kit' })
     if (last === ':unclassified' || last === ':trash') return open({ kind: last.slice(1) as Loose })
     const c = (last && byKey.get(last)) || cells.find(x => x.to_listen > 0) || cells[0]
-    if (c) await open({ kind: 'cell', family: c.family, code: c.code })
+    if (c) await open({ kind: 'cell', folder: c.folder })
   })
   onDestroy(() => ws?.destroy())
 
@@ -680,42 +718,40 @@
       Les chiffres d’une case : à écouter / retenus{filterOn() ? ' (filtrés)' : ''}.
     </p>
     {#if error}<p class="err">{error}</p>{/if}
-    <table class:dragging={dragging !== null}>
-      <thead>
-        <tr class="sections">
-          <th></th>
-          {#if rhythmCols}<th colspan={rhythmCols} class="sec rhythm" title="Tracks 1 à 8 de la doctrine">Rythmique</th>{/if}
-          {#if codes.length - rhythmCols}<th colspan={codes.length - rhythmCols} class="sec melodic first" title="Tracks 9 à 16 de la doctrine">Mélodique</th>{/if}
-        </tr>
-        <tr><th></th>{#each codes as code}<th class:loop={LOOPS.includes(code)} class:mel={!RHYTHM.includes(code)} class:first={code === firstMelodic}
-          title={codeTitle(code)}>{code}</th>{/each}</tr>
-      </thead>
-      <tbody>
-        {#each families as fam}
-          <tr>
-            <th class:empty={!cells.some(c => c.family === fam)}
-              title={cells.some(c => c.family === fam) ? '' : 'aucun sample : glisse-en un ici ou M'}>{fam}</th>
-            {#each codes as code}
-              {@const c = byKey.get(`${fam}/${code}`)}
-              {@const key = `${fam}/${code}`}
-              <!-- svelte-ignore a11y_no_static_element_interactions -->
-              <td class:first={code === firstMelodic} class:over={dropKey === key}
-                ondragover={e => onDragOver(e, key)} ondragleave={() => { if (dropKey === key) dropKey = null }}
-                ondrop={e => onDrop(e, { family: fam, code })}>
-                {#if c}
-                  <button class="cell" class:done={c.to_listen === 0}
-                    class:on={current?.family === fam && current?.code === code}
-                    title="{fam}/{code} : {c.candidates} candidats, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
-                    onclick={() => open({ kind: 'cell', family: fam, code })}>{c.to_listen}/{c.selected}{#if c.reserve && kit}<sup>+{c.reserve}</sup>{/if}</button>
-                {:else}
-                  <span class="slot" title="{fam}/{code}"></span>
-                {/if}
-              </td>
+    <div class="branches" class:dragging={dragging !== null}>
+      {#each branchRows as b (b.branch)}
+        <div class="branch">
+          <button class="fold small" title={BRANCH_HELP[b.branch] ?? b.branch} onclick={() => toggleBranch(b.branch)}>
+            <span class="caret">{closedBranches.has(b.branch) ? '▸' : '▾'}</span> <strong>{b.branch}</strong>
+            <span class="muted">{b.toListen}/{b.selected}</span>
+          </button>
+          {#if !closedBranches.has(b.branch)}
+            {#each b.codes as row (row.code)}
+              <div class="code-row">
+                <span class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
+                  title={codeTitle(row.code)}>{row.code}</span>
+                {#each row.folders as f (f)}
+                  {@const c = byKey.get(f)}
+                  {@const sub = splitFolder(f).sub}
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <span class="drop" class:over={dropKey === f}
+                    ondragover={e => onDragOver(e, f)} ondragleave={() => { if (dropKey === f) dropKey = null }}
+                    ondrop={e => onDrop(e, f)}>
+                    {#if c}
+                      <button class="cell" class:done={c.to_listen === 0} class:on={current?.folder === f}
+                        title="{f} : {c.candidates} candidats, plafond {c.quota ?? 'aucun'}, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
+                        onclick={() => open({ kind: 'cell', folder: f })}>{#if sub}<span class="sub">{sub}</span> {/if}{c.to_listen}/{c.selected}{#if c.reserve && kit}<sup>+{c.reserve}</sup>{/if}</button>
+                    {:else}
+                      <span class="slot" title="{f} : vide, glisse-en un ici ou M">{sub || '·'}</span>
+                    {/if}
+                  </span>
+                {/each}
+              </div>
             {/each}
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+          {/if}
+        </div>
+      {/each}
+    </div>
     <div class="loose">
       <button class="small" aria-pressed={view?.kind === 'unclassified'}
         title="Fichiers sans code : glisse-les vers une case (ou M)"
@@ -729,7 +765,7 @@
           onclick={() => open({ kind: 'trash' })}>Corbeille ({counts.trash})</button>
       </span>
       <button class="small export-btn" disabled={exporting}
-        title="Copie les retenus vers Live/samples (famille / code / nom DT2), pour Transfer"
+        title="Copie les retenus vers Live/samples (branche / code / sous-dossier / nom DT2), pour Transfer"
         onclick={() => runExport(true)}>{exporting ? 'Export…' : 'Exporter…'}</button>
     </div>
     {#if exportReport}
@@ -797,9 +833,9 @@
 
   <section class="detail">
     <header>
-      <strong>{current ? `${current.family} / ${current.code}` : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
+      <strong>{current ? current.folder.replaceAll('/', ' / ') : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
       {#if current}
-        {@const c = byKey.get(`${current.family}/${current.code}`)}
+        {@const c = byKey.get(current.folder)}
         {#if c}<span class="muted small">quota {c.quota ?? 'tout'} · {c.keep} gardés · {c.drop} écartés · {c.candidates} candidats{c.reserve ? ` · ${c.reserve} hors plafond` : ''}</span>{/if}
       {:else if view}
         <span class="muted small">{shown.length} fichiers</span>
@@ -839,11 +875,8 @@
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="move" onkeydown={onMoveKey}>
         <span class="small">Ranger <span class="name">{moving.label}</span> dans</span>
-        <select bind:this={moveSelect} bind:value={moving.family}>
-          {#each FAMILIES as f}<option value={f}>{f}</option>{/each}
-        </select>
-        <select bind:value={moving.code}>
-          {#each CODE_ORDER as c}<option value={c} title={codeTitle(c)}>{c} · {CODE_HELP[c]?.split(' · ')[0] ?? ''}</option>{/each}
+        <select bind:this={moveSelect} bind:value={moving.folder}>
+          {#each allFolders as f}<option value={f} title={codeTitle(splitFolder(f).code)}>{f}{splitFolder(f).sub ? '' : ` · ${CODE_HELP[splitFolder(f).code]?.split(' · ')[0] ?? ''}`}</option>{/each}
         </select>
         <button class="small" onclick={confirmMove} disabled={busy}>Ranger</button>
         <button class="small" onclick={() => (moving = null)}>Annuler</button>
@@ -886,7 +919,7 @@
           <button class="tag small auto" title="Tag inféré des dossiers : filtrer dessus"
             onclick={() => { if (!search.tags?.includes(t)) setSearch({ ...search, tags: [...(search.tags ?? []), t] }) }}>{t}</button>
         {/each}
-        <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : view?.kind === 'kit' && e.family && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
+        <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : view?.kind === 'kit' && e.folder && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
       </li>
     {/snippet}
     {#if view?.kind === 'kit'}
@@ -903,7 +936,7 @@
               {#if f.key !== ':nc'}
                 <li class="folder code" class:mel={!RHYTHM.includes(c.code)}>
                   <button class="fold" title={codeTitle(c.code)} onclick={() => toggleFolder(c.key)}>
-                    <span class="caret">{collapsed.has(c.key) ? '▸' : '▾'}</span> {c.code}
+                    <span class="caret">{collapsed.has(c.key) ? '▸' : '▾'}</span> {c.label}
                     <span class="muted small">{c.selected} / {c.rows.length}</span>
                   </button>
                 </li>
@@ -925,8 +958,8 @@
     {/if}
     {#if current && !showReserve && reserve.length}
       <button class="small" onclick={toggleReserve}>Afficher la réserve ({reserve.length})</button>
-    {:else if current && showReserve && !showOverflow && !kit && byKey.get(`${current.family}/${current.code}`)?.reserve}
-      <button class="small" onclick={toggleReserve}>Afficher les hors plafond ({byKey.get(`${current.family}/${current.code}`)?.reserve})</button>
+    {:else if current && showReserve && !showOverflow && !kit && byKey.get(current.folder)?.reserve}
+      <button class="small" onclick={toggleReserve}>Afficher les hors plafond ({byKey.get(current.folder)?.reserve})</button>
     {/if}
     {#if view && !visible.length}<p class="muted small">{filterOn() ? 'Aucun sample ne répond au filtre.' : 'Liste vide.'}</p>{/if}
   </section>
@@ -957,25 +990,21 @@
   .tag.auto { border-style: dotted; background: none; cursor: pointer; padding: 0 6px; }
   .grid { overflow: auto; }
   .filters { display: flex; gap: 10px; margin: 0 0 6px; }
-  table { border-collapse: collapse; font-size: 12px; }
-  th { font-weight: 600; padding: 2px 4px; text-align: left; }
-  thead th { text-align: center; font-family: ui-monospace, Menlo, monospace; }
-  td { padding: 1px; }
-  th.empty { color: var(--muted); font-weight: 400; }
-  thead th { color: var(--rhythm); cursor: help; }
-  thead th.mel { color: var(--melodic); }
-  thead th.loop { font-style: italic; text-decoration: underline dotted; }
-  tr.sections th { font: 600 10px system-ui, sans-serif; text-transform: uppercase; letter-spacing: 0.06em; padding: 0 4px 2px; border-bottom: 1px solid var(--border); }
-  tr.sections th.rhythm { color: var(--rhythm); }
-  tr.sections th.melodic { color: var(--melodic); }
-  .first { border-left: 2px solid var(--border); padding-left: 6px; }
   .zone { box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
-  .cell { width: 44px; font: 11px ui-monospace, Menlo, monospace; padding: 3px 0; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 3px; cursor: pointer; }
+  .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
+  .branch .fold { border: 0; background: none; color: var(--text); padding: 2px 0; cursor: pointer; }
+  .code-row { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; padding-left: 14px; }
+  .code-label { width: 24px; font: 600 11px ui-monospace, Menlo, monospace; color: var(--rhythm); cursor: help; }
+  .code-label.mel { color: var(--melodic); }
+  .code-label.loop { font-style: italic; text-decoration: underline dotted; }
+  .drop { display: inline-block; border-radius: 3px; }
+  .cell { min-width: 44px; font: 11px ui-monospace, Menlo, monospace; padding: 3px 5px; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 3px; cursor: pointer; }
+  .cell .sub { color: var(--muted); }
   .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }
-  .slot { display: block; width: 44px; height: 21px; border-radius: 3px; }
-  table.dragging .slot { border: 1px dashed var(--border); }
-  td.over .cell, td.over .slot { outline: 2px dashed var(--accent); background: var(--panel-2); }
+  .slot { display: inline-block; min-width: 34px; padding: 3px 5px; font: 11px ui-monospace, Menlo, monospace; color: var(--muted); border: 1px solid transparent; border-radius: 3px; opacity: 0.6; }
+  .branches.dragging .slot { border: 1px dashed var(--border); opacity: 1; }
+  .drop.over .cell, .drop.over .slot { outline: 2px dashed var(--accent); background: var(--panel-2); }
   .loose { display: flex; gap: 8px; margin-top: 10px; }
   .trash-drop { border-radius: 4px; }
   .export-btn { margin-left: auto; }

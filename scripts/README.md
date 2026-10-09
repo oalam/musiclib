@@ -706,9 +706,24 @@ ROOT NOTE = F`, puis la progression par section (`main  Fm - F5 - Fm`).
 # samples.py — bibliothèque de samples DT2 (Phase 7.J)
 
 Classe la copie des packs faite depuis Transfer (`<MEDIA>/Samples`, jamais
-modifiée) en famille / code, nomme les candidats pour l'écran de la DT2 et
-écrit `library/samples/manifest.json`. Règles et quotas : [[SPEC]] § 7.J,
-tables `FAMILY_RULES`, `PACK_CODES`, `CODE_RULES` de `analyzer/samples.py`.
+modifiée) en famille / code / sous-catégorie, range les candidats par dossier
+final du +Drive, nomme les candidats pour l'écran de la DT2 et écrit
+`library/samples/manifest.json`. Règles et plafonds : [[SPEC]] § 7.J et 7.J8,
+tables `FAMILY_RULES`, `PACK_CODES`, `CODE_RULES`, `SUB_RULES` de
+`analyzer/samples.py`.
+
+Arbre (7.J8) : `<BRANCHE>/<CODE>/[<SOUS>]`, avec les branches DRUMS
+(BD … PC), TONAL (BS ST PD), LOOPS (BR DL PL ML BL), FX (`FX/<SOUS>`), VX
+(`VX/<SOUS>`), SAMPLE (`SAMPLE/<CODE>`, sans plafond). Exemples :
+`DRUMS/BD/HARD`, `DRUMS/PC/SKIN`, `LOOPS/DL/150`, `FX/RISE`. Plafond par
+dossier final : 32 pour BR, DL et PL, 16 ailleurs (candidats = 3 ×
+plafond). La sous-catégorie vient des mots du chemin (`SUB_RULES`), à défaut de la
+durée pour BS et ST (`DURATION_SUBS` : SHORT moins de 0,6 s, MID, LONG
+2 s ou plus) et PD (SHORT moins de 4 s, LONG) ou, pour BR / DL, de la tranche de tempo (`060` moins de 120, `120`, `150`, `180`) ;
+sans mot reconnu le fichier reste à la racine du code, et une sous-catégorie
+de moins de 4 fichiers y remonte. La famille ne range plus : elle repère
+SAMPLE et donne un tag de genre (`hardcore`, `jungle`, `dubstep`, `techno`,
+`tribe`).
 
 ```bash
 python samples.py                 # (re)construit le manifeste, affiche la grille
@@ -723,9 +738,10 @@ Exemple de noms : `BD G# Overd 02 vtl`, `BR 170 Amen j89`, `HH Schat 17 meg`,
 BL basse.
 
 - **Overrides** : `library/samples/overrides.json`, clé = chemin relatif à
-  `Samples/`, champs `family`, `code`, `name`, `exclude`, et depuis 7.J4
-  `tags`, `stars` (1 à 5), `trash`. Une famille forcée n'est jamais repliée
-  dans UNIVERSEL. `exclude` ignore le fichier ; `trash` (corbeille, posé
+  `Samples/`, champs `family` (genre ou SAMPLE), `code`, `sub` (7.J8 :
+  sous-catégorie forcée, `""` = racine du code), `name`, `exclude`, et
+  depuis 7.J4 `tags`, `stars` (1 à 5), `trash`. Une sous-catégorie forcée
+  n'est jamais remontée. `exclude` ignore le fichier ; `trash` (corbeille, posé
   depuis le front) le garde listé et restaurable. Une clé terminée par `/`
   vise un kit ou un pack entier (7.J5) : `{"rthm/packs/neurotek/": {"tags":
   ["tribe"], "trash": false}}` ; ses tags sont hérités par tous ses fichiers,
@@ -736,12 +752,14 @@ BL basse.
   30 ms de silence en tête d'un one-shot), `long` (frappe de drums de plus de
   2 s), `illisible`. Un candidat signalé passe en fin de case, sans être
   écarté. Environ 1 min pour mesurer les 2 423 candidats au premier passage.
-- **Écoute (7.J2)** : onglet **Samples** du front (`api.py`). Grille
-  famille × code (à écouter / retenus), puis dans une case la sélection et
+- **Écoute (7.J2)** : onglet **Samples** du front (`api.py`). Arbre des
+  dossiers (7.J8) : une branche repliable, une ligne par code, une case par
+  sous-catégorie (à écouter / retenus ; vide en pointillé, cible de
+  rangement), puis dans une case la sélection et
   la réserve, avec la forme d'onde et une lecture automatique. Raccourcis :
   `K` garder, `D` écarter (le candidat suivant monte dans la sélection),
   `U` annuler, `↑` `↓` sample, `←` `→` case, `Espace` rejouer, `R` réserve,
-  `M` changer de case (statut gardé, écrit aussi dans `overrides.json`).
+  `M` changer de dossier (statut gardé, écrit aussi dans `overrides.json`).
   Chaque décision est écrite dans le manifeste.
 - **Bibliothèque (7.J4)** : dans le même onglet, filtres par tag et par
   étoiles (grille et liste), zone **Non classés** (on leur donne une case :
@@ -761,7 +779,7 @@ BL basse.
   corbeille sur le kit ; la réserve hors plafond du kit apparaît (`+N` sur
   les cases, lignes « hors plafond », liste `reserve` du manifeste) : la
   garder, l'écarter, la noter ou la ranger la fait entrer comme candidat.
-  Choisir un kit ouvre à droite son arborescence FAMILLE / CODE / fichiers
+  Choisir un kit ouvre à droite son arborescence BRANCHE / dossier / fichiers
   (case finale, dossiers repliables, retenus / total, tous les fichiers
   marqués), puis un dossier « Non classés » (`GET /api/samples/kit/tree`).
   Sans kit, `R` déplie la réserve, puis au second appui les fichiers hors
@@ -793,7 +811,8 @@ BL basse.
 - **Export (7.J3)** : `samples.py --export --dry-run` (bilan), puis
   `samples.py --export`, ou le bouton « Exporter… » de l'onglet Samples.
   Copie les retenus tels quels vers
-  `<MEDIA>/Live/samples/<FAMILLE>/<CODE>/<nom>.wav`, à envoyer sur le +Drive
+  `<MEDIA>/Live/samples/<dossier final>/<nom>.wav` (7.J8 :
+  `DRUMS/BD/HARD/BD G# Overd 02 vtl.wav`), à envoyer sur le +Drive
   avec Transfer. Rejouable : `library/samples/export.json` liste les fichiers
   écrits par l'export ; un relancement ne recopie que ce qui a changé et ne
   retire que ces fichiers (sortis des retenus ou changés de case). Un fichier
@@ -931,12 +950,13 @@ dans library.md) :
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
 | GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
 | GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
-| GET | `/api/samples?tag=&min_stars=` | cases famille × code de la bibliothèque de samples (`SampleCell` : retenus, keep, drop, à écouter, signalés) ; filtres optionnels |
-| GET | `/api/samples/cell?family=&code=` | candidats d'une case par rang (`SampleEntry`, avec `tags` et `stars`) |
+| GET | `/api/samples?tag=&min_stars=` | cases de la bibliothèque de samples, une par dossier final (`SampleCell` : `folder`, `branch`, `code`, `sub`, plafond, retenus, keep, drop, à écouter, signalés) ; filtres optionnels |
+| GET | `/api/samples/folders` | dossiers cibles d'un rangement (7.J8), racine du code puis sous-catégories, dans l'ordre de l'arbre |
+| GET | `/api/samples/cell?folder=` | candidats d'une case par rang (`SampleEntry`, avec `tags` et `stars`) |
 | GET | `/api/samples/loose?which=unclassified\|trash` | non classés ou corbeille (`LooseSample`) |
 | GET | `/api/samples/tags` | tags déjà utilisés (autocomplétion) |
 | POST | `/api/samples/status` | `{sources, status}` → grille ; sélection des cases recalculée |
-| POST | `/api/samples/move` | `{sources, family, code}` → grille ; range des candidats ou des non classés, écrit l'override |
+| POST | `/api/samples/move` | `{sources, code, sub}` → grille ; range des candidats ou des non classés, écrit l'override |
 | POST | `/api/samples/stars` | `{sources, stars}` (1 à 5, `null` retire) → grille |
 | POST | `/api/samples/tags` | `{sources, add, remove}` → grille |
 | POST | `/api/samples/trash`, `/restore` | `{sources}` → grille ; corbeille / retour dans la case ou les non classés |

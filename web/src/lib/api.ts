@@ -224,8 +224,10 @@ export interface Dt2SendState {
 export type SampleStatus = 'pending' | 'keep' | 'drop'
 export interface SampleEntry {
   source: string
-  family: string
+  family: string           // genre (tag) ou SAMPLE (7.J8)
   code: string
+  sub: string              // sous-categorie, '' = racine du code
+  folder: string           // dossier final (case) : DRUMS/BD/HARD ; '' = non classe
   pack: string
   name: string
   duration: number | null
@@ -292,9 +294,12 @@ export interface SampleExportReport {
   missing: string[]
   conflicts: string[]
 }
+/** Case = dossier final du +Drive (7.J8) : DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX. */
 export interface SampleCell {
-  family: string
+  folder: string
+  branch: string
   code: string
+  sub: string
   quota: number | null
   candidates: number
   selected: number
@@ -365,8 +370,8 @@ export const api = {
   dt2SendCancel: () => fetch('/api/dt2/send', { method: 'DELETE' }).then(r => json<Dt2SendState | null>(r)),
   sampleCells: (f: SampleFilter = {}, kit = '') =>
     fetch(`/api/samples?${kit ? `kit=${enc(kit)}` : ''}${fq(f)}`).then(r => json<SampleCell[]>(r)),
-  sampleCell: (family: string, code: string, kit = '', overflow = false, f: SampleFilter = {}) =>
-    fetch(`/api/samples/cell?family=${enc(family)}&code=${enc(code)}${kit ? `&kit=${enc(kit)}` : ''}${overflow ? '&overflow=true' : ''}${fq(f)}`).then(r => json<SampleEntry[]>(r)),
+  sampleCell: (folder: string, kit = '', overflow = false, f: SampleFilter = {}) =>
+    fetch(`/api/samples/cell?folder=${enc(folder)}${kit ? `&kit=${enc(kit)}` : ''}${overflow ? '&overflow=true' : ''}${fq(f)}`).then(r => json<SampleEntry[]>(r)),
   sampleLoose: (which: 'unclassified' | 'trash', kit = '', f: SampleFilter = {}) =>
     fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}${fq(f)}`).then(r => json<LooseSample[]>(r)),
   sampleKitTree: (kit: string, f: SampleFilter = {}) =>
@@ -380,7 +385,8 @@ export const api = {
   sampleTags: () => fetch('/api/samples/tags').then(r => json<string[]>(r)),
   // actions par lot : toutes renvoient la grille complete (sans filtre)
   sampleStatus: (sources: string[], status: SampleStatus) => samplePost('status', { sources, status }),
-  sampleMove: (sources: string[], family: string, code: string) => samplePost('move', { sources, family, code }),
+  sampleMove: (sources: string[], code: string, sub: string) => samplePost('move', { sources, code, sub }),
+  sampleFolders: () => fetch('/api/samples/folders').then(r => json<string[]>(r)),
   sampleStars: (sources: string[], stars: number | null) => samplePost('stars', { sources, stars }),
   sampleTagsEdit: (sources: string[], add: string[], remove: string[] = []) => samplePost('tags', { sources, add, remove }),
   sampleTrash: (sources: string[]) => samplePost('trash', { sources }),

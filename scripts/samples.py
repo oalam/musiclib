@@ -2,7 +2,8 @@
 """Bibliotheque de samples DT2 : classement, pre-selection et export (Phase 7.J).
 
 Lit la copie des packs (`<MEDIA>/Samples`, jamais modifiee), classe chaque
-wav en famille / code, nomme les candidats pour l'ecran de la DT2 et ecrit
+wav en famille / code / sous-categorie, range les candidats par dossier final
+du +Drive (`DRUMS/BD/HARD`, `LOOPS/BR`... : 7.J8), nomme les candidats pour l'ecran de la DT2 et ecrit
 le manifeste. Chaque candidat est mesure (pre-filtre 7.J2 : drapeaux muet,
 faible, sature, blanc, long, illisible) et les candidats a defauts passent en
 fin de case ; les one-shots BD / BS / PD sans note dans le nom recoivent
@@ -25,7 +26,7 @@ Fichiers (vault) :
     library/samples/manifest.json   # candidats, noms, statut, selection
     library/samples/export.json     # fichiers ecrits par l'export (seuls retirables)
     library/samples/overrides.json  # corrections manuelles, cle = chemin source :
-        {"rthm/x.wav": {"family": "TRIBE", "code": "BD", "name": "BD Fat 01 rth",
+        {"rthm/x.wav": {"family": "TRIBE", "code": "BD", "sub": "HARD", "name": "BD Fat 01 rth",
                         "exclude": false, "tags": ["acid"], "stars": 4,
                         "trash": false}}
         tags, etoiles et corbeille (7.J4) sont poses depuis le front ; `exclude`
@@ -34,6 +35,8 @@ Fichiers (vault) :
         fichiers, `trash` l'exclut d'un bloc :
         {"rthm/packs/neurotek/": {"tags": ["tribe"], "trash": true}}
         `no_auto` (fichier ou prefixe) masque des tags inferes des dossiers (7.J6).
+        `family` ne range plus (7.J8) : elle donne le tag de genre ou SAMPLE ;
+        `sub` force la sous-categorie ("" = racine du code).
 """
 from __future__ import annotations
 
@@ -44,8 +47,7 @@ from collections import Counter
 from pathlib import Path
 
 from analyzer.samples import (
-    CODES,
-    FAMILIES,
+    BRANCHES,
     ExportReport,
     Manifest,
     Override,
@@ -97,27 +99,27 @@ def save_manifest(m: Manifest, path: Path) -> None:
 
 
 def render_grid(m: Manifest) -> str:
-    """Tableau candidats/retenus par famille x code, totaux en bout de ligne."""
+    """Arbre retenus/candidats par branche puis dossier final, total par branche."""
     g = grid(m)
-    codes = [c for c in CODES if any(c in g[f] for f in g)]
-    lines = ["fam        " + " ".join(f"{c:>7}" for c in codes) + "    total"]
+    lines: list[str] = []
     tot_n = tot_s = 0
-    for fam in FAMILIES:
-        if fam not in g:
+    for branch in BRANCHES:
+        cells = {f: v for f, v in g.items() if f.split("/")[0] == branch}
+        if not cells:
             continue
-        cells = g[fam]
         n = sum(v[0] for v in cells.values())
         s = sum(v[1] for v in cells.values())
         tot_n, tot_s = tot_n + n, tot_s + s
-        row = " ".join(f"{(f'{cells[c][1]}/{cells[c][0]}' if c in cells else '.'):>7}" for c in codes)
-        lines.append(f"{fam:10} {row}  {s:>4}/{n}")
+        lines.append(f"{branch:22} {s:>5}/{n}")
+        lines += [f"  {f.split('/', 1)[1] if '/' in f else '.':20} {v[1]:>5}/{v[0]}"
+                  for f, v in cells.items()]
     lines.append(f"retenus/candidats : {tot_s}/{tot_n} ; fichiers sources : {m.total} ; "
                  f"non classes : {len(m.unclassified)} ; corbeille : {len(m.trashed)}")
     flagged = Counter(f for e in m.entries for f in e.flags or [])
     if flagged:
         lines.append("drapeaux qualite : " + ", ".join(f"{f} {n}" for f, n in flagged.most_common()))
     if m.folded:
-        lines.append("cases repliees dans UNIVERSEL : " + ", ".join(m.folded))
+        lines.append("sous-categories remontees a la racine : " + ", ".join(m.folded))
     return "\n".join(lines)
 
 

@@ -6,6 +6,29 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+### Modifié
+
+- [7.J8] Arbre du +Drive par type : une case est un dossier final
+  `<BRANCHE>/<CODE>/[<SOUS>]` (DRUMS, TONAL, LOOPS, FX, VX, SAMPLE), au lieu
+  de la case famille × code. Plafond par dossier (32 pour BR / DL / PL, 16
+  ailleurs, SAMPLE sans plafond) ; sous-catégories inférées des mots du
+  chemin (`SUB_RULES` : BD HARD / CLEAN / SUB / ACOU, PC SHAKER / SKIN /
+  METAL / WOOD / FOLEY, ML KEYS / PADS / ATMOS / GUITAR, FX RISE / REV /
+  HIT / NOISE, BS SUB / WOB / DIST / ANALOG, ST CHORD / STAB / METAL /
+  ANALOG / BELL / ORCH, PD AMBIENT / CHORD / DRONE, VX, PL, SD), à défaut
+  de la durée pour BS, ST (SHORT / MID / LONG) et PD (SHORT / LONG), ou de la tranche de tempo pour
+  BR / DL (`060`, `120`, `150`, `180`), forcées par l'override `sub`. La famille ne
+  range plus : elle repère SAMPLE et devient un tag de genre. Une boucle de
+  nappe passe en `LOOPS/ML/PADS` ; les thumps et transitions de
+  cinematic Noiiz passent de PD à FX. 1 215 retenus au lieu de 1 056, avec
+  plus de dossiers et moins de kicks par dossier.
+  API : `SampleCell` porte `folder` / `branch` / `code` / `sub`,
+  `/api/samples/cell?folder=`, `move {code, sub}`, `GET /api/samples/folders`.
+  Front : arbre des branches (une ligne par code, une case par
+  sous-catégorie, dossiers vides comme cibles de dépôt), arbre du kit par
+  branche, `M` vers un dossier. L'export réécrit l'arborescence au prochain
+  passage (l'index retire l'ancienne).
+
 ### Ajouté
 
 - [7.E] Sortie audio du lecteur au choix (`setSinkId`) : le morceau part

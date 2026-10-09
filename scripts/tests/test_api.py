@@ -234,10 +234,10 @@ def samples_client(tmp_path: Path) -> TestClient:
     entries = [SampleEntry(source=f"p/fx{i}.wav", family="JUNGLE", code="FX", pack="p",
                            name=f"FX {i}", duration=1.0, rank=i,
                            flags=["sature"] if i == 10 else [])
-               for i in range(1, 11)]
-    select(entries, 8)
+               for i in range(1, 19)]
+    select(entries, 16)
     path = tmp_path / "manifest.json"
-    api.samples.save_manifest(Manifest(source_root=str(src), total=10, entries=entries), path)
+    api.samples.save_manifest(Manifest(source_root=str(src), total=18, entries=entries), path)
     lib = tmp_path / "library.md"
     lib.write_text(LIBRARY, encoding="utf-8")
     return TestClient(api.create_app(library_file=lib, samples_manifest=path, samples_src=src,
@@ -246,13 +246,14 @@ def samples_client(tmp_path: Path) -> TestClient:
 
 def test_samples_cells(samples_client: TestClient):
     cells = samples_client.get("/api/samples").json()
-    assert cells == [{"family": "JUNGLE", "code": "FX", "quota": 8, "candidates": 10,
-                      "selected": 8, "keep": 0, "drop": 0, "to_listen": 8, "flagged": 1,
-                      "reserve": 0}]
-    cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
-    assert [e["rank"] for e in cell] == list(range(1, 11))
-    assert samples_client.get("/api/samples/cell",
-                              params={"family": "JUNGLE", "code": "BD"}).status_code == 404
+    assert cells == [{"folder": "FX", "branch": "FX", "code": "FX", "sub": "", "quota": 16,
+                      "candidates": 18, "selected": 16, "keep": 0, "drop": 0, "to_listen": 16,
+                      "flagged": 1, "reserve": 0}]
+    cell = samples_client.get("/api/samples/cell", params={"folder": "FX"}).json()
+    assert [e["rank"] for e in cell] == list(range(1, 19))
+    assert samples_client.get("/api/samples/cell", params={"folder": "DRUMS/BD"}).status_code == 404
+    folders = samples_client.get("/api/samples/folders").json()
+    assert folders[0] == "DRUMS/BD" and "FX/RISE" in folders
 
 
 def _post(client: TestClient, path: str, **body: object):
@@ -261,10 +262,10 @@ def _post(client: TestClient, path: str, **body: object):
 
 def test_samples_drop_promotes_next_and_persists(samples_client: TestClient):
     r = _post(samples_client, "status", sources=["p/fx1.wav"], status="drop")
-    assert r.status_code == 200 and (r.json()[0]["drop"], r.json()[0]["selected"]) == (1, 8)
-    cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
+    assert r.status_code == 200 and (r.json()[0]["drop"], r.json()[0]["selected"]) == (1, 16)
+    cell = samples_client.get("/api/samples/cell", params={"folder": "FX"}).json()
     selected = [e["source"] for e in cell if e["selected"]]
-    assert "p/fx1.wav" not in selected and "p/fx9.wav" in selected
+    assert "p/fx1.wav" not in selected and "p/fx17.wav" in selected
     assert _post(samples_client, "status", sources=["p/absent.wav"], status="keep").status_code == 404
     assert _post(samples_client, "status", sources=["p/fx1.wav"], status="maybe").status_code == 422
     assert _post(samples_client, "status", sources=[], status="keep").status_code == 422
@@ -286,22 +287,23 @@ def test_samples_audio_only_from_manifest(samples_client: TestClient):
 
 
 def test_samples_move_writes_override(samples_client: TestClient, tmp_path: Path):
-    r = _post(samples_client, "move", sources=["p/fx1.wav"], family="TECHNO", code="VX")
+    r = _post(samples_client, "move", sources=["p/fx1.wav"], code="FX", sub="RISE")
     assert r.status_code == 200
-    cells = {(c["family"], c["code"]): c for c in r.json()}
-    assert cells["TECHNO", "VX"]["selected"] == 1
-    assert cells["JUNGLE", "FX"]["selected"] == 8          # le 9e monte
+    cells = {c["folder"]: c for c in r.json()}
+    assert cells["FX/RISE"]["selected"] == 1 and cells["FX/RISE"]["sub"] == "RISE"
+    assert cells["FX"]["selected"] == 16          # le 17e monte
     assert json.loads((tmp_path / "overrides.json").read_text()) == {
-        "p/fx1.wav": {"family": "TECHNO", "code": "VX"}}
+        "p/fx1.wav": {"code": "FX", "sub": "RISE"}}
+    assert _post(samples_client, "move", sources=["p/fx1.wav"], code="ZZ").status_code == 422
     assert _post(samples_client, "move", sources=["p/fx1.wav"],
-                 family="TECHNO", code="ZZ").status_code == 422
+                 code="VX", sub="RISE").status_code == 422
 
 
 def test_samples_stars_tags_filter(samples_client: TestClient, tmp_path: Path):
     assert _post(samples_client, "stars", sources=["p/fx10.wav"], stars=4).status_code == 200
     assert _post(samples_client, "stars", sources=["p/fx1.wav"], stars=9).status_code == 422
     _post(samples_client, "tags", sources=["p/fx10.wav", "p/fx2.wav"], add=["Dark"])
-    cell = samples_client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX"}).json()
+    cell = samples_client.get("/api/samples/cell", params={"folder": "FX"}).json()
     assert (cell[0]["source"], cell[0]["stars"], cell[0]["tags"]) == ("p/fx10.wav", 4, ["dark"])
     assert samples_client.get("/api/samples/tags").json() == ["dark"]
     only = samples_client.get("/api/samples", params={"tags": "dark", "min_stars": 3}).json()
@@ -316,7 +318,7 @@ def test_samples_stars_tags_filter(samples_client: TestClient, tmp_path: Path):
 
 def test_samples_trash_restore(samples_client: TestClient):
     r = _post(samples_client, "trash", sources=["p/fx1.wav"])
-    assert r.json()[0]["candidates"] == 9
+    assert r.json()[0]["candidates"] == 17
     trash = samples_client.get("/api/samples/loose", params={"which": "trash"}).json()
     assert [t["source"] for t in trash] == ["p/fx1.wav"]
     # toujours ecoutable depuis la corbeille
@@ -351,16 +353,15 @@ def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
         ("k/a", 1, 1), ("k/b", 0, 1)]
     # sans filtre kit : reserve comptee, case sans candidat absente ; avec : case SD visible
     assert [(c["code"], c["reserve"]) for c in client.get("/api/samples").json()] == [("FX", 1)]
-    rows = client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX",
-                                                   "overflow": True}).json()
+    rows = client.get("/api/samples/cell", params={"folder": "FX", "overflow": True}).json()
     assert [r["overflow"] for r in rows] == [False, True]
     cells = {c["code"]: c for c in client.get("/api/samples", params={"kit": "k/b"}).json()}
     assert cells["SD"]["reserve"] == 1 and cells["SD"]["candidates"] == 0
-    rows = client.get("/api/samples/cell", params={"family": "JUNGLE", "code": "FX", "kit": "k/a"}).json()
+    rows = client.get("/api/samples/cell", params={"folder": "FX", "kit": "k/a"}).json()
     assert [(r["source"], r["overflow"]) for r in rows] == [("k/a/fx1.wav", False), ("k/a/fx2.wav", True)]
     tree = client.get("/api/samples/kit/tree", params={"kit": "k"}).json()
     assert [(r["code"], r["source"], r["overflow"]) for r in tree["entries"]] == [
-        ("FX", "k/a/fx1.wav", False), ("FX", "k/a/fx2.wav", True), ("SD", "k/b/sd1.wav", True)]
+        ("SD", "k/b/sd1.wav", True), ("FX", "k/a/fx1.wav", False), ("FX", "k/a/fx2.wav", True)]
     assert tree["unclassified"] == []
     # garder un fichier de la reserve le fait entrer comme candidat
     r = _post(client, "status", sources=["k/a/fx2.wav"], status="keep")
@@ -402,6 +403,6 @@ def test_samples_export(tmp_path: Path):
                                        samples_export=dest,
                                        samples_export_index=tmp_path / "export.json"))
     dry = client.post("/api/samples/export", json={}).json()
-    assert dry["dry_run"] and dry["copied"] == ["JUNGLE/FX/FX 1 p.wav"] and not dest.exists()
+    assert dry["dry_run"] and dry["copied"] == ["FX/FX 1 p.wav"] and not dest.exists()
     r = client.post("/api/samples/export", json={"dry_run": False}).json()
-    assert r["files"] == 1 and (dest / "JUNGLE/FX/FX 1 p.wav").exists()
+    assert r["files"] == 1 and (dest / "FX/FX 1 p.wav").exists()
