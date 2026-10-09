@@ -406,7 +406,7 @@ mutes, FX de transition, principes d'arc).
 | 7.C | Front POC : FastAPI (`scripts/api.py`) + Svelte/Vite + wavesurfer.js (`web/`) : lib, lecteur, vue bank synchronisée ; natif Mac ensuite via Tauri | fait (POC web) |
 | 7.B2 | Premier temps de la mesure + structure déduite des patterns + réutilisation de slots (cf. plan ci-dessous) | fait (premier temps à valider à l'oreille) |
 | 7.D | Base de connaissance `digitakt/kb/*.md` + recherche plein texte dans le front | fait : recherche + panneau, 25 fiches en 5 lots (statut draft, à tester sur la machine) |
-| 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | en cours : envoi d'une track depuis le front fait (`dt2_midi.py`, à valider sur la machine) ; pré-réglage CC / NRPN à venir |
+| 7.E | Enregistrement assisté (requalifié) : script mido qui rejoue les `.mid` de bank track par track sur l'AUTO CHANNEL pendant un `[RECORD]`, plus pré-réglage des sons par CC / NRPN (cf. [[digitakt/kb/cc-nrpn]]) | en cours : envoi d'une track depuis le front fait (`dt2_midi.py`, à valider sur la machine) ; sortie du lecteur vers la DT2 pour l'échantillonner faite (à valider sur la machine) ; pré-réglage CC / NRPN à venir |
 | 7.F | KB intégrée au front : bandeau d'accès, sommaire par lot, liens vers le manuel PDF (table § → page tirée du sommaire du PDF, `/api/manual#page=N`) | fait |
 | 7.G | Façade DT2 complète et interactive (potards, touches de page, transport…) reliée aux fiches et au manuel ; base du pilotage MIDI | fait (ordre des knobs à vérifier sur la machine) |
 | 7.H | Analyse harmonique : gamme (noms du KEYBOARD SETUP de la DT2) et accords par mesure, `harmony.py`, sidecar + note de bank + front | fait |
@@ -503,6 +503,17 @@ SYSEX DUMP de pattern (§14.5), format non documenté.
   Enchaînement guidé des 16 tracks et pré-réglage CC / NRPN hors slice.
 - Notes, vélocités et gate identiques au `.mid` de bank (helper partagé
   `track_note_events`). L'envoi n'écrit rien sur disque.
+
+**Décisions 7.E, sortie du lecteur vers la DT2 (arbitrées le 2026-10-08)** :
+- Le lecteur choisit sa sortie audio (`setSinkId`) : la DT2 en USB CONFIG =
+  `USB AUDIO/MIDI` apparaît comme périphérique ; on l'échantillonne en
+  `[SAMPLING]` `SRC` = USB (écoute : `USB IN` = `MAIN`).
+- Choix mémorisé par le navigateur, par libellé (l'identifiant varie selon
+  les permissions), réappliqué à chaque morceau et à chaque changement de
+  périphérique ; sortie absente = sortie système, signalée.
+- Chrome masque les sorties sans autorisation micro : demande unique, flux
+  coupé aussitôt. Sélecteur masqué si `setSinkId` n'est pas supporté
+  (à vérifier sous Tauri / WKWebView).
 
 **Décisions 7.G (arbitrées le 2026-10-06)** :
 - Les 23 contrôles du §3.1 sont dessinés à l'échelle et aux emplacements du

@@ -63,6 +63,64 @@
     setZoom(current * Math.exp(-e.deltaY * 0.002))
   }
 
+  // sortie audio (setSinkId) : la DT2 en USB AUDIO/MIDI apparait comme un
+  // peripherique ; on y envoie le lecteur pour l'echantillonner (SRC = USB).
+  // Choix memorise par libelle : l'identifiant change selon les permissions.
+  const SINK_KEY = 'ui:sink'
+  const sinkSupported = typeof HTMLMediaElement !== 'undefined' && 'setSinkId' in HTMLMediaElement.prototype
+  let outputs = $state<MediaDeviceInfo[]>([])
+  let sinkLabel = $state(readSink())
+  let sinkError = $state<string | null>(null)
+  const labelsHidden = $derived(outputs.length > 0 && outputs.every(d => !d.label))
+
+  function readSink(): string {
+    try { return localStorage.getItem(SINK_KEY) ?? '' } catch { return '' }
+  }
+
+  async function listOutputs() {
+    if (!sinkSupported || !navigator.mediaDevices?.enumerateDevices) return
+    const all = await navigator.mediaDevices.enumerateDevices()
+    outputs = all.filter(d => d.kind === 'audiooutput' && d.deviceId !== 'default')
+  }
+
+  // Chrome masque libelles et identifiants des sorties tant que le micro n'est
+  // pas autorise : une demande unique, le flux est coupe aussitot.
+  async function unlockOutputs() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      for (const t of stream.getTracks()) t.stop()
+      await listOutputs()
+    } catch (err) {
+      sinkError = `Autorisation refusée : ${err}`
+    }
+  }
+
+  async function applySink(inst: WaveSurfer | null = ws) {
+    if (!inst || !sinkSupported) return
+    const dev = outputs.find(d => d.label && d.label === sinkLabel)
+    sinkError = null
+    try {
+      await inst.setSinkId(dev ? dev.deviceId : '')
+      if (sinkLabel && !dev && outputs.length) sinkError = `Sortie « ${sinkLabel} » absente, sortie système utilisée`
+    } catch (err) {
+      sinkError = `Sortie audio : ${err}`
+    }
+  }
+
+  function chooseSink(label: string) {
+    sinkLabel = label
+    try { localStorage.setItem(SINK_KEY, label) } catch { /* stockage indisponible */ }
+    applySink()
+  }
+
+  $effect(() => {
+    if (!sinkSupported || !navigator.mediaDevices) return
+    const onchange = () => listOutputs().then(() => applySink())
+    listOutputs().then(() => applySink())
+    navigator.mediaDevices.addEventListener('devicechange', onchange)
+    return () => navigator.mediaDevices.removeEventListener('devicechange', onchange)
+  })
+
   const posKey = () => `ui:pos:${track.slug}`
   let savedPos = 0
   let posReady = false  // pas d'ecriture avant la restauration (timeupdate a 0 au chargement)
@@ -214,6 +272,7 @@
     inst.on('error', err => { error = String(err); loading = false })
     ws = inst
     regions = reg
+    applySink(inst)
     return () => inst.destroy()
   })
 
@@ -249,6 +308,19 @@
         {playing ? 'Pause' : 'Lecture'}
       </button>
       <span class="mono">{mmss(currentTime)} / {mmss(duration)}</span>
+      {#if sinkSupported}
+        {#if labelsHidden}
+          <button class="small" title="Le navigateur masque les sorties audio tant que le micro n'est pas autorisé" onclick={unlockOutputs}>Sorties audio…</button>
+        {:else if outputs.length}
+          <select class="small" title="Sortie du lecteur : choisir la Digitakt II (USB AUDIO/MIDI) pour l'échantillonner en SRC = USB"
+            value={sinkLabel} onchange={e => chooseSink(e.currentTarget.value)}>
+            <option value="">Sortie système</option>
+            {#each outputs.filter(d => d.label) as d (d.deviceId)}
+              <option value={d.label}>{d.label}</option>
+            {/each}
+          </select>
+        {/if}
+      {/if}
     </div>
   </header>
 
@@ -299,6 +371,7 @@
 
   {#if loading}<p class="muted small">Chargement et décodage de l'audio…</p>{/if}
   {#if error}<p class="small err">Erreur audio : {error}</p>{/if}
+  {#if sinkError}<p class="small err">{sinkError}</p>{/if}
   <p class="muted small">Clic : position · glisser : boucle · molette : zoom · Espace : lecture / pause · flèches : ±10 s · L : boucle on/off · Échap : retirer la boucle</p>
 </section>
 

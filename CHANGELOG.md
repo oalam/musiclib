@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.E] Sortie audio du lecteur au choix (`setSinkId`) : le morceau part
+  vers la Digitakt II (USB AUDIO/MIDI) pour l'échantillonner en `SRC` = USB.
+  Sélecteur dans le transport, mémorisé par libellé, réappliqué au
+  changement de morceau ou de périphérique ; bouton « Sorties audio… » quand
+  Chrome masque les libellés (autorisation micro, flux coupé aussitôt).
 - [7.J7] Tonalité des one-shots tonals : note mesurée dans l'audio pour BD,
   BS et PD (`measure_note` : fondamentale pyin après l'attaque ; BD en pyin
   seul, BS / PD retenues si le pic spectral s'accorde, sinon « incertaine »),
