@@ -146,21 +146,26 @@ modifier le preset.
 
 ## Sur la Digitakt II
 
-1. Choisir un kick dans la source (filtre « kicks (BD) seulement ») et
-   l'écouter en A/B avec le bouton « source ».
+1. Dans la vue **Samples**, se placer sur un kick (`DRUMS/BD/...`) : c'est
+   la source du rumble. Bouton « Changer dans Samples » pour y revenir ;
+   « ▶ source » pour l'écouter en A/B.
 2. Régler, puis **Rendre sur disque** : le wav part dans
-   `SoundDesign/rumble/` (48 kHz, la fréquence native de la DT2).
+   `SoundDesign/rumble/` (48 kHz, la fréquence native de la DT2) sous le
+   **nom DT2** proposé à partir du kick, modifiable avant le rendu :
+   `BD C Punch 01 dbr` à 150 BPM donne `RM 150 C Punch dbr` (le numéro de
+   variante part d'abord pour tenir dans les 18 caractères).
 3. **Verser** le rendu depuis la liste : il est copié dans le pack
-   `Samples/SoundDesign/rumble/` et rangé en `LOOPS/BL` (boucle de basse,
-   tempo gardé dans le nom affiché par la DT2) après la réanalyse de la
-   bibliothèque. Il suit ensuite
-   le circuit habituel : écoute garder / écarter, puis export vers Transfer.
-4. Sur la machine : une track mélodique (le rumble est une basse, cf.
-   [[../digitakt/doctrine|doctrine]]), sample en lecture **loop**, un trig
-   au premier pas de chaque mesure. Le kick d'origine reste sur sa track :
-   le duck du rumble est déjà calé sur la grille.
-5. En live : muter la track du rumble dans un break, la rouvrir sur le
-   drop ; jouer le filtre de la track pour l'ouvrir progressivement.
+   `Samples/SoundDesign/rumble/` et rangé, après la réanalyse de la
+   bibliothèque, en `DRUMS/RM/<sous-dossier du kick>` (un kick de
+   `DRUMS/BD/CLEAN` donne `DRUMS/RM/CLEAN`). Il suit ensuite le circuit
+   habituel : écoute garder / écarter, puis export vers Transfer.
+4. Sur la machine : **track 2**, juste après le kick (cf.
+   [[../digitakt/doctrine|doctrine]] § 1 et 9), sample en lecture
+   **loop**, un trig au premier pas de chaque mesure. Le kick d'origine
+   reste sur la track 1 : le duck du rumble est déjà calé sur la grille.
+5. En live : muter la track du rumble dans un break (ou la passer en
+   NOT FILL), la rouvrir sur le drop ; jouer le filtre de la track pour
+   l'ouvrir progressivement.
 
 ## Pièges
 

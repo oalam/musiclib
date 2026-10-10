@@ -46,6 +46,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [8.E] Un rumble versé n'est plus rangé en `LOOPS/BL` (contraire à la
+  doctrine : le rumble est la track 2) mais en `DRUMS/RM/...` ; la
+  recherche de source de la vue Sound design est retirée au profit du
+  sample en cours de la vue Samples. Un rendu antérieur, sans nom DT2,
+  est à re-rendre avant de le verser.
 - [7.J8] Plafond de `LOOPS/BR/060` porté à 64 (`FOLDER_CAPS`, plafonds
   propres à un dossier) : 175 candidats, tous en lice, 64 retenus ; 1 183
   retenus au total (1 151 + 32).
@@ -72,6 +77,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.E] Le sound design s'applique au sample en cours de la vue Samples
+  (« Changer dans Samples » y bascule). Nom DT2 proposé à partir de la
+  source, code du traitement et tempo compris (`BD C Punch 01 dbr` →
+  `RM 150 C Punch dbr`), modifiable (`--name` en CLI) ; il nomme aussi le
+  fichier rendu (`<nom> <hash>.wav`). Nouveau code **RM** (rumble, track 2
+  de la doctrine) en DRUMS : le versement écrit un override qui range le
+  rendu en `DRUMS/RM/<sous-dossier du kick>` (`GET /api/sounddesign/target`).
 - [8.D] Notebook rumble (`sounddesign/rumble.md` : théorie, chaîne device
   par device, presets, usage sur la DT2, pièges, ressources) affiché sous
   le rack, « ? » d'un device = sa section. Versement d'un rendu dans le

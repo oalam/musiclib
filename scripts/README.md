@@ -882,8 +882,11 @@ python sounddesign.py render rumble kick_rumble --source <wav> --mute Kick --byp
 python sounddesign.py render rumble deep --source <wav> --dry-run   # sans écriture
 ```
 
-`--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` (relancer
-`samples.py` pour le classer). `--source` est absolu ou relatif à `<MEDIA>/Samples`. `--set` change un
+`--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` et écrit
+son override de rangement (`DRUMS/RM/<sous-dossier du kick>`, nom DT2) ;
+relancer `samples.py` pour le classer. Le nom DT2 est proposé à partir de
+celui de la source (`BD C Punch 01 dbr` → `RM 150 C Punch dbr`), `--name`
+le force. `--source` est absolu ou relatif à `<MEDIA>/Samples`. `--set` change un
 réglage du traitement (`bpm`, `bars`, `hits_per_bar`), `--mute` coupe une
 chaîne, `--bypass CHAINE:INDEX` désactive un device (index à partir de 0,
 `master:0` pour la sortie). Les overrides ne modifient pas le preset.
@@ -1020,10 +1023,15 @@ python api.py &   puis   cd ../web && npm run dev
   - **Écoute en boucle** (Web Audio, sans trou) : tout réglage pendant la
     lecture relance le rendu et remplace la boucle à la même phase (fondu
     de 15 ms). Précédent / suivant de la télécommande = preset voisin.
+  - **Source** (8.E) : le sample en cours de la vue Samples ; « Changer
+    dans Samples » y bascule. **Nom DT2** proposé à partir de la source
+    (code du traitement, tempo), modifiable, avec le dossier cible
+    (`→ DRUMS/RM/CLEAN`).
   - **Rendus** : derniers fichiers de `SoundDesign/<traitement>/`, écoute en
-    boucle ; **Verser** copie le rendu dans le pack `Samples/SoundDesign/`
-    et lance la réanalyse de la bibliothèque (8.D) : il apparaît dans la vue
-    Samples en `LOOPS/BL`, prêt pour l'écoute garder / écarter et l'export.
+    boucle ; **Verser** copie le rendu dans le pack `Samples/SoundDesign/`,
+    écrit son override de rangement et lance la réanalyse (8.D, 8.E) : il
+    apparaît dans la vue Samples en `DRUMS/RM/<sous-dossier du kick>`, prêt
+    pour l'écoute garder / écarter et l'export.
   - **Notebook** (8.D) : la note du vault du traitement
     ([[sounddesign/rumble]]) sous le rack ; le « ? » d'un device fait
     défiler jusqu'à sa section.
@@ -1066,10 +1074,11 @@ erreur sur un fichier annule tout le lot, rien n'est écrit.
 | GET | `/api/sounddesign/presets/{traitement}` | presets du vault, triés par id (404 traitement inconnu) |
 | PUT | `/api/sounddesign/presets/{traitement}/{id}` | `Preset` → crée ou remplace le JSON du vault ; 422 si id hors `[a-z0-9_]`, id / traitement différents du chemin, device ou valeur hors catalogue |
 | POST | `/api/sounddesign/preview` | `{preset, source}` → boucle en `audio/wav` 24 bits, en mémoire (rien d'écrit) ; source = clé du manifeste de samples (404 sinon, 503 sans disque) |
-| POST | `/api/sounddesign/render` | `{preset, source}` → `RenderRecord` ; écrit le wav et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/` |
+| POST | `/api/sounddesign/render` | `{preset, source, name?}` → `RenderRecord` ; écrit `<nom DT2> <hash>.wav` et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/` (nom proposé si absent, 422 si invalide) |
+| GET | `/api/sounddesign/target?treatment=&source=&bpm=` | `{name, sub, folder}` : nom DT2 proposé et dossier de rangement (8.E) |
 | GET | `/api/sounddesign/renders?treatment=` | rendus écrits, du plus récent au plus ancien |
 | GET | `/api/sounddesign/renders/audio?file=` | wav d'un rendu listé (404 sinon) |
-| POST | `/api/sounddesign/verse` | `{file}` → `RenderRecord` avec `versed` (clé du manifeste) ; copie dans `Samples/SoundDesign/` (409 pendant une réanalyse) |
+| POST | `/api/sounddesign/verse` | `{file}` → `RenderRecord` avec `versed` (clé du manifeste) ; copie dans `Samples/SoundDesign/` et override de rangement (code, sous-dossier, nom) ; 409 pendant une réanalyse, 422 pour un rendu sans nom DT2 |
 | GET | `/api/sounddesign/notebook/{traitement}` | `{path, markdown}` du notebook du vault (404 s'il manque) |
 
 **Ajout d'un morceau (7.I)** : bouton « + Ajouter un morceau » de la barre du

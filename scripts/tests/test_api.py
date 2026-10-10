@@ -474,7 +474,7 @@ def sd_client(tmp_path: Path) -> TestClient:
     sf.write(src / "k" / "kick.wav", _kick()[0], 48_000)
     (src / "k" / "hors.wav").write_bytes(b"RIFF")
     entries = [SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
-                           name="BD 1", duration=0.3, rank=1)]
+                           name="BD C Punch 01 k", duration=0.3, rank=1, sub="CLEAN")]
     select(entries, 16)
     manifest = tmp_path / "manifest.json"
     api.samples.save_manifest(Manifest(source_root=str(src), total=1, entries=entries), manifest)
@@ -538,13 +538,31 @@ def test_sounddesign_render_then_list_and_serve(sd_client: TestClient):
     preset["settings"]["bpm"] = 180
     record = sd_client.post("/api/sounddesign/render",
                             json={"preset": preset, "source": "k/kick.wav"}).json()
-    assert record["file"].startswith("rumble/kick__t_180bpm_")
+    # BD C Punch 01 k -> RM 180 C Punch 01 k (19 > 18 caracteres) : le numero part
+    assert record["file"].startswith("rumble/RM 180 C Punch k ")
+    assert (record["name"], record["sub"]) == ("RM 180 C Punch k", "CLEAN")
     renders = sd_client.get("/api/sounddesign/renders?treatment=rumble").json()
     assert [r["file"] for r in renders] == [record["file"]]
     r = sd_client.get("/api/sounddesign/renders/audio", params={"file": record["file"]})
     assert r.status_code == 200 and r.content[:4] == b"RIFF"
     assert sd_client.get("/api/sounddesign/renders/audio",
                          params={"file": "../manifest.json"}).status_code == 404
+
+
+def test_sounddesign_target_and_named_render(sd_client: TestClient):
+    t = sd_client.get("/api/sounddesign/target",
+                      params={"treatment": "rumble", "source": "k/kick.wav", "bpm": 150}).json()
+    assert t == {"name": "RM 150 C Punch k", "sub": "CLEAN", "folder": "DRUMS/RM/CLEAN"}
+    assert sd_client.get("/api/sounddesign/target", params={
+        "treatment": "rumble", "source": "k/hors.wav"}).status_code == 404
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    named = sd_client.post("/api/sounddesign/render", json={
+        "preset": preset, "source": "k/kick.wav", "name": "RM 150 Gros k"}).json()
+    assert named["file"].startswith("rumble/RM 150 Gros k ")
+    for bad in ("../RM x", "RM nom bien trop long ici"):
+        r = sd_client.post("/api/sounddesign/render",
+                           json={"preset": preset, "source": "k/kick.wav", "name": bad})
+        assert r.status_code == 422
 
 
 def test_sounddesign_invalid_preset_is_422(sd_client: TestClient):
@@ -561,6 +579,8 @@ def test_sounddesign_verse_and_notebook(sd_client: TestClient, tmp_path: Path):
     assert sd_client.get("/api/sounddesign/renders").json()[0]["versed"] is None
     versed = sd_client.post("/api/sounddesign/verse", json={"file": record["file"]}).json()
     assert (tmp_path / "Samples" / versed["versed"]).is_file()
+    ov = api.samples.load_overrides(tmp_path / "overrides.json")[versed["versed"]]
+    assert (ov.code, ov.sub, ov.name) == ("RM", "CLEAN", "RM 150 C Punch k")
     assert sd_client.get("/api/sounddesign/renders").json()[0]["versed"] == versed["versed"]
     assert sd_client.post("/api/sounddesign/verse", json={"file": "../x.wav"}).status_code == 404
     nb = sd_client.get("/api/sounddesign/notebook/rumble").json()

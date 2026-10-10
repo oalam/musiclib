@@ -107,7 +107,7 @@ def test_short_name(rel: str, code: str, pack: str, expected: str) -> None:
 
 def test_unique_suffix_keeps_length() -> None:
     taken = {"BD Dense 03 rth"}
-    name = smp._unique("BD Dense 03 rth", taken)
+    name = smp.unique_name("BD Dense 03 rth", taken)
     assert name != "BD Dense 03 rth" and name.endswith(" rth") and len(name) <= NAME_MAX
 
 

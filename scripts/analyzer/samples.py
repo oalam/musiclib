@@ -108,13 +108,15 @@ _FLAT_TO_SHARP = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#", "C
 FLAG_WEIGHT = {"illisible": 3, "muet": 3, "sature": 1, "blanc": 1, "faible": 1, "long": 1}
 
 FAMILIES = ("AUTRES", "DUBSTEP", "HARDCORE", "JUNGLE", "SAMPLE", "TECHNO", "TRIBE", "UNIVERSEL")
-CODES = ("BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC",
+CODES = ("BD", "RM", "SD", "CP", "HH", "OH", "CY", "TM", "PC",
          "BR", "DL", "PL", "ML", "BL", "BS", "ST", "PD", "FX", "VX", "RS")
-DRUMS = frozenset({"BD", "SD", "CP", "HH", "OH", "CY", "TM", "PC"})
-TONAL = frozenset({"BD", "BS", "ST", "PD", "ML", "BL"})   # note gardee dans le nom
+# RM : rumble (track 2 de la doctrine), rendu par le sound design (8.E) et
+# range par override au versement, jamais infere d'un nom de fichier
+DRUMS = frozenset({"BD", "RM", "SD", "CP", "HH", "OH", "CY", "TM", "PC"})
+TONAL = frozenset({"BD", "RM", "BS", "ST", "PD", "ML", "BL"})   # note gardee dans le nom
 PITCHED = frozenset({"BD", "BS", "PD"})   # note mesuree dans l'audio (7.J7 ; ST : accords)
 # Boucles : BR break, DL drums, PL percussions / hats, ML melodie, BL basse
-TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL"})         # BPM garde dans le nom
+TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL", "RM"})   # BPM garde dans le nom
 RHYTHM = DRUMS | {"BR", "DL", "PL"}   # tracks 1 a 8 de la doctrine ; le reste : melodique
 BIG_CAP = frozenset({"BR", "DL", "PL"})   # boucles rythmiques : 32 par dossier, le reste 16
 # plafonds propres a un dossier final (prioritaires) : breaks lents nombreux
@@ -129,6 +131,8 @@ SUB_RULES: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
            ("SUB", ("sub", "boom", "808", "long")),
            ("ACOU", ("acou", "live", "real", "jazz", "vintage")),
            ("CLEAN", ("909", "clean", "tight", "punch", "short"))),
+    # RM : memes sous-dossiers que le kick, herites de la source au versement
+    "RM": (("HARD", ()), ("SUB", ()), ("ACOU", ()), ("CLEAN", ())),
     "ML": (("KEYS", ("piano", "key", "organ", "rhodes", "epiano")),
            ("PADS", ("pad", "drone", "nappe", "string")),
            ("ATMOS", ("atmo", "ambien", "texture", "spher", "cinematic")),
@@ -360,6 +364,7 @@ Status = Literal["pending", "keep", "drop"]
 # nom : lue dans le nom ; mesure : mesuree ; incertaine : mesuree sans note sure
 NoteSrc = Literal["nom", "mesure", "incertaine"]
 LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
+LOOPED = LOOPS | {"RM"}   # boucles (pas de controle blanc / long), RM compris
 
 
 class SampleError(Exception):
@@ -545,11 +550,11 @@ def measure(path: Path, code: str) -> list[str]:
         flags.append("faible")
     if clipped_share(a) > CLIP_SHARE:
         flags.append("sature")
-    if code not in LOOPS:
+    if code not in LOOPED:
         first = int(np.argmax(a >= peak * 10 ** (LEAD_DB / 20)))
         if first / sr > LEAD_MAX_S:
             flags.append("blanc")
-    if code in DRUMS and a.size / sr > LONG_HIT_S:
+    if code in DRUMS and code not in LOOPED and a.size / sr > LONG_HIT_S:
         flags.append("long")
     return flags
 
@@ -983,7 +988,7 @@ def short_name(rel: str, code: str, pack: str, bpm: int | None = None,
     return f"{fixed} {body} {pack}"
 
 
-def _unique(name: str, taken: set[str]) -> str:
+def unique_name(name: str, taken: set[str]) -> str:
     """Suffixe de desambiguisation en tronquant la description si besoin."""
     if name not in taken:
         return name
@@ -1199,7 +1204,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
             ov = overrides.get(r.source, Override())
             bpm, est = tempos.get(r.source, (None, False))
             note, note_hz, note_src = notes[r.source]
-            name = _unique(ov.name or short_name(r.source, code, r.pack, bpm,
+            name = unique_name(ov.name or short_name(r.source, code, r.pack, bpm,
                                                  measured_note(notes[r.source])), taken)
             taken.add(name)
             cell_entries.append(SampleEntry(
@@ -1246,7 +1251,7 @@ def _reselect(manifest: Manifest, folder: str) -> list[SampleEntry]:
     return cell
 
 
-def _set_override(overrides: dict[str, Override], source: str, **update: object) -> Override:
+def set_override(overrides: dict[str, Override], source: str, **update: object) -> Override:
     """Met a jour l'override d'un fichier ; un override revenu aux valeurs par
     defaut est retire (overrides.json reste lisible a la main)."""
     ov = overrides.get(source, Override()).model_copy(update=update)
@@ -1303,7 +1308,7 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str, sub: str,
     pack = pack_of(source)
     entry = SampleEntry(
         source=source, family=family, code=code, sub=sub, pack=pack,
-        name=_unique(ov.name or short_name(source, code, pack, bpm, measured_note(notes)),
+        name=unique_name(ov.name or short_name(source, code, pack, bpm, measured_note(notes)),
                      {e.name for e in target}),
         duration=dur, rank=max((e.rank for e in target), default=0) + 1,
         flags=measure_fn(path, code) if measure_fn is not None and present else None,
@@ -1335,7 +1340,7 @@ def move(manifest: Manifest, overrides: dict[str, Override], source: str,
     entry = _entry(manifest, source)
     if entry is None and source not in manifest.unclassified:
         raise SampleError(f"ni candidat ni non classe : {source}")
-    _set_override(overrides, source, code=code, sub=sub, name=None)
+    set_override(overrides, source, code=code, sub=sub, name=None)
     if entry is None:
         manifest.unclassified.remove(source)
         family = overrides.get(source, Override()).family or family_of(source)
@@ -1353,7 +1358,7 @@ def move(manifest: Manifest, overrides: dict[str, Override], source: str,
     path = root / source
     notes = note_fields(source, code, path, old_entry, note_fn)
     entry.note, entry.note_hz, entry.note_src = notes
-    entry.name = _unique(short_name(source, code, entry.pack, entry.bpm, measured_note(notes)),
+    entry.name = unique_name(short_name(source, code, entry.pack, entry.bpm, measured_note(notes)),
                          {e.name for e in target})
     if measure_fn is not None and path.is_file():
         entry.flags = measure_fn(path, code)
@@ -1369,7 +1374,7 @@ def set_stars(manifest: Manifest, overrides: dict[str, Override], source: str,
         raise SampleError(f"etoiles hors 1..{STARS_MAX} : {stars}")
     if not known(manifest, source):
         raise SampleError(f"sample inconnu : {source}")
-    _set_override(overrides, source, stars=stars)
+    set_override(overrides, source, stars=stars)
     entry = _entry(manifest, source)
     if entry is not None:
         entry.stars = stars
@@ -1382,7 +1387,7 @@ def set_tags(manifest: Manifest, overrides: dict[str, Override], source: str,
     tags effectifs (ceux de son kit compris, qu'on retire sur le kit)."""
     if not known(manifest, source):
         raise SampleError(f"sample inconnu : {source}")
-    _set_override(overrides, source, tags=_edit_tags(
+    set_override(overrides, source, tags=_edit_tags(
         overrides.get(source, Override()).tags, add, remove))
     tags = tags_of(overrides, source)
     entry = _entry(manifest, source) or _reserved(manifest, source)
@@ -1405,7 +1410,7 @@ def set_kit_tags(manifest: Manifest, overrides: dict[str, Override], kit: str,
         raise SampleError(f"kit inconnu : {kit}")
     key = f"{kit}/"
     tags = _edit_tags(overrides.get(key, Override()).tags, add, remove)
-    _set_override(overrides, key, tags=tags)
+    set_override(overrides, key, tags=tags)
     for row in (*manifest.entries, *manifest.reserve):
         if in_kit(row.source, kit):
             row.tags = tags_of(overrides, row.source)
@@ -1426,7 +1431,7 @@ def trash(manifest: Manifest, overrides: dict[str, Override], source: str) -> No
         manifest.unclassified.remove(source)
     elif source not in manifest.trashed:
         raise SampleError(f"sample inconnu : {source}")
-    _set_override(overrides, source, trash=True)
+    set_override(overrides, source, trash=True)
     manifest.trashed = sorted({*manifest.trashed, source})
 
 
@@ -1438,7 +1443,7 @@ def restore(manifest: Manifest, overrides: dict[str, Override], source: str, roo
     if source not in manifest.trashed:
         raise SampleError(f"pas dans la corbeille : {source}")
     manifest.trashed.remove(source)
-    ov = _set_override(overrides, source, trash=False)
+    ov = set_override(overrides, source, trash=False)
     path = root / source
     dur = wav_duration(path) if path.is_file() else None
     code = ov.code or code_of(source, dur)
@@ -1672,7 +1677,7 @@ def trash_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, root
         raise SampleError(f"kit inconnu : {kit}")
     if kit in manifest.trashed_kits:
         raise SampleError(f"kit deja a la corbeille : {kit}")
-    _set_override(overrides, f"{kit}/", trash=True)
+    set_override(overrides, f"{kit}/", trash=True)
     return build_manifest(root, overrides, manifest, measure_fn, bpm_fn, note_fn)
 
 
@@ -1685,7 +1690,7 @@ def restore_kit(manifest: Manifest, overrides: dict[str, Override], kit: str, ro
     kit = kit.strip("/")
     if kit not in manifest.trashed_kits:
         raise SampleError(f"kit pas dans la corbeille : {kit}")
-    _set_override(overrides, f"{kit}/", trash=False)
+    set_override(overrides, f"{kit}/", trash=False)
     return build_manifest(root, overrides, manifest, measure_fn, bpm_fn, note_fn)
 
 

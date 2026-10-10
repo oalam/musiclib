@@ -25,6 +25,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -33,6 +34,8 @@ from typing import Literal
 
 import numpy as np
 from pydantic import BaseModel, Field
+
+from analyzer import samples as smp
 
 SR = 48_000
 PREROLL_SECONDS = 4.0
@@ -103,7 +106,7 @@ class TreatmentSpec(BaseModel):
     source_hint: str                 # quel sample donner en entree
     settings: list[ParamSpec]
     notebook: str                    # note du vault (theorie, usage, ressources)
-    verse_words: str                 # mots du nom verse qui rangent le rendu (samples.code_of)
+    code: str                        # code DT2 du rendu verse (samples.CODES), ex. RM
 
 
 class RenderRecord(BaseModel):
@@ -115,6 +118,8 @@ class RenderRecord(BaseModel):
     sr: int
     seconds: float
     created_at: str
+    name: str = ""                   # nom DT2 propose ou saisi ("" : rendu anterieur a 8.E)
+    sub: str = ""                    # sous-dossier herite de la source (DRUMS/RM/<sub>)
     versed: str | None = None        # cle du manifeste si verse dans le pack (rempli a la lecture)
 
 
@@ -357,7 +362,7 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
                   _p("hits_per_bar", "Coups / mesure", 1, 8, 4, step=1,
                      help="4 = four on the floor.")],
         notebook="sounddesign/rumble.md",
-        verse_words="bass loop"),        # -> LOOPS/BL (tempo garde dans le nom DT2)
+        code="RM"),                      # -> DRUMS/RM/<sous-dossier du kick>, track 2
         _prepare_rumble),
 ]}
 
@@ -490,26 +495,78 @@ def render(preset: Preset, source: np.ndarray) -> np.ndarray:
     return np.ascontiguousarray(loop, dtype=np.float32)
 
 
-def output_name(source: Path, preset: Preset) -> str:
-    """Nom stable : meme source + meme preset effectif = meme fichier (rejouable)."""
-    from library_md import slugify
+# ---------------------------------------------------------------------------
+# Nom DT2 et rangement du rendu (8.E)
+
+NAME_RX = r"^[A-Za-z0-9#][A-Za-z0-9 #._+-]*$"   # nom DT2 saisi : pas de / ni de \\
+
+
+def propose_name(source_name: str, source_code: str, code: str, bpm: float | None) -> str:
+    """Nom DT2 du rendu : code du traitement et tempo a la place du code de la
+    source, note / description / pack gardes (`samples.NAME_MAX` au plus).
+
+    `BD C Punch 01 dbr` -> RM a 150 BPM -> `RM 150 C Punch dbr` : le numero de
+    variante part d'abord, puis la description est tronquee.
+    """
+    words = source_name.split()
+    body, pack = words[1:-1], words[-1:]
+    if source_code in smp.TEMPO and body and body[0].isdigit():
+        body = body[1:]                      # tempo de la source remplace par celui du rendu
+    head = [code, *([str(round(bpm))] if bpm else [])]
+    note = body[:1] if body and re.fullmatch(r"[A-G]#?", body[0]) else []
+    rest = body[len(note):]
+    name = " ".join([*head, *note, *rest, *pack])
+    if len(name) <= smp.NAME_MAX:
+        return name
+    rest = [w for w in rest if not w.isdigit()] or rest
+    fixed = " ".join([*head, *note])
+    budget = smp.NAME_MAX - len(fixed) - sum(len(w) + 1 for w in pack) - 1
+    desc = " ".join(rest)[:max(budget, 0)].rstrip()
+    return " ".join(w for w in [fixed, desc, *pack] if w)
+
+
+def target(source: str, manifest: smp.Manifest, treatment: str,
+           bpm: float | None) -> tuple[str, str]:
+    """(nom DT2 propose, sous-dossier) d'un rendu de `source` (relatif a Samples/).
+
+    Le sous-dossier est celui de la source s'il existe pour le code du
+    traitement (kick de DRUMS/BD/CLEAN -> DRUMS/RM/CLEAN), sinon la racine. Le
+    nom est rendu unique dans le dossier cible (rendus deja verses compris).
+    """
+    code = TREATMENTS[treatment].spec.code
+    entry = next((e for e in manifest.entries if e.source == source), None)
+    reserve = next((r for r in manifest.reserve if r.source == source), None)
+    found = entry or reserve
+    src_code = found.code if found else (smp.code_of(source, None) or "")
+    src_sub = found.sub if found else ""
+    sub = src_sub if smp.has_sub(code, src_sub) else ""
+    pack = found.pack if found else smp.pack_of(source)
+    src_name = entry.name if entry else smp.short_name(source, src_code or code, pack)
+    name = propose_name(src_name, src_code, code, bpm)
+    folder = smp.folder_of("", code, sub)
+    taken = {e.name for e in manifest.entries if e.folder == folder}
+    return smp.unique_name(name, taken), sub
+
+
+def output_name(name: str, preset: Preset) -> str:
+    """`<nom DT2> <hash>.wav` : meme nom + meme preset effectif = meme fichier."""
     digest = hashlib.sha1(preset.model_dump_json().encode()).hexdigest()[:6]
-    bpm = preset.settings.get("bpm")
-    tempo = f"_{int(bpm)}bpm" if bpm is not None else ""
-    return f"{slugify(source.stem)}__{preset.id}{tempo}_{digest}.wav"
+    return f"{name} {digest}.wav"
 
 
-def write_render(audio: np.ndarray, source: Path, source_label: str, preset: Preset,
-                 out_root: Path) -> RenderRecord:
-    """Ecrit `<out_root>/<traitement>/<nom>.wav` (24 bits) et son sidecar `.json`."""
+def write_render(audio: np.ndarray, source_label: str, preset: Preset, out_root: Path,
+                 name: str, sub: str = "") -> RenderRecord:
+    """Ecrit `<out_root>/<traitement>/<nom> <hash>.wav` (24 bits) et son sidecar `.json`."""
     import soundfile as sf
-    path = out_root / preset.treatment / output_name(source, preset)
+    if not re.fullmatch(NAME_RX, name) or len(name) > smp.NAME_MAX:
+        raise PresetError(f"nom DT2 invalide (1 a {smp.NAME_MAX} caracteres, sans /) : {name!r}")
+    path = out_root / preset.treatment / output_name(name, preset)
     path.parent.mkdir(parents=True, exist_ok=True)
     sf.write(str(path), audio.T, SR, subtype="PCM_24")
     record = RenderRecord(
         file=path.relative_to(out_root).as_posix(), source=source_label, preset=preset,
         sr=SR, seconds=round(audio.shape[1] / SR, 4),
-        created_at=datetime.now().isoformat(timespec="seconds"))
+        created_at=datetime.now().isoformat(timespec="seconds"), name=name, sub=sub)
     path.with_suffix(".json").write_text(record.model_dump_json(indent=2) + "\n",
                                          encoding="utf-8")
     return record
@@ -551,34 +608,31 @@ VERSE_PACK = "SoundDesign"   # pack des rendus verses sous <MEDIA>/Samples (Phas
 
 
 def verse_key(record: RenderRecord) -> str:
-    """Cle du manifeste (relative a Samples/) d'un rendu verse.
-
-    Nom sans le sample source (un kick dans le nom le rangerait en BD) :
-    `<traitement> <mots de rangement> <preset> <bpm>bpm <hash>.wav`.
-    """
-    spec = TREATMENTS[record.preset.treatment].spec
-    stem = Path(record.file).stem
-    digest = stem.rsplit("_", 1)[-1]
-    bpm = record.preset.settings.get("bpm")
-    tempo = f" {int(bpm)}bpm" if bpm is not None else ""
-    return f"{VERSE_PACK}/{spec.id}/{spec.id} {spec.verse_words} {record.preset.id}{tempo} {digest}.wav"
+    """Cle du manifeste (relative a Samples/) : `SoundDesign/<traitement>/<fichier>`."""
+    return f"{VERSE_PACK}/{record.file}"
 
 
-def verse(record: RenderRecord, out_root: Path, samples_root: Path) -> str:
-    """Copie le rendu dans le pack SoundDesign de la bibliotheque de samples.
+def verse(record: RenderRecord, out_root: Path, samples_root: Path,
+          overrides: dict[str, smp.Override]) -> str:
+    """Copie le rendu dans le pack SoundDesign et le range par override.
 
-    Seule ecriture sous `<MEDIA>/Samples` (lecture seule sinon). Idempotent :
-    un fichier deja verse a l'identique n'est pas recopie. La reanalyse de la
-    bibliotheque le classe ensuite comme un sample de pack.
+    Seule ecriture sous `<MEDIA>/Samples` (lecture seule sinon). L'override
+    (code du traitement, sous-dossier, nom DT2) range le fichier a la
+    reanalyse, sans dependre de son nom (DRUMS/RM/CLEAN). Idempotent : un
+    fichier deja verse a l'identique n'est pas recopie. `overrides` est
+    modifie en place, a enregistrer par l'appelant.
     """
     import shutil
+    if not record.name:
+        raise PresetError(f"rendu sans nom DT2 (anterieur a 8.E) : {record.file}, a re-rendre")
     key = verse_key(record)
     src = out_root / record.file
     dest = samples_root / key
-    if dest.exists() and dest.stat().st_size == src.stat().st_size:
-        return key
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(src, dest)
+    if not (dest.exists() and dest.stat().st_size == src.stat().st_size):
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest)
+    smp.set_override(overrides, key, code=TREATMENTS[record.preset.treatment].spec.code,
+                     sub=record.sub, name=record.name)
     return key
 
 

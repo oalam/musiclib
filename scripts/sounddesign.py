@@ -13,6 +13,7 @@ Usage:
     sounddesign.py render rumble kick_rumble --source <wav> --mute Kick --bypass Rumble:2
     sounddesign.py render rumble deep --source <wav> --dry-run   # rendu sans ecriture
     sounddesign.py render rumble deep --source <wav> --verse     # + copie dans le pack
+    sounddesign.py render rumble deep --source <wav> --name "RM 150 Fat dbr"
                                                   # Samples/SoundDesign (relancer samples.py)
 
 `--source` : chemin absolu, ou relatif a `<MEDIA>/Samples`.
@@ -21,7 +22,12 @@ Usage:
 
 Fichiers :
     library/sounddesign/presets/<traitement>/<id>.json      # presets (vault)
-    <MEDIA>/SoundDesign/<traitement>/<source>__<preset>_<bpm>bpm_<hash>.wav (+ .json)
+    <MEDIA>/SoundDesign/<traitement>/<nom DT2> <hash>.wav (+ .json)
+    <MEDIA>/Samples/SoundDesign/<traitement>/<nom DT2> <hash>.wav    # --verse
+
+Nom DT2 propose (8.E) : celui de la source avec le code du traitement et le
+tempo (`BD C Punch 01 dbr` -> `RM 150 C Punch dbr`), `--name` pour le forcer ;
+`--verse` le range par override dans DRUMS/RM/<sous-dossier de la source>.
 """
 from __future__ import annotations
 
@@ -38,10 +44,13 @@ from analyzer.sounddesign import (
     load_presets,
     load_source,
     render,
+    target,
     verse,
     with_overrides,
     write_render,
 )
+from analyzer.samples import Manifest
+from samples import MANIFEST_FILE, OVERRIDES_FILE, load_manifest, load_overrides, save_overrides
 from paths import SAMPLES_SRC_DIR, SOUNDDESIGN_OUT_DIR, SOUNDDESIGN_PRESETS_DIR, media_ok, media_relative
 
 
@@ -101,14 +110,21 @@ def _cmd_render(args: argparse.Namespace) -> int:
     if not source.is_absolute():
         source = SAMPLES_SRC_DIR / source
     audio = render(preset, load_source(source))
+    rel = source.relative_to(SAMPLES_SRC_DIR).as_posix() if source.is_relative_to(SAMPLES_SRC_DIR) else ""
+    manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
+    name, sub_dir = target(rel, manifest, preset.treatment, preset.settings.get("bpm"))
+    name = args.name or name
     print(f"{preset.treatment}/{preset.id} : {audio.shape[1] / SR:.3f} s, "
-          f"{len(preset.chains) - sum(c.mute for c in preset.chains)} chaine(s) active(s)")
+          f"{len(preset.chains) - sum(c.mute for c in preset.chains)} chaine(s) active(s), "
+          f"nom {name!r}, sous-dossier {sub_dir or '(racine)'}")
     if args.dry_run:
         return 0
-    record = write_render(audio, source, media_relative(source), preset, SOUNDDESIGN_OUT_DIR)
+    record = write_render(audio, media_relative(source), preset, SOUNDDESIGN_OUT_DIR, name, sub_dir)
     print(f"-> {SOUNDDESIGN_OUT_DIR / record.file}")
     if args.verse:
-        key = verse(record, SOUNDDESIGN_OUT_DIR, SAMPLES_SRC_DIR)
+        overrides = load_overrides(OVERRIDES_FILE)
+        key = verse(record, SOUNDDESIGN_OUT_DIR, SAMPLES_SRC_DIR, overrides)
+        save_overrides(overrides, OVERRIDES_FILE)
         print(f"-> verse : Samples/{key} (relancer samples.py pour le classer)")
     return 0
 
@@ -129,6 +145,7 @@ def main() -> int:
     r.add_argument("--dry-run", action="store_true", help="rend sans ecrire")
     r.add_argument("--verse", action="store_true",
                    help="copie aussi le rendu dans le pack Samples/SoundDesign")
+    r.add_argument("--name", help="nom DT2 (defaut : propose a partir de la source)")
     args = parser.parse_args()
     try:
         if args.cmd == "list":

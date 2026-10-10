@@ -57,6 +57,7 @@ from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.samples import (
     BPM_BANDS,
+    NAME_MAX,
     PITCH_CLASSES,
     STARS_MAX,
     ExportReport,
@@ -70,6 +71,7 @@ from analyzer.samples import (
     all_tags,
     cell_of,
     folder_key,
+    folder_of,
     folder_parts,
     export,
     facet_bpms,
@@ -360,6 +362,15 @@ class SoundDesignRequest(BaseModel):
 
     preset: sd.Preset
     source: str
+    name: str | None = Field(default=None, pattern=sd.NAME_RX, max_length=NAME_MAX)
+
+
+class SdTarget(BaseModel):
+    """Nom DT2 propose et dossier de rangement d'un rendu (8.E)."""
+
+    name: str
+    sub: str
+    folder: str        # DRUMS/RM/CLEAN
 
 
 def _sample_cells(m: samples.Manifest, kit: str | None = None) -> list[SampleCell]:
@@ -897,7 +908,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Ecrit la boucle et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/`."""
         path, audio = render_request(req)
         with render_lock:
-            return sd.write_render(audio, path, media_relative(path), req.preset, sounddesign_out)
+            name, sub = sd.target(req.source, manifest(), req.preset.treatment,
+                                  req.preset.settings.get("bpm"))
+            return sd.write_render(audio, media_relative(path), req.preset, sounddesign_out,
+                                   req.name or name, sub)
 
     @app.get("/api/sounddesign/renders", response_model=list[sd.RenderRecord])
     def sd_renders(treatment: str | None = None) -> list[sd.RenderRecord]:
@@ -907,16 +921,33 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
 
     @app.post("/api/sounddesign/verse", response_model=sd.RenderRecord)
     def sd_verse(req: SdVerse) -> sd.RenderRecord:
-        """Copie un rendu dans le pack `Samples/SoundDesign/` (8.D) ; la reanalyse
-        de la bibliotheque (`POST /api/samples/rebuild`) le classe ensuite."""
+        """Copie un rendu dans le pack `Samples/SoundDesign/` (8.D) et le range par
+        override (code, sous-dossier, nom DT2, 8.E) ; la reanalyse de la
+        bibliotheque (`POST /api/samples/rebuild`) le classe ensuite."""
         record = next((r for r in sd.list_renders(sounddesign_out) if r.file == req.file), None)
         if record is None:
             raise HTTPException(404, f"rendu inconnu : {req.file}")
         media_or_503()
         with samples_lock:
             refuse_if_rebuilding()
-            record.versed = sd.verse(record, sounddesign_out, samples_src)
+            overrides = samples.load_overrides(samples_overrides)
+            try:
+                record.versed = sd.verse(record, sounddesign_out, samples_src, overrides)
+            except sd.PresetError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            samples.save_overrides(overrides, samples_overrides)
         return record
+
+    @app.get("/api/sounddesign/target", response_model=SdTarget)
+    def sd_target(treatment: str, source: str, bpm: float | None = None) -> SdTarget:
+        """Nom DT2 propose pour un rendu de `source` et son dossier (DRUMS/RM/<sous>)."""
+        treatment_or_404(treatment)
+        m = manifest()
+        if not known(m, source):
+            raise HTTPException(404, f"sample hors manifeste : {source}")
+        name, sub = sd.target(source, m, treatment, bpm)
+        return SdTarget(name=name, sub=sub,
+                        folder=folder_of("", sd.TREATMENTS[treatment].spec.code, sub))
 
     @app.get("/api/sounddesign/notebook/{treatment}", response_model=SdNotebook)
     def sd_notebook(treatment: str) -> SdNotebook:

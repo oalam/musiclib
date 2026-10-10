@@ -572,10 +572,12 @@ révisés par 7.J8) :
   neurotek depuis le 2026-10-07),
   AUTRES (house, EDM, world), UNIVERSEL (machines, FX, instruments, foley,
   Native Instruments, minimoog), SAMPLE (samples et resamples maison).
-- Codes à 2 lettres façon Elektron (BD SD CP HH OH CY TM PC, boucles BR DL
+- Codes à 2 lettres façon Elektron (BD RM SD CP HH OH CY TM PC, boucles BR DL
   PL ML BL, puis BS ST PD FX VX RS), aussi en tête du nom :
   `<CODE> [BPM|note] <desc> <pack>`, 18 caractères au plus (≈ 14 visibles
   dans la liste des samples d'une track, où le dossier n'apparaît plus).
+  RM (rumble, track 2 de la doctrine, 8.E) n'est jamais inféré d'un nom de
+  fichier : seuls les rendus du sound design y entrent, par override.
   BPM en tête pour les boucles, note pour BD / BS / ST / PD / ML / BL.
 - Boucles découpées au niveau 2 (pas de 4e niveau, le code reste lisible à
   l'écran) : BR break, DL drums (défaut), PL percussions / hats / tops, ML
@@ -662,7 +664,7 @@ révisés par 7.J8) :
   actions (K / D, M, étoiles, tags) y restent actives ; un clic sur une case
   de la grille revient à la liste de la case.
 - Grille (2026-10-08) : colonnes dans l'ordre des tracks de la doctrine,
-  section rythmique (BD SD CP HH OH CY TM PC, boucles BR DL PL) puis
+  section rythmique (BD RM SD CP HH OH CY TM PC, boucles BR DL PL) puis
   mélodique (BS BL ST ML PD VX FX RS, `RS` = resamples maison, track 16
   joker) ; infobulle par code (rôle et track). Dans l'arbre, dossiers de code
   colorés par section et samples en retrait ; zones matrice / kits / samples
@@ -737,7 +739,8 @@ révisés par 7.J8) :
   genre.
 - Arbre de l'export : `<MEDIA>/Live/samples/<BRANCHE>/<CODE>/[<SOUS>/]<nom>.wav`,
   avec six branches :
-  - DRUMS : one-shots percussifs, BD SD CP HH OH CY TM PC ;
+  - DRUMS : one-shots percussifs, BD SD CP HH OH CY TM PC, et RM (boucles
+    de rumble du sound design, mêmes sous-dossiers que BD) ;
   - TONAL : one-shots avec note (7.J7), BS ST PD ;
   - LOOPS : BR DL PL ML BL ;
   - FX : `FX/<SOUS>/` ;
@@ -918,7 +921,8 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.A | Moteur `analyzer/sounddesign.py` (modèles Pydantic, catalogue de 15 devices, traitement rumble, rendu en boucle sans couture), presets JSON du vault, CLI `sounddesign.py`, tests | fait (presets à valider à l'oreille) |
 | 8.B | API `/api/sounddesign/...` : traitements, catalogue des devices, presets (lecture, sauvegarde `PUT`), écoute à la volée (WAV en mémoire, synchrone : 0,2 s au pire pour 8 mesures à 60 BPM), écriture d'un rendu, liste et écoute des rendus | fait |
 | 8.C | Vue front « Sound design » façon Ableton Live : potards (glisser vertical, Maj fin, double-clic défaut), tranches de mixage = chaînes (fader, activateur = mute, solo d'écoute), devices avec activateur = bypass, courbe de réponse à nœud pour filtres / EQ, ajout / retrait / déplacement de devices et de chaînes, presets enregistrer / enregistrer sous, source du manifeste + écoute A/B, boucle Web Audio re-rendue à chaud, rendus | fait (à valider à l'usage) |
-| 8.D | Notebook rumble [[sounddesign/rumble]] (théorie, chaîne device par device, presets, usage DT2, pièges, ressources) affiché dans la vue (`GET /api/sounddesign/notebook/{t}`, « ? » d'un device = sa section) ; versement d'un rendu dans le pack `Samples/SoundDesign/` puis réanalyse : rangé en `LOOPS/BL` (`POST /api/sounddesign/verse`, `--verse` en CLI) | fait (versement à valider sur le disque) |
+| 8.D | Notebook rumble [[sounddesign/rumble]] (théorie, chaîne device par device, presets, usage DT2, pièges, ressources) affiché dans la vue (`GET /api/sounddesign/notebook/{t}`, « ? » d'un device = sa section) ; versement d'un rendu dans le pack `Samples/SoundDesign/` puis réanalyse : rangé en `LOOPS/BL`, révisé en 8.E (`POST /api/sounddesign/verse`, `--verse` en CLI) | fait (versement à valider sur le disque) |
+| 8.E | Source = sample en cours de la vue Samples (on la change là-bas) ; nom DT2 proposé à partir de celui de la source (code du traitement + tempo, modifiable) ; code **RM** (track 2) : un rumble versé est rangé par override en `DRUMS/RM/<sous-dossier de la source>` (`GET /api/sounddesign/target`) | fait (versement à valider sur le disque) |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -930,10 +934,10 @@ On garde une boucle d'une à huit mesures, sans couture.
   validés contre le catalogue (device, paramètre, bornes) ; un paramètre
   absent prend sa valeur par défaut. Le catalogue (`DEVICES`, `TREATMENTS`)
   est la source des bornes, unités et aides affichées par le front.
-- **Sorties** : `<MEDIA>/SoundDesign/<traitement>/<source>__<preset>_<bpm>bpm_<hash>.wav`
+- **Sorties** : `<MEDIA>/SoundDesign/<traitement>/<nom DT2> <hash>.wav` (8.E)
   (48 kHz, fréquence native de la DT2, 24 bits) + sidecar `.json` (source,
   snapshot du preset effectif). Le hash porte sur le preset effectif : même
-  source et mêmes réglages = même fichier (rejouable). **Hors de
+  nom et mêmes réglages = même fichier (rejouable). **Hors de
   `<MEDIA>/Samples/`**, qui reste la copie en lecture seule des packs.
 - **Boucle sans couture** : coups placés à l'identique dans chaque boucle
   (pas d'arrondi cumulé), pré-roll d'au moins 4 s pour que les queues de
@@ -948,10 +952,22 @@ On garde une boucle d'une à huit mesures, sans couture.
 - **Versement** (8.D, arbitré le 2026-10-10) : un rendu versé est copié dans
   le pack `<MEDIA>/Samples/SoundDesign/<traitement>/`, **seule exception** à
   la lecture seule de `Samples/`, puis suit le circuit des samples
-  (réanalyse, écoute garder / écarter, export Transfer). Nom versé sans le
-  sample source (un `kik` dans le nom rangerait en BD) :
-  `<traitement> <verse_words> <preset> <bpm>bpm <hash>.wav` ; pour le rumble,
-  `bass loop` → `LOOPS/BL` (tempo gardé dans le nom DT2, pas de tranche).
+  (réanalyse, écoute garder / écarter, export Transfer). Rangement révisé
+  en 8.E : le versement écrit un override (code du traitement, sous-dossier,
+  nom DT2) dans `overrides.json`, le nom du fichier ne range plus rien.
+- **Rangement du rumble** (8.E, arbitré le 2026-10-10) : code **RM** en
+  DRUMS, juste après BD, comme la track 2 de la doctrine
+  ([[digitakt/doctrine]] § 1 et 9) ; il hérite du sous-dossier du kick
+  source s'il existe pour RM (HARD, SUB, ACOU, CLEAN) : un kick de
+  `DRUMS/BD/CLEAN` donne `DRUMS/RM/CLEAN`. Tempo et note gardés dans le
+  nom ; pas de contrôle « blanc » ni « long » (c'est une boucle, creusée au
+  premier coup). Le rangement 8.D en `LOOPS/BL` contredisait la doctrine.
+- **Source et nom** (8.E) : la source est le sample en cours de la vue
+  Samples (une seule sélection pour toute l'application). Nom DT2 proposé :
+  celui de la source, code remplacé par celui du traitement, tempo ajouté
+  (`BD C Punch 01 dbr` → `RM 150 C Punch dbr` : le numéro de variante part
+  d'abord, puis la description est tronquée), rendu unique dans le dossier
+  cible ; modifiable avant le rendu.
 - **Notebooks** : un par traitement, markdown du vault (`sounddesign/<t>.md`,
   champ `notebook` du traitement) ; les titres de section reprennent les
   noms des devices pour le lien « ? ».

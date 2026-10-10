@@ -6,15 +6,19 @@
   // reglage pendant la lecture. Le solo n'est pas enregistre dans le preset.
   import { onDestroy } from 'svelte'
   import { createMarked, escapeHtml, replaceWikilinks } from './markdown'
-  import { api, slugify, type DeviceSpec, type RenderRecord, type SampleEntry, type SdPreset, type TreatmentSpec } from './api'
+  import { api, slugify, type DeviceSpec, type RenderRecord, type SdPreset, type SdTarget, type TreatmentSpec } from './api'
+  import { focus } from './focus.svelte'
   import { remote } from './remote.svelte'
   import Device from './sd/Device.svelte'
   import Fader from './sd/Fader.svelte'
   import Knob from './sd/Knob.svelte'
   import { Looper } from './sd/looper'
 
+  // la source est le sample en cours de la vue Samples (8.E) : on la change la-bas
+  let { ongotosamples }: { ongotosamples?: () => void } = $props()
+
   const KEY = 'ui:sd'
-  type Saved = { treatment?: string; preset?: string; source?: string; sourceName?: string }
+  type Saved = { treatment?: string; preset?: string }
   let mem: Saved = {}
   try { mem = JSON.parse(localStorage.getItem(KEY) ?? '{}') } catch { /* stockage indisponible */ }
   function remember(patch: Saved) {
@@ -135,29 +139,27 @@
     solo = solo.includes(name) ? solo.filter(s => s !== name) : [...solo, name]
   }
 
-  // --- Source ---------------------------------------------------------------
-  let source = $state<string | null>(mem.source ?? null)
-  let sourceName = $state(mem.sourceName ?? '')
-  let q = $state('')
-  let kicksOnly = $state(true)
-  let found = $state<SampleEntry[]>([])
-  let searching = $state(false)
-  let searchTimer: ReturnType<typeof setTimeout> | undefined
+  // --- Source : sample en cours de la vue Samples (8.E) ---------------------
+  const source = $derived(focus.sample?.source ?? null)
+  const sourceName = $derived(focus.sample?.name ?? '')
+  // nom DT2 du rendu, propose par l'API (nom de la source, code du traitement,
+  // tempo) et modifiable ; une autre source repart du nom propose
+  let target = $state<SdTarget | null>(null)
+  let name = $state('')
+  let nameEdited = $state(false)
+  const bpm = $derived(preset?.settings.bpm)
+  $effect(() => { void source; nameEdited = false })
   $effect(() => {
-    const query = q
-    const codes = kicksOnly ? ['BD'] : undefined
-    clearTimeout(searchTimer)
-    if (!searching) return
-    searchTimer = setTimeout(async () => {
-      try { found = (await api.sampleTree({ q: query || undefined, codes })).slice(0, 80) } catch (e) { error = String(e) }
-    }, 200)
+    const t = treatment?.id, s = source, b = bpm
+    if (!t || !s) { target = null; return }
+    let stale = false
+    api.sdTarget(t, s, b).then(r => {
+      if (stale) return
+      target = r
+      if (!nameEdited) name = r.name
+    }).catch(e => { if (!stale) error = e instanceof Error ? e.message : String(e) })
+    return () => { stale = true }
   })
-  function pickSource(e: SampleEntry) {
-    source = e.source
-    sourceName = e.name
-    searching = false
-    remember({ source: e.source, sourceName: e.name })
-  }
   let sourceAudio: HTMLAudioElement | undefined = $state()
   function auditionSource() {
     if (!source || !sourceAudio) return
@@ -221,8 +223,8 @@
     try {
       const rec = await api.sdVerse(file)
       renders = renders.map(r => (r.file === file ? rec : r))
-      await api.sampleRebuild()   // classe le nouveau fichier (LOOPS/BL...) dans la vue Samples
-      verseMsg = `Versé : Samples/${rec.versed} ; réanalyse de la bibliothèque lancée.`
+      await api.sampleRebuild()   // range le fichier (override DRUMS/RM/<sous>) dans la vue Samples
+      verseMsg = `Versé : « ${rec.name} » vers ${rec.sub ? `DRUMS/RM/${rec.sub}` : 'DRUMS/RM'} ; réanalyse de la bibliothèque lancée.`
       error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
   }
@@ -231,7 +233,7 @@
     if (!payload || !source) return
     busy = true
     try {
-      const rec = await api.sdRender(payload, source)
+      const rec = await api.sdRender(payload, source, name.trim())
       renders = await api.sdRenders(rec.preset.treatment)
       error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
@@ -295,7 +297,7 @@
     <span class="grow"></span>
     <button class="play" class:on={playing} onclick={playPause} disabled={!source || !preset}
       title="Écouter la boucle (Espace) ; elle se re-rend à chaque réglage">{playing ? '■ Stop' : '▶ Écouter'}</button>
-    <button class="small" onclick={renderToDisk} disabled={!source || !preset || busy}
+    <button class="small" onclick={renderToDisk} disabled={!source || !preset || busy || !name.trim()}
       title="Écrit le wav 48 kHz / 24 bits et son sidecar dans SoundDesign/">Rendre sur disque</button>
     {#if busy}<span class="muted small">rendu…</span>{/if}
   </header>
@@ -314,25 +316,23 @@
 
   <div class="source">
     <span class="small muted">Source</span>
-    {#if source && !searching}
-      <button class="small" onclick={() => (searching = true)} title={source}>{sourceName || source}</button>
+    {#if source}
+      <span class="mono small" title={source}>{sourceName || source}</span>
+      <span class="muted small">{focus.sample?.folder}</span>
       <button class="small" onclick={auditionSource} title="Écouter le sample d'origine (A/B)">▶ source</button>
     {:else}
-      <input class="small" placeholder="Chercher un sample ({treatment?.source_hint ?? '…'})" bind:value={q} onfocus={() => (searching = true)} />
-      <label class="small"><input type="checkbox" bind:checked={kicksOnly} /> kicks (BD) seulement</label>
-      {#if source}<button class="small" onclick={() => (searching = false)}>Annuler</button>{/if}
+      <span class="muted small">Aucun sample en cours : en choisir un dans la vue Samples ({treatment?.source_hint ?? '…'}).</span>
     {/if}
+    <button class="small" onclick={() => ongotosamples?.()}
+      title="Le traitement s'applique au sample en cours de la vue Samples">Changer dans Samples</button>
     <audio bind:this={sourceAudio}></audio>
+    <span class="grow"></span>
+    <label class="small" title="Nom affiché par la DT2 (18 caractères), proposé à partir de la source">Nom DT2
+      <input class="mono name" bind:value={name} oninput={() => (nameEdited = true)} maxlength="18" size="18"
+        pattern={"[A-Za-z0-9#][A-Za-z0-9 #._+\\-]*"} disabled={!source} /></label>
+    {#if nameEdited && target}<button class="small" onclick={() => { name = target!.name; nameEdited = false }} title="Revenir au nom proposé : {target.name}">↺</button>{/if}
+    {#if target}<span class="muted small" title="Dossier du rendu une fois versé dans les samples">→ {target.folder}</span>{/if}
   </div>
-  {#if searching}
-    <ul class="found">
-      {#each found as e (e.source)}
-        <li><button class="small" onclick={() => pickSource(e)} title={e.source}>
-          <span>{e.name}</span><span class="muted">{e.folder} · {e.duration ? `${e.duration.toFixed(2)} s` : ''}</span>
-        </button></li>
-      {:else}<li class="muted small">Aucun sample (taper pour chercher).</li>{/each}
-    </ul>
-  {/if}
 
   {#if preset && treatment}
     <div class="rack">
@@ -416,10 +416,11 @@
           {#each renders as r (r.file)}
             <li>
               <button class="small" class:on={renderPlaying === r.file} onclick={() => playRender(r.file)}>{renderPlaying === r.file ? '■' : '▶'}</button>
-              <span class="mono small fname" title={`${r.file}\n${r.source}\n${r.created_at}`}>{r.file.split('/').pop()}</span>
+              <span class="mono small fname" title={`${r.file}\n${r.source}\n${r.created_at}`}>{r.name || r.file.split('/').pop()}</span>
               <span class="muted small">{r.seconds.toFixed(2)} s</span>
               {#if r.versed}<span class="versed small" title={`Samples/${r.versed}`}>versé</span>
-              {:else}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign (arbre des samples DT2)">Verser</button>{/if}
+              {:else if r.name}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign et ranger en {r.sub ? `DRUMS/RM/${r.sub}` : 'DRUMS/RM'}">Verser</button>
+              {:else}<span class="muted small" title="Rendu antérieur au nommage DT2 : le re-rendre pour le verser">sans nom</span>{/if}
             </li>
           {:else}<li class="muted small">Aucun rendu pour l'instant.</li>{/each}
         </ul>
@@ -435,10 +436,8 @@
   .grow { flex: 1; }
   .dirty { color: var(--accent); }
   .play { min-width: 96px; font-weight: 600; }
-  .source input:not([type]) { min-width: 280px; }
-  .found { list-style: none; margin: 0; padding: 4px; max-height: 220px; overflow-y: auto; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); }
-  .found button { display: flex; justify-content: space-between; gap: 12px; width: 100%; text-align: left; border: 0; background: none; }
-  .found button:hover { background: var(--panel-2); }
+  .source label { display: flex; align-items: center; gap: 6px; }
+  .name:invalid { border-color: #dc2626; }
   .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   h3 { margin: 0 0 8px; font-size: 13px; }
   .rack { display: flex; gap: 10px; align-items: stretch; min-width: 0; }

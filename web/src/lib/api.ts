@@ -372,8 +372,19 @@ export interface RenderRecord {
   sr: number
   seconds: number
   created_at: string
+  /** Nom DT2 (8.E) ; vide pour un rendu anterieur, a re-rendre avant de le verser. */
+  name: string
+  /** Sous-dossier herite de la source (DRUMS/RM/<sub>), "" = racine du code. */
+  sub: string
   /** Cle du manifeste si verse dans le pack Samples/SoundDesign (8.D). */
   versed: string | null
+}
+
+/** Nom DT2 propose et dossier de rangement d'un rendu (8.E). */
+export interface SdTarget {
+  name: string
+  sub: string
+  folder: string
 }
 
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
@@ -488,9 +499,12 @@ export const api = {
     if (!r.ok) await json(r)   // leve avec le detail de l'API
     return r.arrayBuffer()
   },
-  sdRender: (preset: SdPreset, source: string) =>
-    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source }) })
+  sdRender: (preset: SdPreset, source: string, name?: string) =>
+    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, name: name || null }) })
       .then(r => json<RenderRecord>(r)),
+  sdTarget: (treatment: string, source: string, bpm?: number) =>
+    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}&source=${enc(source)}${bpm ? `&bpm=${bpm}` : ''}`)
+      .then(r => json<SdTarget>(r)),
   sdRenders: (treatment: string) => fetch(`/api/sounddesign/renders?treatment=${enc(treatment)}`).then(r => json<RenderRecord[]>(r)),
   sdRenderAudioUrl: (file: string) => `/api/sounddesign/renders/audio?file=${enc(file)}`,
   /** Copie le rendu dans le pack Samples/SoundDesign ; reanalyse a lancer ensuite. */

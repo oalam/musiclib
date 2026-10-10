@@ -133,12 +133,15 @@ def test_load_source_resamples_and_duplicates_mono(tmp_path: Path):
 def test_write_render_is_stable_and_has_sidecar(tmp_path: Path):
     preset = _preset()
     audio = sd.render(preset, _kick())
-    rec1 = sd.write_render(audio, Path("KIK 1.wav"), "Samples/KIK 1.wav", preset, tmp_path)
-    rec2 = sd.write_render(audio, Path("KIK 1.wav"), "Samples/KIK 1.wav", preset, tmp_path)
-    assert rec1.file == rec2.file and rec1.file.startswith("rumble/kik_1__t_150bpm_")
+    rec1 = sd.write_render(audio, "Samples/KIK 1.wav", preset, tmp_path, "RM 150 Kik dbr", "SUB")
+    rec2 = sd.write_render(audio, "Samples/KIK 1.wav", preset, tmp_path, "RM 150 Kik dbr", "SUB")
+    assert rec1.file == rec2.file and rec1.file.startswith("rumble/RM 150 Kik dbr ")
     sidecar = sd.RenderRecord.model_validate_json(
         (tmp_path / rec1.file).with_suffix(".json").read_text())
     assert sidecar.preset == preset and sidecar.seconds == pytest.approx(1.6)
+    assert (sidecar.name, sidecar.sub) == ("RM 150 Kik dbr", "SUB")
+    with pytest.raises(sd.PresetError, match="nom DT2"):
+        sd.write_render(audio, "x", preset, tmp_path, "a/b")
 
 
 def _band_energy(x: np.ndarray, lo: float, hi: float) -> float:
@@ -181,28 +184,63 @@ def test_filter_mode_must_be_an_index():
     assert spec.choices == ["LP12", "LP24", "HP12", "HP24", "BP12", "BP24"]
 
 
-def test_verse_name_is_classified_as_bass_loop(tmp_path: Path):
-    from analyzer.samples import code_of, sub_of, tempo_of
-
-    for pid, bpm in (("deep", 150), ("kick_rumble", 150), ("gritty", 185)):
-        preset = _preset()
-        preset.id = pid
-        preset.settings["bpm"] = bpm
-        record = sd.write_render(sd.render(preset, _kick()), Path("KIK DB 160.wav"), "x", preset, tmp_path)
-        key = sd.verse_key(record)
-        assert "kik" not in key.lower()           # le nom du kick rangerait en BD
-        assert code_of(key, record.seconds) == "BL"
-        assert tempo_of(key) == bpm
-        assert sub_of(key, "BL", record.seconds) == ""   # racine LOOPS/BL, tempo garde dans le nom
+@pytest.mark.parametrize(("source", "code", "bpm", "expected"), [
+    ("BD C Punch 01 dbr", "BD", 150, "RM 150 C Punch dbr"),   # 21 car. : le numero part
+    ("BD Hard 03 hcf", "BD", 185, "RM 185 Hard 03 hcf"),      # 18 car. : tout tient
+    ("BD Distorted Kick 05 xtr", "BD", 190, "RM 190 Distort xtr"),
+    ("BR 117 Rumble j89", "BR", 175, "RM 175 Rumble j89"),     # tempo de la source remplace
+])
+def test_propose_name(source: str, code: str, bpm: int, expected: str):
+    name = sd.propose_name(source, code, "RM", bpm)
+    assert name == expected and len(name) <= 18
 
 
-def test_verse_copies_once_and_marks(tmp_path: Path):
+def _manifest(*entries: object) -> object:
+    from analyzer.samples import Manifest
+    return Manifest(source_root="x", total=len(entries), entries=list(entries))
+
+
+def test_target_inherits_sub_and_stays_unique():
+    from analyzer.samples import SampleEntry
+    kick = SampleEntry(source="d/kick.wav", family="TECHNO", code="BD", pack="dbr",
+                       name="BD C Punch 01 dbr", duration=0.3, rank=1, sub="CLEAN")
+    twin = SampleEntry(source="SoundDesign/rumble/a.wav", family="UNIVERSEL", code="RM",
+                       pack="sou", name="RM 150 C Punch dbr", duration=1.6, rank=1, sub="CLEAN")
+    assert sd.target("d/kick.wav", _manifest(kick), "rumble", 150) == ("RM 150 C Punch dbr", "CLEAN")
+    name, sub = sd.target("d/kick.wav", _manifest(kick, twin), "rumble", 150)
+    assert name != "RM 150 C Punch dbr" and sub == "CLEAN" and len(name) <= 18
+    kick.sub = "RUMBLE"            # sous-dossier manuel du kick, inconnu de RM : racine
+    assert sd.target("d/kick.wav", _manifest(kick), "rumble", 150)[1] == ""
+
+
+def test_verse_copies_once_marks_and_ranges_in_rm(tmp_path: Path):
+    from analyzer.samples import folder_of
     out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
-    record = sd.write_render(sd.render(_preset(), _kick()), Path("k.wav"), "x", _preset(), out)
+    record = sd.write_render(sd.render(_preset(), _kick()), "x", _preset(), out,
+                             "RM 150 C Punch dbr", "CLEAN")
     assert sd.mark_versed([record], samples_root)[0].versed is None
-    key = sd.verse(record, out, samples_root)
-    assert key.startswith("SoundDesign/rumble/rumble bass loop t 150bpm ")
+    overrides: dict = {}
+    key = sd.verse(record, out, samples_root, overrides)
+    assert key == f"SoundDesign/{record.file}"
+    ov = overrides[key]
+    assert folder_of("UNIVERSEL", ov.code, ov.sub) == "DRUMS/RM/CLEAN" and ov.name == record.name
     mtime = (samples_root / key).stat().st_mtime_ns
-    assert sd.verse(record, out, samples_root) == key           # rejouable, pas de recopie
+    assert sd.verse(record, out, samples_root, overrides) == key   # rejouable, pas de recopie
     assert (samples_root / key).stat().st_mtime_ns == mtime
     assert sd.mark_versed([record], samples_root)[0].versed == key
+    old = record.model_copy(update={"name": ""})                  # rendu anterieur a 8.E
+    with pytest.raises(sd.PresetError, match="re-rendre"):
+        sd.verse(old, out, samples_root, overrides)
+
+
+def test_versed_render_lands_in_drums_rm(tmp_path: Path):
+    from analyzer.samples import build_manifest
+    out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
+    record = sd.write_render(sd.render(_preset(), _kick()), "x", _preset(), out,
+                             "RM 150 C Punch dbr", "CLEAN")
+    overrides: dict = {}
+    key = sd.verse(record, out, samples_root, overrides)
+    m = build_manifest(samples_root, overrides)     # mesures reelles : blanc / long exemptes
+    entry = next(e for e in m.entries if e.source == key)
+    assert (entry.folder, entry.name) == ("DRUMS/RM/CLEAN", "RM 150 C Punch dbr")
+    assert not {"blanc", "long"} & set(entry.flags or [])

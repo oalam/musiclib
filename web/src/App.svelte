@@ -276,7 +276,7 @@
   </main>
 </div>
 {#if visited.samples}<div class="samples-main" class:off={view !== 'samples'}><SampleView /></div>{/if}
-{#if visited.sounddesign}<div class="sd-main" class:off={view !== 'sounddesign'}><SoundDesignView /></div>{/if}
+{#if visited.sounddesign}<div class="sd-main" class:off={view !== 'sounddesign'}><SoundDesignView ongotosamples={() => showView('samples')} /></div>{/if}
 {#if visited.knowledge}<div class="kb-main" class:off={view !== 'knowledge'}><KbPanel page bind:this={kbPage} /></div>{/if}
   </div>
 </div>
