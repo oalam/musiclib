@@ -1,0 +1,36 @@
+{
+  "id": "gritty",
+  "treatment": "rumble",
+  "label": "Rumble sale (tribe)",
+  "description": "Plus de saturation et de haut-grave, retour rapide entre les coups : grondement qui pousse a 180 BPM et plus.",
+  "settings": {"bpm": 185, "bars": 1, "hits_per_bar": 4},
+  "chains": [
+    {
+      "name": "Kick",
+      "mute": true,
+      "gain_db": 0,
+      "devices": [
+        {"type": "highpass", "params": {"cutoff_frequency_hz": 25}, "bypass": false}
+      ]
+    },
+    {
+      "name": "Rumble",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "reverb", "params": {"room_size": 0.9, "damping": 0.3, "wet_level": 1, "dry_level": 0, "width": 0}, "bypass": false},
+        {"type": "lowpass", "params": {"cutoff_frequency_hz": 350}, "bypass": false},
+        {"type": "distortion", "params": {"drive_db": 26}, "bypass": false},
+        {"type": "peak", "params": {"cutoff_frequency_hz": 120, "gain_db": 4, "q": 1.2}, "bypass": false},
+        {"type": "ladder_lp", "params": {"cutoff_hz": 260, "resonance": 0.3, "drive": 2}, "bypass": false},
+        {"type": "highpass", "params": {"cutoff_frequency_hz": 35}, "bypass": false},
+        {"type": "duck", "params": {"depth_db": 24, "attack_ms": 1, "hold_ms": 20, "release_ms": 140}, "bypass": false},
+        {"type": "width", "params": {"width": 0}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 60}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

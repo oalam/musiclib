@@ -864,6 +864,61 @@ wikilinks deviennent cliquables (manuel, section de la doctrine, autre
 fiche). Le manuel s'ouvre dans le panneau élargi à la bonne page
 (`#page=N`, visionneuse PDF du navigateur) ou dans un nouvel onglet.
 
+# sounddesign.py — sound design par chaînes de plugins (Phase 8)
+
+Fabrique de nouveaux samples à partir de ceux de la library. Un traitement
+(`rumble` pour l'instant) prépare un signal d'entrée depuis un sample (le
+kick séquencé au tempo), le passe dans les chaînes parallèles d'un preset,
+puis dans le master, et écrit une boucle sans couture. Moteur :
+`analyzer/sounddesign.py` ; plugins : [pedalboard](https://spotify.github.io/pedalboard/)
+(Spotify), plus deux devices maison (`duck`, `width`).
+
+```bash
+python sounddesign.py list        # traitements, réglages par défaut, presets
+python sounddesign.py devices     # catalogue : devices, paramètres, bornes
+python sounddesign.py render rumble deep --source "Drumbrute kick/KIK DB 160 (1).wav"
+python sounddesign.py render rumble gritty --source <wav> --set bpm=190 --set bars=2
+python sounddesign.py render rumble kick_rumble --source <wav> --mute Kick --bypass Rumble:2
+python sounddesign.py render rumble deep --source <wav> --dry-run   # sans écriture
+```
+
+`--source` est absolu ou relatif à `<MEDIA>/Samples`. `--set` change un
+réglage du traitement (`bpm`, `bars`, `hits_per_bar`), `--mute` coupe une
+chaîne, `--bypass CHAINE:INDEX` désactive un device (index à partir de 0,
+`master:0` pour la sortie). Les overrides ne modifient pas le preset.
+
+## Presets
+
+`library/sounddesign/presets/<traitement>/<id>.json`, versionnés. Un preset
+fixe les réglages du traitement, les chaînes (`name`, `mute`, `gain_db`,
+`devices`), le master et la crête de sortie (`output_peak_db`, `null` pour ne
+pas normaliser). Chaque device : `type`, `params` (noms des paramètres
+pedalboard, absent = défaut), `bypass`. Validés au chargement : device,
+paramètre ou valeur hors bornes lèvent `PresetError`.
+
+| Preset | Usage |
+|---|---|
+| `deep` | rumble seul, rond et sombre, 150 BPM : à poser sur une track DT2 sous le kick |
+| `gritty` | rumble seul, plus saturé, retour rapide, 185 BPM (tribe) |
+| `kick_rumble` | kick + rumble dans la même boucle, pour régler ou jouer tel quel |
+
+## Sorties
+
+`<MEDIA>/SoundDesign/<traitement>/<source>__<preset>_<bpm>bpm_<hash>.wav`
+(48 kHz / 24 bits, stéréo, crête à -1 dBFS) + sidecar `.json` (source,
+snapshot du preset effectif, durée). Le hash porte sur le preset effectif :
+rejouer la même commande réécrit le même fichier.
+
+Durée : `bars × 4 × 60 / bpm` ; ex. 150 BPM, 1 mesure = 4 × 60 / 150 = 1,6 s.
+
+## Limites
+
+- Rendu en boucle uniquement (pas encore de one-shot).
+- Pas de sidechain externe dans pedalboard : `duck` creuse sur les positions
+  de coups connues du traitement, pas sur un détecteur d'enveloppe.
+- Le pré-roll (≥ 4 s) suffit pour une reverb `room_size` ≤ 0,9 ; au-delà,
+  ou en `freeze_mode`, la jointure peut cliquer.
+
 # api.py + web/ — front de la library (Phase 7.C)
 
 POC web local : parcourir la library, écouter un morceau et naviguer dedans,

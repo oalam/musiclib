@@ -16,6 +16,7 @@ Deux racines :
 │   ├── stems/<slug>/     # Demucs
 │   └── visuals/          # PNG Phase 5 + _index.md
 ├── Samples/              # copie des samples DT2 (packs bruts, lecture seule)
+├── SoundDesign/<traitement>/  # rendus du sound design (Phase 8) : .wav + sidecar .json
 └── Live/                 # materiel de set live
     ├── renoise/          # .xrns
     ├── grooves/          # .mid / .tidal
@@ -45,6 +46,7 @@ LIBRARY_FILE = LIBRARY / "library.md"
 QUALITY_DIR = LIBRARY / "quality"
 ARTISTS_DIR = LIBRARY / "artists"
 DIGITAKT_DIR = LIBRARY / "digitakt"
+SOUNDDESIGN_PRESETS_DIR = LIBRARY / "sounddesign" / "presets"   # <traitement>/<id>.json
 
 # --- Disque media --------------------------------------------------------
 MEDIA_ROOT = Path(os.environ.get("MUSIC_MEDIA_ROOT", "/Volumes/xtreme"))
@@ -64,6 +66,9 @@ DT2_SAMPLES_DIR = LIVE_DIR / "samples"   # arborescence famille/code prete pour 
 # Copie des samples de la DT2 faite depuis Transfer (packs bruts, lecture seule)
 SAMPLES_SRC_DIR = MEDIA_ROOT / "Samples"
 SAMPLES_META_DIR = LIBRARY / "samples"   # manifeste + overrides (vault)
+
+# Rendus du sound design (Phase 8) : hors de Samples/, qui reste en lecture seule
+SOUNDDESIGN_OUT_DIR = MEDIA_ROOT / "SoundDesign"
 
 # Conteneurs lus par Rekordbox : tout le reste (opus, ogg, webm) est
 # transcode en FLAC a l'acquisition.

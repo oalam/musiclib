@@ -38,6 +38,7 @@ music/scripts/
 ├── visualize.py                  # rendu PNG signatures
 ├── digitakt.py                   # draft de bank Digitakt II (Phase 7.B)
 ├── kb.py                         # base de connaissance Digitakt (Phase 7.D)
+├── sounddesign.py                # traitements par chaînes de plugins (Phase 8)
 ├── library_md.py                 # parse / write library.md
 └── analyzer/
     ├── audio_loader.py           # soundfile + fallback librosa
@@ -60,7 +61,8 @@ music/scripts/
     ├── infer.py                  # auto-fill champs sémantiques
     ├── describe.py               # MusicBrainz lookup
     ├── visualize.py              # render_track + write_index_md
-    └── digitakt.py               # grille 16 tracks, patterns, mutes, MIDI
+    ├── digitakt.py               # grille 16 tracks, patterns, mutes, MIDI
+    └── sounddesign.py            # devices, traitements, presets, rendu en boucle
 ```
 
 ### Schéma de la library
@@ -895,6 +897,49 @@ sur `beat_times_s`. Le recalage `retrack_beats` de `analyzer/digitakt.py` est
 réutilisable pour eux.
 
 ---
+
+## Phase 8 — Sound design (en cours, démarrée le 2026-10-10)
+
+**But** : fabriquer de nouveaux samples à partir de ceux de la library par
+des **traitements** paramétrables (premier : le **rumble**), chacun étant un
+graphe de **chaînes de plugins** (pedalboard + devices maison numpy). Chaque
+traitement a son **notebook** dans le front : théorie musicale, exemples
+d'usage, rôle de chaque paramètre, ressources web, et des devices visuels
+façon Ableton Live qui font le traitement.
+
+Exemple concret, le rumble : un kick one-shot est séquencé au tempo
+(four on the floor), passe dans deux chaînes parallèles, « Kick » (sec) et
+« Rumble » (reverb 100 % wet → passe-bas → distorsion → passe-bas →
+passe-haut → duck sur les coups → mono), puis dans le master (limiteur).
+On garde une boucle d'une à huit mesures, sans couture.
+
+| Sous-phase | Contenu | Statut |
+|---|---|---|
+| 8.A | Moteur `analyzer/sounddesign.py` (modèles Pydantic, catalogue de 15 devices, traitement rumble, rendu en boucle sans couture), presets JSON du vault, CLI `sounddesign.py`, tests | fait (presets à valider à l'oreille) |
+| 8.B | API : traitements, catalogue des devices, presets (lecture, sauvegarde), rendu d'écoute à la volée, écriture d'un rendu sur le disque | à venir |
+| 8.C | Vue front « Sound design » : rack de devices façon Ableton (potards issus des `ParamSpec`, bypass par device, mute et gain par chaîne), choix du sample source, écoute A/B source / rendu | à venir |
+| 8.D | Notebook rumble (`sounddesign/rumble.md` : théorie, usage, paramètres, ressources) intégré à la vue ; rendus versés à l'arbre des samples DT2 | à venir |
+
+**Décisions 8** (arbitrées le 2026-10-10) :
+- **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
+  Ableton) **et** `mute` + `gain_db` par chaîne parallèle.
+- **Notebook = vue du front Svelte** (panneau latéral « Sound design »), pas
+  de Jupyter : le texte vit en markdown dans le vault, les devices
+  appellent l'API.
+- **Presets** : JSON versionnés dans `library/sounddesign/presets/<traitement>/<id>.json`,
+  validés contre le catalogue (device, paramètre, bornes) ; un paramètre
+  absent prend sa valeur par défaut. Le catalogue (`DEVICES`, `TREATMENTS`)
+  est la source des bornes, unités et aides affichées par le front.
+- **Sorties** : `<MEDIA>/SoundDesign/<traitement>/<source>__<preset>_<bpm>bpm_<hash>.wav`
+  (48 kHz, fréquence native de la DT2, 24 bits) + sidecar `.json` (source,
+  snapshot du preset effectif). Le hash porte sur le preset effectif : même
+  source et mêmes réglages = même fichier (rejouable). **Hors de
+  `<MEDIA>/Samples/`**, qui reste la copie en lecture seule des packs.
+- **Boucle sans couture** : coups placés à l'identique dans chaque boucle
+  (pas d'arrondi cumulé), pré-roll d'au moins 4 s pour que les queues de
+  reverb soient en régime, seule la dernière boucle est gardée.
+- **Sidechain** : pedalboard n'a pas d'entrée sidechain ; le device `duck`
+  creuse le signal sur les positions de coups connues du traitement.
 
 ## Décisions arbitrées (à NE PAS refaire)
 

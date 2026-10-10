@@ -1,0 +1,35 @@
+{
+  "id": "kick_rumble",
+  "treatment": "rumble",
+  "label": "Kick + rumble",
+  "description": "Kick et rumble ensemble dans une seule boucle : a ecouter pour regler, ou a jouer tel quel en loop.",
+  "settings": {"bpm": 150, "bars": 1, "hits_per_bar": 4},
+  "chains": [
+    {
+      "name": "Kick",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "highpass", "params": {"cutoff_frequency_hz": 25}, "bypass": false}
+      ]
+    },
+    {
+      "name": "Rumble",
+      "mute": false,
+      "gain_db": -4,
+      "devices": [
+        {"type": "reverb", "params": {"room_size": 0.85, "damping": 0.6, "wet_level": 1, "dry_level": 0, "width": 0}, "bypass": false},
+        {"type": "lowpass", "params": {"cutoff_frequency_hz": 220}, "bypass": false},
+        {"type": "distortion", "params": {"drive_db": 14}, "bypass": false},
+        {"type": "lowpass", "params": {"cutoff_frequency_hz": 160}, "bypass": false},
+        {"type": "highpass", "params": {"cutoff_frequency_hz": 30}, "bypass": false},
+        {"type": "duck", "params": {"depth_db": 30, "attack_ms": 2, "hold_ms": 30, "release_ms": 220}, "bypass": false},
+        {"type": "width", "params": {"width": 0}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

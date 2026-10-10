@@ -72,6 +72,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.A] Sound design, moteur et CLI (`sounddesign.py`,
+  `analyzer/sounddesign.py`) : traitements par chaînes parallèles de
+  plugins pedalboard (15 devices, dont `duck` et `width` maison), `bypass`
+  par device, `mute` et gain par chaîne, rendu en boucle sans couture à
+  48 kHz / 24 bits avec sidecar rejouable dans `<MEDIA>/SoundDesign/`.
+  Premier traitement : rumble, avec trois presets JSON du vault
+  (`library/sounddesign/presets/rumble/` : `deep`, `gritty`, `kick_rumble`).
+  Dépendance `pedalboard`.
+
 - [7.K] Bouton « Réanalyser » de la bibliothèque de samples : reconstruction
   en arrière-plan (`POST` / `GET /api/samples/rebuild`), écritures refusées
   (409) pendant le calcul, bilan candidats / retenus / hors plafond / non
