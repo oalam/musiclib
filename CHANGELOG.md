@@ -8,6 +8,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.K] Boutons « Morceau » / « Sample » de la barre générale : ouvrent
+  aussi la vue correspondante (ils ne changeaient que la cible de la
+  télécommande) ; « Sample » n'est plus grisé avant la première visite.
 - [7.J8] Reconstruction des samples non rejouable : une boucle BR / DL dont
   le tempo avait été mesuré le perdait en passant hors plafond (réserve sans
   tempo) et repartait à la racine au passage suivant, d'où une oscillation

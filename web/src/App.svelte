@@ -62,6 +62,12 @@
     try { localStorage.setItem('ui:view', v) } catch { /* stockage indisponible */ }
   }
 
+  /** Bouton source de la barre : ouvre la vue et y met la telecommande (sans replier la liste). */
+  function showView(v: 'tracks' | 'samples') {
+    if (view !== v) setView(v)
+    remote.focus = v
+  }
+
   async function knowledge(page?: number) {
     setView('knowledge')
     await tick()
@@ -184,10 +190,10 @@
   <strong>Digitakt II</strong>
   <div class="remote" role="group" aria-label="Télécommande">
     <div class="seg small" role="group" aria-label="Source">
-      <button aria-pressed={remote.focus === 'tracks'} onclick={() => (remote.focus = 'tracks')}
-        disabled={!remote.decks.tracks}>Morceau</button>
-      <button aria-pressed={remote.focus === 'samples'} onclick={() => (remote.focus = 'samples')}
-        disabled={!remote.decks.samples} title={remote.decks.samples ? '' : 'Ouvre la vue Samples une fois'}>Sample</button>
+      <button aria-pressed={remote.focus === 'tracks'} onclick={() => showView('tracks')}
+        title="Vue Morceaux, télécommande sur le morceau">Morceau</button>
+      <button aria-pressed={remote.focus === 'samples'} onclick={() => showView('samples')}
+        title="Vue Samples, télécommande sur le sample">Sample</button>
     </div>
     {#if remote.deck}
       {@const d = remote.deck}
