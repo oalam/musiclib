@@ -19,6 +19,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.K] Liste des samples : les retenus ressortent (gras, fond plein) ; la
   réserve passe en retrait (plus petite, atténuée), le hors plafond plus
   encore (italique) ; séparateur « Réserve » marqué.
+- [7.K] Arbre des samples titré « Library » (bilan en infobulle) ; panneau
+  de tagging du kit ouvert au double-clic sur un pad seulement, fermable.
 
 ### Modifié
 

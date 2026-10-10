@@ -616,7 +616,17 @@
   const mo = (b: number) => `${Math.round(b / 1e6)} Mo`
 
   /** Choisit un kit (re-clic : retour a tous) ; la reserve du kit est depliee. */
+  // panneau de tagging du kit : au double-clic sur un pad seulement
+  let kitPanel = $state(false)
+
+  /** Double-clic sur un pad : le kit reste choisi et son panneau s'ouvre. */
+  async function editKit(k: string) {
+    if (kit !== k) await chooseKit(k)
+    kitPanel = true
+  }
+
   async function chooseKit(k: string) {
+    kitPanel = false
     kit = kit === k ? '' : k
     kitTagInput = ''
     showReserve = kit !== ''
@@ -882,8 +892,8 @@
     {/if}
    </div>
     <section class="kits zone">
-      <h3 class="small">Kits <span class="muted">· retenus / fichiers · re-clic pour tout voir</span></h3>
-      {#if kit}
+      <h3 class="small">Kits <span class="muted">· retenus / fichiers · re-clic pour tout voir · double-clic pour tagger</span></h3>
+      {#if kit && kitPanel}
         <div class="kit-bar small">
           <strong title={kit}>{kit}</strong>
           {#if kitInfo}<span class="muted">{kitInfo.candidates} candidats · {kitInfo.reserve} hors plafond · {kitInfo.unclassified} non classés</span>{/if}
@@ -898,12 +908,14 @@
             <button class="small" disabled={!kitTagInput.trim() || busy} onclick={addKitTag}>Tagger le kit</button>
             <button class="small danger" disabled={busy} onclick={trashKit}>Corbeille du kit</button>
           {/if}
+          <button class="small close" title="Fermer" onclick={() => (kitPanel = false)}>×</button>
         </div>
       {/if}
       <div class="pads">
         {#each packs as p (p.kit)}
           <button class="pad" class:on={activePack === p.kit} class:gone={p.trashed}
-            title={p.kit} onclick={() => chooseKit(p.kit)}>
+            title="{p.kit} · double-clic : tags et corbeille du kit"
+            onclick={ev => { if (ev.detail < 2) chooseKit(p.kit) }} ondblclick={() => editKit(p.kit)}>
             <span class="pad-name">{p.label}</span>
             <span class="pad-n">{p.trashed ? 'corbeille' : `${p.selected} / ${p.files}`}</span>
             {#if kitData.tags[p.kit]?.length}<span class="pad-tags">{kitData.tags[p.kit].join(' · ')}</span>{/if}
@@ -914,7 +926,8 @@
         <div class="pads subs">
           {#each subKits as k (k.kit)}
             <button class="pad sub" class:on={kit === k.kit} class:gone={k.trashed_kit}
-              title={k.kit} onclick={() => chooseKit(kit === k.kit ? activePack : k.kit)}>
+              title="{k.kit} · double-clic : tags et corbeille du kit"
+              onclick={ev => { if (ev.detail < 2) chooseKit(kit === k.kit ? activePack : k.kit) }} ondblclick={() => editKit(k.kit)}>
               <span class="pad-name">{k.label}</span>
               <span class="pad-n">{k.trashed_kit ? 'corbeille' : `${k.selected} / ${files(k)}`}{k.unclassified ? ` · ${k.unclassified} nc` : ''}</span>
               {#if kitData.tags[k.kit]?.length}<span class="pad-tags">{kitData.tags[k.kit].join(' · ')}</span>{/if}
@@ -1128,6 +1141,7 @@
   .pad-name { font-size: 13px; font-weight: 600; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere; }
   .pad-n { font: 11px ui-monospace, Menlo, monospace; color: var(--muted); }
   .pad-tags { font-size: 10px; color: var(--melodic); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .kit-bar .close { margin-left: auto; }
   .kit-bar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; padding: 6px 8px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
   .danger { color: #dc2626; }
   .trashed-kits { list-style: none; margin: 0 0 6px; padding: 0; }
