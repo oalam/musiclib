@@ -81,6 +81,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.H] Preset riser `white_fall` (downlifter) : passe-bas qui se ferme de
+  14 kHz à 150 Hz, volume et reverb qui tombent, courbe 0,5 ; environ
+  −29 dB et plus d'aigus au-dessus de 4 kHz à la fin.
 - [8.H] Vue Sound design : colonne latérale des traitements dépliables sur
   leurs presets, mini barre d'outils à icônes (nouveau preset vierge, nom et
   description, suppression) ; les sélecteurs de la barre disparaissent.

@@ -923,6 +923,7 @@ chargement : device, paramètre ou valeur hors bornes lèvent `PresetError`.
 | riser `white_sweep` | bruit blanc, passe-bas résonant 200 Hz → 14 kHz, volume et reverb qui montent, 4 mesures |
 | riser `pink_thin` | bruit rose, passe-haut 40 Hz → 5 kHz (le grave se vide), delay croissant, 8 mesures |
 | riser `pad_lift` | sample en cours (nappe) qui monte d'une octave, filtre et reverb qui s'ouvrent |
+| riser `white_fall` | downlifter : bruit blanc, passe-bas 14 kHz → 150 Hz, volume et reverb qui tombent, 2 mesures, courbe 0,5 |
 
 ## Sorties
 

@@ -1,0 +1,97 @@
+{
+  "id": "white_fall",
+  "treatment": "riser",
+  "label": "Downlifter bruit blanc",
+  "description": "Descente apres un drop : bruit blanc plein, passe-bas resonant qui se ferme de 14 kHz a 150 Hz, volume qui tombe, reverb qui s'assombrit et s'eloigne. Courbe 0,5 : l'essentiel de la chute au debut, puis la queue s'eteint.",
+  "settings": {
+    "bpm": 150,
+    "bars": 2,
+    "source": 0,
+    "pitch_st": 0,
+    "curve": 0.5
+  },
+  "chains": [
+    {
+      "name": "Fall",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {
+          "type": "filter",
+          "params": {
+            "mode": 1,
+            "cutoff_hz": 14000,
+            "resonance": 0.35,
+            "drive": 1
+          },
+          "params_end": {
+            "cutoff_hz": 150
+          },
+          "bypass": false
+        },
+        {
+          "type": "gain",
+          "params": {
+            "gain_db": 0
+          },
+          "params_end": {
+            "gain_db": -24
+          },
+          "bypass": false
+        }
+      ]
+    },
+    {
+      "name": "Air",
+      "mute": false,
+      "gain_db": -6,
+      "devices": [
+        {
+          "type": "reverb",
+          "params": {
+            "room_size": 0.9,
+            "damping": 0.3,
+            "wet_level": 1,
+            "dry_level": 0,
+            "width": 1
+          },
+          "bypass": false
+        },
+        {
+          "type": "filter",
+          "params": {
+            "mode": 1,
+            "cutoff_hz": 12000,
+            "resonance": 0,
+            "drive": 1
+          },
+          "params_end": {
+            "cutoff_hz": 300
+          },
+          "bypass": false
+        },
+        {
+          "type": "gain",
+          "params": {
+            "gain_db": 0
+          },
+          "params_end": {
+            "gain_db": -30
+          },
+          "bypass": false
+        }
+      ]
+    }
+  ],
+  "master": [
+    {
+      "type": "limiter",
+      "params": {
+        "threshold_db": -1,
+        "release_ms": 100
+      },
+      "bypass": false
+    }
+  ],
+  "output_peak_db": -1
+}

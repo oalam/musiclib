@@ -1,7 +1,7 @@
 ---
 tags: [sounddesign, riser, transition, fx]
 traitement: riser
-presets: [white_sweep, pink_thin, pad_lift]
+presets: [white_sweep, pink_thin, pad_lift, white_fall]
 ---
 
 # Riser
@@ -88,11 +88,23 @@ normalisé à −1 dBFS.
 | `white_sweep` | Bruit blanc, LP 200 Hz → 14 kHz, souffle de reverb qui monte | Le riser classique, avant un drop |
 | `pink_thin` | Bruit rose, HP 40 Hz → 5 kHz, delay qui s'empile, 8 mesures | Montée longue qui vide le grave avant le retour du kick |
 | `pad_lift` | Le sample en cours monte d'une octave, filtre et reverb qui s'ouvrent | Montée mélodique, à partir d'une nappe ou d'un drone |
+| `white_fall` | **Downlifter** : bruit blanc plein, passe-bas qui se ferme de 14 kHz à 150 Hz, volume et reverb qui tombent et s'assombrissent, 2 mesures, courbe 0,5 | Juste après un drop ou un impact, pour retomber |
+
+Le downlifter est le même traitement à l'envers : chaque valeur de fin est
+plus basse que celle de départ, et la courbe 0,5 place l'essentiel de la
+chute au début. Mesuré à 150 BPM, `white_fall` dure 2 × 4 × 60 / 150 =
+3,2 s, son niveau tombe d'environ 29 dB (RMS 0,097 au premier quart, 0,0034
+au dernier) et la part de l'énergie au-dessus de 4 kHz passe de 47 % à 0 %.
+Pour une chute plus sombre, les deux chaînes doivent se fermer : un souffle
+de reverb filtré en passe-haut fixe resterait brillant quand le bruit
+principal s'éteint.
 
 ## Sur la Digitakt II
 
 - **Track 15** (FX de transition). Le rendu est rangé en `FX/RISE` une fois
   versé.
+- **Downlifter** : trig sur le premier temps du drop, en même temps que
+  le kick (ou sur un impact) ; il s'éteint seul en 2 mesures.
 - **Riser + fill** (doctrine § 5) : trig du riser en condition **FILL** sur
   le premier pas de la montée, kick en **NOT FILL**. On maintient fill, le
   kick disparaît et le riser monte ; on relâche sur le temps, le kick revient.
