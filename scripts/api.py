@@ -361,7 +361,7 @@ class SoundDesignRequest(BaseModel):
     """Preset effectif (tel qu'edite dans le front) applique a un sample du manifeste."""
 
     preset: sd.Preset
-    source: str
+    source: str = ""   # vide : traitement sans sample (riser sur bruit genere, 8.G)
     name: str | None = Field(default=None, pattern=sd.NAME_RX, max_length=NAME_MAX)
 
 
@@ -856,15 +856,21 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         if treatment not in sd.TREATMENTS:
             raise HTTPException(404, f"traitement inconnu : {treatment}")
 
-    def render_request(req: SoundDesignRequest) -> tuple[Path, Any]:
-        """Source du manifeste uniquement ; PresetError / SourceError -> 422."""
-        if not known(manifest(), req.source):
+    def render_request(req: SoundDesignRequest) -> tuple[Path | None, Any]:
+        """Source du manifeste uniquement, sauf traitement sans sample (chemin None) ;
+        PresetError / SourceError -> 422."""
+        try:
+            wants = sd.needs_source(req.preset)
+        except (KeyError, sd.PresetError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+        if wants and not known(manifest(), req.source):
             raise HTTPException(404, f"sample hors manifeste : {req.source}")
         media_or_503()
-        path = samples_src / req.source
+        path = samples_src / req.source if wants else None
         try:
             with render_lock:
-                return path, sd.render(req.preset, sd.load_source(path))
+                source = sd.load_source(path) if path else sd.NO_SOURCE
+                return path, sd.render(req.preset, source)
         except (sd.PresetError, sd.SourceError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
@@ -908,9 +914,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Ecrit la boucle et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/`."""
         path, audio = render_request(req)
         with render_lock:
-            name, sub = sd.target(req.source, manifest(), req.preset.treatment,
-                                  req.preset.settings.get("bpm"))
-            return sd.write_render(audio, media_relative(path), req.preset, sounddesign_out,
+            name, sub = sd.target(req.source if path else "", manifest(),
+                                  req.preset.treatment, req.preset.settings.get("bpm"))
+            return sd.write_render(audio, media_relative(path) if path else "",
+                                   req.preset, sounddesign_out,
                                    req.name or name, sub)
 
     @app.get("/api/sounddesign/renders", response_model=list[sd.RenderRecord])
@@ -939,11 +946,12 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return record
 
     @app.get("/api/sounddesign/target", response_model=SdTarget)
-    def sd_target(treatment: str, source: str, bpm: float | None = None) -> SdTarget:
-        """Nom DT2 propose pour un rendu de `source` et son dossier (DRUMS/RM/<sous>)."""
+    def sd_target(treatment: str, source: str = "", bpm: float | None = None) -> SdTarget:
+        """Nom DT2 propose pour un rendu de `source` et son dossier (DRUMS/RM/<sous>) ;
+        sans source : rendu sur bruit genere (FX/RISE)."""
         treatment_or_404(treatment)
         m = manifest()
-        if not known(m, source):
+        if source and not known(m, source):
             raise HTTPException(404, f"sample hors manifeste : {source}")
         name, sub = sd.target(source, m, treatment, bpm)
         return SdTarget(name=name, sub=sub,

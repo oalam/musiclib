@@ -1,0 +1,23 @@
+{
+  "id": "pink_thin",
+  "treatment": "riser",
+  "label": "Bruit rose qui s'amincit",
+  "description": "Bruit rose dont le passe-haut monte de 40 Hz a 5 kHz (le grave se vide, la tension monte), delay et volume croissants. Laisse la place au kick qui revient.",
+  "settings": {"bpm": 150, "bars": 8, "source": 1, "pitch_st": 0, "curve": 1.5},
+  "chains": [
+    {
+      "name": "Thin",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "filter", "params": {"mode": 3, "cutoff_hz": 40, "resonance": 0.2, "drive": 1}, "params_end": {"cutoff_hz": 5000, "resonance": 0.5}, "bypass": false},
+        {"type": "delay", "params": {"delay_seconds": 0.3, "feedback": 0.2, "mix": 0.1}, "params_end": {"feedback": 0.6, "mix": 0.4}, "bypass": false},
+        {"type": "gain", "params": {"gain_db": -24}, "params_end": {"gain_db": 0}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

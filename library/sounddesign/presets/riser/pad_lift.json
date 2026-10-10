@@ -1,0 +1,23 @@
+{
+  "id": "pad_lift",
+  "treatment": "riser",
+  "label": "Nappe qui monte d'une octave",
+  "description": "Le sample en cours (nappe, drone) boucle et monte d'une octave, filtre qui s'ouvre, reverb de plus en plus mouillee. Choisir un son tenu dans la vue Samples.",
+  "settings": {"bpm": 150, "bars": 4, "source": 2, "pitch_st": 12, "curve": 2},
+  "chains": [
+    {
+      "name": "Lift",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "filter", "params": {"mode": 1, "cutoff_hz": 400, "resonance": 0.25, "drive": 1.5}, "params_end": {"cutoff_hz": 16000}, "bypass": false},
+        {"type": "reverb", "params": {"room_size": 0.8, "damping": 0.4, "wet_level": 0.15, "dry_level": 1, "width": 1}, "params_end": {"wet_level": 0.7, "dry_level": 0.6}, "bypass": false},
+        {"type": "gain", "params": {"gain_db": -18}, "params_end": {"gain_db": 0}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

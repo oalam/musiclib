@@ -14,6 +14,8 @@ Usage:
     sounddesign.py render rumble deep --source <wav> --dry-run   # rendu sans ecriture
     sounddesign.py render rumble deep --source <wav> --verse     # + copie dans le pack
     sounddesign.py render rumble deep --source <wav> --name "RM 150 Fat dbr"
+    sounddesign.py render riser white_sweep --set bars=8      # bruit genere, sans --source
+    sounddesign.py render riser pad_lift --source <wav>       # nappe qui monte (FX/RISE)
                                                   # Samples/SoundDesign (relancer samples.py)
 
 `--source` : chemin absolu, ou relatif a `<MEDIA>/Samples`.
@@ -27,7 +29,12 @@ Fichiers :
 
 Nom DT2 propose (8.E) : celui de la source avec le code du traitement et le
 tempo (`BD C Punch 01 dbr` -> `RM 150 C Punch dbr`), `--name` pour le forcer ;
-`--verse` le range par override dans DRUMS/RM/<sous-dossier de la source>.
+`--verse` le range par override dans DRUMS/RM/<sous-dossier de la source>
+(riser : FX/RISE, `FX 150 Rise Noise` sans source).
+
+Automation (8.G) : un device pedalboard d'un preset peut porter
+`params_end` (valeurs atteintes en fin de rendu, interpolees selon la
+courbe du traitement ; geometriquement pour les frequences).
 """
 from __future__ import annotations
 
@@ -36,6 +43,7 @@ import sys
 from pathlib import Path
 
 from analyzer.sounddesign import (
+    NO_SOURCE,
     SR,
     TREATMENTS,
     PresetError,
@@ -43,6 +51,7 @@ from analyzer.sounddesign import (
     device_specs,
     load_presets,
     load_source,
+    needs_source,
     render,
     target,
     verse,
@@ -106,11 +115,16 @@ def _cmd_render(args: argparse.Namespace) -> int:
         return 1
     preset = with_overrides(presets[args.preset], _parse_set(args.set), args.mute,
                             _parse_bypass(args.bypass))
-    source = Path(args.source)
-    if not source.is_absolute():
-        source = SAMPLES_SRC_DIR / source
-    audio = render(preset, load_source(source))
-    rel = source.relative_to(SAMPLES_SRC_DIR).as_posix() if source.is_relative_to(SAMPLES_SRC_DIR) else ""
+    source: Path | None = None
+    if needs_source(preset):
+        if not args.source:
+            raise SourceError(f"{preset.treatment}/{preset.id} demande un sample : --source")
+        source = Path(args.source)
+        if not source.is_absolute():
+            source = SAMPLES_SRC_DIR / source
+    audio = render(preset, load_source(source) if source else NO_SOURCE)
+    rel = (source.relative_to(SAMPLES_SRC_DIR).as_posix()
+           if source and source.is_relative_to(SAMPLES_SRC_DIR) else "")
     manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
     name, sub_dir = target(rel, manifest, preset.treatment, preset.settings.get("bpm"))
     name = args.name or name
@@ -119,7 +133,7 @@ def _cmd_render(args: argparse.Namespace) -> int:
           f"nom {name!r}, sous-dossier {sub_dir or '(racine)'}")
     if args.dry_run:
         return 0
-    record = write_render(audio, media_relative(source), preset, SOUNDDESIGN_OUT_DIR, name, sub_dir)
+    record = write_render(audio, media_relative(source) if source else "", preset, SOUNDDESIGN_OUT_DIR, name, sub_dir)
     print(f"-> {SOUNDDESIGN_OUT_DIR / record.file}")
     if args.verse:
         overrides = load_overrides(OVERRIDES_FILE)
@@ -137,7 +151,8 @@ def main() -> int:
     r = sub.add_parser("render", help="rend une boucle a partir d'un sample")
     r.add_argument("treatment", choices=sorted(TREATMENTS))
     r.add_argument("preset")
-    r.add_argument("--source", required=True, help="wav source (absolu ou relatif a <MEDIA>/Samples)")
+    r.add_argument("--source", help="wav source (absolu ou relatif a <MEDIA>/Samples) ; "
+                                    "facultatif si le preset n'en demande pas (riser sur bruit)")
     r.add_argument("--set", action="append", default=[], metavar="NOM=VALEUR",
                    help="reglage du traitement (bpm, bars...)")
     r.add_argument("--mute", action="append", default=[], metavar="CHAINE")

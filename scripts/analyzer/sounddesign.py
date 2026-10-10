@@ -78,6 +78,9 @@ class DeviceSpec(BaseModel):
 class Device(BaseModel):
     type: str
     params: dict[str, float] = Field(default_factory=dict)
+    # automation (8.G) : valeur atteinte en fin de rendu, depuis `params` ;
+    # vide = statique, omis a la serialisation (hash des rendus anterieurs inchange)
+    params_end: dict[str, float] = Field(default_factory=dict, exclude_if=lambda v: not v)
     bypass: bool = False
 
 
@@ -107,6 +110,7 @@ class TreatmentSpec(BaseModel):
     settings: list[ParamSpec]
     notebook: str                    # note du vault (theorie, usage, ressources)
     code: str                        # code DT2 du rendu verse (samples.CODES), ex. RM
+    sub: str = ""                    # sous-dossier fixe (FX/RISE) ; "" : herite de la source
 
 
 class RenderRecord(BaseModel):
@@ -131,12 +135,17 @@ class RenderRecord(BaseModel):
 class RenderContext:
     sr: int
     triggers: np.ndarray             # positions (echantillons) des coups de la source
+    ramp: np.ndarray | None = None   # avancement 0 -> 1 de l'automation, par echantillon
+
+
+PluginFactory = Callable[[dict[str, float]], object]   # parametres -> plugin pedalboard
 
 
 @dataclass(frozen=True)
 class _DeviceDef:
     spec: DeviceSpec
     build: Callable[[dict[str, float], RenderContext], Processor]
+    plugin: PluginFactory | None = None   # pedalboard : automatisable (8.G)
 
 
 def _p(name: str, label: str, lo: float, hi: float, default: float, unit: str = "",
@@ -146,21 +155,28 @@ def _p(name: str, label: str, lo: float, hi: float, default: float, unit: str = 
                      unit=unit, scale=scale, step=step, help=help, choices=choices)
 
 
-def _pedalboard(cls_name: str, mode: str | None = None
-                ) -> Callable[[dict[str, float], RenderContext], Processor]:
-    """Fabrique d'un plugin pedalboard ; les noms de parametres sont ceux de pedalboard.
+def _pedalboard(cls_name: str, mode: str | None = None) -> PluginFactory:
+    """Fabrique d'un plugin pedalboard ; les noms de parametres sont ceux de pedalboard
+    (ce sont aussi ses attributs, que l'automation modifie bloc par bloc).
 
     `mode` fige une valeur d'enum (ex. `LPF24` du ladder), non exposee en potard.
     """
-    def build(params: dict[str, float], ctx: RenderContext) -> Processor:
+    def plugin(params: dict[str, float]) -> object:
         import pedalboard
         cls = getattr(pedalboard, cls_name)
         kwargs: dict[str, object] = dict(params)
         if mode is not None:
             kwargs["mode"] = getattr(cls.Mode, mode)
-        plugin = cls(**kwargs)
-        return lambda x: np.asarray(plugin(x, ctx.sr), dtype=np.float32)
-    return build
+        return cls(**kwargs)
+    return plugin
+
+
+def _pb(spec: DeviceSpec, plugin: PluginFactory) -> _DeviceDef:
+    """Device pedalboard : rendu statique d'un seul tenant, automatisable."""
+    def build(params: dict[str, float], ctx: RenderContext) -> Processor:
+        p = plugin(params)
+        return lambda x: np.asarray(p(x, ctx.sr), dtype=np.float32)  # type: ignore[operator]
+    return _DeviceDef(spec, build, plugin)
 
 
 def _duck(params: dict[str, float], ctx: RenderContext) -> Processor:
@@ -204,35 +220,34 @@ FILTER_MODES = {"LP12": "LPF12", "LP24": "LPF24", "HP12": "HPF12", "HP24": "HPF2
                 "BP12": "BPF12", "BP24": "BPF24"}
 
 
-def _filter(params: dict[str, float], ctx: RenderContext) -> Processor:
+def _filter(params: dict[str, float]) -> object:
     """LadderFilter dont le mode vient du parametre `mode` (index de FILTER_MODES)."""
     import pedalboard
     mode = list(FILTER_MODES.values())[int(params["mode"])]
-    plugin = pedalboard.LadderFilter(mode=getattr(pedalboard.LadderFilter.Mode, mode),
-                                     cutoff_hz=params["cutoff_hz"],
-                                     resonance=params["resonance"], drive=params["drive"])
-    return lambda x: np.asarray(plugin(x, ctx.sr), dtype=np.float32)
+    return pedalboard.LadderFilter(mode=getattr(pedalboard.LadderFilter.Mode, mode),
+                                   cutoff_hz=params["cutoff_hz"],
+                                   resonance=params["resonance"], drive=params["drive"])
 
 
 DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
-    _DeviceDef(DeviceSpec(type="gain", label="Gain", help="Volume en dB.",
+    _pb(DeviceSpec(type="gain", label="Gain", help="Volume en dB.",
                           params=[_p("gain_db", "Gain", -48, 24, 0, "dB")]),
-               _pedalboard("Gain")),
-    _DeviceDef(DeviceSpec(type="highpass", label="Passe-haut",
+        _pedalboard("Gain")),
+    _pb(DeviceSpec(type="highpass", label="Passe-haut",
                           help="Filtre passe-haut 6 dB/oct : retire ce qui est sous la coupure.",
                           params=[_p("cutoff_frequency_hz", "Coupure", 10, 2000, 30, **_HZ)]),
-               _pedalboard("HighpassFilter")),
-    _DeviceDef(DeviceSpec(type="lowpass", label="Passe-bas",
+        _pedalboard("HighpassFilter")),
+    _pb(DeviceSpec(type="lowpass", label="Passe-bas",
                           help="Filtre passe-bas 6 dB/oct : retire ce qui est au-dessus de la coupure.",
                           params=[_p("cutoff_frequency_hz", "Coupure", 20, 20000, 200, **_HZ)]),
-               _pedalboard("LowpassFilter")),
-    _DeviceDef(DeviceSpec(type="ladder_lp", label="Ladder LP24",
+        _pedalboard("LowpassFilter")),
+    _pb(DeviceSpec(type="ladder_lp", label="Ladder LP24",
                           help="Filtre ladder facon Moog, 24 dB/oct, resonance et drive.",
                           params=[_p("cutoff_hz", "Coupure", 20, 20000, 200, **_HZ),
                                   _p("resonance", "Resonance", 0, 1, 0.2),
                                   _p("drive", "Drive", 1, 10, 1)]),
-               _pedalboard("LadderFilter", mode="LPF24")),
-    _DeviceDef(DeviceSpec(type="filter", label="Filtre",
+        _pedalboard("LadderFilter", mode="LPF24")),
+    _pb(DeviceSpec(type="filter", label="Filtre",
                           help="Filtre ladder multimode facon Auto Filter : type passe-bas, "
                                "passe-haut ou passe-bande, pente 12 ou 24 dB/oct, resonance "
                                "(accent autour de la coupure, sifflement vers 1) et drive.",
@@ -241,57 +256,57 @@ DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
                                   _p("cutoff_hz", "Coupure", 20, 20000, 1000, **_HZ),
                                   _p("resonance", "Resonance", 0, 1, 0.3),
                                   _p("drive", "Drive", 1, 10, 1)]),
-               _filter),
-    _DeviceDef(DeviceSpec(type="low_shelf", label="Low shelf",
+        _filter),
+    _pb(DeviceSpec(type="low_shelf", label="Low shelf",
                           help="Plateau grave : monte ou baisse tout ce qui est sous la coupure.",
                           params=[_p("cutoff_frequency_hz", "Coupure", 20, 1000, 80, **_HZ),
                                   _p("gain_db", "Gain", -24, 24, 0, "dB"),
                                   _p("q", "Q", 0.1, 4, 0.707)]),
-               _pedalboard("LowShelfFilter")),
-    _DeviceDef(DeviceSpec(type="peak", label="Bande (peak)",
+        _pedalboard("LowShelfFilter")),
+    _pb(DeviceSpec(type="peak", label="Bande (peak)",
                           help="Cloche d'EQ : creuse ou accentue autour de la frequence.",
                           params=[_p("cutoff_frequency_hz", "Frequence", 20, 20000, 100, **_HZ),
                                   _p("gain_db", "Gain", -24, 24, 0, "dB"),
                                   _p("q", "Q", 0.1, 10, 1)]),
-               _pedalboard("PeakFilter")),
-    _DeviceDef(DeviceSpec(type="reverb", label="Reverb",
+        _pedalboard("PeakFilter")),
+    _pb(DeviceSpec(type="reverb", label="Reverb",
                           help="Reverb algorithmique (Freeverb). En rumble : 100 % wet, largeur 0.",
                           params=[_p("room_size", "Taille", 0, 1, 0.8),
                                   _p("damping", "Amortissement", 0, 1, 0.5),
                                   _p("wet_level", "Wet", 0, 1, 1),
                                   _p("dry_level", "Dry", 0, 1, 0),
                                   _p("width", "Largeur", 0, 1, 0)]),
-               _pedalboard("Reverb")),
-    _DeviceDef(DeviceSpec(type="distortion", label="Distorsion",
+        _pedalboard("Reverb")),
+    _pb(DeviceSpec(type="distortion", label="Distorsion",
                           help="Saturation tanh : ajoute des harmoniques, rend le grave audible.",
                           params=[_p("drive_db", "Drive", 0, 60, 12, "dB")]),
-               _pedalboard("Distortion")),
-    _DeviceDef(DeviceSpec(type="clipping", label="Clipping",
+        _pedalboard("Distortion")),
+    _pb(DeviceSpec(type="clipping", label="Clipping",
                           help="Ecretage dur au seuil.",
                           params=[_p("threshold_db", "Seuil", -40, 0, -6, "dB")]),
-               _pedalboard("Clipping")),
-    _DeviceDef(DeviceSpec(type="bitcrush", label="Bitcrush",
+        _pedalboard("Clipping")),
+    _pb(DeviceSpec(type="bitcrush", label="Bitcrush",
                           help="Reduction de resolution : grain numerique.",
                           params=[_p("bit_depth", "Bits", 1, 24, 8, step=1)]),
-               _pedalboard("Bitcrush")),
-    _DeviceDef(DeviceSpec(type="compressor", label="Compresseur",
+        _pedalboard("Bitcrush")),
+    _pb(DeviceSpec(type="compressor", label="Compresseur",
                           help="Compression classique (pas de sidechain externe : voir Duck).",
                           params=[_p("threshold_db", "Seuil", -60, 0, -18, "dB"),
                                   _p("ratio", "Ratio", 1, 30, 4),
                                   _p("attack_ms", "Attaque", 0.1, 200, 5, "ms", "log"),
                                   _p("release_ms", "Relache", 5, 2000, 100, "ms", "log")]),
-               _pedalboard("Compressor")),
-    _DeviceDef(DeviceSpec(type="limiter", label="Limiteur",
+        _pedalboard("Compressor")),
+    _pb(DeviceSpec(type="limiter", label="Limiteur",
                           help="Limiteur de crete.",
                           params=[_p("threshold_db", "Seuil", -24, 0, -1, "dB"),
                                   _p("release_ms", "Relache", 1, 1000, 100, "ms", "log")]),
-               _pedalboard("Limiter")),
-    _DeviceDef(DeviceSpec(type="delay", label="Delay",
+        _pedalboard("Limiter")),
+    _pb(DeviceSpec(type="delay", label="Delay",
                           help="Echo simple avec reinjection.",
                           params=[_p("delay_seconds", "Temps", 0.001, 2, 0.25, "s", "log"),
                                   _p("feedback", "Feedback", 0, 0.95, 0.3),
                                   _p("mix", "Mix", 0, 1, 0.3)]),
-               _pedalboard("Delay")),
+        _pedalboard("Delay")),
     _DeviceDef(DeviceSpec(type="duck", label="Duck (sidechain)",
                           help="Baisse le volume a chaque coup de la source, comme un "
                                "compresseur en sidechain sur le kick : libere la place du kick.",
@@ -322,12 +337,16 @@ class Prepared:
     loop_len: int
     triggers: np.ndarray
     one_shot: bool = False           # un seul coup : queue coupee au silence + fondu
+    ramp: np.ndarray | None = None   # automation (0 -> 1) ; None : lineaire sur la boucle gardee
+    cut: bool = False                # arret net en fin de rendu (riser), fondu anti-clic
 
 
 @dataclass(frozen=True)
 class _Treatment:
     spec: TreatmentSpec
     prepare: Callable[[np.ndarray, dict[str, float]], Prepared]
+    # le reglage demande-t-il un sample ? (riser sur bruit genere : non)
+    needs_source: Callable[[dict[str, float]], bool] = lambda settings: True
 
 
 def _sequence(source: np.ndarray, hits_per_loop: int, loop_len: int) -> Prepared:
@@ -376,6 +395,15 @@ def _trim_tail(x: np.ndarray) -> np.ndarray:
     return out
 
 
+def _cut(x: np.ndarray) -> np.ndarray:
+    """Arret net (riser) : seul un fondu de CUT_FADE_MS evite le clic."""
+    fade = min(int(CUT_FADE_MS * SR / 1000), x.shape[1])
+    out = x.copy()
+    if fade > 0:
+        out[:, -fade:] *= (0.5 * (1 + np.cos(np.linspace(0, np.pi, fade)))).astype(np.float32)
+    return out
+
+
 def _prepare_rumble(source: np.ndarray, settings: dict[str, float]) -> Prepared:
     if settings["one_shot"]:
         # une track DT2 est monophonique : le coup suivant coupe la queue,
@@ -385,6 +413,49 @@ def _prepare_rumble(source: np.ndarray, settings: dict[str, float]) -> Prepared:
     hits = int(settings["hits_per_bar"])
     bars = int(settings["bars"])
     return _sequence(source, hits * bars, round(bar * bars))
+
+
+# --- Riser (8.G) -----------------------------------------------------------
+
+RISER_SOURCES = ["Bruit blanc", "Bruit rose", "Sample"]
+NO_SOURCE = np.zeros((2, 0), dtype=np.float32)   # source d'un rendu sans sample
+CUT_FADE_MS = 5.0        # arret net du riser : fondu anti-clic seulement
+NOISE_SEED = 8           # bruit reproductible : meme preset = meme fichier
+
+
+def _noise(n: int, pink: bool) -> np.ndarray:
+    """Bruit stereo (canaux independants) ; rose = -3 dB/oct par filtrage spectral."""
+    rng = np.random.default_rng(NOISE_SEED)
+    x = rng.standard_normal((2, n))
+    if pink:
+        spec = np.fft.rfft(x, axis=1)
+        f = np.fft.rfftfreq(n)
+        f[0] = f[1] if n > 1 else 1.0
+        x = np.fft.irfft(spec / np.sqrt(f), n=n, axis=1)
+    return (x / np.max(np.abs(x))).astype(np.float32)
+
+
+def _shape(n: int, curve: float) -> np.ndarray:
+    """Avancement 0 -> 1 sur n echantillons, `t ** curve` (1 = lineaire, 2 = lent puis vite)."""
+    return (np.linspace(0.0, 1.0, n) ** curve) if n > 1 else np.ones(n)
+
+
+def _prepare_riser(source: np.ndarray, settings: dict[str, float]) -> Prepared:
+    """Bruit genere ou sample boucle, monte de `pitch_st` demi-tons (varispeed)
+    sur `bars` mesures selon la courbe ; la meme courbe pilote l'automation."""
+    n = round(settings["bars"] * 4 * 60.0 / settings["bpm"] * SR)
+    ramp = _shape(n, settings["curve"])
+    rate = 2.0 ** (settings["pitch_st"] * ramp / 12.0)
+    phase = np.concatenate([[0.0], np.cumsum(rate[:-1])])
+    need = int(math.ceil(phase[-1])) + 2
+    mode = int(settings["source"])
+    if mode < 2:
+        material = _noise(need, pink=mode == 1)
+    else:
+        material = np.tile(source, (1, need // source.shape[1] + 1))[:, :need]
+    idx = np.arange(need)
+    signal = np.stack([np.interp(phase, idx, material[c]) for c in range(2)]).astype(np.float32)
+    return Prepared(signal, 0, n, np.array([], dtype=int), ramp=ramp, cut=True)
 
 
 TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
@@ -407,7 +478,32 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
         notebook="sounddesign/rumble.md",
         code="RM"),                      # -> DRUMS/RM/<sous-dossier du kick>, track 2
         _prepare_rumble),
+    _Treatment(TreatmentSpec(
+        id="riser", label="Riser",
+        summary="Montee de transition (track 15) : bruit ou son tenu dont filtre, volume, "
+                "envois et hauteur montent sur N mesures, puis arret net sur le temps.",
+        source_hint="aucun (bruit genere) ou son tenu : nappe, drone, bruit du pack",
+        settings=[_p("bpm", "Tempo", 60, 220, 150, "BPM", step=1),
+                  _p("bars", "Mesures", 1, 16, 4, step=1,
+                     help="Duree de la montee ; le rendu s'arrete net a la fin."),
+                  _p("source", "Source", 0, len(RISER_SOURCES) - 1, 0, step=1,
+                     choices=RISER_SOURCES,
+                     help="Bruit genere, ou le sample en cours boucle sur la duree."),
+                  _p("pitch_st", "Hauteur", 0, 24, 0, "demi-tons", step=1,
+                     help="Montee de hauteur (varispeed) sur la duree, selon la courbe."),
+                  _p("curve", "Courbe", 0.25, 4, 2,
+                     help="Forme de la montee : 1 = lineaire, 2 = lente puis rapide "
+                          "(tension en fin de montee), < 1 = rapide puis plateau.")],
+        notebook="sounddesign/riser.md",
+        code="FX", sub="RISE"),          # -> FX/RISE, track 15
+        _prepare_riser, needs_source=lambda st: int(st["source"]) == 2),
 ]}
+
+
+def needs_source(preset: Preset) -> bool:
+    """Le rendu de ce preset demande-t-il un sample source ?"""
+    treatment = TREATMENTS[preset.treatment]
+    return treatment.needs_source(_resolve(treatment.spec.settings, preset.settings, preset.id))
 
 
 def treatment_specs() -> list[TreatmentSpec]:
@@ -443,6 +539,26 @@ def _resolve_device(device: Device, where: str) -> dict[str, float]:
     return _resolve(DEVICES[device.type].spec.params, device.params, f"{where} ({device.type})")
 
 
+def _resolve_end(device: Device, where: str) -> dict[str, float]:
+    """Valeurs de fin d'automation, validees : device pedalboard, parametre continu, bornes."""
+    if not device.params_end:
+        return {}
+    defn = DEVICES[device.type]
+    where = f"{where} ({device.type}) : automation"
+    if defn.plugin is None:
+        raise PresetError(f"{where} non supportee par ce device")
+    by_name = {s.name: s for s in defn.spec.params}
+    for name, value in device.params_end.items():
+        spec = by_name.get(name)
+        if spec is None:
+            raise PresetError(f"{where} : parametre inconnu {name!r}")
+        if spec.choices is not None:
+            raise PresetError(f"{where} : {name} est un selecteur, non automatisable")
+        if not spec.min <= value <= spec.max:
+            raise PresetError(f"{where} : {name}={value} hors de [{spec.min}, {spec.max}]")
+    return dict(device.params_end)
+
+
 def validate(preset: Preset) -> None:
     """Leve PresetError a la premiere incoherence ; ne modifie pas le preset."""
     if preset.treatment not in TREATMENTS:
@@ -455,8 +571,10 @@ def validate(preset: Preset) -> None:
     for chain in preset.chains:
         for i, device in enumerate(chain.devices):
             _resolve_device(device, f"{preset.id} : {chain.name}[{i}]")
+            _resolve_end(device, f"{preset.id} : {chain.name}[{i}]")
     for i, device in enumerate(preset.master):
         _resolve_device(device, f"{preset.id} : master[{i}]")
+        _resolve_end(device, f"{preset.id} : master[{i}]")
 
 
 def load_presets(treatment: str, root: Path) -> list[Preset]:
@@ -506,12 +624,54 @@ def load_source(path: Path) -> np.ndarray:
     return np.ascontiguousarray(data, dtype=np.float32)
 
 
+AUTOMATION_BLOCK = 256   # echantillons (5 ms a 48 kHz) entre deux mises a jour
+
+
+def _value_at(spec: ParamSpec, start: float, end: float, t: float) -> float:
+    """Interpolation debut -> fin ; geometrique pour un potard log (frequences)."""
+    if spec.scale == "log" and start > 0 and end > 0:
+        v = start * (end / start) ** t
+    else:
+        v = start + (end - start) * t
+    return round(v / spec.step) * spec.step if spec.step else v
+
+
+def _automated(device: Device, params: dict[str, float], end: dict[str, float],
+               ctx: RenderContext, n: int) -> Processor:
+    """Plugin pedalboard rendu par blocs, ses attributs suivant `ctx.ramp`.
+
+    L'etat interne (queues de reverb, filtres) est garde d'un bloc a l'autre
+    (`reset=False`) : sans automation, le resultat est identique au rendu
+    d'un seul tenant.
+    """
+    defn = DEVICES[device.type]
+    assert defn.plugin is not None
+    plugin = defn.plugin(params)
+    specs = {s.name: s for s in defn.spec.params}
+    ramp = ctx.ramp if ctx.ramp is not None else np.linspace(0.0, 1.0, n)
+
+    def process(x: np.ndarray) -> np.ndarray:
+        out = np.empty_like(x)
+        for lo in range(0, x.shape[1], AUTOMATION_BLOCK):
+            hi = min(x.shape[1], lo + AUTOMATION_BLOCK)
+            t = float(ramp[min(lo, len(ramp) - 1)])
+            for name, stop in end.items():
+                setattr(plugin, name, _value_at(specs[name], params[name], stop, t))
+            out[:, lo:hi] = plugin.process(x[:, lo:hi], ctx.sr, reset=lo == 0)  # type: ignore[attr-defined]
+        return out
+    return process
+
+
 def _run_devices(devices: list[Device], x: np.ndarray, ctx: RenderContext) -> np.ndarray:
     for device in devices:
         if device.bypass:
             continue
         params = _resolve_device(device, device.type)
-        x = DEVICES[device.type].build(params, ctx)(x)
+        end = _resolve_end(device, device.type)
+        if end:
+            x = _automated(device, params, end, ctx, x.shape[1])(x)
+        else:
+            x = DEVICES[device.type].build(params, ctx)(x)
     return x
 
 
@@ -521,7 +681,12 @@ def render(preset: Preset, source: np.ndarray) -> np.ndarray:
     treatment = TREATMENTS[preset.treatment]
     settings = _resolve(treatment.spec.settings, preset.settings, preset.id)
     prep = treatment.prepare(source, settings)
-    ctx = RenderContext(sr=SR, triggers=prep.triggers)
+    ramp = prep.ramp
+    if ramp is None:   # automation lineaire sur la boucle gardee, fixe pendant le pre-roll
+        ramp = np.zeros(prep.signal.shape[1])
+        ramp[prep.loop_start: prep.loop_start + prep.loop_len] = np.linspace(0.0, 1.0, prep.loop_len)
+        ramp[prep.loop_start + prep.loop_len:] = 1.0
+    ctx = RenderContext(sr=SR, triggers=prep.triggers, ramp=ramp)
 
     mix = np.zeros_like(prep.signal)
     for chain in preset.chains:
@@ -534,6 +699,8 @@ def render(preset: Preset, source: np.ndarray) -> np.ndarray:
     loop = mix[:, prep.loop_start: prep.loop_start + prep.loop_len]
     if prep.one_shot:
         loop = _trim_tail(loop)
+    if prep.cut:
+        loop = _cut(loop)
     peak = float(np.max(np.abs(loop))) if loop.size else 0.0
     if preset.output_peak_db is not None and peak > 0:
         loop = loop * np.float32(10.0 ** (preset.output_peak_db / 20.0) / peak)
@@ -574,17 +741,25 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
            bpm: float | None) -> tuple[str, str]:
     """(nom DT2 propose, sous-dossier) d'un rendu de `source` (relatif a Samples/).
 
-    Le sous-dossier est celui de la source s'il existe pour le code du
-    traitement (kick de DRUMS/BD/CLEAN -> DRUMS/RM/CLEAN), sinon la racine. Le
-    nom est rendu unique dans le dossier cible (rendus deja verses compris).
+    Le sous-dossier est celui du traitement s'il en fixe un (riser : FX/RISE),
+    sinon celui de la source s'il existe pour le code du traitement (kick de
+    DRUMS/BD/CLEAN -> DRUMS/RM/CLEAN), sinon la racine. Sans source (bruit
+    genere), le nom est `<CODE> <BPM> <traitement> Noise`. Le nom est rendu
+    unique dans le dossier cible (rendus deja verses compris).
     """
-    code = TREATMENTS[treatment].spec.code
+    spec = TREATMENTS[treatment].spec
+    code = spec.code
+    if not source:   # rendu sans sample (bruit genere) : `FX 150 Rise Noise`
+        folder = smp.folder_of("", code, spec.sub)
+        taken = {e.name for e in manifest.entries if e.folder == folder}
+        head = " ".join([code, *([str(round(bpm))] if bpm else [])])
+        return smp.unique_name(f"{head} {spec.label[:4]} Noise", taken), spec.sub
     entry = next((e for e in manifest.entries if e.source == source), None)
     reserve = next((r for r in manifest.reserve if r.source == source), None)
     found = entry or reserve
     src_code = found.code if found else (smp.code_of(source, None) or "")
     src_sub = found.sub if found else ""
-    sub = src_sub if smp.has_sub(code, src_sub) else ""
+    sub = spec.sub or (src_sub if smp.has_sub(code, src_sub) else "")
     pack = found.pack if found else smp.pack_of(source)
     src_name = entry.name if entry else smp.short_name(source, src_code or code, pack)
     name = propose_name(src_name, src_code, code, bpm)

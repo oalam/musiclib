@@ -81,6 +81,18 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.G] Traitement **riser** (track 15, rangé en `FX/RISE`) : bruit blanc
+  ou rose généré, ou sample en cours bouclé ; montée de hauteur en demi-tons
+  (varispeed), courbe de montée, longueur de 1 à 16 mesures au tempo, arrêt
+  net sur le temps. Presets `white_sweep`, `pink_thin`, `pad_lift`.
+- [8.G] Automation des devices pedalboard : `params_end` (valeur atteinte en
+  fin de rendu), rendu par blocs de 256 échantillons, interpolation
+  géométrique des fréquences. Les presets sans automation gardent leur JSON
+  (et le hash de leurs rendus).
+- [8.G] API et CLI : `source` facultative quand le preset n'en demande pas
+  (`POST /api/sounddesign/preview|render`, `GET /api/sounddesign/target`,
+  `--source`) ; nom proposé `FX 150 Rise Noise`.
+
 - [8.F] Mode « Un coup » du rumble (réglage `one_shot`, sélecteur Boucle /
   Un coup) : un seul kick et sa queue, sur une longueur en temps au tempo
   (`length_beats`, 1 par défaut : 60 / 150 = 0,4 s à 150 BPM), puis fondu

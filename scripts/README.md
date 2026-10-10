@@ -867,7 +867,7 @@ fiche). Le manuel s'ouvre dans le panneau élargi à la bonne page
 # sounddesign.py — sound design par chaînes de plugins (Phase 8)
 
 Fabrique de nouveaux samples à partir de ceux de la library. Un traitement
-(`rumble` pour l'instant) prépare un signal d'entrée depuis un sample (le
+(`rumble`, `riser`) prépare un signal d'entrée depuis un sample (le
 kick séquencé au tempo), le passe dans les chaînes parallèles d'un preset,
 puis dans le master, et écrit une boucle sans couture. Moteur :
 `analyzer/sounddesign.py` ; plugins : [pedalboard](https://spotify.github.io/pedalboard/)
@@ -880,7 +880,16 @@ python sounddesign.py render rumble deep --source "Drumbrute kick/KIK DB 160 (1)
 python sounddesign.py render rumble gritty --source <wav> --set bpm=190 --set bars=2
 python sounddesign.py render rumble kick_rumble --source <wav> --mute Kick --bypass Rumble:2
 python sounddesign.py render rumble deep --source <wav> --dry-run   # sans écriture
+python sounddesign.py render riser white_sweep --set bars=8         # bruit généré, sans --source
+python sounddesign.py render riser pad_lift --source <wav>          # nappe qui monte
 ```
+
+**Riser** (8.G, track 15 de la doctrine) : réglages `bpm`, `bars` (1 à 16),
+`source` (0 bruit blanc, 1 bruit rose, 2 sample en cours, bouclé),
+`pitch_st` (montée de hauteur en demi-tons, varispeed) et `curve` (1 =
+linéaire, 2 = lente puis rapide). Le rendu dure `bars × 4 × 60 / bpm`
+(4 mesures à 150 BPM = 6,4 s) et s'arrête net (fondu de 5 ms). Sans sample,
+`--source` est inutile ; nom proposé `FX 150 Rise Noise`, rangé en `FX/RISE`.
 
 `--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` et écrit
 son override de rangement (`DRUMS/RM/<sous-dossier du kick>`, nom DT2) ;
@@ -899,18 +908,25 @@ chaîne, `--bypass CHAINE:INDEX` désactive un device (index à partir de 0,
 fixe les réglages du traitement, les chaînes (`name`, `mute`, `gain_db`,
 `devices`), le master et la crête de sortie (`output_peak_db`, `null` pour ne
 pas normaliser). Chaque device : `type`, `params` (noms des paramètres
-pedalboard, absent = défaut), `bypass`. Validés au chargement : device,
-paramètre ou valeur hors bornes lèvent `PresetError`.
+pedalboard, absent = défaut), `bypass` et, pour un device pedalboard,
+`params_end` (automation, 8.G) : valeurs atteintes en fin de rendu, depuis
+`params`, selon la courbe du traitement (géométrique pour un potard en
+fréquence, bloc de 256 échantillons). Pas d'automation des sélecteurs
+(`mode` du filtre) ni des devices maison (`duck`, `width`). Validés au
+chargement : device, paramètre ou valeur hors bornes lèvent `PresetError`.
 
 | Preset | Usage |
 |---|---|
 | `deep` | rumble seul, rond et sombre, 150 BPM : à poser sur une track DT2 sous le kick |
 | `gritty` | rumble seul, plus saturé, retour rapide, 185 BPM (tribe) |
 | `kick_rumble` | kick + rumble dans la même boucle, pour régler ou jouer tel quel |
+| riser `white_sweep` | bruit blanc, passe-bas résonant 200 Hz → 14 kHz, volume et reverb qui montent, 4 mesures |
+| riser `pink_thin` | bruit rose, passe-haut 40 Hz → 5 kHz (le grave se vide), delay croissant, 8 mesures |
+| riser `pad_lift` | sample en cours (nappe) qui monte d'une octave, filtre et reverb qui s'ouvrent |
 
 ## Sorties
 
-`<MEDIA>/SoundDesign/<traitement>/<source>__<preset>_<bpm>bpm_<hash>.wav`
+`<MEDIA>/SoundDesign/<traitement>/<nom DT2> <hash>.wav`
 (48 kHz / 24 bits, stéréo, crête à -1 dBFS) + sidecar `.json` (source,
 snapshot du preset effectif, durée). Le hash porte sur le preset effectif :
 rejouer la même commande réécrit le même fichier.
@@ -919,7 +935,8 @@ Durée : `bars × 4 × 60 / bpm` ; ex. 150 BPM, 1 mesure = 4 × 60 / 150 = 1,6 s
 
 ## Limites
 
-- Rendu en boucle uniquement (pas encore de one-shot).
+- Riser sur sample : la boucle du sample n'est pas fondue à la jointure ;
+  choisir un son tenu sans attaque (nappe, drone) pour éviter un clic par tour.
 - Pas de sidechain externe dans pedalboard : `duck` creuse sur les positions
   de coups connues du traitement, pas sur un détecteur d'enveloppe.
 - Le pré-roll (≥ 4 s) suffit pour une reverb `room_size` ≤ 0,9 ; au-delà,

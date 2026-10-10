@@ -490,7 +490,7 @@ def sd_client(tmp_path: Path) -> TestClient:
 
 def test_sounddesign_catalogue(sd_client: TestClient):
     treatments = sd_client.get("/api/sounddesign/treatments").json()
-    assert [t["id"] for t in treatments] == ["rumble"]
+    assert [t["id"] for t in treatments] == ["rumble", "riser"]
     devices = {d["type"]: d for d in sd_client.get("/api/sounddesign/devices").json()}
     assert devices["duck"]["params"][0]["name"] == "depth_db"
     presets = sd_client.get("/api/sounddesign/presets/rumble").json()
@@ -585,3 +585,16 @@ def test_sounddesign_verse_and_notebook(sd_client: TestClient, tmp_path: Path):
     assert sd_client.post("/api/sounddesign/verse", json={"file": "../x.wav"}).status_code == 404
     nb = sd_client.get("/api/sounddesign/notebook/rumble").json()
     assert nb["path"] == "sounddesign/rumble.md" and nb["markdown"].count("## ") >= 5
+
+
+def test_sounddesign_riser_on_noise_needs_no_source(sd_client: TestClient, tmp_path: Path):
+    from tests.test_sounddesign import _riser
+    preset = json.loads(_riser().model_dump_json())
+    r = sd_client.post("/api/sounddesign/preview", json={"preset": preset})
+    assert r.status_code == 200 and r.content[:4] == b"RIFF"
+    record = sd_client.post("/api/sounddesign/render", json={"preset": preset}).json()
+    assert (record["name"], record["sub"], record["source"]) == ("FX 150 Rise Noise", "RISE", "")
+    t = sd_client.get("/api/sounddesign/target", params={"treatment": "riser", "bpm": 150}).json()
+    assert t["folder"] == "FX/RISE"
+    preset["settings"]["source"] = 2          # sample : la source redevient obligatoire
+    assert sd_client.post("/api/sounddesign/preview", json={"preset": preset}).status_code == 404

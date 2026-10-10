@@ -1,0 +1,32 @@
+{
+  "id": "white_sweep",
+  "treatment": "riser",
+  "label": "Bruit blanc qui s'ouvre",
+  "description": "Riser classique : bruit blanc, passe-bas resonant qui s'ouvre de 200 Hz a 14 kHz, volume et reverb qui montent, coupe net sur le temps.",
+  "settings": {"bpm": 150, "bars": 4, "source": 0, "pitch_st": 0, "curve": 2},
+  "chains": [
+    {
+      "name": "Sweep",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "filter", "params": {"mode": 1, "cutoff_hz": 200, "resonance": 0.35, "drive": 1}, "params_end": {"cutoff_hz": 14000}, "bypass": false},
+        {"type": "gain", "params": {"gain_db": -30}, "params_end": {"gain_db": 0}, "bypass": false}
+      ]
+    },
+    {
+      "name": "Air",
+      "mute": false,
+      "gain_db": -6,
+      "devices": [
+        {"type": "filter", "params": {"mode": 2, "cutoff_hz": 3000, "resonance": 0, "drive": 1}, "bypass": false},
+        {"type": "reverb", "params": {"room_size": 0.9, "damping": 0.3, "wet_level": 1, "dry_level": 0, "width": 1}, "bypass": false},
+        {"type": "gain", "params": {"gain_db": -40}, "params_end": {"gain_db": 0}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

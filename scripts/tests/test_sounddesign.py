@@ -265,3 +265,92 @@ def test_one_shot_lasts_the_chosen_beats_with_faded_tail():
     assert np.all(audio[:, -1] == 0)                       # fondu jusqu'a zero
     preset.settings["length_beats"] = 0.5
     assert sd.render(preset, _kick()).shape[1] == 9_600
+
+
+# --- Riser et automation (8.G) ----------------------------------------------
+
+def _riser(source: int = 0, **settings: float) -> sd.Preset:
+    return sd.Preset.model_validate({
+        "id": "r", "treatment": "riser", "label": "test",
+        "settings": {"bpm": 150, "bars": 2, "source": source, **settings},
+        "chains": [{"name": "Sweep", "devices": [
+            {"type": "filter", "params": {"mode": 0, "cutoff_hz": 200},
+             "params_end": {"cutoff_hz": 12000}},
+            {"type": "gain", "params": {"gain_db": -30}, "params_end": {"gain_db": 0}},
+        ]}],
+    })
+
+
+def _quarters_rms(audio: np.ndarray) -> list[float]:
+    q = audio.shape[1] // 4
+    return [float(np.sqrt(np.mean(audio[:, i * q:(i + 1) * q] ** 2))) for i in range(4)]
+
+
+def test_riser_on_noise_rises_and_stops_dead():
+    # 150 BPM, 2 mesures : 2 * 4 * 60 / 150 = 3,2 s -> 153600 echantillons
+    preset = _riser()
+    assert not sd.needs_source(preset)
+    audio = sd.render(preset, sd.NO_SOURCE)
+    assert audio.shape == (2, 153_600)
+    rms = _quarters_rms(audio)
+    assert rms == sorted(rms) and rms[3] > 10 * rms[0]
+    assert np.all(audio[:, -1] == 0)                         # fondu anti-clic de 5 ms
+    assert np.max(np.abs(audio[:, -480:-240])) > 0.05        # mais la coupe reste nette
+    assert np.array_equal(audio, sd.render(preset, sd.NO_SOURCE))   # bruit reproductible
+
+
+def test_riser_filter_sweep_opens_the_spectrum():
+    audio = sd.render(_riser(), sd.NO_SOURCE)
+    q = audio.shape[1] // 4
+    first, last = audio[:, :q], audio[:, -q:]
+    def share(x: np.ndarray) -> float:
+        return _band_energy(x, 4000, 20000) / _band_energy(x, 20, 20000)
+    assert share(last) > 10 * share(first)
+
+
+def test_riser_pitch_rise_on_sample_source():
+    # sinus 220 Hz, +12 demi-tons : la fin est autour de 440 Hz
+    t = np.arange(4800) / sd.SR
+    sine = np.tile(np.sin(2 * np.pi * 220 * t).astype(np.float32), (2, 1))
+    preset = _riser(source=2, pitch_st=12, curve=1)
+    preset.chains[0].devices = []
+    assert sd.needs_source(preset)
+    audio = sd.render(preset, sine)
+    tail = audio[0, -4800:]
+    freqs = np.fft.rfftfreq(len(tail), 1 / sd.SR)
+    assert abs(freqs[np.argmax(np.abs(np.fft.rfft(tail)))] - 440) < 25
+
+
+def test_automation_without_end_matches_static_render():
+    static = sd.render(_preset(), _kick())
+    auto = _preset()
+    auto.chains[1].devices[1].params_end = {"cutoff_frequency_hz": 200}   # fin = debut
+    assert np.allclose(sd.render(auto, _kick()), static, atol=1e-6)
+
+
+def test_automation_validation():
+    preset = _riser()
+    preset.chains[0].devices[0].params_end = {"mode": 2}
+    with pytest.raises(sd.PresetError, match="selecteur"):
+        sd.validate(preset)
+    preset.chains[0].devices[0].params_end = {"cutoff_hz": 1e6}
+    with pytest.raises(sd.PresetError, match="hors de"):
+        sd.validate(preset)
+    preset.chains[0].devices[0] = sd.Device(type="duck", params_end={"depth_db": 10})
+    with pytest.raises(sd.PresetError, match="non supportee"):
+        sd.validate(preset)
+
+
+def test_static_preset_json_has_no_params_end():
+    # hash des rendus rumble anterieurs a 8.G inchange
+    assert "params_end" not in _preset().model_dump_json()
+
+
+def test_riser_target_is_fx_rise():
+    from analyzer.samples import Manifest, SampleEntry
+    m = Manifest(source_root="x", total=0)
+    assert sd.target("", m, "riser", 150) == ("FX 150 Rise Noise", "RISE")
+    pad = SampleEntry(source="p/pad.wav", family="AMBIENT", code="PD", pack="nz",
+                      name="PD C Warm 01 nz", duration=4.0, rank=1, sub="AMBIENT")
+    name, sub = sd.target("p/pad.wav", _manifest(pad), "riser", 150)
+    assert sub == "RISE" and name.startswith("FX 150 ") and len(name) <= 18
