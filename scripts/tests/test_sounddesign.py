@@ -179,3 +179,30 @@ def test_filter_mode_must_be_an_index():
         sd.validate(preset)
     spec = next(p for p in sd.DEVICES["filter"].spec.params if p.name == "mode")
     assert spec.choices == ["LP12", "LP24", "HP12", "HP24", "BP12", "BP24"]
+
+
+def test_verse_name_is_classified_as_bass_loop(tmp_path: Path):
+    from analyzer.samples import code_of, sub_of, tempo_of
+
+    for pid, bpm in (("deep", 150), ("kick_rumble", 150), ("gritty", 185)):
+        preset = _preset()
+        preset.id = pid
+        preset.settings["bpm"] = bpm
+        record = sd.write_render(sd.render(preset, _kick()), Path("KIK DB 160.wav"), "x", preset, tmp_path)
+        key = sd.verse_key(record)
+        assert "kik" not in key.lower()           # le nom du kick rangerait en BD
+        assert code_of(key, record.seconds) == "BL"
+        assert tempo_of(key) == bpm
+        assert sub_of(key, "BL", record.seconds) == ""   # racine LOOPS/BL, tempo garde dans le nom
+
+
+def test_verse_copies_once_and_marks(tmp_path: Path):
+    out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
+    record = sd.write_render(sd.render(_preset(), _kick()), Path("k.wav"), "x", _preset(), out)
+    assert sd.mark_versed([record], samples_root)[0].versed is None
+    key = sd.verse(record, out, samples_root)
+    assert key.startswith("SoundDesign/rumble/rumble bass loop t 150bpm ")
+    mtime = (samples_root / key).stat().st_mtime_ns
+    assert sd.verse(record, out, samples_root) == key           # rejouable, pas de recopie
+    assert (samples_root / key).stat().st_mtime_ns == mtime
+    assert sd.mark_versed([record], samples_root)[0].versed == key

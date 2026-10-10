@@ -72,6 +72,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.D] Notebook rumble (`sounddesign/rumble.md` : théorie, chaîne device
+  par device, presets, usage sur la DT2, pièges, ressources) affiché sous
+  le rack, « ? » d'un device = sa section. Versement d'un rendu dans le
+  pack `Samples/SoundDesign/` (bouton « Verser », `--verse` en CLI,
+  `POST /api/sounddesign/verse`) suivi de la réanalyse : rangé en
+  `LOOPS/BL`. Rendu markdown du vault factorisé (`web/src/lib/markdown.ts`).
 - [8.C] Device « Filtre » façon Auto Filter (ladder pedalboard) : type
   LP / HP / BP en 12 ou 24 dB/oct (sélecteur), coupure, résonance, drive ;
   courbe à nœud x = coupure, y = résonance. Les passe-haut / passe-bas

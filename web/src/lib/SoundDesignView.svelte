@@ -5,7 +5,8 @@
   // bypass, potards, courbe des filtres). La boucle se re-rend a chaque
   // reglage pendant la lecture. Le solo n'est pas enregistre dans le preset.
   import { onDestroy } from 'svelte'
-  import { api, type DeviceSpec, type RenderRecord, type SampleEntry, type SdPreset, type TreatmentSpec } from './api'
+  import { createMarked, escapeHtml, replaceWikilinks } from './markdown'
+  import { api, slugify, type DeviceSpec, type RenderRecord, type SampleEntry, type SdPreset, type TreatmentSpec } from './api'
   import { remote } from './remote.svelte'
   import Device from './sd/Device.svelte'
   import Fader from './sd/Fader.svelte'
@@ -45,6 +46,8 @@
   async function openTreatment(t: TreatmentSpec) {
     treatment = t
     remember({ treatment: t.id })
+    notebook = ''
+    api.sdNotebook(t.id).then(n => (notebook = n.markdown)).catch(() => (notebook = ''))
     presets = await api.sdPresets(t.id)
     const p = presets.find(x => x.id === mem.preset) ?? presets[0]
     if (p) openPreset(p)
@@ -65,6 +68,23 @@
   function revert() {
     const p = presets.find(x => x.id === preset?.id)
     if (p) { preset = structuredClone($state.snapshot(p)) as SdPreset; saved = JSON.stringify(preset) }
+  }
+
+  // --- Notebook (8.D) : note du vault, wikilinks en texte ---------------------
+  let notebook = $state('')
+  let notebookEl: HTMLElement | undefined = $state()
+  const marked = createMarked()
+  const notebookHtml = $derived(notebook
+    ? marked.parse(replaceWikilinks(notebook.replace(/^---\n[\s\S]*?\n---\n/, ''),
+        (target, alias) => escapeHtml(alias || target.split('/').pop() || target)), { async: false })
+    : '')
+  /** « ? » d'un device : titre du notebook qui commence par son nom (Passe-bas -> Passe-bas (avant…)). */
+  function help(label: string) {
+    const slug = slugify(label)
+    const h = [...(notebookEl?.querySelectorAll('h3, h2') ?? [])].find(e => e.id.startsWith(slug))
+    h?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    h?.classList.add('flash')
+    setTimeout(() => h?.classList.remove('flash'), 1200)
   }
 
   // --- Enregistrement -------------------------------------------------------
@@ -195,6 +215,17 @@
     clearTimeout(liveTimer)
     liveTimer = setTimeout(() => void preview(), 180)
   })
+
+  let verseMsg = $state('')
+  async function verseRender(file: string) {
+    try {
+      const rec = await api.sdVerse(file)
+      renders = renders.map(r => (r.file === file ? rec : r))
+      await api.sampleRebuild()   // classe le nouveau fichier (LOOPS/BL...) dans la vue Samples
+      verseMsg = `Versé : Samples/${rec.versed} ; réanalyse de la bibliothèque lancée.`
+      error = ''
+    } catch (e) { error = e instanceof Error ? e.message : String(e) }
+  }
 
   async function renderToDisk() {
     if (!payload || !source) return
@@ -352,7 +383,8 @@
         <h3>{selected === 'master' ? 'Master' : preset.chains[selected]?.name} <span class="muted small">{selected === 'master' ? 'après la somme des chaînes' : 'chaîne parallèle'}</span></h3>
         <div class="devices">
           {#each devices as d, i (i + d.type)}
-            <Device device={d} spec={catalogue[d.type]} onmove={delta => moveDevice(i, delta)} onremove={() => devices.splice(i, 1)} />
+            <Device device={d} spec={catalogue[d.type]} onmove={delta => moveDevice(i, delta)} onremove={() => devices.splice(i, 1)}
+              onhelp={() => help(catalogue[d.type]?.label ?? d.type)} />
             <span class="arrow" aria-hidden="true">→</span>
           {/each}
           <div class="adder">
@@ -368,20 +400,26 @@
 
     <div class="lower">
       <section class="panel notebook">
-        <h3>Notebook — {treatment.label}</h3>
-        <p>{treatment.summary}</p>
-        <p class="small muted">Sample attendu : {treatment.source_hint}. {preset.description}</p>
-        <p class="small muted">Théorie, rôle de chaque paramètre et ressources : <code>{treatment.notebook}</code> (à venir, 8.D).</p>
+        <p class="small muted nbpath">Notebook — <code>{treatment.notebook}</code> · {preset.label} : {preset.description}</p>
+        {#if notebookHtml}
+          <article class="md" bind:this={notebookEl}>{@html notebookHtml}</article>
+        {:else}
+          <p>{treatment.summary}</p>
+          <p class="small muted">Sample attendu : {treatment.source_hint}. Notebook absent du vault.</p>
+        {/if}
       </section>
       <section class="panel renders">
         <h3>Rendus <span class="muted small">SoundDesign/{treatment.id}</span></h3>
         <audio bind:this={renderAudio} onended={() => (renderPlaying = null)}></audio>
+        {#if verseMsg}<p class="small muted">{verseMsg}</p>{/if}
         <ul>
           {#each renders as r (r.file)}
             <li>
               <button class="small" class:on={renderPlaying === r.file} onclick={() => playRender(r.file)}>{renderPlaying === r.file ? '■' : '▶'}</button>
-              <span class="mono small" title={`${r.source}\n${r.created_at}`}>{r.file.split('/').pop()}</span>
+              <span class="mono small fname" title={`${r.file}\n${r.source}\n${r.created_at}`}>{r.file.split('/').pop()}</span>
               <span class="muted small">{r.seconds.toFixed(2)} s</span>
+              {#if r.versed}<span class="versed small" title={`Samples/${r.versed}`}>versé</span>
+              {:else}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign (arbre des samples DT2)">Verser</button>{/if}
             </li>
           {:else}<li class="muted small">Aucun rendu pour l'instant.</li>{/each}
         </ul>
@@ -423,10 +461,23 @@
   .devices { display: flex; align-items: flex-start; gap: 6px; overflow-x: auto; padding-bottom: 6px; }
   .arrow { align-self: center; color: var(--muted); }
   .adder { display: flex; flex-direction: column; gap: 6px; align-self: center; }
-  .lower { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .notebook p { margin: 0 0 6px; }
+  .lower { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+  .renders { position: sticky; top: 0; }
+  .nbpath { margin: 0 0 4px; }
+  .md { line-height: 1.55; max-width: 820px; }
+  .md :global(h1) { font-size: 20px; margin: 4px 0 10px; }
+  .md :global(h2) { font-size: 16px; margin: 18px 0 6px; border-bottom: 1px solid var(--border); padding-bottom: 3px; }
+  .md :global(h3) { font-size: 14px; margin: 14px 0 4px; scroll-margin-top: 8px; border-radius: 3px; transition: background 0.4s; }
+  .md :global(h3.flash) { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+  .md :global(table) { border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+  .md :global(th), .md :global(td) { border: 1px solid var(--border); padding: 3px 8px; text-align: left; vertical-align: top; }
+  .md :global(th) { background: var(--panel-2); }
+  .md :global(code) { font-size: 12px; background: var(--panel-2); padding: 0 3px; border-radius: 3px; }
+  .md :global(a) { color: var(--accent); }
+  .versed { color: var(--accent); }
   .renders ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
-  .renders li { display: flex; align-items: center; gap: 8px; }
+  .renders li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .fname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .small { font-size: 12px; }
   .err { color: #dc2626; font-size: 12px; margin: 0; }
   @media (max-width: 900px) {

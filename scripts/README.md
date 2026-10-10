@@ -882,7 +882,8 @@ python sounddesign.py render rumble kick_rumble --source <wav> --mute Kick --byp
 python sounddesign.py render rumble deep --source <wav> --dry-run   # sans écriture
 ```
 
-`--source` est absolu ou relatif à `<MEDIA>/Samples`. `--set` change un
+`--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` (relancer
+`samples.py` pour le classer). `--source` est absolu ou relatif à `<MEDIA>/Samples`. `--set` change un
 réglage du traitement (`bpm`, `bars`, `hits_per_bar`), `--mute` coupe une
 chaîne, `--bypass CHAINE:INDEX` désactive un device (index à partir de 0,
 `master:0` pour la sortie). Les overrides ne modifient pas le preset.
@@ -1020,7 +1021,12 @@ python api.py &   puis   cd ../web && npm run dev
     lecture relance le rendu et remplace la boucle à la même phase (fondu
     de 15 ms). Précédent / suivant de la télécommande = preset voisin.
   - **Rendus** : derniers fichiers de `SoundDesign/<traitement>/`, écoute en
-    boucle ; encart Notebook (résumé, sample attendu ; contenu en 8.D).
+    boucle ; **Verser** copie le rendu dans le pack `Samples/SoundDesign/`
+    et lance la réanalyse de la bibliothèque (8.D) : il apparaît dans la vue
+    Samples en `LOOPS/BL`, prêt pour l'écoute garder / écarter et l'export.
+  - **Notebook** (8.D) : la note du vault du traitement
+    ([[sounddesign/rumble]]) sous le rack ; le « ? » d'un device fait
+    défiler jusqu'à sa section.
 
 **API** (127.0.0.1 uniquement ; un fichier n'est servi que pour un slug présent
 dans library.md) :
@@ -1063,6 +1069,8 @@ erreur sur un fichier annule tout le lot, rien n'est écrit.
 | POST | `/api/sounddesign/render` | `{preset, source}` → `RenderRecord` ; écrit le wav et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/` |
 | GET | `/api/sounddesign/renders?treatment=` | rendus écrits, du plus récent au plus ancien |
 | GET | `/api/sounddesign/renders/audio?file=` | wav d'un rendu listé (404 sinon) |
+| POST | `/api/sounddesign/verse` | `{file}` → `RenderRecord` avec `versed` (clé du manifeste) ; copie dans `Samples/SoundDesign/` (409 pendant une réanalyse) |
+| GET | `/api/sounddesign/notebook/{traitement}` | `{path, markdown}` du notebook du vault (404 s'il manque) |
 
 **Ajout d'un morceau (7.I)** : bouton « + Ajouter un morceau » de la barre du
 haut. Recherche (ex. « Limitlezz x Maureen - Shatta Mad », ou une URL YT/SC)

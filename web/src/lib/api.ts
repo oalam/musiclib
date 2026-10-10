@@ -365,7 +365,16 @@ export interface TreatmentSpec {
   settings: ParamSpec[]
   notebook: string
 }
-export interface RenderRecord { file: string; source: string; preset: SdPreset; sr: number; seconds: number; created_at: string }
+export interface RenderRecord {
+  file: string
+  source: string
+  preset: SdPreset
+  sr: number
+  seconds: number
+  created_at: string
+  /** Cle du manifeste si verse dans le pack Samples/SoundDesign (8.D). */
+  versed: string | null
+}
 
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
 export const manualUrl = (page = 1) => `/api/manual#page=${page}`
@@ -484,6 +493,12 @@ export const api = {
       .then(r => json<RenderRecord>(r)),
   sdRenders: (treatment: string) => fetch(`/api/sounddesign/renders?treatment=${enc(treatment)}`).then(r => json<RenderRecord[]>(r)),
   sdRenderAudioUrl: (file: string) => `/api/sounddesign/renders/audio?file=${enc(file)}`,
+  /** Copie le rendu dans le pack Samples/SoundDesign ; reanalyse a lancer ensuite. */
+  sdVerse: (file: string) =>
+    fetch('/api/sounddesign/verse', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file }) })
+      .then(r => json<RenderRecord>(r)),
+  sdNotebook: (treatment: string) =>
+    fetch(`/api/sounddesign/notebook/${enc(treatment)}`).then(r => json<{ path: string; markdown: string }>(r)),
 }
 
 /** Minuscules sans accents (meme regle que kb.normalize). */

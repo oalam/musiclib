@@ -12,6 +12,8 @@ Usage:
     sounddesign.py render rumble deep --source <wav> --set bpm=185 --set bars=2
     sounddesign.py render rumble kick_rumble --source <wav> --mute Kick --bypass Rumble:2
     sounddesign.py render rumble deep --source <wav> --dry-run   # rendu sans ecriture
+    sounddesign.py render rumble deep --source <wav> --verse     # + copie dans le pack
+                                                  # Samples/SoundDesign (relancer samples.py)
 
 `--source` : chemin absolu, ou relatif a `<MEDIA>/Samples`.
 `--bypass CHAINE:INDEX` : index du device dans la chaine (0 = premier),
@@ -36,6 +38,7 @@ from analyzer.sounddesign import (
     load_presets,
     load_source,
     render,
+    verse,
     with_overrides,
     write_render,
 )
@@ -104,6 +107,9 @@ def _cmd_render(args: argparse.Namespace) -> int:
         return 0
     record = write_render(audio, source, media_relative(source), preset, SOUNDDESIGN_OUT_DIR)
     print(f"-> {SOUNDDESIGN_OUT_DIR / record.file}")
+    if args.verse:
+        key = verse(record, SOUNDDESIGN_OUT_DIR, SAMPLES_SRC_DIR)
+        print(f"-> verse : Samples/{key} (relancer samples.py pour le classer)")
     return 0
 
 
@@ -121,6 +127,8 @@ def main() -> int:
     r.add_argument("--mute", action="append", default=[], metavar="CHAINE")
     r.add_argument("--bypass", action="append", default=[], metavar="CHAINE:INDEX")
     r.add_argument("--dry-run", action="store_true", help="rend sans ecrire")
+    r.add_argument("--verse", action="store_true",
+                   help="copie aussi le rendu dans le pack Samples/SoundDesign")
     args = parser.parse_args()
     try:
         if args.cmd == "list":

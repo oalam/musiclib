@@ -19,7 +19,9 @@ design (`PUT .../presets/...` dans le vault, `POST .../render` vers
 MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
 dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre) ;
-un rendu de sound design que s'il a un sidecar sous `<MEDIA>/SoundDesign`.
+un rendu de sound design que s'il a un sidecar sous `<MEDIA>/SoundDesign` ;
+le versement d'un rendu (`POST .../verse`) est la seule ecriture sous
+`<MEDIA>/Samples` (pack `SoundDesign/`).
 
 Usage:
     python api.py                 # http://127.0.0.1:8765 (sert aussi web/dist)
@@ -342,6 +344,15 @@ class SampleTags(BaseModel):
 
 
 PresetId = Annotated[str, Field(pattern=r"^[a-z0-9_]{1,40}$")]
+
+
+class SdNotebook(BaseModel):
+    path: str          # relatif au vault
+    markdown: str
+
+
+class SdVerse(BaseModel):
+    file: str          # rendu liste (relatif a <MEDIA>/SoundDesign)
 
 
 class SoundDesignRequest(BaseModel):
@@ -892,7 +903,29 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def sd_renders(treatment: str | None = None) -> list[sd.RenderRecord]:
         if treatment is not None:
             treatment_or_404(treatment)
-        return sd.list_renders(sounddesign_out, treatment)
+        return sd.mark_versed(sd.list_renders(sounddesign_out, treatment), samples_src)
+
+    @app.post("/api/sounddesign/verse", response_model=sd.RenderRecord)
+    def sd_verse(req: SdVerse) -> sd.RenderRecord:
+        """Copie un rendu dans le pack `Samples/SoundDesign/` (8.D) ; la reanalyse
+        de la bibliotheque (`POST /api/samples/rebuild`) le classe ensuite."""
+        record = next((r for r in sd.list_renders(sounddesign_out) if r.file == req.file), None)
+        if record is None:
+            raise HTTPException(404, f"rendu inconnu : {req.file}")
+        media_or_503()
+        with samples_lock:
+            refuse_if_rebuilding()
+            record.versed = sd.verse(record, sounddesign_out, samples_src)
+        return record
+
+    @app.get("/api/sounddesign/notebook/{treatment}", response_model=SdNotebook)
+    def sd_notebook(treatment: str) -> SdNotebook:
+        treatment_or_404(treatment)
+        rel = sd.TREATMENTS[treatment].spec.notebook
+        path = VAULT_ROOT / rel
+        if not path.is_file():
+            raise HTTPException(404, f"notebook absent du vault : {rel}")
+        return SdNotebook(path=rel, markdown=path.read_text(encoding="utf-8"))
 
     @app.get("/api/sounddesign/renders/audio")
     def sd_render_audio(file: str) -> FileResponse:

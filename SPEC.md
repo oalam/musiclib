@@ -898,7 +898,7 @@ réutilisable pour eux.
 
 ---
 
-## Phase 8 — Sound design (en cours, démarrée le 2026-10-10)
+## Phase 8 — Sound design (livrée le 2026-10-10)
 
 **But** : fabriquer de nouveaux samples à partir de ceux de la library par
 des **traitements** paramétrables (premier : le **rumble**), chacun étant un
@@ -918,7 +918,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.A | Moteur `analyzer/sounddesign.py` (modèles Pydantic, catalogue de 15 devices, traitement rumble, rendu en boucle sans couture), presets JSON du vault, CLI `sounddesign.py`, tests | fait (presets à valider à l'oreille) |
 | 8.B | API `/api/sounddesign/...` : traitements, catalogue des devices, presets (lecture, sauvegarde `PUT`), écoute à la volée (WAV en mémoire, synchrone : 0,2 s au pire pour 8 mesures à 60 BPM), écriture d'un rendu, liste et écoute des rendus | fait |
 | 8.C | Vue front « Sound design » façon Ableton Live : potards (glisser vertical, Maj fin, double-clic défaut), tranches de mixage = chaînes (fader, activateur = mute, solo d'écoute), devices avec activateur = bypass, courbe de réponse à nœud pour filtres / EQ, ajout / retrait / déplacement de devices et de chaînes, presets enregistrer / enregistrer sous, source du manifeste + écoute A/B, boucle Web Audio re-rendue à chaud, rendus | fait (à valider à l'usage) |
-| 8.D | Notebook rumble (`sounddesign/rumble.md` : théorie, usage, paramètres, ressources) intégré à la vue ; rendus versés à l'arbre des samples DT2 | à venir |
+| 8.D | Notebook rumble [[sounddesign/rumble]] (théorie, chaîne device par device, presets, usage DT2, pièges, ressources) affiché dans la vue (`GET /api/sounddesign/notebook/{t}`, « ? » d'un device = sa section) ; versement d'un rendu dans le pack `Samples/SoundDesign/` puis réanalyse : rangé en `LOOPS/BL` (`POST /api/sounddesign/verse`, `--verse` en CLI) | fait (versement à valider sur le disque) |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -945,6 +945,16 @@ On garde une boucle d'une à huit mesures, sans couture.
   le device `filter` (LadderFilter pedalboard) ; `highpass` / `lowpass`
   restent des 1er ordre sans résonance. Un paramètre discret porte
   `choices` (sélecteur dans le front, index validé côté moteur).
+- **Versement** (8.D, arbitré le 2026-10-10) : un rendu versé est copié dans
+  le pack `<MEDIA>/Samples/SoundDesign/<traitement>/`, **seule exception** à
+  la lecture seule de `Samples/`, puis suit le circuit des samples
+  (réanalyse, écoute garder / écarter, export Transfer). Nom versé sans le
+  sample source (un `kik` dans le nom rangerait en BD) :
+  `<traitement> <verse_words> <preset> <bpm>bpm <hash>.wav` ; pour le rumble,
+  `bass loop` → `LOOPS/BL` (tempo gardé dans le nom DT2, pas de tranche).
+- **Notebooks** : un par traitement, markdown du vault (`sounddesign/<t>.md`,
+  champ `notebook` du traitement) ; les titres de section reprennent les
+  noms des devices pour le lien « ? ».
 - **Sidechain** : pedalboard n'a pas d'entrée sidechain ; le device `duck`
   creuse le signal sur les positions de coups connues du traitement.
 

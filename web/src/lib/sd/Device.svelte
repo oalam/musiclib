@@ -7,11 +7,12 @@
   import Knob from './Knob.svelte'
   import { isFilter } from './scale'
 
-  let { device, spec, onmove, onremove }: {
+  let { device, spec, onmove, onremove, onhelp }: {
     device: SdDevice
     spec: DeviceSpec | undefined
     onmove?: (delta: number) => void
     onremove?: () => void
+    onhelp?: () => void
   } = $props()
 
   const values = $derived(Object.fromEntries((spec?.params ?? []).map(p => [p.name, device.params[p.name] ?? p.default])))
@@ -23,6 +24,7 @@
     <button class="act" class:on={!device.bypass} onclick={() => (device.bypass = !device.bypass)}
       aria-pressed={!device.bypass} title={device.bypass ? 'Activer le device' : 'Désactiver le device (bypass)'}></button>
     <span class="title" title={spec?.help}>{spec?.label ?? device.type}</span>
+    {#if onhelp}<button class="mini" onclick={onhelp} title="Explication dans le notebook">?</button>{/if}
     {#if onmove}
       <button class="mini" onclick={() => onmove(-1)} title="Déplacer vers la gauche">‹</button>
       <button class="mini" onclick={() => onmove(1)} title="Déplacer vers la droite">›</button>

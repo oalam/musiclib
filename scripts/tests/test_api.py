@@ -552,3 +552,16 @@ def test_sounddesign_invalid_preset_is_422(sd_client: TestClient):
     preset["chains"][1]["devices"][0]["type"] = "fuzz"
     r = sd_client.post("/api/sounddesign/preview", json={"preset": preset, "source": "k/kick.wav"})
     assert r.status_code == 422 and "device inconnu" in r.json()["detail"]
+
+
+def test_sounddesign_verse_and_notebook(sd_client: TestClient, tmp_path: Path):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    record = sd_client.post("/api/sounddesign/render",
+                            json={"preset": preset, "source": "k/kick.wav"}).json()
+    assert sd_client.get("/api/sounddesign/renders").json()[0]["versed"] is None
+    versed = sd_client.post("/api/sounddesign/verse", json={"file": record["file"]}).json()
+    assert (tmp_path / "Samples" / versed["versed"]).is_file()
+    assert sd_client.get("/api/sounddesign/renders").json()[0]["versed"] == versed["versed"]
+    assert sd_client.post("/api/sounddesign/verse", json={"file": "../x.wav"}).status_code == 404
+    nb = sd_client.get("/api/sounddesign/notebook/rumble").json()
+    assert nb["path"] == "sounddesign/rumble.md" and nb["markdown"].count("## ") >= 5

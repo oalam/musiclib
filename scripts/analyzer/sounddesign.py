@@ -103,6 +103,7 @@ class TreatmentSpec(BaseModel):
     source_hint: str                 # quel sample donner en entree
     settings: list[ParamSpec]
     notebook: str                    # note du vault (theorie, usage, ressources)
+    verse_words: str                 # mots du nom verse qui rangent le rendu (samples.code_of)
 
 
 class RenderRecord(BaseModel):
@@ -114,6 +115,7 @@ class RenderRecord(BaseModel):
     sr: int
     seconds: float
     created_at: str
+    versed: str | None = None        # cle du manifeste si verse dans le pack (rempli a la lecture)
 
 
 # ---------------------------------------------------------------------------
@@ -354,7 +356,8 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
                      help="Longueur de la boucle rendue."),
                   _p("hits_per_bar", "Coups / mesure", 1, 8, 4, step=1,
                      help="4 = four on the floor.")],
-        notebook="sounddesign/rumble.md"),
+        notebook="sounddesign/rumble.md",
+        verse_words="bass loop"),        # -> LOOPS/BL (tempo garde dans le nom DT2)
         _prepare_rumble),
 ]}
 
@@ -534,6 +537,49 @@ def list_renders(out_root: Path, treatment: str | None = None) -> list[RenderRec
         if (out_root / record.file).is_file():
             records.append(record)
     return sorted(records, key=lambda r: (r.created_at, r.file), reverse=True)
+
+
+def mark_versed(records: list[RenderRecord], samples_root: Path) -> list[RenderRecord]:
+    """Renseigne `versed` pour les rendus deja copies dans le pack."""
+    for record in records:
+        key = verse_key(record)
+        record.versed = key if (samples_root / key).is_file() else None
+    return records
+
+
+VERSE_PACK = "SoundDesign"   # pack des rendus verses sous <MEDIA>/Samples (Phase 8.D)
+
+
+def verse_key(record: RenderRecord) -> str:
+    """Cle du manifeste (relative a Samples/) d'un rendu verse.
+
+    Nom sans le sample source (un kick dans le nom le rangerait en BD) :
+    `<traitement> <mots de rangement> <preset> <bpm>bpm <hash>.wav`.
+    """
+    spec = TREATMENTS[record.preset.treatment].spec
+    stem = Path(record.file).stem
+    digest = stem.rsplit("_", 1)[-1]
+    bpm = record.preset.settings.get("bpm")
+    tempo = f" {int(bpm)}bpm" if bpm is not None else ""
+    return f"{VERSE_PACK}/{spec.id}/{spec.id} {spec.verse_words} {record.preset.id}{tempo} {digest}.wav"
+
+
+def verse(record: RenderRecord, out_root: Path, samples_root: Path) -> str:
+    """Copie le rendu dans le pack SoundDesign de la bibliotheque de samples.
+
+    Seule ecriture sous `<MEDIA>/Samples` (lecture seule sinon). Idempotent :
+    un fichier deja verse a l'identique n'est pas recopie. La reanalyse de la
+    bibliotheque le classe ensuite comme un sample de pack.
+    """
+    import shutil
+    key = verse_key(record)
+    src = out_root / record.file
+    dest = samples_root / key
+    if dest.exists() and dest.stat().st_size == src.stat().st_size:
+        return key
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dest)
+    return key
 
 
 def with_overrides(preset: Preset, settings: dict[str, float], mute: list[str],

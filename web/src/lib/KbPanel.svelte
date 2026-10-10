@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte'
-  import { Marked } from 'marked'
-  import { api, manualUrl, normalize, slugify, type KbHit, type KbLot, type KbNote } from './api'
+  import { createMarked, replaceWikilinks } from './markdown'
+  import { api, manualUrl, normalize, type KbHit, type KbLot, type KbNote } from './api'
 
   // page : vue Knowledge du panneau lateral, toujours ouverte ; sinon overlay
   // contextuel (aide de la facade DT2)
@@ -19,23 +19,8 @@
   let body: HTMLDivElement | undefined = $state()
   let timer: ReturnType<typeof setTimeout> | undefined
 
-  // notes locales du vault : HTML brut echappe, ancres = slugify (meme regle que kb.py),
-  // wikilinks Obsidian rendus en texte
-  const escapeHtml = (s: string) =>
-    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  const marked = new Marked({
-    renderer: {
-      html({ text }) { return escapeHtml(text) },
-      // liens externes (videos des fiches) : nouvel onglet, sinon l'app est remplacee
-      link({ href, title, tokens }) {
-        const ext = /^https?:\/\//.test(href)
-        return `<a href="${escapeHtml(href)}"${title ? ` title="${escapeHtml(title)}"` : ''}${ext ? ' target="_blank" rel="noopener"' : ''}>${this.parser.parseInline(tokens)}</a>`
-      },
-      heading({ tokens, depth, text }) {
-        return `<h${depth} id="${slugify(text)}">${this.parser.parseInline(tokens)}</h${depth}>`
-      },
-    },
-  })
+  // notes locales du vault (lib/markdown.ts) ; wikilinks Obsidian rendus en lien ou en texte
+  const marked = createMarked()
   const DOCTRINE = 'digitakt/doctrine.md'
   const known = $derived(new Set([DOCTRINE, ...toc.flatMap(l => l.notes.map(n => n.path))]))
 
@@ -47,9 +32,7 @@
     return known.has(path) ? `[${label}](#kb:${path})` : label
   }
   const html = $derived(note
-    ? marked.parse(note.markdown.replace(/\[\[([^\]|]+)\|?([^\]]*)\]\]/g,
-        (_, target: string, alias: string) => wikilink(target, alias)),
-      { async: false })
+    ? marked.parse(replaceWikilinks(note.markdown, wikilink), { async: false })
     : '')
 
   // les § cites dans le texte deviennent des liens vers la page du manuel
