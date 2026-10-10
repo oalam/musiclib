@@ -870,6 +870,12 @@ révisés par 7.J8) :
   plafond de 16 (32 pour BR / DL / PL), créé sur le +Drive au prochain
   export. Pas de SAMPLE. Sous un filtre d'instrument, les sous-dossiers
   vides du type restent affichés (cibles de dépôt).
+- Réanalyse depuis le front : bouton « Réanalyser » de la zone Library,
+  même reconstruction que `samples.py` (classement, mesures des nouveaux
+  candidats, sélection ; décisions et mesures conservées) dans un thread de
+  l'API, suivi par `GET /api/samples/rebuild`. Pendant le calcul, toute
+  écriture sur les samples répond 409 (le manifeste reconstruit écraserait
+  les décisions prises entre-temps). Bilan affiché à la fin.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

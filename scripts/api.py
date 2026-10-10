@@ -29,6 +29,7 @@ import argparse
 import json
 import subprocess
 import threading
+from datetime import datetime
 from collections.abc import Callable
 from pathlib import Path
 from typing import Annotated, Any, Literal
@@ -191,6 +192,18 @@ def run_grab(req: GrabRequest, ctx: JobContext) -> None:
         ctx.step("harmony")
         if harmony.process(slug, all_entries):
             raise StepFailed("analyse harmonique impossible (voir les logs d'api.py)")
+
+
+class RebuildStatus(BaseModel):
+    """Reanalyse de la bibliotheque de samples lancee depuis le front (7.K)."""
+    status: Literal["idle", "running", "done", "error"] = "idle"
+    started_at: str | None = None
+    finished_at: str | None = None
+    error: str = ""
+    candidates: int = 0
+    selected: int = 0
+    reserve: int = 0
+    unclassified: int = 0
 
 
 class FolderRequest(BaseModel):
@@ -369,6 +382,34 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     app.router.on_shutdown.append(jobs.shutdown)
 
     samples_lock = threading.Lock()
+    rebuild = RebuildStatus()
+
+    def refuse_if_rebuilding() -> None:
+        """Pendant une reanalyse, toute ecriture est refusee : le manifeste
+        reconstruit ecraserait les decisions prises entre-temps."""
+        if rebuild.status == "running":
+            raise HTTPException(409, "réanalyse de la bibliothèque en cours")
+
+    def run_rebuild() -> None:
+        """Meme reconstruction que `samples.py` (decisions et mesures gardees)."""
+        try:
+            samples.load_manual_subs(folders_file)
+            built = samples.build_manifest(
+                samples_src, samples.load_overrides(samples_overrides), samples.load_manifest(samples_manifest),
+                measure_fn=samples.measure, note_fn=samples.measure_note)
+            with samples_lock:
+                samples.save_manifest(built, samples_manifest)
+            rebuild.candidates = len(built.entries)
+            rebuild.selected = sum(e.selected for e in built.entries)
+            rebuild.reserve = len(built.reserve)
+            rebuild.unclassified = len(built.unclassified)
+            rebuild.status = "done"
+        except Exception as exc:  # noqa: BLE001 - remonte au front, le thread ne doit pas mourir en silence
+            rebuild.error = str(exc) or type(exc).__name__
+            rebuild.status = "error"
+        finally:
+            rebuild.finished_at = datetime.now().isoformat(timespec="seconds")
+
     folders_file = samples_folders or samples.FOLDERS_FILE  # resolu a l'appel (tests)
     samples.load_manual_subs(folders_file)  # sous-dossiers manuels (7.K)
 
@@ -592,11 +633,32 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Dossiers cibles d'un rangement (7.J8) : racine du code et sous-categories."""
         return target_folders()
 
+    @app.get("/api/samples/rebuild", response_model=RebuildStatus)
+    def sample_rebuild_status() -> RebuildStatus:
+        return rebuild
+
+    @app.post("/api/samples/rebuild", response_model=RebuildStatus, status_code=202)
+    def sample_rebuild() -> RebuildStatus:
+        """Reanalyse la bibliotheque (nouveaux packs, sous-dossiers manuels) en
+        arriere-plan ; le front suit `GET` jusqu'a `done` / `error`."""
+        media_or_503()
+        if not samples_src.is_dir():
+            raise HTTPException(503, f"source introuvable : {samples_src}")
+        with samples_lock:
+            refuse_if_rebuilding()
+            rebuild.status = "running"
+            rebuild.error = ""
+            rebuild.started_at = datetime.now().isoformat(timespec="seconds")
+            rebuild.finished_at = None
+        threading.Thread(target=run_rebuild, name="samples-rebuild", daemon=True).start()
+        return rebuild
+
     @app.post("/api/samples/folders", response_model=list[str])
     def sample_folder_add(req: FolderRequest) -> list[str]:
         """Cree un sous-dossier manuel d'un code (7.K), rejouable ; il se
         remplit par rangement (M, glisser). Renvoie les dossiers cibles."""
         with samples_lock:
+            refuse_if_rebuilding()
             try:
                 samples.add_manual_sub(folders_file, req.code, req.sub)
             except SampleError as exc:
@@ -612,6 +674,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Applique `op` a chaque source puis ecrit manifeste et overrides ; une
         erreur sur une source annule tout (rien n'est ecrit). Renvoie la grille."""
         with samples_lock:
+            refuse_if_rebuilding()
             m = manifest()
             try:
                 overrides = samples.load_overrides(samples_overrides)
@@ -664,6 +727,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         reconstruction du manifeste (mesure des nouveaux candidats)."""
         media_or_503()
         with samples_lock:
+            refuse_if_rebuilding()
             overrides = samples.load_overrides(samples_overrides)
             try:
                 m = rebuild(manifest(), overrides, kit, samples_src)
@@ -685,6 +749,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def sample_kit_tags(req: SampleKitTags) -> list[SampleCell]:
         """Tags d'un kit ou d'un pack, herites par tous ses fichiers."""
         with samples_lock:
+            refuse_if_rebuilding()
             m = manifest()
             overrides = samples.load_overrides(samples_overrides)
             try:
@@ -707,6 +772,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Copie les retenus vers l'arborescence Transfer (7.J3) ; `dry_run` : bilan."""
         media_or_503()
         with samples_lock:
+            refuse_if_rebuilding()
             try:
                 return export(manifest(), samples_src, samples_export, samples_export_index,
                               dry_run=req.dry_run)

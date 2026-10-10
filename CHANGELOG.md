@@ -59,6 +59,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.K] Bouton « Réanalyser » de la bibliothèque de samples : reconstruction
+  en arrière-plan (`POST` / `GET /api/samples/rebuild`), écritures refusées
+  (409) pendant le calcul, bilan candidats / retenus / hors plafond / non
+  classés, suivi repris après un rechargement de la page.
 - [7.K] Sous-dossier manuel dans l'arbre « Library » : « + » sur la ligne
   d'un code, rempli par rangement (`M`, glisser). `library/samples/folders.json`,
   `POST /api/samples/folders` ; chargé par l'API et `samples.py`. Sous un

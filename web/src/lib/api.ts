@@ -258,6 +258,17 @@ export interface LooseSample {
   auto_tags: string[]
 }
 /** Barre de recherche (7.J6) : ET entre facettes, OU dans une facette. */
+export interface RebuildStatus {
+  status: 'idle' | 'running' | 'done' | 'error'
+  started_at: string | null
+  finished_at: string | null
+  error: string
+  candidates: number
+  selected: number
+  reserve: number
+  unclassified: number
+}
+
 export interface SampleFilter {
   q?: string
   tags?: string[]
@@ -394,6 +405,9 @@ export const api = {
   sampleStatus: (sources: string[], status: SampleStatus) => samplePost('status', { sources, status }),
   sampleMove: (sources: string[], code: string, sub: string) => samplePost('move', { sources, code, sub }),
   sampleFolders: () => fetch('/api/samples/folders').then(r => json<string[]>(r)),
+  /** Reanalyse de la bibliotheque de samples (7.K) : lancement puis suivi. */
+  sampleRebuild: () => fetch('/api/samples/rebuild', { method: 'POST' }).then(r => json<RebuildStatus>(r)),
+  sampleRebuildStatus: () => fetch('/api/samples/rebuild').then(r => json<RebuildStatus>(r)),
   /** Cree un sous-dossier manuel d'un code (7.K) ; renvoie les dossiers cibles. */
   sampleFolderAdd: (code: string, sub: string) =>
     fetch('/api/samples/folders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, sub }) })

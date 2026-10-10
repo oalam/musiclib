@@ -23,7 +23,7 @@
   import WaveSurfer from 'wavesurfer.js'
   import { remote } from './remote.svelte'
   import { loadHistory, pushHistory } from './history'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type SampleFilter } from './api'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type SampleFilter, type RebuildStatus } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -183,6 +183,29 @@
   const visible = $derived(view?.kind === 'kit' || view?.kind === 'type'
     ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
     : showReserve ? [...chosen, ...reserve] : chosen)
+
+  // reanalyse de la bibliotheque (7.K) : nouveaux packs, sous-dossiers manuels ;
+  // les ecritures sont refusees par l'API pendant le calcul
+  let rebuild = $state<RebuildStatus | null>(null)
+  const rebuilding = $derived(rebuild?.status === 'running')
+  async function startRebuild() {
+    try { rebuild = await api.sampleRebuild(); followRebuild() } catch (e) { fail(e) }
+  }
+  function followRebuild() {
+    const timer = setInterval(async () => {
+      try {
+        rebuild = await api.sampleRebuildStatus()
+        if (rebuild.status === 'running') return
+        clearInterval(timer)
+        if (rebuild.status === 'done') {
+          allFolders = await api.sampleFolders()
+          await refresh()
+          await loadEntries()
+          if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
+        }
+      } catch (e) { clearInterval(timer); fail(e) }
+    }, 2000)
+  }
 
   // sous-dossier manuel (7.K) : « + » sur la ligne d'un code, nom saisi en place
   let addingSub = $state<string | null>(null)
@@ -766,6 +789,8 @@
     ws.on('pause', () => { playing = false })
     ws.on('finish', () => { if (looping) ws?.play(); else playing = false })
     try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
+    // reanalyse lancee avant un rechargement de la page : on reprend le suivi
+    api.sampleRebuildStatus().then(r => { if (r.status === 'running') { rebuild = r; followRebuild() } }).catch(() => {})
     try {
       const saved = JSON.parse(localStorage.getItem(SEARCH_KEY) ?? '{}') as SampleFilter
       search = onlyBar(saved)
@@ -898,10 +923,21 @@
           title="Sons rejetés partout, restaurables, jamais supprimés du disque"
           onclick={() => open({ kind: 'trash' })}>Corbeille ({counts.trash})</button>
       </span>
+      <button class="small" disabled={rebuilding}
+        title="Relit les packs de Samples (nouveaux kits, sous-dossiers manuels) ; garde les décisions d'écoute et les mesures. Garder / écarter est bloqué pendant le calcul."
+        onclick={startRebuild}>{rebuilding ? 'Réanalyse…' : 'Réanalyser'}</button>
       <button class="small export-btn" disabled={exporting}
         title="Copie les retenus vers Live/samples (branche / code / sous-dossier / nom DT2), pour Transfer"
         onclick={() => runExport(true)}>{exporting ? 'Export…' : 'Exporter…'}</button>
     </div>
+    {#if rebuild && rebuild.status !== 'idle'}
+      <p class="small rebuild" class:err={rebuild.status === 'error'}>
+        {#if rebuild.status === 'running'}Réanalyse de la bibliothèque en cours (lancée à {rebuild.started_at?.slice(11)}) : garder / écarter / ranger sont bloqués jusqu'à la fin.
+        {:else if rebuild.status === 'done'}Réanalyse terminée : {rebuild.candidates} candidats, {rebuild.selected} retenus, {rebuild.reserve} hors plafond, {rebuild.unclassified} non classés.
+          <button class="small" onclick={() => (rebuild = null)}>×</button>
+        {:else}Réanalyse en échec : {rebuild.error} <button class="small" onclick={() => (rebuild = null)}>×</button>{/if}
+      </p>
+    {/if}
     {#if exportReport}
       {@const r = exportReport}
       <div class="export small">
@@ -1184,6 +1220,7 @@
   .kits h3 { margin: 0 0 6px; font-weight: 600; position: sticky; top: -8px; z-index: 1; padding: 4px 0; background: var(--bg); }
   .lib-title { margin: 0 0 2px; font-weight: 600; }
   .lib-total { margin: 0 0 6px; }
+  .rebuild { margin: 6px 0 0; }
   /* trois pads par ligne, a la largeur de la colonne */
   .pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }

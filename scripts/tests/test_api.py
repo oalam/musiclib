@@ -428,3 +428,31 @@ def test_sample_folder_add(samples_client: TestClient, tmp_path: Path):
     r = _post(samples_client, "move", sources=["p/fx1.wav"], code="FX", sub="XRAY")
     assert r.status_code == 200 and "FX/XRAY" in {c["folder"] for c in r.json()}
     assert json.loads(api.samples.FOLDERS_FILE.read_text(encoding="utf-8")) == {"BD": ["RUMBLE"], "FX": ["XRAY"]}
+
+
+def test_sample_rebuild(samples_client: TestClient, monkeypatch: pytest.MonkeyPatch):
+    """Reanalyse depuis le front (7.K) : en arriere-plan, ecritures refusees pendant."""
+    import threading
+    import time
+
+    gate = threading.Event()
+    real = api.samples.build_manifest
+
+    def slow(*args: object, **kwargs: object) -> object:
+        gate.wait(5)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(api.samples, "build_manifest", slow)
+    monkeypatch.setattr(api.samples, "measure", lambda path, code: [])
+    r = samples_client.post("/api/samples/rebuild")
+    assert r.status_code == 202 and r.json()["status"] == "running"
+    assert samples_client.post("/api/samples/rebuild").status_code == 409
+    assert _post(samples_client, "status", sources=["p/fx1.wav"], status="keep").status_code == 409
+    gate.set()
+    for _ in range(100):
+        state = samples_client.get("/api/samples/rebuild").json()
+        if state["status"] != "running":
+            break
+        time.sleep(0.05)
+    assert state["status"] == "done", state
+    assert state["finished_at"] and state["candidates"] >= 1
