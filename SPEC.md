@@ -846,13 +846,18 @@ révisés par 7.J8) :
 - Totaux dans l'arbre : chaque dossier affiche `à écouter / retenus (total)`,
   total = candidats + hors plafond ; la ligne d'un code à sous-dossiers
   ajoute le total du type à droite.
-- Vue par type (essai) : un filtre d'instrument (puce code, ex. BS) ouvre à
+- Vue par type (gardée après essai) : un filtre d'instrument (puce code, ex. BS) ouvre à
   droite l'arborescence de tous les fichiers du type par sous-dossier
   (`GET /api/samples/tree`). Choisir un kit ne filtre que cette vue (seuls
   les sous-dossiers qui ont des fichiers du kit y restent) ; l'arbre de
   gauche n'est pas réduit au kit. Un clic à gauche déplie et
   montre le dossier à droite. Retirer le filtre d'instrument revient à la
   vue par case.
+- Barre de recherche des samples sous le titre « Library » de l'arbre :
+  texte, tags, kits, instruments seulement (révise 7.J6 / 7.J7 : filtres
+  rythmique / mélodique, one-shot / boucle et étoiles retirés, notes hors
+  de la barre). La roue des notes passe dans l'en-tête de la vue de droite
+  et ne filtre que cette vue, pas l'arbre (mémorisée à part).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

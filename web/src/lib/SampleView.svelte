@@ -253,7 +253,6 @@
     .map(x => ({ kind: 'history' as const, value: x.label, hint: 'filtre récent', recall: x.h }))
 
   // roue chromatique (7.J7) : C en haut, sens horaire, 12 parts de 30 degres
-  const FLAT_TO_SHARP: Record<string, string> = { DB: 'C#', EB: 'D#', GB: 'F#', AB: 'G#', BB: 'A#' }
   const W_OUT = 46, W_IN = 15
   function polar(r: number, deg: number): [number, number] {
     const a = (deg - 90) * Math.PI / 180
@@ -266,10 +265,20 @@
     return `M${x1},${y1} A${W_OUT},${W_OUT} 0 0 1 ${x2},${y2} L${x3},${y3} A${W_IN},${W_IN} 0 0 0 ${x4},${y4} Z`
   }
   const wheelMax = $derived(Math.max(1, ...wheel.map(w => w.count)))
-  function toggleNote(n: string) {
-    const cur = search.notes ?? []
-    const notes = cur.includes(n) ? cur.filter(x => x !== n) : [...cur, n]
-    setSearch({ ...search, notes: notes.length ? notes : undefined })
+  // roue des notes (7.K) : ne filtre que la vue de droite, pas l'arbre
+  const NOTES_KEY = 'ui:sample-notes'
+  let notes = $state<string[]>([])
+  const rightF = $derived(notes.length ? { ...search, notes } : search)
+  async function toggleNote(n: string) {
+    notes = notes.includes(n) ? notes.filter(x => x !== n) : [...notes, n]
+    try { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)) } catch { /* stockage indisponible */ }
+    await loadEntries()
+    if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
+  }
+  /** La barre ne garde que texte, tags, kits et instruments (7.K). */
+  function onlyBar(f: SampleFilter): SampleFilter {
+    const { section: _s, kind: _k, minStars: _m, notes: _n, ...rest } = f
+    return rest
   }
   const GROUP_LABEL: Record<string, string> = { genre: 'genre', instrument: 'instrument', mot: 'mot-clé', manuel: 'tag' }
   const suggestions = $derived.by((): Sug[] => {
@@ -280,10 +289,6 @@
       if (!search.codes?.includes(c) && (c.toLowerCase() === t || CODE_HELP[c].toLowerCase().includes(t)))
         out.push({ kind: 'code', value: c, hint: CODE_HELP[c] })
     }
-    const nt = query.trim().toUpperCase()
-    const note = FLAT_TO_SHARP[nt] ?? nt
-    const w = wheel.find(x => x.note === note)
-    if (w && !search.notes?.includes(note)) out.push({ kind: 'note', value: note, hint: `note · ${w.count}` })
     for (const f of facets) {
       if (f.tag.includes(t) && !search.tags?.includes(f.tag))
         out.push({ kind: 'tag', value: f.tag, hint: `${GROUP_LABEL[f.group] ?? f.group} · ${f.count}` })
@@ -319,7 +324,7 @@
     if (sg.kind === 'history' && sg.recall) {
       query = ''
       suggestIdx = 0
-      setSearch({ ...sg.recall })
+      setSearch(onlyBar(sg.recall))
       return
     }
     const f = { ...search }
@@ -371,9 +376,6 @@
     else if (e.key === 'Backspace' && !query && chips.length) { const c = chips[chips.length - 1]; dropChip(c.kind, c.value) }
   }
 
-  const toggle = <K extends 'section' | 'kind'>(key: K, value: SampleFilter[K]) =>
-    setSearch({ ...search, [key]: search[key] === value ? undefined : value })
-
   function cssVar(name: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
   }
@@ -417,17 +419,17 @@
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
     if (v.kind === 'type') {
-      entries = await api.sampleTree(search, kit).catch(() => [])
+      entries = await api.sampleTree(rightF, kit).catch(() => [])
       return
     }
     if (v.kind === 'kit') {
-      const t = await api.sampleKitTree(kit, search).catch(() => ({ entries: [], unclassified: [] }))
+      const t = await api.sampleKitTree(kit, rightF).catch(() => ({ entries: [], unclassified: [] }))
       entries = [...t.entries, ...t.unclassified.map(looseRow)]
       return
     }
     entries = v.kind === 'cell'
-      ? await api.sampleCell(v.folder, kit, showOverflow, search).catch(() => [])
-      : (await api.sampleLoose(v.kind, kit, search)).map(looseRow)
+      ? await api.sampleCell(v.folder, kit, showOverflow, rightF).catch(() => [])
+      : (await api.sampleLoose(v.kind, kit, rightF)).map(looseRow)
   }
 
   async function open(v: View) {
@@ -728,7 +730,11 @@
     ws.on('pause', () => { playing = false })
     ws.on('finish', () => { if (looping) ws?.play(); else playing = false })
     try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
-    try { search = JSON.parse(localStorage.getItem(SEARCH_KEY) ?? '{}') as SampleFilter } catch { search = {} }
+    try {
+      const saved = JSON.parse(localStorage.getItem(SEARCH_KEY) ?? '{}') as SampleFilter
+      search = onlyBar(saved)
+      notes = JSON.parse(localStorage.getItem(NOTES_KEY) ?? 'null') ?? saved.notes ?? []
+    } catch { search = {} }
     await refresh()
     if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
     let last: string | null = null
@@ -780,57 +786,31 @@
 {/snippet}
 
 <div class="samples">
-  <div class="searchbar zone">
-    <div class="search-in">
-      {#each chips as c (c.kind + c.value)}
-        <span class="chip {c.kind}" title={c.kind === 'code' ? codeTitle(c.value) : c.kind}>{c.kind === 'text' ? `« ${c.value} »` : c.value}<button
-          class="untag" title="Retirer" onclick={() => dropChip(c.kind, c.value)}>×</button></span>
-      {/each}
-      <input bind:this={searchField} bind:value={query} onkeydown={onSearchKey} oninput={() => (suggestIdx = 0)}
-        onfocus={() => (searchFocused = true)} onblur={() => (searchFocused = false)}
-        placeholder={chips.length ? 'affiner…' : 'Rechercher : texte, tag, genre, instrument (BD, kick…), kit…'} />
-      {#if suggestions.length}
-        <ul class="suggest">
-          {#each suggestions as sg, i (sg.kind + sg.value)}
-            <li><button class:on={i === suggestIdx} onmousedown={ev => { ev.preventDefault(); addSug(sg) }}>
-              {#if sg.kind === 'history'}<span class="muted" aria-hidden="true">↺</span> <span>{sg.value}</span>
-              {:else}<span class="chip {sg.kind}">{sg.kind === 'text' ? `« ${sg.value} »` : sg.value}</span>{/if}
-              <span class="muted small">{sg.hint}</span></button></li>
-          {/each}
-        </ul>
-      {/if}
-    </div>
-    <div class="seg small">
-      <button aria-pressed={search.section === 'rhythm'} class="rhythm" onclick={() => toggle('section', 'rhythm')}>Rythmique</button>
-      <button aria-pressed={search.section === 'melodic'} class="melodic" onclick={() => toggle('section', 'melodic')}>Mélodique</button>
-    </div>
-    <div class="seg small">
-      <button aria-pressed={search.kind === 'oneshot'} onclick={() => toggle('kind', 'oneshot')}>One-shot</button>
-      <button aria-pressed={search.kind === 'loop'} onclick={() => toggle('kind', 'loop')}>Boucle</button>
-    </div>
-    <select class="small" value={search.minStars ?? 0}
-      onchange={ev => setSearch({ ...search, minStars: Number((ev.target as HTMLSelectElement).value) || undefined })}>
-      <option value={0}>étoiles : toutes</option>
-      {#each [1, 2, 3, 4, 5] as n}<option value={n}>{'★'.repeat(n)}{n < 5 ? ' et +' : ''}</option>{/each}
-    </select>
-    <svg class="wheel" viewBox="0 0 100 100" role="group" aria-label="Filtrer par note">
-      {#each wheel as w, i (w.note)}
-        {@const [lx, ly] = polar(37, i * 30)}
-        {@const [cx, cy] = polar(24, i * 30)}
-        <g role="button" tabindex="-1" class:on={search.notes?.includes(w.note)} class:empty={!w.count}
-          onclick={() => toggleNote(w.note)} onkeydown={() => {}}>
-          <title>{w.note} : {w.count} sample{w.count > 1 ? 's' : ''}</title>
-          <path d={wedge(i)} style="fill-opacity: {0.08 + 0.5 * w.count / wheelMax}" />
-          <text x={lx} y={ly} class="wl">{w.note}</text>
-          <text x={cx} y={cy} class="wc">{w.count}</text>
-        </g>
-      {/each}
-    </svg>
-    {#if searchOn()}<button class="small" onclick={() => setSearch({})}>Tout effacer</button>{/if}
-  </div>
   <section class="grid">
    <div class="zone matrix">
     <h3 class="lib-title" title="{totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus{filterOn() ? ' (filtrés)' : ''}. Les chiffres d’un dossier : à écouter / retenus (total).">Library</h3>
+    <div class="searchbar">
+      <div class="search-in">
+        {#each chips as c (c.kind + c.value)}
+          <span class="chip {c.kind}" title={c.kind === 'code' ? codeTitle(c.value) : c.kind}>{c.kind === 'text' ? `« ${c.value} »` : c.value}<button
+            class="untag" title="Retirer" onclick={() => dropChip(c.kind, c.value)}>×</button></span>
+        {/each}
+        <input bind:this={searchField} bind:value={query} onkeydown={onSearchKey} oninput={() => (suggestIdx = 0)}
+          onfocus={() => (searchFocused = true)} onblur={() => (searchFocused = false)}
+          placeholder={chips.length ? 'affiner…' : 'Rechercher : texte, tag, genre, instrument (BD, kick…), kit…'} />
+        {#if suggestions.length}
+          <ul class="suggest">
+            {#each suggestions as sg, i (sg.kind + sg.value)}
+              <li><button class:on={i === suggestIdx} onmousedown={ev => { ev.preventDefault(); addSug(sg) }}>
+                {#if sg.kind === 'history'}<span class="muted" aria-hidden="true">↺</span> <span>{sg.value}</span>
+                {:else}<span class="chip {sg.kind}">{sg.kind === 'text' ? `« ${sg.value} »` : sg.value}</span>{/if}
+                <span class="muted small">{sg.hint}</span></button></li>
+            {/each}
+          </ul>
+        {/if}
+      </div>
+      {#if searchOn()}<button class="small" onclick={() => setSearch({})}>Tout effacer</button>{/if}
+    </div>
     {#if error}<p class="err">{error}</p>{/if}
     <div class="branches" class:dragging={dragging !== null}>
       {#each branchRows as b (b.branch)}
@@ -948,6 +928,19 @@
         <span class="muted small">{shown.length} fichiers</span>
       {/if}
       <label class="small"><input type="checkbox" bind:checked={autoplay} /> lecture auto</label>
+    <svg class="wheel" viewBox="0 0 100 100" role="group" aria-label="Filtrer la liste par note">
+      {#each wheel as w, i (w.note)}
+        {@const [lx, ly] = polar(37, i * 30)}
+        {@const [cx, cy] = polar(24, i * 30)}
+        <g role="button" tabindex="-1" class:on={notes.includes(w.note)} class:empty={!w.count}
+          onclick={() => toggleNote(w.note)} onkeydown={() => {}}>
+          <title>{w.note} : {w.count} sample{w.count > 1 ? 's' : ''}</title>
+          <path d={wedge(i)} style="fill-opacity: {0.08 + 0.5 * w.count / wheelMax}" />
+          <text x={lx} y={ly} class="wl">{w.note}</text>
+          <text x={cx} y={cy} class="wc">{w.count}</text>
+        </g>
+      {/each}
+    </svg>
     </header>
     <div class="wave" bind:this={container}></div>
     <div class="toolbar small">
@@ -1073,9 +1066,9 @@
 </div>
 
 <style>
-  .samples { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
-  .searchbar { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .search-in { position: relative; flex: 1; min-width: 280px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
+  .samples { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .searchbar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+  .search-in { position: relative; flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
   .search-in input { flex: 1; min-width: 12em; border: 0; outline: none; background: none; color: var(--text); font-size: 13px; padding: 3px 0; }
   .suggest { position: absolute; z-index: 5; top: 100%; left: 0; right: 0; margin: 2px 0 0; padding: 4px 0; list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 4px; box-shadow: 0 4px 14px rgb(0 0 0 / 0.15); max-height: 22em; overflow-y: auto; }
   .suggest button { display: flex; gap: 8px; align-items: center; width: 100%; border: 0; background: none; padding: 4px 8px; text-align: left; color: var(--text); cursor: pointer; }
@@ -1087,13 +1080,6 @@
   .chip.code { font-family: ui-monospace, Menlo, monospace; border-color: var(--rhythm); color: var(--rhythm); }
   .chip.text { font-style: italic; }
   .chip.note { font-weight: 600; border-color: var(--accent); color: var(--accent); }
-  .seg { display: inline-flex; }
-  .seg button { border-radius: 0; margin-left: -1px; }
-  .seg button:first-child { border-radius: 4px 0 0 4px; }
-  .seg button:last-child { border-radius: 0 4px 4px 0; }
-  .seg button[aria-pressed='true'] { background: var(--panel-2); outline: 1px solid var(--accent); z-index: 1; }
-  .seg button.rhythm[aria-pressed='true'] { color: var(--rhythm); }
-  .seg button.melodic[aria-pressed='true'] { color: var(--melodic); }
   .tag.auto { border-style: dotted; background: none; cursor: pointer; padding: 0 6px; }
   .grid { overflow: auto; }
   .filters { display: flex; gap: 10px; margin: 0 0 6px; }

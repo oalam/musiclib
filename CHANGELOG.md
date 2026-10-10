@@ -21,6 +21,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   encore (italique) ; séparateur « Réserve » marqué.
 - [7.K] Arbre des samples titré « Library » (bilan en infobulle) ; panneau
   de tagging du kit ouvert au double-clic sur un pad seulement, fermable.
+- [7.K] Recherche des samples sous « Library », réduite à texte, tags,
+  kits et instruments (filtres rythmique / mélodique, one-shot / boucle et
+  étoiles retirés) ; roue des notes déplacée dans la vue de droite, qu'elle
+  seule filtre.
 
 ### Modifié
 
@@ -47,7 +51,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
-- [7.K] Vue par type des samples (essai) : un filtre d'instrument liste à
+- [7.K] Vue par type des samples : un filtre d'instrument liste à
   droite tous les fichiers du type par sous-dossier ; un kit ne filtre que
   cette vue (sans ses sous-dossiers vides), l'arbre de gauche reste intact.
   API : `GET /api/samples/tree` (`kit_rows` accepte l'absence de kit).
