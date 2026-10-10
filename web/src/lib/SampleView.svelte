@@ -174,6 +174,13 @@
     ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
     : showReserve ? [...chosen, ...reserve] : chosen)
 
+  /** Clic sur un code de l'arbre : ajoute / retire le filtre d'instrument (vue par type). */
+  function toggleCode(code: string) {
+    const cur = search.codes ?? []
+    const codes = cur.includes(code) ? cur.filter(c => c !== code) : [...cur, code]
+    setSearch({ ...search, codes: codes.length ? codes : undefined })
+  }
+
   /** Vue par type : deplie et montre le dossier dans l'arborescence de droite. */
   function reveal(folder: string) {
     const s = new Set(collapsed)
@@ -823,8 +830,9 @@
             {#each b.codes as row (row.code)}
               {@const root = row.folders.find(f => !splitFolder(f).sub)}
               <div class="code-node">
-                <span class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
-                  title={codeTitle(row.code)}>{row.code}</span>
+                <button class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
+                  class:active={search.codes?.includes(row.code)} onclick={() => toggleCode(row.code)}
+                  title="{codeTitle(row.code)} · clic : filtre d'instrument">{row.code}</button>
                 {#if root}{@render folderNode(root, '')}{/if}
                 {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code} : candidats + hors plafond">({codeTotal(row.folders)})</span>{/if}
               </div>
@@ -928,21 +936,23 @@
         <span class="muted small">{shown.length} fichiers</span>
       {/if}
       <label class="small"><input type="checkbox" bind:checked={autoplay} /> lecture auto</label>
-    <svg class="wheel" viewBox="0 0 100 100" role="group" aria-label="Filtrer la liste par note">
-      {#each wheel as w, i (w.note)}
-        {@const [lx, ly] = polar(37, i * 30)}
-        {@const [cx, cy] = polar(24, i * 30)}
-        <g role="button" tabindex="-1" class:on={notes.includes(w.note)} class:empty={!w.count}
-          onclick={() => toggleNote(w.note)} onkeydown={() => {}}>
-          <title>{w.note} : {w.count} sample{w.count > 1 ? 's' : ''}</title>
-          <path d={wedge(i)} style="fill-opacity: {0.08 + 0.5 * w.count / wheelMax}" />
-          <text x={lx} y={ly} class="wl">{w.note}</text>
-          <text x={cx} y={cy} class="wc">{w.count}</text>
-        </g>
-      {/each}
-    </svg>
     </header>
-    <div class="wave" bind:this={container}></div>
+    <div class="wave-row">
+      <div class="wave" bind:this={container}></div>
+      <svg class="wheel" viewBox="0 0 100 100" role="group" aria-label="Filtrer la liste par note">
+        {#each wheel as w, i (w.note)}
+          {@const [lx, ly] = polar(37, i * 30)}
+          {@const [cx, cy] = polar(24, i * 30)}
+          <g role="button" tabindex="-1" class:on={notes.includes(w.note)} class:empty={!w.count}
+            onclick={() => toggleNote(w.note)} onkeydown={() => {}}>
+            <title>{w.note} : {w.count} sample{w.count > 1 ? 's' : ''}</title>
+            <path d={wedge(i)} style="fill-opacity: {0.08 + 0.5 * w.count / wheelMax}" />
+            <text x={lx} y={ly} class="wl">{w.note}</text>
+            <text x={cx} y={cy} class="wc">{w.count}</text>
+          </g>
+        {/each}
+      </svg>
+    </div>
     <div class="toolbar small">
       <span class="count">{sel.size ? `${sel.size} sélectionnés` : cursor ? 'sample en cours' : 'rien'}</span>
       {#if view?.kind === 'trash'}
@@ -1090,6 +1100,10 @@
   .code-node { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; padding-left: 14px; min-height: 22px; }
   .leaf { padding-left: 42px; }
   .branches .drop { display: block; }
+  button.code-label { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; border-radius: 3px; }
+  button.code-label:hover { text-decoration: underline; }
+  button.code-label.active { background: var(--rhythm); color: var(--panel); text-align: center; }
+  button.code-label.mel.active { background: var(--melodic); }
   .code-label { width: 24px; font: 600 11px ui-monospace, Menlo, monospace; color: var(--rhythm); cursor: help; }
   .code-label.mel { color: var(--melodic); }
   .code-label.loop { font-style: italic; text-decoration: underline dotted; }
@@ -1166,7 +1180,9 @@
   .name { font-family: ui-monospace, Menlo, monospace; white-space: pre; }
   .stars { color: #b45309; font-size: 11px; }
   .dur { width: 5em; }
-  .wheel { width: 96px; height: 96px; flex: none; }
+  .wave-row { display: flex; gap: 10px; align-items: center; }
+  .wave-row .wave { flex: 1; min-width: 0; }
+  .wheel { width: 80px; height: 80px; flex: none; }
   .wheel g { cursor: pointer; outline: none; }
   .wheel path { fill: var(--accent); stroke: var(--border); stroke-width: 0.6; }
   .wheel g.on path { fill: var(--accent); fill-opacity: 1 !important; stroke: var(--text); }

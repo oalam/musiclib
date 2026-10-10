@@ -24,7 +24,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.K] Recherche des samples sous « Library », réduite à texte, tags,
   kits et instruments (filtres rythmique / mélodique, one-shot / boucle et
   étoiles retirés) ; roue des notes déplacée dans la vue de droite, qu'elle
-  seule filtre.
+  seule filtre, alignée avec la forme d'onde. Clic sur un code de l'arbre :
+  filtre d'instrument.
 
 ### Modifié
 

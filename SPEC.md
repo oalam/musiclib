@@ -857,7 +857,10 @@ révisés par 7.J8) :
   texte, tags, kits, instruments seulement (révise 7.J6 / 7.J7 : filtres
   rythmique / mélodique, one-shot / boucle et étoiles retirés, notes hors
   de la barre). La roue des notes passe dans l'en-tête de la vue de droite
-  et ne filtre que cette vue, pas l'arbre (mémorisée à part).
+  et ne filtre que cette vue, pas l'arbre (mémorisée à part). Elle est
+  alignée à droite de la forme d'onde.
+- Un clic sur un code de l'arbre (BD, BS…) ajoute ou retire le filtre
+  d'instrument correspondant (code surligné quand il est actif).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient
