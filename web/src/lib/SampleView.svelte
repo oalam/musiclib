@@ -960,7 +960,7 @@
       </ul>
     {/if}
     {#snippet sampleRow(e: SampleEntry)}
-      <li id="s-{e.source}" class="row {e.status}" class:cur={e.source === cursor} class:out={!e.selected}
+      <li id="s-{e.source}" class="row {e.status}" class:cur={e.source === cursor} class:out={!e.selected} class:over={e.overflow}
         class:sel={sel.has(e.source)} draggable={view?.kind !== 'trash'}
         ondragstart={ev => onDragStart(ev, e.source)} ondragend={onDragEnd}>
         <button class="pick" onclick={ev => onRowClick(ev, e.source)}>
@@ -1019,7 +1019,7 @@
     {:else}
       <ol class="list">
         {#each visible as e, i (e.source)}
-          {#if showReserve && i === chosen.length && reserve.length}<li class="sep muted small">Réserve ({reserve.length})</li>{/if}
+          {#if showReserve && i === chosen.length && reserve.length}<li class="sep small">Réserve ({reserve.length}) · hors sélection</li>{/if}
           {@render sampleRow(e)}
         {/each}
       </ol>
@@ -1124,7 +1124,14 @@
   .row.keep .name { color: var(--rhythm); }
   .row.drop { opacity: 0.5; }
   .row.drop .name { text-decoration: line-through; }
-  .row.out:not(.drop) { opacity: 0.75; }
+  /* retenus en avant ; reserve puis hors plafond nettement en retrait */
+  .row:not(.out):not(.drop):not(.cur):not(.sel) { background: var(--panel); }
+  .row:not(.out):not(.drop) .name { font-weight: 600; }
+  .row.out { font-size: 12px; }
+  .row.out:not(.drop) { opacity: 0.5; }
+  .row.out .name { color: var(--muted); }
+  .row.over:not(.drop) { opacity: 0.35; font-style: italic; }
+  .row.out.cur, .row.out:hover { opacity: 0.9; }
   .pick { flex: 1; min-width: 0; display: flex; gap: 8px; align-items: baseline; background: none; border: 0; padding: 5px 6px; text-align: left; color: var(--text); cursor: pointer; }
   .rank { width: 2.5em; text-align: right; font: 11px ui-monospace, Menlo, monospace; }
   .name { font-family: ui-monospace, Menlo, monospace; white-space: pre; }
@@ -1147,7 +1154,7 @@
   .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
   .status { width: 4em; color: var(--muted); }
   .move { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px 8px; margin-bottom: 6px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
-  .sep { padding: 10px 6px 4px; }
+  .sep { margin-top: 10px; padding: 6px 6px 4px; border-top: 2px dashed var(--border); color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
   .folder .fold { display: flex; gap: 6px; align-items: baseline; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--border); padding: 5px 6px; text-align: left; color: var(--text); cursor: pointer; font-weight: 600; }
   .folder.fam .fold { background: var(--panel); font-size: 13px; }
   .folder.code .fold { padding-left: 22px; font: 600 12px ui-monospace, Menlo, monospace; background: color-mix(in srgb, var(--rhythm) 12%, var(--panel)); color: var(--rhythm); }

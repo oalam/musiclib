@@ -16,6 +16,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   droite), pads de kits sur trois colonnes ; sous un filtre, seuls les
   dossiers qui y répondent sont affichés. Recherche : complétion par Tab
   et par Espace sur un nom exact de facette.
+- [7.K] Liste des samples : les retenus ressortent (gras, fond plein) ; la
+  réserve passe en retrait (plus petite, atténuée), le hors plafond plus
+  encore (italique) ; séparateur « Réserve » marqué.
 
 ### Modifié
 
