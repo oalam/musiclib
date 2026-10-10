@@ -1068,10 +1068,11 @@
   /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
   .kits { margin-top: 12px; width: 0; min-width: 100%; }
   .kits h3 { margin: 0 0 6px; font-weight: 600; }
-  .pads { display: flex; flex-wrap: wrap; gap: 6px; }
+  /* trois pads par ligne, a la largeur de la colonne */
+  .pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
-  .pad { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; width: 128px; min-height: 58px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); color: var(--text); cursor: pointer; text-align: left; }
-  .pad.sub { width: 116px; min-height: 50px; }
+  .pad { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; min-width: 0; min-height: 58px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); color: var(--text); cursor: pointer; text-align: left; }
+  .pad.sub { min-height: 50px; }
   .pad:hover { background: var(--panel-2); }
   .pad.on { outline: 2px solid var(--accent); background: var(--panel-2); }
   .pad.gone { opacity: 0.5; }
