@@ -780,6 +780,7 @@
               <div class="code-row">
                 <span class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
                   title={codeTitle(row.code)}>{row.code}</span>
+                <div class="subs">
                 {#each row.folders as f (f)}
                   {@const c = byKey.get(f)}
                   {@const sub = splitFolder(f).sub}
@@ -796,6 +797,7 @@
                     {/if}
                   </span>
                 {/each}
+                </div>
               </div>
             {/each}
           {/if}
@@ -1016,7 +1018,7 @@
 </div>
 
 <style>
-  .samples { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .samples { display: grid; grid-template-columns: minmax(280px, 400px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
   .searchbar { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .search-in { position: relative; flex: 1; min-width: 280px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
   .search-in input { flex: 1; min-width: 12em; border: 0; outline: none; background: none; color: var(--text); font-size: 13px; padding: 3px 0; }
@@ -1043,7 +1045,10 @@
   .zone { box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
   .branch .fold { border: 0; background: none; color: var(--text); padding: 2px 0; cursor: pointer; }
-  .code-row { display: flex; flex-wrap: wrap; align-items: center; gap: 3px; padding-left: 14px; }
+  /* code a gauche, sous-dossiers qui passent a la ligne dans la colonne bornee */
+  .code-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; gap: 3px; padding-left: 14px; }
+  .code-row .code-label { padding-top: 4px; }
+  .subs { display: flex; flex-wrap: wrap; gap: 3px; }
   .code-label { width: 24px; font: 600 11px ui-monospace, Menlo, monospace; color: var(--rhythm); cursor: help; }
   .code-label.mel { color: var(--melodic); }
   .code-label.loop { font-style: italic; text-decoration: underline dotted; }
