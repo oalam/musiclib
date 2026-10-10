@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.J8] Reconstruction des samples non rejouable : une boucle BR / DL dont
+  le tempo avait été mesuré le perdait en passant hors plafond (réserve sans
+  tempo) et repartait à la racine au passage suivant, d'où une oscillation
+  racine / tranche à chaque réanalyse. La réserve garde désormais `bpm` /
+  `bpm_est` ; la reconstruction reprend les tempos des candidats et de la
+  réserve. Le manifeste converge (deux passages identiques). Le filtre de
+  tempo (7.K) lit aussi ce tempo pour la réserve.
 - [7.K] Vue Samples : la colonne de l'arbre est bornée (280 à 440 px) au
   lieu de prendre la largeur de son contenu ; les sous-dossiers d'un code
   passent à la ligne, alignés après le code. Le bloc de lecture et de

@@ -926,3 +926,27 @@ def test_bpm_bands_filter_and_facet() -> None:
     got = smp.filter_manifest(m, smp.SampleFilter(bpms=["160"]), {})
     assert [e.source for e in got.entries] == ["p/amen 170 bpm.wav"]
     assert smp.bpm_band(89) == "<90" and smp.bpm_band(190) == "190" and smp.bpm_band(None) is None
+
+
+def test_rebuild_converges_with_measured_tempo(tmp_path: Path) -> None:
+    """Reanalyse rejouable (7.K) : une boucle mesuree garde son tempo en
+    reserve, le manifeste se stabilise au lieu d'osciller racine / tranche."""
+    root = tmp_path / "Samples"
+    # 300 breaks au meme tempo : la tranche 120 depasse son plafond (32 x 3)
+    for i in range(300):
+        _wav(root / "jungle" / "breaks" / f"brk {i:03d} break.wav", seconds=0.1)
+
+    def bpm_fn(path: Path, duration: float | None) -> tuple[int | None, bool]:
+        return 124, True
+
+    def state(m: smp.Manifest) -> tuple[object, object]:
+        return (sorted((e.source, e.folder, e.selected) for e in m.entries),
+                sorted((r.source, r.folder) for r in m.reserve))
+
+    m = None
+    runs = []
+    for _ in range(5):
+        m = smp.build_manifest(root, {}, m, measure_fn=None, bpm_fn=bpm_fn, note_fn=None)
+        runs.append(state(m))
+    assert runs[-1] == runs[-2]
+    assert all(r.bpm for r in m.reserve if r.folder != "LOOPS/BR")

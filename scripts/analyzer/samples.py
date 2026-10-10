@@ -432,6 +432,10 @@ class ReserveSample(BaseModel):
     tags: list[str] = Field(default_factory=list)
     auto_tags: list[str] = Field(default_factory=list)
     sub: str = ""
+    # tempo deja mesure quand le fichier etait candidat : sans lui, une boucle
+    # rangee dans sa tranche de tempo repartirait a la racine au passage suivant
+    bpm: int | None = None
+    bpm_est: bool = False
 
     @property
     def folder(self) -> str:
@@ -1120,14 +1124,20 @@ def build_manifest(root: Path, overrides: dict[str, Override],
     manifeste precedent ; `measure_fn=None` saute la mesure (rang = tour de role)."""
     raws, unclassified, trashed, trashed_kits = classify(root, overrides)
     prev = {e.source: e for e in previous.entries} if previous else {}
+    # tempos deja mesures, candidats et reserve : un tempo n'est jamais perdu
+    # (sinon les boucles oscillent entre racine et tranche d'un passage a l'autre)
+    prev_bpm: dict[str, tuple[int, bool]] = {}
+    if previous:
+        prev_bpm = {r.source: (r.bpm, r.bpm_est) for r in previous.reserve if r.bpm}
+        prev_bpm |= {e.source: (e.bpm, e.bpm_est) for e in previous.entries if e.bpm}
     # boucle BR / DL sans tempo dans le nom : tranche du tempo deja mesure (un
     # tempo mesure a ce passage la range au suivant)
     for r in raws:
-        old = prev.get(r.source)
-        if (r.code in TEMPO_SUBS and not r.sub and old is not None and old.bpm
+        old_bpm = prev_bpm.get(r.source)
+        if (r.code in TEMPO_SUBS and not r.sub and old_bpm is not None
                 and branch_of(r.family, r.code) != "SAMPLE"
                 and overrides.get(r.source, Override()).sub is None):
-            r.sub = tempo_band(old.bpm)
+            r.sub = tempo_band(old_bpm[0])
     folded = fold_small_subs(raws, overrides)
     prev_status = {k: e.status for k, e in prev.items()}
 
@@ -1150,7 +1160,9 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         reserve.extend(ReserveSample(source=r.source, family=r.family, code=code, sub=r.sub,
                                      pack=r.pack, duration=r.duration,
                                      tags=tags_of(overrides, r.source),
-                                     auto_tags=auto_tags_of(overrides, r.source))
+                                     auto_tags=auto_tags_of(overrides, r.source),
+                                     bpm=prev_bpm.get(r.source, (None, False))[0],
+                                     bpm_est=prev_bpm.get(r.source, (None, False))[1])
                        for r in ordered[cap:] if r.source not in held)
         flags: dict[str, list[str] | None] = {}
         for r in kept:
@@ -1165,11 +1177,10 @@ def build_manifest(root: Path, overrides: dict[str, Override],
         tempos: dict[str, tuple[int | None, bool]] = {}
         if code in TEMPO:
             for r in kept:
-                old = prev.get(r.source)
                 if tempo_of(r.source) is not None:
                     continue
-                if old is not None and old.bpm is not None:
-                    tempos[r.source] = (old.bpm, old.bpm_est)
+                if r.source in prev_bpm:
+                    tempos[r.source] = prev_bpm[r.source]
                 elif bpm_fn is not None:
                     tempos[r.source] = bpm_fn(root / r.source, r.duration)
         notes = {r.source: note_fields(r.source, code, root / r.source, prev.get(r.source), note_fn)
@@ -1540,7 +1551,7 @@ def filter_manifest(manifest: Manifest, f: SampleFilter,
                               tempo_of_entry(e.source, e.bpm))],
         "reserve": [r for r in manifest.reserve
                     if f.keep(r.source, r.code, r.tags, r.auto_tags, note=_reserve_note(r),
-                              bpm=tempo_of(r.source))],
+                              bpm=tempo_of_entry(r.source, r.bpm))],
         "unclassified": loose_ok, "trashed": trash_ok,
     })
 
@@ -1582,7 +1593,7 @@ def facet_bpms(manifest: Manifest, kit: str | None = None) -> list[tuple[str, in
     si donne : filtre de tempo de la vue de droite (7.K)."""
     tally = {name: 0 for name, _ in BPM_BANDS}
     tempos = [tempo_of_entry(e.source, e.bpm) for e in manifest.entries if kit is None or in_kit(e.source, kit)]
-    tempos += [tempo_of(r.source) for r in manifest.reserve if kit is None or in_kit(r.source, kit)]
+    tempos += [tempo_of_entry(r.source, r.bpm) for r in manifest.reserve if kit is None or in_kit(r.source, kit)]
     for t in tempos:
         band = bpm_band(t)
         if band is not None:
