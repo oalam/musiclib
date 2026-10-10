@@ -862,6 +862,13 @@ révisés par 7.J8) :
   kit (`/api/samples/notes?…&kit=`) ; une note absente du sous-ensemble
   est blanche, sans compteur ni clic (sauf pour retirer une note déjà
   choisie).
+- Filtre de tempo de la vue de droite, même principe que la roue : tranches
+  `BPM_BANDS` (<90, 90-109, 110-129, 130-144, 145-159, 160-174, 175-189,
+  190+), tempo écrit dans le chemin sinon mesuré (boucles) ; comptes sous
+  la barre et le kit (`/api/samples/bpms`), tranches vides blanches, OU
+  entre tranches ; bloc masqué si aucun fichier du sous-ensemble n'a de
+  tempo. Un fichier sans tempo sort de la liste dès qu'une tranche est
+  choisie.
 - Un clic sur un code de l'arbre (BD, BS…) ajoute ou retire le filtre
   d'instrument correspondant (code surligné quand il est actif).
 - Sous-dossier manuel (version simple, sans mot-clé) : « + » sur la ligne

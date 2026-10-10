@@ -389,6 +389,8 @@ def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
     assert client.get("/api/samples/notes", params={"kit": "k/a", "codes": "FX"}).json()[0] == {"note": "C", "count": 0}
     assert client.get("/api/samples", params={"notes": "A"}).json() == []
     assert client.get("/api/samples", params={"notes": "H"}).status_code == 422
+    assert len(client.get("/api/samples/bpms").json()) == 8
+    assert client.get("/api/samples", params={"bpms": "999"}).status_code == 422
 
 
 def test_samples_export(tmp_path: Path):

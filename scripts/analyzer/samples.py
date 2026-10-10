@@ -1466,6 +1466,23 @@ def overflow_of(manifest: Manifest, folder: str,
             for i, (r, note) in enumerate(zip(rows, notes), 1)]
 
 
+# Tranches de tempo du filtre de la vue de droite (7.K) : nom, borne basse.
+BPM_BANDS = (("<90", 0), ("90", 90), ("110", 110), ("130", 130), ("145", 145),
+             ("160", 160), ("175", 175), ("190", 190))
+
+
+def bpm_band(bpm: int | None) -> str | None:
+    """Tranche de BPM_BANDS d'un tempo ; None sans tempo."""
+    if not bpm:
+        return None
+    return [name for name, lo in BPM_BANDS if bpm >= lo][-1]
+
+
+def tempo_of_entry(source: str, measured: int | None = None) -> int | None:
+    """Tempo d'un fichier : ecrit dans le chemin, sinon mesure (boucles)."""
+    return tempo_of(source) or measured
+
+
 class SampleFilter(BaseModel):
     """Barre de recherche (7.J6) : ET entre facettes, OU dans une facette."""
     q: str | None = None                    # mots du nom DT2 ou du chemin (tous)
@@ -1476,13 +1493,17 @@ class SampleFilter(BaseModel):
     kind: Literal["oneshot", "loop"] | None = None
     min_stars: int | None = None
     notes: list[str] = Field(default_factory=list)  # classes de hauteur, en dieses (7.J7)
+    bpms: list[str] = Field(default_factory=list)   # tranches de BPM_BANDS (7.K)
 
     def active(self) -> bool:
         return self != SampleFilter()
 
     def keep(self, source: str, code: str | None, tags: Iterable[str], auto: Iterable[str],
-             stars: int | None = None, name: str = "", note: str | None = None) -> bool:
+             stars: int | None = None, name: str = "", note: str | None = None,
+             bpm: int | None = None) -> bool:
         if self.notes and note not in self.notes:
+            return False
+        if self.bpms and bpm_band(bpm) not in self.bpms:
             return False
         if self.q and not all(w in f"{name} {source}".lower() for w in self.q.lower().split()):
             return False
@@ -1509,15 +1530,17 @@ def filter_manifest(manifest: Manifest, f: SampleFilter,
         return manifest
     loose_ok = [src for src in manifest.unclassified
                 if f.keep(src, None, tags_of(overrides, src), auto_tags_of(overrides, src),
-                          overrides.get(src, Override()).stars)]
+                          overrides.get(src, Override()).stars, bpm=tempo_of(src))]
     trash_ok = [src for src in manifest.trashed
                 if f.keep(src, None, tags_of(overrides, src), auto_tags_of(overrides, src),
-                          overrides.get(src, Override()).stars)]
+                          overrides.get(src, Override()).stars, bpm=tempo_of(src))]
     return manifest.model_copy(update={
         "entries": [e for e in manifest.entries
-                    if f.keep(e.source, e.code, e.tags, e.auto_tags, e.stars, e.name, e.note)],
+                    if f.keep(e.source, e.code, e.tags, e.auto_tags, e.stars, e.name, e.note,
+                              tempo_of_entry(e.source, e.bpm))],
         "reserve": [r for r in manifest.reserve
-                    if f.keep(r.source, r.code, r.tags, r.auto_tags, note=_reserve_note(r))],
+                    if f.keep(r.source, r.code, r.tags, r.auto_tags, note=_reserve_note(r),
+                              bpm=tempo_of(r.source))],
         "unclassified": loose_ok, "trashed": trash_ok,
     })
 
@@ -1552,6 +1575,19 @@ def facet_notes(manifest: Manifest, kit: str | None = None) -> list[tuple[str, i
         if note in counts:
             counts[note] += 1
     return list(counts.items())
+
+
+def facet_bpms(manifest: Manifest, kit: str | None = None) -> list[tuple[str, int]]:
+    """(tranche, fichiers) de BPM_BANDS, candidats et reserve, reduit a un kit
+    si donne : filtre de tempo de la vue de droite (7.K)."""
+    tally = {name: 0 for name, _ in BPM_BANDS}
+    tempos = [tempo_of_entry(e.source, e.bpm) for e in manifest.entries if kit is None or in_kit(e.source, kit)]
+    tempos += [tempo_of(r.source) for r in manifest.reserve if kit is None or in_kit(r.source, kit)]
+    for t in tempos:
+        band = bpm_band(t)
+        if band is not None:
+            tally[band] += 1
+    return list(tally.items())
 
 
 def kit_rows(manifest: Manifest, kit: str | None) -> list[SampleEntry]:

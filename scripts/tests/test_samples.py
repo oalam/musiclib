@@ -911,3 +911,18 @@ def test_cli_export(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
     assert "2 a copier" in capsys.readouterr().out and not dest.exists()
     assert cli.main(["--export", "--source", str(root), "--dest", str(dest)]) == 0
     assert "2 copies" in capsys.readouterr().out and (dest / "FX/FX 2 p.wav").exists()
+
+
+def test_bpm_bands_filter_and_facet() -> None:
+    """Filtre de tempo de la vue de droite (7.K) : nom, sinon mesure."""
+    entries = [smp.SampleEntry(source=src, family="JUNGLE", code="BR", pack="p", name=f"BR {i}",
+                               duration=2.0, rank=i, bpm=bpm)
+               for i, (src, bpm) in enumerate([("p/amen 170 bpm.wav", None), ("p/loop.wav", 128),
+                                               ("p/q.wav", None)], 1)]
+    m = smp.Manifest(source_root="/x", total=3, entries=entries)
+    bands = dict(smp.facet_bpms(m))
+    assert (bands["160"], bands["110"], sum(bands.values())) == (1, 1, 2)
+    assert dict(smp.facet_bpms(m, kit="z"))["160"] == 0
+    got = smp.filter_manifest(m, smp.SampleFilter(bpms=["160"]), {})
+    assert [e.source for e in got.entries] == ["p/amen 170 bpm.wav"]
+    assert smp.bpm_band(89) == "<90" and smp.bpm_band(190) == "190" and smp.bpm_band(None) is None

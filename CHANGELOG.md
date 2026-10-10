@@ -65,6 +65,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   classés, suivi repris après un rechargement de la page.
 - [7.K] Roue des notes : comptes sous le filtre de la barre et le kit ; les
   notes absentes du sous-ensemble sont blanches et non cliquables.
+- [7.K] Filtre par tranche de tempo dans la vue de droite (à côté de la
+  roue) : comptes du sous-ensemble filtré, tranches vides blanches, affiché
+  seulement si des tempos sont connus. API : `bpms` dans le filtre,
+  `GET /api/samples/bpms`.
 - [7.K] Sous-dossier manuel dans l'arbre « Library » : « + » sur la ligne
   d'un code, rempli par rangement (`M`, glisser). `library/samples/folders.json`,
   `POST /api/samples/folders` ; chargé par l'API et `samples.py`. Sous un

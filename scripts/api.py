@@ -50,6 +50,7 @@ from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
 from analyzer.samples import (
+    BPM_BANDS,
     PITCH_CLASSES,
     STARS_MAX,
     ExportReport,
@@ -65,6 +66,7 @@ from analyzer.samples import (
     folder_key,
     folder_parts,
     export,
+    facet_bpms,
     facet_notes,
     facet_tags,
     filter_manifest,
@@ -206,6 +208,11 @@ class RebuildStatus(BaseModel):
     unclassified: int = 0
 
 
+class FacetBpm(BaseModel):
+    band: str   # borne basse de la tranche (BPM_BANDS), "<90" pour la premiere
+    count: int
+
+
 class FolderRequest(BaseModel):
     code: str = Field(min_length=2, max_length=2)
     sub: str = Field(min_length=2, max_length=10)
@@ -293,13 +300,18 @@ def sample_filter(q: Annotated[str | None, Query(max_length=200)] = None,
                   codes: Annotated[list[str] | None, Query(max_length=30)] = None,
                   kind: Literal["oneshot", "loop"] | None = None,
                   min_stars: Annotated[int | None, Query(ge=1, le=STARS_MAX)] = None,
-                  notes: Annotated[list[str] | None, Query(max_length=12)] = None) -> SampleFilter:
+                  notes: Annotated[list[str] | None, Query(max_length=12)] = None,
+                  bpms: Annotated[list[str] | None, Query(max_length=8)] = None) -> SampleFilter:
     """Barre de recherche (7.J6), commune a toutes les lectures de samples."""
     bad = sorted(set(notes or []) - set(PITCH_CLASSES))
     if bad:
         raise HTTPException(422, f"note inconnue : {', '.join(bad)}")
+    bad = sorted(set(bpms or []) - {name for name, _ in BPM_BANDS})
+    if bad:
+        raise HTTPException(422, f"tranche de tempo inconnue : {', '.join(bad)}")
     return SampleFilter(q=q or None, tags=tags or [], kits=kits or [], section=section,
-                        codes=codes or [], kind=kind, min_stars=min_stars, notes=notes or [])
+                        codes=codes or [], kind=kind, min_stars=min_stars, notes=notes or [],
+                        bpms=bpms or [])
 
 
 SampleQuery = Annotated[SampleFilter, Depends(sample_filter)]
@@ -580,6 +592,11 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def sample_facets() -> list[FacetTag]:
         """Tags proposes par la barre de recherche, avec leur groupe (7.J6)."""
         return [FacetTag(tag=t, group=g, count=n) for t, g, n in facet_tags(manifest(), overrides())]
+
+    @app.get("/api/samples/bpms", response_model=list[FacetBpm])
+    def sample_bpms(f: SampleQuery, kit: str | None = None) -> list[FacetBpm]:
+        """Tranches de tempo du sous-ensemble filtre (7.K), pour la vue de droite."""
+        return [FacetBpm(band=b, count=c) for b, c in facet_bpms(view(f), kit or None)]
 
     @app.get("/api/samples/notes", response_model=list[FacetNote])
     def sample_notes(f: SampleQuery, kit: str | None = None) -> list[FacetNote]:

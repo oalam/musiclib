@@ -23,7 +23,7 @@
   import WaveSurfer from 'wavesurfer.js'
   import { remote } from './remote.svelte'
   import { loadHistory, pushHistory } from './history'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type SampleFilter, type RebuildStatus } from './api'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type FacetBpm, type SampleFilter, type RebuildStatus } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -327,7 +327,24 @@
   // roue des notes (7.K) : ne filtre que la vue de droite, pas l'arbre
   const NOTES_KEY = 'ui:sample-notes'
   let notes = $state<string[]>([])
-  const rightF = $derived(notes.length ? { ...search, notes } : search)
+  // tranches de tempo (7.K) : meme principe, si le sous-ensemble a des tempos
+  const BPMS_KEY = 'ui:sample-bpms'
+  let bpms = $state<string[]>([])
+  let bpmFacets = $state<FacetBpm[]>([])
+  const rightF = $derived({ ...search, ...(notes.length ? { notes } : {}), ...(bpms.length ? { bpms } : {}) })
+  const bpmShown = $derived(bpms.length > 0 || bpmFacets.some(b => b.count > 0))
+  /** « 90 » -> « 90-109 », derniere tranche « 190+ ». */
+  function bpmLabel(i: number): string {
+    const b = bpmFacets[i].band
+    const next = bpmFacets[i + 1]?.band
+    return b.startsWith('<') ? b : next ? `${b}-${Number(next) - 1}` : `${b}+`
+  }
+  async function toggleBpm(band: string) {
+    bpms = bpms.includes(band) ? bpms.filter(x => x !== band) : [...bpms, band]
+    try { localStorage.setItem(BPMS_KEY, JSON.stringify(bpms)) } catch { /* stockage indisponible */ }
+    await loadEntries()
+    if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
+  }
   async function toggleNote(n: string) {
     notes = notes.includes(n) ? notes.filter(x => x !== n) : [...notes, n]
     try { localStorage.setItem(NOTES_KEY, JSON.stringify(notes)) } catch { /* stockage indisponible */ }
@@ -336,7 +353,7 @@
   }
   /** La barre ne garde que texte, tags, kits et instruments (7.K). */
   function onlyBar(f: SampleFilter): SampleFilter {
-    const { section: _s, kind: _k, minStars: _m, notes: _n, ...rest } = f
+    const { section: _s, kind: _k, minStars: _m, notes: _n, bpms: _b, ...rest } = f
     return rest
   }
   const GROUP_LABEL: Record<string, string> = { genre: 'genre', instrument: 'instrument', mot: 'mot-clé', manuel: 'tag' }
@@ -453,14 +470,15 @@
   // grille (filtree), compteurs hors case et tags connus
   async function refresh() {
     try {
-      const [c, u, t, tags, k, fa, wh] = await Promise.all([
+      const [c, u, t, tags, k, fa, wh, bp] = await Promise.all([
         api.sampleCells(search, search.codes?.length ? '' : kit),
         api.sampleLoose('unclassified', kit, search), api.sampleLoose('trash', kit, search), api.sampleTags(),
-        api.sampleKits(search), api.sampleFacets(), api.sampleNotes(search, kit),
+        api.sampleKits(search), api.sampleFacets(), api.sampleNotes(search, kit), api.sampleBpms(search, kit),
       ])
       cells = c
       facets = fa
       wheel = wh
+      bpmFacets = bp
       const ak = filterOn() ? await api.sampleKits() : k
       if (!allFolders.length) allFolders = await api.sampleFolders()
       allKits = ak.kits
@@ -795,6 +813,7 @@
       const saved = JSON.parse(localStorage.getItem(SEARCH_KEY) ?? '{}') as SampleFilter
       search = onlyBar(saved)
       notes = JSON.parse(localStorage.getItem(NOTES_KEY) ?? 'null') ?? saved.notes ?? []
+      bpms = JSON.parse(localStorage.getItem(BPMS_KEY) ?? '[]')
     } catch { search = {} }
     await refresh()
     if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
@@ -1030,6 +1049,15 @@
           </g>
         {/each}
       </svg>
+      {#if bpmShown}
+        <div class="bpms" role="group" aria-label="Filtrer la liste par tempo">
+          {#each bpmFacets as b, i (b.band)}
+            <button class="bpm" class:on={bpms.includes(b.band)} class:empty={!b.count}
+              disabled={!b.count && !bpms.includes(b.band)} title="{bpmLabel(i)} BPM : {b.count} sample{b.count > 1 ? 's' : ''}"
+              onclick={() => toggleBpm(b.band)}><span>{bpmLabel(i)}</span>{#if b.count}<span class="bc">{b.count}</span>{/if}</button>
+          {/each}
+        </div>
+      {/if}
     </div>
     <div class="toolbar small">
       <span class="count">{sel.size ? `${sel.size} sélectionnés` : cursor ? 'sample en cours' : 'rien'}</span>
@@ -1275,6 +1303,12 @@
   .wave-row { display: flex; gap: 10px; align-items: center; }
   .wave-row .wave { flex: 1; min-width: 0; }
   .wheel { width: 80px; height: 80px; flex: none; }
+  .bpms { display: grid; grid-template-columns: repeat(2, auto); grid-template-rows: repeat(4, 1fr); grid-auto-flow: column; gap: 2px; height: 80px; flex: none; }
+  .bpm { display: flex; justify-content: space-between; gap: 6px; padding: 0 6px; font: 10px ui-monospace, Menlo, monospace; border-radius: 3px; }
+  .bpm .bc { color: var(--muted); }
+  .bpm.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .bpm.on .bc { color: #fff; }
+  .bpm.empty:not(.on) { background: var(--panel); color: var(--muted); opacity: 0.5; }
   .wheel g { cursor: pointer; outline: none; }
   .wheel path { fill: var(--accent); stroke: var(--border); stroke-width: 0.6; }
   .wheel g.on path { fill: var(--accent); fill-opacity: 1 !important; stroke: var(--text); }

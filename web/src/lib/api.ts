@@ -269,6 +269,9 @@ export interface RebuildStatus {
   unclassified: number
 }
 
+/** Tranche de tempo (borne basse, « <90 » pour la premiere) et fichiers (7.K). */
+export interface FacetBpm { band: string; count: number }
+
 export interface SampleFilter {
   q?: string
   tags?: string[]
@@ -278,6 +281,7 @@ export interface SampleFilter {
   kind?: 'oneshot' | 'loop'
   minStars?: number
   notes?: string[]         // classes de hauteur en dieses (7.J7)
+  bpms?: string[]          // tranches de tempo (7.K, vue de droite)
 }
 /** Tag propose par la barre : groupe genre / instrument / mot (inferes) ou manuel. */
 export interface FacetTag { tag: string; group: string; count: number }
@@ -348,6 +352,7 @@ function fq(f: SampleFilter = {}): string {
   for (const k of f.kits ?? []) q.append('kits', k)
   for (const c of f.codes ?? []) q.append('codes', c)
   for (const n of f.notes ?? []) q.append('notes', n)
+  for (const b of f.bpms ?? []) q.append('bpms', b)
   if (f.section) q.set('section', f.section)
   if (f.kind) q.set('kind', f.kind)
   if (f.minStars) q.set('min_stars', String(f.minStars))
@@ -396,6 +401,8 @@ export const api = {
     fetch(`/api/samples/tree?kit=${enc(kit)}${fq(f)}`).then(r => json<SampleEntry[]>(r)),
   sampleKits: (f: SampleFilter = {}) => fetch(`/api/samples/kits?${fq(f)}`).then(r => json<SampleKits>(r)),
   sampleFacets: () => fetch('/api/samples/facets').then(r => json<FacetTag[]>(r)),
+  sampleBpms: (f: SampleFilter = {}, kit = '') =>
+    fetch(`/api/samples/bpms?kit=${enc(kit)}${fq(f)}`).then(r => json<FacetBpm[]>(r)),
   sampleNotes: (f: SampleFilter = {}, kit = '') =>
     fetch(`/api/samples/notes?kit=${enc(kit)}${fq(f)}`).then(r => json<FacetNote[]>(r)),
   sampleKitTrash: (kit: string) => samplePost('kit/trash', { kit }),
