@@ -53,6 +53,11 @@
     RS: 'Resample, enregistrement maison · track 16 (joker)',
   }
   // libelle court d'un code pour l'arbre : « Kick (bass drum) · track 1 » -> « Kick, bass drum »
+  // track(s) de la doctrine sur deux chiffres : « track 1 » -> « 01 », « tracks 7-8 » -> « 07-08 »
+  const codeTrack = (c: string) => {
+    const m = /tracks? (\d+)(?:-(\d+))?/.exec(CODE_HELP[c] ?? '')
+    return m ? [m[1], m[2]].filter(Boolean).map(n => n!.padStart(2, '0')).join('-') : ''
+  }
   const codeShort = (c: string) => (CODE_HELP[c] ?? c).split(' · ')[0].replace(/ \(/g, ', ').replace(/\)/g, '')
   const codeTitle = (c: string) => `${c} : ${CODE_HELP[c] ?? c}${LOOPS.includes(c) ? ' (boucle)' : ''}`
   const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
@@ -839,7 +844,7 @@
               <div class="code-node">
                 <button class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
                   class:active={search.codes?.includes(row.code)} onclick={() => toggleCode(row.code)}
-                  title="{codeTitle(row.code)} · clic : filtre d'instrument"><span class="acr">{row.code}</span> <span class="desc">({codeShort(row.code)})</span></button>
+                  title="{codeTitle(row.code)} · clic : filtre d'instrument"><span class="acr">{row.code}</span>{#if codeTrack(row.code)}<span class="trk">{codeTrack(row.code)}</span>{/if} <span class="desc">({codeShort(row.code)})</span></button>
                 {#if root}{@render folderNode(root, '')}{/if}
                 {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code} : candidats + hors plafond">({codeTotal(row.folders)})</span>{/if}
               </div>
@@ -1115,6 +1120,7 @@
   button.code-label:hover { text-decoration: underline; }
   button.code-label { width: auto; min-width: 0; max-width: 100%; display: flex; gap: 4px; align-items: baseline; overflow: hidden; }
   button.code-label .acr { display: inline-block; min-width: 24px; padding: 0 2px; border-radius: 3px; }
+  button.code-label .trk { font-weight: 400; color: var(--muted); }
   button.code-label .desc { font: 11px ui-sans-serif, system-ui, sans-serif; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   button.code-label.active .acr { background: var(--rhythm); color: var(--panel); text-align: center; }
   button.code-label.mel.active .acr { background: var(--melodic); }

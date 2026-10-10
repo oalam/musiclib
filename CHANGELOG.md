@@ -31,7 +31,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.K] Total général sous « Library » : fichiers (candidats + hors
   plafond) toutes branches, sous le filtre courant, et retenus.
 - [7.K] Arbre « Library » : libellé de l'instrument entre parenthèses à
-  droite du code (ex. « BD (Kick, bass drum) »), détail complet en infobulle.
+  droite du code, précédé de la track de la doctrine (ex. « BD 01 (Kick,
+  bass drum) », « PC 07-08 (…) »), détail complet en infobulle.
 
 ### Modifié
 
