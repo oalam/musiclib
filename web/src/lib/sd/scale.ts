@@ -19,6 +19,7 @@ export function fromNorm(p: ParamSpec, n: number): number {
 
 /** Affichage facon Live : 1.20 kHz, 180 Hz, -6.0 dB, 40 ms, 0.85. */
 export function fmt(p: ParamSpec, v: number): string {
+  if (p.choices) return p.choices[Math.round(v)] ?? String(v)
   if (p.step) return `${Math.round(v)}${p.unit ? ` ${p.unit}` : ''}`
   switch (p.unit) {
     case 'Hz': return v >= 1000 ? `${(v / 1000).toFixed(v >= 10000 ? 1 : 2)} kHz` : `${v.toFixed(v < 100 ? 1 : 0)} Hz`
@@ -31,7 +32,7 @@ export function fmt(p: ParamSpec, v: number): string {
 
 // --- Courbes de reponse (illustratives : modeles analogiques des filtres) ---
 
-export const FILTER_TYPES = ['highpass', 'lowpass', 'ladder_lp', 'low_shelf', 'peak'] as const
+export const FILTER_TYPES = ['filter', 'highpass', 'lowpass', 'ladder_lp', 'low_shelf', 'peak'] as const
 export type FilterType = (typeof FILTER_TYPES)[number]
 export const isFilter = (t: string): t is FilterType => (FILTER_TYPES as readonly string[]).includes(t)
 
@@ -40,15 +41,20 @@ export const F_MAX = 20000
 
 /** Frequence de coupure et parametre vertical du noeud, selon le filtre. */
 export function cutoffParam(t: FilterType): string {
-  return t === 'ladder_lp' ? 'cutoff_hz' : 'cutoff_frequency_hz'
+  return t === 'ladder_lp' || t === 'filter' ? 'cutoff_hz' : 'cutoff_frequency_hz'
 }
 export function verticalParam(t: FilterType): string | null {
-  if (t === 'ladder_lp') return 'resonance'
+  if (t === 'ladder_lp' || t === 'filter') return 'resonance'
   if (t === 'low_shelf' || t === 'peak') return 'gain_db'
   return null
 }
 
 const lp2 = (x: number, q: number) => 1 / Math.hypot(1 - x * x, x / q)
+const hp2 = (x: number, q: number) => (x * x) / Math.hypot(1 - x * x, x / q)
+const bp2 = (x: number, q: number) => (x / q) / Math.hypot(1 - x * x, x / q)
+
+/** Ordre des types du device `filter` (FILTER_MODES de sounddesign.py). */
+const MODES = ['LP12', 'LP24', 'HP12', 'HP24', 'BP12', 'BP24']
 
 /** Gain en dB a la frequence f. */
 export function responseDb(t: FilterType, params: Record<string, number>, f: number): number {
@@ -59,6 +65,14 @@ export function responseDb(t: FilterType, params: Record<string, number>, f: num
     case 'lowpass': mag = 1 / Math.hypot(1, x); break                   // 1er ordre, 6 dB/oct
     case 'highpass': mag = x / Math.hypot(1, x); break
     case 'ladder_lp': mag = lp2(x, 0.5 + 6 * params.resonance) * lp2(x, 0.6); break   // ~24 dB/oct
+    case 'filter': {
+      const mode = MODES[Math.round(params.mode)] ?? 'LP24'
+      const q = 0.5 + 6 * params.resonance
+      const f2 = mode.startsWith('LP') ? lp2 : mode.startsWith('HP') ? hp2 : bp2
+      mag = f2(x, q) * (mode.endsWith('24') ? f2(x, 0.6) : 1)   // 24 dB/oct = deux etages
+      if (mode.startsWith('BP')) mag *= Math.sqrt(q)               // bp2 vaut 1 a la coupure : le pic suit la resonance
+      break
+    }
     case 'peak': {
       const a = 10 ** (params.gain_db / 40)
       const q = params.q

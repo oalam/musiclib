@@ -139,3 +139,43 @@ def test_write_render_is_stable_and_has_sidecar(tmp_path: Path):
     sidecar = sd.RenderRecord.model_validate_json(
         (tmp_path / rec1.file).with_suffix(".json").read_text())
     assert sidecar.preset == preset and sidecar.seconds == pytest.approx(1.6)
+
+
+def _band_energy(x: np.ndarray, lo: float, hi: float) -> float:
+    spectrum = np.abs(np.fft.rfft(x[0])) ** 2
+    freqs = np.fft.rfftfreq(x.shape[1], 1 / sd.SR)
+    return float(spectrum[(freqs >= lo) & (freqs < hi)].sum())
+
+
+def _filtered(**params: float) -> np.ndarray:
+    noise = np.random.default_rng(0).standard_normal((2, sd.SR)).astype(np.float32) * 0.1
+    ctx = sd.RenderContext(sr=sd.SR, triggers=np.array([], dtype=int))
+    full = {"mode": 1, "cutoff_hz": 1000, "resonance": 0.0, "drive": 1, **params}
+    return sd.DEVICES["filter"].build(full, ctx)(noise)
+
+
+def test_filter_type_selects_lp_hp_bp():
+    modes = list(sd.FILTER_MODES)
+    lp = _filtered(mode=modes.index("LP24"))
+    hp = _filtered(mode=modes.index("HP24"))
+    bp = _filtered(mode=modes.index("BP24"))
+    assert _band_energy(lp, 50, 300) > 10 * _band_energy(lp, 5000, 20000)
+    assert _band_energy(hp, 5000, 20000) > 10 * _band_energy(hp, 50, 300)
+    assert _band_energy(bp, 700, 1400) > _band_energy(bp, 50, 300)
+    assert _band_energy(bp, 700, 1400) > _band_energy(bp, 5000, 20000)
+
+
+def test_filter_resonance_boosts_around_cutoff():
+    flat = _filtered(resonance=0.0)
+    peaky = _filtered(resonance=0.9)
+    ratio = lambda x: _band_energy(x, 800, 1250) / _band_energy(x, 100, 400)  # noqa: E731
+    assert ratio(peaky) > 2 * ratio(flat)
+
+
+def test_filter_mode_must_be_an_index():
+    preset = _preset()
+    preset.chains[1].devices.append(sd.Device(type="filter", params={"mode": 1.5}))
+    with pytest.raises(sd.PresetError, match="index"):
+        sd.validate(preset)
+    spec = next(p for p in sd.DEVICES["filter"].spec.params if p.name == "mode")
+    assert spec.choices == ["LP12", "LP24", "HP12", "HP24", "BP12", "BP24"]

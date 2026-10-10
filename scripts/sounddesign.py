@@ -58,7 +58,10 @@ def _cmd_devices() -> int:
     for spec in device_specs():
         print(f"{spec.type} — {spec.label} : {spec.help}")
         for p in spec.params:
-            print(f"    {p.name} = {p.default:g} {p.unit} [{p.min:g} .. {p.max:g}]".rstrip())
+            if p.choices:
+                print(f"    {p.name} = {p.default:g} : " + ", ".join(f"{i}={c}" for i, c in enumerate(p.choices)))
+            else:
+                print(f"    {p.name} = {p.default:g} {p.unit} [{p.min:g} .. {p.max:g}]".rstrip())
     return 0
 
 

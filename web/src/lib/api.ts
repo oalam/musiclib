@@ -341,6 +341,8 @@ export interface ParamSpec {
   scale: 'lin' | 'log'
   step: number | null
   help: string
+  /** Libelles des valeurs 0..n-1 : selecteur (type de filtre), pas potard. */
+  choices: string[] | null
 }
 export interface DeviceSpec { type: string; label: string; help: string; params: ParamSpec[] }
 export interface SdDevice { type: string; params: Record<string, number>; bypass: boolean }

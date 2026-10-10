@@ -1010,7 +1010,12 @@ python api.py &   puis   cd ../web && npm run dev
     (bypass), ‹ › pour déplacer, × pour retirer, « + device » en bout de
     chaîne. Les filtres et EQ ont une **courbe de réponse** (log 20 Hz -
     20 kHz) avec un nœud à glisser : x = coupure, y = gain (shelf, peak) ou
-    résonance (ladder). Courbes illustratives (modèles analogiques).
+    résonance (ladder, Filtre). Courbes illustratives (modèles analogiques).
+  - **Filtre** (façon Auto Filter) : sélecteur de type LP12 / LP24 / HP12 /
+    HP24 / BP12 / BP24, coupure, résonance (accent autour de la coupure,
+    sifflement vers 1), drive. Les « Passe-haut » / « Passe-bas » sont des
+    1er ordre 6 dB/oct : pas de résonance possible, gardés pour les coupes
+    propres (sub, rumble).
   - **Écoute en boucle** (Web Audio, sans trou) : tout réglage pendant la
     lecture relance le rendu et remplace la boucle à la même phase (fondu
     de 15 ms). Précédent / suivant de la télécommande = preset voisin.

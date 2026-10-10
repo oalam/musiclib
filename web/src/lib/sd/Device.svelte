@@ -38,7 +38,16 @@
       {/if}
       <div class="knobs">
         {#each spec.params as p (p.name)}
-          <Knob spec={p} value={values[p.name]} disabled={device.bypass} onchange={v => set(p.name, v)} />
+          {#if p.choices}
+            <div class="choices" role="radiogroup" aria-label={p.label} title={p.help || p.label}>
+              {#each p.choices as c, i (c)}
+                <button role="radio" aria-checked={Math.round(values[p.name]) === i} class:on={Math.round(values[p.name]) === i}
+                  disabled={device.bypass} onclick={() => set(p.name, i)}>{c}</button>
+              {/each}
+            </div>
+          {:else}
+            <Knob spec={p} value={values[p.name]} disabled={device.bypass} onchange={v => set(p.name, v)} />
+          {/if}
         {/each}
       </div>
     </div>
@@ -55,6 +64,8 @@
   .mini:hover { color: var(--text); }
   .body { padding: 8px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
   .knobs { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 280px; }
+  .choices { display: grid; grid-template-columns: repeat(2, auto); gap: 2px; width: 100%; justify-content: center; }
+  .choices button { padding: 1px 8px; font-size: 11px; border-radius: 2px; }
   .off .body { opacity: 0.45; }
   .err { color: #dc2626; font-size: 12px; padding: 8px; margin: 0; }
 </style>

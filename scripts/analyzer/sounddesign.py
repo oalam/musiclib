@@ -61,6 +61,7 @@ class ParamSpec(BaseModel):
     unit: str = ""
     scale: Literal["lin", "log"] = "lin"   # rendu du potard dans le front
     step: float | None = None              # valeurs discretes (ex. 1 pour un entier)
+    choices: list[str] | None = None       # libelles des valeurs 0..n-1 (selecteur, pas potard)
     help: str = ""
 
 
@@ -133,9 +134,9 @@ class _DeviceDef:
 
 def _p(name: str, label: str, lo: float, hi: float, default: float, unit: str = "",
        scale: Literal["lin", "log"] = "lin", step: float | None = None,
-       help: str = "") -> ParamSpec:
+       help: str = "", choices: list[str] | None = None) -> ParamSpec:
     return ParamSpec(name=name, label=label, min=lo, max=hi, default=default,
-                     unit=unit, scale=scale, step=step, help=help)
+                     unit=unit, scale=scale, step=step, help=help, choices=choices)
 
 
 def _pedalboard(cls_name: str, mode: str | None = None
@@ -187,6 +188,21 @@ def _width(params: dict[str, float], ctx: RenderContext) -> Processor:
 
 _HZ = dict(unit="Hz", scale="log")
 
+# Types du device `filter` : libelle affiche -> mode du LadderFilter pedalboard
+FILTER_MODES = {"LP12": "LPF12", "LP24": "LPF24", "HP12": "HPF12", "HP24": "HPF24",
+                "BP12": "BPF12", "BP24": "BPF24"}
+
+
+def _filter(params: dict[str, float], ctx: RenderContext) -> Processor:
+    """LadderFilter dont le mode vient du parametre `mode` (index de FILTER_MODES)."""
+    import pedalboard
+    mode = list(FILTER_MODES.values())[int(params["mode"])]
+    plugin = pedalboard.LadderFilter(mode=getattr(pedalboard.LadderFilter.Mode, mode),
+                                     cutoff_hz=params["cutoff_hz"],
+                                     resonance=params["resonance"], drive=params["drive"])
+    return lambda x: np.asarray(plugin(x, ctx.sr), dtype=np.float32)
+
+
 DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
     _DeviceDef(DeviceSpec(type="gain", label="Gain", help="Volume en dB.",
                           params=[_p("gain_db", "Gain", -48, 24, 0, "dB")]),
@@ -205,6 +221,16 @@ DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
                                   _p("resonance", "Resonance", 0, 1, 0.2),
                                   _p("drive", "Drive", 1, 10, 1)]),
                _pedalboard("LadderFilter", mode="LPF24")),
+    _DeviceDef(DeviceSpec(type="filter", label="Filtre",
+                          help="Filtre ladder multimode facon Auto Filter : type passe-bas, "
+                               "passe-haut ou passe-bande, pente 12 ou 24 dB/oct, resonance "
+                               "(accent autour de la coupure, sifflement vers 1) et drive.",
+                          params=[_p("mode", "Type", 0, len(FILTER_MODES) - 1, 1, step=1,
+                                     choices=list(FILTER_MODES)),
+                                  _p("cutoff_hz", "Coupure", 20, 20000, 1000, **_HZ),
+                                  _p("resonance", "Resonance", 0, 1, 0.3),
+                                  _p("drive", "Drive", 1, 10, 1)]),
+               _filter),
     _DeviceDef(DeviceSpec(type="low_shelf", label="Low shelf",
                           help="Plateau grave : monte ou baisse tout ce qui est sous la coupure.",
                           params=[_p("cutoff_frequency_hz", "Coupure", 20, 1000, 80, **_HZ),
@@ -353,6 +379,9 @@ def _resolve(specs: list[ParamSpec], given: dict[str, float], where: str) -> dic
         if not spec.min <= value <= spec.max:
             raise PresetError(f"{where} : {spec.name}={value} hors de "
                               f"[{spec.min}, {spec.max}]")
+        if spec.choices is not None and value != int(value):
+            raise PresetError(f"{where} : {spec.name}={value} doit etre un index de "
+                              f"{spec.choices}")
         out[spec.name] = value
     return out
 

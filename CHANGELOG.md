@@ -72,6 +72,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.C] Device « Filtre » façon Auto Filter (ladder pedalboard) : type
+  LP / HP / BP en 12 ou 24 dB/oct (sélecteur), coupure, résonance, drive ;
+  courbe à nœud x = coupure, y = résonance. Les passe-haut / passe-bas
+  6 dB/oct (1er ordre, sans résonance possible) restent pour les coupes
+  propres. `ParamSpec.choices` : paramètre discret affiché en sélecteur.
 - [8.C] Vue « Sound design » du front, rack façon Ableton Live : potards
   (glisser, Maj fin, double-clic défaut), tranches de mixage par chaîne
   (fader, activateur = mute, solo d'écoute), devices avec activateur =

@@ -941,6 +941,10 @@ On garde une boucle d'une à huit mesures, sans couture.
 - **Sources** (8.B) : l'API ne rend que des samples du manifeste (clé
   relative à `<MEDIA>/Samples`), comme l'écoute des samples : pas de chemin
   libre. Les rendus ne sont servis que s'ils ont un sidecar.
+- **Filtres** (8.C) : résonance et type (LP / HP / BP, 12 / 24 dB/oct) via
+  le device `filter` (LadderFilter pedalboard) ; `highpass` / `lowpass`
+  restent des 1er ordre sans résonance. Un paramètre discret porte
+  `choices` (sélecteur dans le front, index validé côté moteur).
 - **Sidechain** : pedalboard n'a pas d'entrée sidechain ; le device `duck`
   creuse le signal sur les positions de coups connues du traitement.
 
