@@ -53,10 +53,14 @@ from analyzer.samples import (
     Override,
     SampleError,
     build_manifest,
+    check_sub,
     export,
+    folder_of,
+    has_sub,
     grid,
     measure,
     measure_note,
+    register_subs,
     tag_report,
 )
 from paths import DT2_SAMPLES_DIR, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
@@ -64,6 +68,7 @@ from paths import DT2_SAMPLES_DIR, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
 MANIFEST_FILE = SAMPLES_META_DIR / "manifest.json"
 OVERRIDES_FILE = SAMPLES_META_DIR / "overrides.json"
 EXPORT_INDEX_FILE = SAMPLES_META_DIR / "export.json"
+FOLDERS_FILE = SAMPLES_META_DIR / "folders.json"  # sous-dossiers manuels (7.K)
 
 
 def load_overrides(path: Path) -> dict[str, Override]:
@@ -74,6 +79,35 @@ def load_overrides(path: Path) -> dict[str, Override]:
     except json.JSONDecodeError as exc:
         raise SampleError(f"{path} : JSON invalide ({exc})") from exc
     return {k: Override.model_validate(v) for k, v in raw.items()}
+
+
+def load_manual_subs(path: Path) -> dict[str, list[str]]:
+    """Sous-dossiers manuels `{"BD": ["RUMBLE"]}`, enregistres dans SUBS."""
+    if not path.exists():
+        return {}
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SampleError(f"{path} : JSON invalide ({exc})") from exc
+    manual = {str(c): [str(x) for x in subs] for c, subs in raw.items()}
+    register_subs(manual)
+    return manual
+
+
+def add_manual_sub(path: Path, code: str, sub: str) -> str:
+    """Cree le sous-dossier `sub` de `code` (rejouable, sans effet s'il existe
+    deja) ; renvoie le dossier final, ex. `DRUMS/BD/RUMBLE`."""
+    name = check_sub(code, sub)
+    manual = load_manual_subs(path)
+    if not has_sub(code, name):
+        manual.setdefault(code, []).append(name)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(dict(sorted(manual.items())), ensure_ascii=False, indent=1) + "\n",
+                       encoding="utf-8")
+        tmp.replace(path)
+        register_subs(manual)
+    return folder_of("", code, name)
 
 
 def save_overrides(overrides: dict[str, Override], path: Path) -> None:
@@ -153,6 +187,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     try:
+        load_manual_subs(FOLDERS_FILE)
         previous = load_manifest(MANIFEST_FILE)
         if args.export:
             if previous is None:

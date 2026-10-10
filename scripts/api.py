@@ -193,6 +193,11 @@ def run_grab(req: GrabRequest, ctx: JobContext) -> None:
             raise StepFailed("analyse harmonique impossible (voir les logs d'api.py)")
 
 
+class FolderRequest(BaseModel):
+    code: str = Field(min_length=2, max_length=2)
+    sub: str = Field(min_length=2, max_length=10)
+
+
 class SampleCell(BaseModel):
     """Case de la bibliotheque de samples = dossier final du +Drive (7.J8),
     vue d'ecoute (7.J2)."""
@@ -355,7 +360,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                samples_src: Path = SAMPLES_SRC_DIR,
                samples_overrides: Path = samples.OVERRIDES_FILE,
                samples_export: Path = DT2_SAMPLES_DIR,
-               samples_export_index: Path = samples.EXPORT_INDEX_FILE) -> FastAPI:
+               samples_export_index: Path = samples.EXPORT_INDEX_FILE,
+               samples_folders: Path | None = None) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
@@ -363,6 +369,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     app.router.on_shutdown.append(jobs.shutdown)
 
     samples_lock = threading.Lock()
+    folders_file = samples_folders or samples.FOLDERS_FILE  # resolu a l'appel (tests)
+    samples.load_manual_subs(folders_file)  # sous-dossiers manuels (7.K)
 
     def manifest() -> samples.Manifest:
         m = samples.load_manifest(samples_manifest)
@@ -582,6 +590,17 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     @app.get("/api/samples/folders", response_model=list[str])
     def sample_folders() -> list[str]:
         """Dossiers cibles d'un rangement (7.J8) : racine du code et sous-categories."""
+        return target_folders()
+
+    @app.post("/api/samples/folders", response_model=list[str])
+    def sample_folder_add(req: FolderRequest) -> list[str]:
+        """Cree un sous-dossier manuel d'un code (7.K), rejouable ; il se
+        remplit par rangement (M, glisser). Renvoie les dossiers cibles."""
+        with samples_lock:
+            try:
+                samples.add_manual_sub(folders_file, req.code, req.sub)
+            except SampleError as exc:
+                raise HTTPException(422, str(exc)) from exc
         return target_folders()
 
     @app.get("/api/samples/tags", response_model=list[str])

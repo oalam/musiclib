@@ -861,6 +861,15 @@ révisés par 7.J8) :
   alignée à droite de la forme d'onde.
 - Un clic sur un code de l'arbre (BD, BS…) ajoute ou retire le filtre
   d'instrument correspondant (code surligné quand il est actif).
+- Sous-dossier manuel (version simple, sans mot-clé) : « + » sur la ligne
+  d'un code dans l'arbre, nom de 2 à 10 lettres ou chiffres (majuscules).
+  Source unique `library/samples/folders.json` (`{"BD": ["RUMBLE"]}`),
+  fusionnée dans `SUBS` au chargement (API, `samples.py`) ;
+  `POST /api/samples/folders` rejouable. Le dossier ne se remplit que par
+  rangement (`M`, glisser → override `sub`), conservé aux reconstructions ;
+  plafond de 16 (32 pour BR / DL / PL), créé sur le +Drive au prochain
+  export. Pas de SAMPLE. Sous un filtre d'instrument, les sous-dossiers
+  vides du type restent affichés (cibles de dépôt).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

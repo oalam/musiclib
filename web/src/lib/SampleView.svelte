@@ -129,8 +129,11 @@
     const i = allFolders.indexOf(f)
     return i >= 0 ? i : 1e3 + codeRank(splitFolder(f).code)
   }
-  // filtre actif : seuls les dossiers qui y repondent (M cible toujours tous les dossiers)
-  const folderList = $derived([...new Set([...(filterOn() ? [] : allFolders), ...cells.map(c => c.folder)])]
+  // filtre actif : seuls les dossiers qui y repondent (M cible toujours tous les
+  // dossiers), plus les sous-dossiers vides du type filtre (cibles de depot)
+  const folderList = $derived([...new Set([
+    ...(filterOn() ? allFolders.filter(f => search.codes?.includes(splitFolder(f).code) && !f.startsWith('SAMPLE/')) : allFolders),
+    ...cells.map(c => c.folder)])]
     .sort((a, b) => folderRank(a) - folderRank(b)))
   const byKey = $derived(new Map(cells.map(c => [c.folder, c])))
   // total d'un dossier / d'un type : candidats + hors plafond
@@ -180,6 +183,24 @@
   const visible = $derived(view?.kind === 'kit' || view?.kind === 'type'
     ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
     : showReserve ? [...chosen, ...reserve] : chosen)
+
+  // sous-dossier manuel (7.K) : « + » sur la ligne d'un code, nom saisi en place
+  let addingSub = $state<string | null>(null)
+  let subName = $state('')
+  async function addSub() {
+    const code = addingSub
+    if (!code || !subName.trim()) return
+    try {
+      allFolders = await api.sampleFolderAdd(code, subName.trim())
+      addingSub = null
+      subName = ''
+      error = ''
+    } catch (e) { fail(e) }
+  }
+  function onSubKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') { e.preventDefault(); addSub() }
+    else if (e.key === 'Escape') { e.preventDefault(); addingSub = null; subName = '' }
+  }
 
   /** Clic sur un code de l'arbre : ajoute / retire le filtre d'instrument (vue par type). */
   function toggleCode(code: string) {
@@ -847,10 +868,19 @@
                   title="{codeTitle(row.code)} · clic : filtre d'instrument"><span class="acr">{row.code}</span>{#if codeTrack(row.code)}<span class="trk">{codeTrack(row.code)}</span>{/if} <span class="desc">({codeShort(row.code)})</span></button>
                 {#if root}{@render folderNode(root, '')}{/if}
                 {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code} : candidats + hors plafond">({codeTotal(row.folders)})</span>{/if}
+                {#if b.branch !== 'SAMPLE'}<button class="add-sub" title="Nouveau sous-dossier de {row.code} (rempli par rangement : M ou glisser)"
+                  onclick={() => { addingSub = addingSub === row.code ? null : row.code; subName = '' }}>+</button>{/if}
               </div>
               {#each row.folders.filter(f => splitFolder(f).sub) as f (f)}
                 <div class="leaf">{@render folderNode(f, splitFolder(f).sub)}</div>
               {/each}
+              {#if addingSub === row.code}
+                <div class="leaf new-sub">
+                  <!-- svelte-ignore a11y_autofocus -->
+                  <input autofocus maxlength="10" placeholder="NOM (2 à 10 lettres)" bind:value={subName} onkeydown={onSubKey} />
+                  <button class="small" disabled={subName.trim().length < 2} onclick={addSub}>Créer</button>
+                </div>
+              {/if}
             {/each}
           {/if}
         </div>
@@ -1113,7 +1143,7 @@
   .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
   .branch .fold { border: 0; background: none; color: var(--text); padding: 2px 0; cursor: pointer; }
   /* treeview : une ligne par dossier, code puis sous-dossiers en retrait, compteurs a droite */
-  .code-node { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; align-items: center; padding-left: 14px; min-height: 22px; }
+  .code-node { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto 18px; align-items: center; padding-left: 14px; min-height: 22px; }
   .leaf { padding-left: 42px; }
   .branches .drop { display: block; }
   button.code-label { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; border-radius: 3px; }
@@ -1134,6 +1164,11 @@
   .cell .sub { color: var(--text); }
   .n { font-variant-numeric: tabular-nums; }
   .tot { color: var(--muted); }
+  .add-sub { grid-column: 4; border: 0; background: none; padding: 0; color: var(--muted); font-size: 13px; line-height: 1; visibility: hidden; }
+  .code-node:hover .add-sub { visibility: visible; }
+  .add-sub:hover { color: var(--accent); }
+  .new-sub { display: flex; gap: 4px; padding: 2px 0; }
+  .new-sub input { flex: 1; min-width: 0; font: 11px ui-monospace, Menlo, monospace; text-transform: uppercase; padding: 2px 6px; }
   .code-tot { grid-column: 3; font: 11px ui-monospace, Menlo, monospace; padding-left: 6px; }
   .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }

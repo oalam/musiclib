@@ -840,6 +840,35 @@ def target_folders() -> list[str]:
                    for sub in ("", *SUBS.get(code, ()))), key=folder_key)
 
 
+# Sous-dossiers ajoutes a la main (7.K) : fusionnes dans SUBS au chargement
+# (`samples.load_manual_subs`) ; sans mot-cle, seuls les rangements manuels
+# (override `sub`) les remplissent.
+SUB_NAME = re.compile(r"[A-Z0-9]{2,10}")
+
+
+def register_subs(manual: dict[str, list[str]]) -> None:
+    """Ajoute des sous-categories manuelles aux connues (rejouable)."""
+    for code, subs in manual.items():
+        known = SUBS.get(code, ())
+        if code in CODES:
+            SUBS[code] = (*known, *(s for s in dict.fromkeys(subs) if s not in known))
+
+
+def has_sub(code: str, sub: str) -> bool:
+    """`sub` est une sous-categorie connue de `code` (regles ou manuelle)."""
+    return sub in SUBS.get(code, ())
+
+
+def check_sub(code: str, sub: str) -> str:
+    """Nom normalise d'un nouveau sous-dossier de `code`, ou SampleError."""
+    name = sub.strip().upper()
+    if code not in CODES or branch_of("", code) == "SAMPLE":
+        raise SampleError(f"code sans sous-dossier possible : {code}")
+    if not SUB_NAME.fullmatch(name):
+        raise SampleError("nom de sous-dossier : 2 a 10 lettres ou chiffres")
+    return name
+
+
 def quota(folder: str) -> int | None:
     """Plafond de retenus d'un dossier final ; None = tout (SAMPLE)."""
     if folder.startswith("SAMPLE/"):

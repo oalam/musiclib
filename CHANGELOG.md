@@ -59,6 +59,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.K] Sous-dossier manuel dans l'arbre « Library » : « + » sur la ligne
+  d'un code, rempli par rangement (`M`, glisser). `library/samples/folders.json`,
+  `POST /api/samples/folders` ; chargé par l'API et `samples.py`. Sous un
+  filtre d'instrument, les sous-dossiers vides du type restent visibles.
 - [7.K] Vue par type des samples : un filtre d'instrument liste à
   droite tous les fichiers du type par sous-dossier ; un kit ne filtre que
   cette vue (sans ses sous-dossiers vides), l'arbre de gauche reste intact.

@@ -411,3 +411,20 @@ def test_samples_export(tmp_path: Path):
     assert dry["dry_run"] and dry["copied"] == ["FX/FX 1 p.wav"] and not dest.exists()
     r = client.post("/api/samples/export", json={"dry_run": False}).json()
     assert r["files"] == 1 and (dest / "FX/FX 1 p.wav").exists()
+
+
+def test_sample_folder_add(samples_client: TestClient, tmp_path: Path):
+    """Sous-dossier manuel (7.K) : cree, rejouable, cible d'un rangement."""
+    r = samples_client.post("/api/samples/folders", json={"code": "BD", "sub": "rumble"})
+    assert r.status_code == 200 and "DRUMS/BD/RUMBLE" in r.json()
+    again = samples_client.post("/api/samples/folders", json={"code": "BD", "sub": "RUMBLE"}).json()
+    assert again.count("DRUMS/BD/RUMBLE") == 1
+    assert samples_client.post("/api/samples/folders", json={"code": "ZZ", "sub": "AB"}).status_code == 422
+    assert samples_client.post("/api/samples/folders", json={"code": "BD", "sub": "A B"}).status_code == 422
+    assert samples_client.get("/api/samples/folders").json().count("DRUMS/BD/RUMBLE") == 1
+    # rangement dans un sous-dossier manuel, persistant dans folders.json
+    assert _post(samples_client, "move", sources=["p/fx1.wav"], code="FX", sub="XRAY").status_code == 422
+    assert samples_client.post("/api/samples/folders", json={"code": "FX", "sub": "XRAY"}).status_code == 200
+    r = _post(samples_client, "move", sources=["p/fx1.wav"], code="FX", sub="XRAY")
+    assert r.status_code == 200 and "FX/XRAY" in {c["folder"] for c in r.json()}
+    assert json.loads(api.samples.FOLDERS_FILE.read_text(encoding="utf-8")) == {"BD": ["RUMBLE"], "FX": ["XRAY"]}

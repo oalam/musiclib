@@ -394,6 +394,10 @@ export const api = {
   sampleStatus: (sources: string[], status: SampleStatus) => samplePost('status', { sources, status }),
   sampleMove: (sources: string[], code: string, sub: string) => samplePost('move', { sources, code, sub }),
   sampleFolders: () => fetch('/api/samples/folders').then(r => json<string[]>(r)),
+  /** Cree un sous-dossier manuel d'un code (7.K) ; renvoie les dossiers cibles. */
+  sampleFolderAdd: (code: string, sub: string) =>
+    fetch('/api/samples/folders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, sub }) })
+      .then(r => json<string[]>(r)),
   sampleStars: (sources: string[], stars: number | null) => samplePost('stars', { sources, stars }),
   sampleTagsEdit: (sources: string[], add: string[], remove: string[] = []) => samplePost('tags', { sources, add, remove }),
   sampleTrash: (sources: string[]) => samplePost('trash', { sources }),
