@@ -12,8 +12,8 @@
   // Vue kit : arborescence BRANCHE / dossier / fichiers (case finale, retenus,
   // reserve, hors plafond), puis un dossier des non classes du kit.
   // Vue par type (7.K) : un filtre d'instrument liste a droite tous les
-  // fichiers du type par sous-dossier ; un kit ne filtre que cette vue (les
-  // sous-dossiers vides du kit restent affiches, l'arbre de gauche ne bouge pas).
+  // fichiers du type par sous-dossier ; un kit ne filtre que cette vue (sans
+  // ses sous-dossiers vides), l'arbre de gauche ne bouge pas.
   // Barre de recherche (7.J6) : texte, tags (manuels, de kit, inferes des
   // dossiers), kits, instruments, rythmique / melodique, one-shot / boucle,
   // etoiles ; ET entre facettes, OU dans une facette ; filtre toute la page.
@@ -151,15 +151,6 @@
   const tree = $derived.by((): FamFolder[] => {
     if (view?.kind !== 'kit' && view?.kind !== 'type') return []
     const branches = new Map<string, Map<string, SampleEntry[]>>()
-    // vue par type : tous les sous-dossiers du type, meme sans fichier du kit
-    if (view.kind === 'type') {
-      for (const f of allFolders.filter(x => search.codes?.includes(splitFolder(x).code))) {
-        const branch = splitFolder(f).branch
-        const byFolder = branches.get(branch) ?? new Map<string, SampleEntry[]>()
-        byFolder.set(f, [])
-        branches.set(branch, byFolder)
-      }
-    }
     for (const e of shown) {
       const branch = e.folder ? splitFolder(e.folder).branch : ''
       const byFolder = branches.get(branch) ?? new Map<string, SampleEntry[]>()
