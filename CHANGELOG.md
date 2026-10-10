@@ -45,6 +45,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.K] Vue par type des samples (essai) : un filtre d'instrument liste à
+  droite tous les fichiers du type par sous-dossier ; un kit ne filtre que
+  cette vue (sous-dossiers vides du kit affichés, arbre de gauche intact).
+  API : `GET /api/samples/tree` (`kit_rows` accepte l'absence de kit).
+  Arbre : total par dossier et par type (candidats + hors plafond).
 - [7.K] Coquille du front : barre générale avec télécommande (Morceau ou
   Sample : précédent, lecture / pause, boucle, suivant ; une seule source
   joue à la fois) et panneau latéral minimisable à icônes (Morceaux,

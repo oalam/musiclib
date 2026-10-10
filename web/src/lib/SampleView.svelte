@@ -11,6 +11,9 @@
   // comprise), porte ses tags (herites par ses fichiers) et sa corbeille.
   // Vue kit : arborescence BRANCHE / dossier / fichiers (case finale, retenus,
   // reserve, hors plafond), puis un dossier des non classes du kit.
+  // Vue par type (7.K) : un filtre d'instrument liste a droite tous les
+  // fichiers du type par sous-dossier ; un kit ne filtre que cette vue (les
+  // sous-dossiers vides du kit restent affiches, l'arbre de gauche ne bouge pas).
   // Barre de recherche (7.J6) : texte, tags (manuels, de kit, inferes des
   // dossiers), kits, instruments, rythmique / melodique, one-shot / boucle,
   // etoiles ; ET entre facettes, OU dans une facette ; filtre toute la page.
@@ -65,7 +68,7 @@
   }
 
   type Loose = 'unclassified' | 'trash'
-  type View = { kind: 'cell'; folder: string } | { kind: Loose } | { kind: 'kit' }
+  type View = { kind: 'cell'; folder: string } | { kind: Loose } | { kind: 'kit' } | { kind: 'type' }
 
   let cells = $state<SampleCell[]>([])
   // dossiers cibles (tous, meme vides) : l'arbre ne bouge pas avec un filtre
@@ -123,6 +126,11 @@
   const folderList = $derived([...new Set([...(filterOn() ? [] : allFolders), ...cells.map(c => c.folder)])]
     .sort((a, b) => folderRank(a) - folderRank(b)))
   const byKey = $derived(new Map(cells.map(c => [c.folder, c])))
+  // total d'un dossier / d'un type : candidats + hors plafond
+  const total = (c: SampleCell) => c.candidates + c.reserve
+  const codeTotal = (folders: string[]) => folders.reduce((n, f) => { const c = byKey.get(f); return n + (c ? total(c) : 0) }, 0)
+  // vue par type : filtre d'instrument actif
+  const typeMode = $derived(!!search.codes?.length)
   const branchRows = $derived(BRANCHES.map(branch => {
     const fs = folderList.filter(f => splitFolder(f).branch === branch)
     const cs = fs.map(f => byKey.get(f)).filter((c): c is SampleCell => c !== undefined)
@@ -141,8 +149,17 @@
   type FamFolder = { key: string; label: string; folders: Folder[]; selected: number; total: number }
   let collapsed = $state<Set<string>>(new Set())
   const tree = $derived.by((): FamFolder[] => {
-    if (view?.kind !== 'kit') return []
+    if (view?.kind !== 'kit' && view?.kind !== 'type') return []
     const branches = new Map<string, Map<string, SampleEntry[]>>()
+    // vue par type : tous les sous-dossiers du type, meme sans fichier du kit
+    if (view.kind === 'type') {
+      for (const f of allFolders.filter(x => search.codes?.includes(splitFolder(x).code))) {
+        const branch = splitFolder(f).branch
+        const byFolder = branches.get(branch) ?? new Map<string, SampleEntry[]>()
+        byFolder.set(f, [])
+        branches.set(branch, byFolder)
+      }
+    }
     for (const e of shown) {
       const branch = e.folder ? splitFolder(e.folder).branch : ''
       const byFolder = branches.get(branch) ?? new Map<string, SampleEntry[]>()
@@ -162,9 +179,18 @@
       }
     })
   })
-  const visible = $derived(view?.kind === 'kit'
+  const visible = $derived(view?.kind === 'kit' || view?.kind === 'type'
     ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
     : showReserve ? [...chosen, ...reserve] : chosen)
+
+  /** Vue par type : deplie et montre le dossier dans l'arborescence de droite. */
+  function reveal(folder: string) {
+    const s = new Set(collapsed)
+    s.delete(folder)
+    s.delete(splitFolder(folder).branch)
+    collapsed = s
+    queueMicrotask(() => document.getElementById(`t-${folder}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
+  }
 
   function toggleBranch(branch: string) {
     const s = new Set(closedBranches)
@@ -284,6 +310,11 @@
     history = pushHistory(HISTORY_KEY, history, f, filterTokens)
     try { localStorage.setItem(SEARCH_KEY, JSON.stringify(f)) } catch { /* stockage indisponible */ }
     await refresh()
+    if (f.codes?.length) { await open({ kind: 'type' }); return }
+    if (view?.kind === 'type') {
+      const c = cells.find(x => x.to_listen > 0) ?? cells[0]
+      if (c) { await open({ kind: 'cell', folder: c.folder }); return }
+    }
     // la case ouverte ne repond plus au filtre : premiere case qui y repond
     if (current && !byKey.has(current.folder) && ordered.length) {
       await open({ kind: 'cell', folder: ordered[0].folder })
@@ -371,7 +402,7 @@
   async function refresh() {
     try {
       const [c, u, t, tags, k, fa, wh] = await Promise.all([
-        api.sampleCells(search, kit),
+        api.sampleCells(search, search.codes?.length ? '' : kit),
         api.sampleLoose('unclassified', kit, search), api.sampleLoose('trash', kit, search), api.sampleTags(),
         api.sampleKits(search), api.sampleFacets(), api.sampleNotes(),
       ])
@@ -394,6 +425,10 @@
     const v = view
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
+    if (v.kind === 'type') {
+      entries = await api.sampleTree(search, kit).catch(() => [])
+      return
+    }
     if (v.kind === 'kit') {
       const t = await api.sampleKitTree(kit, search).catch(() => ({ entries: [], unclassified: [] }))
       entries = [...t.entries, ...t.unclassified.map(looseRow)]
@@ -598,7 +633,8 @@
     try { localStorage.setItem(KIT_KEY, kit) } catch { /* stockage indisponible */ }
     collapsed = new Set()
     await refresh()
-    if (kit) await open({ kind: 'kit' })
+    if (search.codes?.length) await open({ kind: 'type' })
+    else if (kit) await open({ kind: 'kit' })
     else if (view?.kind === 'kit') {
       const c = cells.find(x => x.to_listen > 0) ?? cells[0]
       if (c) await open({ kind: 'cell', folder: c.folder })
@@ -696,6 +732,7 @@
     if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
     let last: string | null = null
     try { last = localStorage.getItem(VIEW_KEY) } catch { /* stockage indisponible */ }
+    if (search.codes?.length) return open({ kind: 'type' })
     if (last === ':kit' && kit) return open({ kind: 'kit' })
     if (last === ':unclassified' || last === ':trash') return open({ kind: last.slice(1) as Loose })
     const c = (last && byKey.get(last)) || cells.find(x => x.to_listen > 0) || cells[0]
@@ -734,7 +771,7 @@
     {#if c}
       <button class="cell" class:done={c.to_listen === 0} class:on={current?.folder === f}
         title="{f} : {c.candidates} candidats, plafond {c.quota ?? 'aucun'}, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
-        onclick={() => open({ kind: 'cell', folder: f })}><span class="sub">{sub}</span><span class="n">{c.to_listen}/{c.selected}{#if c.reserve && kit}<sup>+{c.reserve}</sup>{/if}</span></button>
+        onclick={() => (view?.kind === 'type' ? reveal(f) : open({ kind: 'cell', folder: f }))}><span class="sub">{sub}</span><span class="n">{c.to_listen}/{c.selected} <span class="tot">({total(c)})</span>{#if c.reserve && kit && !typeMode}<sup>+{c.reserve}</sup>{/if}</span></button>
     {:else}
       <span class="slot" title="{f} : vide, glisse-en un ici ou M"><span class="sub">{sub}</span><span class="n">vide</span></span>
     {/if}
@@ -811,6 +848,7 @@
                 <span class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
                   title={codeTitle(row.code)}>{row.code}</span>
                 {#if root}{@render folderNode(root, '')}{/if}
+                {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code} : candidats + hors plafond">({codeTotal(row.folders)})</span>{/if}
               </div>
               {#each row.folders.filter(f => splitFolder(f).sub) as f (f)}
                 <div class="leaf">{@render folderNode(f, splitFolder(f).sub)}</div>
@@ -901,7 +939,7 @@
 
   <section class="detail">
     <header>
-      <strong>{current ? current.folder.replaceAll('/', ' / ') : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
+      <strong>{current ? current.folder.replaceAll('/', ' / ') : view?.kind === 'type' ? `Type ${search.codes?.join(', ')}${kit ? ` · kit ${kit}` : ''}` : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
       {#if current}
         {@const c = byKey.get(current.folder)}
         {#if c}<span class="muted small">quota {c.quota ?? 'tout'} · {c.keep} gardés · {c.drop} écartés · {c.candidates} candidats{c.reserve ? ` · ${c.reserve} hors plafond` : ''}</span>{/if}
@@ -916,7 +954,7 @@
       {#if view?.kind === 'trash'}
         <button class="small" disabled={!targetCount || busy} onclick={restore}>Restaurer</button>
       {:else}
-        {#if current || view?.kind === 'kit'}
+        {#if current || view?.kind === 'kit' || view?.kind === 'type'}
           <button class="small" disabled={!targetCount || busy} onclick={() => decide('keep')}>Garder</button>
           <button class="small" disabled={!targetCount || busy} onclick={() => decide('drop')}>Écarter</button>
         {/if}
@@ -933,7 +971,7 @@
       <button class="small" disabled={!targetCount || !tagInput.trim() || busy} onclick={addTag}>Tagger</button>
     </div>
     <p class="keys muted small">
-      {#if current || view?.kind === 'kit'}<kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · {/if}
+      {#if current || view?.kind === 'kit' || view?.kind === 'type'}<kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · {/if}
       {#if view?.kind === 'trash'}<kbd>U</kbd> restaurer · {:else}<kbd>Suppr</kbd> corbeille · <kbd>M</kbd> case · {/if}
       <kbd>1</kbd>…<kbd>5</kbd> étoiles, <kbd>0</kbd> sans · <kbd>T</kbd> tag ·
       <kbd>↑</kbd><kbd>↓</kbd> sample · <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve, puis hors plafond ·
@@ -987,10 +1025,10 @@
           <button class="tag small auto" title="Tag inféré des dossiers : filtrer dessus"
             onclick={() => { if (!search.tags?.includes(t)) setSearch({ ...search, tags: [...(search.tags ?? []), t] }) }}>{t}</button>
         {/each}
-        <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : view?.kind === 'kit' && e.folder && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
+        <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : (view?.kind === 'kit' || view?.kind === 'type') && e.folder && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
       </li>
     {/snippet}
-    {#if view?.kind === 'kit'}
+    {#if view?.kind === 'kit' || view?.kind === 'type'}
       <ol class="list tree">
         {#each tree as f (f.key)}
           <li class="folder fam">
@@ -1002,10 +1040,10 @@
           {#if !collapsed.has(f.key)}
             {#each f.folders as c (c.key)}
               {#if f.key !== ':nc'}
-                <li class="folder code" class:mel={!RHYTHM.includes(c.code)}>
+                <li class="folder code" id="t-{c.key}" class:mel={!RHYTHM.includes(c.code)}>
                   <button class="fold" title={codeTitle(c.code)} onclick={() => toggleFolder(c.key)}>
                     <span class="caret">{collapsed.has(c.key) ? '▸' : '▾'}</span> {c.label}
-                    <span class="muted small">{c.selected} / {c.rows.length}</span>
+                    <span class="muted small">{c.rows.length ? `${c.selected} / ${c.rows.length}` : 'vide'}</span>
                   </button>
                 </li>
               {/if}
@@ -1062,7 +1100,7 @@
   .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
   .branch .fold { border: 0; background: none; color: var(--text); padding: 2px 0; cursor: pointer; }
   /* treeview : une ligne par dossier, code puis sous-dossiers en retrait, compteurs a droite */
-  .code-node { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; padding-left: 14px; min-height: 22px; }
+  .code-node { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; padding-left: 14px; min-height: 22px; }
   .leaf { padding-left: 42px; }
   .branches .drop { display: block; }
   .code-label { width: 24px; font: 600 11px ui-monospace, Menlo, monospace; color: var(--rhythm); cursor: help; }
@@ -1074,6 +1112,8 @@
   .cell:hover { background: var(--panel-2); border-color: var(--border); }
   .cell .sub { color: var(--text); }
   .n { font-variant-numeric: tabular-nums; }
+  .tot { color: var(--muted); }
+  .code-tot { grid-column: 3; font: 11px ui-monospace, Menlo, monospace; padding-left: 6px; }
   .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }
   .slot { color: var(--muted); opacity: 0.6; }

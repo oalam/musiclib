@@ -380,6 +380,9 @@ export const api = {
     fetch(`/api/samples/loose?which=${which}${kit ? `&kit=${enc(kit)}` : ''}${fq(f)}`).then(r => json<LooseSample[]>(r)),
   sampleKitTree: (kit: string, f: SampleFilter = {}) =>
     fetch(`/api/samples/kit/tree?kit=${enc(kit)}${fq(f)}`).then(r => json<{ entries: SampleEntry[]; unclassified: LooseSample[] }>(r)),
+  /** Vue par type (7.K) : fichiers du filtre par case, reduits a un kit si donne. */
+  sampleTree: (f: SampleFilter, kit = '') =>
+    fetch(`/api/samples/tree?kit=${enc(kit)}${fq(f)}`).then(r => json<SampleEntry[]>(r)),
   sampleKits: (f: SampleFilter = {}) => fetch(`/api/samples/kits?${fq(f)}`).then(r => json<SampleKits>(r)),
   sampleFacets: () => fetch('/api/samples/facets').then(r => json<FacetTag[]>(r)),
   sampleNotes: () => fetch('/api/samples/notes').then(r => json<FacetNote[]>(r)),

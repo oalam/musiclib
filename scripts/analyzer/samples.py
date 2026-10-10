@@ -1523,14 +1523,18 @@ def facet_notes(manifest: Manifest) -> list[tuple[str, int]]:
     return list(counts.items())
 
 
-def kit_rows(manifest: Manifest, kit: str) -> list[SampleEntry]:
-    """Fichiers classes d'un kit, case par case : candidats par rang, puis la
-    reserve hors plafond (`overflow`). Arborescence du front (7.J5)."""
+def kit_rows(manifest: Manifest, kit: str | None) -> list[SampleEntry]:
+    """Fichiers classes d'un kit (tous avec `kit=None`), case par case :
+    candidats par rang, puis la reserve hors plafond (`overflow`).
+    Arborescence du front (7.J5, vue par type 7.K)."""
+    def keep(source: str) -> bool:
+        return kit is None or in_kit(source, kit)
+
     out: list[SampleEntry] = []
-    cells = sorted({e.folder for e in manifest.entries if in_kit(e.source, kit)}
-                   | {r.folder for r in manifest.reserve if in_kit(r.source, kit)}, key=folder_key)
+    cells = sorted({e.folder for e in manifest.entries if keep(e.source)}
+                   | {r.folder for r in manifest.reserve if keep(r.source)}, key=folder_key)
     for folder in cells:
-        out += [e for e in cell_of(manifest, folder) if in_kit(e.source, kit)]
+        out += [e for e in cell_of(manifest, folder) if keep(e.source)]
         out += overflow_of(manifest, folder, kit)
     return out
 

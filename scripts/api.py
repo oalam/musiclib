@@ -566,6 +566,12 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return SampleKitTree(entries=kit_rows(m, kit), unclassified=loose(
             m, samples.load_overrides(samples_overrides), "unclassified", kit))
 
+    @app.get("/api/samples/tree", response_model=list[SampleEntry])
+    def sample_tree(f: SampleQuery, kit: str | None = None) -> list[SampleEntry]:
+        """Arborescence par case des fichiers qui repondent au filtre (vue par
+        type du front, 7.K : filtre d'instrument), reduite a un kit si donne."""
+        return kit_rows(view(f), kit or None)
+
     @app.get("/api/samples/kits", response_model=SampleKits)
     def sample_kits(f: SampleQuery) -> SampleKits:
         """Bilan par kit pour les pads (7.J5), kits a la corbeille compris ;
