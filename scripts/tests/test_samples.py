@@ -114,6 +114,7 @@ def test_unique_suffix_keeps_length() -> None:
 def test_quota() -> None:
     assert smp.quota("LOOPS/DL/150") == 32
     assert smp.quota("LOOPS/BR") == 32
+    assert smp.quota("LOOPS/BR/060") == 64  # plafond propre au dossier
     assert smp.quota("LOOPS/PL/SKIN") == 32
     assert smp.quota("LOOPS/ML/KEYS") == 16
     assert smp.quota("DRUMS/BD/HARD") == 16

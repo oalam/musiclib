@@ -43,6 +43,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.J8] Plafond de `LOOPS/BR/060` porté à 64 (`FOLDER_CAPS`, plafonds
+  propres à un dossier) : 175 candidats, tous en lice, 64 retenus ; 1 183
+  retenus au total (1 151 + 32).
 - [7.J8] Arbre du +Drive par type : une case est un dossier final
   `<BRANCHE>/<CODE>/[<SOUS>]` (DRUMS, TONAL, LOOPS, FX, VX, SAMPLE), au lieu
   de la case famille × code. Plafond par dossier (32 pour BR / DL / PL, 16

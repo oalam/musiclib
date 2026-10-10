@@ -117,6 +117,8 @@ PITCHED = frozenset({"BD", "BS", "PD"})   # note mesuree dans l'audio (7.J7 ; ST
 TEMPO = frozenset({"BR", "DL", "PL", "ML", "BL"})         # BPM garde dans le nom
 RHYTHM = DRUMS | {"BR", "DL", "PL"}   # tracks 1 a 8 de la doctrine ; le reste : melodique
 BIG_CAP = frozenset({"BR", "DL", "PL"})   # boucles rythmiques : 32 par dossier, le reste 16
+# plafonds propres a un dossier final (prioritaires) : breaks lents nombreux
+FOLDER_CAPS = {"LOOPS/BR/060": 64}
 
 # Arbre du +Drive (7.J8) : BRANCHE / CODE / [SOUS] ; FX et VX sans niveau code.
 BRANCHES = ("DRUMS", "TONAL", "LOOPS", "FX", "VX", "SAMPLE")
@@ -877,6 +879,8 @@ def quota(folder: str) -> int | None:
     """Plafond de retenus d'un dossier final ; None = tout (SAMPLE)."""
     if folder.startswith("SAMPLE/"):
         return None
+    if folder in FOLDER_CAPS:
+        return FOLDER_CAPS[folder]
     return 32 if folder_code(folder) in BIG_CAP else 16
 
 

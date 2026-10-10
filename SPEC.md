@@ -802,7 +802,9 @@ révisés par 7.J8) :
       passent en FX (`FX/HIT` et `FX/RISE`).
 
     Résultat : 1 215 retenus sur 3 191 candidats, 74 dossiers.
-  - Plafond : 32 pour BR, DL et PL, 16 pour le reste.
+  - Plafond : 32 pour BR, DL et PL, 16 pour le reste. Plafond propre à un
+    dossier dans `FOLDER_CAPS` (prioritaire) : `LOOPS/BR/060` à 64
+    (2026-10-10, breaks lents nombreux).
   - Front : arbre par branche (repliable), une ligne par code, une case
     par sous-catégorie ; les dossiers vides restent visibles comme cibles
     de dépôt. L'arbre d'un kit suit le même ordre. `M` choisit un dossier.
