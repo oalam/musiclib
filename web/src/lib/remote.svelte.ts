@@ -1,8 +1,9 @@
-// Telecommande de la barre generale : un deck par source (morceaux, samples).
+// Telecommande de la barre generale : un deck par source (morceaux, samples,
+// boucle du sound design).
 // Chaque vue enregistre le sien (getters sur son propre etat, donc reactifs) ;
 // la barre pilote le deck en focus. Une seule source joue a la fois.
 
-export type Source = 'tracks' | 'samples'
+export type Source = 'tracks' | 'samples' | 'sounddesign'
 
 export interface Deck {
   /** Ce qui est charge (artiste — titre, nom du sample) ; vide = rien. */

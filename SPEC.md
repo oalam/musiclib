@@ -917,7 +917,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 |---|---|---|
 | 8.A | Moteur `analyzer/sounddesign.py` (modèles Pydantic, catalogue de 15 devices, traitement rumble, rendu en boucle sans couture), presets JSON du vault, CLI `sounddesign.py`, tests | fait (presets à valider à l'oreille) |
 | 8.B | API `/api/sounddesign/...` : traitements, catalogue des devices, presets (lecture, sauvegarde `PUT`), écoute à la volée (WAV en mémoire, synchrone : 0,2 s au pire pour 8 mesures à 60 BPM), écriture d'un rendu, liste et écoute des rendus | fait |
-| 8.C | Vue front « Sound design » : rack de devices façon Ableton (potards issus des `ParamSpec`, bypass par device, mute et gain par chaîne), choix du sample source, écoute A/B source / rendu | à venir |
+| 8.C | Vue front « Sound design » façon Ableton Live : potards (glisser vertical, Maj fin, double-clic défaut), tranches de mixage = chaînes (fader, activateur = mute, solo d'écoute), devices avec activateur = bypass, courbe de réponse à nœud pour filtres / EQ, ajout / retrait / déplacement de devices et de chaînes, presets enregistrer / enregistrer sous, source du manifeste + écoute A/B, boucle Web Audio re-rendue à chaud, rendus | fait (à valider à l'usage) |
 | 8.D | Notebook rumble (`sounddesign/rumble.md` : théorie, usage, paramètres, ressources) intégré à la vue ; rendus versés à l'arbre des samples DT2 | à venir |
 
 **Décisions 8** (arbitrées le 2026-10-10) :

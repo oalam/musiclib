@@ -991,6 +991,31 @@ python api.py &   puis   cd ../web && npm run dev
   `harmony.py` sur la nouvelle grille, une vingtaine de secondes) : utile après
   `stems.py` ou une mise à jour de l'analyzer. Un échec de l'harmonie n'empêche
   pas la bank (l'ancien bloc `harmony` reste en place).
+- **Sound design (8.C)**, entrée « Sound design » du panneau latéral, rack
+  façon Ableton Live :
+  - **Barre** : traitement, preset (« modifié » dès qu'un réglage bouge),
+    Enregistrer (écrase le JSON du vault), Enregistrer sous (id
+    `[a-z0-9_]`), Rétablir ; Écouter (Espace) et Rendre sur disque.
+  - **Source** : recherche dans le manifeste de samples (kicks BD par
+    défaut), bouton « source » pour l'écoute A/B du sample d'origine.
+  - **Potards** : glisser verticalement (Maj = fin), molette, flèches ;
+    double-clic ou Suppr = valeur par défaut ; arc depuis zéro pour un
+    gain bipolaire ; échelle log pour fréquences et temps.
+  - **Tranches de mixage = chaînes** : fader de gain (double-clic = 0 dB),
+    activateur numéroté (jaune = chaîne active, sinon mute enregistré),
+    **S** = solo d'écoute (non enregistré) ; clic sur le nom pour afficher
+    ses devices, double-clic pour renommer ; « + chaîne », × pour retirer.
+    La tranche Master affiche la normalisation de crête.
+  - **Devices** en ligne dans l'ordre du signal : pastille = activateur
+    (bypass), ‹ › pour déplacer, × pour retirer, « + device » en bout de
+    chaîne. Les filtres et EQ ont une **courbe de réponse** (log 20 Hz -
+    20 kHz) avec un nœud à glisser : x = coupure, y = gain (shelf, peak) ou
+    résonance (ladder). Courbes illustratives (modèles analogiques).
+  - **Écoute en boucle** (Web Audio, sans trou) : tout réglage pendant la
+    lecture relance le rendu et remplace la boucle à la même phase (fondu
+    de 15 ms). Précédent / suivant de la télécommande = preset voisin.
+  - **Rendus** : derniers fichiers de `SoundDesign/<traitement>/`, écoute en
+    boucle ; encart Notebook (résumé, sample attendu ; contenu en 8.D).
 
 **API** (127.0.0.1 uniquement ; un fichier n'est servi que pour un slug présent
 dans library.md) :

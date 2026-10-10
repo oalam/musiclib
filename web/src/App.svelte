@@ -1,6 +1,6 @@
 <script lang="ts">
   // Coquille de l'app : barre generale (telecommande du deck en focus),
-  // panneau lateral minimisable (Morceaux, Samples, Knowledge) ; les vues
+  // panneau lateral minimisable (Morceaux, Samples, Sound design, Knowledge) ; les vues
   // visitees restent montees (lecture qui continue, etat garde).
   import { tick } from 'svelte'
   import { remote } from './lib/remote.svelte'
@@ -11,6 +11,7 @@
   import KbPanel from './lib/KbPanel.svelte'
   import GrabPanel from './lib/GrabPanel.svelte'
   import SampleView from './lib/SampleView.svelte'
+  import SoundDesignView from './lib/SoundDesignView.svelte'
 
   let tracks = $state<TrackSummary[]>([])
   let selected = $state<string | null>(null)
@@ -42,16 +43,16 @@
     grabPanel?.searchFor(q)
   }
 
-  // vue principale (memorisee) ; samples et knowledge montees a la premiere visite
-  type View = 'tracks' | 'samples' | 'knowledge'
-  const VIEWS: View[] = ['tracks', 'samples', 'knowledge']
+  // vue principale (memorisee) ; samples, sound design et knowledge montees a la premiere visite
+  type View = 'tracks' | 'samples' | 'sounddesign' | 'knowledge'
+  const VIEWS: View[] = ['tracks', 'samples', 'sounddesign', 'knowledge']
   let initial: View = 'tracks'
   try {
     const v = localStorage.getItem('ui:view') as View | null
     if (v && VIEWS.includes(v)) initial = v
   } catch { /* stockage indisponible */ }
   let view = $state<View>(initial)
-  let visited = $state<Record<View, boolean>>({ tracks: true, samples: initial === 'samples', knowledge: initial === 'knowledge' })
+  let visited = $state<Record<View, boolean>>({ tracks: true, samples: initial === 'samples', sounddesign: initial === 'sounddesign', knowledge: initial === 'knowledge' })
   if (initial !== 'knowledge') remote.focus = initial
   function setView(v: View) {
     // second clic sur Morceaux : replie / deplie la liste
@@ -173,6 +174,7 @@
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     {#if name === 'tracks'}<path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" />
     {:else if name === 'samples'}<rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+    {:else if name === 'sounddesign'}<circle cx="7" cy="8" r="3" /><path d="M7 8 8.5 6.5" /><circle cx="17" cy="8" r="3" /><path d="m17 8-1.5-1.5" /><path d="M5 15v6M12 13v8M19 17v4" /><path d="M3 15h4M10 13h4M17 17h4" />
     {:else if name === 'knowledge'}<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z" /><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5" />
     {:else if name === 'prev'}<path d="M19 20 9 12l10-8z" fill="currentColor" /><path d="M5 19V5" />
     {:else if name === 'next'}<path d="m5 4 10 8-10 8z" fill="currentColor" /><path d="M19 5v14" />
@@ -197,11 +199,11 @@
     </div>
     {#if remote.deck}
       {@const d = remote.deck}
-      <button class="ic" onclick={() => d.prev()} disabled={!d.label} title={remote.focus === 'tracks' ? 'Morceau précédent de la liste' : 'Sample précédent'}>{@render icon('prev')}</button>
+      <button class="ic" onclick={() => d.prev()} disabled={!d.label} title={remote.focus === 'tracks' ? 'Morceau précédent de la liste' : remote.focus === 'sounddesign' ? 'Preset précédent' : 'Sample précédent'}>{@render icon('prev')}</button>
       <button class="ic" class:on={d.playing} onclick={() => d.playPause()} disabled={!d.label} title="Lecture / pause">{@render icon(d.playing ? 'pause' : 'play')}</button>
       <button class="ic" class:on={d.looping} onclick={() => d.toggleLoop()} disabled={!d.label} aria-pressed={d.looping}
         title={remote.focus === 'tracks' ? 'Boucle : région calée si elle existe, sinon morceau entier' : 'Boucle du sample'}>{@render icon('loop')}</button>
-      <button class="ic" onclick={() => d.next()} disabled={!d.label} title={remote.focus === 'tracks' ? 'Morceau suivant de la liste' : 'Sample suivant'}>{@render icon('next')}</button>
+      <button class="ic" onclick={() => d.next()} disabled={!d.label} title={remote.focus === 'tracks' ? 'Morceau suivant de la liste' : remote.focus === 'sounddesign' ? 'Preset suivant' : 'Sample suivant'}>{@render icon('next')}</button>
       <span class="now small" title={d.label}>{d.label || 'rien de chargé'}</span>
     {/if}
   </div>
@@ -216,6 +218,8 @@
       {@render icon('tracks')}<span>Morceaux</span></button>
     <button aria-pressed={view === 'samples'} onclick={() => setView('samples')} title="Samples : écoute garder / écarter">
       {@render icon('samples')}<span>Samples</span></button>
+    <button aria-pressed={view === 'sounddesign'} onclick={() => setView('sounddesign')} title="Sound design : traitements par chaînes de plugins (rumble…)">
+      {@render icon('sounddesign')}<span>Sound design</span></button>
     <button aria-pressed={view === 'knowledge'} onclick={() => knowledge()} title="Knowledge : fiches, doctrine, manuel (/)">
       {@render icon('knowledge')}<span>Knowledge</span></button>
     <button class="fold" onclick={toggleRail} title={railMini ? 'Afficher les libellés' : 'Réduire aux icônes'}>
@@ -272,6 +276,7 @@
   </main>
 </div>
 {#if visited.samples}<div class="samples-main" class:off={view !== 'samples'}><SampleView /></div>{/if}
+{#if visited.sounddesign}<div class="sd-main" class:off={view !== 'sounddesign'}><SoundDesignView /></div>{/if}
 {#if visited.knowledge}<div class="kb-main" class:off={view !== 'knowledge'}><KbPanel page bind:this={kbPage} /></div>{/if}
   </div>
 </div>
@@ -302,7 +307,7 @@
   .rail.mini span { display: none; }
   .views { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
   .off { display: none !important; }
-  .samples-main, .kb-main { flex: 1; min-height: 0; overflow: hidden; }
+  .samples-main, .sd-main, .kb-main { flex: 1; min-height: 0; overflow: hidden; }
   .layout { display: grid; grid-template-columns: 320px 1fr; flex: 1; min-height: 0; }
   .layout.full { grid-template-columns: 1fr; }
   aside { border-right: 1px solid var(--border); background: var(--panel); min-height: 0; overflow: hidden; display: flex; flex-direction: column; }

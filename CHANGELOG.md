@@ -72,6 +72,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.C] Vue « Sound design » du front, rack façon Ableton Live : potards
+  (glisser, Maj fin, double-clic défaut), tranches de mixage par chaîne
+  (fader, activateur = mute, solo d'écoute), devices avec activateur =
+  bypass et courbe de réponse à nœud pour les filtres / EQ, édition de la
+  chaîne (ajout, retrait, déplacement), presets enregistrer / enregistrer
+  sous, choix de la source et écoute A/B, boucle Web Audio re-rendue à
+  chaque réglage, liste des rendus.
 - [8.B] Sound design, API `/api/sounddesign/...` : traitements et
   catalogue des devices pour le front, lecture et sauvegarde des presets
   du vault, écoute d'un preset édité sur un sample du manifeste (WAV en

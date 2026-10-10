@@ -329,6 +329,42 @@ export interface SampleCell {
   reserve: number          // hors plafond
 }
 
+// --- Sound design (Phase 8) : miroir de analyzer/sounddesign.py -----------
+
+export interface ParamSpec {
+  name: string
+  label: string
+  min: number
+  max: number
+  default: number
+  unit: string
+  scale: 'lin' | 'log'
+  step: number | null
+  help: string
+}
+export interface DeviceSpec { type: string; label: string; help: string; params: ParamSpec[] }
+export interface SdDevice { type: string; params: Record<string, number>; bypass: boolean }
+export interface SdChain { name: string; mute: boolean; gain_db: number; devices: SdDevice[] }
+export interface SdPreset {
+  id: string
+  treatment: string
+  label: string
+  description: string
+  settings: Record<string, number>
+  chains: SdChain[]
+  master: SdDevice[]
+  output_peak_db: number | null
+}
+export interface TreatmentSpec {
+  id: string
+  label: string
+  summary: string
+  source_hint: string
+  settings: ParamSpec[]
+  notebook: string
+}
+export interface RenderRecord { file: string; source: string; preset: SdPreset; sr: number; seconds: number; created_at: string }
+
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
 export const manualUrl = (page = 1) => `/api/manual#page=${page}`
 
@@ -429,6 +465,23 @@ export const api = {
       .then(r => json<SampleExportReport>(r)),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
+  sdTreatments: () => fetch('/api/sounddesign/treatments').then(r => json<TreatmentSpec[]>(r)),
+  sdDevices: () => fetch('/api/sounddesign/devices').then(r => json<DeviceSpec[]>(r)),
+  sdPresets: (treatment: string) => fetch(`/api/sounddesign/presets/${enc(treatment)}`).then(r => json<SdPreset[]>(r)),
+  sdSavePreset: (p: SdPreset) =>
+    fetch(`/api/sounddesign/presets/${enc(p.treatment)}/${enc(p.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
+      .then(r => json<SdPreset>(r)),
+  /** Boucle rendue en WAV, sans ecriture disque. */
+  sdPreview: async (preset: SdPreset, source: string, signal?: AbortSignal): Promise<ArrayBuffer> => {
+    const r = await fetch('/api/sounddesign/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source }), signal })
+    if (!r.ok) await json(r)   // leve avec le detail de l'API
+    return r.arrayBuffer()
+  },
+  sdRender: (preset: SdPreset, source: string) =>
+    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source }) })
+      .then(r => json<RenderRecord>(r)),
+  sdRenders: (treatment: string) => fetch(`/api/sounddesign/renders?treatment=${enc(treatment)}`).then(r => json<RenderRecord[]>(r)),
+  sdRenderAudioUrl: (file: string) => `/api/sounddesign/renders/audio?file=${enc(file)}`,
 }
 
 /** Minuscules sans accents (meme regle que kb.normalize). */
