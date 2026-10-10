@@ -8,7 +8,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
-- [7.K] Vue Samples : la colonne de l'arbre est bornée (280 à 400 px) au
+- [7.K] Vue Samples : la colonne de l'arbre est bornée (280 à 440 px) au
   lieu de prendre la largeur de son contenu ; les sous-dossiers d'un code
   passent à la ligne, alignés après le code. Le bloc de lecture et de
   sélection récupère la largeur restante.

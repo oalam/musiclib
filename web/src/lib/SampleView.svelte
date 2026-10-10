@@ -1018,7 +1018,7 @@
 </div>
 
 <style>
-  .samples { display: grid; grid-template-columns: minmax(280px, 400px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .samples { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
   .searchbar { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .search-in { position: relative; flex: 1; min-width: 280px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
   .search-in input { flex: 1; min-width: 12em; border: 0; outline: none; background: none; color: var(--text); font-size: 13px; padding: 3px 0; }
