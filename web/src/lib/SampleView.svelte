@@ -1091,7 +1091,11 @@
   .chip.text { font-style: italic; }
   .chip.note { font-weight: 600; border-color: var(--accent); color: var(--accent); }
   .tag.auto { border-style: dotted; background: none; cursor: pointer; padding: 0 6px; }
-  .grid { overflow: auto; }
+  /* deux zones fixes de meme hauteur, Library et Kits, chacune scrollable */
+  .grid { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow: hidden; }
+  .matrix, .kits { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+  .matrix .branches { flex: 1; min-height: 0; overflow-y: auto; }
+  .kits { overflow-y: auto; }
   .filters { display: flex; gap: 10px; margin: 0 0 6px; }
   .zone { box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
@@ -1126,8 +1130,7 @@
   .export { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); max-width: 60ch; }
   .export p { margin: 6px 0; }
   /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
-  .kits { margin-top: 12px; width: 0; min-width: 100%; }
-  .kits h3 { margin: 0 0 6px; font-weight: 600; }
+  .kits h3 { margin: 0 0 6px; font-weight: 600; position: sticky; top: -8px; z-index: 1; padding: 4px 0; background: var(--bg); }
   .lib-title { margin: 0 0 6px; font-weight: 600; }
   /* trois pads par ligne, a la largeur de la colonne */
   .pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
@@ -1210,6 +1213,7 @@
   .err { color: #dc2626; font-size: 12px; }
   @media (max-width: 900px) {
     .samples { grid-template-columns: 1fr; height: auto; }
+    .matrix, .kits { flex: none; max-height: 50vh; }
     .list { max-height: 60vh; }
   }
 </style>

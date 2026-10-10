@@ -26,6 +26,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   étoiles retirés) ; roue des notes déplacée dans la vue de droite, qu'elle
   seule filtre, alignée avec la forme d'onde. Clic sur un code de l'arbre :
   filtre d'instrument.
+- [7.K] Colonne de gauche des samples en deux zones fixes de même hauteur,
+  « Library » et « Kits », chacune scrollable (titre et recherche fixes).
 
 ### Modifié
 
