@@ -349,16 +349,15 @@ def _sequence(source: np.ndarray, hits_per_loop: int, loop_len: int) -> Prepared
     return Prepared(out, n_pre * loop_len, loop_len, np.append(triggers, total))
 
 
-ONE_SHOT_MAX_S = 8.0     # queue maximale d'un rendu « un coup »
 TAIL_DB = -60.0          # fin de la queue : sous la crete de 60 dB
-FADE_OUT_MS = 50.0       # fondu de sortie d'un rendu « un coup »
+FADE_OUT_MS = 20.0       # fondu de sortie d'un rendu « un coup »
 
 
-def _single(source: np.ndarray) -> Prepared:
-    """Un seul coup en 0, suivi de ONE_SHOT_MAX_S de silence pour la queue."""
-    total = source.shape[1] + int(ONE_SHOT_MAX_S * SR)
+def _single(source: np.ndarray, total: int) -> Prepared:
+    """Un seul coup en 0, rendu sur `total` echantillons (la longueur choisie)."""
     out = np.zeros((2, total), dtype=np.float32)
-    out[:, : source.shape[1]] = source
+    seg = source[:, :total]
+    out[:, : seg.shape[1]] = seg
     return Prepared(out, 0, total, np.array([0]), one_shot=True)
 
 
@@ -377,14 +376,11 @@ def _trim_tail(x: np.ndarray) -> np.ndarray:
     return out
 
 
-def loop_bpm(settings: dict[str, float]) -> float | None:
-    """Tempo a ecrire dans le nom : aucun pour un rendu « un coup »."""
-    return None if settings.get("one_shot") else settings.get("bpm")
-
-
 def _prepare_rumble(source: np.ndarray, settings: dict[str, float]) -> Prepared:
     if settings["one_shot"]:
-        return _single(source)
+        # une track DT2 est monophonique : le coup suivant coupe la queue,
+        # inutile de rendre au-dela (1 temps a 150 BPM = 60 / 150 = 0,4 s)
+        return _single(source, round(settings["length_beats"] * 60.0 / settings["bpm"] * SR))
     bar = 4 * 60.0 / settings["bpm"] * SR
     hits = int(settings["hits_per_bar"])
     bars = int(settings["bars"])
@@ -403,9 +399,11 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
                   _p("hits_per_bar", "Coups / mesure", 1, 8, 4, step=1,
                      help="4 = four on the floor."),
                   _p("one_shot", "Mode", 0, 1, 0, step=1, choices=["Boucle", "Un coup"],
-                     help="Un coup : un seul kick et sa queue complete, a declencher "
-                          "sur chaque kick (doctrine, track 2) ; tempo, mesures et coups "
-                          "ignores.")],
+                     help="Un coup : un seul kick et sa queue, a declencher sur chaque "
+                          "kick (doctrine, track 2) ; mesures et coups ignores."),
+                  _p("length_beats", "Longueur", 0.25, 4, 1, "temps", step=0.25,
+                     help="Mode Un coup : duree du rendu en temps au tempo, puis fondu "
+                          "de 20 ms. 1 temps = l'ecart entre deux kicks en 4/4.")],
         notebook="sounddesign/rumble.md",
         code="RM"),                      # -> DRUMS/RM/<sous-dossier du kick>, track 2
         _prepare_rumble),

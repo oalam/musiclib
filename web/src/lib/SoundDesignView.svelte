@@ -147,9 +147,11 @@
   let target = $state<SdTarget | null>(null)
   let name = $state('')
   let nameEdited = $state(false)
-  // un coup (8.E) : ni boucle ni tempo dans le nom
+  // un coup (8.F) : longueur en temps au tempo ; mesures et coups ignores
   const oneShot = $derived(!!preset?.settings.one_shot)
-  const bpm = $derived(oneShot ? undefined : preset?.settings.bpm)
+  const ONE_SHOT_ONLY = ['length_beats']
+  const LOOP_ONLY = ['bars', 'hits_per_bar']
+  const bpm = $derived(preset?.settings.bpm)
   $effect(() => { void source; nameEdited = false })
   $effect(() => {
     const t = treatment?.id, s = source, b = bpm
@@ -351,12 +353,14 @@
                 {/each}
               </div>
             {:else}
-              <Knob spec={s} value={preset.settings[s.name] ?? s.default} disabled={oneShot}
+              <Knob spec={s} value={preset.settings[s.name] ?? s.default} disabled={oneShot ? LOOP_ONLY.includes(s.name) : ONE_SHOT_ONLY.includes(s.name)}
                 onchange={v => (preset!.settings[s.name] = v)} />
             {/if}
           {/each}
           {#if oneShot}
-            <span class="muted small dur" title="Un seul kick, queue coupée à -60 dB puis fondu de 50 ms">un coup</span>
+            <span class="muted small dur mono" title="durée du coup = longueur × 60 / bpm, puis fondu de 20 ms">
+              {((preset.settings.length_beats ?? 1) * 60 / (preset.settings.bpm ?? 150)).toFixed(3)} s
+            </span>
           {:else if treatment.settings.some(s => s.name === 'bpm')}
             <span class="muted small dur mono" title="durée de la boucle = mesures × 4 × 60 / bpm">
               {((preset.settings.bars ?? 1) * 4 * 60 / (preset.settings.bpm ?? 150)).toFixed(3)} s

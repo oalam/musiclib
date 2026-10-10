@@ -64,7 +64,8 @@ même aide en infobulle.
 | Tempo | tempo de la boucle et de la séquence du kick | 140-150 hard techno, 180-195 tribe |
 | Mesures | longueur de la boucle (1 à 8) | 1 suffit pour un rumble régulier ; 2 ou 4 si `Coups / mesure` crée un motif |
 | Coups / mesure | nombre de kicks par mesure | 4 = four on the floor ; 2 = demi-temps (rumble plus ample) ; 8 = croches (grondement serré) |
-| Mode | **Boucle** ou **Un coup** | Un coup : un seul kick et sa queue complète (coupée à -60 dB sous la crête, puis fondu de 50 ms), sans tempo dans le nom ; tempo, mesures et coups sont ignorés |
+| Mode | **Boucle** ou **Un coup** | Un coup : un seul kick et sa queue ; mesures et coups sont ignorés |
+| Longueur | durée d'un rendu « un coup », en temps au tempo, puis fondu de 20 ms | 1 temps (0,4 s à 150 BPM : 60 / 150) : une track DT2 ne joue qu'une voix, le kick suivant coupe la queue de toute façon ; 2 à 4 temps pour un kick en demi-temps ou isolé dans un break |
 
 Durée de la boucle : mesures × 4 × 60 / tempo. Exemple : 2 mesures à
 185 BPM = 2 × 4 × 60 / 185 = 2,595 s.

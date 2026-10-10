@@ -43,7 +43,6 @@ from analyzer.sounddesign import (
     device_specs,
     load_presets,
     load_source,
-    loop_bpm,
     render,
     target,
     verse,
@@ -113,7 +112,7 @@ def _cmd_render(args: argparse.Namespace) -> int:
     audio = render(preset, load_source(source))
     rel = source.relative_to(SAMPLES_SRC_DIR).as_posix() if source.is_relative_to(SAMPLES_SRC_DIR) else ""
     manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
-    name, sub_dir = target(rel, manifest, preset.treatment, loop_bpm(preset.settings))
+    name, sub_dir = target(rel, manifest, preset.treatment, preset.settings.get("bpm"))
     name = args.name or name
     print(f"{preset.treatment}/{preset.id} : {audio.shape[1] / SR:.3f} s, "
           f"{len(preset.chains) - sum(c.mute for c in preset.chains)} chaine(s) active(s), "

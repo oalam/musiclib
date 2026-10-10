@@ -82,8 +82,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 ### Ajouté
 
 - [8.F] Mode « Un coup » du rumble (réglage `one_shot`, sélecteur Boucle /
-  Un coup) : un seul kick et sa queue, coupée à -60 dB sous la crête puis
-  fondu de 50 ms ; nom DT2 sans tempo (`RM B Kick ni`).
+  Un coup) : un seul kick et sa queue, sur une longueur en temps au tempo
+  (`length_beats`, 1 par défaut : 60 / 150 = 0,4 s à 150 BPM), puis fondu
+  de 20 ms. Une track DT2 étant monophonique, le kick suivant coupe la
+  queue : la rendre en entier (5 à 8 s mesurés) ne servait à rien.
 - [8.E] Le sound design s'applique au sample en cours de la vue Samples
   (« Changer dans Samples » y bascule). Nom DT2 proposé à partir de la
   source, code du traitement et tempo compris (`BD C Punch 01 dbr` →

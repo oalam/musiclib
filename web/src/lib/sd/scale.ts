@@ -20,7 +20,7 @@ export function fromNorm(p: ParamSpec, n: number): number {
 /** Affichage facon Live : 1.20 kHz, 180 Hz, -6.0 dB, 40 ms, 0.85. */
 export function fmt(p: ParamSpec, v: number): string {
   if (p.choices) return p.choices[Math.round(v)] ?? String(v)
-  if (p.step) return `${Math.round(v)}${p.unit ? ` ${p.unit}` : ''}`
+  if (p.step) return `${p.step < 1 ? String(Math.round(v / p.step) * p.step) : Math.round(v)}${p.unit ? ` ${p.unit}` : ''}`
   switch (p.unit) {
     case 'Hz': return v >= 1000 ? `${(v / 1000).toFixed(v >= 10000 ? 1 : 2)} kHz` : `${v.toFixed(v < 100 ? 1 : 0)} Hz`
     case 'dB': return `${v > 0 ? '+' : ''}${v.toFixed(1)} dB`

@@ -256,12 +256,12 @@ def test_loop_starts_and_ends_in_the_duck():
     assert m[0] < 0.1 * rms and m[-1] < 0.1 * rms
 
 
-def test_one_shot_renders_a_single_hit_with_faded_tail():
+def test_one_shot_lasts_the_chosen_beats_with_faded_tail():
+    # 150 BPM, 1 temps : 60 / 150 = 0,4 s -> 19200 echantillons ; 0,5 temps -> 9600
     preset = _preset()
     preset.settings["one_shot"] = 1
     audio = sd.render(preset, _kick())
-    assert sd.SR * 0.3 < audio.shape[1] < sd.SR * (0.3 + sd.ONE_SHOT_MAX_S)
+    assert audio.shape[1] == 19_200
     assert np.all(audio[:, -1] == 0)                       # fondu jusqu'a zero
-    loop = sd.render(_preset(), _kick())
-    assert audio.shape[1] != loop.shape[1]
-    assert sd.loop_bpm(preset.settings) is None and sd.loop_bpm({"bpm": 150}) == 150
+    preset.settings["length_beats"] = 0.5
+    assert sd.render(preset, _kick()).shape[1] == 9_600
