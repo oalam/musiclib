@@ -28221,7 +28221,7 @@
    "duration": 5.614,
    "rank": 33,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28249,7 +28249,7 @@
    "duration": 5.581,
    "rank": 34,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": null,
    "bpm_est": false,
@@ -28275,7 +28275,7 @@
    "duration": 2.927,
    "rank": 35,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 82,
    "bpm_est": false,
@@ -28303,7 +28303,7 @@
    "duration": 10.435,
    "rank": 36,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": null,
    "bpm_est": false,
@@ -28329,7 +28329,7 @@
    "duration": 5.874,
    "rank": 37,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28357,7 +28357,7 @@
    "duration": 3.2,
    "rank": 38,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 99,
    "bpm_est": true,
@@ -28385,7 +28385,7 @@
    "duration": 3.2,
    "rank": 39,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 99,
    "bpm_est": true,
@@ -28413,7 +28413,7 @@
    "duration": 3.09,
    "rank": 40,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 103,
    "bpm_est": true,
@@ -28441,7 +28441,7 @@
    "duration": 2.906,
    "rank": 41,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 83,
    "bpm_est": false,
@@ -28469,7 +28469,7 @@
    "duration": 3.001,
    "rank": 42,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28497,7 +28497,7 @@
    "duration": 1.333,
    "rank": 43,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 83,
    "bpm_est": true,
@@ -28525,7 +28525,7 @@
    "duration": 1.345,
    "rank": 44,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 83,
    "bpm_est": true,
@@ -28553,7 +28553,7 @@
    "duration": 1.357,
    "rank": 45,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 83,
    "bpm_est": true,
@@ -28581,7 +28581,7 @@
    "duration": 1.322,
    "rank": 46,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 83,
    "bpm_est": true,
@@ -28609,7 +28609,7 @@
    "duration": 1.414,
    "rank": 47,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28637,7 +28637,7 @@
    "duration": 2.826,
    "rank": 48,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28665,7 +28665,7 @@
    "duration": 2.833,
    "rank": 49,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28693,7 +28693,7 @@
    "duration": 3.029,
    "rank": 50,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28721,7 +28721,7 @@
    "duration": 2.891,
    "rank": 51,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28749,7 +28749,7 @@
    "duration": 1.404,
    "rank": 52,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28777,7 +28777,7 @@
    "duration": 2.908,
    "rank": 53,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28805,7 +28805,7 @@
    "duration": 2.828,
    "rank": 54,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 85,
    "bpm_est": false,
@@ -28833,7 +28833,7 @@
    "duration": 2.824,
    "rank": 55,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28861,7 +28861,7 @@
    "duration": 3.0,
    "rank": 56,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28889,7 +28889,7 @@
    "duration": 2.883,
    "rank": 57,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -28917,7 +28917,7 @@
    "duration": 2.953,
    "rank": 58,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -28945,7 +28945,7 @@
    "duration": 3.695,
    "rank": 59,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 103,
    "bpm_est": true,
@@ -28973,7 +28973,7 @@
    "duration": 3.001,
    "rank": 60,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 108,
    "bpm_est": true,
@@ -29001,7 +29001,7 @@
    "duration": 2.087,
    "rank": 61,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 115,
    "bpm_est": false,
@@ -29029,7 +29029,7 @@
    "duration": 1.448,
    "rank": 62,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 112,
    "bpm_est": true,
@@ -29057,7 +29057,7 @@
    "duration": 1.6,
    "rank": 63,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 117,
    "bpm_est": true,
@@ -29085,7 +29085,7 @@
    "duration": 1.6,
    "rank": 64,
    "status": "pending",
-   "selected": false,
+   "selected": true,
    "flags": [],
    "bpm": 117,
    "bpm_est": true,
@@ -29973,13 +29973,2225 @@
    "folder": "LOOPS/BR/060"
   },
   {
+   "source": "Jungle 89  to 99/Breaks/Guess Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 85 Guess j89",
+   "duration": 5.639,
+   "rank": 96,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 85,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Haze Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Haze j89",
+   "duration": 2.822,
+   "rank": 97,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Hurt U So Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 92 Hurt So j89",
+   "duration": 3.431,
+   "rank": 98,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 92,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Imagine Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Imagine j89",
+   "duration": 5.727,
+   "rank": 99,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Inner Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 82 Inner j89",
+   "duration": 2.912,
+   "rank": 100,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 82,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Jazz Thing Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 103 Jazz Th j89",
+   "duration": 6.195,
+   "rank": 101,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 103,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Jazzy Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Jazzy j89",
+   "duration": 5.652,
+   "rank": 102,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Liberty Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Liberty j89",
+   "duration": 1.412,
+   "rank": 103,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Lick Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Lick j89",
+   "duration": 2.743,
+   "rank": 104,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Lights Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Lights j89",
+   "duration": 2.826,
+   "rank": 105,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Limb Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Limb j89",
+   "duration": 2.746,
+   "rank": 106,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Mach Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Mach j89",
+   "duration": 2.825,
+   "rank": 107,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Maintain Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Maintai j89",
+   "duration": 1.445,
+   "rank": 108,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Marbles Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Marbles j89",
+   "duration": 2.82,
+   "rank": 109,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Massive Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Massive j89",
+   "duration": 2.832,
+   "rank": 110,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Metropolis Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Metropo j89",
+   "duration": 2.877,
+   "rank": 111,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Moths Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 83 Moths j89",
+   "duration": 5.787,
+   "rank": 112,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 83,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Mutant Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Mutant j89",
+   "duration": 2.925,
+   "rank": 113,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Mystical Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Mystica j89",
+   "duration": 2.962,
+   "rank": 114,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Oh Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Breaks j89",
+   "duration": 2.89,
+   "rank": 115,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Peace Sign Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Peace S j89",
+   "duration": 3.004,
+   "rank": 116,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Physical Break 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Phys 02 j89",
+   "duration": 2.992,
+   "rank": 117,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Place Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 82 Place j89",
+   "duration": 2.911,
+   "rank": 118,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 82,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Playboy Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Playboy j89",
+   "duration": 6.005,
+   "rank": 119,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Prog Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 82 Prog Ame j89",
+   "duration": 5.853,
+   "rank": 120,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 82,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Prog Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 82 Prog j89",
+   "duration": 5.852,
+   "rank": 121,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 82,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Reach Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Reach j89",
+   "duration": 1.411,
+   "rank": 122,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Reckon Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Reckon j89",
+   "duration": 1.415,
+   "rank": 123,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Reel Funk Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Reel Fu j89",
+   "duration": 2.825,
+   "rank": 124,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Reel Funk Roller.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 85 Reel Fun j89",
+   "duration": 2.823,
+   "rank": 125,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 85,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Repetoire Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Repetoi j89",
+   "duration": 5.825,
+   "rank": 126,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Resolution Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 83 Resoluti j89",
+   "duration": 2.906,
+   "rank": 127,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 83,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Ricochet Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Ricoche j89",
+   "duration": 2.827,
+   "rank": 128,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Rock Amen 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Rock 02 j89",
+   "duration": 2.742,
+   "rank": 129,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Rock Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Rock Am j89",
+   "duration": 1.371,
+   "rank": 130,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Roll On Roll 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Roll 02 j89",
+   "duration": 2.855,
+   "rank": 131,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Roll On Roll 3.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Roll 03 j89",
+   "duration": 2.851,
+   "rank": 132,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Roll On Roll.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Roll On j89",
+   "duration": 1.419,
+   "rank": 133,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Rumble Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Rumble j89",
+   "duration": 1.366,
+   "rank": 134,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Searchin Break 3.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Sear 03 j89",
+   "duration": 2.741,
+   "rank": 135,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Seatown Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Seatown j89",
+   "duration": 5.666,
+   "rank": 136,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Secrets Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 117 Secrets j89",
+   "duration": 1.393,
+   "rank": 137,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 117,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Shock Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Shock j89",
+   "duration": 2.825,
+   "rank": 138,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Shock Filter Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Shock F j89",
+   "duration": 5.651,
+   "rank": 139,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Shoes Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Shoes j89",
+   "duration": 5.72,
+   "rank": 140,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Sight Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 85 Sight j89",
+   "duration": 2.81,
+   "rank": 141,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 85,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Sky Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Sky j89",
+   "duration": 1.442,
+   "rank": 142,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Solar Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 103 Solar j89",
+   "duration": 1.491,
+   "rank": 143,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 103,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Sonic Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 83 Sonic j89",
+   "duration": 2.908,
+   "rank": 144,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 83,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Sound Murderer Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Sound M j89",
+   "duration": 5.823,
+   "rank": 145,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Sovreign Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Sovreig j89",
+   "duration": 2.981,
+   "rank": 146,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Stepper Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Stepper j89",
+   "duration": 2.976,
+   "rank": 147,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Stepper Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Stepp 2 j89",
+   "duration": 2.964,
+   "rank": 148,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Still Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Still j89",
+   "duration": 1.393,
+   "rank": 149,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Stone Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Stone j89",
+   "duration": 2.93,
+   "rank": 150,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Sunset Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 84 Sunset j89",
+   "duration": 2.873,
+   "rank": 151,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 84,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Tear Apache.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Tear Ap j89",
+   "duration": 2.841,
+   "rank": 152,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Tear Break 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 83 Tear 02 j89",
+   "duration": 2.761,
+   "rank": 153,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 83,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Tear Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Tear j89",
+   "duration": 2.838,
+   "rank": 154,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Technology Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Technol j89",
+   "duration": 1.438,
+   "rank": 155,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Terrain Break 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 86 Terra 02 j89",
+   "duration": 2.804,
+   "rank": 156,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 86,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Terrain Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 86 Terrain j89",
+   "duration": 2.805,
+   "rank": 157,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 86,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Trippin Break 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 82 Tripp 02 j89",
+   "duration": 2.911,
+   "rank": 158,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 82,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Trippin Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 82 Trippin j89",
+   "duration": 2.911,
+   "rank": 159,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 82,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Vapour Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Vapour j89",
+   "duration": 2.859,
+   "rank": 160,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Walk Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Walk j89",
+   "duration": 2.794,
+   "rank": 161,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Warhead Break 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Warh 02 j89",
+   "duration": 2.821,
+   "rank": 162,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Warhead Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Warhead j89",
+   "duration": 2.818,
+   "rank": 163,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Warned Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 87 Warned j89",
+   "duration": 2.77,
+   "rank": 164,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 87,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Warning Compound.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Warning j89",
+   "duration": 2.929,
+   "rank": 165,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Warning Copter.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Warni 2 j89",
+   "duration": 1.465,
+   "rank": 166,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/WarPeace Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 85 War Peac j89",
+   "duration": 2.826,
+   "rank": 167,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 85,
+   "bpm_est": false,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Wheel Up 2 Bad.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Whee 02 j89",
+   "duration": 2.811,
+   "rank": 168,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Wheel Up Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Wheel U j89",
+   "duration": 3.003,
+   "rank": 169,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Worries Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Worries j89",
+   "duration": 1.432,
+   "rank": 170,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Your Amen.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Your Am j89",
+   "duration": 2.906,
+   "rank": 171,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Your Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 108 Your j89",
+   "duration": 2.909,
+   "rank": 172,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 108,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Zone Break 2.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Zone 02 j89",
+   "duration": 1.416,
+   "rank": 173,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
+   "source": "Jungle 89  to 99/Breaks/Zone Break.wav",
+   "family": "JUNGLE",
+   "code": "BR",
+   "pack": "j89",
+   "name": "BR 112 Zone j89",
+   "duration": 2.826,
+   "rank": 174,
+   "status": "pending",
+   "selected": false,
+   "flags": [],
+   "bpm": 112,
+   "bpm_est": true,
+   "tags": [
+    "jungle"
+   ],
+   "stars": null,
+   "auto_tags": [
+    "breakbeat",
+    "jungle"
+   ],
+   "note": null,
+   "note_hz": null,
+   "note_src": null,
+   "overflow": false,
+   "sub": "060",
+   "folder": "LOOPS/BR/060"
+  },
+  {
    "source": "Jungle 89  to 99/Breaks/Fairlight Break.wav",
    "family": "JUNGLE",
    "code": "BR",
    "pack": "j89",
    "name": "BR 112 Fairlig j89",
    "duration": 5.822,
-   "rank": 96,
+   "rank": 175,
    "status": "pending",
    "selected": false,
    "flags": [
@@ -164485,1349 +166697,6 @@
    "sub": "",
    "bpm": null,
    "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Guess Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.639,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 85,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Haze Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.822,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Hurt U So Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 3.431,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 92,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Imagine Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.727,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Inner Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.912,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 82,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Jazz Thing Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 6.195,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 103,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Jazzy Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.652,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Liberty Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.412,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Lick Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.743,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Lights Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.826,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Limb Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.746,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Mach Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.825,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Maintain Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.445,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Marbles Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.82,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Massive Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.832,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Metropolis Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.877,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Moths Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.787,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 83,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Mutant Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.925,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Mystical Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.962,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Oh Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.89,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Peace Sign Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 3.004,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Physical Break 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.992,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Place Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.911,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 82,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Playboy Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 6.005,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Prog Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.853,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 82,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Prog Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.852,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 82,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Reach Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.411,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Reckon Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.415,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Reel Funk Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.825,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Reel Funk Roller.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.823,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 85,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Repetoire Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.825,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Resolution Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.906,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 83,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Ricochet Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.827,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Rock Amen 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.742,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Rock Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.371,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Roll On Roll 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.855,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Roll On Roll 3.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.851,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Roll On Roll.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.419,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Rumble Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.366,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Searchin Break 3.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.741,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Seatown Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.666,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Secrets Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.393,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 117,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Shock Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.825,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Shock Filter Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.651,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Shoes Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.72,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Sight Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.81,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 85,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Sky Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.442,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Solar Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.491,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 103,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Sonic Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.908,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 83,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Sound Murderer Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 5.823,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Sovreign Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.981,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Stepper Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.976,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Stepper Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.964,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Still Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.393,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Stone Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.93,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Sunset Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.873,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 84,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Tear Apache.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.841,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Tear Break 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.761,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 83,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Tear Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.838,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Technology Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.438,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Terrain Break 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.804,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 86,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Terrain Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.805,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 86,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Trippin Break 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.911,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 82,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Trippin Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.911,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 82,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Vapour Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.859,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Walk Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.794,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Warhead Break 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.821,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Warhead Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.818,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Warned Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.77,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 87,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Warning Compound.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.929,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Warning Copter.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.465,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/WarPeace Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.826,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 85,
-   "bpm_est": false
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Wheel Up 2 Bad.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.811,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Wheel Up Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 3.003,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Worries Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.432,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Your Amen.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.906,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Your Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.909,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 108,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Zone Break 2.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 1.416,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
-  },
-  {
-   "source": "Jungle 89  to 99/Breaks/Zone Break.wav",
-   "family": "JUNGLE",
-   "code": "BR",
-   "pack": "j89",
-   "duration": 2.826,
-   "tags": [
-    "jungle"
-   ],
-   "auto_tags": [
-    "breakbeat",
-    "jungle"
-   ],
-   "sub": "060",
-   "bpm": 112,
-   "bpm_est": true
   },
   {
    "source": "rthm/loops/dubstep/DubstepBeats_31b.wav",
