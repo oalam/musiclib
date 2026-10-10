@@ -1025,6 +1025,14 @@ erreur sur un fichier annule tout le lot, rien n'est écrit.
 | POST | `/api/grab/search` | `{query}` → candidats YT/SC triés par score (`CandidateInfo`), synchrone (~5-15 s) |
 | POST | `/api/grab` | `{url, analyze_quality, stems, bank, folder}` → `Job` (202) ; 503 sans disque média |
 | GET | `/api/jobs/{id}` | état du job : statut + étapes (`queued` / `running` / `done` / `error` / `skipped`) |
+| GET | `/api/sounddesign/treatments` | traitements (`TreatmentSpec` : réglages, sample attendu, note du notebook) (8.B) |
+| GET | `/api/sounddesign/devices` | catalogue des devices (`DeviceSpec` : paramètres, bornes, unité, échelle lin / log, aide) |
+| GET | `/api/sounddesign/presets/{traitement}` | presets du vault, triés par id (404 traitement inconnu) |
+| PUT | `/api/sounddesign/presets/{traitement}/{id}` | `Preset` → crée ou remplace le JSON du vault ; 422 si id hors `[a-z0-9_]`, id / traitement différents du chemin, device ou valeur hors catalogue |
+| POST | `/api/sounddesign/preview` | `{preset, source}` → boucle en `audio/wav` 24 bits, en mémoire (rien d'écrit) ; source = clé du manifeste de samples (404 sinon, 503 sans disque) |
+| POST | `/api/sounddesign/render` | `{preset, source}` → `RenderRecord` ; écrit le wav et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/` |
+| GET | `/api/sounddesign/renders?treatment=` | rendus écrits, du plus récent au plus ancien |
+| GET | `/api/sounddesign/renders/audio?file=` | wav d'un rendu listé (404 sinon) |
 
 **Ajout d'un morceau (7.I)** : bouton « + Ajouter un morceau » de la barre du
 haut. Recherche (ex. « Limitlezz x Maureen - Shatta Mad », ou une URL YT/SC)

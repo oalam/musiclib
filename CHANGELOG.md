@@ -72,6 +72,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.B] Sound design, API `/api/sounddesign/...` : traitements et
+  catalogue des devices pour le front, lecture et sauvegarde des presets
+  du vault, écoute d'un preset édité sur un sample du manifeste (WAV en
+  mémoire), écriture d'un rendu, liste et écoute des rendus.
 - [8.A] Sound design, moteur et CLI (`sounddesign.py`,
   `analyzer/sounddesign.py`) : traitements par chaînes parallèles de
   plugins pedalboard (15 devices, dont `duck` et `width` maison), `bypass`

@@ -120,6 +120,14 @@ def resolve_audio(entry: dict[str, str]) -> Path | None:
     return p if p.exists() else None
 
 
+def media_relative(path: Path) -> str:
+    """Chemin relatif a MEDIA_ROOT (`Samples/x.wav`), absolu s'il est hors du disque."""
+    try:
+        return path.resolve().relative_to(MEDIA_ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(path)
+
+
 def mix_relative(path: Path) -> str:
     """Forme stockee (sidecar `file_path`, colonne `file`) : relative a MIX_DIR."""
     try:

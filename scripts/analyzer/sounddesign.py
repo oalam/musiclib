@@ -483,6 +483,30 @@ def write_render(audio: np.ndarray, source: Path, source_label: str, preset: Pre
     return record
 
 
+def encode_wav(audio: np.ndarray) -> bytes:
+    """Rendu en WAV 24 bits en memoire (ecoute sans ecriture disque)."""
+    import io
+
+    import soundfile as sf
+    buf = io.BytesIO()
+    sf.write(buf, audio.T, SR, format="WAV", subtype="PCM_24")
+    return buf.getvalue()
+
+
+def list_renders(out_root: Path, treatment: str | None = None) -> list[RenderRecord]:
+    """Rendus ecrits (sidecars lisibles dont le wav existe), du plus recent au plus ancien."""
+    pattern = f"{treatment}/*.json" if treatment else "*/*.json"
+    records = []
+    for sidecar in out_root.glob(pattern):
+        try:
+            record = RenderRecord.model_validate_json(sidecar.read_text(encoding="utf-8"))
+        except ValueError:
+            continue   # sidecar etranger ou corrompu : ignore, pas bloquant pour la liste
+        if (out_root / record.file).is_file():
+            records.append(record)
+    return sorted(records, key=lambda r: (r.created_at, r.file), reverse=True)
+
+
 def with_overrides(preset: Preset, settings: dict[str, float], mute: list[str],
                    bypass: list[tuple[str, int]]) -> Preset:
     """Copie du preset avec reglages, mutes de chaines et bypass (`chaine`, index) appliques."""

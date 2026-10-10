@@ -39,7 +39,7 @@ from analyzer.sounddesign import (
     with_overrides,
     write_render,
 )
-from paths import MEDIA_ROOT, SAMPLES_SRC_DIR, SOUNDDESIGN_OUT_DIR, SOUNDDESIGN_PRESETS_DIR, media_ok
+from paths import SAMPLES_SRC_DIR, SOUNDDESIGN_OUT_DIR, SOUNDDESIGN_PRESETS_DIR, media_ok, media_relative
 
 
 def _cmd_list() -> int:
@@ -82,13 +82,6 @@ def _parse_bypass(items: list[str]) -> list[tuple[str, int]]:
     return out
 
 
-def _source_label(path: Path) -> str:
-    try:
-        return path.resolve().relative_to(MEDIA_ROOT.resolve()).as_posix()
-    except ValueError:
-        return str(path)
-
-
 def _cmd_render(args: argparse.Namespace) -> int:
     if not media_ok():
         return 1
@@ -106,7 +99,7 @@ def _cmd_render(args: argparse.Namespace) -> int:
           f"{len(preset.chains) - sum(c.mute for c in preset.chains)} chaine(s) active(s)")
     if args.dry_run:
         return 0
-    record = write_render(audio, source, _source_label(source), preset, SOUNDDESIGN_OUT_DIR)
+    record = write_render(audio, source, media_relative(source), preset, SOUNDDESIGN_OUT_DIR)
     print(f"-> {SOUNDDESIGN_OUT_DIR / record.file}")
     return 0
 

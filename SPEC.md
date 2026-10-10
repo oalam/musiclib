@@ -916,7 +916,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 | Sous-phase | Contenu | Statut |
 |---|---|---|
 | 8.A | Moteur `analyzer/sounddesign.py` (modèles Pydantic, catalogue de 15 devices, traitement rumble, rendu en boucle sans couture), presets JSON du vault, CLI `sounddesign.py`, tests | fait (presets à valider à l'oreille) |
-| 8.B | API : traitements, catalogue des devices, presets (lecture, sauvegarde), rendu d'écoute à la volée, écriture d'un rendu sur le disque | à venir |
+| 8.B | API `/api/sounddesign/...` : traitements, catalogue des devices, presets (lecture, sauvegarde `PUT`), écoute à la volée (WAV en mémoire, synchrone : 0,2 s au pire pour 8 mesures à 60 BPM), écriture d'un rendu, liste et écoute des rendus | fait |
 | 8.C | Vue front « Sound design » : rack de devices façon Ableton (potards issus des `ParamSpec`, bypass par device, mute et gain par chaîne), choix du sample source, écoute A/B source / rendu | à venir |
 | 8.D | Notebook rumble (`sounddesign/rumble.md` : théorie, usage, paramètres, ressources) intégré à la vue ; rendus versés à l'arbre des samples DT2 | à venir |
 
@@ -938,6 +938,9 @@ On garde une boucle d'une à huit mesures, sans couture.
 - **Boucle sans couture** : coups placés à l'identique dans chaque boucle
   (pas d'arrondi cumulé), pré-roll d'au moins 4 s pour que les queues de
   reverb soient en régime, seule la dernière boucle est gardée.
+- **Sources** (8.B) : l'API ne rend que des samples du manifeste (clé
+  relative à `<MEDIA>/Samples`), comme l'écoute des samples : pas de chemin
+  libre. Les rendus ne sont servis que s'ils ont un sidecar.
 - **Sidechain** : pedalboard n'a pas d'entrée sidechain ; le device `duck`
   creuse le signal sur les positions de coups connues du traitement.
 

@@ -459,3 +459,96 @@ def test_sample_rebuild(samples_client: TestClient, monkeypatch: pytest.MonkeyPa
         time.sleep(0.05)
     assert state["status"] == "done", state
     assert state["finished_at"] and state["candidates"] >= 1
+
+
+# --- Sound design (Phase 8.B) ---------------------------------------------
+
+@pytest.fixture
+def sd_client(tmp_path: Path) -> TestClient:
+    import soundfile as sf
+    from analyzer.samples import Manifest, SampleEntry, select
+    from tests.test_sounddesign import _kick, _preset
+
+    src = tmp_path / "Samples"
+    (src / "k").mkdir(parents=True)
+    sf.write(src / "k" / "kick.wav", _kick()[0], 48_000)
+    (src / "k" / "hors.wav").write_bytes(b"RIFF")
+    entries = [SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
+                           name="BD 1", duration=0.3, rank=1)]
+    select(entries, 16)
+    manifest = tmp_path / "manifest.json"
+    api.samples.save_manifest(Manifest(source_root=str(src), total=1, entries=entries), manifest)
+    presets = tmp_path / "presets"
+    api.sd.save_preset(_preset(), presets)
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    return TestClient(api.create_app(library_file=lib, samples_manifest=manifest, samples_src=src,
+                                     samples_overrides=tmp_path / "overrides.json",
+                                     sounddesign_presets=presets,
+                                     sounddesign_out=tmp_path / "SoundDesign"))
+
+
+def test_sounddesign_catalogue(sd_client: TestClient):
+    treatments = sd_client.get("/api/sounddesign/treatments").json()
+    assert [t["id"] for t in treatments] == ["rumble"]
+    devices = {d["type"]: d for d in sd_client.get("/api/sounddesign/devices").json()}
+    assert devices["duck"]["params"][0]["name"] == "depth_db"
+    presets = sd_client.get("/api/sounddesign/presets/rumble").json()
+    assert [p["id"] for p in presets] == ["t"]
+    assert sd_client.get("/api/sounddesign/presets/nope").status_code == 404
+
+
+def test_sounddesign_save_preset(sd_client: TestClient):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    preset["id"] = "mine"
+    preset["chains"][1]["mute"] = True
+    assert sd_client.put("/api/sounddesign/presets/rumble/mine", json=preset).status_code == 200
+    ids = [p["id"] for p in sd_client.get("/api/sounddesign/presets/rumble").json()]
+    assert ids == ["mine", "t"]
+    # id du chemin != id du preset, id non slug, valeur hors bornes
+    assert sd_client.put("/api/sounddesign/presets/rumble/autre", json=preset).status_code == 422
+    assert sd_client.put("/api/sounddesign/presets/rumble/Mine.x", json=preset).status_code == 422
+    preset["chains"][1]["devices"][1]["params"]["cutoff_frequency_hz"] = 1e6
+    r = sd_client.put("/api/sounddesign/presets/rumble/mine", json=preset)
+    assert r.status_code == 422 and "hors de" in r.json()["detail"]
+
+
+def test_sounddesign_preview_writes_nothing(sd_client: TestClient, tmp_path: Path):
+    import io
+
+    import soundfile as sf
+
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    r = sd_client.post("/api/sounddesign/preview", json={"preset": preset, "source": "k/kick.wav"})
+    assert r.status_code == 200 and r.headers["content-type"] == "audio/wav"
+    audio, sr = sf.read(io.BytesIO(r.content))
+    assert sr == 48_000 and audio.shape == (76_800, 2)   # 4 * 60 / 150 = 1.6 s
+    assert not (tmp_path / "SoundDesign").exists()
+
+
+def test_sounddesign_source_must_be_in_manifest(sd_client: TestClient):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    for source in ("k/hors.wav", "../library.md"):
+        r = sd_client.post("/api/sounddesign/preview", json={"preset": preset, "source": source})
+        assert r.status_code == 404
+
+
+def test_sounddesign_render_then_list_and_serve(sd_client: TestClient):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    preset["settings"]["bpm"] = 180
+    record = sd_client.post("/api/sounddesign/render",
+                            json={"preset": preset, "source": "k/kick.wav"}).json()
+    assert record["file"].startswith("rumble/kick__t_180bpm_")
+    renders = sd_client.get("/api/sounddesign/renders?treatment=rumble").json()
+    assert [r["file"] for r in renders] == [record["file"]]
+    r = sd_client.get("/api/sounddesign/renders/audio", params={"file": record["file"]})
+    assert r.status_code == 200 and r.content[:4] == b"RIFF"
+    assert sd_client.get("/api/sounddesign/renders/audio",
+                         params={"file": "../manifest.json"}).status_code == 404
+
+
+def test_sounddesign_invalid_preset_is_422(sd_client: TestClient):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    preset["chains"][1]["devices"][0]["type"] = "fuzz"
+    r = sd_client.post("/api/sounddesign/preview", json={"preset": preset, "source": "k/kick.wav"})
+    assert r.status_code == 422 and "device inconnu" in r.json()["detail"]

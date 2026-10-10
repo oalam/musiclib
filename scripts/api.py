@@ -5,17 +5,21 @@ track de pattern a la Digitakt II (Phase 7.E, `dt2_midi.py`), ecoute des
 samples DT2 (Phase 7.J2, `samples.py`), leur export vers Transfer (7.J3) et
 la vue par kit (7.J5 : filtre, tags et corbeille d'un kit entier) et la barre
 de recherche (7.J6 : memes filtres sur toutes les lectures de samples ; 7.J7 :
-filtre par note et roue chromatique `GET /api/samples/notes`).
+filtre par note et roue chromatique `GET /api/samples/notes`), et le sound
+design (Phase 8 : traitements, presets, ecoute et rendu, `/api/sounddesign/...`).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
 (`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`), et les
 decisions d'ecoute et le rangement des samples (`POST /api/samples/...`,
 manifeste et overrides.json), et l'export des samples retenus
-(`POST /api/samples/export`, copie vers `<MEDIA>/Live/samples`). L'envoi
+(`POST /api/samples/export`, copie vers `<MEDIA>/Live/samples`), et le sound
+design (`PUT .../presets/...` dans le vault, `POST .../render` vers
+`<MEDIA>/SoundDesign` ; l'ecoute `POST .../preview` n'ecrit rien). L'envoi
 MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
-dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre).
+dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre) ;
+un rendu de sound design que s'il a un sidecar sous `<MEDIA>/SoundDesign`.
 
 Usage:
     python api.py                 # http://127.0.0.1:8765 (sert aussi web/dist)
@@ -35,7 +39,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -87,6 +91,7 @@ from analyzer.samples import (
     set_tags,
     trash_kit,
 )
+from analyzer import sounddesign as sd
 from analyzer.samples import move as move_sample
 from analyzer.samples import restore as restore_sample
 from analyzer.samples import trash as trash_sample
@@ -99,9 +104,12 @@ from paths import (
     LIBRARY_FILE,
     QUALITY_DIR,
     SAMPLES_SRC_DIR,
+    SOUNDDESIGN_OUT_DIR,
+    SOUNDDESIGN_PRESETS_DIR,
     STEMS_DIR,
     VAULT_ROOT,
     MediaRootUnavailable,
+    media_relative,
     require_media,
 )
 from paths import resolve_audio as _resolve_audio_path
@@ -333,6 +341,16 @@ class SampleTags(BaseModel):
     remove: TagList = Field(default_factory=list, max_length=20)
 
 
+PresetId = Annotated[str, Field(pattern=r"^[a-z0-9_]{1,40}$")]
+
+
+class SoundDesignRequest(BaseModel):
+    """Preset effectif (tel qu'edite dans le front) applique a un sample du manifeste."""
+
+    preset: sd.Preset
+    source: str
+
+
 def _sample_cells(m: samples.Manifest, kit: str | None = None) -> list[SampleCell]:
     """Grille du manifeste (deja filtre par la barre de recherche) ; la reserve
     hors plafond est comptee ; avec `kit`, une case qui n'a que de la reserve
@@ -386,7 +404,9 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                samples_overrides: Path = samples.OVERRIDES_FILE,
                samples_export: Path = DT2_SAMPLES_DIR,
                samples_export_index: Path = samples.EXPORT_INDEX_FILE,
-               samples_folders: Path | None = None) -> FastAPI:
+               samples_folders: Path | None = None,
+               sounddesign_presets: Path = SOUNDDESIGN_PRESETS_DIR,
+               sounddesign_out: Path = SOUNDDESIGN_OUT_DIR) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
@@ -805,6 +825,83 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         path = samples_src / source
         if not path.is_file():
             raise HTTPException(404, f"fichier absent : {source}")
+        return FileResponse(path, media_type="audio/wav")
+
+    # --- Sound design (Phase 8) -------------------------------------------
+    render_lock = threading.Lock()   # un rendu a la fois (CPU, ecriture des sidecars)
+
+    def treatment_or_404(treatment: str) -> None:
+        if treatment not in sd.TREATMENTS:
+            raise HTTPException(404, f"traitement inconnu : {treatment}")
+
+    def render_request(req: SoundDesignRequest) -> tuple[Path, Any]:
+        """Source du manifeste uniquement ; PresetError / SourceError -> 422."""
+        if not known(manifest(), req.source):
+            raise HTTPException(404, f"sample hors manifeste : {req.source}")
+        media_or_503()
+        path = samples_src / req.source
+        try:
+            with render_lock:
+                return path, sd.render(req.preset, sd.load_source(path))
+        except (sd.PresetError, sd.SourceError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/sounddesign/treatments", response_model=list[sd.TreatmentSpec])
+    def sd_treatments() -> list[sd.TreatmentSpec]:
+        return sd.treatment_specs()
+
+    @app.get("/api/sounddesign/devices", response_model=list[sd.DeviceSpec])
+    def sd_devices() -> list[sd.DeviceSpec]:
+        """Catalogue : bornes, unites, echelle et aide de chaque potard."""
+        return sd.device_specs()
+
+    @app.get("/api/sounddesign/presets/{treatment}", response_model=list[sd.Preset])
+    def sd_presets(treatment: str) -> list[sd.Preset]:
+        treatment_or_404(treatment)
+        try:
+            return sd.load_presets(treatment, sounddesign_presets)
+        except sd.PresetError as exc:
+            raise HTTPException(500, f"preset du vault invalide : {exc}") from exc
+
+    @app.put("/api/sounddesign/presets/{treatment}/{preset_id}", response_model=sd.Preset)
+    def sd_save_preset(treatment: str, preset_id: PresetId, preset: sd.Preset) -> sd.Preset:
+        """Cree ou remplace un preset du vault (versionne : un ecrasement se rattrape par git)."""
+        treatment_or_404(treatment)
+        if (preset.treatment, preset.id) != (treatment, preset_id):
+            raise HTTPException(422, "id / traitement du preset differents du chemin")
+        try:
+            sd.save_preset(preset, sounddesign_presets)
+        except sd.PresetError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        return preset
+
+    @app.post("/api/sounddesign/preview")
+    def sd_preview(req: SoundDesignRequest) -> Response:
+        """Boucle rendue en WAV, en memoire : rien n'est ecrit."""
+        _, audio = render_request(req)
+        return Response(sd.encode_wav(audio), media_type="audio/wav")
+
+    @app.post("/api/sounddesign/render", response_model=sd.RenderRecord)
+    def sd_render(req: SoundDesignRequest) -> sd.RenderRecord:
+        """Ecrit la boucle et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/`."""
+        path, audio = render_request(req)
+        with render_lock:
+            return sd.write_render(audio, path, media_relative(path), req.preset, sounddesign_out)
+
+    @app.get("/api/sounddesign/renders", response_model=list[sd.RenderRecord])
+    def sd_renders(treatment: str | None = None) -> list[sd.RenderRecord]:
+        if treatment is not None:
+            treatment_or_404(treatment)
+        return sd.list_renders(sounddesign_out, treatment)
+
+    @app.get("/api/sounddesign/renders/audio")
+    def sd_render_audio(file: str) -> FileResponse:
+        """Seuls les rendus listes (sidecar present) sont servis."""
+        if file not in {r.file for r in sd.list_renders(sounddesign_out)}:
+            raise HTTPException(404, f"rendu inconnu : {file}")
+        path = (sounddesign_out / file).resolve()
+        if not path.is_relative_to(sounddesign_out.resolve()):
+            raise HTTPException(404, f"rendu hors de {sounddesign_out.name} : {file}")
         return FileResponse(path, media_type="audio/wav")
 
     if WEB_DIST.exists():
