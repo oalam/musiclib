@@ -806,6 +806,7 @@ révisés par 7.J8) :
   - Front : arbre par branche (repliable), une ligne par code, une case
     par sous-catégorie ; les dossiers vides restent visibles comme cibles
     de dépôt. L'arbre d'un kit suit le même ordre. `M` choisit un dossier.
+    (Révisé par 7.K : treeview, et dossiers masqués sous filtre.)
   - Aucun projet DT2 n'existe encore : le déplacement sur le +Drive est
     sans effet.
 
@@ -833,6 +834,15 @@ révisés par 7.J8) :
 - Historique des filtres dans les propositions (morceaux et samples) : 8
   entrées, sans doublon, un filtre qui affine le précédent le remplace.
   Retenu à la sélection d'un morceau, à l'ajout d'un tag, à Entrée.
+- Arbre des samples en treeview : une ligne par dossier (code avec sa
+  racine, sous-dossiers en retrait dessous), compteurs alignés à droite ;
+  colonne bornée à 280-440 px, pads de kits sur trois colonnes. Sous un
+  filtre (recherche ou kit), seuls les dossiers qui y répondent sont
+  affichés ; `M` cible toujours tous les dossiers. Hors filtre, les
+  dossiers vides restent visibles comme cibles de dépôt.
+- Recherche des samples : Tab complète avec la proposition surlignée, sinon
+  la première facette ; Espace valide une facette dont le nom est
+  exactement saisi (« BD » puis Espace = puce instrument BD).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

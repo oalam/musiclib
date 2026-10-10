@@ -12,6 +12,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   lieu de prendre la largeur de son contenu ; les sous-dossiers d'un code
   passent à la ligne, alignés après le code. Le bloc de lecture et de
   sélection récupère la largeur restante.
+- [7.K] Arbre des samples en treeview (un dossier par ligne, compteurs à
+  droite), pads de kits sur trois colonnes ; sous un filtre, seuls les
+  dossiers qui y répondent sont affichés. Recherche : complétion par Tab
+  et par Espace sur un nom exact de facette.
 
 ### Modifié
 

@@ -119,7 +119,8 @@
     const i = allFolders.indexOf(f)
     return i >= 0 ? i : 1e3 + codeRank(splitFolder(f).code)
   }
-  const folderList = $derived([...new Set([...allFolders, ...cells.map(c => c.folder)])]
+  // filtre actif : seuls les dossiers qui y repondent (M cible toujours tous les dossiers)
+  const folderList = $derived([...new Set([...(filterOn() ? [] : allFolders), ...cells.map(c => c.folder)])]
     .sort((a, b) => folderRank(a) - folderRank(b)))
   const byKey = $derived(new Map(cells.map(c => [c.folder, c])))
   const branchRows = $derived(BRANCHES.map(branch => {
@@ -333,6 +334,18 @@
     else if (e.key === 'ArrowUp') { suggestIdx = Math.max(suggestIdx - 1, 0); e.preventDefault() }
     else if (e.key === 'Enter' && suggestions.length) { addSug(suggestions[suggestIdx] ?? suggestions[0]); e.preventDefault() }
     else if (e.key === 'Escape') { query = ''; searchField?.blur(); e.preventDefault() }
+    // completion : Tab prend la proposition surlignee, sinon la premiere facette ;
+    // Espace valide une facette dont le nom est exactement saisi (BD, kick…)
+    else if (e.key === 'Tab' && query.trim() && suggestions.length) {
+      const facet = suggestions.find(s => s.kind !== 'text' && s.kind !== 'history')
+      addSug(suggestIdx > 0 ? suggestions[suggestIdx] : facet ?? suggestions[0])
+      e.preventDefault()
+    }
+    else if (e.key === ' ' && query.trim()) {
+      const t = query.trim().toLowerCase()
+      const exact = suggestions.find(s => s.kind !== 'text' && s.kind !== 'history' && s.value.toLowerCase() === t)
+      if (exact) { addSug(exact); e.preventDefault() }
+    }
     else if (e.key === 'Backspace' && !query && chips.length) { const c = chips[chips.length - 1]; dropChip(c.kind, c.value) }
   }
 
@@ -712,6 +725,22 @@
 
 <svelte:window onkeydown={onkey} />
 
+{#snippet folderNode(f: string, sub: string)}
+  {@const c = byKey.get(f)}
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <span class="drop" class:over={dropKey === f}
+    ondragover={e => onDragOver(e, f)} ondragleave={() => { if (dropKey === f) dropKey = null }}
+    ondrop={e => onDrop(e, f)}>
+    {#if c}
+      <button class="cell" class:done={c.to_listen === 0} class:on={current?.folder === f}
+        title="{f} : {c.candidates} candidats, plafond {c.quota ?? 'aucun'}, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
+        onclick={() => open({ kind: 'cell', folder: f })}><span class="sub">{sub}</span><span class="n">{c.to_listen}/{c.selected}{#if c.reserve && kit}<sup>+{c.reserve}</sup>{/if}</span></button>
+    {:else}
+      <span class="slot" title="{f} : vide, glisse-en un ici ou M"><span class="sub">{sub}</span><span class="n">vide</span></span>
+    {/if}
+  </span>
+{/snippet}
+
 <div class="samples">
   <div class="searchbar zone">
     <div class="search-in">
@@ -777,28 +806,15 @@
           </button>
           {#if !closedBranches.has(b.branch)}
             {#each b.codes as row (row.code)}
-              <div class="code-row">
+              {@const root = row.folders.find(f => !splitFolder(f).sub)}
+              <div class="code-node">
                 <span class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
                   title={codeTitle(row.code)}>{row.code}</span>
-                <div class="subs">
-                {#each row.folders as f (f)}
-                  {@const c = byKey.get(f)}
-                  {@const sub = splitFolder(f).sub}
-                  <!-- svelte-ignore a11y_no_static_element_interactions -->
-                  <span class="drop" class:over={dropKey === f}
-                    ondragover={e => onDragOver(e, f)} ondragleave={() => { if (dropKey === f) dropKey = null }}
-                    ondrop={e => onDrop(e, f)}>
-                    {#if c}
-                      <button class="cell" class:done={c.to_listen === 0} class:on={current?.folder === f}
-                        title="{f} : {c.candidates} candidats, plafond {c.quota ?? 'aucun'}, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
-                        onclick={() => open({ kind: 'cell', folder: f })}>{#if sub}<span class="sub">{sub}</span> {/if}{c.to_listen}/{c.selected}{#if c.reserve && kit}<sup>+{c.reserve}</sup>{/if}</button>
-                    {:else}
-                      <span class="slot" title="{f} : vide, glisse-en un ici ou M">{sub || '·'}</span>
-                    {/if}
-                  </span>
-                {/each}
-                </div>
+                {#if root}{@render folderNode(root, '')}{/if}
               </div>
+              {#each row.folders.filter(f => splitFolder(f).sub) as f (f)}
+                <div class="leaf">{@render folderNode(f, splitFolder(f).sub)}</div>
+              {/each}
             {/each}
           {/if}
         </div>
@@ -1045,19 +1061,22 @@
   .zone { box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
   .branch .fold { border: 0; background: none; color: var(--text); padding: 2px 0; cursor: pointer; }
-  /* code a gauche, sous-dossiers qui passent a la ligne dans la colonne bornee */
-  .code-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; gap: 3px; padding-left: 14px; }
-  .code-row .code-label { padding-top: 4px; }
-  .subs { display: flex; flex-wrap: wrap; gap: 3px; }
+  /* treeview : une ligne par dossier, code puis sous-dossiers en retrait, compteurs a droite */
+  .code-node { display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: center; padding-left: 14px; min-height: 22px; }
+  .leaf { padding-left: 42px; }
+  .branches .drop { display: block; }
   .code-label { width: 24px; font: 600 11px ui-monospace, Menlo, monospace; color: var(--rhythm); cursor: help; }
   .code-label.mel { color: var(--melodic); }
   .code-label.loop { font-style: italic; text-decoration: underline dotted; }
   .drop { display: inline-block; border-radius: 3px; }
-  .cell { min-width: 44px; font: 11px ui-monospace, Menlo, monospace; padding: 3px 5px; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 3px; cursor: pointer; }
-  .cell .sub { color: var(--muted); }
+  .cell, .slot { display: flex; justify-content: space-between; gap: 8px; width: 100%; font: 11px ui-monospace, Menlo, monospace; padding: 2px 6px; border: 1px solid transparent; background: none; color: var(--text); border-radius: 3px; text-align: left; }
+  .cell { cursor: pointer; }
+  .cell:hover { background: var(--panel-2); border-color: var(--border); }
+  .cell .sub { color: var(--text); }
+  .n { font-variant-numeric: tabular-nums; }
   .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }
-  .slot { display: inline-block; min-width: 34px; padding: 3px 5px; font: 11px ui-monospace, Menlo, monospace; color: var(--muted); border: 1px solid transparent; border-radius: 3px; opacity: 0.6; }
+  .slot { color: var(--muted); opacity: 0.6; }
   .branches.dragging .slot { border: 1px dashed var(--border); opacity: 1; }
   .drop.over .cell, .drop.over .slot { outline: 2px dashed var(--accent); background: var(--panel-2); }
   .loose { display: flex; gap: 8px; margin-top: 10px; }
