@@ -820,10 +820,7 @@
   </div>
   <section class="grid">
    <div class="zone matrix">
-    <p class="muted small">
-      {totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus.
-      Les chiffres d’une case : à écouter / retenus{filterOn() ? ' (filtrés)' : ''}.
-    </p>
+    <h3 class="lib-title" title="{totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus{filterOn() ? ' (filtrés)' : ''}. Les chiffres d’un dossier : à écouter / retenus (total).">Library</h3>
     {#if error}<p class="err">{error}</p>{/if}
     <div class="branches" class:dragging={dragging !== null}>
       {#each branchRows as b (b.branch)}
@@ -1118,6 +1115,7 @@
   /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
   .kits { margin-top: 12px; width: 0; min-width: 100%; }
   .kits h3 { margin: 0 0 6px; font-weight: 600; }
+  .lib-title { margin: 0 0 6px; font-weight: 600; }
   /* trois pads par ligne, a la largeur de la colonne */
   .pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
