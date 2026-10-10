@@ -1542,11 +1542,13 @@ def _reserve_note(r: ReserveSample) -> str | None:
     return sharp(written) if written else None
 
 
-def facet_notes(manifest: Manifest) -> list[tuple[str, int]]:
+def facet_notes(manifest: Manifest, kit: str | None = None) -> list[tuple[str, int]]:
     """(note, fichiers) des 12 classes de hauteur, candidats et reserve, pour
-    la roue chromatique (7.J7)."""
+    la roue chromatique (7.J7) ; reduit a un kit si donne (7.K)."""
     counts = dict.fromkeys(PITCH_CLASSES, 0)
-    for note in [e.note for e in manifest.entries] + [_reserve_note(r) for r in manifest.reserve]:
+    entries = [e.note for e in manifest.entries if kit is None or in_kit(e.source, kit)]
+    reserve = [_reserve_note(r) for r in manifest.reserve if kit is None or in_kit(r.source, kit)]
+    for note in entries + reserve:
         if note in counts:
             counts[note] += 1
     return list(counts.items())

@@ -386,6 +386,7 @@ def test_samples_kit_view_reserve_and_tags(tmp_path: Path):
     # roue chromatique et filtre par note (7.J7) : aucune note ici
     wheel = client.get("/api/samples/notes").json()
     assert len(wheel) == 12 and wheel[0] == {"note": "C", "count": 0}
+    assert client.get("/api/samples/notes", params={"kit": "k/a", "codes": "FX"}).json()[0] == {"note": "C", "count": 0}
     assert client.get("/api/samples", params={"notes": "A"}).json() == []
     assert client.get("/api/samples", params={"notes": "H"}).status_code == 422
 

@@ -582,9 +582,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return [FacetTag(tag=t, group=g, count=n) for t, g, n in facet_tags(manifest(), overrides())]
 
     @app.get("/api/samples/notes", response_model=list[FacetNote])
-    def sample_notes() -> list[FacetNote]:
-        """Roue chromatique : fichiers par note, candidats et reserve (7.J7)."""
-        return [FacetNote(note=n, count=c) for n, c in facet_notes(manifest())]
+    def sample_notes(f: SampleQuery, kit: str | None = None) -> list[FacetNote]:
+        """Roue chromatique : fichiers par note, candidats et reserve (7.J7),
+        sous le filtre de la barre et le kit (7.K : notes absentes grisees)."""
+        return [FacetNote(note=n, count=c) for n, c in facet_notes(view(f), kit or None)]
 
     @app.get("/api/samples/cell", response_model=list[SampleEntry])
     def sample_cell(folder: str, f: SampleQuery, kit: str | None = None,

@@ -841,6 +841,8 @@ def test_filter_by_note_and_wheel() -> None:
     wheel = dict(smp.facet_notes(m))
     assert list(wheel) == list(smp.PITCH_CLASSES)
     assert (wheel["A"], wheel["G#"], wheel["C"]) == (2, 1, 0)
+    assert dict(smp.facet_notes(m, kit="q"))["A"] == 0  # roue du kit (7.K)
+    assert dict(smp.facet_notes(m, kit="p"))["A"] == 2
     rows = smp.overflow_of(m, "DRUMS/BD")
     assert (rows[0].note, rows[0].note_src) == ("A", "nom")
 

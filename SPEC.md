@@ -858,7 +858,10 @@ révisés par 7.J8) :
   rythmique / mélodique, one-shot / boucle et étoiles retirés, notes hors
   de la barre). La roue des notes passe dans l'en-tête de la vue de droite
   et ne filtre que cette vue, pas l'arbre (mémorisée à part). Elle est
-  alignée à droite de la forme d'onde.
+  alignée à droite de la forme d'onde. Ses comptes suivent la barre et le
+  kit (`/api/samples/notes?…&kit=`) ; une note absente du sous-ensemble
+  est blanche, sans compteur ni clic (sauf pour retirer une note déjà
+  choisie).
 - Un clic sur un code de l'arbre (BD, BS…) ajoute ou retire le filtre
   d'instrument correspondant (code surligné quand il est actif).
 - Sous-dossier manuel (version simple, sans mot-clé) : « + » sur la ligne

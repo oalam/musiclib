@@ -396,7 +396,8 @@ export const api = {
     fetch(`/api/samples/tree?kit=${enc(kit)}${fq(f)}`).then(r => json<SampleEntry[]>(r)),
   sampleKits: (f: SampleFilter = {}) => fetch(`/api/samples/kits?${fq(f)}`).then(r => json<SampleKits>(r)),
   sampleFacets: () => fetch('/api/samples/facets').then(r => json<FacetTag[]>(r)),
-  sampleNotes: () => fetch('/api/samples/notes').then(r => json<FacetNote[]>(r)),
+  sampleNotes: (f: SampleFilter = {}, kit = '') =>
+    fetch(`/api/samples/notes?kit=${enc(kit)}${fq(f)}`).then(r => json<FacetNote[]>(r)),
   sampleKitTrash: (kit: string) => samplePost('kit/trash', { kit }),
   sampleKitRestore: (kit: string) => samplePost('kit/restore', { kit }),
   sampleKitTags: (kit: string, add: string[], remove: string[] = []) => samplePost('kit/tags', { kit, add, remove }),

@@ -456,7 +456,7 @@
       const [c, u, t, tags, k, fa, wh] = await Promise.all([
         api.sampleCells(search, search.codes?.length ? '' : kit),
         api.sampleLoose('unclassified', kit, search), api.sampleLoose('trash', kit, search), api.sampleTags(),
-        api.sampleKits(search), api.sampleFacets(), api.sampleNotes(),
+        api.sampleKits(search), api.sampleFacets(), api.sampleNotes(search, kit),
       ])
       cells = c
       facets = fa
@@ -1022,11 +1022,11 @@
           {@const [lx, ly] = polar(37, i * 30)}
           {@const [cx, cy] = polar(24, i * 30)}
           <g role="button" tabindex="-1" class:on={notes.includes(w.note)} class:empty={!w.count}
-            onclick={() => toggleNote(w.note)} onkeydown={() => {}}>
+            onclick={() => { if (w.count || notes.includes(w.note)) toggleNote(w.note) }} onkeydown={() => {}}>
             <title>{w.note} : {w.count} sample{w.count > 1 ? 's' : ''}</title>
             <path d={wedge(i)} style="fill-opacity: {0.08 + 0.5 * w.count / wheelMax}" />
             <text x={lx} y={ly} class="wl">{w.note}</text>
-            <text x={cx} y={cy} class="wc">{w.count}</text>
+            {#if w.count}<text x={cx} y={cy} class="wc">{w.count}</text>{/if}
           </g>
         {/each}
       </svg>
@@ -1278,7 +1278,10 @@
   .wheel g { cursor: pointer; outline: none; }
   .wheel path { fill: var(--accent); stroke: var(--border); stroke-width: 0.6; }
   .wheel g.on path { fill: var(--accent); fill-opacity: 1 !important; stroke: var(--text); }
-  .wheel g.empty { opacity: 0.45; }
+  /* note absente du sous-ensemble filtre : case blanche, sans compteur ni clic */
+  .wheel g.empty:not(.on) path { fill: var(--panel); fill-opacity: 1 !important; }
+  .wheel g.empty:not(.on) text { fill: var(--muted); opacity: 0.5; }
+  .wheel g.empty:not(.on) { cursor: default; }
   .wheel text { text-anchor: middle; dominant-baseline: central; pointer-events: none; fill: var(--text); }
   .wheel .wl { font-size: 8px; font-weight: 600; }
   .wheel .wc { font-size: 5.5px; fill: var(--muted); }
