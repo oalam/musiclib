@@ -903,6 +903,17 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(422, str(exc)) from exc
         return preset
 
+    @app.delete("/api/sounddesign/presets/{treatment}/{preset_id}", status_code=204)
+    def sd_delete_preset(treatment: str, preset_id: PresetId) -> Response:
+        """Retire un preset du vault (versionne : se rattrape par git) ; pas le dernier."""
+        treatment_or_404(treatment)
+        try:
+            sd.delete_preset(treatment, preset_id, sounddesign_presets)
+        except sd.PresetError as exc:
+            code = 404 if "inconnu" in str(exc) else 409
+            raise HTTPException(code, str(exc)) from exc
+        return Response(status_code=204)
+
     @app.post("/api/sounddesign/preview")
     def sd_preview(req: SoundDesignRequest) -> Response:
         """Boucle rendue en WAV, en memoire : rien n'est ecrit."""
@@ -943,7 +954,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             except sd.PresetError as exc:
                 raise HTTPException(422, str(exc)) from exc
             samples.save_overrides(overrides, samples_overrides)
-        return record
+        return sd.mark_versed([record], samples_src)[0]
 
     @app.get("/api/sounddesign/target", response_model=SdTarget)
     def sd_target(treatment: str, source: str = "", bpm: float | None = None) -> SdTarget:

@@ -73,6 +73,7 @@ class DeviceSpec(BaseModel):
     label: str
     help: str
     params: list[ParamSpec]
+    automatable: bool = False        # pedalboard : `params_end` accepte (8.G)
 
 
 class Device(BaseModel):
@@ -111,6 +112,10 @@ class TreatmentSpec(BaseModel):
     notebook: str                    # note du vault (theorie, usage, ressources)
     code: str                        # code DT2 du rendu verse (samples.CODES), ex. RM
     sub: str = ""                    # sous-dossier fixe (FX/RISE) ; "" : herite de la source
+    # sample requis seulement si settings[source_param] == source_sample (riser :
+    # source 2) ; "" : toujours requis
+    source_param: str = ""
+    source_sample: int = 0
 
 
 class RenderRecord(BaseModel):
@@ -125,6 +130,7 @@ class RenderRecord(BaseModel):
     name: str = ""                   # nom DT2 propose ou saisi ("" : rendu anterieur a 8.E)
     sub: str = ""                    # sous-dossier herite de la source (DRUMS/RM/<sub>)
     versed: str | None = None        # cle du manifeste si verse dans le pack (rempli a la lecture)
+    folder: str = ""                 # dossier de rangement une fois verse (rempli a la lecture)
 
 
 # ---------------------------------------------------------------------------
@@ -176,7 +182,7 @@ def _pb(spec: DeviceSpec, plugin: PluginFactory) -> _DeviceDef:
     def build(params: dict[str, float], ctx: RenderContext) -> Processor:
         p = plugin(params)
         return lambda x: np.asarray(p(x, ctx.sr), dtype=np.float32)  # type: ignore[operator]
-    return _DeviceDef(spec, build, plugin)
+    return _DeviceDef(spec.model_copy(update={"automatable": True}), build, plugin)
 
 
 def _duck(params: dict[str, float], ctx: RenderContext) -> Processor:
@@ -345,8 +351,6 @@ class Prepared:
 class _Treatment:
     spec: TreatmentSpec
     prepare: Callable[[np.ndarray, dict[str, float]], Prepared]
-    # le reglage demande-t-il un sample ? (riser sur bruit genere : non)
-    needs_source: Callable[[dict[str, float]], bool] = lambda settings: True
 
 
 def _sequence(source: np.ndarray, hits_per_loop: int, loop_len: int) -> Prepared:
@@ -495,15 +499,19 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
                      help="Forme de la montee : 1 = lineaire, 2 = lente puis rapide "
                           "(tension en fin de montee), < 1 = rapide puis plateau.")],
         notebook="sounddesign/riser.md",
-        code="FX", sub="RISE"),          # -> FX/RISE, track 15
-        _prepare_riser, needs_source=lambda st: int(st["source"]) == 2),
+        code="FX", sub="RISE",           # -> FX/RISE, track 15
+        source_param="source", source_sample=RISER_SOURCES.index("Sample")),
+        _prepare_riser),
 ]}
 
 
 def needs_source(preset: Preset) -> bool:
     """Le rendu de ce preset demande-t-il un sample source ?"""
-    treatment = TREATMENTS[preset.treatment]
-    return treatment.needs_source(_resolve(treatment.spec.settings, preset.settings, preset.id))
+    spec = TREATMENTS[preset.treatment].spec
+    if not spec.source_param:
+        return True
+    settings = _resolve(spec.settings, preset.settings, preset.id)
+    return int(settings[spec.source_param]) == spec.source_sample
 
 
 def treatment_specs() -> list[TreatmentSpec]:
@@ -604,6 +612,16 @@ def save_preset(preset: Preset, root: Path) -> Path:
 # ---------------------------------------------------------------------------
 # Rendu
 # ---------------------------------------------------------------------------
+
+def delete_preset(treatment: str, preset_id: str, root: Path) -> None:
+    """Retire `root/<traitement>/<id>.json` ; refuse le dernier preset du traitement."""
+    path = root / treatment / f"{preset_id}.json"
+    if not path.is_file():
+        raise PresetError(f"preset inconnu {treatment}/{preset_id}")
+    if len(list((root / treatment).glob("*.json"))) <= 1:
+        raise PresetError(f"{treatment}/{preset_id} est le dernier preset du traitement")
+    path.unlink()
+
 
 def load_source(path: Path) -> np.ndarray:
     """Sample en (2, n) float32 a SR (mono duplique, multicanal tronque)."""
@@ -817,10 +835,11 @@ def list_renders(out_root: Path, treatment: str | None = None) -> list[RenderRec
 
 
 def mark_versed(records: list[RenderRecord], samples_root: Path) -> list[RenderRecord]:
-    """Renseigne `versed` pour les rendus deja copies dans le pack."""
+    """Renseigne `versed` (rendus deja copies dans le pack) et `folder` (rangement)."""
     for record in records:
         key = verse_key(record)
         record.versed = key if (samples_root / key).is_file() else None
+        record.folder = smp.folder_of("", TREATMENTS[record.preset.treatment].spec.code, record.sub)
     return records
 
 

@@ -4,6 +4,8 @@
   // sur le nom pour afficher ses devices ; devices en ligne (activateur =
   // bypass, potards, courbe des filtres). La boucle se re-rend a chaque
   // reglage pendant la lecture. Le solo n'est pas enregistre dans le preset.
+  // Colonne laterale (8.H) : traitements et presets, nouveau / modifier /
+  // supprimer ; sans sample pour un riser sur bruit genere.
   import { onDestroy } from 'svelte'
   import { createMarked, escapeHtml, replaceWikilinks } from './markdown'
   import { api, slugify, type DeviceSpec, type RenderRecord, type SdPreset, type SdTarget, type TreatmentSpec } from './api'
@@ -13,6 +15,7 @@
   import Fader from './sd/Fader.svelte'
   import Knob from './sd/Knob.svelte'
   import { Looper } from './sd/looper'
+  import TreatmentList from './sd/TreatmentList.svelte'
 
   // la source est le sample en cours de la vue Samples (8.E) : on la change la-bas
   let { ongotosamples }: { ongotosamples?: () => void } = $props()
@@ -29,7 +32,8 @@
   let treatments = $state<TreatmentSpec[]>([])
   let catalogue = $state<Record<string, DeviceSpec>>({})
   let treatment = $state<TreatmentSpec | null>(null)
-  let presets = $state<SdPreset[]>([])
+  let presetsBy = $state<Record<string, SdPreset[]>>({})   // presets de chaque traitement
+  const presets = $derived(treatment ? presetsBy[treatment.id] ?? [] : [])
   let preset = $state<SdPreset | null>(null)
   let saved = $state('')                       // JSON du preset tel qu'enregistre
   let selected = $state<number | 'master'>(0)  // chaine affichee dans le rack
@@ -43,19 +47,30 @@
   Promise.all([api.sdTreatments(), api.sdDevices()]).then(([t, d]) => {
     treatments = t
     catalogue = Object.fromEntries(d.map(s => [s.type, s]))
-    const first = t.find(x => x.id === mem.treatment) ?? t[0]
-    if (first) void openTreatment(first)
+    return Promise.all(t.map(async x => [x.id, await api.sdPresets(x.id)] as const))
+  }).then(lists => {
+    presetsBy = Object.fromEntries(lists)
+    const first = treatments.find(x => x.id === mem.treatment) ?? treatments[0]
+    if (first) open(first, presetsBy[first.id]?.find(x => x.id === mem.preset))
   }).catch(e => (error = String(e)))
 
-  async function openTreatment(t: TreatmentSpec) {
-    treatment = t
-    remember({ treatment: t.id })
-    notebook = ''
-    api.sdNotebook(t.id).then(n => (notebook = n.markdown)).catch(() => (notebook = ''))
-    presets = await api.sdPresets(t.id)
-    const p = presets.find(x => x.id === mem.preset) ?? presets[0]
-    if (p) openPreset(p)
-    renders = await api.sdRenders(t.id)
+  async function reloadPresets(id: string) {
+    presetsBy[id] = await api.sdPresets(id)
+  }
+
+  /** Ouvre un preset (le premier du traitement par defaut), en changeant de traitement si besoin. */
+  function open(t: TreatmentSpec, p?: SdPreset): boolean {
+    const target = p ?? presetsBy[t.id]?.[0]
+    if (!target || (preset?.id === target.id && treatment?.id === t.id)) return true
+    if (!openPreset(target)) return false
+    if (treatment?.id !== t.id) {
+      treatment = t
+      remember({ treatment: t.id })
+      notebook = ''
+      api.sdNotebook(t.id).then(n => (notebook = n.markdown)).catch(() => (notebook = ''))
+      api.sdRenders(t.id).then(r => (renders = r)).catch(e => (error = String(e)))
+    }
+    return true
   }
 
   function openPreset(p: SdPreset): boolean {
@@ -91,20 +106,62 @@
     setTimeout(() => h?.classList.remove('flash'), 1200)
   }
 
-  // --- Enregistrement -------------------------------------------------------
-  let saveAs = $state<{ id: string; label: string } | null>(null)
-  async function save(target?: { id: string; label: string }) {
+  // --- Enregistrement et gestion des presets (8.H) --------------------------
+  type Meta = { mode: 'new' | 'edit' | 'saveas'; id: string; label: string; description: string }
+  let meta = $state<Meta | null>(null)
+  async function save(body?: SdPreset) {
     if (!preset) return
-    const body = $state.snapshot(preset) as SdPreset
-    if (target) { body.id = target.id; body.label = target.label }
+    body ??= $state.snapshot(preset) as SdPreset
     try {
       const p = await api.sdSavePreset(body)
-      presets = await api.sdPresets(p.treatment)
+      await reloadPresets(p.treatment)
       preset = structuredClone(p)
       saved = JSON.stringify(preset)
-      saveAs = null
+      meta = null
       error = ''
       remember({ preset: p.id })
+    } catch (e) { error = e instanceof Error ? e.message : String(e) }
+  }
+  /** Id libre derive d'un id existant : deep -> deep_2, deep_3... */
+  function freeId(base: string): string {
+    const root = base.replace(/_\d+$/, '') || 'preset'
+    let n = 2
+    while (presets.some(p => p.id === `${root}_${n}`)) n++
+    return `${root}_${n}`
+  }
+  function startMeta(mode: Meta['mode']) {
+    if (!preset) return
+    if (mode === 'edit') meta = { mode, id: preset.id, label: preset.label, description: preset.description }
+    else if (mode === 'saveas') meta = { mode, id: freeId(preset.id), label: `${preset.label} (2)`, description: preset.description }
+    else meta = { mode, id: freeId('preset'), label: '', description: '' }
+  }
+  async function submitMeta(m: Meta) {
+    if (!preset || !treatment) return
+    if (m.mode === 'new') {
+      // preset vierge : une chaine vide, limiteur en sortie, reglages par defaut
+      if (dirty && !confirm('Le preset en cours a des modifications non enregistrées. Les abandonner ?')) return
+      saved = JSON.stringify(preset)   // abandon confirme
+      await save({ id: m.id, treatment: treatment.id, label: m.label, description: m.description,
+        settings: {}, chains: [{ name: 'Chaîne 1', mute: false, gain_db: 0, devices: [] }],
+        master: [{ type: 'limiter', params: {}, bypass: false }], output_peak_db: -1 })
+      return
+    }
+    const body = $state.snapshot(preset) as SdPreset
+    body.label = m.label
+    body.description = m.description
+    if (m.mode === 'saveas') body.id = m.id
+    await save(body)
+  }
+  async function deletePreset() {
+    if (!preset || !treatment) return
+    if (!confirm(`Supprimer le preset « ${preset.label} » (${treatment.id}/${preset.id}.json) ? Il reste récupérable par git.`)) return
+    try {
+      await api.sdDeletePreset(treatment.id, preset.id)
+      await reloadPresets(treatment.id)
+      saved = JSON.stringify(preset)   // plus rien a proteger
+      const next = presets[0]
+      if (next) openPreset(next)
+      error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
   }
 
@@ -140,7 +197,13 @@
   }
 
   // --- Source : sample en cours de la vue Samples (8.E) ---------------------
-  const source = $derived(focus.sample?.source ?? null)
+  const sample = $derived(focus.sample?.source ?? null)
+  // riser sur bruit genere (8.G) : pas de sample ; la regle vient du traitement
+  const needsSource = $derived(!!treatment && !!preset && (!treatment.source_param ||
+    Math.round(preset.settings[treatment.source_param]
+      ?? treatment.settings.find(x => x.name === treatment!.source_param)?.default ?? 0) === treatment.source_sample))
+  const source = $derived(needsSource ? sample : null)
+  const ready = $derived(!!preset && (!needsSource || !!sample))
   const sourceName = $derived(focus.sample?.name ?? '')
   // nom DT2 du rendu, propose par l'API (nom de la source, code du traitement,
   // tempo) et modifiable ; une autre source repart du nom propose
@@ -155,9 +218,9 @@
   $effect(() => { void source; nameEdited = false })
   $effect(() => {
     const t = treatment?.id, s = source, b = bpm
-    if (!t || !s) { target = null; return }
+    if (!t || (needsSource && !s)) { target = null; return }
     let stale = false
-    api.sdTarget(t, s, b).then(r => {
+    api.sdTarget(t, s ?? '', b).then(r => {
       if (stale) return
       target = r
       if (!nameEdited) name = r.name
@@ -191,14 +254,14 @@
   let lastKey = ''   // reglages de la boucle qui joue (evite un re-rendu identique)
   const keyOf = () => JSON.stringify(payload) + source
   async function preview() {
-    if (!payload || !source) return
+    if (!payload || !ready) return
     const id = ++seq
     lastKey = keyOf()
     abort?.abort()
     abort = new AbortController()
     busy = true
     try {
-      const data = await api.sdPreview(payload, source, abort.signal)
+      const data = await api.sdPreview(payload, source ?? '', abort.signal)
       const buf = await looper.decode(data)
       if (id !== seq) return
       sourceAudio?.pause()
@@ -227,17 +290,17 @@
     try {
       const rec = await api.sdVerse(file)
       renders = renders.map(r => (r.file === file ? rec : r))
-      await api.sampleRebuild()   // range le fichier (override DRUMS/RM/<sous>) dans la vue Samples
-      verseMsg = `Versé : « ${rec.name} » vers ${rec.sub ? `DRUMS/RM/${rec.sub}` : 'DRUMS/RM'} ; réanalyse de la bibliothèque lancée.`
+      await api.sampleRebuild()   // range le fichier (override DRUMS/RM/<sous>, FX/RISE) dans la vue Samples
+      verseMsg = `Versé : « ${rec.name} » vers ${rec.folder} ; réanalyse de la bibliothèque lancée.`
       error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
   }
 
   async function renderToDisk() {
-    if (!payload || !source) return
+    if (!payload || !ready) return
     busy = true
     try {
-      const rec = await api.sdRender(payload, source, name.trim())
+      const rec = await api.sdRender(payload, source ?? '', name.trim())
       renders = await api.sdRenders(rec.preset.treatment)
       error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
@@ -282,37 +345,37 @@
 
 <svelte:window onkeydown={onkey} />
 
+<div class="sdwrap">
+<aside class="panel sidecol">
+  <TreatmentList {treatments} presets={presetsBy} current={treatment?.id ?? null} preset={preset?.id ?? null} {dirty}
+    onopen={(t, p) => open(t, p)} onnew={() => startMeta('new')} onedit={() => startMeta('edit')} ondelete={deletePreset} />
+</aside>
 <div class="sd">
   <header class="bar">
-    <label class="small">Traitement
-      <select value={treatment?.id} onchange={e => { const t = treatments.find(x => x.id === e.currentTarget.value); if (t) void openTreatment(t) }}>
-        {#each treatments as t (t.id)}<option value={t.id}>{t.label}</option>{/each}
-      </select>
-    </label>
-    <label class="small">Preset
-      <select value={preset?.id} onchange={e => { const p = presets.find(x => x.id === e.currentTarget.value); if (!p || !openPreset(p)) e.currentTarget.value = preset?.id ?? '' }}>
-        {#each presets as p (p.id)}<option value={p.id}>{p.label}</option>{/each}
-      </select>
-    </label>
+    {#if preset}<strong class="ptitle">{treatment?.label} · {preset.label}</strong>{/if}
     {#if dirty}<span class="dirty small">modifié</span>{/if}
     <button class="small" onclick={() => save()} disabled={!dirty} title="Écrase le preset du vault (versionné par git)">Enregistrer</button>
-    <button class="small" onclick={() => (saveAs = { id: `${preset?.id ?? 'preset'}_2`, label: `${preset?.label ?? ''} (2)` })} disabled={!preset}>Enregistrer sous…</button>
+    <button class="small" onclick={() => startMeta('saveas')} disabled={!preset}>Enregistrer sous…</button>
     <button class="small" onclick={revert} disabled={!dirty}>Rétablir</button>
     <span class="grow"></span>
-    <button class="play" class:on={playing} onclick={playPause} disabled={!source || !preset}
+    <button class="play" class:on={playing} onclick={playPause} disabled={!ready}
       title="Écouter la boucle (Espace) ; elle se re-rend à chaque réglage">{playing ? '■ Stop' : '▶ Écouter'}</button>
-    <button class="small" onclick={renderToDisk} disabled={!source || !preset || busy || !name.trim()}
+    <button class="small" onclick={renderToDisk} disabled={!ready || busy || !name.trim()}
       title="Écrit le wav 48 kHz / 24 bits et son sidecar dans SoundDesign/">Rendre sur disque</button>
     {#if busy}<span class="muted small">rendu…</span>{/if}
   </header>
 
-  {#if saveAs}
-    <form class="saveas" onsubmit={e => { e.preventDefault(); if (saveAs) void save(saveAs) }}>
-      <label class="small">Id <input bind:value={saveAs.id} pattern="[a-z0-9_]{'{1,40}'}" required title="minuscules, chiffres, _" /></label>
-      <label class="small">Nom <input bind:value={saveAs.label} required /></label>
-      <button class="small" type="submit">Enregistrer</button>
-      <button class="small" type="button" onclick={() => (saveAs = null)}>Annuler</button>
-      {#if presets.some(p => p.id === saveAs?.id)}<span class="dirty small">remplace le preset existant</span>{/if}
+  {#if meta}
+    <form class="saveas" onsubmit={e => { e.preventDefault(); if (meta) void submitMeta(meta) }}>
+      <span class="small muted">{meta.mode === 'new' ? `Nouveau preset ${treatment?.label ?? ''} (vierge)` : meta.mode === 'edit' ? 'Modifier le preset' : 'Enregistrer sous'}</span>
+      <label class="small">Id <input bind:value={meta.id} pattern="[a-z0-9_]{'{1,40}'}" required disabled={meta.mode === 'edit'}
+        title={meta.mode === 'edit' ? 'L\'id est le nom du fichier : « Enregistrer sous » pour en changer' : 'minuscules, chiffres, _'} size="14" /></label>
+      <label class="small">Nom <input bind:value={meta.label} required size="22" /></label>
+      <label class="small grow">Description <input class="grow" bind:value={meta.description} /></label>
+      <button class="small" type="submit">{meta.mode === 'edit' ? 'Enregistrer' : 'Créer'}</button>
+      <button class="small" type="button" onclick={() => (meta = null)}>Annuler</button>
+      {#if meta.mode !== 'edit' && presets.some(p => p.id === meta?.id)}<span class="dirty small">remplace le preset existant</span>{/if}
+      {#if meta.mode === 'edit' && dirty}<span class="muted small">enregistre aussi les réglages en cours</span>{/if}
     </form>
   {/if}
 
@@ -320,20 +383,23 @@
 
   <div class="source">
     <span class="small muted">Source</span>
-    {#if source}
+    {#if !needsSource && preset}
+      <span class="small">Bruit généré</span>
+      <span class="muted small">(réglage « Source » du traitement ; « Sample » prend le sample en cours de la vue Samples)</span>
+    {:else if source}
       <span class="mono small" title={source}>{sourceName || source}</span>
       <span class="muted small">{focus.sample?.folder}</span>
       <button class="small" onclick={auditionSource} title="Écouter le sample d'origine (A/B)">▶ source</button>
     {:else}
       <span class="muted small">Aucun sample en cours : en choisir un dans la vue Samples ({treatment?.source_hint ?? '…'}).</span>
     {/if}
-    <button class="small" onclick={() => ongotosamples?.()}
-      title="Le traitement s'applique au sample en cours de la vue Samples">Changer dans Samples</button>
+    {#if needsSource}<button class="small" onclick={() => ongotosamples?.()}
+      title="Le traitement s'applique au sample en cours de la vue Samples">Changer dans Samples</button>{/if}
     <audio bind:this={sourceAudio}></audio>
     <span class="grow"></span>
     <label class="small" title="Nom affiché par la DT2 (18 caractères), proposé à partir de la source">Nom DT2
       <input class="mono name" bind:value={name} oninput={() => (nameEdited = true)} maxlength="18" size="18"
-        pattern={"[A-Za-z0-9#][A-Za-z0-9 #._+\\-]*"} disabled={!source} /></label>
+        pattern={"[A-Za-z0-9#][A-Za-z0-9 #._+\\-]*"} disabled={!target} /></label>
     {#if nameEdited && target}<button class="small" onclick={() => { name = target!.name; nameEdited = false }} title="Revenir au nom proposé : {target.name}">↺</button>{/if}
     {#if target}<span class="muted small" title="Dossier du rendu une fois versé dans les samples">→ {target.folder}</span>{/if}
   </div>
@@ -438,7 +504,7 @@
               <span class="mono small fname" title={`${r.file}\n${r.source}\n${r.created_at}`}>{r.name || r.file.split('/').pop()}</span>
               <span class="muted small">{r.seconds.toFixed(2)} s</span>
               {#if r.versed}<span class="versed small" title={`Samples/${r.versed}`}>versé</span>
-              {:else if r.name}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign et ranger en {r.sub ? `DRUMS/RM/${r.sub}` : 'DRUMS/RM'}">Verser</button>
+              {:else if r.name}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign et ranger en {r.folder}">Verser</button>
               {:else}<span class="muted small" title="Rendu antérieur au nommage DT2 : le re-rendre pour le verser">sans nom</span>{/if}
             </li>
           {:else}<li class="muted small">Aucun rendu pour l'instant.</li>{/each}
@@ -447,11 +513,15 @@
     </div>
   {/if}
 </div>
+</div>
 
 <style>
-  .sd { height: 100%; overflow-y: auto; padding: 10px 14px 24px; display: flex; flex-direction: column; gap: 10px; }
+  .sdwrap { height: 100%; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 10px; padding-left: 10px; }
+  .sidecol { margin: 10px 0 10px; overflow-y: auto; }
+  .ptitle { font-size: 13px; }
+  .sd { height: 100%; overflow-y: auto; padding: 10px 14px 24px 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .bar, .source, .saveas { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .bar label, .saveas label { display: flex; align-items: center; gap: 6px; }
+  .saveas label { display: flex; align-items: center; gap: 6px; }
   .grow { flex: 1; }
   .dirty { color: var(--accent); }
   .play { min-width: 96px; font-weight: 600; }
@@ -501,6 +571,8 @@
   .small { font-size: 12px; }
   .err { color: #dc2626; font-size: 12px; margin: 0; }
   @media (max-width: 900px) {
+    .sdwrap { grid-template-columns: 1fr; padding: 0 10px; }
+    .sidecol { margin-bottom: 0; }
     .rack { flex-direction: column; }
     .settings { width: auto; }
     .mixer { overflow-x: auto; }

@@ -344,8 +344,16 @@ export interface ParamSpec {
   /** Libelles des valeurs 0..n-1 : selecteur (type de filtre), pas potard. */
   choices: string[] | null
 }
-export interface DeviceSpec { type: string; label: string; help: string; params: ParamSpec[] }
-export interface SdDevice { type: string; params: Record<string, number>; bypass: boolean }
+export interface DeviceSpec {
+  type: string; label: string; help: string; params: ParamSpec[]
+  /** Device pedalboard : ses potards acceptent une valeur de fin (8.G). */
+  automatable: boolean
+}
+export interface SdDevice {
+  type: string; params: Record<string, number>; bypass: boolean
+  /** Automation (8.G) : valeur atteinte en fin de rendu, depuis `params`. */
+  params_end?: Record<string, number>
+}
 export interface SdChain { name: string; mute: boolean; gain_db: number; devices: SdDevice[] }
 export interface SdPreset {
   id: string
@@ -364,6 +372,12 @@ export interface TreatmentSpec {
   source_hint: string
   settings: ParamSpec[]
   notebook: string
+  code: string
+  /** Sous-dossier fixe (riser : RISE) ; "" = herite de la source. */
+  sub: string
+  /** Sample requis seulement si settings[source_param] == source_sample ; "" = toujours. */
+  source_param: string
+  source_sample: number
 }
 export interface RenderRecord {
   file: string
@@ -378,6 +392,8 @@ export interface RenderRecord {
   sub: string
   /** Cle du manifeste si verse dans le pack Samples/SoundDesign (8.D). */
   versed: string | null
+  /** Dossier de rangement une fois verse (DRUMS/RM/CLEAN, FX/RISE). */
+  folder: string
 }
 
 /** Nom DT2 propose et dossier de rangement d'un rendu (8.E). */
@@ -493,7 +509,11 @@ export const api = {
   sdSavePreset: (p: SdPreset) =>
     fetch(`/api/sounddesign/presets/${enc(p.treatment)}/${enc(p.id)}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(p) })
       .then(r => json<SdPreset>(r)),
-  /** Boucle rendue en WAV, sans ecriture disque. */
+  /** Retire un preset du vault (pas le dernier du traitement : 409). */
+  sdDeletePreset: (treatment: string, id: string) =>
+    fetch(`/api/sounddesign/presets/${enc(treatment)}/${enc(id)}`, { method: 'DELETE' })
+      .then(r => { if (!r.ok) return json(r) }),
+  /** Boucle rendue en WAV, sans ecriture disque ; source "" = sans sample (bruit genere). */
   sdPreview: async (preset: SdPreset, source: string, signal?: AbortSignal): Promise<ArrayBuffer> => {
     const r = await fetch('/api/sounddesign/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source }), signal })
     if (!r.ok) await json(r)   // leve avec le detail de l'API
@@ -503,7 +523,7 @@ export const api = {
     fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, name: name || null }) })
       .then(r => json<RenderRecord>(r)),
   sdTarget: (treatment: string, source: string, bpm?: number) =>
-    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}&source=${enc(source)}${bpm ? `&bpm=${bpm}` : ''}`)
+    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}${source ? `&source=${enc(source)}` : ''}${bpm ? `&bpm=${bpm}` : ''}`)
       .then(r => json<SdTarget>(r)),
   sdRenders: (treatment: string) => fetch(`/api/sounddesign/renders?treatment=${enc(treatment)}`).then(r => json<RenderRecord[]>(r)),
   sdRenderAudioUrl: (file: string) => `/api/sounddesign/renders/audio?file=${enc(file)}`,

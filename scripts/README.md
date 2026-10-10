@@ -1016,11 +1016,23 @@ python api.py &   puis   cd ../web && npm run dev
   pas la bank (l'ancien bloc `harmony` reste en place).
 - **Sound design (8.C)**, entrée « Sound design » du panneau latéral, rack
   façon Ableton Live :
-  - **Barre** : traitement, preset (« modifié » dès qu'un réglage bouge),
-    Enregistrer (écrase le JSON du vault), Enregistrer sous (id
+  - **Colonne de gauche (8.H)** : traitements (code et dossier de
+    rangement, ex. `FX/RISE`) dépliables sur leurs presets ; clic sur un
+    preset pour l'ouvrir (• = modifié). Mini barre d'outils : **+** nouveau
+    preset vierge dans le traitement ouvert (une chaîne vide, limiteur en
+    sortie), **crayon** nom et description du preset ouvert (l'id, nom du
+    fichier, ne change pas), **corbeille** supprime le preset ouvert
+    (`DELETE /api/sounddesign/presets/{t}/{id}`, refusé pour le dernier
+    d'un traitement ; récupérable par git).
+  - **Barre** : traitement et preset ouverts (« modifié » dès qu'un réglage
+    bouge), Enregistrer (écrase le JSON du vault), Enregistrer sous (id
     `[a-z0-9_]`), Rétablir ; Écouter (Espace) et Rendre sur disque.
-  - **Source** : recherche dans le manifeste de samples (kicks BD par
-    défaut), bouton « source » pour l'écoute A/B du sample d'origine.
+  - **Source** : le sample en cours de la vue Samples (8.E), bouton
+    « source » pour l'écoute A/B ; « Bruit généré » quand le réglage Source
+    du riser ne demande pas de sample (écoute et rendu sans sample).
+  - **Automation (8.H)** : sur un device pedalboard, le bouton **↗** sous
+    un potard ajoute un second potard « fin » (valeur atteinte en fin de
+    rendu, `params_end`) ; re-cliquer retire l'automation.
   - **Potards** : glisser verticalement (Maj = fin), molette, flèches ;
     double-clic ou Suppr = valeur par défaut ; arc depuis zéro pour un
     gain bipolaire ; échelle log pour fréquences et temps.

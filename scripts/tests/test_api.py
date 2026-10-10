@@ -581,6 +581,7 @@ def test_sounddesign_verse_and_notebook(sd_client: TestClient, tmp_path: Path):
     assert (tmp_path / "Samples" / versed["versed"]).is_file()
     ov = api.samples.load_overrides(tmp_path / "overrides.json")[versed["versed"]]
     assert (ov.code, ov.sub, ov.name) == ("RM", "CLEAN", "RM 150 C Punch k")
+    assert versed["folder"] == "DRUMS/RM/CLEAN"
     assert sd_client.get("/api/sounddesign/renders").json()[0]["versed"] == versed["versed"]
     assert sd_client.post("/api/sounddesign/verse", json={"file": "../x.wav"}).status_code == 404
     nb = sd_client.get("/api/sounddesign/notebook/rumble").json()
@@ -598,3 +599,20 @@ def test_sounddesign_riser_on_noise_needs_no_source(sd_client: TestClient, tmp_p
     assert t["folder"] == "FX/RISE"
     preset["settings"]["source"] = 2          # sample : la source redevient obligatoire
     assert sd_client.post("/api/sounddesign/preview", json={"preset": preset}).status_code == 404
+
+
+def test_sounddesign_delete_preset(sd_client: TestClient):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    preset["id"] = "copie"
+    sd_client.put("/api/sounddesign/presets/rumble/copie", json=preset)
+    assert sd_client.delete("/api/sounddesign/presets/rumble/copie").status_code == 204
+    assert [p["id"] for p in sd_client.get("/api/sounddesign/presets/rumble").json()] == ["t"]
+    assert sd_client.delete("/api/sounddesign/presets/rumble/copie").status_code == 404
+    assert sd_client.delete("/api/sounddesign/presets/rumble/t").status_code == 409   # le dernier
+
+
+def test_sounddesign_catalogue_flags_automation_and_source(sd_client: TestClient):
+    devices = {d["type"]: d for d in sd_client.get("/api/sounddesign/devices").json()}
+    assert devices["filter"]["automatable"] and not devices["duck"]["automatable"]
+    riser = next(t for t in sd_client.get("/api/sounddesign/treatments").json() if t["id"] == "riser")
+    assert (riser["source_param"], riser["source_sample"], riser["sub"]) == ("source", 2, "RISE")

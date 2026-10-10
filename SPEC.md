@@ -901,7 +901,7 @@ réutilisable pour eux.
 
 ---
 
-## Phase 8 — Sound design (livrée le 2026-10-10, riser en cours)
+## Phase 8 — Sound design (livrée le 2026-10-10)
 
 **But** : fabriquer de nouveaux samples à partir de ceux de la library par
 des **traitements** paramétrables (premier : le **rumble**), chacun étant un
@@ -925,7 +925,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.E | Source = sample en cours de la vue Samples (on la change là-bas) ; nom DT2 proposé à partir de celui de la source (code du traitement + tempo, modifiable) ; code **RM** (track 2) : un rumble versé est rangé par override en `DRUMS/RM/<sous-dossier de la source>` (`GET /api/sounddesign/target`) | fait (versement à valider sur le disque) |
 | 8.F | Mode **Un coup** du rumble (un kick et sa queue, longueur en temps au tempo, 1 par défaut, fondu de 20 ms : la track DT2 étant monophonique, le kick suivant coupe la queue) ; duck **anticipé** : la boucle commence et finit dans le creux, plus de clic quand on la joue une fois | fait (à valider à l'oreille) |
 | 8.G | Traitement **riser** (track 15, `FX/RISE`) : source bruit blanc / rose généré ou sample en cours bouclé, montée de hauteur (varispeed), courbe, arrêt net ; **automation** générique `params_end` des devices pedalboard (rendu par blocs) ; 3 presets ; API et CLI sans source pour le bruit | fait (à valider à l'oreille) |
-| 8.H | Front du riser : colonne latérale des traitements avec mini barre d'outils, édition de l'automation dans le rack, notebook `sounddesign/riser.md` | à venir |
+| 8.H | Front : colonne latérale des traitements dépliables sur leurs presets, mini barre d'outils (nouveau preset vierge, nom / description, suppression `DELETE /api/sounddesign/presets/{t}/{id}`, pas le dernier) ; source « bruit généré » sans sample ; bouton ↗ d'automation (potard « fin ») ; notebook [[sounddesign/riser]] ; dossier de rangement des rendus (`folder`) | fait (à valider à l'usage) |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -989,6 +989,10 @@ On garde une boucle d'une à huit mesures, sans couture.
   par blocs de 256 échantillons avec état conservé (identique au rendu d'un
   seul tenant sans automation). Omis du JSON quand vide : le hash des
   rendus antérieurs ne change pas. Sert aussi au downlifter (fin < début).
+- **Colonne latérale** (8.H, arbitré le 2026-10-10) : la mini barre
+  d'outils nouveau / modifier / supprimer agit sur les **presets** ; les
+  traitements restent définis dans le moteur (pas de création depuis le
+  front). Le dernier preset d'un traitement ne se supprime pas.
 
 ## Décisions arbitrées (à NE PAS refaire)
 

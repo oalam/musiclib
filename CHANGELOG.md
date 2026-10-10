@@ -81,6 +81,20 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.H] Vue Sound design : colonne latérale des traitements dépliables sur
+  leurs presets, mini barre d'outils à icônes (nouveau preset vierge, nom et
+  description, suppression) ; les sélecteurs de la barre disparaissent.
+  API `DELETE /api/sounddesign/presets/{t}/{id}` (409 pour le dernier).
+- [8.H] Automation dans le rack : bouton ↗ sous un potard d'un device
+  pedalboard, second potard « fin » (`params_end`) ; le catalogue porte
+  `automatable`.
+- [8.H] Riser sans sample dans le front (« Bruit généré ») : écoute, nom
+  proposé et rendu ; le traitement dit quand il demande un sample
+  (`source_param` / `source_sample`).
+- [8.H] Notebook [[sounddesign/riser]] (théorie, chaîne device par device,
+  presets, usage DT2 avec FILL / NOT FILL, pièges).
+- [8.H] Rendus : dossier de rangement (`folder`, ex. `FX/RISE`) affiché au
+  versement au lieu de `DRUMS/RM` codé en dur.
 - [8.G] Traitement **riser** (track 15, rangé en `FX/RISE`) : bruit blanc
   ou rose généré, ou sample en cours bouclé ; montée de hauteur en demi-tons
   (varispeed), courbe de montée, longueur de 1 à 16 mesures au tempo, arrêt
