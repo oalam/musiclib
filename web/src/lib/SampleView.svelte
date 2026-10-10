@@ -52,6 +52,8 @@
     VX: 'Voix, samples parlés · track 14', FX: 'FX de transition (riser, impact, noise…) · track 15',
     RS: 'Resample, enregistrement maison · track 16 (joker)',
   }
+  // libelle court d'un code pour l'arbre : « Kick (bass drum) · track 1 » -> « Kick, bass drum »
+  const codeShort = (c: string) => (CODE_HELP[c] ?? c).split(' · ')[0].replace(/ \(/g, ', ').replace(/\)/g, '')
   const codeTitle = (c: string) => `${c} : ${CODE_HELP[c] ?? c}${LOOPS.includes(c) ? ' (boucle)' : ''}`
   const codeRank = (c: string) => (CODE_ORDER.includes(c) ? CODE_ORDER.indexOf(c) : CODE_ORDER.length)
   // branches du +Drive (memes noms qu'analyzer/samples.py) ; FX et VX sans niveau code
@@ -837,7 +839,7 @@
               <div class="code-node">
                 <button class="code-label" class:mel={!RHYTHM.includes(row.code)} class:loop={LOOPS.includes(row.code)}
                   class:active={search.codes?.includes(row.code)} onclick={() => toggleCode(row.code)}
-                  title="{codeTitle(row.code)} · clic : filtre d'instrument">{row.code}</button>
+                  title="{codeTitle(row.code)} · clic : filtre d'instrument"><span class="acr">{row.code}</span> <span class="desc">({codeShort(row.code)})</span></button>
                 {#if root}{@render folderNode(root, '')}{/if}
                 {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code} : candidats + hors plafond">({codeTotal(row.folders)})</span>{/if}
               </div>
@@ -1106,13 +1108,16 @@
   .branches { font-size: 12px; display: flex; flex-direction: column; gap: 2px; }
   .branch .fold { border: 0; background: none; color: var(--text); padding: 2px 0; cursor: pointer; }
   /* treeview : une ligne par dossier, code puis sous-dossiers en retrait, compteurs a droite */
-  .code-node { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; padding-left: 14px; min-height: 22px; }
+  .code-node { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; align-items: center; padding-left: 14px; min-height: 22px; }
   .leaf { padding-left: 42px; }
   .branches .drop { display: block; }
   button.code-label { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; border-radius: 3px; }
   button.code-label:hover { text-decoration: underline; }
-  button.code-label.active { background: var(--rhythm); color: var(--panel); text-align: center; }
-  button.code-label.mel.active { background: var(--melodic); }
+  button.code-label { width: auto; min-width: 0; max-width: 100%; display: flex; gap: 4px; align-items: baseline; overflow: hidden; }
+  button.code-label .acr { display: inline-block; min-width: 24px; padding: 0 2px; border-radius: 3px; }
+  button.code-label .desc { font: 11px ui-sans-serif, system-ui, sans-serif; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  button.code-label.active .acr { background: var(--rhythm); color: var(--panel); text-align: center; }
+  button.code-label.mel.active .acr { background: var(--melodic); }
   .code-label { width: 24px; font: 600 11px ui-monospace, Menlo, monospace; color: var(--rhythm); cursor: help; }
   .code-label.mel { color: var(--melodic); }
   .code-label.loop { font-style: italic; text-decoration: underline dotted; }
