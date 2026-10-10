@@ -28,6 +28,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   filtre d'instrument.
 - [7.K] Colonne de gauche des samples en deux zones fixes de même hauteur,
   « Library » et « Kits », chacune scrollable (titre et recherche fixes).
+- [7.K] Total général sous « Library » : fichiers (candidats + hors
+  plafond) toutes branches, sous le filtre courant, et retenus.
 
 ### Modifié
 

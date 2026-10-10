@@ -205,7 +205,8 @@
   }
   const totals = $derived(cells.reduce((a, c) => ({
     selected: a.selected + c.selected, keep: a.keep + c.keep, toListen: a.toListen + c.to_listen,
-  }), { selected: 0, keep: 0, toListen: 0 }))
+    files: a.files + total(c),
+  }), { selected: 0, keep: 0, toListen: 0, files: 0 }))
   const targetCount = $derived(sel.size || (cursor ? 1 : 0))
 
   type Pad = { kit: string; label: string; selected: number; files: number; trashed: boolean }
@@ -796,6 +797,10 @@
   <section class="grid">
    <div class="zone matrix">
     <h3 class="lib-title" title="{totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus{filterOn() ? ' (filtrés)' : ''}. Les chiffres d’un dossier : à écouter / retenus (total).">Library</h3>
+    <p class="lib-total small muted">
+      {search.codes?.length ? `${search.codes.join(', ')} : ` : ''}{totals.files.toLocaleString('fr-FR')} fichiers{searchOn() ? ' filtrés' : ''},
+      toutes branches · {totals.selected.toLocaleString('fr-FR')} retenus
+    </p>
     <div class="searchbar">
       <div class="search-in">
         {#each chips as c (c.kind + c.value)}
@@ -1131,7 +1136,8 @@
   .export p { margin: 6px 0; }
   /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
   .kits h3 { margin: 0 0 6px; font-weight: 600; position: sticky; top: -8px; z-index: 1; padding: 4px 0; background: var(--bg); }
-  .lib-title { margin: 0 0 6px; font-weight: 600; }
+  .lib-title { margin: 0 0 2px; font-weight: 600; }
+  .lib-total { margin: 0 0 6px; }
   /* trois pads par ligne, a la largeur de la colonne */
   .pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
