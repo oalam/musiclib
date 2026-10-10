@@ -909,7 +909,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         path, audio = render_request(req)
         with render_lock:
             name, sub = sd.target(req.source, manifest(), req.preset.treatment,
-                                  req.preset.settings.get("bpm"))
+                                  sd.loop_bpm(req.preset.settings))
             return sd.write_render(audio, media_relative(path), req.preset, sounddesign_out,
                                    req.name or name, sub)
 

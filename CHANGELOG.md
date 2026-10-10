@@ -8,6 +8,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [8.F] Clic d'un rumble joué une seule fois : la boucle finissait en plein
+  grondement (0,53 d'amplitude sur `Kick 1973 DS 1`, preset `deep`). Le
+  duck anticipe désormais le coup (creux complet sur le kick, y compris
+  celui de la boucle suivante) : début et fin à 0,018, jointure continue.
 - [7.K] Boutons « Morceau » / « Sample » de la barre générale : ouvrent
   aussi la vue correspondante (ils ne changeaient que la cible de la
   télécommande) ; « Sample » n'est plus grisé avant la première visite.
@@ -77,6 +81,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.F] Mode « Un coup » du rumble (réglage `one_shot`, sélecteur Boucle /
+  Un coup) : un seul kick et sa queue, coupée à -60 dB sous la crête puis
+  fondu de 50 ms ; nom DT2 sans tempo (`RM B Kick ni`).
 - [8.E] Le sound design s'applique au sample en cours de la vue Samples
   (« Changer dans Samples » y bascule). Nom DT2 proposé à partir de la
   source, code du traitement et tempo compris (`BD C Punch 01 dbr` →

@@ -147,7 +147,9 @@
   let target = $state<SdTarget | null>(null)
   let name = $state('')
   let nameEdited = $state(false)
-  const bpm = $derived(preset?.settings.bpm)
+  // un coup (8.E) : ni boucle ni tempo dans le nom
+  const oneShot = $derived(!!preset?.settings.one_shot)
+  const bpm = $derived(oneShot ? undefined : preset?.settings.bpm)
   $effect(() => { void source; nameEdited = false })
   $effect(() => {
     const t = treatment?.id, s = source, b = bpm
@@ -340,9 +342,22 @@
         <h3>{treatment.label}</h3>
         <div class="knobs">
           {#each treatment.settings as s (s.name)}
-            <Knob spec={s} value={preset.settings[s.name] ?? s.default} onchange={v => (preset!.settings[s.name] = v)} />
+            {#if s.choices}
+              <div class="choices" role="radiogroup" aria-label={s.label} title={s.help || s.label}>
+                {#each s.choices as c, i (c)}
+                  <button role="radio" aria-checked={Math.round(preset.settings[s.name] ?? s.default) === i}
+                    class:on={Math.round(preset.settings[s.name] ?? s.default) === i}
+                    onclick={() => (preset!.settings[s.name] = i)}>{c}</button>
+                {/each}
+              </div>
+            {:else}
+              <Knob spec={s} value={preset.settings[s.name] ?? s.default} disabled={oneShot}
+                onchange={v => (preset!.settings[s.name] = v)} />
+            {/if}
           {/each}
-          {#if treatment.settings.some(s => s.name === 'bpm')}
+          {#if oneShot}
+            <span class="muted small dur" title="Un seul kick, queue coupée à -60 dB puis fondu de 50 ms">un coup</span>
+          {:else if treatment.settings.some(s => s.name === 'bpm')}
             <span class="muted small dur mono" title="durée de la boucle = mesures × 4 × 60 / bpm">
               {((preset.settings.bars ?? 1) * 4 * 60 / (preset.settings.bpm ?? 150)).toFixed(3)} s
             </span>
@@ -443,6 +458,8 @@
   .rack { display: flex; gap: 10px; align-items: stretch; min-width: 0; }
   .settings { flex: none; width: 150px; }
   .settings .knobs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .settings .choices { display: flex; gap: 2px; width: 100%; justify-content: center; }
+  .settings .choices button { padding: 1px 8px; font-size: 11px; border-radius: 2px; }
   .dur { width: 100%; text-align: center; }
   .mixer { flex: none; display: flex; gap: 4px; align-items: flex-end; }
   .strip { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 2px; border-radius: 4px; border: 1px solid transparent; }

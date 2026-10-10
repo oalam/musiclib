@@ -64,6 +64,7 @@ même aide en infobulle.
 | Tempo | tempo de la boucle et de la séquence du kick | 140-150 hard techno, 180-195 tribe |
 | Mesures | longueur de la boucle (1 à 8) | 1 suffit pour un rumble régulier ; 2 ou 4 si `Coups / mesure` crée un motif |
 | Coups / mesure | nombre de kicks par mesure | 4 = four on the floor ; 2 = demi-temps (rumble plus ample) ; 8 = croches (grondement serré) |
+| Mode | **Boucle** ou **Un coup** | Un coup : un seul kick et sa queue complète (coupée à -60 dB sous la crête, puis fondu de 50 ms), sans tempo dans le nom ; tempo, mesures et coups sont ignorés |
 
 Durée de la boucle : mesures × 4 × 60 / tempo. Exemple : 2 mesures à
 185 BPM = 2 × 4 × 60 / 185 = 2,595 s.
@@ -110,6 +111,10 @@ monter (50-60 Hz) si le kick a déjà beaucoup de sub.
 
 Baisse le volume à chaque coup de la séquence, comme un compresseur en
 sidechain déclenché par le kick, mais calé exactement sur la grille.
+L'attaque **anticipe** le coup : le creux est complet quand le kick frappe.
+La boucle commence et finit donc dans le creux (à -30 dB, environ 0,02
+d'amplitude au lieu de 0,5) : jouée une seule fois, elle ne claque ni au
+départ ni à l'arrêt.
 
 | Paramètre | Effet | Repères |
 |---|---|---|
@@ -160,9 +165,11 @@ modifier le preset.
    `DRUMS/BD/CLEAN` donne `DRUMS/RM/CLEAN`). Il suit ensuite le circuit
    habituel : écoute garder / écarter, puis export vers Transfer.
 4. Sur la machine : **track 2**, juste après le kick (cf.
-   [[../digitakt/doctrine|doctrine]] § 1 et 9), sample en lecture
-   **loop**, un trig au premier pas de chaque mesure. Le kick d'origine
-   reste sur la track 1 : le duck du rumble est déjà calé sur la grille.
+   [[../digitakt/doctrine|doctrine]] § 1 et 9). Rendu **Boucle** : sample
+   en lecture **loop**, un trig au premier pas de chaque mesure. Rendu
+   **Un coup** : un trig sur chaque pas du kick, comme le préconise la
+   doctrine (§ 9) ; le rumble suit alors le motif du kick, fills compris.
+   Le kick d'origine reste sur la track 1.
 5. En live : muter la track du rumble dans un break (ou la passer en
    NOT FILL), la rouvrir sur le drop ; jouer le filtre de la track pour
    l'ouvrir progressivement.

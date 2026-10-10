@@ -173,12 +173,16 @@ def _duck(params: dict[str, float], ctx: RenderContext) -> Processor:
                             np.ones(hold), np.linspace(1.0, 0.0, release)])
 
     def process(x: np.ndarray) -> np.ndarray:
+        # anticipation (8.E) : l'attaque se termine sur le coup, le creux est
+        # complet quand le kick frappe ; une boucle commence et finit donc
+        # dans le creux (pas de clic quand on la joue une fois)
         n = x.shape[1]
         amount = np.zeros(n)
         for t in ctx.triggers:
-            seg = shape[: max(0, n - int(t))]
-            np.maximum(amount[int(t): int(t) + len(seg)], seg,
-                       out=amount[int(t): int(t) + len(seg)])
+            start = int(t) - attack
+            seg = shape[max(0, -start): max(0, n - start)]
+            lo = max(0, start)
+            np.maximum(amount[lo: lo + len(seg)], seg, out=amount[lo: lo + len(seg)])
         gain = 10.0 ** (-params["depth_db"] * amount / 20.0)
         return (x * gain).astype(np.float32)
     return process
@@ -317,6 +321,7 @@ class Prepared:
     loop_start: int                  # debut de la boucle gardee
     loop_len: int
     triggers: np.ndarray
+    one_shot: bool = False           # un seul coup : queue coupee au silence + fondu
 
 
 @dataclass(frozen=True)
@@ -340,10 +345,46 @@ def _sequence(source: np.ndarray, hits_per_loop: int, loop_len: int) -> Prepared
     for t in triggers:
         seg = source[:, : total - t]
         out[:, t: t + seg.shape[1]] += seg
-    return Prepared(out, n_pre * loop_len, loop_len, triggers)
+    # coup de la boucle suivante (non joue) : le duck anticipe creuse aussi la fin
+    return Prepared(out, n_pre * loop_len, loop_len, np.append(triggers, total))
+
+
+ONE_SHOT_MAX_S = 8.0     # queue maximale d'un rendu « un coup »
+TAIL_DB = -60.0          # fin de la queue : sous la crete de 60 dB
+FADE_OUT_MS = 50.0       # fondu de sortie d'un rendu « un coup »
+
+
+def _single(source: np.ndarray) -> Prepared:
+    """Un seul coup en 0, suivi de ONE_SHOT_MAX_S de silence pour la queue."""
+    total = source.shape[1] + int(ONE_SHOT_MAX_S * SR)
+    out = np.zeros((2, total), dtype=np.float32)
+    out[:, : source.shape[1]] = source
+    return Prepared(out, 0, total, np.array([0]), one_shot=True)
+
+
+def _trim_tail(x: np.ndarray) -> np.ndarray:
+    """Coupe la queue sous TAIL_DB et termine par un fondu (cosinus) : pas de clic."""
+    env = np.max(np.abs(x), axis=0)
+    peak = float(env.max()) if env.size else 0.0
+    if peak <= 0:
+        return x[:, :1]
+    above = np.nonzero(env >= peak * 10 ** (TAIL_DB / 20))[0]
+    end = int(above[-1]) + 1
+    fade = min(int(FADE_OUT_MS * SR / 1000), end // 4)
+    out = x[:, :end].copy()
+    if fade > 0:
+        out[:, end - fade:] *= (0.5 * (1 + np.cos(np.linspace(0, np.pi, fade)))).astype(np.float32)
+    return out
+
+
+def loop_bpm(settings: dict[str, float]) -> float | None:
+    """Tempo a ecrire dans le nom : aucun pour un rendu « un coup »."""
+    return None if settings.get("one_shot") else settings.get("bpm")
 
 
 def _prepare_rumble(source: np.ndarray, settings: dict[str, float]) -> Prepared:
+    if settings["one_shot"]:
+        return _single(source)
     bar = 4 * 60.0 / settings["bpm"] * SR
     hits = int(settings["hits_per_bar"])
     bars = int(settings["bars"])
@@ -360,7 +401,11 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
                   _p("bars", "Mesures", 1, 8, 1, step=1,
                      help="Longueur de la boucle rendue."),
                   _p("hits_per_bar", "Coups / mesure", 1, 8, 4, step=1,
-                     help="4 = four on the floor.")],
+                     help="4 = four on the floor."),
+                  _p("one_shot", "Mode", 0, 1, 0, step=1, choices=["Boucle", "Un coup"],
+                     help="Un coup : un seul kick et sa queue complete, a declencher "
+                          "sur chaque kick (doctrine, track 2) ; tempo, mesures et coups "
+                          "ignores.")],
         notebook="sounddesign/rumble.md",
         code="RM"),                      # -> DRUMS/RM/<sous-dossier du kick>, track 2
         _prepare_rumble),
@@ -489,6 +534,8 @@ def render(preset: Preset, source: np.ndarray) -> np.ndarray:
     mix = _run_devices(preset.master, mix, ctx)
 
     loop = mix[:, prep.loop_start: prep.loop_start + prep.loop_len]
+    if prep.one_shot:
+        loop = _trim_tail(loop)
     peak = float(np.max(np.abs(loop))) if loop.size else 0.0
     if preset.output_peak_db is not None and peak > 0:
         loop = loop * np.float32(10.0 ** (preset.output_peak_db / 20.0) / peak)

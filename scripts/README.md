@@ -884,7 +884,8 @@ python sounddesign.py render rumble deep --source <wav> --dry-run   # sans écri
 
 `--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` et écrit
 son override de rangement (`DRUMS/RM/<sous-dossier du kick>`, nom DT2) ;
-relancer `samples.py` pour le classer. Le nom DT2 est proposé à partir de
+relancer `samples.py` pour le classer. `--set one_shot=1` rend un seul
+coup (queue complète, fondu de sortie, nom sans tempo). Le nom DT2 est proposé à partir de
 celui de la source (`BD C Punch 01 dbr` → `RM 150 C Punch dbr`), `--name`
 le force. `--source` est absolu ou relatif à `<MEDIA>/Samples`. `--set` change un
 réglage du traitement (`bpm`, `bars`, `hits_per_bar`), `--mute` coupe une

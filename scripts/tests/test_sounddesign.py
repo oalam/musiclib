@@ -244,3 +244,24 @@ def test_versed_render_lands_in_drums_rm(tmp_path: Path):
     entry = next(e for e in m.entries if e.source == key)
     assert (entry.folder, entry.name) == ("DRUMS/RM/CLEAN", "RM 150 C Punch dbr")
     assert not {"blanc", "long"} & set(entry.flags or [])
+
+
+def test_loop_starts_and_ends_in_the_duck():
+    # duck anticipe : le creux est complet sur le coup, la boucle jouee une
+    # fois ne demarre ni ne s'arrete en plein grondement
+    preset = _preset()
+    preset.chains[0].mute = True
+    m = np.abs(sd.render(preset, _kick()).mean(axis=0))
+    rms = float(np.sqrt(np.mean(m ** 2)))
+    assert m[0] < 0.1 * rms and m[-1] < 0.1 * rms
+
+
+def test_one_shot_renders_a_single_hit_with_faded_tail():
+    preset = _preset()
+    preset.settings["one_shot"] = 1
+    audio = sd.render(preset, _kick())
+    assert sd.SR * 0.3 < audio.shape[1] < sd.SR * (0.3 + sd.ONE_SHOT_MAX_S)
+    assert np.all(audio[:, -1] == 0)                       # fondu jusqu'a zero
+    loop = sd.render(_preset(), _kick())
+    assert audio.shape[1] != loop.shape[1]
+    assert sd.loop_bpm(preset.settings) is None and sd.loop_bpm({"bpm": 150}) == 150
