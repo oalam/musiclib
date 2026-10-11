@@ -1,0 +1,21 @@
+{
+  "id": "saturator_tints",
+  "treatment": "variations",
+  "label": "Teintes Saturator",
+  "description": "8 variantes (tranche 1 = kick brut) : Saturator Analog Clip, drive de 0 a 12 dB, Color qui pousse la saturation dans l'aigu (le clic grene) et la retient dans le grave (sub propre), Hi-Quality. A valider a l'oreille.",
+  "settings": {"bpm": 150, "length_beats": 1, "slices": 1, "jitter": 0.3},
+  "chains": [
+    {
+      "name": "Kick",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "saturator", "params": {"curve": 0, "drive_db": 0, "color": 1, "freq_lo": 120, "amt_lo": -50, "freq_hi": 2500, "amt_hi": 40, "post_clip": 1, "output_db": 0, "dry_wet": 100, "hi_quality": 1}, "params_end": {"drive_db": 12}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

@@ -202,3 +202,116 @@ class DynamicTube(_Filters):
 
     def __call__(self, x: np.ndarray, sr: int) -> np.ndarray:
         return self.process(x, sr, reset=True)
+
+
+SATURATOR_CURVES = ["Analog Clip", "Soft Sine", "Bass Shaper", "Medium", "Hard", "Sinoid Fold",
+                    "Digital Clip", "Waveshaper"]
+POST_CLIP = ["Off", "Soft", "Hard"]
+
+
+def _analog_clip(u: np.ndarray) -> np.ndarray:
+    """Ecretage arrondi : lineaire puis genou court vers +/- 1."""
+    return u / (1.0 + np.abs(u) ** 2.5) ** 0.4
+
+
+def _waveshaper(u: np.ndarray, drive: float, lin: float, curve: float, damp: float,
+                depth: float, period: float) -> np.ndarray:
+    """Courbe Waveshaper : partie lineaire (`lin`) + cubique (`curve`, 3e harmonique),
+    sinus superpose (`depth`, densite `period`), aplatissement du centre (`damp`) ;
+    `drive` dose l'ecart a la droite."""
+    v = np.clip(u, -1.0, 1.0)
+    shaped = lin * v + curve * (1.5 * v - 0.5 * v ** 3)
+    shaped = shaped / max(lin + curve, 1e-6) if lin + curve > 1 else shaped
+    shaped = shaped + 0.5 * depth * np.sin(np.pi * (1 + 15 * period) * v)
+    shaped = shaped * (1.0 - damp * np.exp(-((v / 0.15) ** 2)))
+    return (1.0 - drive) * v + drive * shaped
+
+
+class Saturator(_Filters):
+    """Saturateur a courbes facon Live.
+
+    - `curve` : Analog Clip (arrondi), Soft Sine (sinus jusqu'a +/- 1), Bass
+      Shaper (sature des les faibles niveaux, pour les basses), Medium (tanh),
+      Hard (genou tres court), Sinoid Fold (repli : le signal fort se
+      replie, harmoniques metalliques), Digital Clip (ecretage net),
+      Waveshaper (parametres `ws_*`) ;
+    - `drive_db` : gain avant la courbe ;
+    - `color` : EQ avant la courbe puis inverse apres : `amt_lo` / `amt_hi`
+      (%) saturent plus (+) ou moins (-) le grave sous `freq_lo` / l'aigu
+      au-dessus de `freq_hi`, sans changer l'equilibre du signal propre ;
+    - `post_clip` : Soft (Analog Clip) ou Hard : la sortie ne depasse jamais
+      `output_db` ; `dry_wet` (%) ; `hi_quality` : courbe a 4 x la frequence.
+    """
+
+    COLOR_DB = 15.0          # accentuation des etageres a +/- 100 %
+
+    def __init__(self, curve: float = 0, drive_db: float = 0.0, color: float = 0,
+                 freq_lo: float = 200.0, amt_lo: float = 0.0, freq_hi: float = 3000.0,
+                 amt_hi: float = 0.0, ws_drive: float = 0.5, ws_lin: float = 0.5,
+                 ws_curve: float = 0.5, ws_damp: float = 0.0, ws_depth: float = 0.0,
+                 ws_period: float = 0.0, post_clip: float = 0, output_db: float = 0.0,
+                 dry_wet: float = 100.0, hi_quality: float = 0) -> None:
+        super().__init__()
+        self.curve, self.drive_db, self.color = curve, drive_db, color
+        self.freq_lo, self.amt_lo, self.freq_hi, self.amt_hi = freq_lo, amt_lo, freq_hi, amt_hi
+        self.ws_drive, self.ws_lin, self.ws_curve = ws_drive, ws_lin, ws_curve
+        self.ws_damp, self.ws_depth, self.ws_period = ws_damp, ws_depth, ws_period
+        self.post_clip, self.output_db, self.dry_wet, self.hi_quality = post_clip, output_db, dry_wet, hi_quality
+        shelf = self.pb.LowShelfFilter, self.pb.HighShelfFilter
+        self._pre = [shelf[0](cutoff_frequency_hz=200.0), shelf[1](cutoff_frequency_hz=3000.0)]
+        self._post = [shelf[0](cutoff_frequency_hz=200.0), shelf[1](cutoff_frequency_hz=3000.0)]
+        self._os = _Oversampler()
+
+    def _shape(self, u: np.ndarray) -> np.ndarray:
+        c = int(round(self.curve))
+        if c == 0:
+            return _analog_clip(u)
+        if c == 1:
+            return np.sin(np.clip(u, -1.0, 1.0) * np.pi / 2)
+        if c == 2:   # hyperbole : forte compression des faibles niveaux, borne a 1
+            v = np.clip(u, -1.0, 1.0)
+            return 5.0 * v / (1.0 + 4.0 * np.abs(v))
+        if c == 3:
+            return np.tanh(u)
+        if c == 4:
+            return u / (1.0 + np.abs(u) ** 8) ** 0.125
+        if c == 5:
+            return np.sin(u * np.pi / 2)
+        if c == 6:
+            return np.clip(u, -1.0, 1.0)
+        return _waveshaper(u, self.ws_drive, self.ws_lin, self.ws_curve, self.ws_damp,
+                           self.ws_depth, self.ws_period)
+
+    def process(self, x: np.ndarray, sr: int, reset: bool = True) -> np.ndarray:
+        nyq = sr / 2 * 0.95
+        on = bool(round(self.color))
+        gains = (self.amt_lo / 100 * self.COLOR_DB if on else 0.0,
+                 self.amt_hi / 100 * self.COLOR_DB if on else 0.0)
+        freqs = (min(nyq, self.freq_lo), min(nyq, self.freq_hi))
+        for pre, post, f, g in zip(self._pre, self._post, freqs, gains):
+            pre.cutoff_frequency_hz = post.cutoff_frequency_hz = f
+            pre.gain_db, post.gain_db = g, -g
+        u = x
+        for f in self._pre:
+            u = self.run(f, u, sr, reset)
+        u = u * 10.0 ** (self.drive_db / 20)
+        if round(self.hi_quality):
+            if reset:
+                self._os.reset()
+            y = self._os.down(self._shape(self._os.up(u)))
+        else:
+            y = self._shape(u)
+        y = y.astype(np.float32)
+        for f in self._post:
+            y = self.run(f, y, sr, reset)
+        clip = int(round(self.post_clip))
+        if clip == 1:
+            y = _analog_clip(y)
+        elif clip == 2:
+            y = np.clip(y, -1.0, 1.0)
+        y = y * 10.0 ** (self.output_db / 20)
+        mix = self.dry_wet / 100
+        return ((1 - mix) * x + mix * y).astype(np.float32)
+
+    def __call__(self, x: np.ndarray, sr: int) -> np.ndarray:
+        return self.process(x, sr, reset=True)

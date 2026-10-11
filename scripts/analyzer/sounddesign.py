@@ -68,6 +68,9 @@ class ParamSpec(BaseModel):
     step: float | None = None              # valeurs discretes (ex. 1 pour un entier)
     choices: list[str] | None = None       # libelles des valeurs 0..n-1 (selecteur, pas potard)
     help: str = ""
+    # affiche seulement si un selecteur du meme device a l'une de ces valeurs
+    # (Saturator : potards WS si courbe = Waveshaper) ; None : toujours
+    active_when: dict[str, list[int]] | None = None
 
 
 class DeviceSpec(BaseModel):
@@ -170,9 +173,11 @@ class _DeviceDef:
 
 def _p(name: str, label: str, lo: float, hi: float, default: float, unit: str = "",
        scale: Literal["lin", "log"] = "lin", step: float | None = None,
-       help: str = "", choices: list[str] | None = None) -> ParamSpec:
+       help: str = "", choices: list[str] | None = None,
+       active_when: dict[str, list[int]] | None = None) -> ParamSpec:
     return ParamSpec(name=name, label=label, min=lo, max=hi, default=default,
-                     unit=unit, scale=scale, step=step, help=help, choices=choices)
+                     unit=unit, scale=scale, step=step, help=help, choices=choices,
+                     active_when=active_when)
 
 
 def _pedalboard(cls_name: str, mode: str | None = None) -> PluginFactory:
@@ -248,6 +253,9 @@ def _filter(params: dict[str, float]) -> object:
                                    cutoff_hz=params["cutoff_hz"],
                                    resonance=params["resonance"], drive=params["drive"])
 
+
+_WS = {"curve": [saturation.SATURATOR_CURVES.index("Waveshaper")]}   # potards du Saturator actifs en Waveshaper
+_COLOR = {"color": [1]}
 
 DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
     _pb(DeviceSpec(type="gain", label="Gain", help="Volume en dB.",
@@ -358,6 +366,34 @@ DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
                               help="Courbe calculee a 4 x la frequence : moins de repliement "
                                    "sur les aigus satures, 0,33 ms de latence.")]),
         lambda params: saturation.DynamicTube(**params)),
+    _pb(DeviceSpec(type="saturator", label="Saturator",
+                   help="Saturateur a courbes facon Live : Analog Clip, Soft Sine, Bass Shaper, "
+                        "Medium, Hard, Sinoid Fold (repli metallique), Digital Clip, "
+                        "Waveshaper (potards WS). Color : sature plus ou moins le grave / "
+                        "l'aigu sans changer l'equilibre du son propre. Post clip : la sortie "
+                        "ne depasse jamais Output.",
+                   params=[_p("curve", "Courbe", 0, len(saturation.SATURATOR_CURVES) - 1, 0, step=1,
+                              choices=saturation.SATURATOR_CURVES),
+                           _p("drive_db", "Drive", -36, 36, 0, "dB"),
+                           _p("color", "Color", 0, 1, 0, step=1, choices=["Off", "On"]),
+                           _p("freq_lo", "Freq Lo", 20, 2000, 200, **_HZ, active_when=_COLOR),
+                           _p("amt_lo", "Amt Lo", -100, 100, 0, "%", active_when=_COLOR),
+                           _p("freq_hi", "Freq Hi", 200, 20000, 3000, **_HZ, active_when=_COLOR),
+                           _p("amt_hi", "Amt Hi", -100, 100, 0, "%", active_when=_COLOR),
+                           _p("ws_drive", "WS Drive", 0, 1, 0.5, active_when=_WS),
+                           _p("ws_lin", "WS Lin", 0, 1, 0.5, active_when=_WS),
+                           _p("ws_curve", "WS Curve", 0, 1, 0.5, active_when=_WS),
+                           _p("ws_damp", "WS Damp", 0, 1, 0, active_when=_WS),
+                           _p("ws_depth", "WS Depth", 0, 1, 0, active_when=_WS),
+                           _p("ws_period", "WS Period", 0, 1, 0, active_when=_WS),
+                           _p("post_clip", "Post clip", 0, len(saturation.POST_CLIP) - 1, 0, step=1,
+                              choices=saturation.POST_CLIP),
+                           _p("output_db", "Output", -36, 12, 0, "dB"),
+                           _p("dry_wet", "Dry/Wet", 0, 100, 100, "%"),
+                           _p("hi_quality", "Hi-Quality", 0, 1, 0, step=1, choices=["Off", "On"],
+                              help="Courbe calculee a 4 x la frequence : moins de repliement, "
+                                   "0,33 ms de latence.")]),
+        lambda params: saturation.Saturator(**params)),
     _DeviceDef(DeviceSpec(type="duck", label="Duck (sidechain)",
                           help="Baisse le volume a chaque coup de la source, comme un "
                                "compresseur en sidechain sur le kick : libere la place du kick.",

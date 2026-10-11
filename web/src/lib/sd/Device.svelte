@@ -21,6 +21,9 @@
 
   const values = $derived(Object.fromEntries((spec?.params ?? []).map(p => [p.name, device.params[p.name] ?? p.default])))
   function set(name: string, v: number) { device.params[name] = v }
+  // parametres masques tant que leur selecteur ne les active pas (Saturator : WS, Color)
+  const shown = $derived((spec?.params ?? []).filter(p => !p.active_when ||
+    Object.entries(p.active_when).every(([k, vals]) => vals.includes(Math.round(values[k])))))
   const automated = (name: string) => device.params_end?.[name] !== undefined
   function toggleAuto(name: string) {
     if (automated(name)) {
@@ -52,9 +55,10 @@
         <FilterCurve type={device.type} params={values} specs={spec.params} disabled={device.bypass} onchange={set} />
       {/if}
       <div class="knobs">
-        {#each spec.params as p (p.name)}
+        {#each shown as p (p.name)}
           {#if p.choices}
             <div class="choices" role="radiogroup" aria-label={p.label} title={p.help || p.label}>
+              <span class="clabel">{p.label}</span>
               {#each p.choices as c, i (c)}
                 <button role="radio" aria-checked={Math.round(values[p.name]) === i} class:on={Math.round(values[p.name]) === i}
                   disabled={device.bypass} onclick={() => set(p.name, i)}>{c}</button>
@@ -96,6 +100,7 @@
   .knobs { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 280px; }
   .choices { display: grid; grid-template-columns: repeat(2, auto); gap: 2px; width: 100%; justify-content: center; }
   .choices button { padding: 1px 8px; font-size: 11px; border-radius: 2px; }
+  .clabel { grid-column: 1 / -1; text-align: center; font-size: 10px; color: var(--muted); }
   .param { display: flex; flex-direction: column; align-items: center; }
   .param.auto { background: color-mix(in srgb, var(--accent) 10%, transparent); border-radius: 4px; }
   .pair { display: flex; }

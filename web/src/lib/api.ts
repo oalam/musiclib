@@ -343,6 +343,8 @@ export interface ParamSpec {
   help: string
   /** Libelles des valeurs 0..n-1 : selecteur (type de filtre), pas potard. */
   choices: string[] | null
+  /** Affiche seulement si un selecteur du device a l'une de ces valeurs (potards WS du Saturator). */
+  active_when?: Record<string, number[]> | null
 }
 export interface DeviceSpec {
   type: string; label: string; help: string; params: ParamSpec[]

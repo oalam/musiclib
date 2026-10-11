@@ -122,3 +122,43 @@ def test_tube_hi_quality_blocks_match_and_silence_stays_silent():
     assert np.allclose(np.concatenate(parts, axis=1), whole, atol=1e-5)
     quiet = plugin(np.zeros((2, 4800), dtype=np.float32), SR)
     assert np.abs(quiet).max() < 1e-4
+
+
+@pytest.mark.parametrize("curve", range(len(sat.SATURATOR_CURVES)))
+def test_saturator_curves_are_odd_bounded_and_silent(curve: int):
+    plugin = sat.Saturator(curve=curve, drive_db=12)
+    assert np.abs(plugin(np.zeros((2, 2400), dtype=np.float32), SR)).max() < 1e-6
+    u = np.linspace(-4, 4, 801)
+    y = plugin._shape(u)
+    assert np.allclose(y, -y[::-1], atol=1e-9)          # impaire : pas de DC, harmoniques impaires
+    assert np.abs(y).max() <= 1.6
+    f, even, odd = _harmonics(plugin(_sine(amp=0.8), SR))
+    assert odd > 0.01 * f and even < 0.01 * f
+
+
+def test_saturator_post_clip_caps_output_and_dry_wet_zero_is_transparent():
+    x = _sine(amp=0.9)
+    y = sat.Saturator(curve=5, drive_db=24, post_clip=2, output_db=-6)(x, SR)
+    assert np.abs(y).max() <= 10 ** (-6 / 20) + 1e-6
+    assert np.allclose(sat.Saturator(dry_wet=0, drive_db=24)(x, SR), x, atol=1e-6)
+
+
+def test_saturator_color_moves_saturation_to_the_highs():
+    x = _sine(freq=200, amp=0.5) + _sine(freq=4000, amp=0.2)
+    def high_dirt(amt_hi: float) -> float:
+        y = sat.Saturator(curve=3, drive_db=6, color=1, amt_hi=amt_hi)(x, SR)
+        spec = np.abs(np.fft.rfft(y[0, SR // 10:]))
+        freqs = np.fft.rfftfreq(y.shape[1] - SR // 10, 1 / SR)
+        return float(spec[np.argmin(np.abs(freqs - 12000))])   # 3e harmonique du 4 kHz
+    assert high_dirt(100) > 2 * high_dirt(0)
+
+
+def test_saturator_hi_quality_and_blocks():
+    x = _sine(freq=5000, amp=0.9)
+    lo = sat.Saturator(curve=6, drive_db=18)(x, SR)
+    hi = sat.Saturator(curve=6, drive_db=18, hi_quality=1)(x, SR)
+    assert _alias_ratio(hi, 5000) < 0.5 * _alias_ratio(lo, 5000)
+    plugin = sat.Saturator(curve=7, drive_db=6, color=1, amt_lo=50, hi_quality=1, ws_depth=0.5)
+    whole = plugin(x[:, :9600], SR)
+    parts = [plugin.process(x[:, lo:min(lo + 256, 9600)], SR, reset=lo == 0) for lo in range(0, 9600, 256)]
+    assert np.allclose(np.concatenate(parts, axis=1), whole, atol=1e-5)

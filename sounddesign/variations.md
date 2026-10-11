@@ -84,6 +84,23 @@ non harmoniques, quand on sature des aigus) ; 0,33 ms de latence, sans
 conséquence sur un one-shot. À activer dès que le drive ou le tone sont
 hauts.
 
+### Saturator
+
+Émulation du Saturator de Live : une **courbe** au choix, précédée d'un
+**drive**. Analog Clip (arrondi, le plus polyvalent), Soft Sine (doux),
+Bass Shaper (sature dès les faibles niveaux, épaissit une basse), Medium
+(tanh), Hard (genou court), Sinoid Fold (le signal fort se replie :
+harmoniques métalliques, à doser), Digital Clip (écrêtage net), Waveshaper
+(potards WS, affichés seulement pour cette courbe : Lin la partie
+linéaire, Curve la 3e harmonique, Depth et Period un sinus superposé,
+Damp aplatit le centre, Drive dose l'écart à la droite). **Color** (On)
+sature plus ou moins le grave sous Freq Lo et l'aigu au-dessus de Freq Hi
+(EQ avant la courbe, inverse après : l'équilibre du son propre ne bouge
+pas) ; sur un kick, Amt Lo négatif garde le sub propre et Amt Hi positif
+fait grener le clic. **Post clip** Soft ou Hard : la sortie ne dépasse
+jamais Output. **Hi-Quality** : courbe à 4 × la fréquence, conseillé avec
+Hard, Digital Clip et Sinoid Fold qui replient beaucoup.
+
 ### Bande (peak)
 
 Une cloche vers 3,5 kHz qui monte un peu le clic de l'attaque sur les
@@ -107,6 +124,7 @@ kick garde son attaque, la queue grave change d'une tranche à l'autre.
 |---|---|---|
 | `drive_tints` | Drive 2 → 12 dB, clic −1 → +3 dB, 8 tranches | Kick de kit qui respire, sur la track 1 |
 | `rumble_tints` | Rumble −30 → −12 dB, drive 2 → 8 dB, 8 tranches | Kick et rumble d'un seul sample, la queue qui bouge |
+| `saturator_tints` | Saturator Analog Clip, drive 0 → 12 dB, Color (sub propre, clic grené), Hi-Quality | Grain qui monte sans toucher au sub |
 | `tube_tints` | Bias du tube 0,1 → 0,5, overdrive dry/wet 30 → 60 %, 8 tranches | Grain de lampe qui monte, attaque plus sale, sub gardé |
 | `layer_blend` | Couche C1 −24 → −6 dB au-dessus de 1 kHz, 8 tranches | Kick + clic ou top d'un autre sample, dosé tranche par tranche |
 

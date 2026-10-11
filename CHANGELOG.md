@@ -87,6 +87,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.K] Device **Saturator**, émulation de celui de Live : 8 courbes
+  (Analog Clip, Soft Sine, Bass Shaper, Medium, Hard, Sinoid Fold, Digital
+  Clip, Waveshaper et ses 6 potards), Drive, Color (étagères grave / aigu
+  avant la courbe, inverses après), Post clip Soft / Hard, Output,
+  Dry/Wet, Hi-Quality ; automatisable. Les potards dépendant d'un
+  sélecteur ne s'affichent que s'il les active (`active_when`) ; les
+  sélecteurs des devices portent leur nom. Preset `variations/saturator_tints`.
 - [8.K] Mode **Hi-Quality** du Dynamic Tube : courbe calculée à 4 × la
   fréquence d'échantillonnage (filtres anti-repliement à état, automation
   par blocs inchangée), 0,33 ms de latence.
