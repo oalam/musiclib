@@ -206,8 +206,8 @@ def test_target_inherits_sub_and_stays_unique():
                        name="BD C Punch 01 dbr", duration=0.3, rank=1, sub="CLEAN")
     twin = SampleEntry(source="SoundDesign/rumble/a.wav", family="UNIVERSEL", code="RM",
                        pack="sou", name="RM 150 C Punch dbr", duration=1.6, rank=1, sub="CLEAN")
-    assert sd.target("d/kick.wav", _manifest(kick), "rumble", 150) == ("RM 150 C Punch dbr", "CLEAN")
-    name, sub = sd.target("d/kick.wav", _manifest(kick, twin), "rumble", 150)
+    assert sd.target("d/kick.wav", _manifest(kick), "rumble", 150) == ("RM 150 C Punch dbr", "CLEAN", "RM")
+    name, sub, _ = sd.target("d/kick.wav", _manifest(kick, twin), "rumble", 150)
     assert name != "RM 150 C Punch dbr" and sub == "CLEAN" and len(name) <= 18
     kick.sub = "RUMBLE"            # sous-dossier manuel du kick, inconnu de RM : racine
     assert sd.target("d/kick.wav", _manifest(kick), "rumble", 150)[1] == ""
@@ -349,8 +349,76 @@ def test_static_preset_json_has_no_params_end():
 def test_riser_target_is_fx_rise():
     from analyzer.samples import Manifest, SampleEntry
     m = Manifest(source_root="x", total=0)
-    assert sd.target("", m, "riser", 150) == ("FX 150 Rise Noise", "RISE")
+    assert sd.target("", m, "riser", 150) == ("FX 150 Rise Noise", "RISE", "FX")
     pad = SampleEntry(source="p/pad.wav", family="AMBIENT", code="PD", pack="nz",
                       name="PD C Warm 01 nz", duration=4.0, rank=1, sub="AMBIENT")
-    name, sub = sd.target("p/pad.wav", _manifest(pad), "riser", 150)
+    name, sub, _ = sd.target("p/pad.wav", _manifest(pad), "riser", 150)
     assert sub == "RISE" and name.startswith("FX 150 ") and len(name) <= 18
+
+
+# --- Variations en tranches (8.I) --------------------------------------------
+
+def _variations(slices: int = 1, jitter: float = 0.0) -> sd.Preset:
+    return sd.Preset.model_validate({
+        "id": "v", "treatment": "variations", "label": "test",
+        "settings": {"bpm": 150, "length_beats": 1, "slices": slices, "jitter": jitter},
+        "chains": [{"name": "Kick", "devices": [
+            {"type": "distortion", "params": {"drive_db": 0}, "params_end": {"drive_db": 30}},
+        ]}],
+    })
+
+
+def test_variations_are_equal_slices_on_the_grid():
+    # 8 tranches d'un temps a 150 BPM : 8 x 60 / 150 = 3,2 s -> 8 x 19200 echantillons
+    audio = sd.render(_variations(), _kick())
+    assert audio.shape == (2, 8 * 19_200)
+    slices = audio.reshape(2, 8, 19_200)
+    assert np.all(slices[:, :, -1] == 0)                    # chaque tranche finit en fondu
+    assert np.all(np.abs(slices[:, :, :200]).max(axis=2) > 0.05)   # et commence par le coup
+
+
+def test_variations_progress_and_levels_match():
+    slices = sd.render(_variations(), _kick()).reshape(2, 8, 19_200)
+    window = int(sd.LEVEL_WINDOW_MS * sd.SR / 1000)
+    levels = np.sqrt(np.mean(slices[:, :, :window] ** 2, axis=(0, 2)))
+    assert levels.max() / levels.min() < 1.05               # niveau egalise
+    # plus de drive = plus d'harmoniques aigues
+    def bright(x: np.ndarray) -> float:
+        return _band_energy(x, 1000, 20000) / _band_energy(x, 20, 20000)
+    assert bright(slices[:, 7]) > 3 * bright(slices[:, 0])
+
+
+def test_variant_positions_progressive_with_bounded_jitter():
+    assert np.allclose(sd.variant_positions(5, 0), [0, 0.25, 0.5, 0.75, 1])
+    jit = sd.variant_positions(16, 1)
+    assert np.all(np.abs(jit - np.arange(16) / 15) <= 0.5 / 15 + 1e-9)
+    assert np.array_equal(jit, sd.variant_positions(16, 1))  # reproductible
+
+
+def test_variations_target_keeps_source_code_and_tags_slices(tmp_path: Path):
+    from analyzer.samples import SLICES_TAG, SampleEntry
+    kick = SampleEntry(source="d/kick.wav", family="TECHNO", code="BD", pack="dbr",
+                       name="BD C Punch 01 dbr", duration=0.3, rank=1, sub="CLEAN")
+    preset = _variations()
+    assert sd.slice_count(preset) == 8
+    t = sd.target("d/kick.wav", _manifest(kick), "variations", 150, 8)
+    assert t == ("BD V8 C Punch dbr", "CLEAN", "BD")
+    out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
+    record = sd.write_render(sd.render(preset, _kick()), "x", preset, out, t.name, t.sub, t.code)
+    assert (record.code, record.slices) == ("BD", 8)
+    overrides: dict = {}
+    key = sd.verse(record, out, samples_root, overrides)
+    assert (overrides[key].code, overrides[key].sub, overrides[key].tags) == ("BD", "CLEAN", [SLICES_TAG])
+    assert sd.mark_versed([record], samples_root)[0].folder == "DRUMS/BD/CLEAN"
+
+
+def test_versed_slices_are_not_flagged_long(tmp_path: Path):
+    from analyzer.samples import build_manifest
+    out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
+    preset = _variations()
+    record = sd.write_render(sd.render(preset, _kick()), "x", preset, out,
+                             "BD V8 C Punch dbr", "CLEAN", "BD")
+    overrides: dict = {}
+    key = sd.verse(record, out, samples_root, overrides)
+    entry = next(e for e in build_manifest(samples_root, overrides).entries if e.source == key)
+    assert entry.folder == "DRUMS/BD/CLEAN" and "long" not in (entry.flags or [])

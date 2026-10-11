@@ -16,6 +16,8 @@ Usage:
     sounddesign.py render rumble deep --source <wav> --name "RM 150 Fat dbr"
     sounddesign.py render riser white_sweep --set bars=8      # bruit genere, sans --source
     sounddesign.py render riser pad_lift --source <wav>       # nappe qui monte (FX/RISE)
+    sounddesign.py render variations drive_tints --source <kick> --verse
+                                  # 8 variantes en tranches GRID, rangees avec le kick
                                                   # Samples/SoundDesign (relancer samples.py)
 
 `--source` : chemin absolu, ou relatif a `<MEDIA>/Samples`.
@@ -53,6 +55,7 @@ from analyzer.sounddesign import (
     load_source,
     needs_source,
     render,
+    slice_count,
     target,
     verse,
     with_overrides,
@@ -126,14 +129,17 @@ def _cmd_render(args: argparse.Namespace) -> int:
     rel = (source.relative_to(SAMPLES_SRC_DIR).as_posix()
            if source and source.is_relative_to(SAMPLES_SRC_DIR) else "")
     manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
-    name, sub_dir = target(rel, manifest, preset.treatment, preset.settings.get("bpm"))
+    planned = target(rel, manifest, preset.treatment, preset.settings.get("bpm"),
+                     slice_count(preset))
+    name, sub_dir = planned.name, planned.sub
     name = args.name or name
     print(f"{preset.treatment}/{preset.id} : {audio.shape[1] / SR:.3f} s, "
           f"{len(preset.chains) - sum(c.mute for c in preset.chains)} chaine(s) active(s), "
           f"nom {name!r}, sous-dossier {sub_dir or '(racine)'}")
     if args.dry_run:
         return 0
-    record = write_render(audio, media_relative(source) if source else "", preset, SOUNDDESIGN_OUT_DIR, name, sub_dir)
+    record = write_render(audio, media_relative(source) if source else "", preset, SOUNDDESIGN_OUT_DIR, name, sub_dir,
+                          planned.code)
     print(f"-> {SOUNDDESIGN_OUT_DIR / record.file}")
     if args.verse:
         overrides = load_overrides(OVERRIDES_FILE)

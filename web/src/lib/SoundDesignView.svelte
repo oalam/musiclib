@@ -214,13 +214,21 @@
   const oneShot = $derived(!!preset?.settings.one_shot)
   const ONE_SHOT_ONLY = ['length_beats']
   const LOOP_ONLY = ['bars', 'hits_per_bar']
+  // seuls les traitements a mode Un coup (rumble) grisent la longueur en boucle
+  const hasOneShot = $derived(!!treatment?.settings.some(x => x.name === 'one_shot'))
   const bpm = $derived(preset?.settings.bpm)
+  // variations (8.I) : nombre de tranches = libelle du selecteur `slices`
+  const sliceCount = $derived.by(() => {
+    if (treatment?.automation !== 'slices' || !preset) return 0
+    const spec = treatment.settings.find(x => x.name === 'slices')
+    return Number(spec?.choices?.[Math.round(preset.settings.slices ?? spec.default)] ?? 0)
+  })
   $effect(() => { void source; nameEdited = false })
   $effect(() => {
-    const t = treatment?.id, s = source, b = bpm
+    const t = treatment?.id, s = source, b = bpm, n = sliceCount
     if (!t || (needsSource && !s)) { target = null; return }
     let stale = false
-    api.sdTarget(t, s ?? '', b).then(r => {
+    api.sdTarget(t, s ?? '', b, n).then(r => {
       if (stale) return
       target = r
       if (!nameEdited) name = r.name
@@ -419,11 +427,15 @@
                 {/each}
               </div>
             {:else}
-              <Knob spec={s} value={preset.settings[s.name] ?? s.default} disabled={oneShot ? LOOP_ONLY.includes(s.name) : ONE_SHOT_ONLY.includes(s.name)}
+              <Knob spec={s} value={preset.settings[s.name] ?? s.default} disabled={oneShot ? LOOP_ONLY.includes(s.name) : hasOneShot && ONE_SHOT_ONLY.includes(s.name)}
                 onchange={v => (preset!.settings[s.name] = v)} />
             {/if}
           {/each}
-          {#if oneShot}
+          {#if sliceCount}
+            <span class="muted small dur mono" title="tranches de même longueur : longueur × 60 / bpm chacune">
+              {sliceCount} × {((preset.settings.length_beats ?? 1) * 60 / (preset.settings.bpm ?? 150)).toFixed(3)} s
+            </span>
+          {:else if oneShot}
             <span class="muted small dur mono" title="durée du coup = longueur × 60 / bpm, puis fondu de 20 ms">
               {((preset.settings.length_beats ?? 1) * 60 / (preset.settings.bpm ?? 150)).toFixed(3)} s
             </span>
@@ -468,7 +480,7 @@
         <h3>{selected === 'master' ? 'Master' : preset.chains[selected]?.name} <span class="muted small">{selected === 'master' ? 'après la somme des chaînes' : 'chaîne parallèle'}</span></h3>
         <div class="devices">
           {#each devices as d, i (i + d.type)}
-            <Device device={d} spec={catalogue[d.type]} onmove={delta => moveDevice(i, delta)} onremove={() => devices.splice(i, 1)}
+            <Device device={d} spec={catalogue[d.type]} slices={treatment.automation === 'slices'} onmove={delta => moveDevice(i, delta)} onremove={() => devices.splice(i, 1)}
               onhelp={() => help(catalogue[d.type]?.label ?? d.type)} />
             <span class="arrow" aria-hidden="true">→</span>
           {/each}
@@ -502,7 +514,7 @@
             <li>
               <button class="small" class:on={renderPlaying === r.file} onclick={() => playRender(r.file)}>{renderPlaying === r.file ? '■' : '▶'}</button>
               <span class="mono small fname" title={`${r.file}\n${r.source}\n${r.created_at}`}>{r.name || r.file.split('/').pop()}</span>
-              <span class="muted small">{r.seconds.toFixed(2)} s</span>
+              <span class="muted small">{r.slices ? `${r.slices} tranches · ` : ''}{r.seconds.toFixed(2)} s</span>
               {#if r.versed}<span class="versed small" title={`Samples/${r.versed}`}>versé</span>
               {:else if r.name}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign et ranger en {r.folder}">Verser</button>
               {:else}<span class="muted small" title="Rendu antérieur au nommage DT2 : le re-rendre pour le verser">sans nom</span>{/if}

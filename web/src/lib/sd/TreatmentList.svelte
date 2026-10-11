@@ -45,7 +45,7 @@
           onclick={() => (open[t.id] = !isOpen(t.id))} title={t.summary}>
           <span class="caret" aria-hidden="true">{isOpen(t.id) ? '▾' : '▸'}</span>
           <span class="tlabel">{t.label}</span>
-          <span class="muted small mono">{t.code}{t.sub ? `/${t.sub}` : ''}</span>
+          <span class="muted small mono" title={t.code ? 'Code DT2 et dossier du rendu versé' : 'Rangé avec la source (même code, même dossier)'}>{t.code ? `${t.code}${t.sub ? `/${t.sub}` : ''}` : '= source'}</span>
         </button>
         {#if isOpen(t.id)}
           <ul>

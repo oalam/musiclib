@@ -867,7 +867,7 @@ fiche). Le manuel s'ouvre dans le panneau élargi à la bonne page
 # sounddesign.py — sound design par chaînes de plugins (Phase 8)
 
 Fabrique de nouveaux samples à partir de ceux de la library. Un traitement
-(`rumble`, `riser`) prépare un signal d'entrée depuis un sample (le
+(`rumble`, `riser`, `variations`) prépare un signal d'entrée depuis un sample (le
 kick séquencé au tempo), le passe dans les chaînes parallèles d'un preset,
 puis dans le master, et écrit une boucle sans couture. Moteur :
 `analyzer/sounddesign.py` ; plugins : [pedalboard](https://spotify.github.io/pedalboard/)
@@ -890,6 +890,17 @@ python sounddesign.py render riser pad_lift --source <wav>          # nappe qui 
 linéaire, 2 = lente puis rapide). Le rendu dure `bars × 4 × 60 / bpm`
 (4 mesures à 150 BPM = 6,4 s) et s'arrête net (fondu de 5 ms). Sans sample,
 `--source` est inutile ; nom proposé `FX 150 Rise Noise`, rangé en `FX/RISE`.
+
+**Variations** (8.I) : le one-shot `--source` est rendu une fois par tranche
+(`slices` : 0 = 4, 1 = 8, 2 = 16, 3 = 32), chaque tranche dure
+`length_beats × 60 / bpm` (8 tranches d'un temps à 150 BPM = 3,2 s), niveau
+égalisé ; `params_end` donne la valeur de la dernière tranche, `jitter`
+l'aléa. Nom `BD V8 C Punch dbr`, rangé avec la source, tag `slices` au
+versement. Sur la DT2 : machine GRID, `GRID` = nombre de tranches.
+
+```bash
+python sounddesign.py render variations drive_tints --source <kick> --set slices=2 --verse
+```
 
 `--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` et écrit
 son override de rangement (`DRUMS/RM/<sous-dossier du kick>`, nom DT2) ;
@@ -923,6 +934,8 @@ chargement : device, paramètre ou valeur hors bornes lèvent `PresetError`.
 | riser `white_sweep` | bruit blanc, passe-bas résonant 200 Hz → 14 kHz, volume et reverb qui montent, 4 mesures |
 | riser `pink_thin` | bruit rose, passe-haut 40 Hz → 5 kHz (le grave se vide), delay croissant, 8 mesures |
 | riser `pad_lift` | sample en cours (nappe) qui monte d'une octave, filtre et reverb qui s'ouvrent |
+| variations `drive_tints` | 8 tranches : drive 2 → 12 dB, clic à 3,5 kHz −1 → +3 dB |
+| variations `rumble_tints` | 8 tranches : rumble −30 → −12 dB, drive du kick 2 → 8 dB |
 | riser `white_fall` | downlifter : bruit blanc, passe-bas 14 kHz → 150 Hz, volume et reverb qui tombent, 2 mesures, courbe 0,5 |
 
 ## Sorties

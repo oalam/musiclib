@@ -30,7 +30,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, NamedTuple
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -110,12 +110,14 @@ class TreatmentSpec(BaseModel):
     source_hint: str                 # quel sample donner en entree
     settings: list[ParamSpec]
     notebook: str                    # note du vault (theorie, usage, ressources)
-    code: str                        # code DT2 du rendu verse (samples.CODES), ex. RM
+    code: str                        # code DT2 du rendu verse (samples.CODES), ex. RM ; "" : celui de la source
     sub: str = ""                    # sous-dossier fixe (FX/RISE) ; "" : herite de la source
     # sample requis seulement si settings[source_param] == source_sample (riser :
     # source 2) ; "" : toujours requis
     source_param: str = ""
     source_sample: int = 0
+    # automation : sur la duree du rendu ("time") ou d'une tranche a l'autre ("slices", 8.I)
+    automation: Literal["time", "slices"] = "time"
 
 
 class RenderRecord(BaseModel):
@@ -129,6 +131,8 @@ class RenderRecord(BaseModel):
     created_at: str
     name: str = ""                   # nom DT2 propose ou saisi ("" : rendu anterieur a 8.E)
     sub: str = ""                    # sous-dossier herite de la source (DRUMS/RM/<sub>)
+    code: str = ""                   # code DT2 effectif ("" : celui du traitement, rendus anterieurs a 8.I)
+    slices: int = 0                  # nombre de tranches GRID (variations, 8.I) ; 0 : un seul son
     versed: str | None = None        # cle du manifeste si verse dans le pack (rempli a la lecture)
     folder: str = ""                 # dossier de rangement une fois verse (rempli a la lecture)
 
@@ -345,6 +349,7 @@ class Prepared:
     one_shot: bool = False           # un seul coup : queue coupee au silence + fondu
     ramp: np.ndarray | None = None   # automation (0 -> 1) ; None : lineaire sur la boucle gardee
     cut: bool = False                # arret net en fin de rendu (riser), fondu anti-clic
+    variants: np.ndarray | None = None   # position 0 -> 1 de chaque tranche (variations, 8.I)
 
 
 @dataclass(frozen=True)
@@ -462,6 +467,37 @@ def _prepare_riser(source: np.ndarray, settings: dict[str, float]) -> Prepared:
     return Prepared(signal, 0, n, np.array([], dtype=int), ramp=ramp, cut=True)
 
 
+# --- Variations en tranches (8.I) --------------------------------------------
+
+SLICE_COUNTS = [4, 8, 16, 32]   # grilles GRID de la DT2 (2 a 64, puissances de 2)
+VARIATION_SEED = 8
+LEVEL_WINDOW_MS = 150.0         # niveau d'une tranche : RMS de l'attaque et du corps
+
+
+def variant_positions(n: int, jitter: float) -> np.ndarray:
+    """Position 0 -> 1 de chaque tranche : progressive (1 = la plus sobre, n =
+    la plus marquee), plus un alea reproductible d'au plus `jitter` pas."""
+    if n < 2:
+        return np.zeros(n)
+    base = np.arange(n) / (n - 1)
+    noise = np.random.default_rng(VARIATION_SEED).uniform(-0.5, 0.5, n)
+    return np.clip(base + jitter * noise / (n - 1), 0.0, 1.0)
+
+
+def _prepare_variations(source: np.ndarray, settings: dict[str, float]) -> Prepared:
+    """Le one-shot source, rendu une fois par tranche (voir `render`)."""
+    slot = round(settings["length_beats"] * 60.0 / settings["bpm"] * SR)
+    single = _single(source, slot)
+    n = SLICE_COUNTS[int(settings["slices"])]
+    return Prepared(single.signal, 0, slot, single.triggers, one_shot=True,
+                    variants=variant_positions(n, settings["jitter"]))
+
+
+def _level(x: np.ndarray) -> float:
+    head = x[:, : int(LEVEL_WINDOW_MS * SR / 1000)]
+    return float(np.sqrt(np.mean(head ** 2))) if head.size else 0.0
+
+
 TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
     _Treatment(TreatmentSpec(
         id="rumble", label="Rumble",
@@ -502,6 +538,25 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
         code="FX", sub="RISE",           # -> FX/RISE, track 15
         source_param="source", source_sample=RISER_SOURCES.index("Sample")),
         _prepare_riser),
+    _Treatment(TreatmentSpec(
+        id="variations", label="Variations",
+        summary="Jeu de variantes subtiles d'un one-shot (teintes d'overdrive, rumble "
+                "plus ou moins present), en tranches egales a charger en GRID sur la DT2 "
+                "et a tirer au hasard (CREATE RANDOM LOCKS sur SLICE).",
+        source_hint="one-shot de drums (kick d'un kit)",
+        settings=[_p("bpm", "Tempo", 60, 220, 150, "BPM", step=1),
+                  _p("length_beats", "Longueur", 0.25, 4, 1, "temps", step=0.25,
+                     help="Duree d'une tranche en temps au tempo (queue coupee, fondu de "
+                          "20 ms) : toutes les tranches ont la meme longueur."),
+                  _p("slices", "Tranches", 0, len(SLICE_COUNTS) - 1, 1, step=1,
+                     choices=[str(n) for n in SLICE_COUNTS],
+                     help="Nombre de variantes = grille GRID de la DT2."),
+                  _p("jitter", "Alea", 0, 1, 0.3,
+                     help="0 = pas regulier de la tranche 1 (la plus sobre) a la derniere "
+                          "(la plus marquee) ; 1 = jusqu'a un pas d'ecart en plus ou en moins.")],
+        notebook="sounddesign/variations.md",
+        code="", automation="slices"),   # code et sous-dossier de la source (DRUMS/BD/...)
+        _prepare_variations),
 ]}
 
 
@@ -693,6 +748,38 @@ def _run_devices(devices: list[Device], x: np.ndarray, ctx: RenderContext) -> np
     return x
 
 
+def _mix(preset: Preset, prep: Prepared, ctx: RenderContext) -> np.ndarray:
+    """Somme des chaines actives puis master, sur tout le signal prepare."""
+    mix = np.zeros_like(prep.signal)
+    for chain in preset.chains:
+        if chain.mute:
+            continue
+        out = _run_devices(chain.devices, prep.signal.copy(), ctx)
+        mix += out * np.float32(10.0 ** (chain.gain_db / 20.0))
+    return _run_devices(preset.master, mix, ctx)
+
+
+def _render_variants(preset: Preset, prep: Prepared) -> np.ndarray:
+    """Une tranche par position : l'automation est figee a la position de la
+    tranche, queue coupee, niveau egalise (RMS de l'attaque), tranches de
+    meme longueur mises bout a bout (grille GRID exacte)."""
+    assert prep.variants is not None
+    n = prep.signal.shape[1]
+    slices = []
+    for t in prep.variants:
+        ctx = RenderContext(sr=SR, triggers=prep.triggers, ramp=np.full(n, float(t)))
+        one = _trim_tail(_mix(preset, prep, ctx)[:, :prep.loop_len])
+        slot = np.zeros((2, prep.loop_len), dtype=np.float32)
+        slot[:, : one.shape[1]] = one
+        slices.append(slot)
+    levels = [_level(x) for x in slices]
+    target = float(np.median([v for v in levels if v > 0] or [0.0]))
+    for x, v in zip(slices, levels):
+        if v > 0:
+            x *= np.float32(target / v)
+    return np.concatenate(slices, axis=1)
+
+
 def render(preset: Preset, source: np.ndarray) -> np.ndarray:
     """Boucle rendue (2, loop_len) a SR ; chaines mutees et devices bypasses ignores."""
     validate(preset)
@@ -706,16 +793,11 @@ def render(preset: Preset, source: np.ndarray) -> np.ndarray:
         ramp[prep.loop_start + prep.loop_len:] = 1.0
     ctx = RenderContext(sr=SR, triggers=prep.triggers, ramp=ramp)
 
-    mix = np.zeros_like(prep.signal)
-    for chain in preset.chains:
-        if chain.mute:
-            continue
-        out = _run_devices(chain.devices, prep.signal.copy(), ctx)
-        mix += out * np.float32(10.0 ** (chain.gain_db / 20.0))
-    mix = _run_devices(preset.master, mix, ctx)
-
-    loop = mix[:, prep.loop_start: prep.loop_start + prep.loop_len]
-    if prep.one_shot:
+    if prep.variants is not None:
+        loop = _render_variants(preset, prep)
+    else:
+        loop = _mix(preset, prep, ctx)[:, prep.loop_start: prep.loop_start + prep.loop_len]
+    if prep.one_shot and prep.variants is None:
         loop = _trim_tail(loop)
     if prep.cut:
         loop = _cut(loop)
@@ -731,7 +813,8 @@ def render(preset: Preset, source: np.ndarray) -> np.ndarray:
 NAME_RX = r"^[A-Za-z0-9#][A-Za-z0-9 #._+-]*$"   # nom DT2 saisi : pas de / ni de \\
 
 
-def propose_name(source_name: str, source_code: str, code: str, bpm: float | None) -> str:
+def propose_name(source_name: str, source_code: str, code: str, bpm: float | None,
+                 tag: str = "") -> str:
     """Nom DT2 du rendu : code du traitement et tempo a la place du code de la
     source, note / description / pack gardes (`samples.NAME_MAX` au plus).
 
@@ -742,7 +825,7 @@ def propose_name(source_name: str, source_code: str, code: str, bpm: float | Non
     body, pack = words[1:-1], words[-1:]
     if source_code in smp.TEMPO and body and body[0].isdigit():
         body = body[1:]                      # tempo de la source remplace par celui du rendu
-    head = [code, *([str(round(bpm))] if bpm else [])]
+    head = [code, *([str(round(bpm))] if bpm else []), *([tag] if tag else [])]
     note = body[:1] if body and re.fullmatch(r"[A-G]#?", body[0]) else []
     rest = body[len(note):]
     name = " ".join([*head, *note, *rest, *pack])
@@ -755,15 +838,31 @@ def propose_name(source_name: str, source_code: str, code: str, bpm: float | Non
     return " ".join(w for w in [fixed, desc, *pack] if w)
 
 
+class Target(NamedTuple):
+    name: str                        # nom DT2 propose
+    sub: str                         # sous-dossier
+    code: str                        # code DT2 du rendu
+
+
+def slice_count(preset: Preset) -> int:
+    """Nombre de tranches d'un rendu de variations (8.I), 0 pour un son unique."""
+    spec = TREATMENTS[preset.treatment].spec
+    if spec.automation != "slices":
+        return 0
+    return SLICE_COUNTS[int(_resolve(spec.settings, preset.settings, preset.id)["slices"])]
+
+
 def target(source: str, manifest: smp.Manifest, treatment: str,
-           bpm: float | None) -> tuple[str, str]:
-    """(nom DT2 propose, sous-dossier) d'un rendu de `source` (relatif a Samples/).
+           bpm: float | None, slices: int = 0) -> Target:
+    """Nom DT2 propose, sous-dossier et code d'un rendu de `source` (relatif a Samples/).
 
     Le sous-dossier est celui du traitement s'il en fixe un (riser : FX/RISE),
     sinon celui de la source s'il existe pour le code du traitement (kick de
     DRUMS/BD/CLEAN -> DRUMS/RM/CLEAN), sinon la racine. Sans source (bruit
-    genere), le nom est `<CODE> <BPM> <traitement> Noise`. Le nom est rendu
-    unique dans le dossier cible (rendus deja verses compris).
+    genere), le nom est `<CODE> <BPM> <traitement> Noise`. Variations (8.I) :
+    code et sous-dossier de la source, `V<tranches>` a la place du tempo
+    (`BD C Punch 01 dbr` -> `BD V8 C Punch dbr`). Le nom est rendu unique
+    dans le dossier cible (rendus deja verses compris).
     """
     spec = TREATMENTS[treatment].spec
     code = spec.code
@@ -771,19 +870,21 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
         folder = smp.folder_of("", code, spec.sub)
         taken = {e.name for e in manifest.entries if e.folder == folder}
         head = " ".join([code, *([str(round(bpm))] if bpm else [])])
-        return smp.unique_name(f"{head} {spec.label[:4]} Noise", taken), spec.sub
+        return Target(smp.unique_name(f"{head} {spec.label[:4]} Noise", taken), spec.sub, code)
     entry = next((e for e in manifest.entries if e.source == source), None)
     reserve = next((r for r in manifest.reserve if r.source == source), None)
     found = entry or reserve
     src_code = found.code if found else (smp.code_of(source, None) or "")
     src_sub = found.sub if found else ""
+    if not code:     # variations (8.I) : le rendu reste un son du code de la source
+        code, bpm = src_code or "BD", None
     sub = spec.sub or (src_sub if smp.has_sub(code, src_sub) else "")
     pack = found.pack if found else smp.pack_of(source)
     src_name = entry.name if entry else smp.short_name(source, src_code or code, pack)
-    name = propose_name(src_name, src_code, code, bpm)
+    name = propose_name(src_name, src_code, code, bpm, f"V{slices}" if slices else "")
     folder = smp.folder_of("", code, sub)
     taken = {e.name for e in manifest.entries if e.folder == folder}
-    return smp.unique_name(name, taken), sub
+    return Target(smp.unique_name(name, taken), sub, code)
 
 
 def output_name(name: str, preset: Preset) -> str:
@@ -793,7 +894,7 @@ def output_name(name: str, preset: Preset) -> str:
 
 
 def write_render(audio: np.ndarray, source_label: str, preset: Preset, out_root: Path,
-                 name: str, sub: str = "") -> RenderRecord:
+                 name: str, sub: str = "", code: str = "") -> RenderRecord:
     """Ecrit `<out_root>/<traitement>/<nom> <hash>.wav` (24 bits) et son sidecar `.json`."""
     import soundfile as sf
     if not re.fullmatch(NAME_RX, name) or len(name) > smp.NAME_MAX:
@@ -804,7 +905,8 @@ def write_render(audio: np.ndarray, source_label: str, preset: Preset, out_root:
     record = RenderRecord(
         file=path.relative_to(out_root).as_posix(), source=source_label, preset=preset,
         sr=SR, seconds=round(audio.shape[1] / SR, 4),
-        created_at=datetime.now().isoformat(timespec="seconds"), name=name, sub=sub)
+        created_at=datetime.now().isoformat(timespec="seconds"), name=name, sub=sub,
+        code=code or TREATMENTS[preset.treatment].spec.code, slices=slice_count(preset))
     path.with_suffix(".json").write_text(record.model_dump_json(indent=2) + "\n",
                                          encoding="utf-8")
     return record
@@ -839,8 +941,13 @@ def mark_versed(records: list[RenderRecord], samples_root: Path) -> list[RenderR
     for record in records:
         key = verse_key(record)
         record.versed = key if (samples_root / key).is_file() else None
-        record.folder = smp.folder_of("", TREATMENTS[record.preset.treatment].spec.code, record.sub)
+        record.folder = smp.folder_of("", record_code(record), record.sub)
     return records
+
+
+def record_code(record: RenderRecord) -> str:
+    """Code DT2 d'un rendu (sidecar anterieur a 8.I : celui du traitement)."""
+    return record.code or TREATMENTS[record.preset.treatment].spec.code
 
 
 VERSE_PACK = "SoundDesign"   # pack des rendus verses sous <MEDIA>/Samples (Phase 8.D)
@@ -870,8 +977,11 @@ def verse(record: RenderRecord, out_root: Path, samples_root: Path,
     if not (dest.exists() and dest.stat().st_size == src.stat().st_size):
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
-    smp.set_override(overrides, key, code=TREATMENTS[record.preset.treatment].spec.code,
-                     sub=record.sub, name=record.name)
+    # fichier de tranches : tag `slices`, la reanalyse ne le juge pas « long »
+    tags = sorted({*overrides.get(key, smp.Override()).tags,
+                   *([smp.SLICES_TAG] if record.slices else [])})
+    smp.set_override(overrides, key, code=record_code(record), sub=record.sub,
+                     name=record.name, tags=tags)
     return key
 
 

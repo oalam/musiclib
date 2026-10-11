@@ -81,6 +81,17 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.I] Traitement **variations** : jeu de variantes subtiles d'un one-shot
+  (4 / 8 / 16 / 32 tranches égales dans un seul fichier, pour la machine
+  GRID de la DT2 et CREATE RANDOM LOCKS sur `SLICE`) ; paramètres étagés de
+  la tranche 1 à N par `params_end`, aléa reproductible, niveau égalisé.
+  Presets `drive_tints` (overdrive) et `rumble_tints` (rumble dosé).
+  Notebook [[sounddesign/variations]].
+- [8.I] Un rendu de variations reste un son de la source : même code et
+  même sous-dossier (`BD V8 C Punch dbr` en `DRUMS/BD/CLEAN`), sidecar avec
+  `code` et `slices` ; versé avec le tag `slices`, que la réanalyse des
+  samples exempte du contrôle « long ». `GET /api/sounddesign/target`
+  accepte `slices`.
 - [8.H] Preset riser `white_fall` (downlifter) : passe-bas qui se ferme de
   14 kHz à 150 Hz, volume et reverb qui tombent, courbe 0,5 ; environ
   −29 dB et plus d'aigus au-dessus de 4 kHz à la fin.

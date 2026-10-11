@@ -926,6 +926,8 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.F | Mode **Un coup** du rumble (un kick et sa queue, longueur en temps au tempo, 1 par défaut, fondu de 20 ms : la track DT2 étant monophonique, le kick suivant coupe la queue) ; duck **anticipé** : la boucle commence et finit dans le creux, plus de clic quand on la joue une fois | fait (à valider à l'oreille) |
 | 8.G | Traitement **riser** (track 15, `FX/RISE`) : source bruit blanc / rose généré ou sample en cours bouclé, montée de hauteur (varispeed), courbe, arrêt net ; **automation** générique `params_end` des devices pedalboard (rendu par blocs) ; 3 presets ; API et CLI sans source pour le bruit | fait (à valider à l'oreille) |
 | 8.H | Front : colonne latérale des traitements dépliables sur leurs presets, mini barre d'outils (nouveau preset vierge, nom / description, suppression `DELETE /api/sounddesign/presets/{t}/{id}`, pas le dernier) ; source « bruit généré » sans sample ; bouton ↗ d'automation (potard « fin ») ; notebook [[sounddesign/riser]] ; dossier de rangement des rendus (`folder`) | fait (à valider à l'usage) |
+| 8.I | Traitement **variations** : un one-shot rendu N fois (4 / 8 / 16 / 32, grille GRID de la DT2) en tranches égales dans un seul fichier, paramètres étagés de la tranche 1 (sobre) à N (marquée) par `params_end` + aléa reproductible, niveau égalisé (RMS des 150 premières ms) ; rangé avec la source (`BD V8 …`, même code et dossier), tag `slices` (pas de contrôle « long ») ; presets `drive_tints`, `rumble_tints` ; notebook [[sounddesign/variations]] | fait (à valider à l'oreille) |
+| 8.J | Layering : source par chaîne (deuxième sample), calage des attaques en ms, mélange variable d'une tranche à l'autre | à venir |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -993,6 +995,14 @@ On garde une boucle d'une à huit mesures, sans couture.
   d'outils nouveau / modifier / supprimer agit sur les **presets** ; les
   traitements restent définis dans le moteur (pas de création depuis le
   front). Le dernier preset d'un traitement ne se supprime pas.
+- **Variations** (8.I, arbitré le 2026-10-11) : répartition **progressive +
+  aléa** (tranche 1 la plus sobre, N la plus marquée, aléa d'au plus un pas,
+  graine fixe) ; le hasard du jeu se fait sur la DT2 (CREATE RANDOM LOCKS
+  sur `SLICE`). Niveau **égalisé** : la variation porte sur la couleur, pas
+  le volume. Un seul fichier en tranches de même longueur (machine GRID).
+  Le rendu garde le code et le sous-dossier de la source ; `params_end` y
+  désigne la valeur de la dernière tranche (`automation: "slices"` du
+  traitement). Le **layering** de plusieurs samples est reporté en 8.J.
 
 ## Décisions arbitrées (à NE PAS refaire)
 

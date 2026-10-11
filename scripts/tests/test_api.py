@@ -490,7 +490,7 @@ def sd_client(tmp_path: Path) -> TestClient:
 
 def test_sounddesign_catalogue(sd_client: TestClient):
     treatments = sd_client.get("/api/sounddesign/treatments").json()
-    assert [t["id"] for t in treatments] == ["rumble", "riser"]
+    assert [t["id"] for t in treatments] == ["rumble", "riser", "variations"]
     devices = {d["type"]: d for d in sd_client.get("/api/sounddesign/devices").json()}
     assert devices["duck"]["params"][0]["name"] == "depth_db"
     presets = sd_client.get("/api/sounddesign/presets/rumble").json()
@@ -616,3 +616,9 @@ def test_sounddesign_catalogue_flags_automation_and_source(sd_client: TestClient
     assert devices["filter"]["automatable"] and not devices["duck"]["automatable"]
     riser = next(t for t in sd_client.get("/api/sounddesign/treatments").json() if t["id"] == "riser")
     assert (riser["source_param"], riser["source_sample"], riser["sub"]) == ("source", 2, "RISE")
+
+
+def test_sounddesign_variations_target_keeps_kick_folder(sd_client: TestClient):
+    t = sd_client.get("/api/sounddesign/target", params={
+        "treatment": "variations", "source": "k/kick.wav", "bpm": 150, "slices": 8}).json()
+    assert t == {"name": "BD V8 C Punch 01 k", "sub": "CLEAN", "folder": "DRUMS/BD/CLEAN"}

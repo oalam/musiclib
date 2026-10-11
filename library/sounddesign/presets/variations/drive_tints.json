@@ -1,0 +1,23 @@
+{
+  "id": "drive_tints",
+  "treatment": "variations",
+  "label": "Teintes d'overdrive",
+  "description": "8 variantes du kick, de presque propre (drive 2 dB) a franchement sature (12 dB), avec un clic un peu plus present en fin de serie. Niveaux egalises : seul le grain change.",
+  "settings": {"bpm": 150, "length_beats": 1, "slices": 1, "jitter": 0.3},
+  "chains": [
+    {
+      "name": "Kick",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "distortion", "params": {"drive_db": 2}, "params_end": {"drive_db": 12}, "bypass": false},
+        {"type": "peak", "params": {"cutoff_frequency_hz": 3500, "gain_db": -1, "q": 1}, "params_end": {"gain_db": 3}, "bypass": false},
+        {"type": "highpass", "params": {"cutoff_frequency_hz": 25}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}

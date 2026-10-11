@@ -9,9 +9,11 @@
   import Knob from './Knob.svelte'
   import { isFilter } from './scale'
 
-  let { device, spec, onmove, onremove, onhelp }: {
+  let { device, spec, slices = false, onmove, onremove, onhelp }: {
     device: SdDevice
     spec: DeviceSpec | undefined
+    /** Traitement en tranches (variations, 8.I) : la valeur de fin est celle de la derniere tranche. */
+    slices?: boolean
     onmove?: (delta: number) => void
     onremove?: () => void
     onhelp?: () => void
@@ -63,14 +65,16 @@
               <div class="pair">
                 <Knob spec={p} value={values[p.name]} disabled={device.bypass} onchange={v => set(p.name, v)} />
                 {#if automated(p.name)}
-                  <Knob spec={{ ...p, label: 'fin' }} value={device.params_end![p.name]} disabled={device.bypass}
+                  <Knob spec={{ ...p, label: slices ? 'tranche N' : 'fin' }} value={device.params_end![p.name]} disabled={device.bypass}
                     onchange={v => (device.params_end![p.name] = v)} />
                 {/if}
               </div>
               {#if spec.automatable}
                 <button class="autob" class:on={automated(p.name)} onclick={() => toggleAuto(p.name)} disabled={device.bypass}
                   aria-pressed={automated(p.name)}
-                  title={automated(p.name) ? 'Retirer l\'automation' : 'Automatiser : le paramètre va de sa valeur à une valeur de fin sur la durée du rendu, selon la courbe du traitement'}>↗</button>
+                  title={automated(p.name) ? 'Retirer l\'automation' : slices
+                    ? 'Varier : le paramètre va de sa valeur (tranche 1) à une autre (dernière tranche), avec l\'aléa du traitement'
+                    : 'Automatiser : le paramètre va de sa valeur à une valeur de fin sur la durée du rendu, selon la courbe du traitement'}>↗</button>
               {/if}
             </div>
           {/if}

@@ -364,6 +364,7 @@ Status = Literal["pending", "keep", "drop"]
 # nom : lue dans le nom ; mesure : mesuree ; incertaine : mesuree sans note sure
 NoteSrc = Literal["nom", "mesure", "incertaine"]
 LOOPS = frozenset({"BR", "DL", "PL", "ML", "BL"})
+SLICES_TAG = "slices"     # tag d'un fichier de tranches GRID (sound design 8.I) : pas de controle long
 LOOPED = LOOPS | {"RM"}   # boucles (pas de controle blanc / long), RM compris
 
 
@@ -1179,7 +1180,12 @@ def build_manifest(root: Path, overrides: dict[str, Override],
             if old is not None and old.flags is not None and old.code == code:
                 flags[r.source] = old.flags
             elif measure_fn is not None:
-                flags[r.source] = measure_fn(root / r.source, code)
+                measured = measure_fn(root / r.source, code)
+                # fichier de tranches (variations, 8.I) : plusieurs frappes a la
+                # suite, la duree ne dit rien de la qualite
+                if SLICES_TAG in tags_of(overrides, r.source):
+                    measured = [f for f in measured if f != "long"]
+                flags[r.source] = measured
             else:
                 flags[r.source] = None
         # tempo des boucles qui ne l'ecrivent pas (repris du manifeste precedent)

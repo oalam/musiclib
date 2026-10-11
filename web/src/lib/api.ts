@@ -378,6 +378,8 @@ export interface TreatmentSpec {
   /** Sample requis seulement si settings[source_param] == source_sample ; "" = toujours. */
   source_param: string
   source_sample: number
+  /** Automation sur la duree du rendu, ou d'une tranche a l'autre (variations, 8.I). */
+  automation: 'time' | 'slices'
 }
 export interface RenderRecord {
   file: string
@@ -394,6 +396,10 @@ export interface RenderRecord {
   versed: string | null
   /** Dossier de rangement une fois verse (DRUMS/RM/CLEAN, FX/RISE). */
   folder: string
+  /** Code DT2 du rendu ("" : rendu anterieur a 8.I, celui du traitement). */
+  code: string
+  /** Nombre de tranches GRID (variations, 8.I) ; 0 = un seul son. */
+  slices: number
 }
 
 /** Nom DT2 propose et dossier de rangement d'un rendu (8.E). */
@@ -522,8 +528,8 @@ export const api = {
   sdRender: (preset: SdPreset, source: string, name?: string) =>
     fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, name: name || null }) })
       .then(r => json<RenderRecord>(r)),
-  sdTarget: (treatment: string, source: string, bpm?: number) =>
-    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}${source ? `&source=${enc(source)}` : ''}${bpm ? `&bpm=${bpm}` : ''}`)
+  sdTarget: (treatment: string, source: string, bpm?: number, slices?: number) =>
+    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}${source ? `&source=${enc(source)}` : ''}${bpm ? `&bpm=${bpm}` : ''}${slices ? `&slices=${slices}` : ''}`)
       .then(r => json<SdTarget>(r)),
   sdRenders: (treatment: string) => fetch(`/api/sounddesign/renders?treatment=${enc(treatment)}`).then(r => json<RenderRecord[]>(r)),
   sdRenderAudioUrl: (file: string) => `/api/sounddesign/renders/audio?file=${enc(file)}`,

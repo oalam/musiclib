@@ -925,11 +925,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Ecrit la boucle et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/`."""
         path, audio = render_request(req)
         with render_lock:
-            name, sub = sd.target(req.source if path else "", manifest(),
-                                  req.preset.treatment, req.preset.settings.get("bpm"))
+            t = sd.target(req.source if path else "", manifest(), req.preset.treatment,
+                          req.preset.settings.get("bpm"), sd.slice_count(req.preset))
             return sd.write_render(audio, media_relative(path) if path else "",
-                                   req.preset, sounddesign_out,
-                                   req.name or name, sub)
+                                   req.preset, sounddesign_out, req.name or t.name, t.sub, t.code)
 
     @app.get("/api/sounddesign/renders", response_model=list[sd.RenderRecord])
     def sd_renders(treatment: str | None = None) -> list[sd.RenderRecord]:
@@ -957,16 +956,16 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return sd.mark_versed([record], samples_src)[0]
 
     @app.get("/api/sounddesign/target", response_model=SdTarget)
-    def sd_target(treatment: str, source: str = "", bpm: float | None = None) -> SdTarget:
+    def sd_target(treatment: str, source: str = "", bpm: float | None = None,
+                  slices: int = 0) -> SdTarget:
         """Nom DT2 propose pour un rendu de `source` et son dossier (DRUMS/RM/<sous>) ;
         sans source : rendu sur bruit genere (FX/RISE)."""
         treatment_or_404(treatment)
         m = manifest()
         if source and not known(m, source):
             raise HTTPException(404, f"sample hors manifeste : {source}")
-        name, sub = sd.target(source, m, treatment, bpm)
-        return SdTarget(name=name, sub=sub,
-                        folder=folder_of("", sd.TREATMENTS[treatment].spec.code, sub))
+        t = sd.target(source, m, treatment, bpm, slices)
+        return SdTarget(name=t.name, sub=t.sub, folder=folder_of("", t.code, t.sub))
 
     @app.get("/api/sounddesign/notebook/{treatment}", response_model=SdNotebook)
     def sd_notebook(treatment: str) -> SdNotebook:
