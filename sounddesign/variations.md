@@ -54,6 +54,31 @@ de façon géométrique pour une fréquence.
 La teinte d'overdrive. De 2 à 12 dB, le kick passe de rond à granuleux ;
 au-delà de 15 dB, ce n'est plus une variante mais un autre kick.
 
+### Overdrive
+
+Émulation de l'Overdrive de Live : un **passe-bande** choisit la bande
+saturée (fréquence, largeur en octaves), puis une saturation asymétrique de
+pédale (0 % de drive distord déjà), la **tonalité** (passe-bas après la
+saturation, 800 Hz à 20 kHz), la **dynamique** (0 % : la saturation
+compresse et rattrape le niveau, son dense ; 100 % : l'enveloppe de
+l'entrée revient, l'attaque du kick reste) et le **dry/wet**. Sur un kick,
+le passe-bande retire le sub : bande large (8 à 9 octaves) ou dry/wet
+autour de 30 à 60 % pour garder le corps. Automatiser le dry/wet ou le
+drive d'une tranche à l'autre donne des teintes plus « pédale » que la
+Distorsion.
+
+### Dynamic Tube
+
+Émulation du Dynamic Tube de Live : une lampe dont le **bias** (point de
+repos dans la courbe) donne le grain asymétrique, et dont l'**enveloppe**
+module ce bias selon le niveau : positive, l'attaque est plus sale que la
+queue ; négative, les forts restent propres (expansion). Modèles : **A**
+propre tant que le signal reste sous un seuil, **B** saturation douce,
+**C** « mauvais ampli » qui distord tout le temps. **Tone** au-dessus de
+0,5 porte la distorsion sur les aigus (le clic grésille), en dessous sur le
+grave. Pas de mode Hi-Quality (pas de suréchantillonnage) : rester sobre
+sur le drive des aigus pour éviter le repliement.
+
 ### Bande (peak)
 
 Une cloche vers 3,5 kHz qui monte un peu le clic de l'attaque sur les
@@ -77,6 +102,7 @@ kick garde son attaque, la queue grave change d'une tranche à l'autre.
 |---|---|---|
 | `drive_tints` | Drive 2 → 12 dB, clic −1 → +3 dB, 8 tranches | Kick de kit qui respire, sur la track 1 |
 | `rumble_tints` | Rumble −30 → −12 dB, drive 2 → 8 dB, 8 tranches | Kick et rumble d'un seul sample, la queue qui bouge |
+| `tube_tints` | Bias du tube 0,1 → 0,5, overdrive dry/wet 30 → 60 %, 8 tranches | Grain de lampe qui monte, attaque plus sale, sub gardé |
 | `layer_blend` | Couche C1 −24 → −6 dB au-dessus de 1 kHz, 8 tranches | Kick + clic ou top d'un autre sample, dosé tranche par tranche |
 
 ## Layering

@@ -81,6 +81,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.K] Devices **Overdrive** et **Dynamic Tube**, émulations des devices
+  de Live (`analyzer/saturation.py`) : passe-bande, saturation asymétrique
+  de pédale, tonalité, dynamique, dry/wet ; lampe à modèles A / B / C dont
+  le bias suit l'enveloppe (attaque / relâche), tonalité par pré- et
+  désaccentuation. Automatisables (↗) comme les devices pedalboard ; preset
+  `variations/tube_tints`, sections du notebook variations.
 - [8.J] Forme d'onde dans le lecteur du sound design : boucle écoutée ou
   rendu du disque en lecture, tête de lecture animée, grille des tranches
   en variations.

@@ -37,6 +37,7 @@ import numpy as np
 from pydantic import BaseModel, Field
 
 from analyzer import samples as smp
+from analyzer import saturation
 
 SR = 48_000
 PREROLL_SECONDS = 4.0
@@ -326,6 +327,34 @@ DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
                                   _p("feedback", "Feedback", 0, 0.95, 0.3),
                                   _p("mix", "Mix", 0, 1, 0.3)]),
         _pedalboard("Delay")),
+    _pb(DeviceSpec(type="overdrive", label="Overdrive",
+                   help="Pedale d'overdrive facon Live : passe-bande (la bande saturee), "
+                        "saturation asymetrique (0 % distord deja), tonalite apres la "
+                        "saturation, dynamique (0 % = compresse et dense, 100 % = garde "
+                        "les transitoires), dry/wet. Sur un kick : bande large ou dry/wet "
+                        "< 100 % pour garder le sub.",
+                   params=[_p("filter_hz", "Frequence", 50, 20000, 1000, **_HZ),
+                           _p("width_oct", "Largeur", 0.5, 9, 6, "oct"),
+                           _p("drive", "Drive", 0, 100, 50, "%"),
+                           _p("tone", "Tone", 0, 100, 50, "%"),
+                           _p("dynamics", "Dynamique", 0, 100, 50, "%"),
+                           _p("dry_wet", "Dry/Wet", 0, 100, 100, "%")]),
+        lambda params: saturation.Overdrive(**params)),
+    _pb(DeviceSpec(type="dynamic_tube", label="Dynamic Tube",
+                   help="Lampe facon Live dont le bias suit l'enveloppe : modele A (propre "
+                        "sous un seuil), B (doux), C (distord tout le temps) ; bias = grain "
+                        "asymetrique ; enveloppe + = plus sale sur les forts, - = forts "
+                        "propres ; tone = distorsion vers l'aigu ou le grave.",
+                   params=[_p("model", "Modele", 0, len(saturation.TUBE_MODELS) - 1, 1, step=1,
+                              choices=saturation.TUBE_MODELS),
+                           _p("drive_db", "Drive", -12, 36, 0, "dB"),
+                           _p("bias", "Bias", 0, 1, 0.2),
+                           _p("envelope", "Enveloppe", -3, 3, 0),
+                           _p("attack_ms", "Attaque", 0.1, 1000, 10, "ms", "log"),
+                           _p("release_ms", "Relache", 1, 3000, 100, "ms", "log"),
+                           _p("tone", "Tone", 0, 1, 0.5),
+                           _p("output_db", "Sortie", -36, 36, 0, "dB")]),
+        lambda params: saturation.DynamicTube(**params)),
     _DeviceDef(DeviceSpec(type="duck", label="Duck (sidechain)",
                           help="Baisse le volume a chaque coup de la source, comme un "
                                "compresseur en sidechain sur le kick : libere la place du kick.",

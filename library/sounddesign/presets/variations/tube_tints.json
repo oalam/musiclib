@@ -1,0 +1,23 @@
+{
+  "id": "tube_tints",
+  "treatment": "variations",
+  "label": "Teintes lampe + overdrive",
+  "description": "8 variantes : Dynamic Tube modele B dont le bias monte de 0,1 a 0,5 (grain asymetrique) avec une enveloppe positive (plus sale sur l'attaque), puis Overdrive bande large melange a 30 -> 60 % pour garder le sub. A valider a l'oreille.",
+  "settings": {"bpm": 150, "length_beats": 1, "slices": 1, "jitter": 0.3},
+  "chains": [
+    {
+      "name": "Kick",
+      "mute": false,
+      "gain_db": 0,
+      "devices": [
+        {"type": "dynamic_tube", "params": {"model": 1, "drive_db": 3, "bias": 0.1, "envelope": 1, "attack_ms": 5, "release_ms": 80, "tone": 0.6}, "params_end": {"bias": 0.5}, "bypass": false},
+        {"type": "overdrive", "params": {"filter_hz": 800, "width_oct": 8, "drive": 30, "tone": 60, "dynamics": 70, "dry_wet": 30}, "params_end": {"dry_wet": 60}, "bypass": false},
+        {"type": "highpass", "params": {"cutoff_frequency_hz": 25}, "bypass": false}
+      ]
+    }
+  ],
+  "master": [
+    {"type": "limiter", "params": {"threshold_db": -1, "release_ms": 100}, "bypass": false}
+  ],
+  "output_peak_db": -1
+}
