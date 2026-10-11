@@ -19,6 +19,7 @@
   import Knob from './sd/Knob.svelte'
   import { Looper } from './sd/looper'
   import TreatmentList from './sd/TreatmentList.svelte'
+  import Waveform from './sd/Waveform.svelte'
 
   // la source est le sample en cours de la vue Samples (8.E) : on la change la-bas
   // `onshow` : revenir a cette vue apres le choix d'une couche dans Samples (8.J)
@@ -268,6 +269,14 @@
   let playing = $state(false)
   let busy = $state(false)
   looper.onstate = p => { playing = p; if (p) remote.played('sounddesign') }
+  // forme d'onde : derniere boucle ecoutee, ou rendu du disque en lecture
+  let waveBuf = $state.raw<AudioBuffer | null>(null)
+  let waveLabel = $state('')
+  let waveSlices = $state(0)
+  const wavePos = () => {
+    if (renderPlaying && renderAudio?.duration) return renderAudio.currentTime / renderAudio.duration
+    return looper.phase()
+  }
 
   /** Preset envoye a l'API : le solo d'ecoute mute les autres chaines. */
   const payload = $derived.by(() => {
@@ -293,7 +302,12 @@
       const buf = await looper.decode(data)
       if (id !== seq) return
       sourceAudio?.pause()
+      renderAudio?.pause()
+      renderPlaying = null
       looper.play(buf)
+      waveBuf = buf
+      waveLabel = 'écoute'
+      waveSlices = sliceCount
       error = ''
     } catch (e) {
       if (e instanceof DOMException && e.name === 'AbortError') return
@@ -344,6 +358,13 @@
     renderAudio.loop = true
     void renderAudio.play()
     renderPlaying = file
+    const rec = renders.find(r => r.file === file)
+    fetch(api.sdRenderAudioUrl(file)).then(r => r.arrayBuffer()).then(b => looper.decode(b)).then(buf => {
+      if (renderPlaying !== file) return
+      waveBuf = buf
+      waveLabel = rec?.name || file.split('/').pop() || ''
+      waveSlices = rec?.slices ?? 0
+    }).catch(() => { /* forme d'onde facultative */ })
   }
 
   // deck de la telecommande : precedent / suivant = preset voisin
@@ -444,6 +465,7 @@
   </div>
 
   {#if preset && treatment}
+    <Waveform buffer={waveBuf} pos={wavePos} slices={waveSlices} label={waveLabel} />
     <div class="rack">
       <section class="panel settings">
         <h3>{treatment.label}</h3>

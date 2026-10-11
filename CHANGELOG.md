@@ -81,6 +81,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.J] Forme d'onde dans le lecteur du sound design : boucle écoutée ou
+  rendu du disque en lecture, tête de lecture animée, grille des tranches
+  en variations.
 - [8.J] **Layering** : couches en plus de la source (3 au plus), choisies
   dans la vue Samples par « + couche » (bandeau « Ajouter comme couche »,
   la source ne change pas pendant le choix). Chaque chaîne lit une couche

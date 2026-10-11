@@ -13,6 +13,12 @@ export class Looper {
 
   get playing(): boolean { return this.node !== null }
 
+  /** Position 0..1 dans la boucle qui joue, null a l'arret (tete de lecture). */
+  phase(): number | null {
+    if (!this.ctx || !this.node || !this.duration) return null
+    return ((this.ctx.currentTime - this.startedAt) % this.duration) / this.duration
+  }
+
   async decode(data: ArrayBuffer): Promise<AudioBuffer> {
     this.ctx ??= new AudioContext()
     return this.ctx.decodeAudioData(data)
