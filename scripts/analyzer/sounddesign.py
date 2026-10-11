@@ -1029,7 +1029,7 @@ def slice_count(preset: Preset) -> int:
 
 
 def target(source: str, manifest: smp.Manifest, treatment: str,
-           bpm: float | None, slices: int = 0) -> Target:
+           bpm: float | None, slices: int = 0, folder: str = "") -> Target:
     """Nom DT2 propose, sous-dossier et code d'un rendu de `source` (relatif a Samples/).
 
     Le sous-dossier est celui du traitement s'il en fixe un (riser : FX/RISE),
@@ -1039,14 +1039,20 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
     code et sous-dossier de la source, `V<tranches>` a la place du tempo
     (`BD C Punch 01 dbr` -> `BD V8 C Punch dbr`). Le nom est rendu unique
     dans le dossier cible (rendus deja verses compris).
+
+    `folder` (un de `samples.target_folders()`) impose le dossier, donc le
+    code et le sous-dossier : le nom propose prend ce code
+    (`DRUMS/RM/SUB` pour une variation de kick -> `RM V8 C Punch dbr`).
     """
     spec = TREATMENTS[treatment].spec
-    code = spec.code
+    forced = _forced_folder(folder)
     if not source:   # rendu sans sample (bruit genere) : `FX 150 Rise Noise`
-        folder = smp.folder_of("", code, spec.sub)
-        taken = {e.name for e in manifest.entries if e.folder == folder}
+        code, sub = forced or (spec.code, spec.sub)
+        dest = smp.folder_of("", code, sub)
+        taken = {e.name for e in manifest.entries if e.folder == dest}
         head = " ".join([code, *([str(round(bpm))] if bpm else [])])
-        return Target(smp.unique_name(f"{head} {spec.label[:4]} Noise", taken), spec.sub, code)
+        return Target(smp.unique_name(f"{head} {spec.label[:4]} Noise", taken), sub, code)
+    code = spec.code
     entry = next((e for e in manifest.entries if e.source == source), None)
     reserve = next((r for r in manifest.reserve if r.source == source), None)
     found = entry or reserve
@@ -1055,12 +1061,24 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
     if not code:     # variations (8.I) : le rendu reste un son du code de la source
         code, bpm = src_code or "BD", None
     sub = spec.sub or (src_sub if smp.has_sub(code, src_sub) else "")
+    if forced:
+        code, sub = forced
     pack = found.pack if found else smp.pack_of(source)
     src_name = entry.name if entry else smp.short_name(source, src_code or code, pack)
     name = propose_name(src_name, src_code, code, bpm, f"V{slices}" if slices else "")
-    folder = smp.folder_of("", code, sub)
-    taken = {e.name for e in manifest.entries if e.folder == folder}
+    dest = smp.folder_of("", code, sub)
+    taken = {e.name for e in manifest.entries if e.folder == dest}
     return Target(smp.unique_name(name, taken), sub, code)
+
+
+def _forced_folder(folder: str) -> tuple[str, str] | None:
+    """(code, sous-dossier) d'un dossier de rangement choisi ; None : dossier propose."""
+    if not folder:
+        return None
+    if folder not in smp.target_folders():
+        raise PresetError(f"dossier de rangement inconnu : {folder!r}")
+    _, code, sub = smp.folder_parts(folder)
+    return code, sub
 
 
 # revision du rendu d'un traitement, dans le hash quand il change de contenu a

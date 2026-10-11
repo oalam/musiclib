@@ -155,8 +155,11 @@ l'attaque, et le dosage de la couche change d'une tranche à l'autre.
 
 ## Sur la Digitakt II
 
-1. Verser le rendu : il est rangé **avec la source** (même code, même
-   dossier, ex. `DRUMS/BD/CLEAN`), nommé `BD V8 …`, tagué `slices`.
+1. Verser le rendu : il est rangé par défaut **avec la source** (même
+   code, même dossier, ex. `DRUMS/BD/CLEAN`), nommé `BD V8 …`, tagué
+   `slices`. Le menu `→` à côté du nom DT2 choisit un autre dossier avant le
+   rendu (ex. `DRUMS/RM/CLEAN` : nommé `RM V8 …`). Le badge « versé » ouvre
+   le rendu dans la vue Samples.
 2. Track 1 (kick), machine **GRID** (`[FUNC] + [SRC]`), `GRID` = nombre de
    tranches du rendu (8).
 3. Poser les trigs du kick, puis **CREATE RANDOM LOCKS** sur `SLICE` : chaque

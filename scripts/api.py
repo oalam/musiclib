@@ -365,6 +365,7 @@ class SoundDesignRequest(BaseModel):
     # couches 1.. (8.J) : samples du manifeste lus par les chaines `layer` >= 1
     layers: list[str] = Field(default_factory=list, max_length=sd.MAX_LAYERS - 1)
     name: str | None = Field(default=None, pattern=sd.NAME_RX, max_length=NAME_MAX)
+    folder: str = ""   # dossier de rangement choisi (samples.target_folders) ; vide : propose
 
 
 class SdTarget(BaseModel):
@@ -931,8 +932,12 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         """Ecrit la boucle et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/`."""
         path, audio = render_request(req)
         with render_lock:
-            t = sd.target(req.source if path else "", manifest(), req.preset.treatment,
-                          req.preset.settings.get("bpm"), sd.slice_count(req.preset))
+            try:
+                t = sd.target(req.source if path else "", manifest(), req.preset.treatment,
+                              req.preset.settings.get("bpm"), sd.slice_count(req.preset),
+                              req.folder)
+            except sd.PresetError as exc:
+                raise HTTPException(422, str(exc)) from exc
             return sd.write_render(audio, media_relative(path) if path else "",
                                    req.preset, sounddesign_out, req.name or t.name, t.sub, t.code,
                                    [media_relative(samples_src / x) for x in req.layers])
@@ -964,14 +969,18 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
 
     @app.get("/api/sounddesign/target", response_model=SdTarget)
     def sd_target(treatment: str, source: str = "", bpm: float | None = None,
-                  slices: int = 0) -> SdTarget:
+                  slices: int = 0, folder: str = "") -> SdTarget:
         """Nom DT2 propose pour un rendu de `source` et son dossier (DRUMS/RM/<sous>) ;
-        sans source : rendu sur bruit genere (FX/RISE)."""
+        sans source : rendu sur bruit genere (FX/RISE). `folder` impose le dossier
+        (et donc le code du nom propose)."""
         treatment_or_404(treatment)
         m = manifest()
         if source and not known(m, source):
             raise HTTPException(404, f"sample hors manifeste : {source}")
-        t = sd.target(source, m, treatment, bpm, slices)
+        try:
+            t = sd.target(source, m, treatment, bpm, slices, folder)
+        except sd.PresetError as exc:
+            raise HTTPException(422, str(exc)) from exc
         return SdTarget(name=t.name, sub=t.sub, folder=folder_of("", t.code, t.sub))
 
     @app.get("/api/sounddesign/notebook/{treatment}", response_model=SdNotebook)

@@ -215,8 +215,20 @@
   const ready = $derived(!!preset && (!needsSource || !!sample) && focus.layers.length >= layersUsed)
   const sourceName = $derived(focus.sample?.name ?? '')
   // nom DT2 du rendu, propose par l'API (nom de la source, code du traitement,
-  // tempo) et modifiable ; une autre source repart du nom propose
+  // tempo) et modifiable ; une autre source repart du nom propose. Dossier de
+  // rangement : propose, ou choisi parmi tous (le nom propose prend son code),
+  // remis au propose a chaque changement de traitement
   let target = $state<SdTarget | null>(null)
+  let folder = $state('')
+  let proposed = $state('')
+  let folders = $state<string[]>([])
+  api.sampleFolders().then(f => (folders = f)).catch(() => {})
+  const folderGroups = $derived.by(() => {
+    const g = new Map<string, string[]>()
+    for (const f of folders) g.set(f.split('/')[0], [...(g.get(f.split('/')[0]) ?? []), f])
+    return [...g]
+  })
+  $effect(() => { void treatment?.id; folder = '' })
   let name = $state('')
   let nameEdited = $state(false)
   // un coup (8.F) : longueur en temps au tempo ; mesures et coups ignores
@@ -234,13 +246,14 @@
   })
   $effect(() => { void source; nameEdited = false })
   $effect(() => {
-    const t = treatment?.id, s = source, b = bpm, n = sliceCount
+    const t = treatment?.id, s = source, b = bpm, n = sliceCount, f = folder
     if (!t || (needsSource && !s)) { target = null; return }
     let stale = false
-    api.sdTarget(t, s ?? '', b, n).then(r => {
+    Promise.all([api.sdTarget(t, s ?? '', b, n), f ? api.sdTarget(t, s ?? '', b, n, f) : null]).then(([p, r]) => {
       if (stale) return
-      target = r
-      if (!nameEdited) name = r.name
+      proposed = p.folder
+      target = r ?? p
+      if (!nameEdited) name = target.name
     }).catch(e => { if (!stale) error = e instanceof Error ? e.message : String(e) })
     return () => { stale = true }
   })
@@ -342,7 +355,7 @@
     if (!payload || !ready) return
     busy = true
     try {
-      const rec = await api.sdRender(payload, source ?? '', sentLayers, name.trim())
+      const rec = await api.sdRender(payload, source ?? '', sentLayers, name.trim(), folder)
       renders = await api.sdRenders(rec.preset.treatment)
       error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
@@ -461,7 +474,13 @@
       <input class="mono name" bind:value={name} oninput={() => (nameEdited = true)} maxlength="18" size="18"
         pattern={"[A-Za-z0-9#][A-Za-z0-9 #._+\\-]*"} disabled={!target} /></label>
     {#if nameEdited && target}<button class="small" onclick={() => { name = target!.name; nameEdited = false }} title="Revenir au nom proposé : {target.name}">↺</button>{/if}
-    {#if target}<span class="muted small" title="Dossier du rendu une fois versé dans les samples">→ {target.folder}</span>{/if}
+    {#if target}<label class="small" title="Dossier du rendu une fois versé dans les samples ; le nom proposé prend son code">→
+      <select class="small mono" bind:value={folder}>
+        <option value="">{proposed} (proposé)</option>
+        {#each folderGroups as [branch, fs] (branch)}
+          <optgroup label={branch}>{#each fs as f (f)}<option value={f}>{f}</option>{/each}</optgroup>
+        {/each}
+      </select></label>{/if}
   </div>
 
   {#if preset && treatment}

@@ -96,6 +96,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.E] Dossier de rangement d'un rendu au choix, avant le rendu : le
+  `→ dossier` à côté du nom DT2 devient un menu (dossier proposé, ou tous
+  les dossiers cibles groupés par branche) ; le nom proposé prend le code du
+  dossier choisi (variation de kick en `DRUMS/RM/CLEAN` -> `RM V8 …`).
+  Remis au proposé à chaque changement de traitement. API : `folder` sur
+  `GET /api/sounddesign/target` et `POST /api/sounddesign/render` (422 si
+  inconnu), `sounddesign.target(folder=)`.
 - [8.D] Badge « versé » d'un rendu cliquable : ouvre la vue Samples sur
   son dossier (ex. `DRUMS/BD/CLEAN`), sample sélectionné et joué, sans en
   faire la source du sound design (il ne le devient que si on le

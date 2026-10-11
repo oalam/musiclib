@@ -412,6 +412,18 @@ def test_variations_target_keeps_source_code_and_tags_slices(tmp_path: Path):
     assert sd.mark_versed([record], samples_root)[0].folder == "DRUMS/BD/CLEAN"
 
 
+def test_target_in_chosen_folder_takes_its_code_and_sub():
+    from analyzer.samples import SampleEntry
+    kick = SampleEntry(source="d/kick.wav", family="TECHNO", code="BD", pack="dbr",
+                       name="BD C Punch 01 dbr", duration=0.3, rank=1, sub="CLEAN")
+    m = _manifest(kick)
+    assert sd.target("d/kick.wav", m, "variations", 150, 8, "DRUMS/RM") == ("RM V8 C Punch dbr", "", "RM")
+    assert sd.target("d/kick.wav", m, "rumble", 150, 0, "DRUMS/BD/SUB") == ("BD 150 C Punch dbr", "SUB", "BD")
+    assert sd.target("", m, "riser", 150, 0, "FX")[1:] == ("", "FX")
+    with pytest.raises(sd.PresetError):
+        sd.target("d/kick.wav", m, "variations", 150, 8, "DRUMS/XX")
+
+
 def test_versed_slices_are_not_flagged_long(tmp_path: Path):
     from analyzer.samples import build_manifest
     out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"

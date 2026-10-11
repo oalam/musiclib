@@ -535,11 +535,12 @@ export const api = {
     if (!r.ok) await json(r)   // leve avec le detail de l'API
     return r.arrayBuffer()
   },
-  sdRender: (preset: SdPreset, source: string, layers: string[], name?: string) =>
-    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, layers, name: name || null }) })
+  /** `folder` : dossier de rangement choisi (vide : propose). */
+  sdRender: (preset: SdPreset, source: string, layers: string[], name?: string, folder = '') =>
+    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, layers, name: name || null, folder }) })
       .then(r => json<RenderRecord>(r)),
-  sdTarget: (treatment: string, source: string, bpm?: number, slices?: number) =>
-    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}${source ? `&source=${enc(source)}` : ''}${bpm ? `&bpm=${bpm}` : ''}${slices ? `&slices=${slices}` : ''}`)
+  sdTarget: (treatment: string, source: string, bpm?: number, slices?: number, folder = '') =>
+    fetch(`/api/sounddesign/target?treatment=${enc(treatment)}${source ? `&source=${enc(source)}` : ''}${bpm ? `&bpm=${bpm}` : ''}${slices ? `&slices=${slices}` : ''}${folder ? `&folder=${enc(folder)}` : ''}`)
       .then(r => json<SdTarget>(r)),
   sdRenders: (treatment: string) => fetch(`/api/sounddesign/renders?treatment=${enc(treatment)}`).then(r => json<RenderRecord[]>(r)),
   sdRenderAudioUrl: (file: string) => `/api/sounddesign/renders/audio?file=${enc(file)}`,

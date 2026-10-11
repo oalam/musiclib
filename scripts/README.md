@@ -1129,8 +1129,8 @@ erreur sur un fichier annule tout le lot, rien n'est écrit.
 | GET | `/api/sounddesign/presets/{traitement}` | presets du vault, triés par id (404 traitement inconnu) |
 | PUT | `/api/sounddesign/presets/{traitement}/{id}` | `Preset` → crée ou remplace le JSON du vault ; 422 si id hors `[a-z0-9_]`, id / traitement différents du chemin, device ou valeur hors catalogue |
 | POST | `/api/sounddesign/preview` | `{preset, source}` → boucle en `audio/wav` 24 bits, en mémoire (rien d'écrit) ; source = clé du manifeste de samples (404 sinon, 503 sans disque) |
-| POST | `/api/sounddesign/render` | `{preset, source, name?}` → `RenderRecord` ; écrit `<nom DT2> <hash>.wav` et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/` (nom proposé si absent, 422 si invalide) |
-| GET | `/api/sounddesign/target?treatment=&source=&bpm=` | `{name, sub, folder}` : nom DT2 proposé et dossier de rangement (8.E) |
+| POST | `/api/sounddesign/render` | `{preset, source, name?, folder?}` → `RenderRecord` ; écrit `<nom DT2> <hash>.wav` et son sidecar sous `<MEDIA>/SoundDesign/<traitement>/` (nom proposé si absent, 422 si invalide) ; `folder` (un de `GET /api/samples/folders`) impose le dossier de rangement, donc le code |
+| GET | `/api/sounddesign/target?treatment=&source=&bpm=&slices=&folder=` | `{name, sub, folder}` : nom DT2 proposé et dossier de rangement (8.E) ; `folder` impose le dossier et le code du nom proposé (422 si inconnu) |
 | GET | `/api/sounddesign/renders?treatment=` | rendus écrits, du plus récent au plus ancien |
 | GET | `/api/sounddesign/renders/audio?file=` | wav d'un rendu listé (404 sinon) |
 | POST | `/api/sounddesign/verse` | `{file}` → `RenderRecord` avec `versed` (clé du manifeste) ; copie dans `Samples/SoundDesign/` et override de rangement (code, sous-dossier, nom) ; 409 pendant une réanalyse, 422 pour un rendu sans nom DT2 |
