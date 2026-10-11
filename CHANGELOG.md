@@ -50,6 +50,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [8.K] Devices du rack sound design compactés façon Live, sans espace
+  vide : sélecteurs en bandeau (bascule pour Off/On comme Color ou
+  Hi-Quality, segments pour Post clip ou le modèle A/B/C, menu déroulant
+  pour la courbe ou le type de filtre) ; potards principaux en grille d'une
+  rangée (jusqu'à 3) ou deux, qui s'étend en largeur ; paramètres activés
+  par un sélecteur (Saturator : Color, Waveshaper) en sections titrées de
+  champs à barre à droite (`Knob` variante `bar`, préfixe commun retiré :
+  WS Drive -> Drive) ; bouton d'automation ↗ en coin du potard au lieu
+  d'une ligne dédiée. Le Saturator complet passe de ~700 px de haut à ~130.
 - [8.I] Variations : la tranche 1 est désormais la **source brute**, sans
   traitement (le son de référence) ; les variantes occupent les tranches 2
   à N, de la plus sobre à la plus marquée. Les rendus antérieurs ne sont pas
