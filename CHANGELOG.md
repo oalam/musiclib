@@ -96,6 +96,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.D] Badge « versé » d'un rendu cliquable : ouvre la vue Samples sur
+  son dossier (ex. `DRUMS/BD/CLEAN`), sample sélectionné et joué, sans en
+  faire la source du sound design (il ne le devient que si on le
+  resélectionne après un autre sample). `focus.show()` porte la demande ;
+  `open()` de la vue Samples accepte un sample cible.
 - [8.K] Courbe de transfert du Saturator dans le device, façon Live :
   entrée -1..1 en abscisse, sortie en ordonnée (plafonds ±1 et diagonale du
   son inchangé en pointillés) ; suit la courbe, le Drive, les potards WS, le

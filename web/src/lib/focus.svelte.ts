@@ -3,6 +3,8 @@
 // Layering (8.J) : buffer de couches 1.. a cote de cette source (couche 0).
 // « + couche » passe en mode choix : la vue Samples ne change plus la source,
 // son sample en cours devient le candidat, ajoute par « Ajouter comme couche ».
+// Badge « versé » d'un rendu : la vue Samples ouvre son dossier et le
+// selectionne, sans en faire la source du sound design.
 
 export interface FocusSample {
   source: string
@@ -28,6 +30,8 @@ class Focus {
   picking = $state(false)
   candidate = $state<FocusSample | null>(null)
   private onpicked: (() => void) | null = null
+  /** Sample a montrer dans la vue Samples (consomme par elle). */
+  reveal = $state<{ folder: string; source: string } | null>(null)
 
   set(s: FocusSample | null) {
     if (this.picking) { this.candidate = s; return }
@@ -55,6 +59,10 @@ class Focus {
     const done = this.onpicked
     this.onpicked = null
     done?.()
+  }
+
+  show(folder: string, source: string) {
+    this.reveal = { folder, source }
   }
 
   removeLayer(i: number) {

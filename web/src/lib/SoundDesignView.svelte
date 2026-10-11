@@ -575,7 +575,8 @@
               <button class="small" class:on={renderPlaying === r.file} onclick={() => playRender(r.file)}>{renderPlaying === r.file ? '■' : '▶'}</button>
               <span class="mono small fname" title={`${r.file}\n${r.source}\n${r.created_at}`}>{r.name || r.file.split('/').pop()}</span>
               <span class="muted small">{r.slices ? `${r.slices} tranches · ` : ''}{r.seconds.toFixed(2)} s</span>
-              {#if r.versed}<span class="versed small" title={`Samples/${r.versed}`}>versé</span>
+              {#if r.versed}<button class="versed small" onclick={() => { focus.show(r.folder, r.versed!); ongotosamples?.() }}
+                title={`Samples/${r.versed}\nOuvrir dans la vue Samples (${r.folder})`}>versé</button>
               {:else if r.name}<button class="small" onclick={() => verseRender(r.file)} title="Copier dans le pack Samples/SoundDesign et ranger en {r.folder}">Verser</button>
               {:else}<span class="muted small" title="Rendu antérieur au nommage DT2 : le re-rendre pour le verser">sans nom</span>{/if}
             </li>
@@ -636,7 +637,8 @@
   .md :global(th) { background: var(--panel-2); }
   .md :global(code) { font-size: 12px; background: var(--panel-2); padding: 0 3px; border-radius: 3px; }
   .md :global(a) { color: var(--accent); }
-  .versed { color: var(--accent); }
+  .versed { color: var(--accent); background: none; border-color: transparent; padding: 0 4px; text-decoration: underline dotted; }
+  .versed:hover { border-color: var(--accent); }
   .layer { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--border); border-radius: 4px; padding: 0 2px 0 6px; }
   .badge { font-size: 10px; color: var(--accent); }
   .renders ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }

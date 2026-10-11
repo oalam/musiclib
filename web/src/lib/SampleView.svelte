@@ -510,7 +510,8 @@
       : (await api.sampleLoose(v.kind, kit, rightF)).map(looseRow)
   }
 
-  async function open(v: View) {
+  /** `target` : sample a selectionner a l'arrivee (defaut : premier a ecouter). */
+  async function open(v: View, target?: string) {
     view = v
     sel = new Set()
     moving = null
@@ -518,16 +519,32 @@
     try { localStorage.setItem(VIEW_KEY, key) } catch { /* stockage indisponible */ }
     await loadEntries()
     const first = visible.find(e => e.status === 'pending') ?? visible[0]
-    pick(first?.source ?? null)
+    pick(target ?? first?.source ?? null)
   }
 
-  // sample en cours = source du sound design (8.E), renommage compris
+  // sample en cours = source du sound design (8.E), renommage compris ; sauf
+  // un rendu montre depuis son badge « versé » (`quiet`), jusqu'au suivant
+  let quiet: string | null = null
   $effect(() => {
     const e = visible.find(x => x.source === cursor)
-    if (e) focus.set({ source: e.source, name: e.name, code: e.code, folder: e.folder })
+    if (e && e.source !== quiet) focus.set({ source: e.source, name: e.name, code: e.code, folder: e.folder })
   })
 
+  // rendu verse montre depuis le sound design : son dossier, puis lui
+  let mounted = $state(false)
+  $effect(() => {
+    const r = focus.reveal
+    if (!r || !mounted) return
+    focus.reveal = null
+    void showSample(r.folder, r.source)
+  })
+  async function showSample(folder: string, source: string) {
+    quiet = source
+    await open({ kind: 'cell', folder }, source)
+  }
+
   function pick(source: string | null) {
+    if (source !== quiet) quiet = null
     cursor = source
     if (!source || !ws) return
     ws.load(api.sampleAudioUrl(source)).catch(() => { /* chargement remplace par le suivant */ })
@@ -826,6 +843,9 @@
     if (kit && !kitData.kits.some(k => k.kit === kit || k.pack === kit)) { kit = ''; await refresh() }
     let last: string | null = null
     try { last = localStorage.getItem(VIEW_KEY) } catch { /* stockage indisponible */ }
+    // un rendu a montrer (badge « versé ») remplace la vue memorisee
+    if (focus.reveal) { mounted = true; return }
+    mounted = true
     if (search.codes?.length) return open({ kind: 'type' })
     if (last === ':kit' && kit) return open({ kind: 'kit' })
     if (last === ':unclassified' || last === ':trash') return open({ kind: last.slice(1) as Loose })
