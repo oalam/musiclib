@@ -1,12 +1,13 @@
 <script lang="ts">
   // Device facon Ableton Live : barre de titre (activateur = bypass, nom,
   // deplacer, retirer), corps grise quand desactive ; courbe de reponse pour
-  // les filtres et EQ, puis une rangee de potards. Automation (8.H) : sur un
-  // device pedalboard, le bouton ↗ d'un potard ajoute un second potard, la
-  // valeur atteinte en fin de rendu (params_end).
+  // les filtres et EQ, de transfert pour le Saturator, puis les potards.
+  // Automation (8.H) : sur un device pedalboard, le bouton ↗ d'un potard
+  // ajoute un second potard, la valeur atteinte en fin de rendu (params_end).
   import type { DeviceSpec, ParamSpec, SdDevice } from '../api'
   import FilterCurve from './FilterCurve.svelte'
   import Knob from './Knob.svelte'
+  import SaturatorCurve from './SaturatorCurve.svelte'
   import { isFilter } from './scale'
 
   let { device, spec, slices = false, onmove, onremove, onhelp }: {
@@ -125,6 +126,8 @@
         {/if}
         {#if isFilter(device.type)}
           <FilterCurve type={device.type} params={values} specs={spec.params} disabled={device.bypass} onchange={set} />
+        {:else if device.type === 'saturator'}
+          <SaturatorCurve params={values} specs={spec.params} disabled={device.bypass} onchange={set} />
         {/if}
         {#if main.length}
           <div class="knobs" class:two={main.length > 3}>

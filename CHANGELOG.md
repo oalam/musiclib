@@ -96,6 +96,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.K] Courbe de transfert du Saturator dans le device, façon Live :
+  entrée -1..1 en abscisse, sortie en ordonnée (plafonds ±1 et diagonale du
+  son inchangé en pointillés) ; suit la courbe, le Drive, les potards WS, le
+  Post clip, l'Output et le Dry/Wet (Color exclu : neutre sur un signal
+  propre). Glisser verticalement règle le Drive (Maj = fin), double-clic le
+  remet à 0 dB. Courbes portées de `saturation.py` dans
+  `SaturatorCurve.svelte`, à tenir synchrones.
 - [8.K] Device **Saturator**, émulation de celui de Live : 8 courbes
   (Analog Clip, Soft Sine, Bass Shaper, Medium, Hard, Sinoid Fold, Digital
   Clip, Waveshaper et ses 6 potards), Drive, Color (étagères grave / aigu
