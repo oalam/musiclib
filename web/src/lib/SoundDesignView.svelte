@@ -6,11 +6,14 @@
   // reglage pendant la lecture. Le solo n'est pas enregistre dans le preset.
   // Colonne laterale (8.H) : traitements et presets, nouveau / modifier /
   // supprimer ; sans sample pour un riser sur bruit genere.
+  // Layering (8.J) : couches en plus de la source (buffer de focus), chaque
+  // chaine lit la sienne (boite « Source » en tete de ses devices).
   import { onDestroy } from 'svelte'
   import { createMarked, escapeHtml, replaceWikilinks } from './markdown'
   import { api, slugify, type DeviceSpec, type RenderRecord, type SdPreset, type SdTarget, type TreatmentSpec } from './api'
-  import { focus } from './focus.svelte'
+  import { focus, MAX_LAYERS } from './focus.svelte'
   import { remote } from './remote.svelte'
+  import ChainSource from './sd/ChainSource.svelte'
   import Device from './sd/Device.svelte'
   import Fader from './sd/Fader.svelte'
   import Knob from './sd/Knob.svelte'
@@ -18,7 +21,8 @@
   import TreatmentList from './sd/TreatmentList.svelte'
 
   // la source est le sample en cours de la vue Samples (8.E) : on la change la-bas
-  let { ongotosamples }: { ongotosamples?: () => void } = $props()
+  // `onshow` : revenir a cette vue apres le choix d'une couche dans Samples (8.J)
+  let { ongotosamples, onshow }: { ongotosamples?: () => void; onshow?: () => void } = $props()
 
   const KEY = 'ui:sd'
   type Saved = { treatment?: string; preset?: string }
@@ -203,7 +207,11 @@
     Math.round(preset.settings[treatment.source_param]
       ?? treatment.settings.find(x => x.name === treatment!.source_param)?.default ?? 0) === treatment.source_sample))
   const source = $derived(needsSource ? sample : null)
-  const ready = $derived(!!preset && (!needsSource || !!sample))
+  // couches lues par les chaines actives (8.J) : seules celles-ci partent a l'API
+  // (le hash du rendu en depend) ; une couche demandee mais absente bloque l'ecoute
+  const layersUsed = $derived(Math.max(0, ...(preset?.chains.filter(c => !c.mute).map(c => c.layer ?? 0) ?? [])))
+  const sentLayers = $derived(focus.layers.slice(0, layersUsed).map(l => l.source))
+  const ready = $derived(!!preset && (!needsSource || !!sample) && focus.layers.length >= layersUsed)
   const sourceName = $derived(focus.sample?.name ?? '')
   // nom DT2 du rendu, propose par l'API (nom de la source, code du traitement,
   // tempo) et modifiable ; une autre source repart du nom propose
@@ -236,11 +244,23 @@
     return () => { stale = true }
   })
   let sourceAudio: HTMLAudioElement | undefined = $state()
-  function auditionSource() {
-    if (!source || !sourceAudio) return
+  function auditionSource(src: string | null = source) {
+    if (!src || !sourceAudio) return
     looper.stop()
-    sourceAudio.src = api.sampleAudioUrl(source)
+    sourceAudio.src = api.sampleAudioUrl(src)
     void sourceAudio.play()
+  }
+  function addLayer() {
+    focus.startPick(() => onshow?.())
+    ongotosamples?.()
+  }
+  /** Retire la couche Ci : ses chaines repassent sur la source, les suivantes sont renumerotees. */
+  function removeLayer(i: number) {
+    focus.removeLayer(i)
+    for (const c of preset?.chains ?? []) {
+      if ((c.layer ?? 0) === i + 1) delete c.layer
+      else if ((c.layer ?? 0) > i + 1) c.layer = c.layer! - 1
+    }
   }
 
   // --- Ecoute ---------------------------------------------------------------
@@ -260,7 +280,7 @@
   let seq = 0
   let abort: AbortController | null = null
   let lastKey = ''   // reglages de la boucle qui joue (evite un re-rendu identique)
-  const keyOf = () => JSON.stringify(payload) + source
+  const keyOf = () => JSON.stringify(payload) + source + sentLayers.join('|')
   async function preview() {
     if (!payload || !ready) return
     const id = ++seq
@@ -269,7 +289,7 @@
     abort = new AbortController()
     busy = true
     try {
-      const data = await api.sdPreview(payload, source ?? '', abort.signal)
+      const data = await api.sdPreview(payload, source ?? '', sentLayers, abort.signal)
       const buf = await looper.decode(data)
       if (id !== seq) return
       sourceAudio?.pause()
@@ -308,7 +328,7 @@
     if (!payload || !ready) return
     busy = true
     try {
-      const rec = await api.sdRender(payload, source ?? '', name.trim())
+      const rec = await api.sdRender(payload, source ?? '', sentLayers, name.trim())
       renders = await api.sdRenders(rec.preset.treatment)
       error = ''
     } catch (e) { error = e instanceof Error ? e.message : String(e) }
@@ -397,12 +417,23 @@
     {:else if source}
       <span class="mono small" title={source}>{sourceName || source}</span>
       <span class="muted small">{focus.sample?.folder}</span>
-      <button class="small" onclick={auditionSource} title="Écouter le sample d'origine (A/B)">▶ source</button>
+      <button class="small" onclick={() => auditionSource()} title="Écouter le sample d'origine (A/B)">▶ source</button>
     {:else}
       <span class="muted small">Aucun sample en cours : en choisir un dans la vue Samples ({treatment?.source_hint ?? '…'}).</span>
     {/if}
     {#if needsSource}<button class="small" onclick={() => ongotosamples?.()}
       title="Le traitement s'applique au sample en cours de la vue Samples">Changer dans Samples</button>{/if}
+    {#if needsSource}
+      {#each focus.layers as l, i (l.source)}
+        <span class="layer small" title={`${l.source}\n${l.folder}`}>
+          <span class="mono">C{i + 1} · {l.name}</span>
+          <button class="mini" onclick={() => auditionSource(l.source)} title="Écouter la couche">▶</button>
+          <button class="mini" onclick={() => removeLayer(i)} title="Retirer la couche (ses chaînes repassent sur la source)">×</button>
+        </span>
+      {/each}
+      <button class="small" onclick={addLayer} disabled={focus.layers.length >= MAX_LAYERS}
+        title="Ajouter une couche : choisir un autre sample dans la vue Samples, puis l'attribuer à une chaîne (boîte Source)">+ couche</button>
+    {/if}
     <audio bind:this={sourceAudio}></audio>
     <span class="grow"></span>
     <label class="small" title="Nom affiché par la DT2 (18 caractères), proposé à partir de la source">Nom DT2
@@ -457,6 +488,9 @@
             {:else}
               <button class="cname small" onclick={() => (selected = i)} ondblclick={() => (renaming = i)} title="Afficher ses devices ; double-clic pour renommer">{c.name}</button>
             {/if}
+            {#if c.layer || c.offset_ms || c.gain_db_end !== undefined}
+              <span class="badge mono" title="Couche lue, décalage d'attaque, gain automatisé (boîte Source)">{c.layer ? `C${c.layer}` : 'S'}{c.offset_ms ? ` ${c.offset_ms > 0 ? '+' : ''}${c.offset_ms}` : ''}{c.gain_db_end !== undefined ? ' ↗' : ''}</span>
+            {/if}
             <div class="btns">
               <button class="tact" class:on={!c.mute} onclick={() => (c.mute = !c.mute)} aria-pressed={!c.mute} title={c.mute ? 'Activer la chaîne' : 'Couper la chaîne (mute, enregistré)'}>{i + 1}</button>
               <button class="tsolo" class:on={solo.includes(c.name)} onclick={() => toggleSolo(c.name)} title="Solo d'écoute (non enregistré)">S</button>
@@ -479,6 +513,10 @@
       <section class="panel chain">
         <h3>{selected === 'master' ? 'Master' : preset.chains[selected]?.name} <span class="muted small">{selected === 'master' ? 'après la somme des chaînes' : 'chaîne parallèle'}</span></h3>
         <div class="devices">
+          {#if selected !== 'master' && preset.chains[selected]}
+            <ChainSource chain={preset.chains[selected]} layers={focus.layers} slices={treatment.automation === 'slices'} />
+            <span class="arrow" aria-hidden="true">→</span>
+          {/if}
           {#each devices as d, i (i + d.type)}
             <Device device={d} spec={catalogue[d.type]} slices={treatment.automation === 'slices'} onmove={delta => moveDevice(i, delta)} onremove={() => devices.splice(i, 1)}
               onhelp={() => help(catalogue[d.type]?.label ?? d.type)} />
@@ -577,6 +615,8 @@
   .md :global(code) { font-size: 12px; background: var(--panel-2); padding: 0 3px; border-radius: 3px; }
   .md :global(a) { color: var(--accent); }
   .versed { color: var(--accent); }
+  .layer { display: inline-flex; align-items: center; gap: 2px; border: 1px solid var(--border); border-radius: 4px; padding: 0 2px 0 6px; }
+  .badge { font-size: 10px; color: var(--accent); }
   .renders ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 200px; overflow-y: auto; }
   .renders li { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
   .fname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }

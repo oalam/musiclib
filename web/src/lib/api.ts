@@ -354,7 +354,13 @@ export interface SdDevice {
   /** Automation (8.G) : valeur atteinte en fin de rendu, depuis `params`. */
   params_end?: Record<string, number>
 }
-export interface SdChain { name: string; mute: boolean; gain_db: number; devices: SdDevice[] }
+export interface SdChain {
+  name: string; mute: boolean; gain_db: number; devices: SdDevice[]
+  /** Layering (8.J) : couche lue (0 = source, omis), decalage d'attaque, gain de fin (automation). */
+  layer?: number
+  offset_ms?: number
+  gain_db_end?: number
+}
 export interface SdPreset {
   id: string
   treatment: string
@@ -400,6 +406,8 @@ export interface RenderRecord {
   code: string
   /** Nombre de tranches GRID (variations, 8.I) ; 0 = un seul son. */
   slices: number
+  /** Couches 1.. du rendu (8.J), absentes sans layering. */
+  layers?: string[]
 }
 
 /** Nom DT2 propose et dossier de rangement d'un rendu (8.E). */
@@ -520,13 +528,13 @@ export const api = {
     fetch(`/api/sounddesign/presets/${enc(treatment)}/${enc(id)}`, { method: 'DELETE' })
       .then(r => { if (!r.ok) return json(r) }),
   /** Boucle rendue en WAV, sans ecriture disque ; source "" = sans sample (bruit genere). */
-  sdPreview: async (preset: SdPreset, source: string, signal?: AbortSignal): Promise<ArrayBuffer> => {
-    const r = await fetch('/api/sounddesign/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source }), signal })
+  sdPreview: async (preset: SdPreset, source: string, layers: string[], signal?: AbortSignal): Promise<ArrayBuffer> => {
+    const r = await fetch('/api/sounddesign/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, layers }), signal })
     if (!r.ok) await json(r)   // leve avec le detail de l'API
     return r.arrayBuffer()
   },
-  sdRender: (preset: SdPreset, source: string, name?: string) =>
-    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, name: name || null }) })
+  sdRender: (preset: SdPreset, source: string, layers: string[], name?: string) =>
+    fetch('/api/sounddesign/render', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ preset, source, layers, name: name || null }) })
       .then(r => json<RenderRecord>(r)),
   sdTarget: (treatment: string, source: string, bpm?: number, slices?: number) =>
     fetch(`/api/sounddesign/target?treatment=${enc(treatment)}${source ? `&source=${enc(source)}` : ''}${bpm ? `&bpm=${bpm}` : ''}${slices ? `&slices=${slices}` : ''}`)

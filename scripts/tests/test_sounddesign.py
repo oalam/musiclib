@@ -422,3 +422,75 @@ def test_versed_slices_are_not_flagged_long(tmp_path: Path):
     key = sd.verse(record, out, samples_root, overrides)
     entry = next(e for e in build_manifest(samples_root, overrides).entries if e.source == key)
     assert entry.folder == "DRUMS/BD/CLEAN" and "long" not in (entry.flags or [])
+
+
+# --- Layering (8.J) ----------------------------------------------------------
+
+def _click(delay_ms: float = 0.0) -> np.ndarray:
+    """Clic aigu court precede de `delay_ms` de silence (couche d'attaque)."""
+    n0 = int(delay_ms * sd.SR / 1000)
+    t = np.arange(int(0.02 * sd.SR)) / sd.SR
+    wave = np.cos(2 * np.pi * 3000 * t) * np.exp(-t / 0.003)
+    x = np.concatenate([np.zeros(n0), wave])
+    return np.stack([x, x]).astype(np.float32)
+
+
+def _layered(offset_ms: float = 0.0, **layer: object) -> sd.Preset:
+    return sd.Preset.model_validate({
+        "id": "l", "treatment": "variations", "label": "test",
+        "settings": {"bpm": 150, "length_beats": 1, "slices": 0, "jitter": 0},
+        "chains": [{"name": "Kick", "devices": []},
+                   {"name": "Click", "layer": 1, "offset_ms": offset_ms, **layer}],
+        "output_peak_db": None,
+    })
+
+
+def test_neutral_layering_fields_keep_json_and_render():
+    preset = _preset()
+    assert "layer" not in preset.model_dump_json()
+    assert np.array_equal(sd.render(preset, _kick()), sd.render(preset, _kick(), [_click()]))
+
+
+def test_onset_and_alignment_put_attacks_together():
+    assert sd.onset(_click(10)) == 480                       # 10 ms a 48 kHz
+    ref = sd.onset(_kick())
+    kick, click = sd.align_layers([_kick(), _click(10)], [0.0, 0.0])
+    assert sd.onset(kick) == sd.onset(click) == ref          # silence initial de la couche coupe
+    _, late = sd.align_layers([_kick(), _click(10)], [0.0, 5.0])
+    assert sd.onset(late) == ref + 240                       # + 5 ms
+    # avancer la couche de 5 ms sous son attaque : tout est retarde d'autant
+    kick, early = sd.align_layers([_kick(), _click()], [0.0, -5.0])
+    assert (sd.onset(kick), sd.onset(early)) == (240, 0)
+
+
+def test_chain_reads_its_layer():
+    preset = _layered()
+    preset.chains[0].mute = True
+    audio = sd.render(preset, _kick(), [_click()])
+    assert _band_energy(audio, 2000, 5000) > 10 * _band_energy(audio, 20, 200)
+    with pytest.raises(sd.SourceError, match="couche 1"):
+        sd.render(preset, _kick())
+
+
+def test_chain_gain_end_blends_across_slices():
+    # couche du clic de -60 dB (tranche 1) a 0 dB (tranche 4)
+    preset = _layered(gain_db=-60, gain_db_end=0)
+    slices = sd.render(preset, _kick(), [_click()]).reshape(2, 4, 19_200)
+    ratios = [_band_energy(slices[:, i], 2000, 5000) / _band_energy(slices[:, i], 20, 200)
+              for i in range(4)]
+    assert ratios == sorted(ratios) and ratios[3] > 100 * ratios[0]
+
+
+def test_layering_validation():
+    for bad in ({"layer": 4}, {"offset_ms": 60}, {"gain_db_end": 40}):
+        with pytest.raises(sd.PresetError):
+            sd.validate(_layered(**bad))
+
+
+def test_layers_change_render_file_name(tmp_path: Path):
+    preset = _layered()
+    a = sd.output_name("BD C Punch", preset)
+    assert sd.output_name("BD C Punch", preset, ["k/click.wav"]) != a
+    record = sd.write_render(np.zeros((2, 10), dtype=np.float32), "k/kick.wav", preset,
+                             tmp_path, "BD L Punch", layers=["k/click.wav"])
+    assert record.layers == ["k/click.wav"]

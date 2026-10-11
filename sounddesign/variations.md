@@ -77,6 +77,32 @@ kick garde son attaque, la queue grave change d'une tranche à l'autre.
 |---|---|---|
 | `drive_tints` | Drive 2 → 12 dB, clic −1 → +3 dB, 8 tranches | Kick de kit qui respire, sur la track 1 |
 | `rumble_tints` | Rumble −30 → −12 dB, drive 2 → 8 dB, 8 tranches | Kick et rumble d'un seul sample, la queue qui bouge |
+| `layer_blend` | Couche C1 −24 → −6 dB au-dessus de 1 kHz, 8 tranches | Kick + clic ou top d'un autre sample, dosé tranche par tranche |
+
+## Layering
+
+Concrètement : la source (le kick de la vue Samples) tient le corps, une
+**couche** (clic de 909, top d'un autre kick, bruit court) apporte
+l'attaque, et le dosage de la couche change d'une tranche à l'autre.
+
+- **Ajouter une couche** : « + couche » à côté de la source, choisir le
+  sample dans la vue Samples, « Ajouter comme couche ». Jusqu'à trois
+  couches (C1 à C3) ; la source ne change pas pendant le choix.
+- **Attribuer** : boîte « Source » en tête des devices de la chaîne,
+  sélecteur Source / C1… Le preset retient le numéro de couche, pas le
+  fichier : le même preset sert à n'importe quelle paire.
+- **Calage des attaques** : automatique, l'attaque de la couche (premier
+  passage à −30 dB de sa crête) est posée sur celle de la source, son
+  silence initial est coupé. Le potard **Décalage** (±50 ms) ajuste à la
+  main : +2 à +5 ms laissent passer le clic du kick avant celui de la
+  couche ; un décalage négatif qui entamerait la couche retarde tout le son.
+- **Mélange variable** : ↗ gain sur la boîte Source, le gain de la chaîne
+  va de son fader (tranche 1) à la valeur de fin (dernière tranche), avec
+  l'aléa du traitement. Le niveau des tranches reste égalisé : la couche
+  change la couleur, pas le volume.
+- **Pièges** : filtrer la couche (passe-haut) pour ne pas doubler le grave,
+  sinon les deux fondamentales se battent (phase) ; écouter la couche seule
+  (solo) pour vérifier son calage.
 
 ## Sur la Digitakt II
 

@@ -927,7 +927,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.G | Traitement **riser** (track 15, `FX/RISE`) : source bruit blanc / rose généré ou sample en cours bouclé, montée de hauteur (varispeed), courbe, arrêt net ; **automation** générique `params_end` des devices pedalboard (rendu par blocs) ; 3 presets ; API et CLI sans source pour le bruit | fait (à valider à l'oreille) |
 | 8.H | Front : colonne latérale des traitements dépliables sur leurs presets, mini barre d'outils (nouveau preset vierge, nom / description, suppression `DELETE /api/sounddesign/presets/{t}/{id}`, pas le dernier) ; source « bruit généré » sans sample ; bouton ↗ d'automation (potard « fin ») ; notebook [[sounddesign/riser]] ; dossier de rangement des rendus (`folder`) | fait (à valider à l'usage) |
 | 8.I | Traitement **variations** : un one-shot rendu N fois (4 / 8 / 16 / 32, grille GRID de la DT2) en tranches égales dans un seul fichier, paramètres étagés de la tranche 1 (sobre) à N (marquée) par `params_end` + aléa reproductible, niveau égalisé (RMS des 150 premières ms) ; rangé avec la source (`BD V8 …`, même code et dossier), tag `slices` (pas de contrôle « long ») ; presets `drive_tints`, `rumble_tints` ; notebook [[sounddesign/variations]] | fait (à valider à l'oreille) |
-| 8.J | Layering : source par chaîne (deuxième sample), calage des attaques en ms, mélange variable d'une tranche à l'autre | à venir |
+| 8.J | **Layering** : buffer de couches (source = couche 0, « + couche » choisit un autre sample dans la vue Samples, 3 au plus), couche lue par chaque chaîne (`layer`), calage automatique des attaques puis décalage `offset_ms` (±50 ms), gain de fin de chaîne `gain_db_end` (mélange variable dans le temps ou d'une tranche à l'autre) ; boîte « Source » en tête des devices ; `layers` dans la requête, le sidecar et le hash ; `--layer` en CLI ; preset `layer_blend` | fait (à valider à l'oreille) |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -1003,6 +1003,17 @@ On garde une boucle d'une à huit mesures, sans couture.
   Le rendu garde le code et le sous-dossier de la source ; `params_end` y
   désigne la valeur de la dernière tranche (`automation: "slices"` du
   traitement). Le **layering** de plusieurs samples est reporté en 8.J.
+- **Layering** (8.J, arbitré le 2026-10-11) : un **buffer de couches** à
+  côté de la source (couche 0 = sample en cours) ; « + couche » passe la
+  vue Samples en mode choix (la source ne bouge pas, le sample en cours
+  devient candidat). Le preset retient le **numéro** de couche par chaîne,
+  pas le fichier : un preset vaut pour toute paire. Calage **automatique**
+  (attaque = premier passage à −30 dB de la crête, posée sur celle de la
+  source) **plus un décalage** manuel ; avancer une couche ne coupe que son
+  silence initial. Mélange variable par **gain de chaîne automatisable**
+  (`gain_db_end`, interpolé en dB), même mécanisme en temps et en tranches.
+  Champs neutres omis du JSON : hash des rendus antérieurs inchangé ; les
+  couches entrent dans le hash quand il y en a.
 
 ## Décisions arbitrées (à NE PAS refaire)
 

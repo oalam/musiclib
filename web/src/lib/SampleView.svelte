@@ -872,6 +872,20 @@
   </span>
 {/snippet}
 
+{#if focus.picking}
+  <!-- choix d'une couche du sound design (8.J) : la source ne change pas -->
+  <div class="pick" role="status">
+    <span class="small">Couche du sound design :</span>
+    {#if focus.candidate && focus.candidate.source !== focus.sample?.source}
+      <strong class="mono small">{focus.candidate.name}</strong>
+      <button class="small" onclick={() => focus.endPick(true)}>Ajouter comme couche</button>
+    {:else}
+      <span class="small muted">choisir un sample autre que la source ({focus.sample?.name ?? 'aucune'})</span>
+    {/if}
+    <button class="small" onclick={() => focus.endPick(false)}>Annuler</button>
+  </div>
+{/if}
+
 <div class="samples">
   <section class="grid">
    <div class="zone matrix">
@@ -1344,6 +1358,8 @@
   .tree .row { padding-left: 52px; }
   .small { font-size: 12px; }
   .err { color: #dc2626; font-size: 12px; }
+  .pick { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--accent); border-radius: 6px; padding: 6px 12px; box-shadow: 0 4px 16px rgb(0 0 0 / 0.3); }
   @media (max-width: 900px) {
     .samples { grid-template-columns: 1fr; height: auto; }
     .matrix, .kits { flex: none; max-height: 50vh; }

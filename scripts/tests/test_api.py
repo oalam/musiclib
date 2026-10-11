@@ -622,3 +622,16 @@ def test_sounddesign_variations_target_keeps_kick_folder(sd_client: TestClient):
     t = sd_client.get("/api/sounddesign/target", params={
         "treatment": "variations", "source": "k/kick.wav", "bpm": 150, "slices": 8}).json()
     assert t == {"name": "BD V8 C Punch 01 k", "sub": "CLEAN", "folder": "DRUMS/BD/CLEAN"}
+
+
+def test_sounddesign_layers_must_be_in_manifest(sd_client: TestClient):
+    preset = sd_client.get("/api/sounddesign/presets/rumble").json()[0]
+    preset["chains"][1]["layer"] = 1
+    body = {"preset": preset, "source": "k/kick.wav"}
+    assert sd_client.post("/api/sounddesign/preview", json=body).status_code == 422  # couche absente
+    body["layers"] = ["k/hors.wav"]
+    assert sd_client.post("/api/sounddesign/preview", json=body).status_code == 404
+    body["layers"] = ["k/kick.wav"]
+    assert sd_client.post("/api/sounddesign/preview", json=body).status_code == 200
+    record = sd_client.post("/api/sounddesign/render", json=body).json()
+    assert len(record["layers"]) == 1 and record["layers"][0].endswith("k/kick.wav")

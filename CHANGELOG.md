@@ -81,6 +81,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.J] **Layering** : couches en plus de la source (3 au plus), choisies
+  dans la vue Samples par « + couche » (bandeau « Ajouter comme couche »,
+  la source ne change pas pendant le choix). Chaque chaîne lit une couche
+  (boîte « Source » en tête de ses devices) ; attaques calées
+  automatiquement sur celle de la source (−30 dB de la crête) puis décalage
+  ±50 ms ; gain de fin de chaîne (↗ gain) pour un mélange qui varie dans le
+  temps ou d'une tranche à l'autre. API (`layers` de la requête, du sidecar,
+  dans le hash), CLI `--layer`, preset `variations/layer_blend`, section
+  Layering du notebook variations.
 - [8.I] Traitement **variations** : jeu de variantes subtiles d'un one-shot
   (4 / 8 / 16 / 32 tranches égales dans un seul fichier, pour la machine
   GRID de la DT2 et CREATE RANDOM LOCKS sur `SLICE`) ; paramètres étagés de

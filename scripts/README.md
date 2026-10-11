@@ -898,6 +898,16 @@ linéaire, 2 = lente puis rapide). Le rendu dure `bars × 4 × 60 / bpm`
 l'aléa. Nom `BD V8 C Punch dbr`, rangé avec la source, tag `slices` au
 versement. Sur la DT2 : machine GRID, `GRID` = nombre de tranches.
 
+**Layering** (8.J) : `--layer <wav>` (répétable) donne les couches 1, 2…
+lues par les chaînes dont `layer` les désigne dans le preset ; attaques
+calées sur celle de la source puis `offset_ms` (±50 ms), `gain_db_end` de
+chaîne pour un mélange qui varie (dans le temps, ou d'une tranche à
+l'autre). Les couches sont gardées au sidecar et entrent dans le hash.
+
+```bash
+python sounddesign.py render variations layer_blend --source <kick.wav> --layer <clic.wav>
+```
+
 ```bash
 python sounddesign.py render variations drive_tints --source <kick> --set slices=2 --verse
 ```

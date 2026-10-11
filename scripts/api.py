@@ -362,6 +362,8 @@ class SoundDesignRequest(BaseModel):
 
     preset: sd.Preset
     source: str = ""   # vide : traitement sans sample (riser sur bruit genere, 8.G)
+    # couches 1.. (8.J) : samples du manifeste lus par les chaines `layer` >= 1
+    layers: list[str] = Field(default_factory=list, max_length=sd.MAX_LAYERS - 1)
     name: str | None = Field(default=None, pattern=sd.NAME_RX, max_length=NAME_MAX)
 
 
@@ -857,20 +859,24 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(404, f"traitement inconnu : {treatment}")
 
     def render_request(req: SoundDesignRequest) -> tuple[Path | None, Any]:
-        """Source du manifeste uniquement, sauf traitement sans sample (chemin None) ;
-        PresetError / SourceError -> 422."""
+        """Source et couches du manifeste uniquement, sauf traitement sans sample
+        (chemin None) ; PresetError / SourceError -> 422."""
         try:
             wants = sd.needs_source(req.preset)
         except (KeyError, sd.PresetError) as exc:
             raise HTTPException(422, str(exc)) from exc
         if wants and not known(manifest(), req.source):
             raise HTTPException(404, f"sample hors manifeste : {req.source}")
+        for layer in req.layers:
+            if not known(manifest(), layer):
+                raise HTTPException(404, f"couche hors manifeste : {layer}")
         media_or_503()
         path = samples_src / req.source if wants else None
         try:
             with render_lock:
                 source = sd.load_source(path) if path else sd.NO_SOURCE
-                return path, sd.render(req.preset, source)
+                layers = [sd.load_source(samples_src / x) for x in req.layers]
+                return path, sd.render(req.preset, source, layers)
         except (sd.PresetError, sd.SourceError) as exc:
             raise HTTPException(422, str(exc)) from exc
 
@@ -928,7 +934,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             t = sd.target(req.source if path else "", manifest(), req.preset.treatment,
                           req.preset.settings.get("bpm"), sd.slice_count(req.preset))
             return sd.write_render(audio, media_relative(path) if path else "",
-                                   req.preset, sounddesign_out, req.name or t.name, t.sub, t.code)
+                                   req.preset, sounddesign_out, req.name or t.name, t.sub, t.code,
+                                   [media_relative(samples_src / x) for x in req.layers])
 
     @app.get("/api/sounddesign/renders", response_model=list[sd.RenderRecord])
     def sd_renders(treatment: str | None = None) -> list[sd.RenderRecord]:

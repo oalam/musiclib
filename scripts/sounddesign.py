@@ -125,7 +125,9 @@ def _cmd_render(args: argparse.Namespace) -> int:
         source = Path(args.source)
         if not source.is_absolute():
             source = SAMPLES_SRC_DIR / source
-    audio = render(preset, load_source(source) if source else NO_SOURCE)
+    layers = [Path(x) if Path(x).is_absolute() else SAMPLES_SRC_DIR / x for x in args.layer]
+    audio = render(preset, load_source(source) if source else NO_SOURCE,
+                   [load_source(x) for x in layers])
     rel = (source.relative_to(SAMPLES_SRC_DIR).as_posix()
            if source and source.is_relative_to(SAMPLES_SRC_DIR) else "")
     manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
@@ -139,7 +141,7 @@ def _cmd_render(args: argparse.Namespace) -> int:
     if args.dry_run:
         return 0
     record = write_render(audio, media_relative(source) if source else "", preset, SOUNDDESIGN_OUT_DIR, name, sub_dir,
-                          planned.code)
+                          planned.code, [media_relative(x) for x in layers])
     print(f"-> {SOUNDDESIGN_OUT_DIR / record.file}")
     if args.verse:
         overrides = load_overrides(OVERRIDES_FILE)
@@ -159,6 +161,9 @@ def main() -> int:
     r.add_argument("preset")
     r.add_argument("--source", help="wav source (absolu ou relatif a <MEDIA>/Samples) ; "
                                     "facultatif si le preset n'en demande pas (riser sur bruit)")
+    r.add_argument("--layer", action="append", default=[], metavar="WAV",
+                   help="couche 1, 2... (8.J) lue par les chaines `layer` du preset, "
+                        "absolue ou relative a <MEDIA>/Samples")
     r.add_argument("--set", action="append", default=[], metavar="NOM=VALEUR",
                    help="reglage du traitement (bpm, bars...)")
     r.add_argument("--mute", action="append", default=[], metavar="CHAINE")

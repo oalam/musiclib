@@ -22,6 +22,7 @@ native de la Digitakt II), crete normalisee.
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import math
@@ -90,6 +91,13 @@ class Chain(BaseModel):
     mute: bool = False
     gain_db: float = 0.0
     devices: list[Device] = Field(default_factory=list)
+    # layering (8.J), omis a la serialisation quand neutres (hash inchange) :
+    # couche lue par la chaine (0 = source principale, 1.. = couches ajoutees),
+    # decalage de son attaque apres calage auto sur celle de la source, gain
+    # de fin (automation du melange, dans le temps ou d'une tranche a l'autre)
+    layer: int = Field(default=0, exclude_if=lambda v: v == 0)
+    offset_ms: float = Field(default=0.0, exclude_if=lambda v: v == 0)
+    gain_db_end: float | None = Field(default=None, exclude_if=lambda v: v is None)
 
 
 class Preset(BaseModel):
@@ -133,6 +141,7 @@ class RenderRecord(BaseModel):
     sub: str = ""                    # sous-dossier herite de la source (DRUMS/RM/<sub>)
     code: str = ""                   # code DT2 effectif ("" : celui du traitement, rendus anterieurs a 8.I)
     slices: int = 0                  # nombre de tranches GRID (variations, 8.I) ; 0 : un seul son
+    layers: list[str] = Field(default_factory=list, exclude_if=lambda v: not v)  # couches 1.. (8.J)
     versed: str | None = None        # cle du manifeste si verse dans le pack (rempli a la lecture)
     folder: str = ""                 # dossier de rangement une fois verse (rempli a la lecture)
 
@@ -350,6 +359,7 @@ class Prepared:
     ramp: np.ndarray | None = None   # automation (0 -> 1) ; None : lineaire sur la boucle gardee
     cut: bool = False                # arret net en fin de rendu (riser), fondu anti-clic
     variants: np.ndarray | None = None   # position 0 -> 1 de chaque tranche (variations, 8.I)
+    layers: tuple[np.ndarray, ...] = ()  # signal prepare de chaque couche (8.J) ; () : `signal` seul
 
 
 @dataclass(frozen=True)
@@ -622,6 +632,28 @@ def _resolve_end(device: Device, where: str) -> dict[str, float]:
     return dict(device.params_end)
 
 
+MAX_LAYERS = 4                   # source principale + 3 couches
+OFFSET_MS = 50.0                 # decalage d'attaque d'une chaine : +/- 50 ms
+CHAIN_GAIN_DB = (-60.0, 24.0)    # bornes du gain de fin d'une chaine
+
+
+def _validate_layering(chain: Chain, preset_id: str) -> None:
+    where = f"{preset_id} : {chain.name}"
+    if not 0 <= chain.layer < MAX_LAYERS:
+        raise PresetError(f"{where} : couche {chain.layer} hors de [0, {MAX_LAYERS - 1}]")
+    if abs(chain.offset_ms) > OFFSET_MS:
+        raise PresetError(f"{where} : decalage {chain.offset_ms} ms hors de "
+                          f"[-{OFFSET_MS:g}, {OFFSET_MS:g}]")
+    lo, hi = CHAIN_GAIN_DB
+    if chain.gain_db_end is not None and not lo <= chain.gain_db_end <= hi:
+        raise PresetError(f"{where} : gain de fin {chain.gain_db_end} dB hors de [{lo:g}, {hi:g}]")
+
+
+def layer_count(preset: Preset) -> int:
+    """Nombre de sources lues par les chaines actives : 1 + la plus haute couche."""
+    return 1 + max((c.layer for c in preset.chains if not c.mute), default=0)
+
+
 def validate(preset: Preset) -> None:
     """Leve PresetError a la premiere incoherence ; ne modifie pas le preset."""
     if preset.treatment not in TREATMENTS:
@@ -632,6 +664,7 @@ def validate(preset: Preset) -> None:
     if len(set(names)) != len(names):
         raise PresetError(f"{preset.id} : noms de chaines en double {names}")
     for chain in preset.chains:
+        _validate_layering(chain, preset.id)
         for i, device in enumerate(chain.devices):
             _resolve_device(device, f"{preset.id} : {chain.name}[{i}]")
             _resolve_end(device, f"{preset.id} : {chain.name}[{i}]")
@@ -748,14 +781,25 @@ def _run_devices(devices: list[Device], x: np.ndarray, ctx: RenderContext) -> np
     return x
 
 
+def _chain_gain(chain: Chain, ctx: RenderContext, n: int) -> np.ndarray | np.float32:
+    """Gain lineaire de la chaine ; avec `gain_db_end`, suit l'automation (en dB)."""
+    if chain.gain_db_end is None:
+        return np.float32(10.0 ** (chain.gain_db / 20.0))
+    ramp = ctx.ramp if ctx.ramp is not None else np.linspace(0.0, 1.0, n)
+    db = chain.gain_db + (chain.gain_db_end - chain.gain_db) * ramp[:n]
+    return (10.0 ** (db / 20.0)).astype(np.float32)
+
+
 def _mix(preset: Preset, prep: Prepared, ctx: RenderContext) -> np.ndarray:
-    """Somme des chaines actives puis master, sur tout le signal prepare."""
+    """Somme des chaines actives (chacune sur le signal de sa couche) puis master."""
     mix = np.zeros_like(prep.signal)
+    n = mix.shape[1]
     for chain in preset.chains:
         if chain.mute:
             continue
-        out = _run_devices(chain.devices, prep.signal.copy(), ctx)
-        mix += out * np.float32(10.0 ** (chain.gain_db / 20.0))
+        signal = prep.layers[chain.layer] if prep.layers else prep.signal
+        out = _run_devices(chain.devices, signal.copy(), ctx)
+        mix += out * _chain_gain(chain, ctx, n)
     return _run_devices(preset.master, mix, ctx)
 
 
@@ -780,12 +824,71 @@ def _render_variants(preset: Preset, prep: Prepared) -> np.ndarray:
     return np.concatenate(slices, axis=1)
 
 
-def render(preset: Preset, source: np.ndarray) -> np.ndarray:
-    """Boucle rendue (2, loop_len) a SR ; chaines mutees et devices bypasses ignores."""
+ONSET_DB = -30.0         # attaque d'un sample : premier echantillon a -30 dB de sa crete
+
+
+def onset(x: np.ndarray) -> int:
+    """Position (echantillons) de l'attaque : premier passage a ONSET_DB de la crete."""
+    env = np.max(np.abs(x), axis=0) if x.size else np.zeros(0)
+    peak = float(env.max()) if env.size else 0.0
+    if peak <= 0:
+        return 0
+    return int(np.argmax(env >= peak * 10 ** (ONSET_DB / 20)))
+
+
+def _shift(x: np.ndarray, n: int) -> np.ndarray:
+    """Retarde de n echantillons (silence devant), ou avance si n < 0 (debut coupe)."""
+    if n >= 0:
+        return np.concatenate([np.zeros((2, n), dtype=np.float32), x], axis=1)
+    return x[:, -n:]
+
+
+def align_layers(sources: list[np.ndarray], offsets_ms: list[float]) -> list[np.ndarray]:
+    """Calage des attaques (8.J) : l'attaque de chaque couche est posee sur celle
+    de la source principale (`sources[0]`), plus le decalage de la couche
+    (positif = plus tard). Avancer une couche ne coupe que son silence
+    initial : si un decalage negatif entamait du son, toutes les couches sont
+    retardees d'autant (l'attaque la plus precoce reste entiere)."""
+    ref = onset(sources[0])
+    onsets = [onset(x) for x in sources]
+    shifts = [ref - o + round(ms * SR / 1000) for o, ms in zip(onsets, offsets_ms)]
+    shifts[0] = round(offsets_ms[0] * SR / 1000)
+    pad = max(0, *(-s - o for s, o in zip(shifts, onsets)))
+    return [x if s + pad == 0 else _shift(x, s + pad) for x, s in zip(sources, shifts)]
+
+
+def _prepare_layers(treatment: _Treatment, preset: Preset, settings: dict[str, float],
+                    sources: list[np.ndarray]) -> Prepared:
+    """Chaque couche preparee comme la source (memes coups, meme longueur) ;
+    la preparation de la source principale fournit coups et automation."""
+    if layer_count(preset) > len(sources):
+        raise SourceError(f"{preset.id} : couche {layer_count(preset) - 1} demandee, "
+                          f"{len(sources) - 1} couche(s) fournie(s)")
+    used = {c.layer for c in preset.chains if not c.mute}
+    offsets = [0.0] * len(sources)
+    for chain in preset.chains:   # decalage : celui de la premiere chaine active de la couche
+        if not chain.mute and offsets[chain.layer] == 0:
+            offsets[chain.layer] = chain.offset_ms
+    if used <= {0} and not any(offsets):
+        return treatment.prepare(sources[0], settings)
+    aligned = align_layers(sources, offsets)
+    main = treatment.prepare(aligned[0], settings)
+    layers = tuple(main.signal if i == 0 else
+                   treatment.prepare(x, settings).signal if i in used else
+                   np.zeros_like(main.signal)
+                   for i, x in enumerate(aligned))
+    return dataclasses.replace(main, layers=layers)
+
+
+def render(preset: Preset, source: np.ndarray, layers: list[np.ndarray] | None = None) -> np.ndarray:
+    """Boucle rendue (2, loop_len) a SR ; chaines mutees et devices bypasses ignores.
+
+    `layers` : couches 1.. (8.J), lues par les chaines dont `layer` les designe.
+    """
     validate(preset)
     treatment = TREATMENTS[preset.treatment]
     settings = _resolve(treatment.spec.settings, preset.settings, preset.id)
-    prep = treatment.prepare(source, settings)
+    prep = _prepare_layers(treatment, preset, settings, [source, *(layers or [])])
     ramp = prep.ramp
     if ramp is None:   # automation lineaire sur la boucle gardee, fixe pendant le pre-roll
         ramp = np.zeros(prep.signal.shape[1])
@@ -887,26 +990,32 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
     return Target(smp.unique_name(name, taken), sub, code)
 
 
-def output_name(name: str, preset: Preset) -> str:
-    """`<nom DT2> <hash>.wav` : meme nom + meme preset effectif = meme fichier."""
-    digest = hashlib.sha1(preset.model_dump_json().encode()).hexdigest()[:6]
+def output_name(name: str, preset: Preset, layers: list[str] | None = None) -> str:
+    """`<nom DT2> <hash>.wav` : meme nom + meme preset effectif (+ memes couches) = meme fichier."""
+    key = preset.model_dump_json() + "".join(f"\n{x}" for x in layers or [])
+    digest = hashlib.sha1(key.encode()).hexdigest()[:6]
     return f"{name} {digest}.wav"
 
 
 def write_render(audio: np.ndarray, source_label: str, preset: Preset, out_root: Path,
-                 name: str, sub: str = "", code: str = "") -> RenderRecord:
-    """Ecrit `<out_root>/<traitement>/<nom> <hash>.wav` (24 bits) et son sidecar `.json`."""
+                 name: str, sub: str = "", code: str = "",
+                 layers: list[str] | None = None) -> RenderRecord:
+    """Ecrit `<out_root>/<traitement>/<nom> <hash>.wav` (24 bits) et son sidecar `.json`.
+
+    `layers` : etiquettes des couches 1.. (8.J), gardees au sidecar et au hash.
+    """
     import soundfile as sf
     if not re.fullmatch(NAME_RX, name) or len(name) > smp.NAME_MAX:
         raise PresetError(f"nom DT2 invalide (1 a {smp.NAME_MAX} caracteres, sans /) : {name!r}")
-    path = out_root / preset.treatment / output_name(name, preset)
+    path = out_root / preset.treatment / output_name(name, preset, layers)
     path.parent.mkdir(parents=True, exist_ok=True)
     sf.write(str(path), audio.T, SR, subtype="PCM_24")
     record = RenderRecord(
         file=path.relative_to(out_root).as_posix(), source=source_label, preset=preset,
         sr=SR, seconds=round(audio.shape[1] / SR, 4),
         created_at=datetime.now().isoformat(timespec="seconds"), name=name, sub=sub,
-        code=code or TREATMENTS[preset.treatment].spec.code, slices=slice_count(preset))
+        code=code or TREATMENTS[preset.treatment].spec.code, slices=slice_count(preset),
+        layers=list(layers or []))
     path.with_suffix(".json").write_text(record.model_dump_json(indent=2) + "\n",
                                          encoding="utf-8")
     return record
