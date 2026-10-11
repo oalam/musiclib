@@ -466,19 +466,19 @@ def test_onset_and_alignment_put_attacks_together():
 def test_chain_reads_its_layer():
     preset = _layered()
     preset.chains[0].mute = True
-    audio = sd.render(preset, _kick(), [_click()])
+    audio = sd.render(preset, _kick(), [_click()])[:, 19_200:]   # tranche 1 = source brute
     assert _band_energy(audio, 2000, 5000) > 10 * _band_energy(audio, 20, 200)
     with pytest.raises(sd.SourceError, match="couche 1"):
         sd.render(preset, _kick())
 
 
 def test_chain_gain_end_blends_across_slices():
-    # couche du clic de -60 dB (tranche 1) a 0 dB (tranche 4)
+    # tranche 1 = source brute, puis couche du clic de -60 dB (tranche 2) a 0 dB (tranche 4)
     preset = _layered(gain_db=-60, gain_db_end=0)
     slices = sd.render(preset, _kick(), [_click()]).reshape(2, 4, 19_200)
     ratios = [_band_energy(slices[:, i], 2000, 5000) / _band_energy(slices[:, i], 20, 200)
-              for i in range(4)]
-    assert ratios == sorted(ratios) and ratios[3] > 100 * ratios[0]
+              for i in range(1, 4)]
+    assert ratios == sorted(ratios) and ratios[2] > 100 * ratios[0]
 
 
 def test_layering_validation():
@@ -494,3 +494,14 @@ def test_layers_change_render_file_name(tmp_path: Path):
     record = sd.write_render(np.zeros((2, 10), dtype=np.float32), "k/kick.wav", preset,
                              tmp_path, "BD L Punch", layers=["k/click.wav"])
     assert record.layers == ["k/click.wav"]
+
+
+def test_variations_first_slice_is_the_raw_source():
+    # tranche 1 = la source sans traitement (au niveau egalise pres), tranche 2 = variante sobre
+    slices = sd.render(_variations(), _kick()).reshape(2, 8, 19_200)
+    kick = _kick()[0]
+    first = slices[0, 0, : kick.size - 1000]
+    ref = kick[: first.size]
+    assert abs(np.corrcoef(first, ref)[0, 1]) > 0.999
+    assert not np.allclose(slices[0, 1, :1000] / np.abs(slices[0, 1]).max(),
+                           slices[0, 0, :1000] / np.abs(slices[0, 0]).max(), atol=1e-3)

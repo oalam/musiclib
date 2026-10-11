@@ -73,7 +73,7 @@
                 <button class="autob" class:on={automated(p.name)} onclick={() => toggleAuto(p.name)} disabled={device.bypass}
                   aria-pressed={automated(p.name)}
                   title={automated(p.name) ? 'Retirer l\'automation' : slices
-                    ? 'Varier : le paramètre va de sa valeur (tranche 1) à une autre (dernière tranche), avec l\'aléa du traitement'
+                    ? 'Varier : le paramètre va de sa valeur (tranche 2, la 1 étant la source brute) à une autre (dernière tranche), avec l\'aléa du traitement'
                     : 'Automatiser : le paramètre va de sa valeur à une valeur de fin sur la durée du rendu, selon la courbe du traitement'}>↗</button>
               {/if}
             </div>

@@ -353,7 +353,10 @@ DEVICES: dict[str, _DeviceDef] = {d.spec.type: d for d in [
                            _p("attack_ms", "Attaque", 0.1, 1000, 10, "ms", "log"),
                            _p("release_ms", "Relache", 1, 3000, 100, "ms", "log"),
                            _p("tone", "Tone", 0, 1, 0.5),
-                           _p("output_db", "Sortie", -36, 36, 0, "dB")]),
+                           _p("output_db", "Sortie", -36, 36, 0, "dB"),
+                           _p("hi_quality", "Hi-Quality", 0, 1, 0, step=1, choices=["Off", "On"],
+                              help="Courbe calculee a 4 x la frequence : moins de repliement "
+                                   "sur les aigus satures, 0,33 ms de latence.")]),
         lambda params: saturation.DynamicTube(**params)),
     _DeviceDef(DeviceSpec(type="duck", label="Duck (sidechain)",
                           help="Baisse le volume a chaque coup de la source, comme un "
@@ -514,7 +517,7 @@ LEVEL_WINDOW_MS = 150.0         # niveau d'une tranche : RMS de l'attaque et du 
 
 
 def variant_positions(n: int, jitter: float) -> np.ndarray:
-    """Position 0 -> 1 de chaque tranche : progressive (1 = la plus sobre, n =
+    """Position 0 -> 1 de chaque variante : progressive (1 = la plus sobre, n =
     la plus marquee), plus un alea reproductible d'au plus `jitter` pas."""
     if n < 2:
         return np.zeros(n)
@@ -524,12 +527,13 @@ def variant_positions(n: int, jitter: float) -> np.ndarray:
 
 
 def _prepare_variations(source: np.ndarray, settings: dict[str, float]) -> Prepared:
-    """Le one-shot source, rendu une fois par tranche (voir `render`)."""
+    """Le one-shot source, brut en tranche 1 puis rendu une fois par variante
+    (tranches 2 a N, voir `render`)."""
     slot = round(settings["length_beats"] * 60.0 / settings["bpm"] * SR)
     single = _single(source, slot)
     n = SLICE_COUNTS[int(settings["slices"])]
     return Prepared(single.signal, 0, slot, single.triggers, one_shot=True,
-                    variants=variant_positions(n, settings["jitter"]))
+                    variants=variant_positions(n - 1, settings["jitter"]))
 
 
 def _level(x: np.ndarray) -> float:
@@ -591,8 +595,9 @@ TREATMENTS: dict[str, _Treatment] = {t.spec.id: t for t in [
                      choices=[str(n) for n in SLICE_COUNTS],
                      help="Nombre de variantes = grille GRID de la DT2."),
                   _p("jitter", "Alea", 0, 1, 0.3,
-                     help="0 = pas regulier de la tranche 1 (la plus sobre) a la derniere "
-                          "(la plus marquee) ; 1 = jusqu'a un pas d'ecart en plus ou en moins.")],
+                     help="Tranche 1 = la source brute ; 0 = pas regulier de la tranche 2 "
+                          "(la plus sobre) a la derniere (la plus marquee) ; 1 = jusqu'a un "
+                          "pas d'ecart en plus ou en moins.")],
         notebook="sounddesign/variations.md",
         code="", automation="slices"),   # code et sous-dossier de la source (DRUMS/BD/...)
         _prepare_variations),
@@ -833,12 +838,15 @@ def _mix(preset: Preset, prep: Prepared, ctx: RenderContext) -> np.ndarray:
 
 
 def _render_variants(preset: Preset, prep: Prepared) -> np.ndarray:
-    """Une tranche par position : l'automation est figee a la position de la
-    tranche, queue coupee, niveau egalise (RMS de l'attaque), tranches de
+    """Tranche 1 = la source brute (aucun traitement : le son de reference),
+    puis une tranche par position : l'automation est figee a la position de
+    la tranche, queue coupee, niveau egalise (RMS de l'attaque), tranches de
     meme longueur mises bout a bout (grille GRID exacte)."""
     assert prep.variants is not None
     n = prep.signal.shape[1]
-    slices = []
+    base = _trim_tail(prep.signal[:, :prep.loop_len])
+    slices = [np.zeros((2, prep.loop_len), dtype=np.float32)]
+    slices[0][:, : base.shape[1]] = base
     for t in prep.variants:
         ctx = RenderContext(sr=SR, triggers=prep.triggers, ramp=np.full(n, float(t)))
         one = _trim_tail(_mix(preset, prep, ctx)[:, :prep.loop_len])
@@ -1019,9 +1027,16 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
     return Target(smp.unique_name(name, taken), sub, code)
 
 
+# revision du rendu d'un traitement, dans le hash quand il change de contenu a
+# preset egal (le fichier ancien n'est pas ecrase) : variations 2 = tranche 1 brute
+RENDER_REVISION = {"variations": 2}
+
+
 def output_name(name: str, preset: Preset, layers: list[str] | None = None) -> str:
     """`<nom DT2> <hash>.wav` : meme nom + meme preset effectif (+ memes couches) = meme fichier."""
     key = preset.model_dump_json() + "".join(f"\n{x}" for x in layers or [])
+    if preset.treatment in RENDER_REVISION:
+        key += f"\nrev{RENDER_REVISION[preset.treatment]}"
     digest = hashlib.sha1(key.encode()).hexdigest()[:6]
     return f"{name} {digest}.wav"
 

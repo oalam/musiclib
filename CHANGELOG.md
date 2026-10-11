@@ -50,6 +50,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [8.I] Variations : la tranche 1 est désormais la **source brute**, sans
+  traitement (le son de référence) ; les variantes occupent les tranches 2
+  à N, de la plus sobre à la plus marquée. Les rendus antérieurs ne sont pas
+  touchés : la révision du rendu entre dans le hash, le nouveau fichier ne
+  les écrase pas.
+
 - [8.E] Un rumble versé n'est plus rangé en `LOOPS/BL` (contraire à la
   doctrine : le rumble est la track 2) mais en `DRUMS/RM/...` ; la
   recherche de source de la vue Sound design est retirée au profit du
@@ -81,6 +87,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.K] Mode **Hi-Quality** du Dynamic Tube : courbe calculée à 4 × la
+  fréquence d'échantillonnage (filtres anti-repliement à état, automation
+  par blocs inchangée), 0,33 ms de latence.
 - [8.K] Devices **Overdrive** et **Dynamic Tube**, émulations des devices
   de Live (`analyzer/saturation.py`) : passe-bande, saturation asymétrique
   de pédale, tonalité, dynamique, dry/wet ; lampe à modèles A / B / C dont

@@ -14,7 +14,8 @@ machine GRID les découpe et un tirage au sort par trig fait que deux coups
 de suite ne sont jamais tout à fait identiques.
 
 Exemple concret : le preset `drive_tints` sur un kick, à 150 BPM, 8 tranches
-d'un temps : un fichier de 8 × 60 / 150 = 3,2 s. La tranche 1 est presque
+d'un temps : un fichier de 8 × 60 / 150 = 3,2 s. La tranche 1 est le kick
+**brut**, sans aucun traitement (le son de référence), la tranche 2 presque
 propre (drive 2 dB), la tranche 8 franchement saturée (12 dB). Mesuré sur un
 kick synthétique, la part d'harmoniques au-dessus de 300 Hz passe de 0,3 % à
 1,1 % et le corps du kick (RMS après le premier quart) de 0,269 à 0,326,
@@ -37,8 +38,9 @@ alors que l'attaque a le même niveau dans les 8 tranches.
 
 Le bouton ↗ sous un potard ne trace plus une évolution dans le temps : il
 donne la valeur de la **dernière tranche** (potard « tranche N »). La
-tranche 1 prend la valeur du potard, les autres s'étagent entre les deux,
-de façon géométrique pour une fréquence.
+tranche 1 est la source brute (chaînes ignorées) ; la tranche 2 prend la
+valeur du potard, les suivantes s'étagent jusqu'à la valeur de fin, de
+façon géométrique pour une fréquence.
 
 ### Réglages du traitement
 
@@ -47,7 +49,7 @@ de façon géométrique pour une fréquence.
 | Tempo | Avec la longueur : durée d'une tranche. |
 | Longueur | Durée d'une tranche en temps (1 = l'écart entre deux kicks en 4/4). La queue est coupée, fondu de 20 ms ; la track DT2 étant monophonique, le kick suivant la coupe de toute façon. |
 | Tranches | 4, 8, 16 ou 32 : la grille GRID à régler sur la DT2. |
-| Aléa | 0 = pas régulier de la tranche 1 (la plus sobre) à la dernière (la plus marquée) ; 1 = jusqu'à un pas d'écart en plus ou en moins. Le tirage est fixe : même preset, même fichier. |
+| Aléa | La tranche 1 reste la source brute ; 0 = pas régulier de la tranche 2 (la plus sobre) à la dernière (la plus marquée) ; 1 = jusqu'à un pas d'écart en plus ou en moins. Le tirage est fixe : même preset, même fichier. |
 
 ### Distorsion
 
@@ -76,8 +78,11 @@ queue ; négative, les forts restent propres (expansion). Modèles : **A**
 propre tant que le signal reste sous un seuil, **B** saturation douce,
 **C** « mauvais ampli » qui distord tout le temps. **Tone** au-dessus de
 0,5 porte la distorsion sur les aigus (le clic grésille), en dessous sur le
-grave. Pas de mode Hi-Quality (pas de suréchantillonnage) : rester sobre
-sur le drive des aigus pour éviter le repliement.
+grave. **Hi-Quality** : la courbe est calculée à 4 × la fréquence
+d'échantillonnage, ce qui réduit le repliement (des fréquences parasites,
+non harmoniques, quand on sature des aigus) ; 0,33 ms de latence, sans
+conséquence sur un one-shot. À activer dès que le drive ou le tone sont
+hauts.
 
 ### Bande (peak)
 
@@ -123,7 +128,7 @@ l'attaque, et le dosage de la couche change d'une tranche à l'autre.
   main : +2 à +5 ms laissent passer le clic du kick avant celui de la
   couche ; un décalage négatif qui entamerait la couche retarde tout le son.
 - **Mélange variable** : ↗ gain sur la boîte Source, le gain de la chaîne
-  va de son fader (tranche 1) à la valeur de fin (dernière tranche), avec
+  va de son fader (tranche 2) à la valeur de fin (dernière tranche), avec
   l'aléa du traitement. Le niveau des tranches reste égalisé : la couche
   change la couleur, pas le volume.
 - **Pièges** : filtrer la couche (passe-haut) pour ne pas doubler le grave,

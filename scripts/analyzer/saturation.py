@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from scipy.signal import lfilter
+from scipy.signal import firwin, lfilter
 
 
 def _one_pole(ms: float, sr: int) -> float:
@@ -102,6 +102,31 @@ class Overdrive(_Filters):
 
 
 TUBE_MODELS = ["A", "B", "C"]
+OVERSAMPLE = 4               # Hi-Quality : courbe du tube calculee a 4 x la frequence
+_AA_TAPS = 64                # filtre anti-repliement (FIR, phase lineaire) : 0,33 ms de latence a 48 kHz
+
+
+class _Oversampler:
+    """Sur-echantillonnage x OVERSAMPLE autour d'une non-linearite, etat garde
+    d'un bloc a l'autre (meme resultat par blocs que d'un seul tenant)."""
+
+    def __init__(self) -> None:
+        self.h = firwin(_AA_TAPS, 0.9 / OVERSAMPLE).astype(np.float64)
+        self.reset()
+
+    def reset(self) -> None:
+        self.zi_up = np.zeros((2, _AA_TAPS - 1))
+        self.zi_down = np.zeros((2, _AA_TAPS - 1))
+
+    def up(self, x: np.ndarray) -> np.ndarray:
+        stuffed = np.zeros((x.shape[0], x.shape[1] * OVERSAMPLE))
+        stuffed[:, ::OVERSAMPLE] = x * OVERSAMPLE
+        out, self.zi_up = lfilter(self.h, [1.0], stuffed, axis=1, zi=self.zi_up)
+        return np.asarray(out)
+
+    def down(self, x: np.ndarray) -> np.ndarray:
+        out, self.zi_down = lfilter(self.h, [1.0], x, axis=1, zi=self.zi_down)
+        return np.asarray(out)[:, ::OVERSAMPLE]
 
 
 def _tube(u: np.ndarray, model: int) -> np.ndarray:
@@ -128,7 +153,9 @@ class DynamicTube(_Filters):
     - `tone` (0..1) : 0,5 neutre ; plus haut, la distorsion porte sur les
       aigus (aigus accentues avant le tube, rendus apres), plus bas sur le
       grave / medium ;
-    - `output_db` : niveau de sortie.
+    - `output_db` : niveau de sortie ;
+    - `hi_quality` : 1 = courbe calculee a 4 x la frequence d'echantillonnage
+      (moins de repliement sur les aigus satures, 0,33 ms de latence).
     """
 
     TONE_HZ = 1200.0          # pivot de la pre- / desaccentuation
@@ -136,8 +163,10 @@ class DynamicTube(_Filters):
 
     def __init__(self, model: float = 1, drive_db: float = 0.0, bias: float = 0.2, envelope: float = 0.0,
                  attack_ms: float = 10.0, release_ms: float = 100.0, tone: float = 0.5,
-                 output_db: float = 0.0) -> None:
+                 output_db: float = 0.0, hi_quality: float = 0) -> None:
         super().__init__()
+        self.hi_quality = hi_quality
+        self._os = _Oversampler()
         self.model, self.drive_db, self.bias, self.envelope = model, drive_db, bias, envelope
         self.attack_ms, self.release_ms, self.tone, self.output_db = attack_ms, release_ms, tone, output_db
         self._pre = self.pb.HighShelfFilter(cutoff_frequency_hz=self.TONE_HZ, gain_db=0.0)
@@ -158,7 +187,15 @@ class DynamicTube(_Filters):
                                      _one_pole(self.release_ms, sr), self._env)
             bias = np.clip(bias + 0.3 * self.envelope * env, -1.5, 1.5)
         model = int(round(self.model))
-        y = _tube(u + bias, model) - _tube(bias, model)   # point de repos retire
+        if round(self.hi_quality):
+            # signal sur-echantillonne ; bias (lent) tenu, sans filtrage : pas de
+            # transitoire du point de repos au premier bloc
+            if reset:
+                self._os.reset()
+            hi_bias = np.repeat(bias, OVERSAMPLE)
+            y = self._os.down(_tube(self._os.up(u) + hi_bias, model) - _tube(hi_bias, model))
+        else:
+            y = _tube(u + bias, model) - _tube(bias, model)   # point de repos retire
         y = self.run(self._dc, y.astype(np.float32), sr, reset)
         y = self.run(self._post, y, sr, reset)
         return (y * 10.0 ** (self.output_db / 20)).astype(np.float32)

@@ -928,7 +928,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.H | Front : colonne latérale des traitements dépliables sur leurs presets, mini barre d'outils (nouveau preset vierge, nom / description, suppression `DELETE /api/sounddesign/presets/{t}/{id}`, pas le dernier) ; source « bruit généré » sans sample ; bouton ↗ d'automation (potard « fin ») ; notebook [[sounddesign/riser]] ; dossier de rangement des rendus (`folder`) | fait (à valider à l'usage) |
 | 8.I | Traitement **variations** : un one-shot rendu N fois (4 / 8 / 16 / 32, grille GRID de la DT2) en tranches égales dans un seul fichier, paramètres étagés de la tranche 1 (sobre) à N (marquée) par `params_end` + aléa reproductible, niveau égalisé (RMS des 150 premières ms) ; rangé avec la source (`BD V8 …`, même code et dossier), tag `slices` (pas de contrôle « long ») ; presets `drive_tints`, `rumble_tints` ; notebook [[sounddesign/variations]] | fait (à valider à l'oreille) |
 | 8.J | **Layering** : buffer de couches (source = couche 0, « + couche » choisit un autre sample dans la vue Samples, 3 au plus), couche lue par chaque chaîne (`layer`), calage automatique des attaques puis décalage `offset_ms` (±50 ms), gain de fin de chaîne `gain_db_end` (mélange variable dans le temps ou d'une tranche à l'autre) ; boîte « Source » en tête des devices ; `layers` dans la requête, le sidecar et le hash ; `--layer` en CLI ; preset `layer_blend` | fait (à valider à l'oreille) |
-| 8.K | Devices **Overdrive** et **Dynamic Tube** (émulations maison des devices de Live, `analyzer/saturation.py`) : passe-bande / saturation asymétrique / tonalité / dynamique / dry-wet ; lampe à modèles A / B / C, bias modulé par l'enveloppe, tonalité par pré- et désaccentuation ; interface de plugin pedalboard, donc automatisables (`params_end`) ; preset `variations/tube_tints` | fait (à valider à l'oreille) |
+| 8.K | Devices **Overdrive** et **Dynamic Tube** (émulations maison des devices de Live, `analyzer/saturation.py`) : passe-bande / saturation asymétrique / tonalité / dynamique / dry-wet ; lampe à modèles A / B / C, bias modulé par l'enveloppe, tonalité par pré- et désaccentuation ; interface de plugin pedalboard, donc automatisables (`params_end`) ; mode **Hi-Quality** du tube (suréchantillonnage × 4, filtres à état, 0,33 ms de latence) ; preset `variations/tube_tints` | fait (à valider à l'oreille) |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -997,8 +997,9 @@ On garde une boucle d'une à huit mesures, sans couture.
   traitements restent définis dans le moteur (pas de création depuis le
   front). Le dernier preset d'un traitement ne se supprime pas.
 - **Variations** (8.I, arbitré le 2026-10-11) : répartition **progressive +
-  aléa** (tranche 1 la plus sobre, N la plus marquée, aléa d'au plus un pas,
-  graine fixe) ; le hasard du jeu se fait sur la DT2 (CREATE RANDOM LOCKS
+  aléa** (tranche 2 la plus sobre, N la plus marquée, aléa d'au plus un pas,
+  graine fixe ; révisé le 2026-10-11 : la **tranche 1 est la source brute**,
+  sans traitement, le son de référence) ; le hasard du jeu se fait sur la DT2 (CREATE RANDOM LOCKS
   sur `SLICE`). Niveau **égalisé** : la variation porte sur la couleur, pas
   le volume. Un seul fichier en tranches de même longueur (machine GRID).
   Le rendu garde le code et le sous-dossier de la source ; `params_end` y

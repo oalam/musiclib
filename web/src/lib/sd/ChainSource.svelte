@@ -46,7 +46,7 @@
       <button class="autob" class:on={chain.gain_db_end !== undefined} onclick={toggleGainEnd}
         aria-pressed={chain.gain_db_end !== undefined}
         title={chain.gain_db_end !== undefined ? 'Retirer l\'automation du gain' : slices
-          ? 'Mélange variable : le gain de la chaîne va de son fader (tranche 1) à une valeur de fin (dernière tranche)'
+          ? 'Mélange variable : le gain de la chaîne va de son fader (tranche 2) à une valeur de fin (dernière tranche)'
           : 'Mélange variable : le gain de la chaîne va de son fader à une valeur de fin sur la durée du rendu'}>↗ gain</button>
     </div>
   </div>

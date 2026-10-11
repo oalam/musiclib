@@ -93,3 +93,32 @@ def test_devices_in_catalogue_render_and_automate():
     preset.chains[0].devices[1].params_end = {"model": 1}
     with pytest.raises(sd.PresetError, match="selecteur"):
         sd.validate(preset)
+
+
+def _alias_ratio(y: np.ndarray, f0: float) -> float:
+    """Energie hors harmoniques de f0 (repliement) sur energie totale, sous 20 kHz."""
+    seg = y[0, SR // 10:]
+    spec = np.abs(np.fft.rfft(seg * np.hanning(seg.size))) ** 2
+    freqs = np.fft.rfftfreq(seg.size, 1 / SR)
+    harmonic = np.zeros_like(freqs, dtype=bool)
+    for k in range(1, int(20000 / f0) + 1):
+        harmonic |= np.abs(freqs - k * f0) < 30
+    band = freqs < 20000
+    return float(spec[band & ~harmonic].sum() / spec[band].sum())
+
+
+def test_tube_hi_quality_reduces_aliasing():
+    x = _sine(freq=5000, amp=0.9)
+    lo = sat.DynamicTube(model=1, drive_db=24)(x, SR)
+    hi = sat.DynamicTube(model=1, drive_db=24, hi_quality=1)(x, SR)
+    assert _alias_ratio(hi, 5000) < 0.3 * _alias_ratio(lo, 5000)
+
+
+def test_tube_hi_quality_blocks_match_and_silence_stays_silent():
+    x = _sine(seconds=0.2)
+    plugin = sat.DynamicTube(hi_quality=1, envelope=1, bias=0.5)
+    whole = plugin(x, SR)
+    parts = [plugin.process(x[:, lo:lo + 256], SR, reset=lo == 0) for lo in range(0, x.shape[1], 256)]
+    assert np.allclose(np.concatenate(parts, axis=1), whole, atol=1e-5)
+    quiet = plugin(np.zeros((2, 4800), dtype=np.float32), SR)
+    assert np.abs(quiet).max() < 1e-4
