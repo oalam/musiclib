@@ -80,7 +80,7 @@
 </div>
 
 <style>
-  .wave { position: relative; width: 100%; background: var(--panel-2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+  .wave { position: relative; flex: none; width: 100%; background: var(--panel-2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
   canvas { display: block; width: 100%; }
   .head { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--text, #fff); pointer-events: none; }
   .empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
