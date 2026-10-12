@@ -50,6 +50,8 @@ calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
   `.mid` complet en LIVE RECORDING et voir si les 16 tracks s'écrivent.
 - *À vérifier* aussi : quelle note joue un sample à sa hauteur d'origine
   sur une track audio (60 supposé par `digitakt.py`).
+- Jouer et enregistrer depuis un contrôleur (Maschine MK2, tout USB via le
+  Mac) : [[controleur-maschine]].
 - `PRG CH RECEIVE` permet de changer de pattern depuis l'extérieur (program
   change), utile plus tard pour piloter la chaîne d'une bank.
 

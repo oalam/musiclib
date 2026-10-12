@@ -94,3 +94,4 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 25 | [[audio-routing-overbridge]] | §6.6, §14.6, §14.8.1 | draft |
 | 32 | [[overbridge-live-vst]] | §6.6, §13.1.1, §14.6, §14.8.1 | draft |
 | 33 | [[midi-vst]] | §16.3, A.2.7, §14.4, §14.6.3 | draft |
+| 35 | [[controleur-maschine]] | §10.2.3, §10.2.4, §14.4, §14.8.1 | draft |

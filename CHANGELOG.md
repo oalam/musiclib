@@ -102,6 +102,27 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.D] Fiche KB `controleur-maschine` (lot 5, n° 35) : Maschine MK2 en
+  mode MIDI (Controller Editor) vers la DT2, tout USB via le Mac sans DAW
+  (routeur MIDI ou une ligne `mido`), notes sur l'AUTO CHANNEL ; tutos
+  branchement, perc en LIVE avec la vélocité des pads, basse en STEP.
+  Liée depuis l'index et `midi-config`.
+- [7.D] Template Controller Editor `digitakt/maschine/DT2 Pads.ncm2`
+  (Maschine MK2) : pads sur le canal 10, contrôles désactivés, 8 groupes
+  (une note, chromatique, éolien, phrygien, dorien, mineur harmonique,
+  phrygien dominant, penta mineure). Fiche `controleur-maschine` : import,
+  tonalité réglée par `TUNE` sur la DT2.
+  Groupe A remplacé par une page rythmique : notes 0-7 (pads 9-16 en
+  doublon) = tracks 1-8 quelle que soit la track active (manuel §8.4,
+  vérifié sur la machine). Port du routeur corrigé : `Maschine MK2 Virtual
+  Input`.
+  Couleurs des pads : page rythmique rangée 1 rouge, rangée 2 bleu,
+  doublons sans couleur ; gammes avec tonique rouge, tierce
+  jaune, quinte verte, reste à la couleur de la famille (blanc chromatique,
+  bleu mineur, violet majeur), boutons GROUP idem. Pads en LED on = For
+  MIDI Out : le pad frappé s'allume.
+  Rangée du haut du groupe A en rouge ; couleurs de groupe reprises de
+  l'export Controller Editor (`color-index`).
 - [7.D] Fiche KB `enregistrement-quantize` : trois tutos (grille de bank en
   GRID ; basse en contretemps en STEP RECORDING, en STANDARD, JUMP et percs
   une par une avec `[FUNC] + [TRIG n]` ; perc jouée en LIVE puis calée par
