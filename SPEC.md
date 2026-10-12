@@ -1017,6 +1017,68 @@ On garde une boucle d'une à huit mesures, sans couture.
   Champs neutres omis du JSON : hash des rendus antérieurs inchangé ; les
   couches entrent dans le hash quand il y en a.
 
+## Phase 9 — Générateur MIDI acid (à venir, cadrée le 2026-10-12)
+
+**But** : un générateur de lignes acid dans le front, inspiré de **Sting**
+(if-tah, plugin VST3 / AU / CLAP ; manuel lu le 2026-10-12,
+[user manual](https://www.if-tah.com/devices/sting/user-manual)), qui joue
+en MIDI **directement sur la DT2** ou sur **un VST du Mac**, sans DAW.
+
+Exemple concret : tonique F#, phrygien, `Type` 11, `Density` 14, 16 pas ;
+« Generate » tire notes, accents, durées et octaves ; on verrouille le
+rythme et on relance les notes ; la ligne joue sur la track 10 de la DT2,
+calée sur son horloge, ou sur une émulation 303 via un bus IAC.
+
+**Ce que reprend Sting** (référence pour les sous-phases) : séquence de 16
+pas en quatre couches (note, accent à 3 niveaux, gate à 3 longueurs,
+octave −1 à +2) tirées ensemble par `Generate` ; `Type` (1-16, intervalles
+aléatoires → phrasé acid), `Density` (1-16), `Accent` (0-100, contraste des
+vélocités), `Gate` (1-200 %), `Step Count`, `Offset`, `Direction` (avant,
+arrière, pendule), `Swing`, `Step Jitter`, `Polymeter Reset` ; `Root`,
+`Scale`, `Transpose`, `Octave Low / High` ; verrou par couche (« Randomize
+Notes / Velocity / Gate / Octave ») ; `Tie Mode` (notes liées = slides) et
+CC de slide (TB-03) ; `Auto Generate` ; 128 slots (8 × 16) ; 2 LFO et
+matrice de modulation (cibles `Type`, `Density`, `Steps`, `Offset`,
+`Accent`, `Gate`, `Root`, `Scale`) appliquée **autour** de la valeur du
+potard ; moteurs Arp, Bass et Counterpoint (4 voix : A, B, accords, basse
+sur 4 canaux, `Weight`, `Harmonic Density`) ; import de fichier MIDI.
+Non documenté par Sting (à concevoir ici) : les règles exactes de tirage,
+les silences de `Density`, les vélocités des accents, le chevauchement
+des slides.
+
+| Sous-phase | Contenu | Statut |
+|---|---|---|
+| 9.A | Moteur **Algo** : modèles Pydantic, 16 pas × 4 couches, `Type`, `Density`, `Accent`, `Gate`, `Root`, `Scale` (gammes de `harmony.SCALES`), `Transpose`, octaves bornées, `Step Count`, `Offset`, `Direction`, `Swing`, `Tie Mode`, verrous par couche, graine reproductible ; export `.mid` d'une mesure ; tests | à venir |
+| 9.B | **Lecture temps réel** : cible DT2 (horloge et Start de la DT2, AUTO CHANNEL ou `CHAN` d'une track MIDI, comme `Dt2Sender`) ou cible Mac (horloge interne, port virtuel IAC vers le VST) ; réglages pris en compte au tour suivant ; panique (all notes off) ; CC de slide optionnel ; API | à venir |
+| 9.C | **Vue front « Acid »** : potards de la vue compacte (Mode, Type, Density, Steps, Offset, Accent, Gate, Root, Scale), grille éditable note / accent / gate / octave, verrous, Generate, choix de la cible et du port, lecture / arrêt (potards de la vue Sound design) | à venir |
+| 9.D | **Slots** (8 banks × 16, JSON versionnés dans le vault) et `Auto Generate` (division de 1/64 à 32 mesures) | à venir |
+| 9.E | **Modulation** : 2 LFO (sinus, rampes, triangle, carré, aléatoire, drunk, séquence 16 pas ; sync / libre), matrice cibles × sources autour du potard ; `Step Jitter`, `Polymeter Reset` | à venir |
+| 9.F | Moteurs **Arp** et **Bass** sur entrée MIDI (Maschine, clavier) ; tonique suivie en temps réel | à venir |
+| 9.G | **Counterpoint** : 4 voix sur 4 canaux, `Weight`, `Harmonic Density`, transposition et mute par voix | à venir |
+| 9.H | **Import MIDI** : une mesure = gabarit éditable ; plus long = statistiques par pas et hauteur ; source possible : les `.mid` des banks (`library/digitakt/<slug>/pNN.mid`) | à venir |
+
+**Décisions 9** (arbitrées le 2026-10-12) :
+- **Générateur dans le front** (vue Svelte + API du projet), pas de plugin
+  VST / AU.
+- **Deux cibles** : DT2 en direct, ou VST sur le Mac.
+- **Plusieurs sous-phases**, cadrées sur le manuel de Sting (tableau
+  ci-dessus) ; hors périmètre : Launchpad / monome, thèmes, lecteur
+  d'écran, horloge pilotée par LFO (`Clock Mode` LFO1 / Gate).
+- **Fonctions non supportées par la DT2 acceptées** : pas de glide sur une
+  track audio (le slide ne vaut que pour la cible VST ou un synthé
+  externe), une note à la fois sur une track audio (accords et
+  Counterpoint : track MIDI de la DT2, 4 notes par trig, ou VST).
+
+**Proposé, à confirmer en début de 9.A** : moteur de tirage et lecture en
+**Python** (mido, tests, mypy, réutilise `harmony.SCALES` et l'horloge de
+`dt2_midi.py`, timing hors navigateur), le front ne faisant que l'édition
+et l'affichage ; l'alternative Web MIDI (moteur en TypeScript) dépend du
+navigateur (absente de Safari).
+
+**À vérifier sur la machine** : ce que fait un `note_off` sur une track
+audio jouée par l'AUTO CHANNEL (durée de gate respectée ou non selon
+l'enveloppe AMP) ; enregistrement de la ligne en LIVE REC (voie 7.E).
+
 ## Décisions arbitrées (à NE PAS refaire)
 
 - **Phase 3 (export DJ XML Rekordbox/Traktor)** : skipée intentionnellement.

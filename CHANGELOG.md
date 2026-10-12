@@ -50,6 +50,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [9] SPEC : cadrage de la Phase 9, générateur MIDI acid inspiré de Sting
+  (if-tah) : fonctions de référence tirées de son manuel, sous-phases
+  9.A-9.H, décisions (générateur du front, cibles DT2 ou VST du Mac,
+  fonctions non supportées par la DT2 acceptées), moteur Python proposé.
 - [7.D] Fiche KB `midi-vst` : pas à pas « figer l'acid en boucles pour le
   live » (export au tempo et dans la tonalité, machine STRETCH, longueur de
   track en PER TRACK, retouches dans la DT2) et piège du grain de STRETCH.
