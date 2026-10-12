@@ -102,6 +102,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.D] Fiche KB `enregistrement-quantize` : trois tutos (grille de bank en
+  GRID ; basse en contretemps en STEP RECORDING, en STANDARD, JUMP et percs
+  une par une avec `[FUNC] + [TRIG n]` ; perc jouée en LIVE puis calée par
+  la quantize), gestes du STEP complétés depuis le manuel §10.2.4.
+  Section « GRID ou STEP ? » : tableau de choix, accords (tracks MIDI,
+  `NOT2`-`NOT4` ou clavier externe), enchaînement GRID → STEP → GRID.
 - [7.D] Fiche KB `preset-pool` (lot 3, n° 34) : quatre cas d'usage en
   tuto (track Id qui change de son à chaque pas, variantes d'un même son,
   touches en pads de one-shots, palette du set multi-styles), quand le pool
