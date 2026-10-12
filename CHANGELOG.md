@@ -50,6 +50,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.D] Fiche KB `midi-vst` : pas à pas « figer l'acid en boucles pour le
+  live » (export au tempo et dans la tonalité, machine STRETCH, longueur de
+  track en PER TRACK, retouches dans la DT2) et piège du grain de STRETCH.
 - [7.D] Fiche KB `slice-breaks` : étape 5 du pas à pas (amen re-séquencé à
   172) détaillée en trois patterns réservoir B13-B15 (dense, aéré, ancré),
   tirage CREATE RANDOM LOCKS relancé à chaque `[YES]`, bon tirage figé par

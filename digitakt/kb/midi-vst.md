@@ -3,7 +3,7 @@ tags: [digitakt, kb]
 theme: Tracks MIDI vers des synthés VST (acid, accords)
 lot: 5
 ordre: 33
-manuel: "§16.3, A.2.7, §14.4, §14.6.3 (p79-80, 87, 101-103)"
+manuel: "§16.3, A.2.3, A.2.7, §14.4, §14.6.3 (p79-80, 87, 96, 101-103)"
 os: "1.17"
 statut: draft
 ---
@@ -47,6 +47,41 @@ tracks audio (monophoniques) ne jouent pas.
 3. Un trig long toutes les 2 ou 4 mesures, note lockée par trig :
    progression i7 → IV7 du §11 (dorien).
 
+## Pas à pas : figer l'acid en boucles pour le live
+
+But : jouer la ligne acid sans le Mac sur scène. On écrit et on explore en
+MIDI vers le VST (pas à pas ci-dessus), puis on fige les meilleures prises
+en boucles audio jouées par la DT2. On garde glides, accents et filtre de
+la 303 ; on perd la main sur les notes et le cutoff du VST.
+
+1. **Exporter** depuis le DAW, au tempo et dans la tonalité du pattern :
+   mono, sec (ni reverb ni delay), début sur le premier temps, fin juste
+   avant le premier temps suivant. Durée de 8 mesures : 8 × 4 × 60 / 190 =
+   10,1 s à 190 BPM ; 8 × 4 × 60 / 172 = 11,2 s à 172 BPM. Poids en mono
+   48 kHz / 16 bits : 48 000 × 2 = 96 Ko/s, soit environ 1 Mo.
+2. **Garder le filtre de la 303 dans la prise** (c'est lui qui fait la
+   ligne) et exporter deux ou trois variantes : sobre, accentuée, filtre
+   ouvert.
+3. **DT2, track 10** : machine **STRETCH**, `BARS` = 8 (cf.
+   [[machines-src]]). Son `TUNE` est indépendant du tempo (manuel A.2.3) :
+   on peut transposer sans désynchroniser la boucle. En ONESHOT, `TUNE`
+   change la vitesse et la boucle ne tombe plus sur les mesures.
+4. **Longueur de la track = longueur de la boucle**. Le trig du pas 1
+   relance le sample à chaque tour : avec 16 pas, on n'entendrait que la
+   première mesure. PAGE SETUP en PER TRACK, track 10 à 128 pas, le reste
+   à 16 (cf. [[page-setup]], [[polymetrie]]). Sinon, exporter des boucles
+   de 1 mesure (16 pas) ou 2 (32 pas).
+5. **Un trig au pas 1**, `LEN` de trig long.
+6. **Retouches dans la DT2** :
+   - filtre (cutoff, résonance) avec un LFO synchronisé sur 1, 2 ou 4
+     mesures, ou en p-lock sur la dernière mesure avant une bascule ;
+   - overdrive, bit reduction, envoi delay en p-lock sur quelques pas ;
+   - `STRT` en p-lock pour faire repartir la boucle de la mesure 3 ou 5 ;
+   - variantes par sample lock ou preset lock (cf. [[preset-pool]], cas 2) ;
+   - re-séquencer une boucle d'une mesure coupée en 16 (une note par pas,
+     cf. [[slice-breaks]]) ; les glides qui enjambent deux tranches sont
+     coupés.
+
 ## En live techno
 
 - La track MIDI **garde son rôle** dans la grille (10 = lead, 11 = atmo) :
@@ -70,6 +105,9 @@ tracks audio (monophoniques) ne jouent pas.
   [[microtiming-retrigs]]).
 - Plugins payants (Acid V) ou gratuits (comparatif ci-dessous) : à choisir
   avant de figer le kit.
+- Boucle figée : STRETCH découpe le son en grains ; sur les attaques sèches
+  d'une 303, vérifier à l'oreille que ça ne bave pas. Sinon, ONESHOT à
+  tempo et tonalité fixes.
 
 ## À essayer (5 min)
 
