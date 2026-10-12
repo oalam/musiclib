@@ -109,6 +109,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [9.A] Moteur du générateur acid (`scripts/analyzer/acid.py`) : séquence
+  de 16 pas en quatre couches (notes, accent, gate, octave) tirées par
+  `generate`, une graine par couche (verrouiller une couche ne change pas
+  le tirage des autres) ; `Type`, `Density`, `Accent`, `Gate`, `Root`,
+  `Scale` (`harmony.SCALES`), `Transpose`, octaves bornées, `Steps`,
+  `Offset`, `Direction` (avant, arrière, pendule), `Swing`, `Tie Mode`
+  (slide = chevauchement, même note = prolongée) ; export `.mid` d'une
+  mesure, CLI `python -m analyzer.acid` ; 23 tests.
 - [7.D] Fiche KB `controleur-maschine` (lot 5, n° 35) : Maschine MK2 en
   mode MIDI (Controller Editor) vers la DT2, tout USB via le Mac sans DAW
   (routeur MIDI ou une ligne `mido`), notes sur l'AUTO CHANNEL ; tutos

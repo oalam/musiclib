@@ -1048,7 +1048,7 @@ des slides.
 
 | Sous-phase | Contenu | Statut |
 |---|---|---|
-| 9.A | Moteur **Algo** : modèles Pydantic, 16 pas × 4 couches, `Type`, `Density`, `Accent`, `Gate`, `Root`, `Scale` (gammes de `harmony.SCALES`), `Transpose`, octaves bornées, `Step Count`, `Offset`, `Direction`, `Swing`, `Tie Mode`, verrous par couche, graine reproductible ; export `.mid` d'une mesure ; tests | à venir |
+| 9.A | Moteur **Algo** : modèles Pydantic, 16 pas × 4 couches, `Type`, `Density`, `Accent`, `Gate`, `Root`, `Scale` (gammes de `harmony.SCALES`), `Transpose`, octaves bornées, `Step Count`, `Offset`, `Direction`, `Swing`, `Tie Mode`, verrous par couche, graine reproductible ; export `.mid` d'une mesure ; tests (`analyzer/acid.py`, `tests/test_acid.py`) | fait (à valider à l'oreille) |
 | 9.B | **Lecture temps réel** : cible DT2 (horloge et Start de la DT2, AUTO CHANNEL ou `CHAN` d'une track MIDI, comme `Dt2Sender`) ou cible Mac (horloge interne, port virtuel IAC vers le VST) ; réglages pris en compte au tour suivant ; panique (all notes off) ; CC de slide optionnel ; API | à venir |
 | 9.C | **Vue front « Acid »** : potards de la vue compacte (Mode, Type, Density, Steps, Offset, Accent, Gate, Root, Scale), grille éditable note / accent / gate / octave, verrous, Generate, choix de la cible et du port, lecture / arrêt (potards de la vue Sound design) | à venir |
 | 9.D | **Slots** (8 banks × 16, JSON versionnés dans le vault) et `Auto Generate` (division de 1/64 à 32 mesures) | à venir |
@@ -1069,11 +1069,32 @@ des slides.
   externe), une note à la fois sur une track audio (accords et
   Counterpoint : track MIDI de la DT2, 4 notes par trig, ou VST).
 
-**Proposé, à confirmer en début de 9.A** : moteur de tirage et lecture en
-**Python** (mido, tests, mypy, réutilise `harmony.SCALES` et l'horloge de
-`dt2_midi.py`, timing hors navigateur), le front ne faisant que l'édition
-et l'affichage ; l'alternative Web MIDI (moteur en TypeScript) dépend du
-navigateur (absente de Safari).
+- **Moteur en Python** (confirmé le 2026-10-12) : tirage et envoi MIDI
+  par l'API (mido, réutilise `harmony.SCALES` et l'horloge de
+  `dt2_midi.py`, timing hors navigateur) ; le front ne fait que l'édition
+  et l'affichage. Web MIDI écarté (absent de Safari).
+
+**Règles de tirage de 9.A** (non documentées par Sting, choisies ici,
+`analyzer/acid.py`) :
+- **Notes** : marche aléatoire sur les degrés de la gamme, départ sur la
+  tonique ; saut max de 1 degré (`Type` 1) à 14 (`Type` 16) ; retour à la
+  tonique avec une probabilité de 0,35 × (16 − Type) / 15 ; degrés bornés
+  d'une octave sous la tonique à deux au-dessus.
+- **Density** : `Density` pas joués sur 16, le pas 0 toujours joué, les
+  autres tirés au hasard ; le rythme (pas joués + longueurs) forme la
+  couche gate, verrouillable seule (« garder le rythme, relancer les
+  notes »).
+- **Accent** : niveaux 0 / 1 / 2 tirés à 60 / 25 / 15 % ; vélocité
+  = 80 + niveau × `Accent` × 47 / 200 (127 au maximum).
+- **Gate** : court / normal / long tirés à 25 / 50 / 25 %, soit 0,25 /
+  0,5 / 1 pas × `Gate` %. Une même note ne chevauche jamais la suivante.
+- **Slides** (`Tie Mode`) : un pas long suivi d'un pas joué est lié ;
+  note différente = le note_off part après le note_on suivant (legato,
+  slide sur un synthé mono) ; même note = prolongée.
+- **Octave** : 0 tirée à 60 % si permise, sinon uniforme dans
+  [`Octave Low`, `Octave High`].
+- **Swing** : positions impaires retardées de (2 × swing % − 1) pas
+  (50 = droit, 66 ≈ ternaire, 75 = demi-pas).
 
 **À vérifier sur la machine** : ce que fait un `note_off` sur une track
 audio jouée par l'AUTO CHANNEL (durée de gate respectée ou non selon
