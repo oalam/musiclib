@@ -1049,7 +1049,7 @@ des slides.
 | Sous-phase | Contenu | Statut |
 |---|---|---|
 | 9.A | Moteur **Algo** : modèles Pydantic, 16 pas × 4 couches, `Type`, `Density`, `Accent`, `Gate`, `Root`, `Scale` (gammes de `harmony.SCALES`), `Transpose`, octaves bornées, `Step Count`, `Offset`, `Direction`, `Swing`, `Tie Mode`, verrous par couche, graine reproductible ; export `.mid` d'une mesure ; tests (`analyzer/acid.py`, `tests/test_acid.py`) | fait (à valider à l'oreille) |
-| 9.B | **Lecture temps réel** : cible DT2 (horloge et Start de la DT2, AUTO CHANNEL ou `CHAN` d'une track MIDI, comme `Dt2Sender`) ou cible Mac (horloge interne, port virtuel IAC vers le VST) ; réglages pris en compte au tour suivant ; panique (all notes off) ; CC de slide optionnel ; API | à venir |
+| 9.B | **Lecture temps réel** : cible DT2 (horloge et Start de la DT2, AUTO CHANNEL ou `CHAN` d'une track MIDI, comme `Dt2Sender`) ou cible Mac (horloge interne, port virtuel IAC vers le VST) ; réglages pris en compte au tour suivant ; panique (all notes off) ; CC de slide optionnel ; API (`acid_midi.py`, `/api/acid/...`) | fait (à valider sur la DT2 et un VST) |
 | 9.C | **Vue front « Acid »** : potards de la vue compacte (Mode, Type, Density, Steps, Offset, Accent, Gate, Root, Scale), grille éditable note / accent / gate / octave, verrous, Generate, choix de la cible et du port, lecture / arrêt (potards de la vue Sound design) | à venir |
 | 9.D | **Slots** (8 banks × 16, JSON versionnés dans le vault) et `Auto Generate` (division de 1/64 à 32 mesures) | à venir |
 | 9.E | **Modulation** : 2 LFO (sinus, rampes, triangle, carré, aléatoire, drunk, séquence 16 pas ; sync / libre), matrice cibles × sources autour du potard ; `Step Jitter`, `Polymeter Reset` | à venir |

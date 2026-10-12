@@ -93,6 +93,17 @@ class AcidSequence(BaseModel):
     steps: list[AcidStep] = Field(min_length=SEQ_LEN, max_length=SEQ_LEN)
 
 
+class GenerateRequest(BaseModel):
+    """Corps de `POST /api/acid/generate` ; sans graine, une graine est tiree."""
+    params: AcidParams = AcidParams()
+    seed: int | None = Field(None, ge=0)
+    previous: AcidSequence | None = None
+    locks: list[Layer] = []
+
+    def resolved_seed(self) -> int:
+        return self.seed if self.seed is not None else random.randrange(2**31)
+
+
 class AcidNote(BaseModel):
     """Note jouee, en ticks (PPQ) depuis le debut du cycle."""
     start: int

@@ -109,6 +109,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [9.B] Lecture temps réel des lignes acid (`scripts/acid_midi.py`) : cible
+  DT2 (Start et horloge de la DT2, boucle, Stop = retour en attente) ou
+  cible Mac (horloge interne 24 ppqn vers un bus IAC) ; nouvelle ligne
+  prise au tour suivant, BPM immédiat ; slides en legato et CC de slide
+  optionnel ; arrêt et panique (CC 123 sur les 16 canaux) ; routes
+  `POST /api/acid/generate`, `POST|GET|DELETE /api/acid/play`,
+  `POST /api/acid/panic` ; CLI ; 14 tests.
 - [9.A] Moteur du générateur acid (`scripts/analyzer/acid.py`) : séquence
   de 16 pas en quatre couches (notes, accent, gate, octave) tirées par
   `generate`, une graine par couche (verrouiller une couche ne change pas

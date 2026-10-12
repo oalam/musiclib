@@ -675,6 +675,37 @@ d'une demi-double-croche). Backend : `python-rtmidi`. Les ports restent ouverts 
 « Envoyer à la DT2 » de la vue bank (routes `GET /api/dt2/ports`,
 `POST|GET|DELETE /api/dt2/send`, un envoi à la fois).
 
+# acid — générateur de lignes acid (Phase 9)
+
+Tirage (`analyzer/acid.py`, 9.A) : 16 pas en quatre couches (notes, accent,
+gate, octave), réglages repris de Sting (if-tah), règles de tirage décrites
+dans [[../SPEC]] (Phase 9). Lecture en boucle (`acid_midi.py`, 9.B) :
+
+- **cible `dt2`** : attend le Start de la DT2, suit son horloge (6 clocks par
+  pas), boucle ; un Stop de la DT2 remet en attente du Start suivant. Mêmes
+  réglages DT2 que `dt2_midi.py` ; notes sur l'AUTO CHANNEL ou le `CHAN`
+  d'une track MIDI.
+- **cible `mac`** : horloge interne (24 ppqn au BPM demandé), sortie seule
+  vers un bus IAC (à activer dans Configuration audio et MIDI → Gestionnaire
+  IAC) écouté par le VST.
+
+Une nouvelle ligne envoyée pendant la lecture part au tour suivant ; le BPM
+change tout de suite. Slides : note liée = note_on de la suivante avant le
+note_off (legato), plus un CC de slide optionnel (127 sur la note atteinte
+par un slide, 0 sinon).
+
+```bash
+python -m analyzer.acid --root F# --scale PHRYGIAN --type 11 --density 14 --seed 3 -o /tmp/acid.mid
+python acid_midi.py --list-ports
+python acid_midi.py --port "IAC Driver Bus 1" --target mac --bpm 145 --root F# --scale PHRYGIAN --seed 3
+python acid_midi.py --port "Elektron Digitakt II" --target dt2 --channel 10 --seed 3
+```
+
+Routes : `POST /api/acid/generate` (sans graine = graine tirée ; `previous`
++ `locks` gardent des couches), `POST|GET|DELETE /api/acid/play` (lecture,
+état, arrêt avec coupure des notes), `POST /api/acid/panic` (CC 123 sur les
+16 canaux). Ports listés par `GET /api/dt2/ports`.
+
 # harmony.py — gamme et accords (Phase 7.H)
 
 Gamme du morceau sous son nom **KB SCALE** de la DT2 (7 modes, mineurs

@@ -6,7 +6,9 @@ samples DT2 (Phase 7.J2, `samples.py`), leur export vers Transfer (7.J3) et
 la vue par kit (7.J5 : filtre, tags et corbeille d'un kit entier) et la barre
 de recherche (7.J6 : memes filtres sur toutes les lectures de samples ; 7.J7 :
 filtre par note et roue chromatique `GET /api/samples/notes`), et le sound
-design (Phase 8 : traitements, presets, ecoute et rendu, `/api/sounddesign/...`).
+design (Phase 8 : traitements, presets, ecoute et rendu, `/api/sounddesign/...`),
+et le generateur acid (Phase 9 : tirage `POST /api/acid/generate`, lecture
+temps reel vers la DT2 ou un VST du Mac `/api/acid/play`, `acid_midi.py`).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
@@ -16,7 +18,7 @@ manifeste et overrides.json), et l'export des samples retenus
 (`POST /api/samples/export`, copie vers `<MEDIA>/Live/samples`), et le sound
 design (`PUT .../presets/...` dans le vault, `POST .../render` vers
 `<MEDIA>/SoundDesign` ; l'ecoute `POST .../preview` n'ecrit rien). L'envoi
-MIDI (`/api/dt2/send`) n'ecrit rien sur disque. Ecoute
+MIDI (`/api/dt2/send`, `/api/acid/...`) n'ecrit rien sur disque. Ecoute
 sur 127.0.0.1 uniquement. Les fichiers ne sont servis que pour un slug present
 dans library.md, et un sample que s'il figure au manifeste (pas de chemin libre) ;
 un rendu de sound design que s'il a un sidecar sous `<MEDIA>/SoundDesign` ;
@@ -45,6 +47,7 @@ from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import acid_midi
 import digitakt
 import dt2_midi
 import grab
@@ -52,6 +55,7 @@ import harmony
 import kb
 import samples
 import stems
+from analyzer import acid
 from analyzer.harmony import Harmony, keyboard_setup
 from analyzer.infer import load_sidecar
 from analyzer.rhythm_signature import beats_per_bar
@@ -424,6 +428,7 @@ def _validate_grab(req: GrabRequest) -> None:
 
 def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                sender: dt2_midi.Dt2Sender | None = None,
+               acid_player: acid_midi.AcidPlayer | None = None,
                samples_manifest: Path = samples.MANIFEST_FILE,
                samples_src: Path = SAMPLES_SRC_DIR,
                samples_overrides: Path = samples.OVERRIDES_FILE,
@@ -436,6 +441,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
     app.router.on_shutdown.append(dt2.shutdown)
+    player = acid_player or acid_midi.AcidPlayer()
+    app.router.on_shutdown.append(player.shutdown)
     app.router.on_shutdown.append(jobs.shutdown)
 
     samples_lock = threading.Lock()
@@ -593,6 +600,35 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     @app.delete("/api/dt2/send", response_model=dt2_midi.SendState | None)
     def dt2_send_cancel() -> dt2_midi.SendState | None:
         return dt2.cancel()
+
+    @app.post("/api/acid/generate", response_model=acid.AcidSequence)
+    def acid_generate(req: acid.GenerateRequest) -> acid.AcidSequence:
+        """Tire une ligne ; les couches de `locks` viennent de `previous`."""
+        try:
+            return acid.generate(req.params, req.resolved_seed(), req.previous,
+                                 frozenset(req.locks))
+        except acid.AcidError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/acid/play", response_model=acid_midi.PlayerState, status_code=202)
+    def acid_play(req: acid_midi.PlayRequest) -> acid_midi.PlayerState:
+        """Lance la lecture en boucle, ou remplace la ligne au tour suivant."""
+        try:
+            return player.play(req)
+        except dt2_midi.MidiUnavailable as exc:
+            raise HTTPException(503, str(exc)) from exc
+
+    @app.get("/api/acid/play", response_model=acid_midi.PlayerState | None)
+    def acid_state() -> acid_midi.PlayerState | None:
+        return player.current()
+
+    @app.delete("/api/acid/play", response_model=acid_midi.PlayerState | None)
+    def acid_stop() -> acid_midi.PlayerState | None:
+        return player.stop()
+
+    @app.post("/api/acid/panic", response_model=acid_midi.PlayerState | None)
+    def acid_panic() -> acid_midi.PlayerState | None:
+        return player.panic()
 
     @app.get("/api/kb/search", response_model=list[kb.KbHit])
     def kb_search(q: str = Query(..., min_length=1, max_length=200),

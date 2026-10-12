@@ -217,6 +217,56 @@ def test_dt2_send(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     assert client.delete("/api/dt2/send").json()["status"] == "cancelled"
 
 
+
+def test_acid_generate_and_play(tmp_path: Path):
+    from test_acid_midi import FakeClock
+    from test_dt2_midi import FakeMidi, FakePort
+
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    out = FakePort()
+    player = api.acid_midi.AcidPlayer(opener=FakeMidi(), out_opener=lambda name: out,
+                                      clock_factory=FakeClock)
+    client = TestClient(api.create_app(library_file=lib, acid_player=player))
+    params = {"root": 6, "scale": "PHRYGIAN", "type": 11, "density": 14}
+
+    r = client.post("/api/acid/generate", json={"params": params, "seed": 3})
+    assert r.status_code == 200
+    seq = r.json()
+    assert seq["seed"] == 3 and len(seq["steps"]) == 16
+    assert sum(s["on"] for s in seq["steps"]) == 14
+    r = client.post("/api/acid/generate", json={"params": params, "seed": 4,
+                                                "previous": seq, "locks": ["gate"]})
+    assert [s["on"] for s in r.json()["steps"]] == [s["on"] for s in seq["steps"]]
+    assert isinstance(client.post("/api/acid/generate", json={}).json()["seed"], int)
+    assert client.post("/api/acid/generate", json={"locks": ["notes"]}).status_code == 422
+    assert client.post("/api/acid/generate", json={"params": {"scale": "X"}}).status_code == 422
+
+    assert client.get("/api/acid/play").json() is None
+    body = {"sequence": seq, "target": "mac", "port": "IAC", "channel": 1}
+    assert client.post("/api/acid/play", json=body | {"channel": 0}).status_code == 422
+    r = client.post("/api/acid/play", json=body)
+    assert r.status_code == 202 and r.json()["status"] == "playing"
+    assert client.post("/api/acid/panic").status_code == 200
+    assert client.delete("/api/acid/play").json()["status"] == "stopped"
+
+
+def test_acid_play_port_unavailable(tmp_path: Path):
+    from test_acid_midi import FakeClock
+
+    def broken(name: str) -> None:
+        raise api.dt2_midi.MidiUnavailable("port MIDI non ouvrable : IAC")
+
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    player = api.acid_midi.AcidPlayer(out_opener=broken, clock_factory=FakeClock)  # type: ignore[arg-type]
+    client = TestClient(api.create_app(library_file=lib, acid_player=player))
+    seq = client.post("/api/acid/generate", json={"seed": 1}).json()
+    r = client.post("/api/acid/play", json={"sequence": seq, "target": "mac",
+                                            "port": "IAC", "channel": 1})
+    assert r.status_code == 503
+    assert client.get("/api/acid/play").json()["status"] == "error"
+
 def test_dt2_ports(client: TestClient, monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setattr(api.dt2_midi, "list_ports",
                         lambda: api.dt2_midi.Dt2Ports(inputs=["X"], outputs=["X"], default="X"))
