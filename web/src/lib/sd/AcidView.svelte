@@ -1,7 +1,7 @@
 <script lang="ts">
   // Generateur acid (Phase 9.C), outil MIDI du sound design, inspire de Sting
-  // (if-tah). Generate tire les quatre couches (notes, accent, gate, octave)
-  // cote API ; un verrou garde sa couche au tirage suivant. Les potards de
+  // (if-tah). Generate tire les couches allumees (notes, accent, gate, octave)
+  // cote API, comme les « Randomize » de Sting ; une couche eteinte est gardee. Les potards de
   // tirage (Type, Density, octaves) ne relancent que leur couche, avec la meme
   // graine ; les autres (Steps, Offset, Accent, Gate, Swing, Transpose, Root,
   // Scale) changent la lecture sans retirer. Grille editable : clic = cycle
@@ -196,14 +196,16 @@
 <div class="acid">
   <header class="bar">
     <strong>Acid · MIDI</strong>
-    <button class="gen" onclick={generate} title="Tire les couches non verrouillées (nouvelle graine)">Generate</button>
-    <span class="small muted">graine {seq?.seed ?? '—'}</span>
-    <span class="locks" role="group" aria-label="Verrous">
+    <button class="gen" onclick={generate} disabled={locks.length === LAYERS.length}
+      title={locks.length === LAYERS.length ? 'Aucune couche à tirer : en allumer au moins une' : 'Retire les couches allumées (nouvelle graine)'}>Generate</button>
+    <span class="locks" role="group" aria-label="Couches tirées par Generate">
+      <span class="small muted">tirer :</span>
       {#each LAYERS as l (l.id)}
-        <button class="small" class:on={locks.includes(l.id)} aria-pressed={locks.includes(l.id)}
-          onclick={() => toggleLock(l.id)} title="Verrou : garder la couche {l.label} au prochain Generate">{l.label}</button>
+        <button class="small" class:on={!locks.includes(l.id)} aria-pressed={!locks.includes(l.id)} onclick={() => toggleLock(l.id)}
+          title={locks.includes(l.id) ? `${l.label} gardé au prochain Generate (clic = le tirer)` : `${l.label} retiré au prochain Generate (clic = le garder)`}>{l.label}</button>
       {/each}
     </span>
+    <span class="small muted">graine {seq?.seed ?? '—'}</span>
     <span class="grow"></span>
     <button class="play" class:on={active} onclick={() => (active ? stop() : play())} disabled={!seq || !port}
       title={active ? 'Arrêter (coupe les notes)' : 'Jouer en boucle'}>{active ? '■ Stop' : '▶ Play'}</button>
@@ -337,7 +339,7 @@
   .tone { display: flex; flex-direction: column; gap: 6px; }
   .choices { display: flex; gap: 2px; }
   .choices button { padding: 1px 8px; font-size: 11px; border-radius: 2px; }
-  .locks { display: flex; gap: 2px; }
+  .locks { display: flex; gap: 2px; align-items: center; }
   .gen { font-weight: 600; }
   .play { min-width: 76px; }
   .small { font-size: 12px; }

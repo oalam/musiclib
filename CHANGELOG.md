@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [9.C] Vue Acid : le rack audio masqué restait affiché sous la colonne
+  des traitements (règle `.sd` plus forte que `.hide`) et coupait la vue ;
+  boutons Notes / Accent / Gate / Octave inversés, comme les « Randomize »
+  de Sting : allumé = tiré par Generate, éteint = gardé (en orange, un
+  verrou passait pour actif et Generate semblait sans effet).
 - [8.F] Clic d'un rumble joué une seule fois : la boucle finissait en plein
   grondement (0,53 d'amplitude sur `Kick 1973 DS 1`, preset `deep`). Le
   duck anticipe désormais le coup (creux complet sur le kick, y compris

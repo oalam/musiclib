@@ -623,7 +623,7 @@
   .sdwrap { height: 100%; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 10px; padding-left: 10px; }
   .sidecol { margin: 10px 0 10px; overflow-y: auto; }
   .tool { width: 100%; margin-bottom: 8px; text-align: left; font-size: 12px; }
-  .hide { display: none; }
+  .sd.hide { display: none; }
   .ptitle { font-size: 13px; }
   .sd { height: 100%; overflow-y: auto; padding: 10px 14px 24px 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .bar, .source, .saveas { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
