@@ -73,6 +73,7 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 28 | [[rumble-grave]] | §11.5-11.8, §12.3, §12.5, §13 | draft |
 | 30 | [[slice-breaks]] | A.2.5, A.2.6, §8.5.4 | draft |
 | 31 | [[kick-mental-vst]] | §13.1.1, §13.6.7, A.2.1 | draft |
+| 34 | [[preset-pool]] | §8.5.4, §9.1, §9.3.4, §9.8.2, §10.8.2 | draft |
 
 ## Lot 4 — Structurer le set, puis le jouer
 

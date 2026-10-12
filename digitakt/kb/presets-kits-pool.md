@@ -44,7 +44,8 @@ kit modèle permet de l'appliquer d'un coup à tous les patterns vides du set.
   (`[TRK] + [TRIG 1] + [RECORD]` / `[STOP]`).
 - Le **pool** (128 presets max par projet) sert aux *preset locks* : y
   ajouter les variantes de kick / basse à échanger pas à pas (PRESET
-  `MANAGE` > sélection > `[LEFT]` > `ADD TO PRESET POOL`).
+  `MANAGE` > sélection > `[LEFT]` > `ADD TO PRESET POOL`). Cas d'usage
+  détaillés : [[preset-pool]].
 - `TRACK SWAP` (`[FUNC] + [FLTR]` > KIT) remet un son sur la bonne track
   sans perdre ses trigs : pratique pour ranger un pattern importé selon la
   grille des 16 tracks.

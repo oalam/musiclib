@@ -102,6 +102,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.D] Fiche KB `preset-pool` (lot 3, n° 34) : quatre cas d'usage en
+  tuto (track Id qui change de son à chaque pas, variantes d'un même son,
+  touches en pads de one-shots, palette du set multi-styles), quand le pool
+  ne sert à rien (socle), proposition de rangement des slots à arbitrer.
+  Liée depuis l'index et `presets-kits-pool`.
 - [8.E] Dossier de rangement d'un rendu au choix, avant le rendu : le
   `→ dossier` à côté du nom DT2 devient un menu (dossier proposé, ou tous
   les dossiers cibles groupés par branche) ; le nom proposé prend le code du
