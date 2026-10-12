@@ -601,6 +601,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def dt2_send_cancel() -> dt2_midi.SendState | None:
         return dt2.cancel()
 
+    @app.get("/api/acid/scales", response_model=list[acid.ScaleInfo])
+    def acid_scales() -> list[acid.ScaleInfo]:
+        return acid.scales()
+
     @app.post("/api/acid/generate", response_model=acid.AcidSequence)
     def acid_generate(req: acid.GenerateRequest) -> acid.AcidSequence:
         """Tire une ligne ; les couches de `locks` viennent de `previous`."""

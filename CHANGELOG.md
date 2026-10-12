@@ -109,6 +109,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [9.C] Vue « Acid · MIDI » du sound design (`web/src/lib/sd/AcidView.svelte`),
+  ouverte depuis la colonne des traitements : Generate et graine, verrous
+  par couche, potards de tirage (Type, Density, octaves : relancent leur
+  seule couche, même graine) et de lecture (Steps, Offset, Accent, Gate,
+  Swing, Transpose), Root, Scale, Direction, Tie ; grille 16 pas éditable
+  (note : clic = joué / silence, molette ou flèches = degré ; accent, gate,
+  octave : clic = valeur suivante ; slides marqués), pas joué surligné ;
+  cible VST du Mac ou DT2, port, canal, BPM, CC de slide, Play / Stop,
+  Panique ; modifications envoyées au tour suivant pendant la lecture ;
+  réglages gardés dans le navigateur. Route `GET /api/acid/scales`.
 - [9.B] Lecture temps réel des lignes acid (`scripts/acid_midi.py`) : cible
   DT2 (Start et horloge de la DT2, boucle, Stop = retour en attente) ou
   cible Mac (horloge interne 24 ppqn vers un bus IAC) ; nouvelle ligne

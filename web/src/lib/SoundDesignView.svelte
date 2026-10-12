@@ -8,6 +8,8 @@
   // supprimer ; sans sample pour un riser sur bruit genere.
   // Layering (8.J) : couches en plus de la source (buffer de focus), chaque
   // chaine lit la sienne (boite « Source » en tete de ses devices).
+  // Outil MIDI (9.C) : « Acid · MIDI » en tete de colonne remplace le rack
+  // par le generateur de lignes acid (`sd/AcidView`).
   import { onDestroy } from 'svelte'
   import { createMarked, escapeHtml, replaceWikilinks } from './markdown'
   import { api, slugify, type DeviceSpec, type RenderRecord, type SdPreset, type SdTarget, type TreatmentSpec } from './api'
@@ -17,6 +19,7 @@
   import Device from './sd/Device.svelte'
   import Fader from './sd/Fader.svelte'
   import Knob from './sd/Knob.svelte'
+  import AcidView from './sd/AcidView.svelte'
   import { Looper } from './sd/looper'
   import TreatmentList from './sd/TreatmentList.svelte'
   import Waveform from './sd/Waveform.svelte'
@@ -26,12 +29,18 @@
   let { ongotosamples, onshow }: { ongotosamples?: () => void; onshow?: () => void } = $props()
 
   const KEY = 'ui:sd'
-  type Saved = { treatment?: string; preset?: string }
+  type Saved = { treatment?: string; preset?: string; tool?: 'audio' | 'acid' }
   let mem: Saved = {}
   try { mem = JSON.parse(localStorage.getItem(KEY) ?? '{}') } catch { /* stockage indisponible */ }
   function remember(patch: Saved) {
     mem = { ...mem, ...patch }
     try { localStorage.setItem(KEY, JSON.stringify(mem)) } catch { /* stockage indisponible */ }
+  }
+
+  let tool = $state<'audio' | 'acid'>(mem.tool ?? 'audio')
+  function setTool(t: 'audio' | 'acid') {
+    tool = t
+    remember({ tool: t })
   }
 
   let treatments = $state<TreatmentSpec[]>([])
@@ -409,10 +418,13 @@
 
 <div class="sdwrap">
 <aside class="panel sidecol">
-  <TreatmentList {treatments} presets={presetsBy} current={treatment?.id ?? null} preset={preset?.id ?? null} {dirty}
-    onopen={(t, p) => open(t, p)} onnew={() => startMeta('new')} onedit={() => startMeta('edit')} ondelete={deletePreset} />
+  <button class="tool" class:on={tool === 'acid'} aria-pressed={tool === 'acid'} onclick={() => setTool(tool === 'acid' ? 'audio' : 'acid')}
+    title="Générateur de lignes acid en MIDI (DT2 ou VST du Mac)">Acid · MIDI</button>
+  <TreatmentList {treatments} presets={presetsBy} current={tool === 'audio' ? (treatment?.id ?? null) : null} preset={preset?.id ?? null} {dirty}
+    onopen={(t, p) => { setTool('audio'); open(t, p) }} onnew={() => startMeta('new')} onedit={() => startMeta('edit')} ondelete={deletePreset} />
 </aside>
-<div class="sd">
+{#if tool === 'acid'}<div class="sd"><AcidView /></div>{/if}
+<div class="sd" class:hide={tool === 'acid'}>
   <header class="bar">
     {#if preset}<strong class="ptitle">{treatment?.label} · {preset.label}</strong>{/if}
     {#if dirty}<span class="dirty small">modifié</span>{/if}
@@ -610,6 +622,8 @@
 <style>
   .sdwrap { height: 100%; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 10px; padding-left: 10px; }
   .sidecol { margin: 10px 0 10px; overflow-y: auto; }
+  .tool { width: 100%; margin-bottom: 8px; text-align: left; font-size: 12px; }
+  .hide { display: none; }
   .ptitle { font-size: 13px; }
   .sd { height: 100%; overflow-y: auto; padding: 10px 14px 24px 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .bar, .source, .saveas { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }

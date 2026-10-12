@@ -113,6 +113,17 @@ class AcidNote(BaseModel):
     slide: bool = False  # liee a la suivante (chevauchement)
 
 
+class ScaleInfo(BaseModel):
+    name: str          # nom KB SCALE de la DT2 (cle de `harmony.SCALES`)
+    label: str
+    intervals: list[int]
+
+
+def scales() -> list[ScaleInfo]:
+    """Gammes proposees au front (memes noms que la DT2)."""
+    return [ScaleInfo(name=k, label=lab, intervals=list(iv)) for k, (lab, iv) in SCALES.items()]
+
+
 def _rng(seed: int, layer: Layer) -> random.Random:
     return random.Random(f"{seed}:{layer}")
 

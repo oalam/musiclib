@@ -242,6 +242,8 @@ def test_acid_generate_and_play(tmp_path: Path):
     assert client.post("/api/acid/generate", json={"locks": ["notes"]}).status_code == 422
     assert client.post("/api/acid/generate", json={"params": {"scale": "X"}}).status_code == 422
 
+    scales = client.get("/api/acid/scales").json()
+    assert {"name": "PHRYGIAN", "label": "phrygien", "intervals": [0, 1, 3, 5, 7, 8, 10]} in scales
     assert client.get("/api/acid/play").json() is None
     body = {"sequence": seq, "target": "mac", "port": "IAC", "channel": 1}
     assert client.post("/api/acid/play", json=body | {"channel": 0}).status_code == 422
