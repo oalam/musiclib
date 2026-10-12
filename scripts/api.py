@@ -605,6 +605,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     def acid_scales() -> list[acid.ScaleInfo]:
         return acid.scales()
 
+    @app.get("/api/acid/progressions", response_model=list[acid.ProgressionInfo])
+    def acid_progressions() -> list[acid.ProgressionInfo]:
+        return acid.progressions()
+
     @app.post("/api/acid/generate", response_model=acid.AcidSequence)
     def acid_generate(req: acid.GenerateRequest) -> acid.AcidSequence:
         """Tire une ligne ; les couches de `locks` viennent de `previous`."""

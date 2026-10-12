@@ -690,7 +690,9 @@ dans [[../SPEC]] (Phase 9). Lecture en boucle (`acid_midi.py`, 9.B) :
   IAC) écouté par le VST.
 
 Une nouvelle ligne envoyée pendant la lecture part au tour suivant ; le BPM
-change tout de suite. Slides : note liée = note_on de la suivante avant le
+change tout de suite. `bars` (1-8) arrête la lecture après N mesures (pour
+échantillonner). Séquences de 32 pas ; mode `arp` : arpège d'une progression
+d'accords de la gamme (`PROGRESSIONS`, `GET /api/acid/progressions`). Slides : note liée = note_on de la suivante avant le
 note_off (legato), plus un CC de slide optionnel (127 sur la note atteinte
 par un slide, 0 sinon).
 

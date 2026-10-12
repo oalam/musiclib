@@ -214,18 +214,23 @@ export interface AcidParams {
   root: number; scale: string; transpose: number
   octave_low: number; octave_high: number; base_note: number
   steps: number; offset: number; direction: AcidDirection; swing: number; tie_mode: boolean
+  /** arp : notes = arpege des accords de `progression` (degres de la gamme), un accord tous les `chord_steps` pas. */
+  mode: 'algo' | 'arp'; progression: number[]; chord_steps: 8 | 16; arp: 'up' | 'down' | 'updown' | 'random'
 }
 /** Un pas : accent 0-2, gate 0 court / 1 normal / 2 long, octave -1..+2. */
 export interface AcidStep { on: boolean; degree: number; accent: number; gate: number; octave: number }
 export interface AcidSequence { seed: number; params: AcidParams; steps: AcidStep[] }
 export interface AcidScale { name: string; label: string; intervals: number[] }
+export interface AcidProgression { name: string; degrees: number[] }
 export interface AcidGenerateRequest { params: AcidParams; seed?: number | null; previous?: AcidSequence | null; locks?: AcidLayer[] }
 export interface AcidPlayRequest {
   sequence: AcidSequence; target: 'dt2' | 'mac'; port: string; channel: number; bpm: number; slide_cc: number | null
+  /** Arret apres N mesures (1-8), null = boucle. */
+  bars: number | null
 }
 export interface AcidPlayerState {
-  id: string; target: 'dt2' | 'mac'; port: string; channel: number; bpm: number; seed: number
-  status: 'idle' | 'waiting' | 'playing' | 'stopped' | 'error'
+  id: string; target: 'dt2' | 'mac'; port: string; channel: number; bpm: number; seed: number; bars: number | null
+  status: 'idle' | 'waiting' | 'playing' | 'stopped' | 'done' | 'error'
   step: number; cycles: number; pending: boolean; detail: string; warning: string
 }
 
@@ -502,6 +507,7 @@ export const api = {
   dt2SendStatus: () => fetch('/api/dt2/send').then(r => json<Dt2SendState | null>(r)),
   dt2SendCancel: () => fetch('/api/dt2/send', { method: 'DELETE' }).then(r => json<Dt2SendState | null>(r)),
   acidScales: () => fetch('/api/acid/scales').then(r => json<AcidScale[]>(r)),
+  acidProgressions: () => fetch('/api/acid/progressions').then(r => json<AcidProgression[]>(r)),
   acidGenerate: (req: AcidGenerateRequest) =>
     fetch('/api/acid/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(req) })
       .then(r => json<AcidSequence>(r)),

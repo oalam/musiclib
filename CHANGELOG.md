@@ -114,6 +114,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [9.C2] Séquenceur acid étendu : 32 pas sur deux mesures (`Density` par
+  mesure ; une séquence de 16 pas est complétée par sa répétition),
+  `Steps` jusqu'à 32, repère ▶ / ◀ du pas de départ (`Offset`) ; lecture
+  arrêtée après 1 à 8 mesures (`bars`, statut `done`) pour échantillonner ;
+  mode **Arp** : arpège des triades de la gamme sur une progression
+  (`I-VI-VII-I`, `I-IV-V-I`… via `GET /api/acid/progressions`), un accord
+  par mesure ou demi-mesure, motif ↑ ↓ ↕ ou hasard ; 14 tests.
 - [9.C] Vue « Acid · MIDI » du sound design (`web/src/lib/sd/AcidView.svelte`),
   ouverte depuis la colonne des traitements : Generate et graine, verrous
   par couche, potards de tirage (Type, Density, octaves : relancent leur

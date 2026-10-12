@@ -19,7 +19,7 @@ F_SHARP_PHRYGIAN = AcidParams(root=6, scale="PHRYGIAN", type=11, density=14)
 
 
 def _seq(steps: list[AcidStep], **kw: object) -> AcidSequence:
-    pad = [AcidStep(on=False)] * (16 - len(steps))
+    pad = [AcidStep(on=False)] * (acid.SEQ_LEN - len(steps))
     return AcidSequence(seed=0, params=AcidParams(**kw), steps=steps + pad)  # type: ignore[arg-type]
 
 
@@ -31,10 +31,12 @@ def test_generate_is_reproducible():
 
 
 @pytest.mark.parametrize("density", [1, 7, 16])
-def test_density_counts_played_steps_and_step0_always_on(density):
+def test_density_counts_played_steps_per_bar(density):
     seq = acid.generate(AcidParams(density=density), seed=1)
-    assert sum(s.on for s in seq.steps) == density
-    assert seq.steps[0].on
+    assert len(seq.steps) == 32
+    for bar in (seq.steps[:16], seq.steps[16:]):
+        assert sum(s.on for s in bar) == density
+        assert bar[0].on
 
 
 def test_notes_stay_in_scale():
@@ -107,7 +109,46 @@ def test_play_order(direction, expected):
 
 
 def test_play_order_offset_wraps():
-    assert acid.play_order(AcidParams(steps=3, offset=15)) == [15, 0, 1]
+    assert acid.play_order(AcidParams(steps=3, offset=31)) == [31, 0, 1]
+    assert acid.play_order(AcidParams(steps=32, offset=4))[:2] == [4, 5]
+
+
+def test_sequence_of_16_steps_is_padded_to_32():
+    steps = [{"degree": i} for i in range(16)]
+    seq = AcidSequence.model_validate({"seed": 0, "params": {}, "steps": steps})
+    assert [s.degree for s in seq.steps] == list(range(16)) * 2
+
+
+def _arp(**kw: object) -> list[int]:
+    p = AcidParams(mode="arp", scale="AEOLIAN (MINOR)", **kw)  # type: ignore[arg-type]
+    return [s.degree for s in acid.generate(p, seed=1).steps]
+
+
+def test_arp_up_follows_progression_one_chord_per_bar():
+    d = _arp(progression=[0, 5], arp="up")
+    assert d[:4] == [0, 2, 4, 0]                  # I : tonique, tierce, quinte
+    assert d[16:20] == [-2, 0, 2, -2]             # VI pris sous la tonique (degre 5 - 7)
+
+
+def test_arp_patterns_and_half_bar_chords():
+    assert _arp(progression=[0], arp="down")[:3] == [4, 2, 0]
+    assert _arp(progression=[0], arp="updown")[:4] == [0, 2, 4, 2]
+    d = _arp(progression=[0, 3], chord_steps=8)
+    assert d[8:11] == [3, 5, 7] and d[16:19] == [0, 2, 4]
+    assert set(_arp(progression=[0], arp="random")) <= {0, 2, 4}
+
+
+def test_arp_notes_stay_in_scale_and_lock_keeps_rhythm():
+    p = AcidParams(mode="arp", root=6, scale="PHRYGIAN")
+    first = acid.generate(p, seed=1)
+    allowed = {(6 + i) % 12 for i in (0, 1, 3, 5, 7, 8, 10)}
+    assert all(acid.step_note(p, s) % 12 in allowed for s in first.steps)
+    again = acid.generate(p, seed=2, previous=first, locks=frozenset({"gate"}))
+    assert [s.on for s in again.steps] == [s.on for s in first.steps]
+
+
+def test_progressions_are_known_degrees():
+    assert all(all(0 <= d <= 6 for d in prog) for prog in acid.PROGRESSIONS.values())
 
 
 def test_swing_delays_odd_positions():

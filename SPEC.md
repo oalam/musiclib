@@ -1051,6 +1051,7 @@ des slides.
 | 9.A | Moteur **Algo** : modèles Pydantic, 16 pas × 4 couches, `Type`, `Density`, `Accent`, `Gate`, `Root`, `Scale` (gammes de `harmony.SCALES`), `Transpose`, octaves bornées, `Step Count`, `Offset`, `Direction`, `Swing`, `Tie Mode`, verrous par couche, graine reproductible ; export `.mid` d'une mesure ; tests (`analyzer/acid.py`, `tests/test_acid.py`) | fait (à valider à l'oreille) |
 | 9.B | **Lecture temps réel** : cible DT2 (horloge et Start de la DT2, AUTO CHANNEL ou `CHAN` d'une track MIDI, comme `Dt2Sender`) ou cible Mac (horloge interne, port virtuel IAC vers le VST) ; réglages pris en compte au tour suivant ; panique (all notes off) ; CC de slide optionnel ; API (`acid_midi.py`, `/api/acid/...`) | fait (cible Mac validée via IAC le 2026-10-12 ; cible DT2 à valider) |
 | 9.C | **Vue front « Acid »** : potards de la vue compacte (Mode, Type, Density, Steps, Offset, Accent, Gate, Root, Scale), grille éditable note / accent / gate / octave, verrous, Generate, choix de la cible et du port, lecture / arrêt (potards de la vue Sound design) ; outil « Acid · MIDI » de la colonne du sound design (`web/src/lib/sd/AcidView.svelte`), gammes servies par `GET /api/acid/scales` ; `Mode` (Arp, Bass, Counterpoint) attend 9.F-9.G | fait (à valider dans le front) |
+| 9.C2 | **Séquenceur étendu** (demandé le 2026-10-12) : 32 pas (deux mesures, `Density` comptée par mesure de 16, une séquence de 16 pas est complétée par sa répétition) ; `Steps` 1-32, `Offset` 0-31 et repère du pas de départ dans la grille ; lecture arrêtée après 1 à 8 mesures (`bars`, pour échantillonner) ; mode **Arp** : arpège des triades de la gamme sur une progression (`GET /api/acid/progressions`), un accord par mesure ou demi-mesure, motif montant / descendant / aller-retour / hasard | fait (à valider à l'oreille) |
 | 9.D | **Slots** (8 banks × 16, JSON versionnés dans le vault) et `Auto Generate` (division de 1/64 à 32 mesures) | à venir |
 | 9.E | **Modulation** : 2 LFO (sinus, rampes, triangle, carré, aléatoire, drunk, séquence 16 pas ; sync / libre), matrice cibles × sources autour du potard ; `Step Jitter`, `Polymeter Reset` | à venir |
 | 9.F | Moteurs **Arp** et **Bass** sur entrée MIDI (Maschine, clavier) ; tonique suivie en temps réel | à venir |
@@ -1095,6 +1096,13 @@ des slides.
   [`Octave Low`, `Octave High`].
 - **Swing** : positions impaires retardées de (2 × swing % − 1) pas
   (50 = droit, 66 ≈ ternaire, 75 = demi-pas).
+- **Arp** (9.C2) : triade de la gamme sur le degré d (d, d + 2, d + 4,
+  donc juste aussi en pentatonique) ; fondamentale de V, VI, VII prise
+  sous la tonique (registre de basse) ; motif compté sur la position du
+  pas dans l'accord (un silence saute une note) ; `Type` sans effet.
+- **Mesures** : `bars` compte des mesures de 16 doubles-croches depuis
+  le départ (Start de la DT2 ou Play), quelle que soit la longueur de la
+  boucle ; à la fin, notes coupées et statut `done`.
 
 **À vérifier sur la machine** : ce que fait un `note_off` sur une track
 audio jouée par l'AUTO CHANNEL (durée de gate respectée ou non selon

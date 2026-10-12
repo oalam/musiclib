@@ -32,8 +32,9 @@ from dt2_midi import (CLOCKS_PER_STEP, SYSEX_WARNING, InPort, MidiUnavailable, O
                       PortOpener, close_ports, open_mido_ports)
 
 Target = Literal["dt2", "mac"]
-PlayerStatus = Literal["idle", "waiting", "playing", "stopped", "error"]
+PlayerStatus = Literal["idle", "waiting", "playing", "stopped", "done", "error"]
 TICKS_PER_CLOCK = TICKS_PER_STEP // CLOCKS_PER_STEP  # 20 ticks acid par clock MIDI
+CLOCKS_PER_BAR = 16 * CLOCKS_PER_STEP
 ALL_NOTES_OFF = 123
 
 
@@ -45,6 +46,8 @@ class PlayRequest(BaseModel):
     bpm: float = Field(140, ge=40, le=300, description="horloge interne (cible mac)")
     slide_cc: int | None = Field(None, ge=0, le=127,
                                  description="CC de slide : 127 sur une note liee, 0 sinon")
+    bars: int | None = Field(None, ge=1, le=8,
+                             description="arret apres N mesures de 16 doubles-croches (None = boucle)")
 
 
 class PlayerState(BaseModel):
@@ -54,6 +57,7 @@ class PlayerState(BaseModel):
     channel: int
     bpm: float
     seed: int
+    bars: int | None = None
     status: PlayerStatus = "idle"
     step: int = -1          # pas de la sequence en cours de lecture
     cycles: int = 0         # tours complets joues
@@ -169,6 +173,8 @@ class AcidPlayer:
         self._order: list[int] = []
         self._pending: tuple[AcidSequence, dict[int, list[Any]], int] | None = None
         self._clock = 0
+        self._elapsed = 0                 # clocks joues depuis le depart (arret apres `bars`)
+        self._limit: int | None = None
         self._sounding: set[int] = set()
 
     def current(self) -> PlayerState | None:
@@ -187,6 +193,8 @@ class AcidPlayer:
                 self._pending = (req.sequence, schedule, total)
                 st.pending = True
                 st.bpm = req.bpm
+                st.bars = req.bars
+                self._limit = req.bars * CLOCKS_PER_BAR if req.bars else None
                 if self._clock_src is not None:
                     self._clock_src.set_bpm(req.bpm)
                 return st.model_copy(deep=True)
@@ -206,11 +214,13 @@ class AcidPlayer:
             self._order = play_order(req.sequence.params)
             self._pending = None
             self._clock = 0
+            self._elapsed = 0
+            self._limit = req.bars * CLOCKS_PER_BAR if req.bars else None
             self._sounding = set()
             playing = req.target == "mac"
             self._state = PlayerState(
                 id=uuid.uuid4().hex[:12], target=req.target, port=req.port,
-                channel=req.channel, bpm=req.bpm, seed=req.sequence.seed,
+                channel=req.channel, bpm=req.bpm, seed=req.sequence.seed, bars=req.bars,
                 status="playing" if playing else "waiting",
                 detail="lecture (horloge interne)" if playing else "en attente du Start de la DT2")
             if playing:
@@ -303,6 +313,7 @@ class AcidPlayer:
                 self._swap_pending()
                 st.status, st.detail, st.step = "playing", "lecture (horloge de la DT2)", -1
                 self._clock = 0
+                self._elapsed = 0
             elif kind == "stop":
                 self._notes_off()
                 st.status, st.detail, st.step = "waiting", "Stop de la DT2, en attente du Start", -1
@@ -318,18 +329,32 @@ class AcidPlayer:
             self._pending = None
 
     def _tick(self) -> None:
+        clock: Clock | None = None
         with self._lock:
             st = self._state
             if st is None or st.status != "playing" or self._out is None:
                 return
-            if self._clock >= self._total:
-                self._send(self._schedule.get(self._total, []))
-                self._swap_pending()
-                self._clock = 0
-                st.cycles += 1
-            self._send(self._schedule.get(self._clock, []))
-            st.step = self._order[self._clock // CLOCKS_PER_STEP]
-            self._clock += 1
+            if self._limit is not None and self._elapsed >= self._limit:
+                self._notes_off()
+                st.status, st.step, st.pending = "done", -1, False
+                st.detail = f"{st.bars} mesure(s) jouee(s)"
+                clock, self._clock_src = self._clock_src, None
+            else:
+                self._advance(st)
+        if clock is not None:
+            clock.stop()  # depuis le thread d'horloge : arret sans join
+
+    def _advance(self, st: PlayerState) -> None:
+        """Sous verrou : envoie les messages du clock courant."""
+        if self._clock >= self._total:
+            self._send(self._schedule.get(self._total, []))
+            self._swap_pending()
+            self._clock = 0
+            st.cycles += 1
+        self._send(self._schedule.get(self._clock, []))
+        st.step = self._order[self._clock // CLOCKS_PER_STEP]
+        self._clock += 1
+        self._elapsed += 1
 
 
 def main() -> int:

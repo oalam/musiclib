@@ -233,8 +233,8 @@ def test_acid_generate_and_play(tmp_path: Path):
     r = client.post("/api/acid/generate", json={"params": params, "seed": 3})
     assert r.status_code == 200
     seq = r.json()
-    assert seq["seed"] == 3 and len(seq["steps"]) == 16
-    assert sum(s["on"] for s in seq["steps"]) == 14
+    assert seq["seed"] == 3 and len(seq["steps"]) == 32
+    assert sum(s["on"] for s in seq["steps"]) == 2 * 14  # Density par mesure de 16
     r = client.post("/api/acid/generate", json={"params": params, "seed": 4,
                                                 "previous": seq, "locks": ["gate"]})
     assert [s["on"] for s in r.json()["steps"]] == [s["on"] for s in seq["steps"]]
@@ -244,6 +244,7 @@ def test_acid_generate_and_play(tmp_path: Path):
 
     scales = client.get("/api/acid/scales").json()
     assert {"name": "PHRYGIAN", "label": "phrygien", "intervals": [0, 1, 3, 5, 7, 8, 10]} in scales
+    assert {"name": "I-VI-VII-I", "degrees": [0, 5, 6, 0]} in client.get("/api/acid/progressions").json()
     assert client.get("/api/acid/play").json() is None
     body = {"sequence": seq, "target": "mac", "port": "IAC", "channel": 1}
     assert client.post("/api/acid/play", json=body | {"channel": 0}).status_code == 422

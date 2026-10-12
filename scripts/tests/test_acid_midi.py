@@ -59,7 +59,7 @@ class Rig:
 
 
 def _seq(steps: list[AcidStep], seed: int = 0, **kw: Any) -> AcidSequence:
-    pad = [AcidStep(on=False)] * (16 - len(steps))
+    pad = [AcidStep(on=False)] * (acid.SEQ_LEN - len(steps))
     return AcidSequence(seed=seed, params=AcidParams(**kw), steps=steps + pad)
 
 
@@ -211,3 +211,37 @@ def test_generated_sequence_plays_whole_cycle():
     rig.clocks[0].tick(16 * 6 + 1)
     ons = [n for n in _notes(rig.out.sent) if n[0] == "note_on"]
     assert len(ons) == len(acid.render_notes(seq)) + 1
+
+
+def test_mac_stops_after_bars():
+    rig = Rig()
+    st = rig.player.play(_req(_two_notes(), bars=2))
+    assert st.bars == 2
+    clock = rig.clocks[0]
+    clock.tick(2 * 96)
+    assert rig.player.current().status == "playing"  # type: ignore[union-attr]
+    assert len([n for n in _notes(rig.out.sent) if n[0] == "note_on"]) == 4
+    clock.tick(1)
+    st = rig.player.current()
+    assert st is not None and st.status == "done" and not clock.running
+    clock.tick(20)  # plus rien apres la fin
+    assert len([n for n in _notes(rig.out.sent) if n[0] == "note_on"]) == 4
+
+
+def test_bars_count_whole_bars_even_with_short_loop():
+    rig = Rig()
+    seq = AcidSequence(seed=0, params=AcidParams(tie_mode=False, steps=4),
+                       steps=[AcidStep()] + [AcidStep(on=False)] * (acid.SEQ_LEN - 1))
+    rig.player.play(_req(seq, bars=1))
+    rig.clocks[0].tick(96 + 1)
+    assert len([n for n in _notes(rig.out.sent) if n[0] == "note_on"]) == 4  # 4 tours de 4 pas
+
+
+def test_dt2_bars_counted_from_start():
+    rig = Rig()
+    rig.player.play(_req(_two_notes(), target="dt2", port="DT2", bars=1))
+    rig.midi.feed("start")
+    rig.midi.feed("clock", 97)
+    st = rig.player.current()
+    assert st is not None and st.status == "done"
+    assert _notes(rig.midi.outport.sent)[-1][0] == "note_off"

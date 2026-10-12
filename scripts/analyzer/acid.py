@@ -30,9 +30,24 @@ from analyzer.harmony import NOTE_NAMES, SCALES
 
 Layer = Literal["notes", "velocity", "gate", "octave"]
 Direction = Literal["forward", "backward", "pendulum"]
+Mode = Literal["algo", "arp"]
+ArpPattern = Literal["up", "down", "updown", "random"]
 
 LAYERS: tuple[Layer, ...] = ("notes", "velocity", "gate", "octave")
-SEQ_LEN = 16
+SEQ_LEN = 32
+BLOCK = 16  # une mesure de doubles-croches : Density se compte par bloc
+
+# progressions d'accords en degres de la gamme (0 = tonique), mode arp (9.C2)
+PROGRESSIONS: dict[str, tuple[int, ...]] = {
+    "I-VI-VII-I": (0, 5, 6, 0),
+    "I-IV-V-I": (0, 3, 4, 0),
+    "I-VII-VI-VII": (0, 6, 5, 6),
+    "I-III-VII-IV": (0, 2, 6, 3),
+    "I-V": (0, 4),
+    "I-IV": (0, 3),
+    "I (pédale)": (0,),
+}
+_ARP_UPDOWN = (0, 1, 2, 1)
 PPQ = 480
 TICKS_PER_STEP = PPQ // 4  # double-croche
 
@@ -64,6 +79,10 @@ class AcidParams(BaseModel):
     direction: Direction = "forward"
     swing: int = Field(50, ge=50, le=75)         # % ; 50 = droit, 66 = ternaire
     tie_mode: bool = True
+    mode: Mode = "algo"                          # arp : notes = accords de `progression`
+    progression: list[int] = Field(default_factory=lambda: [0, 5, 6, 0], min_length=1, max_length=8)
+    chord_steps: Literal[8, 16] = 16             # pas par accord (demi-mesure / mesure)
+    arp: ArpPattern = "up"
 
     @field_validator("scale")
     @classmethod
@@ -91,6 +110,14 @@ class AcidSequence(BaseModel):
     seed: int
     params: AcidParams
     steps: list[AcidStep] = Field(min_length=SEQ_LEN, max_length=SEQ_LEN)
+
+    @field_validator("steps", mode="before")
+    @classmethod
+    def _pad_16(cls, v: Any) -> Any:
+        """Sequence de 16 pas (avant le passage a 32) : la 2e moitie repete la 1re."""
+        if isinstance(v, list) and len(v) == BLOCK:
+            return v + v
+        return v
 
 
 class GenerateRequest(BaseModel):
@@ -124,6 +151,15 @@ def scales() -> list[ScaleInfo]:
     return [ScaleInfo(name=k, label=lab, intervals=list(iv)) for k, (lab, iv) in SCALES.items()]
 
 
+class ProgressionInfo(BaseModel):
+    name: str
+    degrees: list[int]
+
+
+def progressions() -> list[ProgressionInfo]:
+    return [ProgressionInfo(name=k, degrees=list(v)) for k, v in PROGRESSIONS.items()]
+
+
 def _rng(seed: int, layer: Layer) -> random.Random:
     return random.Random(f"{seed}:{layer}")
 
@@ -147,8 +183,33 @@ def _draw_velocity(rng: random.Random) -> list[int]:
     return rng.choices((0, 1, 2), weights=_ACCENT_WEIGHTS, k=SEQ_LEN)
 
 
+def _arp_notes(p: AcidParams, rng: random.Random) -> list[int]:
+    """Degres d'un arpege sur la progression : triade de la gamme (degres d, d+2,
+    d+4), un accord tous les `chord_steps` pas ; motif compte sur la position
+    dans l'accord. Fondamentale de V, VI, VII prise sous la tonique (basse)."""
+    n = len(SCALES[p.scale][1])
+    out = []
+    for i in range(SEQ_LEN):
+        root = p.progression[(i // p.chord_steps) % len(p.progression)] % n
+        if root >= 4:
+            root -= n
+        tones = (root, root + 2, root + 4)
+        k = i % p.chord_steps
+        if p.arp == "up":
+            out.append(tones[k % 3])
+        elif p.arp == "down":
+            out.append(tones[2 - k % 3])
+        elif p.arp == "updown":
+            out.append(tones[_ARP_UPDOWN[k % 4]])
+        else:
+            out.append(rng.choice(tones))
+    return out
+
+
 def _draw_gate(p: AcidParams, rng: random.Random) -> list[tuple[bool, int]]:
-    played = {0} | set(rng.sample(range(1, SEQ_LEN), p.density - 1))
+    played: set[int] = set()
+    for b in range(0, SEQ_LEN, BLOCK):  # `density` pas joues sur 16, premier pas de chaque mesure joue
+        played |= {b} | {b + i for i in rng.sample(range(1, BLOCK), p.density - 1)}
     lengths = rng.choices((0, 1, 2), weights=_GATE_WEIGHTS, k=SEQ_LEN)
     return [(i in played, lengths[i]) for i in range(SEQ_LEN)]
 
@@ -178,7 +239,7 @@ def generate(params: AcidParams, seed: int, previous: AcidSequence | None = None
         return prev is not None and layer in locks
 
     degrees = ([s.degree for s in prev] if keep("notes") and prev
-               else _draw_notes(params, _rng(seed, "notes")))
+               else (_arp_notes if params.mode == "arp" else _draw_notes)(params, _rng(seed, "notes")))
     accents = ([s.accent for s in prev] if keep("velocity") and prev
                else _draw_velocity(_rng(seed, "velocity")))
     gates = ([(s.on, s.gate) for s in prev] if keep("gate") and prev
