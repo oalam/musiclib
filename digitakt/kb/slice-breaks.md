@@ -32,8 +32,10 @@ tranches égales).
 
 ## Pas à pas : amen re-séquencé à 172
 
-1. Charger un break d'une mesure, machine SLICE, CREATE SLICE GRID 16 avec
-   détection de transitoires : une tranche par coup.
+1. Charger un break d'une mesure **coupée exactement** (début sur le premier
+   kick, fin juste avant le kick suivant), machine SLICE, CREATE SLICE GRID
+   16 **sans détection de transitoires** (H) : grille égale, une tranche par
+   double croche, donc tranche n = pas n.
 2. Track 12 (Id1, doctrine §1), 16 trigs, CREATE LINEAR LOCKS : le break
    rejoue tel quel.
 3. Locker `SLICE` sur quelques trigs (kick et snare échangés, ghost
@@ -41,7 +43,66 @@ tranches égales).
 4. Variante en LIVE REC, trig mode SLICES : jouer les tranches aux touches,
    quantize auto active (cf. [[enregistrement-quantize]]).
 5. CREATE RANDOM LOCKS sur une copie du pattern : version « réservoir »
-   (slots 13-15, doctrine §2).
+   (slots 13-15, doctrine §2). Détail ci-dessous.
+
+### Focus étape 5 : trois réservoirs tirés au sort
+
+**Pourquoi** : les slots 13-15 sont les patterns à sortir si l'énergie
+retombe ou si la salle en redemande (doctrine §2). Le tirage aléatoire donne
+un break haché sans le réécrire ; le socle (tracks 1-11, 14-16) reste
+identique, donc mutes et fills restent valables.
+
+Exemple de rangement : le break des étapes 1-3 vit en B04 (bank B = DnB,
+doctrine §13), les réservoirs en B13, B14, B15.
+
+1. **Dupliquer** : `[PTN]`, `[TRIG 4] + [RECORD]` (copie B04), puis
+   `[TRIG 13] + [STOP]`, `[TRIG 14] + [STOP]`, `[TRIG 15] + [STOP]`
+   (cf. [[copier-coller]]). `[FUNC] + [SETTINGS]` : projet sauvé, B04
+   intact quoi qu'il arrive.
+2. **Choisir les trigs avant le tirage** (en GRID, track 12) : le hasard ne
+   touche que les trigs posés, c'est donc le placement qui fixe le phrasé.
+   - B13 « dense » : les 16 trigs gardés.
+   - B14 « aéré » : 8 trigs (pas 1, 3, 5… 15) ; `LEN` = 2 sur chacun pour
+     combler les trous avec la tranche suivante.
+   - B15 « ancré » : 16 trigs, tirage puis squelette rétabli (point 5).
+3. **Tirer** (pattern en lecture, track 12 active) : `[SRC]`, `[YES]`
+   (menu SLICE), `[DOWN]` jusqu'à CREATE RANDOM LOCKS, `[YES]`. **Chaque
+   `[YES]` refait un tirage** (manuel §A.2.6) : écouter une mesure, relancer
+   tant que ça ne groove pas. À 172 BPM, une mesure = 4 × 60 / 172 =
+   1,395 s ; dix tirages écoutés ≈ 10 × 1,395 = 14 s.
+4. **Figer un bon tirage** : `[NO]` pour sortir du menu, **puis**
+   `[FUNC] + [YES]` (temp save, cf. [[perform-kit-temp-save]]). Si un
+   tirage suivant est moins bon, `[FUNC] + [NO]` ramène le précédent : il
+   n'y a pas d'« annuler » du tirage.
+5. **Ancrer (B15)** : relocker `SLICE` à la main sur les quatre appuis de
+   l'amen. En grille égale, chaque appui reprend sa propre tranche (pas n →
+   `SLICE` n) : pas 1 → 1, pas 5 → 5, pas 11 → 11, pas 13 → 13. Les 12
+   autres pas gardent leur tranche tirée au sort : on entend toujours
+   « boum… tak… boum-boum tak », le hasard ne joue que sur les ghosts et
+   les hats.
+
+   Première mesure de l'amen en 16 pas (transcription courante, à confirmer
+   à la préécoute) ; X = appui, x = coup secondaire, g = ghost :
+
+   | Pas | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
+   |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+   | Hat | x | | x | | x | | x | | x | | x | | x | | x | |
+   | Kick | **X** | | x | | | | | | | | **X** | x | | | | |
+   | Snare | | | | | **X** | | | g | | g | | | **X** | | | g |
+
+   Appuis : kick 1 (la mesure démarre), snare 5 et 13 (temps 2 et 4, le
+   backbeat), kick 11 suivi du 12 (le double kick syncopé, signature de
+   l'amen).
+6. `[FUNC] + [SETTINGS]` : le tirage n'est gardé qu'une fois le projet
+   sauvé (le temp save ne survit pas au changement de projet).
+
+**En jeu** : B04 → B13 quand la salle monte, B14 pour respirer sans
+couper le break, B15 pour revenir vers B04 sans rupture (même kick, même
+snare).
+
+**À vérifier sur la machine** : que RANDOM LOCKS écrase bien les locks
+`SLICE` posés à la main à l'étape 3 et conserve les locks `LEN` ; qu'une
+tranche peut sortir plusieurs fois (tirage avec remise) ou non.
 
 ## En live techno
 
@@ -55,6 +116,9 @@ tranches égales).
 
 ## Pièges
 
+- Grille égale et sample mal coupé : si le break ne fait pas exactement une
+  mesure, les tranches glissent par rapport aux pas et tranche n ≠ pas n.
+  Ajuster début et fin du sample avant CREATE SLICE GRID.
 - Les points de tranches sont sauvés **avec le preset** : sauvegarder le
   preset, sinon le découpage est perdu au rechargement du sample.
 - CREATE LINEAR / RANDOM LOCKS ne s'applique qu'aux **trigs déjà posés**.

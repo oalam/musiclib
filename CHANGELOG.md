@@ -50,6 +50,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.D] Fiche KB `slice-breaks` : étape 5 du pas à pas (amen re-séquencé à
+  172) détaillée en trois patterns réservoir B13-B15 (dense, aéré, ancré),
+  tirage CREATE RANDOM LOCKS relancé à chaque `[YES]`, bon tirage figé par
+  temp save, points à vérifier sur la machine. Étape 1 passée en grille
+  égale sans détection de transitoires (tranche n = pas n), ancrage de B15
+  corrigé en conséquence, avec la grille des appuis de l'amen en 16 pas.
 - [8.K] Devices du rack sound design compactés façon Live, sans espace
   vide : sélecteurs en bandeau (bascule pour Off/On comme Color ou
   Hi-Quality, segments pour Post clip ou le modèle A/B/C, menu déroulant
