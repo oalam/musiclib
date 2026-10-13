@@ -64,6 +64,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.L2] Vue Samples plus lisible avec le panneau du live : aide clavier
+  retirée sous la barre d'actions, colonnes Library et Live resserrées
+  (210-270 et 230-290 px) au profit de la liste, pads des kits en grille
+  auto (2 ou 3 par ligne), boutons de la Library sans coupure de libellé.
 - [7.L1] Grille de tracks révisée de `digitakt/doctrine.md` §1 (4 ride,
   5-6 hats, 12 vocal, 13-14 Id1 / Id2) reportée dans les `TrackSpec` de
   `analyzer/digitakt.py`, l'ordre `samples.CODES` et les libellés de la

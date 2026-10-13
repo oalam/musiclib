@@ -1140,14 +1140,6 @@
       <datalist id="sample-tags">{#each allTags as t}<option value={t}></option>{/each}</datalist>
       <button class="small" disabled={!targetCount || !tagInput.trim() || busy} onclick={addTag}>Tagger</button>
     </div>
-    <p class="keys muted small">
-      {#if current || view?.kind === 'kit' || view?.kind === 'type'}<kbd>K</kbd> garder · <kbd>D</kbd> écarter · <kbd>U</kbd> annuler · {/if}
-      {#if view?.kind === 'trash'}<kbd>U</kbd> restaurer · {:else}<kbd>Suppr</kbd> corbeille · <kbd>M</kbd> case · {/if}
-      <kbd>1</kbd>…<kbd>5</kbd> étoiles, <kbd>0</kbd> sans · <kbd>T</kbd> tag ·
-      <kbd>↑</kbd><kbd>↓</kbd> sample · <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve, puis hors plafond ·
-      <kbd>⌘</kbd>/<kbd>Maj</kbd>-clic sélection, <kbd>⌘A</kbd> tout, <kbd>Échap</kbd> aucun · glisser vers une case ou la corbeille
-      {#if liveOpen} · <kbd>L</kbd> ajout à la banque active du live, ou glisser sur une banque{/if}
-    </p>
     {#if moving}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="move" onkeydown={onMoveKey}>
@@ -1245,8 +1237,8 @@
 </div>
 
 <style>
-  .samples { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
-  .samples.with-live { grid-template-columns: minmax(280px, 400px) minmax(0, 1fr) minmax(300px, 400px); }
+  .samples { display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .samples.with-live { grid-template-columns: minmax(210px, 270px) minmax(0, 1fr) minmax(230px, 290px); gap: 12px 10px; padding: 12px 10px; }
   .inlive { font-size: 10px; padding: 0 4px; border-radius: 3px; border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; }
   .searchbar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
   .search-in { position: relative; flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
@@ -1304,7 +1296,8 @@
   .slot { color: var(--muted); opacity: 0.6; }
   .branches.dragging .slot { border: 1px dashed var(--border); opacity: 1; }
   .drop.over .cell, .drop.over .slot { outline: 2px dashed var(--accent); background: var(--panel-2); }
-  .loose { display: flex; gap: 8px; margin-top: 10px; }
+  .loose { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .loose button { white-space: nowrap; }
   .trash-drop { border-radius: 4px; }
   .export-btn { margin-left: auto; }
   .export { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); max-width: 60ch; }
@@ -1315,7 +1308,7 @@
   .lib-total { margin: 0 0 6px; }
   .rebuild { margin: 6px 0 0; }
   /* trois pads par ligne, a la largeur de la colonne */
-  .pads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .pads { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
   .pads.subs { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
   .pad { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 2px; min-width: 0; min-height: 58px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel); color: var(--text); cursor: pointer; text-align: left; }
   .pad.sub { min-height: 50px; }
@@ -1343,7 +1336,6 @@
   .stars-bar { display: inline-flex; gap: 2px; }
   .star { font-size: 11px; padding: 1px 4px; color: #b45309; }
   .tag-in { width: 9em; font-size: 12px; }
-  .keys { margin: 4px 0 8px; }
   kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; }
   .list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; min-height: 0; }
   .row { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); user-select: none; }
