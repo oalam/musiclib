@@ -956,6 +956,15 @@ révisés par 7.J8) :
   active, coupé au temps suivant s'il est plus long, arrêt au relâchement.
   Pas de recalage des boucles. Sans live ouvert ou sans tempo : Espace
   rejoue une fois, comme avant.
+- Simplification de la vue Samples (2026-10-13), les lives remplaçant la
+  sélection par case : plus de garder / écarter, de réserve ni de plafond
+  affichés, plus de rangement (bouton « Case… », `M`, dépôt sur une case,
+  sous-dossiers manuels) ni de bouton « Exporter… » ; tous les fichiers d'une
+  case sont listés, filtrables au milieu par tag ou style (filtre local, ET
+  entre les tags) ; corbeille en icône. Front seul : le back (statuts,
+  quotas, export 7.J3) et les décisions déjà écrites restent en place.
+  Remplace, pour le front, les décisions 7.J2 (écoute K / D, R), 7.J3
+  (bouton d'export) et 7.J4 (rangement, garder / écarter dans la barre).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

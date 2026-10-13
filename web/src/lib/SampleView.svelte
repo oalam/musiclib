@@ -1,16 +1,14 @@
 <script lang="ts">
   // Bibliotheque des samples DT2 (7.J2, 7.J4) : arbre des dossiers du +Drive
   // (7.J8 : branche, puis une ligne par code, une case par sous-categorie), puis
-  // une liste (case, non classes ou corbeille). Dans une case : les retenus a
-  // ecouter (keep / drop au clavier) et la reserve ; un drop fait monter le
-  // candidat suivant (selection recalculee par l'API). Selection multiple
-  // (Cmd, Maj), barre d'outils, glisser-deposer vers une case ou la corbeille.
-  // Export des retenus vers Transfer (7.J3) : bilan, puis copie confirmee.
+  // une liste (case, non classes ou corbeille). Depuis 7.L3 : plus de garder /
+  // ecarter, de plafond ni de rangement ; tous les fichiers d'une case sont
+  // listes, filtrables au milieu par tag ou style (filtre local de la liste).
+  // Selection multiple (Cmd, Maj), corbeille (icone, Suppr, glisser dessus).
   // Kits (7.J5) : pads des packs sous la grille, puis des sous-kits du pack
-  // choisi ; un pad filtre grille et listes sur le kit (reserve hors plafond
-  // comprise), porte ses tags (herites par ses fichiers) et sa corbeille.
-  // Vue kit : arborescence BRANCHE / dossier / fichiers (case finale, retenus,
-  // reserve, hors plafond), puis un dossier des non classes du kit.
+  // choisi ; un pad filtre grille et listes sur le kit, porte ses tags (herites par ses fichiers) et sa corbeille.
+  // Vue kit : arborescence BRANCHE / dossier / fichiers, puis un dossier des
+  // non classes du kit.
   // Vue par type (7.K) : un filtre d'instrument liste a droite tous les
   // fichiers du type par sous-dossier ; un kit ne filtre que cette vue (sans
   // ses sous-dossiers vides), l'arbre de gauche ne bouge pas.
@@ -28,7 +26,8 @@
   import { focus } from './focus.svelte'
   import { loadHistory, pushHistory } from './history'
   import LivePanel from './LivePanel.svelte'
-  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type FacetBpm, type SampleFilter, type RebuildStatus } from './api'
+  import * as retrig from './retrig'
+  import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleKit, type SampleKits, type FacetTag, type FacetNote, type FacetBpm, type SampleFilter, type RebuildStatus } from './api'
 
   const FLAG_HELP: Record<string, string> = {
     muet: 'crête sous -40 dBFS',
@@ -80,7 +79,7 @@
   }
 
   type Loose = 'unclassified' | 'trash'
-  type View = { kind: 'cell'; folder: string } | { kind: Loose } | { kind: 'kit' } | { kind: 'type' }
+  type View = { kind: 'cell'; folder: string } | { kind: Loose } | { kind: 'kit' } | { kind: 'type'; folder?: string }
 
   let cells = $state<SampleCell[]>([])
   // dossiers cibles (tous, meme vides) : l'arbre ne bouge pas avec un filtre
@@ -94,9 +93,9 @@
   let cursor = $state<string | null>(null)    // source du sample en cours
   let sel = $state<Set<string>>(new Set())    // selection multiple (Cmd / Maj)
   let anchor: string | null = null            // origine d'une plage Maj-clic
-  let showReserve = $state(false)
-  // hors plafond de toute la case (2e appui sur R) ; avec un kit, toujours la
-  let showOverflow = $state(false)
+  // filtre local de la liste du milieu (7.L3) : tags ou styles, ET entre eux
+  let localTags = $state<string[]>([])
+  let localInput = $state('')
   let busy = $state(false)
   let autoplay = $state(true)
   // barre de recherche : filtre applique cote API a toutes les lectures
@@ -110,14 +109,8 @@
   let searchField: HTMLInputElement | undefined = $state()
   let tagInput = $state('')
   let tagField: HTMLInputElement | undefined = $state()
-  // changement de case (M) : statut garde, rang en fin de case
-  let moving = $state<{ sources: string[]; label: string; folder: string } | null>(null)
-  let moveSelect: HTMLSelectElement | undefined = $state()
-  // glisser-deposer : sources tirees, cible survolee (dossier ou "trash")
+  // glisser-deposer : sources tirees, cible survolee (corbeille ; live dans LivePanel)
   let dragging = $state<string[] | null>(null)
-  // export (7.J3) : bilan (dry_run) puis rapport de la copie
-  let exportReport = $state<SampleExportReport | null>(null)
-  let exporting = $state(false)
   let dropKey = $state<string | null>(null)
   // kit (prefixe de chemin : pack ou pack/sous-kit), '' = tous
   let kit = $state('')
@@ -152,7 +145,7 @@
     ...cells.map(c => c.folder)])]
     .sort((a, b) => folderRank(a) - folderRank(b)))
   const byKey = $derived(new Map(cells.map(c => [c.folder, c])))
-  // total d'un dossier / d'un type : candidats + hors plafond
+  // total d'un dossier / d'un type : tous ses fichiers (candidats + hors plafond de l'API)
   const total = (c: SampleCell) => c.candidates + c.reserve
   const codeTotal = (folders: string[]) => folders.reduce((n, f) => { const c = byKey.get(f); return n + (c ? total(c) : 0) }, 0)
   // vue par type : filtre d'instrument actif
@@ -163,16 +156,29 @@
     const codesIn = [...new Set(fs.map(f => splitFolder(f).code))]
     return {
       branch, codes: codesIn.map(code => ({ code, folders: fs.filter(f => splitFolder(f).code === code) })),
-      selected: cs.reduce((n, c) => n + c.selected, 0), toListen: cs.reduce((n, c) => n + c.to_listen, 0),
+      files: cs.reduce((n, c) => n + total(c), 0),
     }
   }).filter(b => b.codes.length))
-  const shown = $derived(entries)
-  const chosen = $derived(shown.filter(e => e.selected))
-  const reserve = $derived(shown.filter(e => !e.selected))
-  // ordre de navigation : la selection, puis la reserve si elle est depliee
+  const tagsOf = (e: SampleEntry) => [...new Set([...e.tags, ...e.auto_tags])]
+  const shown = $derived(localTags.length ? entries.filter(e => { const t = tagsOf(e); return localTags.every(x => t.includes(x)) }) : entries)
+  // tags et styles de la liste (avant filtre local), du plus frequent au plus rare
+  const localFacets = $derived.by(() => {
+    const n = new Map<string, number>()
+    for (const e of entries) for (const t of tagsOf(e)) n.set(t, (n.get(t) ?? 0) + 1)
+    return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'fr'))
+  })
+  function addLocal(t: string) {
+    const v = t.trim()
+    if (v && !localTags.includes(v)) localTags = [...localTags, v]
+    localInput = ''
+  }
+  function onLocalKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') { e.preventDefault(); addLocal(localInput) }
+    else if (e.key === 'Escape') { e.preventDefault(); localInput = ''; (e.target as HTMLElement).blur() }
+  }
   // arborescence du kit : branches (ordre de l'arbre), dossiers, puis non classes
-  type Folder = { key: string; label: string; code: string; rows: SampleEntry[]; selected: number }
-  type FamFolder = { key: string; label: string; folders: Folder[]; selected: number; total: number }
+  type Folder = { key: string; label: string; code: string; rows: SampleEntry[] }
+  type FamFolder = { key: string; label: string; folders: Folder[]; total: number }
   let collapsed = $state<Set<string>>(new Set())
   const tree = $derived.by((): FamFolder[] => {
     if (view?.kind !== 'kit' && view?.kind !== 'type') return []
@@ -187,18 +193,17 @@
     return [...branches.entries()].sort(([a], [b]) => branchRank(a) - branchRank(b)).map(([branch, byFolder]) => {
       const folders = [...byFolder.entries()].sort(([a], [b]) => folderRank(a) - folderRank(b)).map(([folder, rows]) => ({
         key: folder || ':nc/', label: folder.split('/').slice(1).join('/') || folder, code: splitFolder(folder).code,
-        rows, selected: branch ? rows.filter(r => r.selected).length : 0,
+        rows,
       }))
       return {
         key: branch || ':nc', label: branch || 'Non classés', folders,
-        selected: folders.reduce((n, f) => n + f.selected, 0),
         total: folders.reduce((n, f) => n + f.rows.length, 0),
       }
     })
   })
   const visible = $derived(view?.kind === 'kit' || view?.kind === 'type'
     ? tree.flatMap(f => collapsed.has(f.key) ? [] : f.folders.flatMap(c => collapsed.has(c.key) ? [] : c.rows))
-    : showReserve ? [...chosen, ...reserve] : chosen)
+    : shown)
 
   // reanalyse de la bibliotheque (7.K) : nouveaux packs, sous-dossiers manuels ;
   // les ecritures sont refusees par l'API pendant le calcul
@@ -223,38 +228,20 @@
     }, 2000)
   }
 
-  // sous-dossier manuel (7.K) : « + » sur la ligne d'un code, nom saisi en place
-  let addingSub = $state<string | null>(null)
-  let subName = $state('')
-  async function addSub() {
-    const code = addingSub
-    if (!code || !subName.trim()) return
-    try {
-      allFolders = await api.sampleFolderAdd(code, subName.trim())
-      addingSub = null
-      subName = ''
-      error = ''
-    } catch (e) { fail(e) }
-  }
-  function onSubKey(e: KeyboardEvent) {
-    if (e.key === 'Enter') { e.preventDefault(); addSub() }
-    else if (e.key === 'Escape') { e.preventDefault(); addingSub = null; subName = '' }
-  }
-
-  /** Clic sur un code de l'arbre : ajoute / retire le filtre d'instrument (vue par type). */
+  /** Clic sur un code de l'arbre : ajoute / retire le filtre d'instrument (vue par type) ;
+   *  vue restreinte a une case du type : retour au type entier. */
   function toggleCode(code: string) {
     const cur = search.codes ?? []
+    if (view?.kind === 'type' && view.folder && cur.includes(code)) { open({ kind: 'type' }); return }
     const codes = cur.includes(code) ? cur.filter(c => c !== code) : [...cur, code]
     setSearch({ ...search, codes: codes.length ? codes : undefined })
   }
 
-  /** Vue par type : deplie et montre le dossier dans l'arborescence de droite. */
+  /** Vue par type : restreint la vue du milieu a la case (re-clic : type entier). */
   function reveal(folder: string) {
-    const s = new Set(collapsed)
-    s.delete(folder)
-    s.delete(splitFolder(folder).branch)
-    collapsed = s
-    queueMicrotask(() => document.getElementById(`t-${folder}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
+    const v = view?.kind === 'type' && view.folder === folder ? { kind: 'type' as const } : { kind: 'type' as const, folder }
+    collapsed = new Set()
+    open(v)
   }
 
   function toggleBranch(branch: string) {
@@ -270,20 +257,16 @@
     else s.add(key)
     collapsed = s
   }
-  const totals = $derived(cells.reduce((a, c) => ({
-    selected: a.selected + c.selected, keep: a.keep + c.keep, toListen: a.toListen + c.to_listen,
-    files: a.files + total(c),
-  }), { selected: 0, keep: 0, toListen: 0, files: 0 }))
+  const totals = $derived(cells.reduce((n, c) => n + total(c), 0))
   const targetCount = $derived(sel.size || (cursor ? 1 : 0))
 
-  type Pad = { kit: string; label: string; selected: number; files: number; trashed: boolean }
+  type Pad = { kit: string; label: string; files: number; trashed: boolean }
   const files = (k: SampleKit) => k.candidates + k.reserve + k.unclassified + k.trashed
   // pads de packs (sommes des sous-kits) ; un pack est barre si tout est a la corbeille
   const packs = $derived.by(() => {
     const out = new Map<string, Pad>()
     for (const k of kitData.kits) {
-      const p = out.get(k.pack) ?? { kit: k.pack, label: k.pack, selected: 0, files: 0, trashed: true }
-      p.selected += k.selected
+      const p = out.get(k.pack) ?? { kit: k.pack, label: k.pack, files: 0, trashed: true }
       p.files += files(k)
       p.trashed &&= k.trashed_kit
       out.set(k.pack, p)
@@ -394,6 +377,14 @@
   })
 
   async function setSearch(f: SampleFilter) {
+    // autre instrument : note et tempo choisis pour le precedent ne valent plus
+    // (une note de kick viderait les boucles PL) ; arborescence depliee
+    if ((f.codes ?? []).join() !== (search.codes ?? []).join()) {
+      notes = []
+      bpms = []
+      collapsed = new Set()
+      try { localStorage.setItem(NOTES_KEY, '[]'); localStorage.setItem(BPMS_KEY, '[]') } catch { /* stockage indisponible */ }
+    }
     search = f
     history = pushHistory(HISTORY_KEY, history, f, filterTokens)
     try { localStorage.setItem(SEARCH_KEY, JSON.stringify(f)) } catch { /* stockage indisponible */ }
@@ -512,7 +503,8 @@
     if (!v) { entries = []; return }
     // une case videe (tout deplace) n'existe plus : liste vide
     if (v.kind === 'type') {
-      entries = await api.sampleTree(rightF, kit).catch(() => [])
+      const all = await api.sampleTree(rightF, kit).catch(() => [])
+      entries = v.folder ? all.filter(e => e.folder === v.folder) : all
       return
     }
     if (v.kind === 'kit') {
@@ -521,7 +513,7 @@
       return
     }
     entries = v.kind === 'cell'
-      ? await api.sampleCell(v.folder, kit, showOverflow, rightF).catch(() => [])
+      ? await api.sampleCell(v.folder, kit, true, rightF).catch(() => [])
       : (await api.sampleLoose(v.kind, kit, rightF)).map(looseRow)
   }
 
@@ -529,12 +521,10 @@
   async function open(v: View, target?: string) {
     view = v
     sel = new Set()
-    moving = null
     const key = v.kind === 'cell' ? v.folder : `:${v.kind}`
     try { localStorage.setItem(VIEW_KEY, key) } catch { /* stockage indisponible */ }
     await loadEntries()
-    const first = visible.find(e => e.status === 'pending') ?? visible[0]
-    pick(target ?? first?.source ?? null)
+    pick(target ?? visible[0]?.source ?? null)
   }
 
   // sample en cours = source du sound design (8.E), renommage compris ; sauf
@@ -563,7 +553,7 @@
     cursor = source
     if (!source || !ws) return
     ws.load(api.sampleAudioUrl(source)).catch(() => { /* chargement remplace par le suivant */ })
-    document.getElementById(`s-${CSS.escape(source)}`)?.scrollIntoView({ block: 'nearest' })
+    queueMicrotask(() => document.getElementById(`s-${source}`)?.scrollIntoView({ block: 'nearest' }))
   }
 
   function step(delta: number) {
@@ -610,19 +600,6 @@
     }
   }
 
-  async function decide(status: SampleStatus) {
-    if (!current && view?.kind !== 'kit') return
-    // vue kit : les non classes n'ont pas de case (M pour leur en donner une)
-    const sources = targets().filter(s => entries.find(e => e.source === s)?.folder)
-    const single = sel.size ? null : cursor
-    if (!(await act(s => api.sampleStatus(s, status), sources)) || !single || status === 'pending') return
-    // ecoute : prochain retenu encore a ecouter apres celui-ci, sinon le premier
-    const pend = entries.filter(e => e.selected && e.status === 'pending')
-    const order = entries.map(e => e.source)
-    const after = pend.find(e => order.indexOf(e.source) > order.indexOf(single))
-    pick((after ?? pend[0])?.source ?? single)
-  }
-
   const stars = (n: number | null) => act(s => api.sampleStars(s, n))
   const toTrash = (sources?: string[]) => act(api.sampleTrash, sources)
   const restore = () => act(api.sampleRestore)
@@ -632,31 +609,6 @@
     if (!t) return
     if (await act(s => api.sampleTagsEdit(s, [t]))) tagInput = ''
     tagField?.blur()
-  }
-
-  function startMove() {
-    const sources = targets()
-    if (!sources.length || view?.kind === 'trash') return
-    const one = entries.find(e => e.source === sources[0])
-    moving = {
-      sources,
-      label: sources.length > 1 ? `${sources.length} samples` : one?.name ?? sources[0],
-      folder: current?.folder ?? (one?.folder && !one.folder.startsWith('SAMPLE/') ? one.folder : 'DRUMS/PC'),
-    }
-    queueMicrotask(() => moveSelect?.focus())
-  }
-
-  async function confirmMove() {
-    if (!moving) return
-    const m = moving
-    if (current && m.folder === current.folder) { moving = null; return }
-    const { code, sub } = splitFolder(m.folder)
-    if (await act(s => api.sampleMove(s, code, sub), m.sources)) moving = null
-  }
-
-  function onMoveKey(e: KeyboardEvent) {
-    if (e.key === 'Enter') { e.preventDefault(); confirmMove() }
-    else if (e.key === 'Escape') { e.preventDefault(); moving = null }
   }
 
   function onTagKey(e: KeyboardEvent) {
@@ -705,35 +657,15 @@
     dropKey = key
   }
 
-  /** Depot sur un dossier (rangement) ou sur la corbeille. */
-  function onDrop(ev: DragEvent, target: string) {
+  /** Depot sur la corbeille. */
+  function onDrop(ev: DragEvent) {
     ev.preventDefault()
     const sources = dragging
     onDragEnd()
-    if (!sources) return
-    if (target === 'trash') toTrash(sources)
-    else {
-      const { code, sub } = splitFolder(target)
-      act(s => api.sampleMove(s, code, sub), sources)
-    }
+    if (sources) toTrash(sources)
   }
 
-  async function runExport(dryRun: boolean) {
-    if (exporting) return
-    exporting = true
-    try {
-      exportReport = await api.sampleExport(dryRun)
-      error = ''
-    } catch (e) {
-      fail(e)
-    } finally {
-      exporting = false
-    }
-  }
-
-  const mo = (b: number) => `${Math.round(b / 1e6)} Mo`
-
-  /** Choisit un kit (re-clic : retour a tous) ; la reserve du kit est depliee. */
+  /** Choisit un kit (re-clic : retour a tous). */
   // panneau de tagging du kit : au double-clic sur un pad seulement
   let kitPanel = $state(false)
 
@@ -747,15 +679,13 @@
     kitPanel = false
     kit = kit === k ? '' : k
     kitTagInput = ''
-    showReserve = kit !== ''
-    showOverflow = false
     try { localStorage.setItem(KIT_KEY, kit) } catch { /* stockage indisponible */ }
     collapsed = new Set()
     await refresh()
     if (search.codes?.length) await open({ kind: 'type' })
     else if (kit) await open({ kind: 'kit' })
     else if (view?.kind === 'kit') {
-      const c = cells.find(x => x.to_listen > 0) ?? cells[0]
+      const c = cells[0]
       if (c) await open({ kind: 'cell', folder: c.folder })
     } else if (view) await open(view)
   }
@@ -776,7 +706,7 @@
 
   function trashKit() {
     const n = kitInfo ? files(kitInfo) : packs.find(p => p.kit === kit)?.files ?? 0
-    if (!confirm(`Mettre ${kit} à la corbeille (${n} fichiers) ? Les décisions d’écoute de ses fichiers seront perdues ; restaurable d’un bloc.`)) return
+    if (!confirm(`Mettre ${kit} à la corbeille (${n} fichiers) ? Restaurable d’un bloc.`)) return
     kitAct(() => api.sampleKitTrash(kit))
   }
 
@@ -792,37 +722,30 @@
     else if (e.key === 'Escape') { e.preventDefault(); (e.target as HTMLElement).blur() }
   }
 
-  /** R : reserve, puis hors plafond (sans kit), puis tout replie. */
-  async function toggleReserve() {
-    const c = current ? byKey.get(current.folder) : undefined
-    if (!showReserve) showReserve = true
-    else if (!showOverflow && !kit && c?.reserve) showOverflow = true
-    else { showReserve = kit !== ''; showOverflow = false }
-    await loadEntries()
-    if (!visible.some(e => e.source === cursor)) pick(visible[0]?.source ?? null)
-  }
-
-
   function onkey(e: KeyboardEvent) {
     const t = e.target as HTMLElement | null
-    if (moving) return
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return
-    if (document.querySelector('aside.panel, aside.kb')) return
+    // panneau lateral affiche par-dessus (KB) ; une vue masquee mais montee
+    // (colonne aside.panel du sound design) ne bloque pas le clavier
+    if ([...document.querySelectorAll<HTMLElement>('aside.panel, aside.kb')].some(a => a.offsetParent)) return
     if (!container?.offsetParent) return  // vue masquee (autre section du panneau lateral)
     const k = e.key
     if ((e.metaKey || e.ctrlKey) && (k === 'a' || k === 'A')) { sel = new Set(visible.map(x => x.source)); e.preventDefault(); return }
     if (e.metaKey || e.ctrlKey || e.altKey) return
     const trashView = view?.kind === 'trash'
-    if (k === 'k' || k === 'K') decide('keep')
-    else if (k === 'd' || k === 'D') decide('drop')
-    else if (k === 'u' || k === 'U') { if (trashView) restore(); else decide('pending') }
+    if ((k === 'u' || k === 'U') && trashView) restore()
     else if (k === 'ArrowDown') step(1)
     else if (k === 'ArrowUp') step(-1)
     else if (k === 'ArrowRight') stepCell(1)
     else if (k === 'ArrowLeft') stepCell(-1)
-    else if (k === ' ') { ws?.stop(); ws?.play() }
-    else if (k === 'r' || k === 'R') toggleReserve()
-    else if (k === 'm' || k === 'M') startMove()
+    else if (k === ' ') {
+      // Espace tenu : relance a chaque temps au tempo de la banque active du
+      // live (arret au relachement) ; sans tempo, rejoue une fois
+      const bpm = liveOpen ? livePanel?.tempo() : null
+      if (e.repeat) { /* deja lance */ }
+      else if (bpm && cursor) { ws?.pause(); retrig.start(api.sampleAudioUrl(cursor), bpm) }
+      else { ws?.stop(); ws?.play() }
+    }
     else if (k === 't' || k === 'T') tagField?.focus()
     else if ((k === 'l' || k === 'L') && liveOpen) livePanel?.add(targets())
     else if (k >= '0' && k <= '5') stars(k === '0' ? null : Number(k))
@@ -846,7 +769,7 @@
     ws.on('play', () => { playing = true; remote.played('samples') })
     ws.on('pause', () => { playing = false })
     ws.on('finish', () => { if (looping) ws?.play(); else playing = false })
-    try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
+    try { kit = localStorage.getItem(KIT_KEY) ?? '' } catch { /* stockage indisponible */ }
     try { liveOpen = !!localStorage.getItem(LIVE_PANEL_KEY) } catch { /* stockage indisponible */ }
     // reanalyse lancee avant un rechargement de la page : on reprend le suivi
     api.sampleRebuildStatus().then(r => { if (r.status === 'running') { rebuild = r; followRebuild() } }).catch(() => {})
@@ -866,10 +789,10 @@
     if (search.codes?.length) return open({ kind: 'type' })
     if (last === ':kit' && kit) return open({ kind: 'kit' })
     if (last === ':unclassified' || last === ':trash') return open({ kind: last.slice(1) as Loose })
-    const c = (last && byKey.get(last)) || cells.find(x => x.to_listen > 0) || cells[0]
+    const c = (last && byKey.get(last)) || cells[0]
     if (c) await open({ kind: 'cell', folder: c.folder })
   })
-  onDestroy(() => ws?.destroy())
+  onDestroy(() => { ws?.destroy(); retrig.stop() })
 
   // deck de la telecommande
   let playing = $state(false)
@@ -891,20 +814,17 @@
   }
 </script>
 
-<svelte:window onkeydown={onkey} />
+<svelte:window onkeydown={onkey} onkeyup={e => { if (e.key === ' ') retrig.stop() }} onblur={() => retrig.stop()} />
 
 {#snippet folderNode(f: string, sub: string)}
   {@const c = byKey.get(f)}
-  <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <span class="drop" class:over={dropKey === f}
-    ondragover={e => onDragOver(e, f)} ondragleave={() => { if (dropKey === f) dropKey = null }}
-    ondrop={e => onDrop(e, f)}>
+  <span class="drop">
     {#if c}
-      <button class="cell" class:done={c.to_listen === 0} class:on={current?.folder === f}
-        title="{f} : {c.candidates} candidats, plafond {c.quota ?? 'aucun'}, {c.keep} gardés, {c.drop} écartés, {c.flagged} signalés{c.reserve ? `, ${c.reserve} hors plafond` : ''}"
-        onclick={() => (view?.kind === 'type' ? reveal(f) : open({ kind: 'cell', folder: f }))}><span class="sub">{sub}</span><span class="n">{c.to_listen}/{c.selected} <span class="tot">({total(c)})</span>{#if c.reserve && kit && !typeMode}<sup>+{c.reserve}</sup>{/if}</span></button>
+      <button class="cell" class:on={current?.folder === f || (view?.kind === 'type' && view.folder === f)}
+        title="{f} : {total(c)} fichiers{c.flagged ? `, ${c.flagged} signalés` : ''}"
+        onclick={() => (view?.kind === 'type' ? reveal(f) : open({ kind: 'cell', folder: f }))}><span class="sub">{sub}</span><span class="n">{total(c)}</span></button>
     {:else}
-      <span class="slot" title="{f} : vide, glisse-en un ici ou M"><span class="sub">{sub}</span><span class="n">vide</span></span>
+      <span class="slot" title="{f} : vide"><span class="sub">{sub}</span><span class="n">vide</span></span>
     {/if}
   </span>
 {/snippet}
@@ -926,10 +846,9 @@
 <div class="samples" class:with-live={liveOpen}>
   <section class="grid">
    <div class="zone matrix">
-    <h3 class="lib-title" title="{totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus{filterOn() ? ' (filtrés)' : ''}. Les chiffres d’un dossier : à écouter / retenus (total).">Library</h3>
+    <h3 class="lib-title" title="Les chiffres d’un dossier : nombre de fichiers{filterOn() ? ' (filtrés)' : ''}.">Library</h3>
     <p class="lib-total small muted">
-      {search.codes?.length ? `${search.codes.join(', ')} : ` : ''}{totals.files.toLocaleString('fr-FR')} fichiers{searchOn() ? ' filtrés' : ''},
-      toutes branches · {totals.selected.toLocaleString('fr-FR')} retenus
+      {search.codes?.length ? `${search.codes.join(', ')} : ` : ''}{totals.toLocaleString('fr-FR')} fichiers{searchOn() ? ' filtrés' : ''}, toutes branches
     </p>
     <div class="searchbar">
       <div class="search-in">
@@ -954,12 +873,12 @@
       {#if searchOn()}<button class="small" onclick={() => setSearch({})}>Tout effacer</button>{/if}
     </div>
     {#if error}<p class="err">{error}</p>{/if}
-    <div class="branches" class:dragging={dragging !== null}>
+    <div class="branches">
       {#each branchRows as b (b.branch)}
         <div class="branch">
           <button class="fold small" title={BRANCH_HELP[b.branch] ?? b.branch} onclick={() => toggleBranch(b.branch)}>
             <span class="caret">{closedBranches.has(b.branch) ? '▸' : '▾'}</span> <strong>{b.branch}</strong>
-            <span class="muted">{b.toListen}/{b.selected}</span>
+            <span class="muted">{b.files}</span>
           </button>
           {#if !closedBranches.has(b.branch)}
             {#each b.codes as row (row.code)}
@@ -969,20 +888,11 @@
                   class:active={search.codes?.includes(row.code)} onclick={() => toggleCode(row.code)}
                   title="{codeTitle(row.code)} · clic : filtre d'instrument"><span class="acr">{row.code}</span>{#if codeTrack(row.code)}<span class="trk">{codeTrack(row.code)}</span>{/if} <span class="desc">({codeShort(row.code)})</span></button>
                 {#if root}{@render folderNode(root, '')}{/if}
-                {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code} : candidats + hors plafond">({codeTotal(row.folders)})</span>{/if}
-                {#if b.branch !== 'SAMPLE'}<button class="add-sub" title="Nouveau sous-dossier de {row.code} (rempli par rangement : M ou glisser)"
-                  onclick={() => { addingSub = addingSub === row.code ? null : row.code; subName = '' }}>+</button>{/if}
+                {#if row.folders.length > 1}<span class="tot code-tot" title="total du type {row.code}">({codeTotal(row.folders)})</span>{/if}
               </div>
               {#each row.folders.filter(f => splitFolder(f).sub) as f (f)}
                 <div class="leaf">{@render folderNode(f, splitFolder(f).sub)}</div>
               {/each}
-              {#if addingSub === row.code}
-                <div class="leaf new-sub">
-                  <!-- svelte-ignore a11y_autofocus -->
-                  <input autofocus maxlength="10" placeholder="NOM (2 à 10 lettres)" bind:value={subName} onkeydown={onSubKey} />
-                  <button class="small" disabled={subName.trim().length < 2} onclick={addSub}>Créer</button>
-                </div>
-              {/if}
             {/each}
           {/if}
         </div>
@@ -990,58 +900,37 @@
     </div>
     <div class="loose">
       <button class="small" aria-pressed={view?.kind === 'unclassified'}
-        title="Fichiers sans code : glisse-les vers une case (ou M)"
+        title="Fichiers sans code (consultation)"
         onclick={() => open({ kind: 'unclassified' })}>Non classés ({counts.unclassified})</button>
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <span class="trash-drop" class:over={dropKey === 'trash'}
         ondragover={e => onDragOver(e, 'trash')} ondragleave={() => { if (dropKey === 'trash') dropKey = null }}
-        ondrop={e => onDrop(e, 'trash')}>
+        ondrop={onDrop}>
         <button class="small" aria-pressed={view?.kind === 'trash'}
           title="Sons rejetés partout, restaurables, jamais supprimés du disque"
           onclick={() => open({ kind: 'trash' })}>Corbeille ({counts.trash})</button>
       </span>
       <button class="small" disabled={rebuilding}
-        title="Relit les packs de Samples (nouveaux kits, sous-dossiers manuels) ; garde les décisions d'écoute et les mesures. Garder / écarter est bloqué pendant le calcul."
+        title="Relit les packs de Samples (nouveaux kits) ; garde les tags, étoiles et mesures. Les modifications sont bloquées pendant le calcul."
         onclick={startRebuild}>{rebuilding ? 'Réanalyse…' : 'Réanalyser'}</button>
-      <button class="small export-btn" disabled={exporting}
-        title="Copie les retenus vers Live/samples (branche / code / sous-dossier / nom DT2), pour Transfer"
-        onclick={() => runExport(true)}>{exporting ? 'Export…' : 'Exporter…'}</button>
-      <button class="small" aria-pressed={liveOpen} title="Panneau du live : sélection de la lib par banque, jauge de RAM, export vers Live/00-live"
+      <button class="small live-btn" aria-pressed={liveOpen} title="Panneau du live : sélection de la lib par banque, jauge de RAM, export vers Live/00-live"
         onclick={toggleLive}>Live</button>
     </div>
     {#if rebuild && rebuild.status !== 'idle'}
       <p class="small rebuild" class:err={rebuild.status === 'error'}>
-        {#if rebuild.status === 'running'}Réanalyse de la bibliothèque en cours (lancée à {rebuild.started_at?.slice(11)}) : garder / écarter / ranger sont bloqués jusqu'à la fin.
-        {:else if rebuild.status === 'done'}Réanalyse terminée : {rebuild.candidates} candidats, {rebuild.selected} retenus, {rebuild.reserve} hors plafond, {rebuild.unclassified} non classés.
+        {#if rebuild.status === 'running'}Réanalyse de la bibliothèque en cours (lancée à {rebuild.started_at?.slice(11)}) : les modifications sont bloquées jusqu'à la fin.
+        {:else if rebuild.status === 'done'}Réanalyse terminée : {rebuild.candidates + rebuild.reserve} fichiers classés, {rebuild.unclassified} non classés.
           <button class="small" onclick={() => (rebuild = null)}>×</button>
         {:else}Réanalyse en échec : {rebuild.error} <button class="small" onclick={() => (rebuild = null)}>×</button>{/if}
       </p>
     {/if}
-    {#if exportReport}
-      {@const r = exportReport}
-      <div class="export small">
-        <strong>{r.dry_run ? 'Bilan de l’export' : 'Export terminé'}</strong>
-        <span class="muted">→ {r.dest}</span>
-        <p>
-          {r.files} retenus ({mo(r.bytes)}) : {r.copied.length} {r.dry_run ? 'à copier' : 'copiés'},
-          {r.unchanged} inchangés, {r.removed.length} {r.dry_run ? 'à retirer' : 'retirés'}.
-        </p>
-        {#if r.missing.length}<p class="err">Sources absentes ({r.missing.length}) : {r.missing.slice(0, 5).join(', ')}</p>{/if}
-        {#if r.conflicts.length}<p class="err">Fichiers posés à la main, non écrasés ({r.conflicts.length}) : {r.conflicts.slice(0, 5).join(', ')}</p>{/if}
-        {#if r.dry_run}
-          <button class="small" disabled={exporting || (!r.copied.length && !r.removed.length)}
-            onclick={() => runExport(false)}>{exporting ? 'Copie…' : 'Copier'}</button>
-        {/if}
-        <button class="small" onclick={() => (exportReport = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
-      </div>
-    {/if}
    </div>
     <section class="kits zone">
-      <h3 class="small">Kits <span class="muted">· retenus / fichiers · re-clic pour tout voir · double-clic pour tagger</span></h3>
+      <h3 class="small">Kits <span class="muted">· fichiers · re-clic pour tout voir · double-clic pour tagger</span></h3>
       {#if kit && kitPanel}
         <div class="kit-bar small">
           <strong title={kit}>{kit}</strong>
-          {#if kitInfo}<span class="muted">{kitInfo.candidates} candidats · {kitInfo.reserve} hors plafond · {kitInfo.unclassified} non classés</span>{/if}
+          {#if kitInfo}<span class="muted">{files(kitInfo)} fichiers · {kitInfo.unclassified} non classés</span>{/if}
           {#each kitData.tags[kit] ?? [] as t}
             <span class="tag">{t}<button class="untag" title="Retirer le tag {t} du kit"
               onclick={() => kitAct(() => api.sampleKitTags(kit, [], [t]))}>×</button></span>
@@ -1062,7 +951,7 @@
             title="{p.kit} · double-clic : tags et corbeille du kit"
             onclick={ev => { if (ev.detail < 2) chooseKit(p.kit) }} ondblclick={() => editKit(p.kit)}>
             <span class="pad-name">{p.label}</span>
-            <span class="pad-n">{p.trashed ? 'corbeille' : `${p.selected} / ${p.files}`}</span>
+            <span class="pad-n">{p.trashed ? 'corbeille' : p.files}</span>
             {#if kitData.tags[p.kit]?.length}<span class="pad-tags">{kitData.tags[p.kit].join(' · ')}</span>{/if}
           </button>
         {/each}
@@ -1074,7 +963,7 @@
               title="{k.kit} · double-clic : tags et corbeille du kit"
               onclick={ev => { if (ev.detail < 2) chooseKit(kit === k.kit ? activePack : k.kit) }} ondblclick={() => editKit(k.kit)}>
               <span class="pad-name">{k.label}</span>
-              <span class="pad-n">{k.trashed_kit ? 'corbeille' : `${k.selected} / ${files(k)}`}{k.unclassified ? ` · ${k.unclassified} nc` : ''}</span>
+              <span class="pad-n">{k.trashed_kit ? 'corbeille' : files(k)}{k.unclassified ? ` · ${k.unclassified} nc` : ''}</span>
               {#if kitData.tags[k.kit]?.length}<span class="pad-tags">{kitData.tags[k.kit].join(' · ')}</span>{/if}
             </button>
           {/each}
@@ -1085,13 +974,8 @@
 
   <section class="detail">
     <header>
-      <strong>{current ? current.folder.replaceAll('/', ' / ') : view?.kind === 'type' ? `Type ${search.codes?.join(', ')}${kit ? ` · kit ${kit}` : ''}` : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
-      {#if current}
-        {@const c = byKey.get(current.folder)}
-        {#if c}<span class="muted small">quota {c.quota ?? 'tout'} · {c.keep} gardés · {c.drop} écartés · {c.candidates} candidats{c.reserve ? ` · ${c.reserve} hors plafond` : ''}</span>{/if}
-      {:else if view}
-        <span class="muted small">{shown.length} fichiers</span>
-      {/if}
+      <strong>{current ? current.folder.replaceAll('/', ' / ') : view?.kind === 'type' ? (view.folder ? view.folder.replaceAll('/', ' / ') : `Type ${search.codes?.join(', ')}`) + (kit ? ` · kit ${kit}` : '') : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
+      {#if view}<span class="muted small">{shown.length}{localTags.length ? ` / ${entries.length}` : ''} fichiers</span>{/if}
       <label class="small"><input type="checkbox" bind:checked={autoplay} /> lecture auto</label>
     </header>
     <div class="wave-row">
@@ -1124,12 +1008,8 @@
       {#if view?.kind === 'trash'}
         <button class="small" disabled={!targetCount || busy} onclick={restore}>Restaurer</button>
       {:else}
-        {#if current || view?.kind === 'kit' || view?.kind === 'type'}
-          <button class="small" disabled={!targetCount || busy} onclick={() => decide('keep')}>Garder</button>
-          <button class="small" disabled={!targetCount || busy} onclick={() => decide('drop')}>Écarter</button>
-        {/if}
-        <button class="small" disabled={!targetCount || busy} onclick={startMove}>Case…</button>
-        <button class="small" disabled={!targetCount || busy} onclick={() => toTrash()}>Corbeille</button>
+        <button class="small icon" disabled={!targetCount || busy} title="Mettre à la corbeille (Suppr)" aria-label="Corbeille"
+          onclick={() => toTrash()}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4M6.5 6.5v5M9.5 6.5v5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       {/if}
       <span class="stars-bar">
         {#each [1, 2, 3, 4, 5] as n}<button class="star" disabled={!targetCount || busy} title="{n} étoile{n > 1 ? 's' : ''} ({n})" onclick={() => stars(n)}>{'★'.repeat(n)}</button>{/each}
@@ -1140,18 +1020,18 @@
       <datalist id="sample-tags">{#each allTags as t}<option value={t}></option>{/each}</datalist>
       <button class="small" disabled={!targetCount || !tagInput.trim() || busy} onclick={addTag}>Tagger</button>
     </div>
-    {#if moving}
-      <!-- svelte-ignore a11y_no_static_element_interactions -->
-      <div class="move" onkeydown={onMoveKey}>
-        <span class="small">Ranger <span class="name">{moving.label}</span> dans</span>
-        <select bind:this={moveSelect} bind:value={moving.folder}>
-          {#each allFolders as f}<option value={f} title={codeTitle(splitFolder(f).code)}>{f}{splitFolder(f).sub ? '' : ` · ${CODE_HELP[splitFolder(f).code]?.split(' · ')[0] ?? ''}`}</option>{/each}
-        </select>
-        <button class="small" onclick={confirmMove} disabled={busy}>Ranger</button>
-        <button class="small" onclick={() => (moving = null)}>Annuler</button>
-        <span class="muted small">statut gardé, rangé en fin de case · <kbd>Entrée</kbd> / <kbd>Échap</kbd></span>
-      </div>
-    {/if}
+    <div class="local small">
+      {#each localTags as t (t)}
+        <span class="chip tag">{t}<button class="untag" title="Retirer" onclick={() => (localTags = localTags.filter(x => x !== t))}>×</button></span>
+      {/each}
+      <input class="local-in" list="local-tags" placeholder="filtrer : tag, style…" bind:value={localInput} onkeydown={onLocalKey}
+        onchange={() => { if (localFacets.some(([t]) => t === localInput)) addLocal(localInput) }} />
+      <datalist id="local-tags">{#each localFacets as [t, n] (t)}<option value={t}>{n}</option>{/each}</datalist>
+      {#each localFacets.filter(([t]) => !localTags.includes(t)).slice(0, 8) as [t, n] (t)}
+        <button class="tag auto" title="{n} fichier{n > 1 ? 's' : ''} : filtrer la liste" onclick={() => addLocal(t)}>{t} <span class="muted">{n}</span></button>
+      {/each}
+      {#if localTags.length}<button class="small" onclick={() => (localTags = [])}>Tout voir</button>{/if}
+    </div>
     {#if view?.kind === 'trash' && trashedKits.length}
       <ul class="trashed-kits small">
         {#each trashedKits as k (k.kit)}
@@ -1161,15 +1041,13 @@
       </ul>
     {/if}
     {#snippet sampleRow(e: SampleEntry)}
-      <li id="s-{e.source}" class="row {e.status}" class:cur={e.source === cursor} class:out={!e.selected} class:over={e.overflow}
+      <li id="s-{e.source}" class="row" class:cur={e.source === cursor}
         class:sel={sel.has(e.source)} draggable={view?.kind !== 'trash'}
         ondragstart={ev => onDragStart(ev, e.source)} ondragend={onDragEnd}>
         <button class="pick" onclick={ev => onRowClick(ev, e.source)}>
-          {#if current}<span class="rank muted">{e.rank}</span>{/if}
           <span class="name">{e.name}</span>
           {#if e.stars}<span class="stars" title="{e.stars} étoile{e.stars > 1 ? 's' : ''}">{'★'.repeat(e.stars)}</span>{/if}
           <span class="dur muted small">{fmt(e.duration)}</span>
-          {#if e.overflow}<span class="est" title="au-delà du plafond de candidats : garder, écarter, noter ou ranger le fait entrer">hors plafond</span>{/if}
           {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
           {#if e.note_src === 'mesure'}<span class="est" title="note mesurée dans l’audio ({e.note_hz} Hz), à vérifier à l’oreille">~{e.note}</span>{/if}
           {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
@@ -1189,7 +1067,6 @@
           <button class="tag small auto" title="Tag inféré des dossiers : filtrer dessus"
             onclick={() => { if (!search.tags?.includes(t)) setSearch({ ...search, tags: [...(search.tags ?? []), t] }) }}>{t}</button>
         {/each}
-        <span class="status small">{e.status === 'keep' ? 'gardé' : e.status === 'drop' ? 'écarté' : (view?.kind === 'kit' || view?.kind === 'type') && e.folder && !e.overflow ? (e.selected ? 'retenu' : 'réserve') : ''}</span>
       </li>
     {/snippet}
     {#if view?.kind === 'kit' || view?.kind === 'type'}
@@ -1198,7 +1075,7 @@
           <li class="folder fam">
             <button class="fold" onclick={() => toggleFolder(f.key)}>
               <span class="caret">{collapsed.has(f.key) ? '▸' : '▾'}</span> {f.label}
-              <span class="muted small">{f.key === ':nc' ? f.total : `${f.selected} / ${f.total}`}</span>
+              <span class="muted small">{f.total}</span>
             </button>
           </li>
           {#if !collapsed.has(f.key)}
@@ -1207,7 +1084,7 @@
                 <li class="folder code" id="t-{c.key}" class:mel={!RHYTHM.includes(c.code)}>
                   <button class="fold" title={codeTitle(c.code)} onclick={() => toggleFolder(c.key)}>
                     <span class="caret">{collapsed.has(c.key) ? '▸' : '▾'}</span> {c.label}
-                    <span class="muted small">{c.rows.length ? `${c.selected} / ${c.rows.length}` : 'vide'}</span>
+                    <span class="muted small">{c.rows.length || 'vide'}</span>
                   </button>
                 </li>
               {/if}
@@ -1220,25 +1097,17 @@
       </ol>
     {:else}
       <ol class="list">
-        {#each visible as e, i (e.source)}
-          {#if showReserve && i === chosen.length && reserve.length}<li class="sep small">Réserve ({reserve.length}) · hors sélection</li>{/if}
-          {@render sampleRow(e)}
-        {/each}
+        {#each visible as e (e.source)}{@render sampleRow(e)}{/each}
       </ol>
     {/if}
-    {#if current && !showReserve && reserve.length}
-      <button class="small" onclick={toggleReserve}>Afficher la réserve ({reserve.length})</button>
-    {:else if current && showReserve && !showOverflow && !kit && byKey.get(current.folder)?.reserve}
-      <button class="small" onclick={toggleReserve}>Afficher les hors plafond ({byKey.get(current.folder)?.reserve})</button>
-    {/if}
-    {#if view && !visible.length}<p class="muted small">{filterOn() ? 'Aucun sample ne répond au filtre.' : 'Liste vide.'}</p>{/if}
+    {#if view && !visible.length}<p class="muted small">{filterOn() || localTags.length ? 'Aucun sample ne répond au filtre.' : 'Liste vide.'}</p>{/if}
   </section>
   {#if liveOpen}<LivePanel bind:this={livePanel} bind:inLive play={pick} />{/if}
 </div>
 
 <style>
   .samples { display: grid; grid-template-columns: minmax(260px, 380px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
-  .samples.with-live { grid-template-columns: minmax(210px, 270px) minmax(0, 1fr) minmax(230px, 290px); gap: 12px 10px; padding: 12px 10px; }
+  .samples.with-live { grid-template-columns: minmax(210px, 270px) minmax(0, 1.3fr) minmax(320px, 1fr); gap: 12px 10px; padding: 12px 10px; }
   .inlive { font-size: 10px; padding: 0 4px; border-radius: 3px; border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; }
   .searchbar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
   .search-in { position: relative; flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
@@ -1285,23 +1154,16 @@
   .cell .sub { color: var(--text); }
   .n { font-variant-numeric: tabular-nums; }
   .tot { color: var(--muted); }
-  .add-sub { grid-column: 4; border: 0; background: none; padding: 0; color: var(--muted); font-size: 13px; line-height: 1; visibility: hidden; }
-  .code-node:hover .add-sub { visibility: visible; }
-  .add-sub:hover { color: var(--accent); }
-  .new-sub { display: flex; gap: 4px; padding: 2px 0; }
-  .new-sub input { flex: 1; min-width: 0; font: 11px ui-monospace, Menlo, monospace; text-transform: uppercase; padding: 2px 6px; }
   .code-tot { grid-column: 3; font: 11px ui-monospace, Menlo, monospace; padding-left: 6px; }
-  .cell.done { background: var(--cell-off); color: var(--muted); }
   .cell.on { outline: 2px solid var(--accent); }
   .slot { color: var(--muted); opacity: 0.6; }
-  .branches.dragging .slot { border: 1px dashed var(--border); opacity: 1; }
-  .drop.over .cell, .drop.over .slot { outline: 2px dashed var(--accent); background: var(--panel-2); }
   .loose { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .loose button { white-space: nowrap; }
   .trash-drop { border-radius: 4px; }
-  .export-btn { margin-left: auto; }
-  .export { margin-top: 10px; padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); max-width: 60ch; }
-  .export p { margin: 6px 0; }
+  .live-btn { margin-left: auto; }
+  .local { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 6px; }
+  .local-in { width: 11em; font-size: 12px; padding: 2px 6px; }
+  .icon { display: inline-flex; align-items: center; padding: 3px 6px; }
   /* largeur de la grille : les pads remplissent la colonne sans l'elargir */
   .kits h3 { margin: 0 0 6px; font-weight: 600; position: sticky; top: -8px; z-index: 1; padding: 4px 0; background: var(--bg); }
   .lib-title { margin: 0 0 2px; font-weight: 600; }
@@ -1325,7 +1187,6 @@
   .trashed-kits { list-style: none; margin: 0 0 6px; padding: 0; }
   .trashed-kits li { display: flex; gap: 8px; align-items: center; padding: 4px 6px; border-bottom: 1px solid var(--border); }
   .cell { position: relative; }
-  .cell sup { position: absolute; top: -7px; right: -3px; font-size: 9px; line-height: 1; padding: 1px 2px; border-radius: 6px; background: var(--panel-2); color: var(--muted); pointer-events: none; }
   .trash-drop.over { outline: 2px dashed #dc2626; }
   .detail { display: flex; flex-direction: column; min-height: 0; min-width: 0; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   .detail header { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
@@ -1336,24 +1197,14 @@
   .stars-bar { display: inline-flex; gap: 2px; }
   .star { font-size: 11px; padding: 1px 4px; color: #b45309; }
   .tag-in { width: 9em; font-size: 12px; }
-  kbd { font-family: ui-monospace, Menlo, monospace; font-size: 11px; border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; }
   .list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; min-height: 0; }
   .row { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border); user-select: none; }
   .row.cur { background: var(--panel-2); box-shadow: inset 3px 0 0 var(--accent); }
   .row.sel { background: color-mix(in srgb, var(--accent) 18%, transparent); }
-  .row.keep .name { color: var(--rhythm); }
-  .row.drop { opacity: 0.5; }
-  .row.drop .name { text-decoration: line-through; }
   /* retenus en avant ; reserve puis hors plafond nettement en retrait */
   .row:not(.out):not(.drop):not(.cur):not(.sel) { background: var(--panel); }
   .row:not(.out):not(.drop) .name { font-weight: 600; }
-  .row.out { font-size: 12px; }
-  .row.out:not(.drop) { opacity: 0.5; }
-  .row.out .name { color: var(--muted); }
-  .row.over:not(.drop) { opacity: 0.35; font-style: italic; }
-  .row.out.cur, .row.out:hover { opacity: 0.9; }
   .pick { flex: 1; min-width: 0; display: flex; gap: 8px; align-items: baseline; background: none; border: 0; padding: 5px 6px; text-align: left; color: var(--text); cursor: pointer; }
-  .rank { width: 2.5em; text-align: right; font: 11px ui-monospace, Menlo, monospace; }
   .name { font-family: ui-monospace, Menlo, monospace; white-space: pre; }
   .stars { color: #b45309; font-size: 11px; }
   .dur { width: 5em; }
@@ -1383,9 +1234,6 @@
   .kit-tag { padding-right: 6px; border-style: dashed; }
   .untag { border: 0; background: none; color: var(--muted); padding: 0 3px; cursor: pointer; font-size: 10px; }
   .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
-  .status { width: 4em; color: var(--muted); }
-  .move { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px 8px; margin-bottom: 6px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
-  .sep { margin-top: 10px; padding: 6px 6px 4px; border-top: 2px dashed var(--border); color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
   .folder .fold { display: flex; gap: 6px; align-items: baseline; width: 100%; background: none; border: 0; border-bottom: 1px solid var(--border); padding: 5px 6px; text-align: left; color: var(--text); cursor: pointer; font-weight: 600; }
   .folder.fam .fold { background: var(--panel); font-size: 13px; }
   .folder.code .fold { padding-left: 22px; font: 600 12px ui-monospace, Menlo, monospace; background: color-mix(in srgb, var(--rhythm) 12%, var(--panel)); color: var(--rhythm); }

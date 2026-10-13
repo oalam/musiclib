@@ -8,6 +8,21 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.J2] Vue Samples : le sample en cours sortait de l'écran en naviguant
+  aux flèches dans une longue liste. La ligne était cherchée par
+  `getElementById` avec un id passé par `CSS.escape`, qui ne correspondait
+  jamais dès que le chemin contenait espace, `/` ou parenthèse. Elle est
+  maintenant trouvée et défile pour rester visible.
+- [7.J2] Vue Samples : clavier inopérant (flèches haut / bas, Espace,
+  étoiles, Suppr…) dès que la vue Sound design avait été ouverte une fois.
+  Celle-ci reste montée, masquée, et sa colonne `aside.panel` passait pour
+  un panneau ouvert par-dessus. Seul un panneau réellement affiché bloque
+  désormais le clavier.
+- [7.K] Vue par type : la note (roue) et la tranche de tempo choisies pour
+  un instrument restaient actives, et mémorisées, en passant à un autre.
+  Une note de kick vidait les boucles PL, qui n'ont pas de note. Ces deux
+  filtres et l'arborescence repliée sont remis à zéro quand le filtre
+  d'instrument change.
 - [7.B] Frappes de drums des banks : événements (onsets du stem drums)
   classés par montée d'énergie dans la bande de chaque track, au pas le
   plus proche, au lieu du max d'enveloppe par pas qui retenait le fond
@@ -64,6 +79,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.K] Vue par type : un clic sur une case de l'arbre (ex. PL / TOPS)
+  restreint la vue du milieu à cette case au lieu d'y faire défiler ; un
+  re-clic sur la case, ou sur l'étiquette du code, revient au type entier.
+- [7.L] Vue Samples simplifiée (front seul) : garder / écarter, réserve,
+  plafond, rangement (« Case… », `M`, dépôt sur une case, sous-dossiers) et
+  « Exporter… » retirés ; tous les fichiers d'une case listés ; filtre local
+  par tag ou style au-dessus de la liste (suggestions des tags les plus
+  fréquents) ; corbeille en icône. Back et décisions écrites inchangés.
 - [7.L2] Vue Samples plus lisible avec le panneau du live : aide clavier
   retirée sous la barre d'actions, colonnes Library et Live resserrées
   (210-270 et 230-290 px) au profit de la liste, pads des kits en grille

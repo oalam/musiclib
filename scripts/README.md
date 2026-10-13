@@ -785,6 +785,12 @@ BL basse.
   30 ms de silence en tête d'un one-shot), `long` (frappe de drums de plus de
   2 s), `illisible`. Un candidat signalé passe en fin de case, sans être
   écarté. Environ 1 min pour mesurer les 2 423 candidats au premier passage.
+- **Depuis la simplification du 2026-10-13** (voir SPEC, décisions 7.L) :
+  la vue Samples ne propose plus garder / écarter, réserve, plafond,
+  rangement (`M`, dépôt sur une case, sous-dossiers) ni « Exporter… » ; tous
+  les fichiers d'une case sont listés, filtrables au milieu par tag ou style ;
+  restent étoiles, tags, corbeille (icône, `Suppr`), ajout au live (`L`).
+  Les paragraphes 7.J2 à 7.J5 ci-dessous décrivent le back, toujours en place.
 - **Écoute (7.J2)** : onglet **Samples** du front (`api.py`). Arbre des
   dossiers (7.J8) : une branche repliable, une ligne par code, une case par
   sous-catégorie (à écouter / retenus ; vide en pointillé, cible de
