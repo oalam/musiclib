@@ -415,7 +415,7 @@ mutes, FX de transition, principes d'arc).
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
 | 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7), arbre du +Drive par type / code / sous-catégorie et plafond par dossier (7.J8) | fait (7.J1 à 7.J8) ; reste l'écoute elle-même, l'export se rejoue après |
 | 7.K | Coquille du front : barre générale avec télécommande (morceau ou sample : précédent, lecture / pause, boucle, suivant), panneau latéral minimisable à icônes (Morceaux, Samples, Knowledge), filtre des morceaux par tags multiples, tri date / alpha, historique et recherche en ligne dans les propositions | fait (à valider à l'usage) |
-| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), dédoublonnage dans `0-COMMON`, noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille de pistes de [[digitakt/doctrine-dt2-solaris]] reportée dans `analyzer/digitakt.py` et le front | arbitré le 2026-10-13, à coder (back puis front) |
+| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), dédoublonnage dans `0-COMMON`, noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 front à venir |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -895,14 +895,14 @@ révisés par 7.J8) :
   écriture sur les samples répond 409 (le manifeste reconstruit écraserait
   les décisions prises entre-temps). Bilan affiché à la fin.
 
-**Décisions 7.L — lives (arbitrées le 2026-10-13, à coder)** :
-- [[digitakt/doctrine-dt2-solaris]] **remplace** la doctrine existante pour la
-  grille des pistes (T1 kick, T2 sub, T3 rumble, T4 snare / clap, T5-T6
-  hats, T7-T8 percs, T9 acid, T10 drone / nappe, T11 FX, T12-T13 breaks
-  découpés ; T14-T16 non attribuées). La grille 16 tracks de
-  [[digitakt/doctrine]] §1 est caduque. À reporter dans le code : les
-  `TrackSpec` de `analyzer/digitakt.py` (banks générées depuis un morceau)
-  et l'ordre des colonnes de la grille Samples du front (7.J5).
+**Décisions 7.L — lives (arbitrées le 2026-10-13, 7.L1 faite)** :
+- La grille 16 tracks de [[digitakt/doctrine]] §1 **fait foi**, révisée le
+  2026-10-13 : 1 kick, 2 rumble / sub, 3 clap / snare, 4 ride, 5 hat fermé,
+  6 hat ouvert, 7-8 percs, 9 basse, 10 lead, 11 atmo, 12 vocal, 13-14
+  Id1 / Id2, 15 FX, 16 réserve. [[digitakt/doctrine-dt2-solaris]] s'y
+  aligne. Reportée dans les `TrackSpec` de `analyzer/digitakt.py`, l'ordre
+  des codes (`samples.CODES`) et la grille Samples du front ; les banks
+  déjà générées gardent l'ancienne grille jusqu'à leur régénération.
 - Lib et live sont deux objets distincts : la lib (7.J, arbre par type
   pour chercher) reste telle quelle ; un live est une sélection rangée par
   banque pour jouer, indépendante des décisions keep / drop.
@@ -931,7 +931,14 @@ révisés par 7.J8) :
   fichiers). L'outil écrit sur le SSD ; la synchro vers le +Drive reste une
   étape manuelle dans Transfer.
 - Découpage : 7.L1 back (modèle, API, export, grille de `analyzer/digitakt.py`),
-  7.L2 front (sélecteur, panneau, jauge, ordre de la grille Samples).
+  7.L2 front (sélecteur, panneau, jauge).
+- Arbitrages en session de code 7.L1 (2026-10-13) : un RS ou un fichier non
+  classé n'entre pas dans un live (pas de branche) ; RAM mesurée à l'ajout
+  et gardée dans le live (pas de relecture du SSD à chaque bilan) ; noms en
+  double dans un dossier rendus uniques à l'export (`unique_name`, casse
+  ignorée) ; l'export de la lib et celui des lives partagent `samples.sync`.
+  L'ordre des codes de la grille Samples du front suit déjà la grille révisée
+  (CY avant HH / OH).
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

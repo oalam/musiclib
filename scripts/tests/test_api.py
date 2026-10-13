@@ -688,3 +688,51 @@ def test_sounddesign_layers_must_be_in_manifest(sd_client: TestClient):
     assert sd_client.post("/api/sounddesign/preview", json=body).status_code == 200
     record = sd_client.post("/api/sounddesign/render", json=body).json()
     assert len(record["layers"]) == 1 and record["layers"][0].endswith("k/kick.wav")
+
+
+# --- Lives (7.L) --------------------------------------------------------------
+
+def test_lives_flow(tmp_path: Path):
+    import soundfile as sf
+    from analyzer.samples import Manifest, SampleEntry
+
+    src = tmp_path / "Samples"
+    (src / "k").mkdir(parents=True)
+    sf.write(src / "k" / "kick.wav", [0.0] * 48_000, 48_000)
+    entries = [SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
+                           name="BD F Hard 01 k", duration=1.0, rank=1)]
+    manifest = tmp_path / "manifest.json"
+    api.samples.save_manifest(Manifest(source_root=str(src), total=1, entries=entries), manifest)
+    lib = tmp_path / "library.md"
+    lib.write_text(LIBRARY, encoding="utf-8")
+    client = TestClient(api.create_app(library_file=lib, samples_manifest=manifest, samples_src=src,
+                                       samples_overrides=tmp_path / "overrides.json",
+                                       lives_meta=tmp_path / "lives", lives_export=tmp_path / "00-live"))
+
+    r = client.post("/api/lives", json={"name": "solaris", "banks": ["A-HALF", "B-DNB"], "pack": "slr"})
+    assert r.status_code == 201
+    assert client.post("/api/lives", json={"name": "solaris"}).status_code == 422
+    assert client.get("/api/lives").json() == ["solaris"]
+    assert client.get("/api/lives/inconnu").status_code == 404
+
+    r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "A-HALF"})
+    r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "B-DNB"})
+    body = r.json()
+    assert body["folders"] == [{"path": "0-COMMON/DRUMS", "files": 1, "ram": 96_000, "over_cap": False}]
+    assert body["live"]["items"][0]["folder"] == "0-COMMON"
+    assert client.post("/api/lives/solaris/add",
+                       json={"sources": ["k/absent.wav"], "bank": "A-HALF"}).status_code == 422
+
+    r = client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD F Tribe slr"})
+    assert r.json()["live"]["items"][0]["name"] == "BD F Tribe slr"
+
+    r = client.post("/api/lives/solaris/export", json={"dry_run": True})
+    assert r.json()["copied"] == ["0-COMMON/DRUMS/BD F Tribe slr.wav"]
+    assert not (tmp_path / "00-live").exists()
+    client.post("/api/lives/solaris/export", json={"dry_run": False})
+    assert (tmp_path / "00-live" / "solaris" / "0-COMMON" / "DRUMS" / "BD F Tribe slr.wav").is_file()
+
+    r = client.put("/api/lives/solaris/banks", json={"banks": ["B-DNB"]})
+    assert r.json()["folders"][0]["path"] == "B-DNB/DRUMS"
+    r = client.post("/api/lives/solaris/remove", json={"sources": ["k/kick.wav"]})
+    assert r.json()["live"]["items"] == []

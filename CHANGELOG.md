@@ -64,6 +64,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.L1] Grille de tracks révisée de `digitakt/doctrine.md` §1 (4 ride,
+  5-6 hats, 12 vocal, 13-14 Id1 / Id2) reportée dans les `TrackSpec` de
+  `analyzer/digitakt.py`, l'ordre `samples.CODES` et les libellés de la
+  vue Samples. Les banks déjà générées gardent l'ancienne grille jusqu'à
+  leur régénération.
 - [9] SPEC : cadrage de la Phase 9, générateur MIDI acid inspiré de Sting
   (if-tah) : fonctions de référence tirées de son manuel, sous-phases
   9.A-9.H, décisions (générateur du front, cibles DT2 ou VST du Mac,
@@ -123,9 +128,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L1] Lives : `analyzer/lives.py` (live = `library/lives/<live>.json`,
+  banques, samples du catalogue par banque et branche, `0-COMMON` pour un
+  sample partagé, noms DT2 modifiables, pack du live pour les samples
+  maison, RAM au format DT2 48 kHz / 16 bits, plafond 64 par dossier en
+  avertissement) ; routes `/api/lives` ; export rejouable vers
+  `<MEDIA>/Live/00-live/<live>/` (`paths.DT2_LIVES_DIR`), copie partagée
+  avec l'export de la lib (`samples.sync`).
 - [7.L] Doctrine de live `digitakt/doctrine-dt2-solaris.md` (set free party
-  160-175 BPM, 6 banques, arborescence `00-live/solaris/` sur le +Drive) ;
-  elle remplace la grille de pistes de `digitakt/doctrine.md` §1. Décisions
+  160-175 BPM, 6 banques, arborescence `00-live/solaris/` sur le +Drive),
+  alignée sur la grille de `digitakt/doctrine.md` §1. Décisions
   7.L (lives : sélection de la lib par banque, `0-COMMON`, plafond 64 par
   dossier, jauge de RAM, export rejouable) arbitrées dans SPEC, à coder.
 

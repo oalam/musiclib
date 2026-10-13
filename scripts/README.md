@@ -897,6 +897,39 @@ wikilinks deviennent cliquables (manuel, section de la doctrine, autre
 fiche). Le manuel s'ouvre dans le panneau élargi à la bonne page
 (`#page=N`, visionneuse PDF du navigateur) ou dans un nouvel onglet.
 
+# Lives DT2 (Phase 7.L, `analyzer/lives.py`)
+
+Un live est une sélection de samples de la lib rangée par banque pour
+jouer (doctrine de live : [[../digitakt/doctrine-dt2-solaris]], décisions :
+[[SPEC]] § 7.L). Fichier `library/lives/<live>.json`, export vers
+`<MEDIA>/Live/00-live/<live>/<BANQUE>/<BRANCHE>/<nom>.wav`, que Transfer
+envoie tel quel sur le +Drive. Exemple :
+
+```
+00-live/solaris/0-COMMON/DRUMS/BD F Hard 01 k.wav    # kick utilisé par A et C
+00-live/solaris/C-TRIBE/LOOPS/BL 168 AcidG1 slr.wav  # sample maison, pack du live
+```
+
+- Source : tout le catalogue classé (candidats et réserve), pas seulement
+  les retenus ; un non classé, un fichier en corbeille ou un RS est refusé.
+- Un sample utilisé par deux banques ou plus va dans `0-COMMON`.
+- Nom : celui de la lib (`<CODE> [BPM|note] <desc> <pack>`), modifiable
+  par live ; les samples maison (famille SAMPLE) prennent le pack du live.
+- RAM estimée au format de la DT2 (48 kHz / 16 bits, 400 Mo par projet),
+  mesurée sur l'en-tête à l'ajout ; plafond de 64 fichiers par dossier en
+  simple avertissement (`over_cap`).
+- Export rejouable (`samples.sync`, index `library/lives/<live>.export.json`).
+
+API : `GET/POST /api/lives`, `GET /api/lives/{live}` (bilan par dossier et
+RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
+(`bank` absent : retire du live), `POST .../rename`, `POST .../export`
+(`dry_run`, vrai par défaut). Pas encore d'écran dans le front (7.L2).
+
+```bash
+python -m pytest tests/test_lives.py             # unitaires
+python -m pytest tests/test_api.py -k lives      # parcours API
+```
+
 # sounddesign.py — sound design par chaînes de plugins (Phase 8)
 
 Fabrique de nouveaux samples à partir de ceux de la library. Un traitement

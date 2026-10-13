@@ -62,10 +62,12 @@ RENOISE_DIR = LIVE_DIR / "renoise"
 GROOVES_DIR = LIVE_DIR / "grooves"
 DIGITAKT_MIDI_DIR = LIVE_DIR / "digitakt"
 DT2_SAMPLES_DIR = LIVE_DIR / "samples"   # arborescence famille/code prete pour Transfer
+DT2_LIVES_DIR = LIVE_DIR / "00-live"     # un dossier par live (7.L), meme nom sur le +Drive
 
 # Copie des samples de la DT2 faite depuis Transfer (packs bruts, lecture seule)
 SAMPLES_SRC_DIR = MEDIA_ROOT / "Samples"
 SAMPLES_META_DIR = LIBRARY / "samples"   # manifeste + overrides (vault)
+LIVES_META_DIR = LIBRARY / "lives"       # <live>.json + index d'export (7.L)
 
 # Rendus du sound design (Phase 8) : hors de Samples/, qui reste en lecture seule
 SOUNDDESIGN_OUT_DIR = MEDIA_ROOT / "SoundDesign"

@@ -108,7 +108,7 @@ _FLAT_TO_SHARP = {"Db": "C#", "Eb": "D#", "Gb": "F#", "Ab": "G#", "Bb": "A#", "C
 FLAG_WEIGHT = {"illisible": 3, "muet": 3, "sature": 1, "blanc": 1, "faible": 1, "long": 1}
 
 FAMILIES = ("AUTRES", "DUBSTEP", "HARDCORE", "JUNGLE", "SAMPLE", "TECHNO", "TRIBE", "UNIVERSEL")
-CODES = ("BD", "RM", "SD", "CP", "HH", "OH", "CY", "TM", "PC",
+CODES = ("BD", "RM", "SD", "CP", "CY", "HH", "OH", "TM", "PC",
          "BR", "DL", "PL", "ML", "BL", "BS", "ST", "PD", "FX", "VX", "RS")
 # RM : rumble (track 2 de la doctrine), rendu par le sound design (8.E) et
 # range par override au versement, jamais infere d'un nom de fichier
@@ -1764,8 +1764,16 @@ def export_plan(manifest: Manifest) -> dict[str, str]:
 def export(manifest: Manifest, root: Path, dest: Path, index_path: Path,
            dry_run: bool = False) -> ExportReport:
     """Synchronise `dest` avec les retenus du manifeste (voir l'en-tete)."""
+    return sync(export_plan(manifest), root, dest, index_path, dry_run)
+
+
+def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
+         dry_run: bool = False) -> ExportReport:
+    """Copie rejouable d'un plan (chemin relatif a dest -> source relative a
+    root) : ne recopie que ce qui a change, ne retire que les fichiers de
+    l'index, jamais un fichier pose a la main. Partage par l'export de la lib
+    (7.J3) et celui des lives (7.L)."""
     index = load_export_index(index_path)
-    plan = export_plan(manifest)
     report = ExportReport(dest=str(dest), dry_run=dry_run)
     new_index: dict[str, ExportItem] = {}
     for rel, source in plan.items():

@@ -8,14 +8,16 @@ de recherche (7.J6 : memes filtres sur toutes les lectures de samples ; 7.J7 :
 filtre par note et roue chromatique `GET /api/samples/notes`), et le sound
 design (Phase 8 : traitements, presets, ecoute et rendu, `/api/sounddesign/...`),
 et le generateur acid (Phase 9 : tirage `POST /api/acid/generate`, lecture
-temps reel vers la DT2 ou un VST du Mac `/api/acid/play`, `acid_midi.py`).
+temps reel vers la DT2 ou un VST du Mac `/api/acid/play`, `acid_midi.py`),
+et les lives (Phase 7.L : selection de la lib par banque, `/api/lives/...`).
 
 Lecture seule sur la library, sauf la generation d'une bank (`POST .../bank`)
 qui appelle `digitakt.py` puis `harmony.py` (7.H), et l'ajout d'un morceau
 (`POST /api/grab`, job en arriere-plan, un a la fois, cf. `jobs.py`), et les
 decisions d'ecoute et le rangement des samples (`POST /api/samples/...`,
 manifeste et overrides.json), et l'export des samples retenus
-(`POST /api/samples/export`, copie vers `<MEDIA>/Live/samples`), et le sound
+(`POST /api/samples/export`, copie vers `<MEDIA>/Live/samples`), les lives
+(`library/lives/<live>.json`, export vers `<MEDIA>/Live/00-live/<live>`), et le sound
 design (`PUT .../presets/...` dans le vault, `POST .../render` vers
 `<MEDIA>/SoundDesign` ; l'ecoute `POST .../preview` n'ecrit rien). L'envoi
 MIDI (`/api/dt2/send`, `/api/acid/...`) n'ecrit rien sur disque. Ecoute
@@ -99,6 +101,7 @@ from analyzer.samples import (
     set_tags,
     trash_kit,
 )
+from analyzer import lives as lv
 from analyzer import sounddesign as sd
 from analyzer.samples import move as move_sample
 from analyzer.samples import restore as restore_sample
@@ -108,8 +111,10 @@ from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
 from library_md import parse_library
 from paths import (
     DIGITAKT_DIR,
+    DT2_LIVES_DIR,
     DT2_SAMPLES_DIR,
     LIBRARY_FILE,
+    LIVES_META_DIR,
     QUALITY_DIR,
     SAMPLES_SRC_DIR,
     SOUNDDESIGN_OUT_DIR,
@@ -343,6 +348,31 @@ class SampleExport(BaseModel):
     dry_run: bool = True    # bilan d'abord, copie sur confirmation
 
 
+class LiveCreate(BaseModel):
+    name: str
+    banks: list[str] = Field(default_factory=list)
+    pack: str = ""
+
+
+class LiveBanks(BaseModel):
+    banks: list[str]
+
+
+class LiveAdd(BaseModel):
+    sources: list[str] = Field(min_length=1)
+    bank: str
+
+
+class LiveRemove(BaseModel):
+    sources: list[str] = Field(min_length=1)
+    bank: str | None = None     # None : retire du live entier
+
+
+class LiveRename(BaseModel):
+    source: str
+    name: str
+
+
 class SampleTags(BaseModel):
     sources: Sources
     add: TagList = Field(default_factory=list, max_length=20)
@@ -435,6 +465,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                samples_export: Path = DT2_SAMPLES_DIR,
                samples_export_index: Path = samples.EXPORT_INDEX_FILE,
                samples_folders: Path | None = None,
+               lives_meta: Path = LIVES_META_DIR,
+               lives_export: Path = DT2_LIVES_DIR,
                sounddesign_presets: Path = SOUNDDESIGN_PRESETS_DIR,
                sounddesign_out: Path = SOUNDDESIGN_OUT_DIR) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
@@ -895,6 +927,73 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         if not path.is_file():
             raise HTTPException(404, f"fichier absent : {source}")
         return FileResponse(path, media_type="audio/wav")
+
+    # --- Lives (Phase 7.L) --------------------------------------------------
+    lives_lock = threading.Lock()
+
+    def live_or_error(name: str) -> lv.Live:
+        try:
+            return lv.load_live(lives_meta, name)
+        except lv.LiveError as exc:
+            raise HTTPException(404, str(exc)) from exc
+
+    def live_edit(name: str, op: Callable[[lv.Live], object]) -> lv.LiveSummary:
+        """Lecture, operation, ecriture sous verrou ; tout ou rien (422)."""
+        with lives_lock:
+            live = live_or_error(name)
+            try:
+                op(live)
+            except lv.LiveError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            lv.save_live(live, lives_meta)
+        return lv.summary(live)
+
+    @app.get("/api/lives", response_model=list[str])
+    def lives_list() -> list[str]:
+        return lv.list_lives(lives_meta)
+
+    @app.post("/api/lives", response_model=lv.LiveSummary, status_code=201)
+    def live_create(req: LiveCreate) -> lv.LiveSummary:
+        with lives_lock:
+            try:
+                live = lv.create_live(lives_meta, req.name, req.banks, req.pack)
+            except lv.LiveError as exc:
+                raise HTTPException(422, str(exc)) from exc
+            lv.save_live(live, lives_meta)
+        return lv.summary(live)
+
+    @app.get("/api/lives/{name}", response_model=lv.LiveSummary)
+    def live_get(name: str) -> lv.LiveSummary:
+        return lv.summary(live_or_error(name))
+
+    @app.put("/api/lives/{name}/banks", response_model=lv.LiveSummary)
+    def live_banks(name: str, req: LiveBanks) -> lv.LiveSummary:
+        return live_edit(name, lambda live: lv.set_banks(live, req.banks))
+
+    @app.post("/api/lives/{name}/add", response_model=lv.LiveSummary)
+    def live_add(name: str, req: LiveAdd) -> lv.LiveSummary:
+        media_or_503()   # la RAM se mesure a l'ajout, sur le fichier source
+        m = manifest()
+        return live_edit(name, lambda live: lv.add(live, m, req.sources, req.bank, samples_src))
+
+    @app.post("/api/lives/{name}/remove", response_model=lv.LiveSummary)
+    def live_remove(name: str, req: LiveRemove) -> lv.LiveSummary:
+        return live_edit(name, lambda live: lv.remove(live, req.sources, req.bank))
+
+    @app.post("/api/lives/{name}/rename", response_model=lv.LiveSummary)
+    def live_rename(name: str, req: LiveRename) -> lv.LiveSummary:
+        return live_edit(name, lambda live: lv.rename(live, req.source, req.name))
+
+    @app.post("/api/lives/{name}/export", response_model=ExportReport)
+    def live_export(name: str, req: SampleExport) -> ExportReport:
+        """Copie le live vers `<MEDIA>/Live/00-live/<live>` ; `dry_run` : bilan."""
+        media_or_503()
+        with lives_lock:
+            live = live_or_error(name)
+            try:
+                return lv.export_live(live, samples_src, lives_export, lives_meta, dry_run=req.dry_run)
+            except lv.LiveError as exc:
+                raise HTTPException(422, str(exc)) from exc
 
     # --- Sound design (Phase 8) -------------------------------------------
     render_lock = threading.Lock()   # un rendu a la fois (CPU, ecriture des sidecars)
