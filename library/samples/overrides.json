@@ -56,6 +56,33 @@
  "Music Radar/Percussion/Djembe/Djembe_loop04(100BPM).wav": {
   "stars": 2
  },
+ "SoundDesign/rumble/RM 150 B Kick ni 7d19ff.wav": {
+  "code": "RM",
+  "name": "RM 150 B Kick ni",
+  "trash": true,
+  "sub": ""
+ },
+ "SoundDesign/rumble/RM 160 D Tranc er1 f46545.wav": {
+  "code": "RM",
+  "name": "RM 160 D Tranc er1",
+  "sub": ""
+ },
+ "SoundDesign/rumble/RM D Trance 90 er1 890944.wav": {
+  "code": "RM",
+  "sub": "CLEAN"
+ },
+ "SoundDesign/rumble/RM Kik Db 01 dbr 890944.wav": {
+  "code": "RM",
+  "sub": "CLEAN"
+ },
+ "SoundDesign/variations/BD V8 Clean 01 909 b4e0be.wav": {
+  "code": "BD",
+  "name": "BD V8 Clean 01 909",
+  "tags": [
+   "slices"
+  ],
+  "sub": "CLEAN"
+ },
  "bass graves/": {
   "tags": [
    "bass",
