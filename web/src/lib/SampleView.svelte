@@ -91,7 +91,10 @@
   let view = $state<View | null>(null)
   let entries = $state<SampleEntry[]>([])
   let cursor = $state<string | null>(null)    // source du sample en cours
-  let cursorUrl = $state('')                    // audio du sample en cours (rendu accorde d'un live)
+  let cursorUrl = $state('')
+  // zone du clavier (fleches) : liste de la lib, ou liste de la banque du live
+  // apres un clic dans celle-ci ; un choix dans la lib la rend a la lib
+  let zone = $state<'lib' | 'live'>('lib')                    // audio du sample en cours (rendu accorde d'un live)
   let sel = $state<Set<string>>(new Set())    // selection multiple (Cmd / Maj)
   let anchor: string | null = null            // origine d'une plage Maj-clic
   // filtre local de la liste du milieu (7.L3) : tags ou styles, ET entre eux
@@ -555,7 +558,14 @@
     await open({ kind: 'cell', folder }, source)
   }
 
+  /** Ecoute depuis le panneau du live : il prend les fleches (zone live). */
+  function playLive(source: string, url?: string) {
+    pick(source, url)
+    zone = 'live'
+  }
+
   function pick(source: string | null, url?: string) {
+    zone = 'lib'
     if (source !== quiet) quiet = null
     cursor = source
     if (!source || !ws) return
@@ -576,7 +586,7 @@
     const i = visible.findIndex(e => e.source === cursor)
     const next = [...visible.slice(i + 1), ...visible.slice(0, Math.max(i, 0)).reverse()].find(e => !gone.has(e.source))
     await livePanel.add(sources)
-    if (hidingLive && cursor && !visible.some(e => e.source === cursor)) pick(next?.source ?? null)
+    if (zone === 'lib' && hidingLive && cursor && !visible.some(e => e.source === cursor)) pick(next?.source ?? null)
   }
 
   function step(delta: number) {
@@ -757,6 +767,12 @@
     if (e.metaKey || e.ctrlKey || e.altKey) return
     const trashView = view?.kind === 'trash'
     if ((k === 'u' || k === 'U') && trashView) restore()
+    else if (zone === 'live' && liveOpen && livePanel && k.startsWith('Arrow')) {
+      if (k === 'ArrowDown') livePanel.step(1)
+      else if (k === 'ArrowUp') livePanel.step(-1)
+      else if (k === 'ArrowRight') livePanel.stepBank(1)
+      else livePanel.stepBank(-1)
+    }
     else if (k === 'ArrowDown') step(1)
     else if (k === 'ArrowUp') step(-1)
     else if (k === 'ArrowRight') stepCell(1)
@@ -1128,7 +1144,7 @@
     {/if}
     {#if view && !visible.length}<p class="muted small">{filterOn() || localTags.length ? 'Aucun sample ne répond au filtre.' : 'Liste vide.'}</p>{/if}
   </section>
-  {#if liveOpen}<LivePanel bind:this={livePanel} bind:inLive play={pick} />{/if}
+  {#if liveOpen}<LivePanel bind:this={livePanel} bind:inLive focused={zone === 'live'} play={playLive} />{/if}
 </div>
 
 <style>

@@ -155,6 +155,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L4] Panneau du live au clavier : après un clic sur un sample de la
+  banque, flèches haut / bas parcourent sa liste (écoute accordée), gauche /
+  droite changent de banque (premier sample joué), Espace rejoue ou relance
+  au tempo comme dans la lib. Un choix dans la lib lui rend les flèches.
 - [7.L4] Vue Samples, panneau du live ouvert : case « hors live » du
   filtre de la liste, qui masque les samples déjà pris dans le live (toutes
   banques), mémorisée ; le compteur affiche `affichés / total`. Avec le

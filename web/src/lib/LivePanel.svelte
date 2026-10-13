@@ -12,11 +12,14 @@
   let {
     play,
     inLive = $bindable(new Map<string, string[]>()),
+    focused = false,
   }: {
     /** Ecoute d'un sample du live dans le lecteur de la vue Samples ; url : rendu accorde. */
     play: (source: string, url?: string) => void
     /** source -> banques du live choisi (badges de la liste de la lib). */
     inLive?: Map<string, string[]>
+    /** fleches et Espace de la vue Samples agissent sur la liste de la banque */
+    focused?: boolean
   } = $props()
 
   const COMMON = '0-COMMON'
@@ -173,8 +176,29 @@
   }
 
   /** Ecoute telle qu'exportee : rendu varispeed de l'API si le sample est accorde. */
+  // sample en cours de la liste (fleches haut / bas quand le panneau a le clavier)
+  let cur = $state<string | null>(null)
+
   function listen(it: LiveItem) {
+    cur = it.source
     play(it.source, it.shift ? api.liveAudioUrl(current, it.source, it.shift) : undefined)
+    queueMicrotask(() => document.getElementById(`live-${it.source}`)?.scrollIntoView({ block: 'nearest' }))
+  }
+
+  /** Fleche haut / bas : sample precedent / suivant de la liste affichee. */
+  export function step(delta: number) {
+    if (!shown.length) return
+    const i = shown.findIndex(it => it.source === cur)
+    listen(shown[i < 0 ? 0 : Math.min(Math.max(i + delta, 0), shown.length - 1)])
+  }
+
+  /** Fleche gauche / droite : banque precedente / suivante, premier sample joue. */
+  export function stepBank(delta: number) {
+    if (!rows.length) return
+    const i = rows.indexOf(bank)
+    bank = rows[(i + delta + rows.length) % rows.length]
+    folder = ''
+    if (shown.length) listen(shown[0])
   }
 
   const fmtShift = (n: number) => (n > 0 ? `+${n}` : `${n}`)
@@ -335,7 +359,7 @@
     {#if tuneInfo && tuneInfo.bank === bank}<p class="small muted tuneinfo">{tuneInfo.text}</p>{/if}
     <ul class="items small">
       {#each shown as it (it.source)}
-        <li>
+        <li id="live-{it.source}" class:cur={it.source === cur} class:kbd={focused && it.source === cur}>
           {#if renaming === it.source}
             <!-- svelte-ignore a11y_autofocus -->
             <input class="rename mono" autofocus maxlength={NAME_MAX} bind:value={renameText} onkeydown={onRenameKey} onblur={() => (renaming = null)} />
@@ -430,6 +454,8 @@
   .items li { display: flex; gap: 6px; align-items: center; padding: 2px 0; border-bottom: 1px solid var(--border); }
   .items li > * { flex: none; }
   .items li.muted { display: block; }
+  .items li.cur .pick { color: var(--accent); }
+  .items li.kbd { background: color-mix(in srgb, var(--accent) 14%, transparent); }
   .items li > .pick, .items li > .rename { flex: 1 1 auto; min-width: 0; }
   .pick { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); text-align: left; }
   .pick:hover { color: var(--accent); }

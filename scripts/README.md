@@ -967,7 +967,10 @@ sur les samples transposés ; un clic sur leur nom les fait entendre tels
 qu'exportés (aussi pour Espace tenu). Les samples du
 live portent le badge de leurs banques dans la liste de la lib ; la case
 « hors live » du filtre de la liste les masque (le curseur passe au suivant
-après un ajout par `L` ou `Entrée`).
+après un ajout par `L` ou `Entrée`). Un clic sur un sample de la banque
+donne les flèches au panneau (ligne surlignée) : haut / bas dans la liste,
+gauche / droite de banque en banque, Espace comme dans la lib ; un choix
+dans la lib les lui rend.
 
 ```bash
 python -m pytest tests/test_lives.py             # unitaires
