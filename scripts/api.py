@@ -383,6 +383,11 @@ class LiveRename(BaseModel):
     name: str
 
 
+class LiveTune(BaseModel):
+    bank: str
+    reset: bool = False         # remet les samples a leur hauteur d'origine
+
+
 class SampleTags(BaseModel):
     sources: Sources
     add: TagList = Field(default_factory=list, max_length=20)
@@ -1001,6 +1006,13 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     @app.post("/api/lives/{name}/rename", response_model=lv.LiveSummary)
     def live_rename(name: str, req: LiveRename) -> lv.LiveSummary:
         return live_edit(name, lambda live: lv.rename(live, req.source, req.name))
+
+    @app.post("/api/lives/{name}/tune", response_model=lv.LiveSummary)
+    def live_tune(name: str, req: LiveTune) -> lv.LiveSummary:
+        """Accorde les kicks, rumbles et basses d'une banque sur sa tonalite."""
+        media_or_503()   # la RAM se remesure sur le fichier source
+        m = manifest()
+        return live_edit(name, lambda live: lv.tune_bank(live, m, req.bank, samples_src, req.reset))
 
     @app.post("/api/lives/{name}/export", response_model=ExportReport)
     def live_export(name: str, req: SampleExport) -> ExportReport:

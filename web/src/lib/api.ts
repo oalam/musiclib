@@ -349,6 +349,10 @@ export interface LiveItem {
   name: string
   banks: string[]
   ram: number | null
+  /** note de la source (dieses), relevee a l'accordage */
+  note: string | null
+  /** demi-tons de varispeed appliques a l'export (accordage de la banque) */
+  shift: number
   /** banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques */
   folder: string
 }
@@ -588,6 +592,8 @@ export const api = {
   liveKey: (name: string, bank: string, key: string) => livePost(`/${enc(name)}/key`, { bank, key }),
   /** Tempo d'une banque (30 a 300 BPM) ; null : retire. */
   liveTempo: (name: string, bank: string, bpm: number | null) => livePost(`/${enc(name)}/tempo`, { bank, bpm }),
+  /** Accorde les kicks, rumbles et basses d'une banque sur sa tonalite ; reset : hauteur d'origine. */
+  liveTune: (name: string, bank: string, reset = false) => livePost(`/${enc(name)}/tune`, { bank, reset }),
   liveRename: (name: string, source: string, newName: string) => livePost(`/${enc(name)}/rename`, { source, name: newName }),
   liveExport: (name: string, dryRun: boolean) =>
     fetch(`/api/lives/${enc(name)}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })

@@ -20,6 +20,12 @@ mesuree a l'ajout (en-tete seul) et gardee dans le live.
 
 Export rejouable : meme copie que l'export de la lib (`samples.sync`), avec
 un index propre au live (`<live>.export.json`).
+
+Accordage par banque : les kicks, rumbles et basses (TUNABLE) d'une banque
+dont la note est connue sont ramenes sur la tonique de sa tonalite, par le
+plus court chemin (-6 a +5 demi-tons). Le decalage est garde dans le live et
+applique a l'export en varispeed (comme le pitch de la DT2 : la duree suit) ;
+la lib n'est pas touchee. 0-COMMON n'est accorde que sur sa propre tonalite.
 """
 from __future__ import annotations
 
@@ -35,10 +41,14 @@ from .samples import (
     NAME_MAX,
     ExportReport,
     Manifest,
+    PITCHED,
     SampleError,
     _entry,
     _reserved,
     branch_of,
+    measure_note,
+    name_note,
+    sharp,
     short_name,
     sync,
     unique_name,
@@ -56,6 +66,14 @@ PACK_NAME = re.compile(r"[a-z0-9]{2,4}")
 KEY_MAX = 12                     # tonalite d'une banque, texte libre (Fa m, sol mineur)
 TEMPO_RANGE = (30.0, 300.0)      # BPM de la DT2
 EXPORT_SUFFIX = ".export.json"
+TUNABLE = frozenset({"BD", "RM", "BS"})   # one-shots accordes sur la tonique de la banque
+PITCH_CLASSES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+_SOLFEGE = {"do": "C", "re": "D", "mi": "E", "fa": "F", "sol": "G", "la": "A", "si": "B"}
+_KEY_RX = re.compile(
+    r"^(?:(?P<fr>do|r[eé]|mi|fa|sol|la|si)|(?P<en>[a-g]))"
+    r"\s*(?P<acc>#|♯|b(?![a-z])|♭|di[eè]se|b[eé]mol)?",
+    re.IGNORECASE,
+)
 
 
 class LiveError(Exception):
@@ -70,6 +88,8 @@ class LiveItem(BaseModel):
     name: str                        # nom DT2 voulu, sans extension (<= NAME_MAX)
     banks: list[str]                 # banques qui l'utilisent, dans l'ordre du live
     ram: int | None = None           # octets en RAM DT2, None : en-tete illisible
+    note: str | None = None          # note de la source (dieses), relevee a l'accordage
+    shift: int = 0                   # demi-tons de varispeed appliques a l'export
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -149,15 +169,16 @@ def save_live(live: Live, meta_dir: Path) -> None:
     tmp.replace(path)
 
 
-def ram_bytes(path: Path) -> int | None:
-    """Place en RAM DT2 (48 kHz / 16 bits, canaux gardes), d'apres l'en-tete."""
+def ram_bytes(path: Path, shift: int = 0) -> int | None:
+    """Place en RAM DT2 (48 kHz / 16 bits, canaux gardes), d'apres l'en-tete ;
+    `shift` : demi-tons de varispeed (la duree est divisee par 2^(shift/12))."""
     try:
         info = sf.info(str(path))
     except (RuntimeError, OSError):
         return None
     if info.samplerate <= 0:
         return None
-    frames = math.ceil(info.frames * DT2_RATE / info.samplerate)
+    frames = math.ceil(info.frames * DT2_RATE / info.samplerate / 2.0 ** (shift / 12.0))
     return frames * info.channels * DT2_SAMPLE_BYTES
 
 
@@ -215,6 +236,112 @@ def set_key(live: Live, bank: str, key: str) -> None:
         live.keys[bank] = key
     else:
         live.keys.pop(bank, None)
+
+
+def key_root(key: str) -> str | None:
+    """Tonique d'une tonalite saisie (`Fa m`, `sol mineur`, `Si bemol`, `F#m`,
+    `Bb`), en dieses ; None si illisible."""
+    m = _KEY_RX.match(key.strip())
+    if m is None:
+        return None
+    fr = m["fr"]
+    root = _SOLFEGE[fr.lower().replace("é", "e")] if fr else m["en"].upper()
+    acc = (m["acc"] or "").lower()
+    step = 1 if acc in ("#", "♯") or acc.startswith("di") else -1 if acc else 0
+    return PITCH_CLASSES[(PITCH_CLASSES.index(root) + step) % 12]
+
+
+def semitones(note: str, target: str) -> int:
+    """Plus court decalage de `note` vers `target` (dieses), de -6 a +5 :
+    a egalite on descend (un kick monte de 6 demi-tons perd sa queue)."""
+    d = (PITCH_CLASSES.index(target) - PITCH_CLASSES.index(note)) % 12
+    return d - 12 if d >= 6 else d
+
+
+def transpose(note: str, shift: int) -> str:
+    return PITCH_CLASSES[(PITCH_CLASSES.index(note) + shift) % 12]
+
+
+def entry_note(manifest: Manifest, item: LiveItem) -> str | None:
+    """Note connue sans mesure : manifeste, sinon nom du fichier (dieses)."""
+    entry = _entry(manifest, item.source)
+    if entry is not None and entry.note:
+        return sharp(entry.note)
+    written = name_note(item.source, item.code)
+    return sharp(written) if written else None
+
+
+def source_note(manifest: Manifest, item: LiveItem, root: Path) -> str | None:
+    """Note de la source : celle du manifeste (lue ou mesuree), sinon lue dans
+    le nom du fichier, sinon mesuree dans l'audio (BD / BS de la reserve, jamais
+    mesures, mesure gardee dans `item.note`) ; None si la mesure est incertaine
+    (RM : pas de mesure)."""
+    known = entry_note(manifest, item)
+    if known:
+        return known
+    if item.note:
+        return item.note
+    if item.code in PITCHED and (root / item.source).is_file():
+        return measure_note(root / item.source, item.code)[0]
+    return None
+
+
+def _renote(name: str, old: str, new: str | None) -> str:
+    """Remplace la note `old` d'un nom DT2 (`BD F Hard 01 k`) par `new`, apres
+    le code et l'eventuel BPM ; `new` None : la retire. Sans note dans le nom,
+    `new` est inseree apres le code (et le BPM), la description tronquee pour
+    tenir dans NAME_MAX."""
+    toks = name.split(" ")
+    for i, t in enumerate(toks[1:3], 1):
+        if t and t[0].isupper() and len(t) <= 2 and sharp(t) == old:
+            if new is None:
+                del toks[i]
+            else:
+                toks[i] = new
+            return " ".join(toks)
+    if new is None or len(toks) < 3:
+        return name
+    at = 2 if toks[1].isdigit() else 1
+    toks.insert(at, new)
+    over = len(" ".join(toks)) - NAME_MAX
+    if over > 0:      # tronque la description (avant le numero de variante et le pack)
+        words, num = toks[at + 1:-1], []
+        if words and words[-1].isdigit():
+            words, num = words[:-1], words[-1:]
+        desc = " ".join(words)[:-over].rstrip()
+        toks = [*toks[:at + 1], *([desc] if desc else []), *num, toks[-1]]
+    return " ".join(toks)
+
+
+def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
+              reset: bool = False) -> list[LiveItem]:
+    """Accorde les TUNABLE d'une banque (ou de 0-COMMON) sur la tonique de sa
+    tonalite ; `reset` : les remet a leur hauteur d'origine. Renvoie les
+    samples TUNABLE de la banque (accordes ou sans note connue)."""
+    if bank != COMMON and bank not in live.banks:
+        raise LiveError(f"banque absente du live : {bank}")
+    target = None
+    if not reset:
+        key = live.keys.get(bank, "")
+        if not key:
+            raise LiveError(f"{bank} n'a pas de tonalite : la saisir d'abord")
+        target = key_root(key)
+        if target is None:
+            raise LiveError(f"tonalite illisible pour {bank} : {key!r} (ex. Fa m, F#m, sol)")
+    touched = [it for it in live.items if it.folder == bank and it.code in TUNABLE]
+    for it in touched:
+        it.note = source_note(manifest, it, root)
+        shift = semitones(it.note, target) if it.note and target else 0
+        if shift == it.shift:
+            continue
+        if it.note:
+            # note absente du nom d'origine (mesuree ici) : inseree, retiree au reset
+            named = bool(entry_note(manifest, it))
+            new = transpose(it.note, shift) if shift or named else None
+            it.name = _renote(it.name, transpose(it.note, it.shift), new)
+        it.shift = shift
+        it.ram = ram_bytes(root / it.source, shift)
+    return touched
 
 
 def _ordered(live: Live, banks: list[str]) -> list[str]:
@@ -293,14 +420,18 @@ class _NoCase(set[str]):
 def plan(live: Live) -> dict[str, str]:
     """Chemin d'arrivee (relatif au dossier du live) -> source, noms rendus
     uniques par dossier."""
-    out: dict[str, str] = {}
+    return {rel: it.source for rel, it in _placed(live).items()}
+
+
+def _placed(live: Live) -> dict[str, LiveItem]:
+    out: dict[str, LiveItem] = {}
     taken: dict[str, _NoCase] = {}
     for it in sorted(live.items, key=lambda i: (i.folder, i.branch, i.name, i.source)):
         folder = f"{it.folder}/{it.branch}"
         seen = taken.setdefault(folder, _NoCase())
         name = unique_name(it.name, seen)
         seen.add(name.lower())
-        out[f"{folder}/{name}.wav"] = it.source
+        out[f"{folder}/{name}.wav"] = it
     return out
 
 
@@ -325,6 +456,9 @@ def export_live(live: Live, root: Path, dest_root: Path, meta_dir: Path,
                 dry_run: bool = False) -> ExportReport:
     """Synchronise `<dest_root>/<live>/` avec le live (voir l'en-tete)."""
     try:
-        return sync(plan(live), root, dest_root / live.name, index_file(meta_dir, live.name), dry_run)
+        placed = _placed(live)
+        shifts = {rel: it.shift for rel, it in placed.items() if it.shift}
+        return sync({rel: it.source for rel, it in placed.items()}, root, dest_root / live.name,
+                    index_file(meta_dir, live.name), dry_run, shifts)
     except SampleError as exc:
         raise LiveError(str(exc)) from exc

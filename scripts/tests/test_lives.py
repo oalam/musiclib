@@ -179,3 +179,84 @@ def test_save_load_and_export(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert not (dest / "solaris" / "A-HALF" / "DRUMS").exists()
     with pytest.raises(lv.LiveError):
         lv.load_live(meta, "inconnu")
+
+
+@pytest.mark.parametrize(("key", "root"), [
+    ("Fa m", "F"), ("sol mineur", "G"), ("Si bémol", "A#"), ("si b", "A#"), ("Ré", "D"),
+    ("fa dièse", "F#"), ("F#m", "F#"), ("Bb", "A#"), ("Dm", "D"), ("E", "E"), ("xx", None),
+])
+def test_key_root(key: str, root: str | None):
+    assert lv.key_root(key) == root
+
+
+def test_semitones_shortest_path():
+    assert lv.semitones("D#", "F") == 2
+    assert lv.semitones("A", "F") == -4
+    assert lv.semitones("C", "F#") == -6          # egalite : on descend
+    assert lv.semitones("F", "F") == 0
+
+
+def test_tune_bank(tmp_path: Path, lib: tuple[Manifest, Path]):
+    m, root = lib
+    m.entries[0].note = "F"                        # kick en fa
+    live = _live(tmp_path)
+    lv.add(live, m, ["k/kick.wav", "k/hat.wav"], "A-HALF", root)
+    kick = next(it for it in live.items if it.source == "k/kick.wav")
+    ram = kick.ram
+    with pytest.raises(lv.LiveError):              # pas de tonalite
+        lv.tune_bank(live, m, "A-HALF", root)
+    lv.set_key(live, "A-HALF", "Sol m")
+    touched = lv.tune_bank(live, m, "A-HALF", root)
+    assert [it.source for it in touched] == ["k/kick.wav"]      # le hat n'est pas accorde
+    assert (kick.note, kick.shift, kick.name) == ("F", 2, "BD G Hard 01 k")
+    assert ram is not None and kick.ram is not None and kick.ram < ram   # plus court en montant
+    lv.set_key(live, "A-HALF", "Mi")
+    lv.tune_bank(live, m, "A-HALF", root)
+    assert (kick.shift, kick.name) == (-1, "BD E Hard 01 k")
+    lv.tune_bank(live, m, "A-HALF", root, reset=True)
+    assert (kick.shift, kick.name, kick.ram) == (0, "BD F Hard 01 k", ram)
+    lv.set_key(live, "A-HALF", "??")
+    with pytest.raises(lv.LiveError):
+        lv.tune_bank(live, m, "A-HALF", root)
+
+
+def test_export_tuned(tmp_path: Path, lib: tuple[Manifest, Path]):
+    m, root = lib
+    m.entries[0].note = "F"
+    meta, dest = tmp_path / "lives", tmp_path / "00-live"
+    live = _live(tmp_path)
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", root)
+    lv.set_key(live, "A-HALF", "Fa")
+    lv.export_live(live, root, dest, meta)
+    out = dest / "solaris" / "A-HALF" / "DRUMS"
+    lv.set_key(live, "A-HALF", "La")               # +4 demi-tons
+    lv.tune_bank(live, m, "A-HALF", root)
+    r = lv.export_live(live, root, dest, meta)
+    assert r.copied == ["A-HALF/DRUMS/BD A Hard 01 k.wav"] and r.removed == ["A-HALF/DRUMS/BD F Hard 01 k.wav"]
+    info = sf.info(str(out / "BD A Hard 01 k.wav"))
+    assert info.samplerate == 44_100 and info.subtype == "PCM_24" and info.channels == 2
+    assert info.frames == pytest.approx(44_100 / 2 ** (4 / 12), abs=2)
+    r = lv.export_live(live, root, dest, meta)     # rejouable : rien a reecrire
+    assert r.copied == [] and r.unchanged == 1
+
+
+def test_renote_inserts_and_removes():
+    assert lv._renote("BD Kick 03 rth", "A", "F") == "BD F Kick 03 rth"
+    assert lv._renote("BD F Kick 03 rth", "F", None) == "BD Kick 03 rth"
+    assert lv._renote("RM 168 Bb Sub me", "A#", "C") == "RM 168 C Sub me"
+    assert lv._renote("BD Rounded Thing 07 rth", "C#", "F") == "BD F Rounde 07 rth"   # 18 caracteres
+
+
+def test_tune_measures_missing_note(tmp_path: Path, lib: tuple[Manifest, Path],
+                                    monkeypatch: pytest.MonkeyPatch):
+    m, root = lib
+    m.entries[0].name = "BD Hard 01 k"           # ni note au manifeste ni dans le nom
+    monkeypatch.setattr(lv, "measure_note", lambda path, code: ("A", 55.0))
+    live = _live(tmp_path)
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", root)
+    lv.set_key(live, "A-HALF", "Fa m")
+    lv.tune_bank(live, m, "A-HALF", root)
+    kick = live.items[0]
+    assert (kick.note, kick.shift, kick.name) == ("A", -4, "BD F Hard 01 k")
+    lv.tune_bank(live, m, "A-HALF", root, reset=True)
+    assert (kick.shift, kick.name) == (0, "BD Hard 01 k")

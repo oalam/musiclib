@@ -484,6 +484,7 @@ class ExportItem(BaseModel):
     source: str
     size: int
     mtime_ns: int
+    shift: int = 0      # demi-tons de varispeed appliques a l'ecriture (lives 7.L)
 
 
 class ExportReport(BaseModel):
@@ -1742,7 +1743,7 @@ def load_export_index(path: Path) -> dict[str, ExportItem]:
 
 
 def save_export_index(index: dict[str, ExportItem], path: Path) -> None:
-    data = {k: v.model_dump() for k, v in sorted(index.items())}
+    data = {k: v.model_dump(exclude_defaults=True) for k, v in sorted(index.items())}
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -1767,12 +1768,27 @@ def export(manifest: Manifest, root: Path, dest: Path, index_path: Path,
     return sync(export_plan(manifest), root, dest, index_path, dry_run)
 
 
+def write_varispeed(src: Path, out: Path, semitones: int) -> None:
+    """Ecrit `src` transpose de `semitones` demi-tons en varispeed (lecture
+    plus rapide ou plus lente, comme le pitch de la DT2 : la duree suit), au
+    meme format que la source."""
+    import librosa  # import lourd, seulement quand un live est transpose
+
+    info = sf.info(str(src))
+    data, sr = sf.read(str(src), dtype="float32", always_2d=True)
+    rate = 2.0 ** (semitones / 12.0)
+    y = librosa.resample(data.T, orig_sr=sr * rate, target_sr=sr, res_type="soxr_hq").T
+    sf.write(str(out), np.clip(y, -1.0, 1.0), sr, subtype=info.subtype, format="WAV")
+
+
 def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
-         dry_run: bool = False) -> ExportReport:
+         dry_run: bool = False, shifts: dict[str, int] | None = None) -> ExportReport:
     """Copie rejouable d'un plan (chemin relatif a dest -> source relative a
     root) : ne recopie que ce qui a change, ne retire que les fichiers de
     l'index, jamais un fichier pose a la main. Partage par l'export de la lib
-    (7.J3) et celui des lives (7.L)."""
+    (7.J3) et celui des lives (7.L). `shifts` (chemin relatif -> demi-tons) :
+    fichiers ecrits transposes en varispeed au lieu d'etre copies."""
+    shifts = shifts or {}
     index = load_export_index(index_path)
     report = ExportReport(dest=str(dest), dry_run=dry_run)
     new_index: dict[str, ExportItem] = {}
@@ -1783,11 +1799,13 @@ def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
         except FileNotFoundError:
             report.missing.append(source)
             continue
-        item = ExportItem(source=source, size=st.st_size, mtime_ns=st.st_mtime_ns)
+        shift = shifts.get(rel, 0)
+        item = ExportItem(source=source, size=st.st_size, mtime_ns=st.st_mtime_ns, shift=shift)
         report.files += 1
         report.bytes += st.st_size
         old = index.get(rel)
-        same_size = out.is_file() and out.stat().st_size == st.st_size
+        # fichier transpose : sa taille differe de la source, seul l'index fait foi
+        same_size = out.is_file() and (old == item if shift else out.stat().st_size == st.st_size)
         if out.exists() and old is None and not same_size:
             report.conflicts.append(rel)
             continue
@@ -1801,7 +1819,10 @@ def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
         if not dry_run:
             out.parent.mkdir(parents=True, exist_ok=True)
             tmp = out.with_name(f".{out.name}.tmp")
-            shutil.copy2(src, tmp)
+            if shift:
+                write_varispeed(src, tmp, shift)
+            else:
+                shutil.copy2(src, tmp)
             tmp.replace(out)
     for rel in sorted(index.keys() - plan.keys()):
         report.removed.append(rel)

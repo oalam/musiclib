@@ -155,6 +155,19 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L4] Accordage par banque d'un live : bouton « accorder » de la liste
+  de la banque active, qui ramène ses kicks, rumbles et basses (BD, RM, BS,
+  `lives.TUNABLE`) sur la tonique de sa tonalité (`Fa m`, `sol mineur`,
+  `F#m`, `Bb`… lue par `lives.key_root`), par le plus court chemin (-6 à +5
+  demi-tons). Note de la source : manifeste, sinon nom du fichier, sinon
+  mesurée (`measure_note`, BD / BS de la réserve) et gardée dans le live.
+  Décalage gardé par sample (`shift`) et appliqué à l'export en varispeed
+  (`samples.write_varispeed`, même format que la source ; l'index d'export
+  note le décalage) : la lib n'est pas touchée, « désaccorder » remet la
+  hauteur d'origine. Nom DT2 mis à la note d'arrivée (insérée si absente),
+  RAM recalculée sur la durée transposée. Route
+  `POST /api/lives/{live}/tune` (`bank`, `reset`). 0-COMMON n'est accordé
+  que sur sa propre tonalité.
 - [7.L2] Panneau du live : dépôt de samples directement sur la liste de
   la banque en cours (titre ou fichiers), en plus des lignes de la grille.
 - [7.L2] Tempo par banque d'un live (`tempos`, `lives.set_tempo`, route

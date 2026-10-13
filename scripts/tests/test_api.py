@@ -729,6 +729,9 @@ def test_lives_flow(tmp_path: Path):
     r = client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 165})
     assert r.json()["live"]["tempos"] == {"A-HALF": 165.0}
     assert client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 10}).status_code == 422
+    assert client.post("/api/lives/solaris/tune", json={"bank": "0-COMMON"}).status_code == 422   # sans tonalite
+    r = client.post("/api/lives/solaris/tune", json={"bank": "A-HALF"})
+    assert r.status_code == 200 and r.json()["live"]["items"][0]["shift"] == 0   # kick dans 0-COMMON
 
     r = client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD F Tribe slr"})
     assert r.json()["live"]["items"][0]["name"] == "BD F Tribe slr"

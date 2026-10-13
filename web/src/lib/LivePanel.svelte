@@ -23,6 +23,7 @@
   const BRANCHES = ['DRUMS', 'TONAL', 'LOOPS', 'FX', 'VX']   // lives.LIVE_BRANCHES
   const CAP = 64                                              // lives.LIVE_CAP
   const NAME_MAX = 18
+  const TUNABLE = ['BD', 'RM', 'BS']                          // lives.TUNABLE
   const LIVE_KEY = 'ui:live'
   const NEW = ':new'
 
@@ -48,6 +49,8 @@
   // renommage DT2 en place
   let renaming = $state<string | null>(null)
   let renameText = $state('')
+  // bilan du dernier accordage (banque -> message)
+  let tuneInfo = $state<{ bank: string; text: string } | null>(null)
   let report = $state<SampleExportReport | null>(null)
   let exporting = $state(false)
 
@@ -58,6 +61,8 @@
     const list = folder ? items.filter(i => `${i.folder}/${i.branch}` === folder) : items.filter(i => i.folder === bank)
     return [...list].sort((a, b) => BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch) || a.name.localeCompare(b.name))
   })
+  const tunable = $derived((sum?.live.items ?? []).filter(i => i.folder === bank && TUNABLE.includes(i.code)))
+  const shifted = $derived(tunable.some(i => i.shift))
   const ratio = $derived(sum ? sum.ram / sum.ram_limit : 0)
   const rowFiles = (b: string) => (sum?.folders ?? []).filter(f => f.path.split('/')[0] === b).reduce((n, f) => n + f.files, 0)
   // plusieurs banques -> le sample est rangé dans 0-COMMON, d'ou l'info « aussi en »
@@ -155,6 +160,19 @@
     if (e.key === 'Enter') { e.preventDefault(); saveKey() }
     else if (e.key === 'Escape') { e.preventDefault(); keying = null }
   }
+
+  async function tune(reset: boolean) {
+    const b = bank
+    if (!(await run(() => api.liveTune(current, b, reset)))) return
+    const items = (sum?.live.items ?? []).filter(i => i.folder === b && TUNABLE.includes(i.code))
+    const moved = items.filter(i => i.shift).length
+    const unknown = items.filter(i => !i.note).length
+    tuneInfo = { bank: b, text: reset ? `${items.length} remis à leur hauteur d'origine`
+      : `${moved} transposé${moved > 1 ? 's' : ''}, ${items.length - moved - unknown} déjà dans le ton`
+        + (unknown ? `, ${unknown} sans note connue` : '') }
+  }
+
+  const fmtShift = (n: number) => (n > 0 ? `+${n}` : `${n}`)
 
   function startRename(it: LiveItem) {
     renaming = it.source
@@ -302,7 +320,14 @@
         <input type="number" min="30" max="300" step="0.1" placeholder="—" value={s.live.tempos[bank] ?? ''}
           onchange={saveTempo} onkeydown={e => { if (e.key === 'Enter' || e.key === 'Escape') (e.target as HTMLElement).blur() }} /> BPM
       </label>
+      {#if tunable.length}
+        <button class="small link" disabled={busy || !s.live.keys[bank]}
+          title={s.live.keys[bank] ? `Ramène les kicks, rumbles et basses de ${bank} sur la tonique de ${s.live.keys[bank]} (varispeed à l'export, la lib n'est pas touchée)` : `Saisir d'abord la tonalité de ${bank} (double-clic sur la banque)`}
+          onclick={() => tune(false)}>accorder</button>
+        {#if shifted}<button class="small link" disabled={busy} title="Remet les samples de {bank} à leur hauteur d'origine" onclick={() => tune(true)}>désaccorder</button>{/if}
+      {/if}
     </h4>
+    {#if tuneInfo && tuneInfo.bank === bank}<p class="small muted tuneinfo">{tuneInfo.text}</p>{/if}
     <ul class="items small">
       {#each shown as it (it.source)}
         <li>
@@ -315,6 +340,7 @@
               onclick={ev => { if (ev.detail < 2) play(it.source) }} ondblclick={() => startRename(it)}>{it.name}</button>
           {/if}
           {#if !folder}<span class="muted br">{it.branch}</span>{/if}
+          {#if it.shift}<span class="flag shift" title="{it.note} → transposé de {fmtShift(it.shift)} demi-ton{Math.abs(it.shift) > 1 ? 's' : ''} à l'export (varispeed ; l'écoute ici reste à la hauteur d'origine)">{fmtShift(it.shift)}</span>{/if}
           {#if it.ram == null}<span class="flag" title="en-tête illisible : RAM non comptée">ram ?</span>{/if}
           <span class="banks">
             {#each it.banks as b}
@@ -386,6 +412,8 @@
   .bname { flex: none; }
   .bank.on { background: var(--accent); color: #fff; border-radius: 3px; }
   .key { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 400; opacity: 0.8; }
+  .flag.shift { background: #2563eb; font-variant-numeric: tabular-nums; }
+  .tuneinfo { margin: 0 0 4px; }
   .keyedit { font-family: ui-monospace, monospace; font-size: 12px; white-space: nowrap; }
   .keyedit input { width: 5.5em; font-size: 12px; }
   .cnt { min-width: 2.4em; padding: 0 4px; font-size: 12px; }
