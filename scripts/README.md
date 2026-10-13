@@ -789,7 +789,7 @@ BL basse.
   la vue Samples ne propose plus garder / écarter, réserve, plafond,
   rangement (`M`, dépôt sur une case, sous-dossiers) ni « Exporter… » ; tous
   les fichiers d'une case sont listés, filtrables au milieu par tag ou style ;
-  restent étoiles, tags, corbeille (icône, `Suppr`), ajout au live (`L`).
+  restent étoiles, tags, corbeille (icône, `Suppr`), ajout au live (`L`, `Entrée` pour le sample en cours seul).
   Les paragraphes 7.J2 à 7.J5 ci-dessous décrivent le back, toujours en place.
 - **Écoute (7.J2)** : onglet **Samples** du front (`api.py`). Arbre des
   dossiers (7.J8) : une branche repliable, une ligne par code, une case par
@@ -956,7 +956,8 @@ dossier, rouge au-delà de 64), liste avec écoute au clic, renommage au
 double-clic, retrait par banque ou du live, export (bilan puis copie).
 Ajout : glisser des samples de la liste sur une ligne de banque ou sur la
 liste de la banque en cours, ou `L`
-(sélection, sinon sample en cours) vers la banque active. Champ BPM de la
+(sélection, sinon sample en cours) ou `Entrée` (sample en cours seul) vers
+la banque active. Champ BPM de la
 banque active (titre de la liste) : Espace tenu relance le sample en cours
 à chaque temps à ce tempo, relâché il l'arrête ; sans tempo, Espace rejoue
 une fois. Lien « accorder » à côté (banque avec tonalité et kicks, rumbles

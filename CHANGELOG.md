@@ -155,6 +155,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L4] Vue Samples, panneau du live ouvert : `Entrée` ajoute le sample en
+  cours (sans la sélection) à la banque active.
 - [7.L4] Écoute accordée dans le panneau du live : un sample transposé est
   joué tel qu'exporté (forme d'onde, lecture et Espace tenu), rendu par la
   même fonction que l'export (route `GET /api/lives/{live}/audio?source=`).

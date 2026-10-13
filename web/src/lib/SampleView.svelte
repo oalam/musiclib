@@ -18,7 +18,7 @@
   // Propositions : historique des filtres en plus des facettes ; deck de la
   // telecommande de la barre generale (lecture, boucle, sample precedent / suivant).
   // Lives (7.L2) : bouton Live, panneau en troisieme colonne (LivePanel) ;
-  // L ajoute la selection a la banque active, glisser sur une ligne de banque ;
+  // L ajoute la selection a la banque active (Entree : le sample en cours seul), glisser sur une ligne de banque ;
   // badge des banques du live sur les samples de la liste.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
@@ -750,6 +750,7 @@
     }
     else if (k === 't' || k === 'T') tagField?.focus()
     else if ((k === 'l' || k === 'L') && liveOpen) livePanel?.add(targets())
+    else if (k === 'Enter' && liveOpen && cursor) livePanel?.add([cursor])
     else if (k >= '0' && k <= '5') stars(k === '0' ? null : Number(k))
     else if ((k === 'Delete' || k === 'Backspace') && !trashView) toTrash()
     else if (k === 'Escape') sel = new Set()

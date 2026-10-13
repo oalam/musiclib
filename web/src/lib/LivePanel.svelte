@@ -356,7 +356,7 @@
           <button class="untag out" disabled={busy} title="Retirer du live" onclick={() => remove([it.source], null)}>retirer</button>
         </li>
       {:else}
-        <li class="muted">Vide : glisse des samples ici ou sur une ligne de banque, ou <kbd>L</kbd> pour la banque active.</li>
+        <li class="muted">Vide : glisse des samples ici ou sur une ligne de banque, ou <kbd>L</kbd> (sélection) / <kbd>Entrée</kbd> (sample en cours) pour la banque active.</li>
       {/each}
     </ul>
     </div>
