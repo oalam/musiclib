@@ -123,6 +123,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L] Doctrine de live `digitakt/doctrine-dt2-solaris.md` (set free party
+  160-175 BPM, 6 banques, arborescence `00-live/solaris/` sur le +Drive) ;
+  elle remplace la grille de pistes de `digitakt/doctrine.md` §1. Décisions
+  7.L (lives : sélection de la lib par banque, `0-COMMON`, plafond 64 par
+  dossier, jauge de RAM, export rejouable) arbitrées dans SPEC, à coder.
+
 - [9.C2] Séquenceur acid étendu : 32 pas sur deux mesures (`Density` par
   mesure ; une séquence de 16 pas est complétée par sa répétition),
   `Steps` jusqu'à 32, repère ▶ / ◀ du pas de départ (`Offset`) ; lecture

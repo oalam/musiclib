@@ -1,11 +1,16 @@
 ---
 tags: [digitakt, doctrine, live, set, elektron]
 source: "https://youtu.be/y_YijodbZYI"
-updated: 2026-10-07
+updated: 2026-10-13
 status: living document
 ---
 
 # Doctrine Digitakt II — live techno
+
+> **Grille des pistes caduque (2026-10-13)** : la disposition des pistes de
+> [[doctrine-dt2-solaris]] remplace la grille 16 tracks du §1 (cf. SPEC
+> « Décisions 7.L »). Les sections qui citent un numéro de track (§1, §4,
+> §9, §10, §12) suivent l'ancienne grille.
 
 Règles **arbitrées** pour préparer et jouer un live sur Digitakt II. Elles
 servent aussi de contrat à l'analyzer [[../scripts/README|digitakt.py]]
