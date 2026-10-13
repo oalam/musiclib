@@ -20,6 +20,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   boutons Notes / Accent / Gate / Octave inversés, comme les « Randomize »
   de Sting : allumé = tiré par Generate, éteint = gardé (en orange, un
   verrou passait pour actif et Generate semblait sans effet).
+- [8.K] Paramètres en % affichés sans unité (`52.00` au lieu de `52 %`) :
+  Saturator, Overdrive.
 - [8.F] Clic d'un rumble joué une seule fois : la boucle finissait en plein
   grondement (0,53 d'amplitude sur `Kick 1973 DS 1`, preset `deep`). Le
   duck anticipe désormais le coup (creux complet sur le kick, y compris
@@ -27,8 +29,6 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.K] Boutons « Morceau » / « Sample » de la barre générale : ouvrent
   aussi la vue correspondante (ils ne changeaient que la cible de la
   télécommande) ; « Sample » n'est plus grisé avant la première visite.
-- [8.K] Paramètres en % affichés sans unité (`52.00` au lieu de `52 %`) :
-  Saturator, Overdrive.
 - [7.J8] Reconstruction des samples non rejouable : une boucle BR / DL dont
   le tempo avait été mesuré le perdait en passant hors plafond (réserve sans
   tempo) et repartait à la racine au passage suivant, d'où une oscillation
@@ -155,6 +155,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   `Offset`, `Direction` (avant, arrière, pendule), `Swing`, `Tie Mode`
   (slide = chevauchement, même note = prolongée) ; export `.mid` d'une
   mesure, CLI `python -m analyzer.acid` ; 23 tests.
+- [7.D] Fiche KB `oneshots-synthe` (lot 3, n° 36) : one-shots mélodiques
+  depuis un synthé (contraintes imposées par la DT2, réglages du synthé,
+  note de référence et `TUNE`, longueurs, boucle FORWARD LOOP, tessiture
+  par preset lock, accords parallèles, nommage des octaves Elektron).
 - [7.D] Fiche KB `controleur-maschine` (lot 5, n° 35) : Maschine MK2 en
   mode MIDI (Controller Editor) vers la DT2, tout USB via le Mac sans DAW
   (routeur MIDI ou une ligne `mido`), notes sur l'AUTO CHANNEL ; tutos
@@ -162,10 +166,6 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   Liée depuis l'index et `midi-config`.
 - [7.D] Template Controller Editor `digitakt/maschine/DT2 Pads.ncm2`
   (Maschine MK2) : pads sur le canal 10, contrôles désactivés, 8 groupes
-- [7.D] Fiche KB `oneshots-synthe` (lot 3, n° 36) : one-shots mélodiques
-  depuis un synthé (contraintes imposées par la DT2, réglages du synthé,
-  note de référence et `TUNE`, longueurs, boucle FORWARD LOOP, tessiture
-  par preset lock, accords parallèles, nommage des octaves Elektron).
   (une note, chromatique, éolien, phrygien, dorien, mineur harmonique,
   phrygien dominant, penta mineure). Fiche `controleur-maschine` : import,
   tonalité réglée par `TUNE` sur la DT2.
@@ -191,6 +191,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   touches en pads de one-shots, palette du set multi-styles), quand le pool
   ne sert à rien (socle), proposition de rangement des slots à arbitrer.
   Liée depuis l'index et `presets-kits-pool`.
+- [8.K] Courbe Color du Saturator, façon Live, en tête de la section
+  Color : accentuation avant la courbe (étagère grave, nœud 1 = Freq Lo /
+  Amt Lo ; aiguë, nœud 2 = Freq Hi / Amt Hi ; ±15 dB à ±100 %), au-dessus
+  de 0 dB la bande sature plus. Glisser un nœud règle fréquence et
+  quantité, double-clic les remet par défaut. `scale.shelfDb` (étagère
+  grave ou aiguë) sert aussi au Low shelf.
 - [8.E] Dossier de rangement d'un rendu au choix, avant le rendu : le
   `→ dossier` à côté du nom DT2 devient un menu (dossier proposé, ou tous
   les dossiers cibles groupés par branche) ; le nom proposé prend le code du
@@ -202,12 +208,6 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   son dossier (ex. `DRUMS/BD/CLEAN`), sample sélectionné et joué, sans en
   faire la source du sound design (il ne le devient que si on le
   resélectionne après un autre sample). `focus.show()` porte la demande ;
-- [8.K] Courbe Color du Saturator, façon Live, en tête de la section
-  Color : accentuation avant la courbe (étagère grave, nœud 1 = Freq Lo /
-  Amt Lo ; aiguë, nœud 2 = Freq Hi / Amt Hi ; ±15 dB à ±100 %), au-dessus
-  de 0 dB la bande sature plus. Glisser un nœud règle fréquence et
-  quantité, double-clic les remet par défaut. `scale.shelfDb` (étagère
-  grave ou aiguë) sert aussi au Low shelf.
   `open()` de la vue Samples accepte un sample cible.
 - [8.K] Courbe de transfert du Saturator dans le device, façon Live :
   entrée -1..1 en abscisse, sortie en ordonnée (plafonds ±1 et diagonale du
