@@ -20,6 +20,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.K] Boutons « Morceau » / « Sample » de la barre générale : ouvrent
   aussi la vue correspondante (ils ne changeaient que la cible de la
   télécommande) ; « Sample » n'est plus grisé avant la première visite.
+- [8.K] Paramètres en % affichés sans unité (`52.00` au lieu de `52 %`) :
+  Saturator, Overdrive.
 - [7.J8] Reconstruction des samples non rejouable : une boucle BR / DL dont
   le tempo avait été mesuré le perdait en passant hors plafond (réserve sans
   tempo) et repartait à la racine au passage suivant, d'où une oscillation
@@ -189,6 +191,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   son dossier (ex. `DRUMS/BD/CLEAN`), sample sélectionné et joué, sans en
   faire la source du sound design (il ne le devient que si on le
   resélectionne après un autre sample). `focus.show()` porte la demande ;
+- [8.K] Courbe Color du Saturator, façon Live, en tête de la section
+  Color : accentuation avant la courbe (étagère grave, nœud 1 = Freq Lo /
+  Amt Lo ; aiguë, nœud 2 = Freq Hi / Amt Hi ; ±15 dB à ±100 %), au-dessus
+  de 0 dB la bande sature plus. Glisser un nœud règle fréquence et
+  quantité, double-clic les remet par défaut. `scale.shelfDb` (étagère
+  grave ou aiguë) sert aussi au Low shelf.
   `open()` de la vue Samples accepte un sample cible.
 - [8.K] Courbe de transfert du Saturator dans le device, façon Live :
   entrée -1..1 en abscisse, sortie en ordonnée (plafonds ±1 et diagonale du

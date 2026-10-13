@@ -26,6 +26,7 @@ export function fmt(p: ParamSpec, v: number): string {
     case 'dB': return `${v > 0 ? '+' : ''}${v.toFixed(1)} dB`
     case 'ms': return v >= 1000 ? `${(v / 1000).toFixed(2)} s` : `${v.toFixed(v < 10 ? 1 : 0)} ms`
     case 's': return v < 1 ? `${(v * 1000).toFixed(0)} ms` : `${v.toFixed(2)} s`
+    case '%': return `${v.toFixed(Math.abs(v) < 10 ? 1 : 0)} %`
     default: return v.toFixed(2)
   }
 }
@@ -79,12 +80,16 @@ export function responseDb(t: FilterType, params: Record<string, number>, f: num
       mag = Math.hypot(1 - x * x, (x * a) / q) / Math.hypot(1 - x * x, x / (a * q))
       break
     }
-    case 'low_shelf': {
-      const a = 10 ** (params.gain_db / 40)
-      const k = (Math.sqrt(a) * x) / params.q
-      mag = (a * Math.hypot(a - x * x, k)) / Math.hypot(1 - a * x * x, k)
-      break
-    }
+    case 'low_shelf': return shelfDb('low', fc, params.gain_db, f, params.q)
   }
   return 20 * Math.log10(Math.max(mag, 1e-6))
+}
+
+/** Etagere grave ou aigue (RBJ, Q 0.707 comme pedalboard) : gain en dB a f. */
+export function shelfDb(kind: 'low' | 'high', fc: number, gainDb: number, f: number, q = Math.SQRT1_2): number {
+  const a = 10 ** (gainDb / 40)
+  const x = f / fc
+  const k = (Math.sqrt(a) * x) / q
+  const [num, den] = [Math.hypot(a - x * x, k), Math.hypot(1 - a * x * x, k)]
+  return 20 * Math.log10(Math.max((a * (kind === 'low' ? num / den : den / num)), 1e-6))
 }

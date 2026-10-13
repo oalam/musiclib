@@ -1,12 +1,13 @@
 <script lang="ts">
   // Device facon Ableton Live : barre de titre (activateur = bypass, nom,
   // deplacer, retirer), corps grise quand desactive ; courbe de reponse pour
-  // les filtres et EQ, de transfert pour le Saturator, puis les potards.
+  // les filtres et EQ, de transfert (et Color) pour le Saturator, puis les potards.
   // Automation (8.H) : sur un device pedalboard, le bouton ↗ d'un potard
   // ajoute un second potard, la valeur atteinte en fin de rendu (params_end).
   import type { DeviceSpec, ParamSpec, SdDevice } from '../api'
   import FilterCurve from './FilterCurve.svelte'
   import Knob from './Knob.svelte'
+  import ColorCurve from './ColorCurve.svelte'
   import SaturatorCurve from './SaturatorCurve.svelte'
   import { isFilter } from './scale'
 
@@ -140,6 +141,9 @@
           {#each sections as s (s.title)}
             <div class="section">
               <span class="stitle">{s.title}</span>
+              {#if device.type === 'saturator' && s.params.some(p => p.name === 'freq_lo')}
+                <ColorCurve params={values} specs={spec.params} disabled={device.bypass} onchange={set} />
+              {/if}
               <div class="bars">
                 {#each s.params as p (p.name)}{@render param(p, true)}{/each}
               </div>
