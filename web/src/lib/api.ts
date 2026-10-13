@@ -341,6 +341,20 @@ export interface SampleExportReport {
   missing: string[]
   conflicts: string[]
 }
+/** Lives DT2 (7.L, analyzer/lives.py) : selection de la lib rangee par banque. */
+export interface LiveItem {
+  source: string
+  code: string
+  branch: string
+  name: string
+  banks: string[]
+  ram: number | null
+  /** banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques */
+  folder: string
+}
+export interface Live { name: string; pack: string; banks: string[]; items: LiveItem[] }
+export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean }
+export interface LiveSummary { live: Live; folders: LiveFolder[]; ram: number; ram_limit: number; unknown_ram: number }
 /** Case = dossier final du +Drive (7.J8) : DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX. */
 export interface SampleCell {
   folder: string
@@ -483,6 +497,11 @@ function samplePost(action: string, body: object): Promise<SampleCell[]> {
     .then(r => json<SampleCell[]>(r))
 }
 
+function livePost(path: string, body: object): Promise<LiveSummary> {
+  return fetch(`/api/lives${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+    .then(r => json<LiveSummary>(r))
+}
+
 export const api = {
   tracks: () => fetch('/api/tracks').then(r => json<TrackSummary[]>(r)),
   track: (slug: string) => fetch(`/api/tracks/${enc(slug)}`).then(r => json<TrackDetail>(r)),
@@ -555,6 +574,19 @@ export const api = {
   sampleRestore: (sources: string[]) => samplePost('restore', { sources }),
   sampleExport: (dryRun: boolean) =>
     fetch('/api/samples/export', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })
+      .then(r => json<SampleExportReport>(r)),
+  lives: () => fetch('/api/lives').then(r => json<string[]>(r)),
+  live: (name: string) => fetch(`/api/lives/${enc(name)}`).then(r => json<LiveSummary>(r)),
+  liveCreate: (name: string, banks: string[], pack: string) => livePost('', { name, banks, pack }),
+  liveBanks: (name: string, banks: string[]) =>
+    fetch(`/api/lives/${enc(name)}/banks`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ banks }) })
+      .then(r => json<LiveSummary>(r)),
+  liveAdd: (name: string, sources: string[], bank: string) => livePost(`/${enc(name)}/add`, { sources, bank }),
+  /** `bank` null : retire du live entier. */
+  liveRemove: (name: string, sources: string[], bank: string | null) => livePost(`/${enc(name)}/remove`, { sources, bank }),
+  liveRename: (name: string, source: string, newName: string) => livePost(`/${enc(name)}/rename`, { source, name: newName }),
+  liveExport: (name: string, dryRun: boolean) =>
+    fetch(`/api/lives/${enc(name)}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })
       .then(r => json<SampleExportReport>(r)),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),

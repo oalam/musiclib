@@ -415,7 +415,7 @@ mutes, FX de transition, principes d'arc).
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
 | 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7), arbre du +Drive par type / code / sous-catégorie et plafond par dossier (7.J8) | fait (7.J1 à 7.J8) ; reste l'écoute elle-même, l'export se rejoue après |
 | 7.K | Coquille du front : barre générale avec télécommande (morceau ou sample : précédent, lecture / pause, boucle, suivant), panneau latéral minimisable à icônes (Morceaux, Samples, Knowledge), filtre des morceaux par tags multiples, tri date / alpha, historique et recherche en ligne dans les propositions | fait (à valider à l'usage) |
-| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), dédoublonnage dans `0-COMMON`, noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 front à venir |
+| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), dédoublonnage dans `0-COMMON`, noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 fait (front : `LivePanel.svelte`, 3e colonne de la vue Samples) |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -895,7 +895,7 @@ révisés par 7.J8) :
   écriture sur les samples répond 409 (le manifeste reconstruit écraserait
   les décisions prises entre-temps). Bilan affiché à la fin.
 
-**Décisions 7.L — lives (arbitrées le 2026-10-13, 7.L1 faite)** :
+**Décisions 7.L — lives (arbitrées le 2026-10-13, 7.L1 et 7.L2 faites)** :
 - La grille 16 tracks de [[digitakt/doctrine]] §1 **fait foi**, révisée le
   2026-10-13 : 1 kick, 2 rumble / sub, 3 clap / snare, 4 ride, 5 hat fermé,
   6 hat ouvert, 7-8 percs, 9 basse, 10 lead, 11 atmo, 12 vocal, 13-14
@@ -939,6 +939,12 @@ révisés par 7.J8) :
   ignorée) ; l'export de la lib et celui des lives partagent `samples.sync`.
   L'ordre des codes de la grille Samples du front suit déjà la grille révisée
   (CY avant HH / OH).
+- Arbitrages en session de code 7.L2 (2026-10-13) : panneau du live en
+  troisième colonne de la vue Samples, ouvert par un bouton « Live » ; la
+  banque active (clic sur sa ligne) reçoit les ajouts au clavier (`L`) ; un
+  dépôt sur une ligne ajoute à cette banque (la branche suit le code) ;
+  banques modifiées par une saisie séparée par des espaces, confirmation si
+  des samples sortent du live ; badge des banques sur les samples de la lib.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

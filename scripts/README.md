@@ -923,7 +923,17 @@ envoie tel quel sur le +Drive. Exemple :
 API : `GET/POST /api/lives`, `GET /api/lives/{live}` (bilan par dossier et
 RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
 (`bank` absent : retire du live), `POST .../rename`, `POST .../export`
-(`dry_run`, vrai par défaut). Pas encore d'écran dans le front (7.L2).
+(`dry_run`, vrai par défaut).
+
+Front (7.L2, `web/src/lib/LivePanel.svelte`) : bouton « Live » de la vue
+Samples, panneau en troisième colonne. Sélecteur de live (ou création :
+nom, pack, banques séparées par des espaces), jauge de RAM, grille banques
+× branches (clic sur une banque : banque active ; sur un compteur : son
+dossier, rouge au-delà de 64), liste avec écoute au clic, renommage au
+double-clic, retrait par banque ou du live, export (bilan puis copie).
+Ajout : glisser des samples de la liste sur une ligne de banque, ou `L`
+(sélection, sinon sample en cours) vers la banque active. Les samples du
+live portent le badge de leurs banques dans la liste de la lib.
 
 ```bash
 python -m pytest tests/test_lives.py             # unitaires

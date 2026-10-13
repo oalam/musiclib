@@ -128,6 +128,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L2] Front des lives (`web/src/lib/LivePanel.svelte`) : bouton « Live »
+  de la vue Samples, panneau en troisième colonne avec sélecteur et
+  création de live, jauge de RAM du projet, grille banques × branches
+  (plafond 64 en rouge), liste du dossier ou de la banque (écoute,
+  renommage DT2 au double-clic, retrait par banque ou du live), export
+  bilan puis copie vers `Live/00-live/<live>`. Ajout par glisser-déposer
+  sur une banque ou `L` vers la banque active ; badge des banques du live
+  sur les samples de la lib.
 - [7.L1] Lives : `analyzer/lives.py` (live = `library/lives/<live>.json`,
   banques, samples du catalogue par banque et branche, `0-COMMON` pour un
   sample partagé, noms DT2 modifiables, pack du live pour les samples

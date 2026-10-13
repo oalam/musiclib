@@ -19,11 +19,15 @@
   // etoiles ; ET entre facettes, OU dans une facette ; filtre toute la page.
   // Propositions : historique des filtres en plus des facettes ; deck de la
   // telecommande de la barre generale (lecture, boucle, sample precedent / suivant).
+  // Lives (7.L2) : bouton Live, panneau en troisieme colonne (LivePanel) ;
+  // L ajoute la selection a la banque active, glisser sur une ligne de banque ;
+  // badge des banques du live sur les samples de la liste.
   import { onDestroy, onMount } from 'svelte'
   import WaveSurfer from 'wavesurfer.js'
   import { remote } from './remote.svelte'
   import { focus } from './focus.svelte'
   import { loadHistory, pushHistory } from './history'
+  import LivePanel from './LivePanel.svelte'
   import { api, type LooseSample, type SampleCell, type SampleEntry, type SampleExportReport, type SampleKit, type SampleKits, type SampleStatus, type FacetTag, type FacetNote, type FacetBpm, type SampleFilter, type RebuildStatus } from './api'
 
   const FLAG_HELP: Record<string, string> = {
@@ -119,6 +123,17 @@
   let kit = $state('')
   let kitData = $state<SampleKits>({ kits: [], tags: {} })
   let kitTagInput = $state('')
+
+  // lives (7.L2) : panneau ouvert ou non, banques du live choisi par source
+  const LIVE_PANEL_KEY = 'ui:live-panel'
+  let liveOpen = $state(false)
+  let inLive = $state(new Map<string, string[]>())
+  let livePanel: LivePanel | undefined = $state()
+  function toggleLive() {
+    liveOpen = !liveOpen
+    if (!liveOpen) inLive = new Map()
+    try { localStorage.setItem(LIVE_PANEL_KEY, liveOpen ? '1' : '') } catch { /* stockage indisponible */ }
+  }
 
   let container: HTMLDivElement | undefined = $state()
   let ws: WaveSurfer | null = null
@@ -675,7 +690,7 @@
   function onDragStart(ev: DragEvent, source: string) {
     const sources = sel.has(source) ? [...sel] : [source]
     ev.dataTransfer?.setData('text/plain', sources.join('\n'))
-    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'move'
+    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'copyMove'   // copie : ajout a un live
     dragging = sources
   }
 
@@ -809,6 +824,7 @@
     else if (k === 'r' || k === 'R') toggleReserve()
     else if (k === 'm' || k === 'M') startMove()
     else if (k === 't' || k === 'T') tagField?.focus()
+    else if ((k === 'l' || k === 'L') && liveOpen) livePanel?.add(targets())
     else if (k >= '0' && k <= '5') stars(k === '0' ? null : Number(k))
     else if ((k === 'Delete' || k === 'Backspace') && !trashView) toTrash()
     else if (k === 'Escape') sel = new Set()
@@ -831,6 +847,7 @@
     ws.on('pause', () => { playing = false })
     ws.on('finish', () => { if (looping) ws?.play(); else playing = false })
     try { kit = localStorage.getItem(KIT_KEY) ?? ''; showReserve = kit !== '' } catch { /* stockage indisponible */ }
+    try { liveOpen = !!localStorage.getItem(LIVE_PANEL_KEY) } catch { /* stockage indisponible */ }
     // reanalyse lancee avant un rechargement de la page : on reprend le suivi
     api.sampleRebuildStatus().then(r => { if (r.status === 'running') { rebuild = r; followRebuild() } }).catch(() => {})
     try {
@@ -906,7 +923,7 @@
   </div>
 {/if}
 
-<div class="samples">
+<div class="samples" class:with-live={liveOpen}>
   <section class="grid">
    <div class="zone matrix">
     <h3 class="lib-title" title="{totals.keep} gardés · {totals.toListen} à écouter sur {totals.selected} retenus{filterOn() ? ' (filtrés)' : ''}. Les chiffres d’un dossier : à écouter / retenus (total).">Library</h3>
@@ -989,6 +1006,8 @@
       <button class="small export-btn" disabled={exporting}
         title="Copie les retenus vers Live/samples (branche / code / sous-dossier / nom DT2), pour Transfer"
         onclick={() => runExport(true)}>{exporting ? 'Export…' : 'Exporter…'}</button>
+      <button class="small" aria-pressed={liveOpen} title="Panneau du live : sélection de la lib par banque, jauge de RAM, export vers Live/00-live"
+        onclick={toggleLive}>Live</button>
     </div>
     {#if rebuild && rebuild.status !== 'idle'}
       <p class="small rebuild" class:err={rebuild.status === 'error'}>
@@ -1127,6 +1146,7 @@
       <kbd>1</kbd>…<kbd>5</kbd> étoiles, <kbd>0</kbd> sans · <kbd>T</kbd> tag ·
       <kbd>↑</kbd><kbd>↓</kbd> sample · <kbd>←</kbd><kbd>→</kbd> case · <kbd>Espace</kbd> rejouer · <kbd>R</kbd> réserve, puis hors plafond ·
       <kbd>⌘</kbd>/<kbd>Maj</kbd>-clic sélection, <kbd>⌘A</kbd> tout, <kbd>Échap</kbd> aucun · glisser vers une case ou la corbeille
+      {#if liveOpen} · <kbd>L</kbd> ajout à la banque active du live, ou glisser sur une banque{/if}
     </p>
     {#if moving}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -1161,6 +1181,7 @@
           {#if e.bpm_est}<span class="est" title="tempo estimé par l’audio, non confirmé par la durée">~{e.bpm} bpm</span>{/if}
           {#if e.note_src === 'mesure'}<span class="est" title="note mesurée dans l’audio ({e.note_hz} Hz), à vérifier à l’oreille">~{e.note}</span>{/if}
           {#each e.flags ?? [] as f}<span class="flag" title={FLAG_HELP[f] ?? f}>{f}</span>{/each}
+          {#if inLive.has(e.source)}<span class="inlive" title="dans le live : {inLive.get(e.source)?.join(', ')}">{inLive.get(e.source)?.join(' · ')}</span>{/if}
           <span class="src muted small" title={e.source}>{e.source}</span>
         </button>
         {#each e.tags as t}
@@ -1220,10 +1241,13 @@
     {/if}
     {#if view && !visible.length}<p class="muted small">{filterOn() ? 'Aucun sample ne répond au filtre.' : 'Liste vide.'}</p>{/if}
   </section>
+  {#if liveOpen}<LivePanel bind:this={livePanel} bind:inLive play={pick} />{/if}
 </div>
 
 <style>
   .samples { display: grid; grid-template-columns: minmax(280px, 440px) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 12px 16px; padding: 12px 16px; height: 100%; min-height: 0; }
+  .samples.with-live { grid-template-columns: minmax(280px, 400px) minmax(0, 1fr) minmax(300px, 400px); }
+  .inlive { font-size: 10px; padding: 0 4px; border-radius: 3px; border: 1px solid var(--accent); color: var(--accent); white-space: nowrap; }
   .searchbar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
   .search-in { position: relative; flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; background: var(--panel); }
   .search-in input { flex: 1; min-width: 12em; border: 0; outline: none; background: none; color: var(--text); font-size: 13px; padding: 3px 0; }
@@ -1381,7 +1405,7 @@
   .layerpick { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 8px;
     background: var(--panel); border: 1px solid var(--accent); border-radius: 6px; padding: 6px 12px; box-shadow: 0 4px 16px rgb(0 0 0 / 0.3); }
   @media (max-width: 900px) {
-    .samples { grid-template-columns: 1fr; height: auto; }
+    .samples, .samples.with-live { grid-template-columns: 1fr; height: auto; }
     .matrix, .kits { flex: none; max-height: 50vh; }
     .list { max-height: 60vh; }
   }
