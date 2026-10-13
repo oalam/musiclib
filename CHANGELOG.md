@@ -155,6 +155,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   Liée depuis l'index et `midi-config`.
 - [7.D] Template Controller Editor `digitakt/maschine/DT2 Pads.ncm2`
   (Maschine MK2) : pads sur le canal 10, contrôles désactivés, 8 groupes
+- [7.D] Fiche KB `oneshots-synthe` (lot 3, n° 36) : one-shots mélodiques
+  depuis un synthé (contraintes imposées par la DT2, réglages du synthé,
+  note de référence et `TUNE`, longueurs, boucle FORWARD LOOP, tessiture
+  par preset lock, accords parallèles, nommage des octaves Elektron).
   (une note, chromatique, éolien, phrygien, dorien, mineur harmonique,
   phrygien dominant, penta mineure). Fiche `controleur-maschine` : import,
   tonalité réglée par `TUNE` sur la DT2.

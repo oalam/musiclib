@@ -74,6 +74,7 @@ Pour ne voir que ce qui reste à tester sur la machine : ajouter
 | 30 | [[slice-breaks]] | A.2.5, A.2.6, §8.5.4 | draft |
 | 31 | [[kick-mental-vst]] | §13.1.1, §13.6.7, A.2.1 | draft |
 | 34 | [[preset-pool]] | §8.5.4, §9.1, §9.3.4, §9.8.2, §10.8.2 | draft |
+| 36 | [[oneshots-synthe]] | §8.4, §9.1, §13.1, A.2.1, A.2.3 | draft |
 
 ## Lot 4 — Structurer le set, puis le jouer
 
