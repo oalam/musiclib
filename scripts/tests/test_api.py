@@ -723,6 +723,13 @@ def test_lives_flow(tmp_path: Path):
     assert client.post("/api/lives/solaris/add",
                        json={"sources": ["k/absent.wav"], "bank": "A-HALF"}).status_code == 422
 
+    r = client.post("/api/lives/solaris/key", json={"bank": "A-HALF", "key": "Fa m"})
+    assert r.json()["live"]["keys"] == {"A-HALF": "Fa m"}
+    assert client.post("/api/lives/solaris/key", json={"bank": "Z-NONE", "key": "La m"}).status_code == 422
+    r = client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 165})
+    assert r.json()["live"]["tempos"] == {"A-HALF": 165.0}
+    assert client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 10}).status_code == 422
+
     r = client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD F Tribe slr"})
     assert r.json()["live"]["items"][0]["name"] == "BD F Tribe slr"
 

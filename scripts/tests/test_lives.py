@@ -100,6 +100,37 @@ def test_set_banks_drops_removed(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert [(it.source, it.banks) for it in live.items] == [("k/kick.wav", ["A-HALF"])]
 
 
+def test_set_key_and_banks_drop_it(tmp_path: Path):
+    live = _live(tmp_path)
+    lv.set_key(live, "A-HALF", "  Fa   m ")
+    lv.set_key(live, "B-DNB", "Sol m")
+    lv.set_key(live, lv.COMMON, "Fa m")
+    assert live.keys == {"A-HALF": "Fa m", "B-DNB": "Sol m", lv.COMMON: "Fa m"}
+    lv.set_key(live, "B-DNB", "")
+    assert "B-DNB" not in live.keys
+    with pytest.raises(lv.LiveError):
+        lv.set_key(live, "Z-NONE", "La m")
+    with pytest.raises(lv.LiveError):
+        lv.set_key(live, "A-HALF", "x" * (lv.KEY_MAX + 1))
+    lv.set_banks(live, ["B-DNB"])
+    assert live.keys == {lv.COMMON: "Fa m"}
+
+
+def test_set_tempo_and_banks_drop_it(tmp_path: Path):
+    live = _live(tmp_path)
+    lv.set_tempo(live, "A-HALF", 165.04)
+    lv.set_tempo(live, "B-DNB", 172)
+    assert live.tempos == {"A-HALF": 165.0, "B-DNB": 172.0}
+    lv.set_tempo(live, "B-DNB", None)
+    assert "B-DNB" not in live.tempos
+    with pytest.raises(lv.LiveError):
+        lv.set_tempo(live, "A-HALF", 400)
+    with pytest.raises(lv.LiveError):
+        lv.set_tempo(live, "Z-NONE", 170)
+    lv.set_banks(live, ["B-DNB"])
+    assert live.tempos == {}
+
+
 def test_ram_at_dt2_format(tmp_path: Path):
     _wav(tmp_path / "a.wav", 1.0, sr=44_100, channels=2)
     assert lv.ram_bytes(tmp_path / "a.wav") == 48_000 * 2 * 2   # 48 kHz / 16 bits, stereo

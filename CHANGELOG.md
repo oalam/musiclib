@@ -132,6 +132,22 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L2] Panneau du live : dépôt de samples directement sur la liste de
+  la banque en cours (titre ou fichiers), en plus des lignes de la grille.
+- [7.L2] Tempo par banque d'un live (`tempos`, `lives.set_tempo`, route
+  `POST /api/lives/{live}/tempo`), champ BPM de la banque active dans le
+  panneau du live. Espace tenu dans la vue Samples : le sample en cours
+  est relancé à chaque temps à ce tempo (Web Audio, `web/src/lib/retrig.ts`,
+  fondu de 5 ms à chaque coupe), arrêt au relâchement ; sans tempo, Espace
+  rejoue une fois.
+- [7.L2] Tonalité par banque d'un live : champ `keys` du live
+  (`lives.set_key`, texte libre de 12 caractères), route
+  `POST /api/lives/{live}/key` ; dans le panneau du live, double-clic sur
+  une banque pour la saisir, affichée entre parenthèses
+  (`A-HALF (Fa m)`). Grille resserrée : noms de banque sur une ligne,
+  tonalité abrégée si elle est longue, une ligne par sample dans la liste ;
+  colonne Live élargie (au moins 320 px, puis partage 1 / 1,3 avec la
+  liste du milieu).
 - [7.L2] Front des lives (`web/src/lib/LivePanel.svelte`) : bouton « Live »
   de la vue Samples, panneau en troisième colonne avec sélecteur et
   création de live, jauge de RAM du projet, grille banques × branches

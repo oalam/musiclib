@@ -922,17 +922,24 @@ envoie tel quel sur le +Drive. Exemple :
 
 API : `GET/POST /api/lives`, `GET /api/lives/{live}` (bilan par dossier et
 RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
-(`bank` absent : retire du live), `POST .../rename`, `POST .../export`
+(`bank` absent : retire du live), `POST .../key` (`bank`, `key` : tonalité
+saisie de la banque, vide pour la retirer), `POST .../tempo` (`bank`, `bpm`
+de 30 à 300, `null` pour le retirer), `POST .../rename`, `POST .../export`
 (`dry_run`, vrai par défaut).
 
 Front (7.L2, `web/src/lib/LivePanel.svelte`) : bouton « Live » de la vue
 Samples, panneau en troisième colonne. Sélecteur de live (ou création :
 nom, pack, banques séparées par des espaces), jauge de RAM, grille banques
-× branches (clic sur une banque : banque active ; sur un compteur : son
+× branches (clic sur une banque : banque active ; double-clic : sa tonalité,
+affichée entre parenthèses, ex. `A-HALF (Fa m)` ; clic sur un compteur : son
 dossier, rouge au-delà de 64), liste avec écoute au clic, renommage au
 double-clic, retrait par banque ou du live, export (bilan puis copie).
-Ajout : glisser des samples de la liste sur une ligne de banque, ou `L`
-(sélection, sinon sample en cours) vers la banque active. Les samples du
+Ajout : glisser des samples de la liste sur une ligne de banque ou sur la
+liste de la banque en cours, ou `L`
+(sélection, sinon sample en cours) vers la banque active. Champ BPM de la
+banque active (titre de la liste) : Espace tenu relance le sample en cours
+à chaque temps à ce tempo, relâché il l'arrête ; sans tempo, Espace rejoue
+une fois. Les samples du
 live portent le badge de leurs banques dans la liste de la lib.
 
 ```bash

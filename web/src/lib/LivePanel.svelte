@@ -42,6 +42,9 @@
   let newBanks = $state('A-HALF B-DNB C-TRIBE D-RESPI E-SATURE F-JOKER')
   let editingBanks = $state(false)
   let banksText = $state('')
+  // tonalite d'une banque, saisie en place (double-clic sur la banque)
+  let keying = $state<string | null>(null)
+  let keyText = $state('')
   // renommage DT2 en place
   let renaming = $state<string | null>(null)
   let renameText = $state('')
@@ -118,12 +121,40 @@
   }
 
   /** Ajout a une banque (L ou depot) ; tout ou rien cote API. */
+  /** Tempo de la banque active (Espace tenu dans la vue Samples), null sans live ou sans tempo. */
+  export function tempo(): number | null {
+    return sum?.live.tempos[bank] ?? null
+  }
+
+  async function saveTempo(ev: Event) {
+    const v = (ev.target as HTMLInputElement).value.trim()
+    const bpm = v ? Number(v.replace(',', '.')) : null
+    if (bpm !== null && !Number.isFinite(bpm)) return
+    await run(() => api.liveTempo(current, bank, bpm))
+  }
+
   export async function add(sources: string[], to: string = bank) {
     if (!current || !sources.length) return
     if (await run(() => api.liveAdd(current, sources, to))) { bank = to; folder = '' }
   }
 
   const remove = (sources: string[], from: string | null) => run(() => api.liveRemove(current, sources, from))
+
+  function startKey(b: string) {
+    keying = b
+    keyText = sum?.live.keys[b] ?? ''
+  }
+
+  async function saveKey() {
+    const b = keying
+    if (!b) return
+    if (await run(() => api.liveKey(current, b, keyText))) keying = null
+  }
+
+  function onKeyKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') { e.preventDefault(); saveKey() }
+    else if (e.key === 'Escape') { e.preventDefault(); keying = null }
+  }
 
   function startRename(it: LiveItem) {
     renaming = it.source
@@ -234,9 +265,14 @@
           <tr class:active={bank === b} class:over={dropBank === b}
             ondragover={e => onDragOver(e, b)} ondragleave={() => { if (dropBank === b) dropBank = null }} ondrop={e => onDrop(e, b)}>
             <th>
+              {#if keying === b}
+                <!-- svelte-ignore a11y_autofocus -->
+                <span class="keyedit">{b} (<input autofocus maxlength="12" placeholder="Fa m" bind:value={keyText} onkeydown={onKeyKey} onblur={() => (keying = null)} />)</span>
+              {:else}
               <button class="bank" class:on={bank === b && !folder}
-                title="{b} : {rowFiles(b)} fichiers{b === COMMON ? ' (samples de plusieurs banques)' : usedBy(b) ? `, plus ${usedBy(b)} rangés dans ${COMMON}` : ''} · clic : banque active (L), dépôt : ajout"
-                onclick={() => { bank = b; folder = '' }}>{b}</button>
+                title="{b} : {rowFiles(b)} fichiers{b === COMMON ? ' (samples de plusieurs banques)' : usedBy(b) ? `, plus ${usedBy(b)} rangés dans ${COMMON}` : ''} · clic : banque active (L), double-clic : tonalité, dépôt : ajout"
+                onclick={ev => { if (ev.detail < 2) { bank = b; folder = '' } }} ondblclick={() => startKey(b)}><span class="bname">{b}</span>{#if s.live.keys[b]}<span class="key" title={s.live.keys[b]}>({s.live.keys[b]})</span>{/if}</button>
+              {/if}
             </th>
             {#each BRANCHES as br}
               {@const f = byPath.get(`${b}/${br}`)}
@@ -253,9 +289,19 @@
       </tbody>
     </table>
 
+    <!-- depot sur la liste : ajout a la banque en cours -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div class="dropzone" class:over={dropBank === ':list'}
+      ondragover={e => onDragOver(e, ':list')} ondragleave={() => { if (dropBank === ':list') dropBank = null }}
+      ondrop={e => onDrop(e, bank)}>
     <h4 class="small">
       {folder ? folder.replace('/', ' / ') : bank}
+      {#if s.live.keys[bank]}<span class="key">({s.live.keys[bank]})</span>{/if}
       <span class="muted">· {shown.length} fichier{shown.length > 1 ? 's' : ''}</span>
+      <label class="bpm muted" title="Tempo de {bank} : Espace tenu relance le sample en cours à chaque temps">
+        <input type="number" min="30" max="300" step="0.1" placeholder="—" value={s.live.tempos[bank] ?? ''}
+          onchange={saveTempo} onkeydown={e => { if (e.key === 'Enter' || e.key === 'Escape') (e.target as HTMLElement).blur() }} /> BPM
+      </label>
     </h4>
     <ul class="items small">
       {#each shown as it (it.source)}
@@ -279,9 +325,10 @@
           <button class="untag out" disabled={busy} title="Retirer du live" onclick={() => remove([it.source], null)}>retirer</button>
         </li>
       {:else}
-        <li class="muted">Vide : glisse des samples sur une ligne de banque, ou <kbd>L</kbd> pour la banque active.</li>
+        <li class="muted">Vide : glisse des samples ici ou sur une ligne de banque, ou <kbd>L</kbd> pour la banque active.</li>
       {/each}
     </ul>
+    </div>
 
     <div class="foot">
       <button class="small" disabled={exporting || !s.live.items.length}
@@ -315,7 +362,9 @@
   .live { display: flex; flex-direction: column; gap: 6px; min-height: 0; overflow-y: auto; box-sizing: border-box; border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; }
   header { display: flex; gap: 8px; align-items: center; }
   h3 { margin: 0; font-size: 14px; }
-  h4 { margin: 6px 0 0; font-weight: 600; }
+  h4 { display: flex; gap: 6px; align-items: baseline; margin: 6px 0 0; font-weight: 600; }
+  .bpm { margin-left: auto; font-weight: 400; white-space: nowrap; }
+  .bpm input { width: 4.5em; font-size: 12px; }
   .form { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; padding: 6px 8px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
   .form label { display: flex; gap: 4px; align-items: center; }
   .form label.wide { flex: 1 1 100%; }
@@ -328,23 +377,33 @@
   .gauge-txt { margin: 0; }
   .grid { border-collapse: collapse; width: 100%; }
   .grid th, .grid td { padding: 1px 3px; text-align: center; border-bottom: 1px solid var(--border); }
-  .grid thead th { font-weight: 500; color: var(--muted); font-size: 11px; }
+  .grid thead th { font-weight: 500; color: var(--muted); font-size: 10px; }
+  .grid td { width: 2.4em; padding: 1px; }
   .grid tbody th { text-align: left; }
   .grid tr.active th .bank { font-weight: 600; }
   .grid tr.over { outline: 2px dashed var(--accent); outline-offset: -2px; }
-  .bank { border: 0; background: none; padding: 1px 4px; font-family: ui-monospace, monospace; font-size: 12px; cursor: pointer; color: var(--text); }
+  .bank { display: inline-flex; align-items: baseline; gap: 4px; max-width: 100%; border: 0; background: none; padding: 1px 4px; font-family: ui-monospace, monospace; font-size: 12px; text-align: left; white-space: nowrap; cursor: pointer; color: var(--text); }
+  .bname { flex: none; }
   .bank.on { background: var(--accent); color: #fff; border-radius: 3px; }
+  .key { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 400; opacity: 0.8; }
+  .keyedit { font-family: ui-monospace, monospace; font-size: 12px; white-space: nowrap; }
+  .keyedit input { width: 5.5em; font-size: 12px; }
   .cnt { min-width: 2.4em; padding: 0 4px; font-size: 12px; }
   .cnt.cap { border-color: #dc2626; color: #dc2626; }
   .link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 0; cursor: pointer; }
-  .items { list-style: none; margin: 0; padding: 0; }
-  .items li { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 2px 0; border-bottom: 1px solid var(--border); }
-  .pick { border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); text-align: left; }
+  .dropzone { border-radius: 4px; padding-bottom: 6px; }
+  .dropzone.over { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  .items { list-style: none; margin: 0; padding: 0; min-height: 2em; }
+  .items li { display: flex; gap: 6px; align-items: center; padding: 2px 0; border-bottom: 1px solid var(--border); }
+  .items li > * { flex: none; }
+  .items li.muted { display: block; }
+  .items li > .pick, .items li > .rename { flex: 1 1 auto; min-width: 0; }
+  .pick { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; background: none; padding: 0; cursor: pointer; color: var(--text); text-align: left; }
   .pick:hover { color: var(--accent); }
   .rename { width: 14em; font-size: 12px; }
   .mono { font-family: ui-monospace, monospace; }
   .br { font-size: 11px; }
-  .banks { display: inline-flex; gap: 3px; margin-left: auto; flex-wrap: wrap; }
+  .banks { display: inline-flex; gap: 3px; }
   .tag { display: inline-flex; align-items: center; gap: 2px; padding: 0 4px; border: 1px solid var(--border); border-radius: 3px; font-size: 11px; }
   .tag.here { border-color: var(--accent); }
   .untag { border: 0; background: none; padding: 0 2px; cursor: pointer; color: var(--muted); font-size: 11px; }

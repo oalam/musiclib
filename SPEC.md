@@ -945,6 +945,17 @@ révisés par 7.J8) :
   dépôt sur une ligne ajoute à cette banque (la branche suit le code) ;
   banques modifiées par une saisie séparée par des espaces, confirmation si
   des samples sortent du live ; badge des banques sur les samples de la lib.
+- Tonalité par banque (2026-10-13) : saisie à la main (texte libre, 12
+  caractères, ex. « Fa m ») et gardée dans le live (`keys`), affichée
+  entre parenthèses après le nom de la banque ; pas déduite des notes des
+  samples (banque vide, boucles sans note, pivots). Une banque retirée
+  perd sa tonalité.
+- Tempo par banque et Espace tenu (2026-10-13) : BPM saisi par banque
+  (`tempos`, 30 à 300, au dixième) ; Espace tenu dans la vue Samples
+  relance le sample en cours à chaque temps (noire) au tempo de la banque
+  active, coupé au temps suivant s'il est plus long, arrêt au relâchement.
+  Pas de recalage des boucles. Sans live ouvert ou sans tempo : Espace
+  rejoue une fois, comme avant.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

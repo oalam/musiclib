@@ -368,6 +368,16 @@ class LiveRemove(BaseModel):
     bank: str | None = None     # None : retire du live entier
 
 
+class LiveKey(BaseModel):
+    bank: str
+    key: str = ""               # vide : retire la tonalite
+
+
+class LiveTempo(BaseModel):
+    bank: str
+    bpm: float | None = None    # None : retire le tempo
+
+
 class LiveRename(BaseModel):
     source: str
     name: str
@@ -979,6 +989,14 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     @app.post("/api/lives/{name}/remove", response_model=lv.LiveSummary)
     def live_remove(name: str, req: LiveRemove) -> lv.LiveSummary:
         return live_edit(name, lambda live: lv.remove(live, req.sources, req.bank))
+
+    @app.post("/api/lives/{name}/key", response_model=lv.LiveSummary)
+    def live_key(name: str, req: LiveKey) -> lv.LiveSummary:
+        return live_edit(name, lambda live: lv.set_key(live, req.bank, req.key))
+
+    @app.post("/api/lives/{name}/tempo", response_model=lv.LiveSummary)
+    def live_tempo(name: str, req: LiveTempo) -> lv.LiveSummary:
+        return live_edit(name, lambda live: lv.set_tempo(live, req.bank, req.bpm))
 
     @app.post("/api/lives/{name}/rename", response_model=lv.LiveSummary)
     def live_rename(name: str, req: LiveRename) -> lv.LiveSummary:

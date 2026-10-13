@@ -53,6 +53,8 @@ RAM_LIMIT = 400_000_000          # 400 Mo par projet (manuel §9.1)
 LIVE_NAME = re.compile(r"[a-z0-9][a-z0-9_-]{0,31}")
 BANK_NAME = re.compile(r"[A-Z1-9][A-Z0-9-]{0,15}")   # 0-... reserve a 0-COMMON
 PACK_NAME = re.compile(r"[a-z0-9]{2,4}")
+KEY_MAX = 12                     # tonalite d'une banque, texte libre (Fa m, sol mineur)
+TEMPO_RANGE = (30.0, 300.0)      # BPM de la DT2
 EXPORT_SUFFIX = ".export.json"
 
 
@@ -80,6 +82,8 @@ class Live(BaseModel):
     name: str
     pack: str = ""                   # pack des samples maison du live (famille SAMPLE), ex. slr
     banks: list[str] = Field(default_factory=list)   # sans 0-COMMON, toujours present
+    keys: dict[str, str] = Field(default_factory=dict)  # tonalite saisie par banque (ex. A-HALF : Fa m)
+    tempos: dict[str, float] = Field(default_factory=dict)  # BPM par banque (ecoute au clavier du front)
     items: list[LiveItem] = Field(default_factory=list)
 
 
@@ -183,6 +187,34 @@ def set_banks(live: Live, banks: list[str]) -> None:
     for it in live.items:
         it.banks = _ordered(live, [b for b in it.banks if b in kept])
     live.items = [it for it in live.items if it.banks]
+    live.keys = {b: k for b, k in live.keys.items() if b in kept}
+    live.tempos = {b: t for b, t in live.tempos.items() if b in kept}
+
+
+def set_tempo(live: Live, bank: str, bpm: float | None) -> None:
+    """Tempo d'une banque (ou de 0-COMMON), arrondi au dixieme ; None : retire."""
+    if bank != COMMON and bank not in live.banks:
+        raise LiveError(f"banque absente du live : {bank}")
+    if bpm is None:
+        live.tempos.pop(bank, None)
+        return
+    lo, hi = TEMPO_RANGE
+    if not lo <= bpm <= hi:
+        raise LiveError(f"tempo hors plage : {bpm} ({lo:g} a {hi:g} BPM)")
+    live.tempos[bank] = round(bpm, 1)
+
+
+def set_key(live: Live, bank: str, key: str) -> None:
+    """Tonalite d'une banque du live (ou de 0-COMMON) ; vide : retiree."""
+    if bank != COMMON and bank not in live.banks:
+        raise LiveError(f"banque absente du live : {bank}")
+    key = " ".join(key.split())
+    if len(key) > KEY_MAX:
+        raise LiveError(f"tonalite trop longue : {key!r} ({KEY_MAX} caracteres au plus)")
+    if key:
+        live.keys[bank] = key
+    else:
+        live.keys.pop(bank, None)
 
 
 def _ordered(live: Live, banks: list[str]) -> list[str]:

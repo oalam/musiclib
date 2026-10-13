@@ -352,7 +352,7 @@ export interface LiveItem {
   /** banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques */
   folder: string
 }
-export interface Live { name: string; pack: string; banks: string[]; items: LiveItem[] }
+export interface Live { name: string; pack: string; banks: string[]; keys: Record<string, string>; tempos: Record<string, number>; items: LiveItem[] }
 export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean }
 export interface LiveSummary { live: Live; folders: LiveFolder[]; ram: number; ram_limit: number; unknown_ram: number }
 /** Case = dossier final du +Drive (7.J8) : DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX. */
@@ -584,6 +584,10 @@ export const api = {
   liveAdd: (name: string, sources: string[], bank: string) => livePost(`/${enc(name)}/add`, { sources, bank }),
   /** `bank` null : retire du live entier. */
   liveRemove: (name: string, sources: string[], bank: string | null) => livePost(`/${enc(name)}/remove`, { sources, bank }),
+  /** Tonalite d'une banque, texte libre ; vide : retiree. */
+  liveKey: (name: string, bank: string, key: string) => livePost(`/${enc(name)}/key`, { bank, key }),
+  /** Tempo d'une banque (30 a 300 BPM) ; null : retire. */
+  liveTempo: (name: string, bank: string, bpm: number | null) => livePost(`/${enc(name)}/tempo`, { bank, bpm }),
   liveRename: (name: string, source: string, newName: string) => livePost(`/${enc(name)}/rename`, { source, name: newName }),
   liveExport: (name: string, dryRun: boolean) =>
     fetch(`/api/lives/${enc(name)}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })
