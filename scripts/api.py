@@ -36,6 +36,7 @@ En dev du front : `npm run dev` dans web/ (proxy /api → 8765).
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import subprocess
 import threading
@@ -104,6 +105,7 @@ from analyzer.samples import (
 from analyzer import lives as lv
 from analyzer import sounddesign as sd
 from analyzer.samples import move as move_sample
+from analyzer.samples import write_varispeed
 from analyzer.samples import restore as restore_sample
 from analyzer.samples import trash as trash_sample
 from analyzer.types import CuePoint, DigitaktBank, Segment
@@ -1013,6 +1015,23 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         media_or_503()   # la RAM se remesure sur le fichier source
         m = manifest()
         return live_edit(name, lambda live: lv.tune_bank(live, m, req.bank, samples_src, req.reset))
+
+    @app.get("/api/lives/{name}/audio")
+    def live_audio(name: str, source: str) -> Response:
+        """Ecoute d'un sample du live tel qu'exporte : transpose en varispeed
+        par l'accordage de sa banque (meme rendu que l'export), sinon tel quel."""
+        media_or_503()
+        it = next((i for i in live_or_error(name).items if i.source == source), None)
+        if it is None:
+            raise HTTPException(404, f"sample absent du live : {source}")
+        path = samples_src / source
+        if not path.is_file():
+            raise HTTPException(404, f"fichier absent : {source}")
+        if not it.shift:
+            return FileResponse(path, media_type="audio/wav")
+        buf = io.BytesIO()
+        write_varispeed(path, buf, it.shift)
+        return Response(buf.getvalue(), media_type="audio/wav")
 
     @app.post("/api/lives/{name}/export", response_model=ExportReport)
     def live_export(name: str, req: SampleExport) -> ExportReport:

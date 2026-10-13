@@ -931,10 +931,11 @@ RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
 (`bank` absent : retire du live), `POST .../key` (`bank`, `key` : tonalité
 saisie de la banque, vide pour la retirer), `POST .../tempo` (`bank`, `bpm`
 de 30 à 300, `null` pour le retirer), `POST .../tune` (`bank`, `reset` :
-accorde ou désaccorde la banque), `POST .../rename`, `POST .../export`
+accorde ou désaccorde la banque), `GET .../audio?source=` (écoute telle
+qu'exportée : rendu varispeed si le sample est accordé), `POST .../rename`, `POST .../export`
 (`dry_run`, vrai par défaut).
 
-Accordage (7.L4, `lives.tune_bank`) : les BD, RM et BS (`TUNABLE`) rangés
+Accordage (7.L4, `lives.tune_bank`) : les BD, RM, BS, PD et ST (`TUNABLE`) rangés
 dans la banque sont ramenés sur la tonique de sa tonalité (`key_root` lit
 `Fa m`, `sol mineur`, `Si bémol`, `F#m`, `Bb`), par le plus court chemin de
 -6 à +5 demi-tons (à égalité on descend : un kick monté perd sa queue). Ex. :
@@ -961,7 +962,8 @@ banque active (titre de la liste) : Espace tenu relance le sample en cours
 une fois. Lien « accorder » à côté (banque avec tonalité et kicks, rumbles
 ou basses) et « désaccorder » une fois accordée ; bilan sous le titre
 (transposés, déjà dans le ton, sans note connue) ; badge bleu `+2` / `-4`
-sur les samples transposés (l'écoute reste à la hauteur d'origine). Les samples du
+sur les samples transposés ; un clic sur leur nom les fait entendre tels
+qu'exportés (aussi pour Espace tenu). Les samples du
 live portent le badge de leurs banques dans la liste de la lib.
 
 ```bash

@@ -91,6 +91,7 @@
   let view = $state<View | null>(null)
   let entries = $state<SampleEntry[]>([])
   let cursor = $state<string | null>(null)    // source du sample en cours
+  let cursorUrl = $state('')                    // audio du sample en cours (rendu accorde d'un live)
   let sel = $state<Set<string>>(new Set())    // selection multiple (Cmd / Maj)
   let anchor: string | null = null            // origine d'une plage Maj-clic
   // filtre local de la liste du milieu (7.L3) : tags ou styles, ET entre eux
@@ -548,11 +549,12 @@
     await open({ kind: 'cell', folder }, source)
   }
 
-  function pick(source: string | null) {
+  function pick(source: string | null, url?: string) {
     if (source !== quiet) quiet = null
     cursor = source
     if (!source || !ws) return
-    ws.load(api.sampleAudioUrl(source)).catch(() => { /* chargement remplace par le suivant */ })
+    cursorUrl = url ?? api.sampleAudioUrl(source)
+    ws.load(cursorUrl).catch(() => { /* chargement remplace par le suivant */ })
     queueMicrotask(() => document.getElementById(`s-${source}`)?.scrollIntoView({ block: 'nearest' }))
   }
 
@@ -743,7 +745,7 @@
       // live (arret au relachement) ; sans tempo, rejoue une fois
       const bpm = liveOpen ? livePanel?.tempo() : null
       if (e.repeat) { /* deja lance */ }
-      else if (bpm && cursor) { ws?.pause(); retrig.start(api.sampleAudioUrl(cursor), bpm) }
+      else if (bpm && cursor) { ws?.pause(); retrig.start(cursorUrl, bpm) }
       else { ws?.stop(); ws?.play() }
     }
     else if (k === 't' || k === 'T') tagField?.focus()

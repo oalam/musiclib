@@ -5,6 +5,7 @@ Lancer (depuis scripts/) :
 """
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 
@@ -700,7 +701,7 @@ def test_lives_flow(tmp_path: Path):
     (src / "k").mkdir(parents=True)
     sf.write(src / "k" / "kick.wav", [0.0] * 48_000, 48_000)
     entries = [SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
-                           name="BD F Hard 01 k", duration=1.0, rank=1)]
+                           name="BD F Hard 01 k", duration=1.0, rank=1, note="F")]
     manifest = tmp_path / "manifest.json"
     api.samples.save_manifest(Manifest(source_root=str(src), total=1, entries=entries), manifest)
     lib = tmp_path / "library.md"
@@ -741,6 +742,14 @@ def test_lives_flow(tmp_path: Path):
     assert not (tmp_path / "00-live").exists()
     client.post("/api/lives/solaris/export", json={"dry_run": False})
     assert (tmp_path / "00-live" / "solaris" / "0-COMMON" / "DRUMS" / "BD F Tribe slr.wav").is_file()
+    r = client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav"})
+    assert r.status_code == 200 and len(r.content) > 96_000                 # tel quel
+    client.post("/api/lives/solaris/key", json={"bank": "0-COMMON", "key": "Sol"})
+    r = client.post("/api/lives/solaris/tune", json={"bank": "0-COMMON"})
+    assert r.json()["live"]["items"][0]["shift"] == 2
+    r = client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav"})
+    assert r.status_code == 200 and sf.info(io.BytesIO(r.content)).frames == pytest.approx(48_000 / 2 ** (2 / 12), abs=2)
+    assert client.get("/api/lives/solaris/audio", params={"source": "x.wav"}).status_code == 404
 
     r = client.put("/api/lives/solaris/banks", json={"banks": ["B-DNB"]})
     assert r.json()["folders"][0]["path"] == "B-DNB/DRUMS"

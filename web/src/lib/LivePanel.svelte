@@ -13,8 +13,8 @@
     play,
     inLive = $bindable(new Map<string, string[]>()),
   }: {
-    /** Ecoute d'un sample du live dans le lecteur de la vue Samples. */
-    play: (source: string) => void
+    /** Ecoute d'un sample du live dans le lecteur de la vue Samples ; url : rendu accorde. */
+    play: (source: string, url?: string) => void
     /** source -> banques du live choisi (badges de la liste de la lib). */
     inLive?: Map<string, string[]>
   } = $props()
@@ -23,7 +23,7 @@
   const BRANCHES = ['DRUMS', 'TONAL', 'LOOPS', 'FX', 'VX']   // lives.LIVE_BRANCHES
   const CAP = 64                                              // lives.LIVE_CAP
   const NAME_MAX = 18
-  const TUNABLE = ['BD', 'RM', 'BS']                          // lives.TUNABLE
+  const TUNABLE = ['BD', 'RM', 'BS', 'PD', 'ST']              // lives.TUNABLE
   const LIVE_KEY = 'ui:live'
   const NEW = ':new'
 
@@ -170,6 +170,11 @@
     tuneInfo = { bank: b, text: reset ? `${items.length} remis à leur hauteur d'origine`
       : `${moved} transposé${moved > 1 ? 's' : ''}, ${items.length - moved - unknown} déjà dans le ton`
         + (unknown ? `, ${unknown} sans note connue` : '') }
+  }
+
+  /** Ecoute telle qu'exportee : rendu varispeed de l'API si le sample est accorde. */
+  function listen(it: LiveItem) {
+    play(it.source, it.shift ? api.liveAudioUrl(current, it.source, it.shift) : undefined)
   }
 
   const fmtShift = (n: number) => (n > 0 ? `+${n}` : `${n}`)
@@ -322,7 +327,7 @@
       </label>
       {#if tunable.length}
         <button class="small link" disabled={busy || !s.live.keys[bank]}
-          title={s.live.keys[bank] ? `Ramène les kicks, rumbles et basses de ${bank} sur la tonique de ${s.live.keys[bank]} (varispeed à l'export, la lib n'est pas touchée)` : `Saisir d'abord la tonalité de ${bank} (double-clic sur la banque)`}
+          title={s.live.keys[bank] ? `Ramène les kicks, rumbles, basses, pads et stabs de ${bank} sur la tonique de ${s.live.keys[bank]} (varispeed à l'export, la lib n'est pas touchée)` : `Saisir d'abord la tonalité de ${bank} (double-clic sur la banque)`}
           onclick={() => tune(false)}>accorder</button>
         {#if shifted}<button class="small link" disabled={busy} title="Remet les samples de {bank} à leur hauteur d'origine" onclick={() => tune(true)}>désaccorder</button>{/if}
       {/if}
@@ -337,10 +342,10 @@
             <span class="muted">{renameText.length}/{NAME_MAX}</span>
           {:else}
             <button class="pick mono" title="{it.source} · clic : écouter, double-clic : renommer"
-              onclick={ev => { if (ev.detail < 2) play(it.source) }} ondblclick={() => startRename(it)}>{it.name}</button>
+              onclick={ev => { if (ev.detail < 2) listen(it) }} ondblclick={() => startRename(it)}>{it.name}</button>
           {/if}
           {#if !folder}<span class="muted br">{it.branch}</span>{/if}
-          {#if it.shift}<span class="flag shift" title="{it.note} → transposé de {fmtShift(it.shift)} demi-ton{Math.abs(it.shift) > 1 ? 's' : ''} à l'export (varispeed ; l'écoute ici reste à la hauteur d'origine)">{fmtShift(it.shift)}</span>{/if}
+          {#if it.shift}<span class="flag shift" title="{it.note} → transposé de {fmtShift(it.shift)} demi-ton{Math.abs(it.shift) > 1 ? 's' : ''} à l'export (varispeed ; clic sur le nom : écoute accordée)">{fmtShift(it.shift)}</span>{/if}
           {#if it.ram == null}<span class="flag" title="en-tête illisible : RAM non comptée">ram ?</span>{/if}
           <span class="banks">
             {#each it.banks as b}

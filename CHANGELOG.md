@@ -155,6 +155,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L4] Écoute accordée dans le panneau du live : un sample transposé est
+  joué tel qu'exporté (forme d'onde, lecture et Espace tenu), rendu par la
+  même fonction que l'export (route `GET /api/lives/{live}/audio?source=`).
+- [7.L4] Accordage étendu aux pads (PD, note mesurée) et aux stabs (ST,
+  note du nom de fichier).
 - [7.L4] Accordage par banque d'un live : bouton « accorder » de la liste
   de la banque active, qui ramène ses kicks, rumbles et basses (BD, RM, BS,
   `lives.TUNABLE`) sur la tonique de sa tonalité (`Fa m`, `sol mineur`,

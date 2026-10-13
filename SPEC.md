@@ -415,7 +415,7 @@ mutes, FX de transition, principes d'arc).
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
 | 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7), arbre du +Drive par type / code / sous-catégorie et plafond par dossier (7.J8) | fait (7.J1 à 7.J8) ; reste l'écoute elle-même, l'export se rejoue après |
 | 7.K | Coquille du front : barre générale avec télécommande (morceau ou sample : précédent, lecture / pause, boucle, suivant), panneau latéral minimisable à icônes (Morceaux, Samples, Knowledge), filtre des morceaux par tags multiples, tri date / alpha, historique et recherche en ligne dans les propositions | fait (à valider à l'usage) |
-| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), dédoublonnage dans `0-COMMON`, noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 fait (front : `LivePanel.svelte`, 3e colonne de la vue Samples) ; 7.L4 fait (accordage des BD / RM / BS d'une banque sur sa tonalité, varispeed à l'export) |
+| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), dédoublonnage dans `0-COMMON`, noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 fait (front : `LivePanel.svelte`, 3e colonne de la vue Samples) ; 7.L4 fait (accordage des BD / RM / BS / PD / ST d'une banque sur sa tonalité, varispeed à l'export, écoute accordée) |
 
 **Décisions 7.I** (arbitrées le 2026-10-07) :
 - Parcours **recherche puis choix** : la requête (ex. « Limitlezz x Maureen -
@@ -961,8 +961,9 @@ révisés par 7.J8) :
   tonalité saisie, par le plus court chemin. Décalage gardé dans le live et
   appliqué à l'export en varispeed (la durée suit, comme le pitch de la
   DT2) ; la lib n'est jamais modifiée et l'accordage s'annule. 0-COMMON
-  n'est accordé que s'il a sa propre tonalité. Candidats à élargir : PD
-  (note mesurée), ST (note du nom).
+  n'est accordé que s'il a sa propre tonalité. Étendu aux pads (PD) et
+  stabs (ST) le même jour. L'écoute du panneau passe par le même rendu que
+  l'export (pas de simulation dans le navigateur).
 - Simplification de la vue Samples (2026-10-13), les lives remplaçant la
   sélection par case : plus de garder / écarter, de réserve ni de plafond
   affichés, plus de rangement (bouton « Case… », `M`, dépôt sur une case,

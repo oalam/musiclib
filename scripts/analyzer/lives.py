@@ -21,7 +21,7 @@ mesuree a l'ajout (en-tete seul) et gardee dans le live.
 Export rejouable : meme copie que l'export de la lib (`samples.sync`), avec
 un index propre au live (`<live>.export.json`).
 
-Accordage par banque : les kicks, rumbles et basses (TUNABLE) d'une banque
+Accordage par banque : les kicks, rumbles, basses, pads et stabs (TUNABLE) d'une banque
 dont la note est connue sont ramenes sur la tonique de sa tonalite, par le
 plus court chemin (-6 a +5 demi-tons). Le decalage est garde dans le live et
 applique a l'export en varispeed (comme le pitch de la DT2 : la duree suit) ;
@@ -66,7 +66,7 @@ PACK_NAME = re.compile(r"[a-z0-9]{2,4}")
 KEY_MAX = 12                     # tonalite d'une banque, texte libre (Fa m, sol mineur)
 TEMPO_RANGE = (30.0, 300.0)      # BPM de la DT2
 EXPORT_SUFFIX = ".export.json"
-TUNABLE = frozenset({"BD", "RM", "BS"})   # one-shots accordes sur la tonique de la banque
+TUNABLE = frozenset({"BD", "RM", "BS", "PD", "ST"})   # one-shots accordes sur la tonique de la banque
 PITCH_CLASSES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 _SOLFEGE = {"do": "C", "re": "D", "mi": "E", "fa": "F", "sol": "G", "la": "A", "si": "B"}
 _KEY_RX = re.compile(

@@ -70,7 +70,7 @@ import struct
 from collections import defaultdict
 from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Literal
+from typing import BinaryIO, Literal
 
 import numpy as np
 import soundfile as sf
@@ -1768,17 +1768,18 @@ def export(manifest: Manifest, root: Path, dest: Path, index_path: Path,
     return sync(export_plan(manifest), root, dest, index_path, dry_run)
 
 
-def write_varispeed(src: Path, out: Path, semitones: int) -> None:
+def write_varispeed(src: Path, out: Path | BinaryIO, semitones: int) -> None:
     """Ecrit `src` transpose de `semitones` demi-tons en varispeed (lecture
     plus rapide ou plus lente, comme le pitch de la DT2 : la duree suit), au
-    meme format que la source."""
+    meme format que la source. `out` : chemin, ou flux (ecoute du live)."""
     import librosa  # import lourd, seulement quand un live est transpose
 
     info = sf.info(str(src))
     data, sr = sf.read(str(src), dtype="float32", always_2d=True)
     rate = 2.0 ** (semitones / 12.0)
     y = librosa.resample(data.T, orig_sr=sr * rate, target_sr=sr, res_type="soxr_hq").T
-    sf.write(str(out), np.clip(y, -1.0, 1.0), sr, subtype=info.subtype, format="WAV")
+    target = str(out) if isinstance(out, Path) else out
+    sf.write(target, np.clip(y, -1.0, 1.0), sr, subtype=info.subtype, format="WAV")
 
 
 def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
