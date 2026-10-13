@@ -155,6 +155,10 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L4] Vue Samples, panneau du live ouvert : case « hors live » du
+  filtre de la liste, qui masque les samples déjà pris dans le live (toutes
+  banques), mémorisée ; le compteur affiche `affichés / total`. Avec le
+  filtre, un ajout par `L` ou `Entrée` fait passer au sample suivant.
 - [7.L4] Vue Samples, panneau du live ouvert : `Entrée` ajoute le sample en
   cours (sans la sélection) à la banque active.
 - [7.L4] Écoute accordée dans le panneau du live : un sample transposé est

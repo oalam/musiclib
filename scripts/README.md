@@ -965,7 +965,9 @@ ou basses) et « désaccorder » une fois accordée ; bilan sous le titre
 (transposés, déjà dans le ton, sans note connue) ; badge bleu `+2` / `-4`
 sur les samples transposés ; un clic sur leur nom les fait entendre tels
 qu'exportés (aussi pour Espace tenu). Les samples du
-live portent le badge de leurs banques dans la liste de la lib.
+live portent le badge de leurs banques dans la liste de la lib ; la case
+« hors live » du filtre de la liste les masque (le curseur passe au suivant
+après un ajout par `L` ou `Entrée`).
 
 ```bash
 python -m pytest tests/test_lives.py             # unitaires

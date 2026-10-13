@@ -161,7 +161,13 @@
     }
   }).filter(b => b.codes.length))
   const tagsOf = (e: SampleEntry) => [...new Set([...e.tags, ...e.auto_tags])]
-  const shown = $derived(localTags.length ? entries.filter(e => { const t = tagsOf(e); return localTags.every(x => t.includes(x)) }) : entries)
+  // filtre « hors live » : masque les samples deja pris dans le live ouvert
+  const HIDE_LIVE_KEY = 'ui:sample-hide-live'
+  let hideLive = $state(false)
+  const hidingLive = $derived(hideLive && liveOpen)
+  const shown = $derived(entries.filter(e =>
+    (!hidingLive || !inLive.has(e.source))
+    && (!localTags.length || localTags.every(x => tagsOf(e).includes(x)))))
   // tags et styles de la liste (avant filtre local), du plus frequent au plus rare
   const localFacets = $derived.by(() => {
     const n = new Map<string, number>()
@@ -558,6 +564,21 @@
     queueMicrotask(() => document.getElementById(`s-${source}`)?.scrollIntoView({ block: 'nearest' }))
   }
 
+  function saveHideLive() {
+    try { localStorage.setItem(HIDE_LIVE_KEY, hideLive ? '1' : '') } catch { /* stockage indisponible */ }
+  }
+
+  /** Ajout au live (L, Entree) ; filtre « hors live » actif : le curseur passe
+   * au premier sample suivant qui reste dans la liste. */
+  async function addToLive(sources: string[]) {
+    if (!livePanel || !sources.length) return
+    const gone = new Set(sources)
+    const i = visible.findIndex(e => e.source === cursor)
+    const next = [...visible.slice(i + 1), ...visible.slice(0, Math.max(i, 0)).reverse()].find(e => !gone.has(e.source))
+    await livePanel.add(sources)
+    if (hidingLive && cursor && !visible.some(e => e.source === cursor)) pick(next?.source ?? null)
+  }
+
   function step(delta: number) {
     if (!visible.length) return
     const i = visible.findIndex(e => e.source === cursor)
@@ -749,8 +770,8 @@
       else { ws?.stop(); ws?.play() }
     }
     else if (k === 't' || k === 'T') tagField?.focus()
-    else if ((k === 'l' || k === 'L') && liveOpen) livePanel?.add(targets())
-    else if (k === 'Enter' && liveOpen && cursor) livePanel?.add([cursor])
+    else if ((k === 'l' || k === 'L') && liveOpen) addToLive(targets())
+    else if (k === 'Enter' && liveOpen && cursor) addToLive([cursor])
     else if (k >= '0' && k <= '5') stars(k === '0' ? null : Number(k))
     else if ((k === 'Delete' || k === 'Backspace') && !trashView) toTrash()
     else if (k === 'Escape') sel = new Set()
@@ -774,6 +795,7 @@
     ws.on('finish', () => { if (looping) ws?.play(); else playing = false })
     try { kit = localStorage.getItem(KIT_KEY) ?? '' } catch { /* stockage indisponible */ }
     try { liveOpen = !!localStorage.getItem(LIVE_PANEL_KEY) } catch { /* stockage indisponible */ }
+    try { hideLive = !!localStorage.getItem(HIDE_LIVE_KEY) } catch { /* stockage indisponible */ }
     // reanalyse lancee avant un rechargement de la page : on reprend le suivi
     api.sampleRebuildStatus().then(r => { if (r.status === 'running') { rebuild = r; followRebuild() } }).catch(() => {})
     try {
@@ -978,7 +1000,7 @@
   <section class="detail">
     <header>
       <strong>{current ? current.folder.replaceAll('/', ' / ') : view?.kind === 'type' ? (view.folder ? view.folder.replaceAll('/', ' / ') : `Type ${search.codes?.join(', ')}`) + (kit ? ` · kit ${kit}` : '') : view?.kind === 'kit' ? `Kit ${kit}` : view?.kind === 'unclassified' ? 'Non classés' : view?.kind === 'trash' ? 'Corbeille' : 'Choisis une case'}</strong>
-      {#if view}<span class="muted small">{shown.length}{localTags.length ? ` / ${entries.length}` : ''} fichiers</span>{/if}
+      {#if view}<span class="muted small">{shown.length}{shown.length !== entries.length ? ` / ${entries.length}` : ''} fichiers</span>{/if}
       <label class="small"><input type="checkbox" bind:checked={autoplay} /> lecture auto</label>
     </header>
     <div class="wave-row">
@@ -1034,6 +1056,7 @@
         <button class="tag auto" title="{n} fichier{n > 1 ? 's' : ''} : filtrer la liste" onclick={() => addLocal(t)}>{t} <span class="muted">{n}</span></button>
       {/each}
       {#if localTags.length}<button class="small" onclick={() => (localTags = [])}>Tout voir</button>{/if}
+      {#if liveOpen}<label class="hide-live" title="Masque les samples déjà pris dans le live ouvert (toutes banques)"><input type="checkbox" bind:checked={hideLive} onchange={saveHideLive} /> hors live</label>{/if}
     </div>
     {#if view?.kind === 'trash' && trashedKits.length}
       <ul class="trashed-kits small">
@@ -1164,6 +1187,7 @@
   .loose button { white-space: nowrap; }
   .trash-drop { border-radius: 4px; }
   .live-btn { margin-left: auto; }
+  .hide-live { display: inline-flex; gap: 3px; align-items: center; margin-left: auto; white-space: nowrap; }
   .local { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-bottom: 6px; }
   .local-in { width: 11em; font-size: 12px; padding: 2px 6px; }
   .icon { display: inline-flex; align-items: center; padding: 3px 6px; }
