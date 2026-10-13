@@ -153,6 +153,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   branche, `M` vers un dossier. L'export réécrit l'arborescence au prochain
   passage (l'index retire l'ancienne).
 
+### Modifié
+
+- [7.L4] Accordage appliqué au live entier (`lives.tune_live`) : « accorder
+  le live », à côté de la jauge de RAM, accorde chaque banque qui a une
+  tonalité (0-COMMON compris) ; les samples d'une banque sans tonalité
+  reprennent leur hauteur d'origine ; « désaccorder » remet tout le live.
+  Tout ou rien si une tonalité est illisible. `POST /api/lives/{live}/tune`
+  ne prend plus que `reset`. Les liens par banque disparaissent.
+
 ### Ajouté
 
 - [7.L4] Panneau du live au clavier : après un clic sur un sample de la

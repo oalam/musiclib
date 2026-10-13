@@ -53,7 +53,7 @@
   let renaming = $state<string | null>(null)
   let renameText = $state('')
   // bilan du dernier accordage (banque -> message)
-  let tuneInfo = $state<{ bank: string; text: string } | null>(null)
+  let tuneInfo = $state('')
   let report = $state<SampleExportReport | null>(null)
   let exporting = $state(false)
 
@@ -64,8 +64,10 @@
     const list = folder ? items.filter(i => `${i.folder}/${i.branch}` === folder) : items.filter(i => i.folder === bank)
     return [...list].sort((a, b) => BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch) || a.name.localeCompare(b.name))
   })
-  const tunable = $derived((sum?.live.items ?? []).filter(i => i.folder === bank && TUNABLE.includes(i.code)))
+  // accordage global du live : one-shots tonals, banques avec tonalite
+  const tunable = $derived((sum?.live.items ?? []).filter(i => TUNABLE.includes(i.code)))
   const shifted = $derived(tunable.some(i => i.shift))
+  const keyed = $derived(rows.filter(b => sum?.live.keys[b]))
   const ratio = $derived(sum ? sum.ram / sum.ram_limit : 0)
   const rowFiles = (b: string) => (sum?.folders ?? []).filter(f => f.path.split('/')[0] === b).reduce((n, f) => n + f.files, 0)
   // plusieurs banques -> le sample est rangé dans 0-COMMON, d'ou l'info « aussi en »
@@ -89,6 +91,7 @@
   }
 
   async function choose(name: string) {
+    tuneInfo = ''
     report = null
     editingBanks = false
     renaming = null
@@ -164,15 +167,19 @@
     else if (e.key === 'Escape') { e.preventDefault(); keying = null }
   }
 
+  /** Accorde (ou desaccorde) tout le live : chaque banque sur sa tonalite. */
   async function tune(reset: boolean) {
-    const b = bank
-    if (!(await run(() => api.liveTune(current, b, reset)))) return
-    const items = (sum?.live.items ?? []).filter(i => i.folder === b && TUNABLE.includes(i.code))
-    const moved = items.filter(i => i.shift).length
-    const unknown = items.filter(i => !i.note).length
-    tuneInfo = { bank: b, text: reset ? `${items.length} remis à leur hauteur d'origine`
-      : `${moved} transposé${moved > 1 ? 's' : ''}, ${items.length - moved - unknown} déjà dans le ton`
-        + (unknown ? `, ${unknown} sans note connue` : '') }
+    if (!(await run(() => api.liveTune(current, reset)))) return
+    const live = sum!.live
+    const items = live.items.filter(i => TUNABLE.includes(i.code))
+    if (reset) { tuneInfo = `${items.length} remis à leur hauteur d'origine`; return }
+    const inKey = items.filter(i => live.keys[i.folder])
+    const moved = inKey.filter(i => i.shift).length
+    const unknown = inKey.filter(i => !i.note).length
+    const keyless = [...new Set(items.filter(i => !live.keys[i.folder]).map(i => i.folder))]
+    tuneInfo = `${moved} transposé${moved > 1 ? 's' : ''}, ${inKey.length - moved - unknown} déjà dans le ton`
+      + (unknown ? `, ${unknown} sans note connue` : '')
+      + (keyless.length ? ` · sans tonalité : ${keyless.join(', ')}` : '')
   }
 
   /** Ecoute telle qu'exportee : rendu varispeed de l'API si le sample est accorde. */
@@ -286,7 +293,14 @@
     <p class="small gauge-txt" class:err={ratio > 1}>
       RAM {mo(s.ram)} / {mo(s.ram_limit)} ({Math.round(ratio * 100)} %) · {s.live.items.length} samples
       {#if s.unknown_ram}<span class="muted"> · {s.unknown_ram} non mesuré{s.unknown_ram > 1 ? 's' : ''}</span>{/if}
+      {#if tunable.length}
+        · <button class="small link" disabled={busy || !keyed.length}
+          title={keyed.length ? `Ramène les kicks, rumbles, basses, pads et stabs de chaque banque sur la tonique de sa tonalité (${keyed.map(b => `${b} : ${s.live.keys[b]}`).join(', ')}) ; une banque sans tonalité garde la hauteur d'origine. Varispeed à l'export, la lib n'est pas touchée.` : 'Saisir d\'abord la tonalité des banques (double-clic sur une banque)'}
+          onclick={() => tune(false)}>accorder le live</button>
+        {#if shifted}<button class="small link" disabled={busy} title="Remet tout le live à sa hauteur d'origine" onclick={() => tune(true)}>désaccorder</button>{/if}
+      {/if}
     </p>
+    {#if tuneInfo}<p class="small muted tuneinfo">{tuneInfo} <button class="untag" title="Fermer" onclick={() => (tuneInfo = '')}>×</button></p>{/if}
 
     {#if editingBanks}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -349,14 +363,7 @@
         <input type="number" min="30" max="300" step="0.1" placeholder="—" value={s.live.tempos[bank] ?? ''}
           onchange={saveTempo} onkeydown={e => { if (e.key === 'Enter' || e.key === 'Escape') (e.target as HTMLElement).blur() }} /> BPM
       </label>
-      {#if tunable.length}
-        <button class="small link" disabled={busy || !s.live.keys[bank]}
-          title={s.live.keys[bank] ? `Ramène les kicks, rumbles, basses, pads et stabs de ${bank} sur la tonique de ${s.live.keys[bank]} (varispeed à l'export, la lib n'est pas touchée)` : `Saisir d'abord la tonalité de ${bank} (double-clic sur la banque)`}
-          onclick={() => tune(false)}>accorder</button>
-        {#if shifted}<button class="small link" disabled={busy} title="Remet les samples de {bank} à leur hauteur d'origine" onclick={() => tune(true)}>désaccorder</button>{/if}
-      {/if}
     </h4>
-    {#if tuneInfo && tuneInfo.bank === bank}<p class="small muted tuneinfo">{tuneInfo.text}</p>{/if}
     <ul class="items small">
       {#each shown as it (it.source)}
         <li id="live-{it.source}" class:cur={it.source === cur} class:kbd={focused && it.source === cur}>

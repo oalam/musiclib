@@ -730,9 +730,8 @@ def test_lives_flow(tmp_path: Path):
     r = client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 165})
     assert r.json()["live"]["tempos"] == {"A-HALF": 165.0}
     assert client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 10}).status_code == 422
-    assert client.post("/api/lives/solaris/tune", json={"bank": "0-COMMON"}).status_code == 422   # sans tonalite
-    r = client.post("/api/lives/solaris/tune", json={"bank": "A-HALF"})
-    assert r.status_code == 200 and r.json()["live"]["items"][0]["shift"] == 0   # kick dans 0-COMMON
+    r = client.post("/api/lives/solaris/tune", json={})
+    assert r.status_code == 200 and r.json()["live"]["items"][0]["shift"] == 0   # 0-COMMON sans tonalite
 
     r = client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD F Tribe slr"})
     assert r.json()["live"]["items"][0]["name"] == "BD F Tribe slr"
@@ -745,7 +744,7 @@ def test_lives_flow(tmp_path: Path):
     r = client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav"})
     assert r.status_code == 200 and len(r.content) > 96_000                 # tel quel
     client.post("/api/lives/solaris/key", json={"bank": "0-COMMON", "key": "Sol"})
-    r = client.post("/api/lives/solaris/tune", json={"bank": "0-COMMON"})
+    r = client.post("/api/lives/solaris/tune", json={})
     assert r.json()["live"]["items"][0]["shift"] == 2
     r = client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav"})
     assert r.status_code == 200 and sf.info(io.BytesIO(r.content)).frames == pytest.approx(48_000 / 2 ** (2 / 12), abs=2)

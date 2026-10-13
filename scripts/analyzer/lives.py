@@ -25,7 +25,8 @@ Accordage par banque : les kicks, rumbles, basses, pads et stabs (TUNABLE) d'une
 dont la note est connue sont ramenes sur la tonique de sa tonalite, par le
 plus court chemin (-6 a +5 demi-tons). Le decalage est garde dans le live et
 applique a l'export en varispeed (comme le pitch de la DT2 : la duree suit) ;
-la lib n'est pas touchee. 0-COMMON n'est accorde que sur sa propre tonalite.
+la lib n'est pas touchee. L'accordage s'applique au live entier
+(`tune_live`) ; 0-COMMON n'est accorde que sur sa propre tonalite.
 """
 from __future__ import annotations
 
@@ -341,6 +342,22 @@ def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
             it.name = _renote(it.name, transpose(it.note, it.shift), new)
         it.shift = shift
         it.ram = ram_bytes(root / it.source, shift)
+    return touched
+
+
+def tune_live(live: Live, manifest: Manifest, root: Path, reset: bool = False) -> list[LiveItem]:
+    """Accorde tout le live : chaque banque (0-COMMON compris) qui a une
+    tonalite ; les samples d'une banque sans tonalite reprennent leur hauteur
+    d'origine. `reset` : tout le live a sa hauteur d'origine. Tout ou rien :
+    une tonalite illisible arrete avant toute modification."""
+    rows = [COMMON, *live.banks]
+    if not reset:
+        bad = [f"{b} ({live.keys[b]!r})" for b in rows if live.keys.get(b) and key_root(live.keys[b]) is None]
+        if bad:
+            raise LiveError(f"tonalite illisible : {', '.join(bad)} (ex. Fa m, F#m, sol)")
+    touched: list[LiveItem] = []
+    for b in rows:
+        touched += tune_bank(live, manifest, b, root, reset=reset or not live.keys.get(b))
     return touched
 
 

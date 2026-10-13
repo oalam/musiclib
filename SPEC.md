@@ -958,7 +958,9 @@ révisés par 7.J8) :
   rejoue une fois, comme avant.
 - Accordage par banque (7.L4, arbitré le 2026-10-13) : les kicks, rumbles
   et basses (BD, RM, BS) d'une banque sont ramenés sur la tonique de sa
-  tonalité saisie, par le plus court chemin. Décalage gardé dans le live et
+  tonalité saisie, par le plus court chemin. L'action s'applique au live
+  entier (toutes les banques qui ont une tonalité ; sans tonalité, hauteur
+  d'origine), pas banque par banque. Décalage gardé dans le live et
   appliqué à l'export en varispeed (la durée suit, comme le pitch de la
   DT2) ; la lib n'est jamais modifiée et l'accordage s'annule. 0-COMMON
   n'est accordé que s'il a sa propre tonalité. Étendu aux pads (PD) et

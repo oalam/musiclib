@@ -930,13 +930,14 @@ API : `GET/POST /api/lives`, `GET /api/lives/{live}` (bilan par dossier et
 RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
 (`bank` absent : retire du live), `POST .../key` (`bank`, `key` : tonalité
 saisie de la banque, vide pour la retirer), `POST .../tempo` (`bank`, `bpm`
-de 30 à 300, `null` pour le retirer), `POST .../tune` (`bank`, `reset` :
-accorde ou désaccorde la banque), `GET .../audio?source=` (écoute telle
+de 30 à 300, `null` pour le retirer), `POST .../tune` (`reset` : accorde ou
+désaccorde tout le live), `GET .../audio?source=` (écoute telle
 qu'exportée : rendu varispeed si le sample est accordé), `POST .../rename`, `POST .../export`
 (`dry_run`, vrai par défaut).
 
-Accordage (7.L4, `lives.tune_bank`) : les BD, RM, BS, PD et ST (`TUNABLE`) rangés
-dans la banque sont ramenés sur la tonique de sa tonalité (`key_root` lit
+Accordage (7.L4, `lives.tune_live`, banque par banque avec `tune_bank`) :
+appliqué au live entier ; dans chaque banque qui a une tonalité (0-COMMON
+compris), les BD, RM, BS, PD et ST (`TUNABLE`) sont ramenés sur la tonique de sa tonalité (`key_root` lit
 `Fa m`, `sol mineur`, `Si bémol`, `F#m`, `Bb`), par le plus court chemin de
 -6 à +5 demi-tons (à égalité on descend : un kick monté perd sa queue). Ex. :
 banque `A-HALF (Fa m)`, kick mesuré en A → `shift` -4, nom `BD A Kick 03 rth`
@@ -945,7 +946,8 @@ sinon d'une mesure (`measure_note`, gardée dans `note`) ; un RM sans note
 dans son nom n'est pas accordé. Le décalage est rendu à l'export en
 varispeed (`samples.write_varispeed` : durée divisée par 2^(shift/12), comme
 le pitch de la DT2), sans toucher la lib ; l'index d'export garde `shift`
-pour réécrire le fichier quand il change.
+pour réécrire le fichier quand il change. Une banque sans tonalité garde
+(ou reprend) la hauteur d'origine ; une tonalité illisible arrête tout.
 
 Front (7.L2, `web/src/lib/LivePanel.svelte`) : bouton « Live » de la vue
 Samples, panneau en troisième colonne. Sélecteur de live (ou création :
@@ -960,9 +962,9 @@ liste de la banque en cours, ou `L`
 la banque active. Champ BPM de la
 banque active (titre de la liste) : Espace tenu relance le sample en cours
 à chaque temps à ce tempo, relâché il l'arrête ; sans tempo, Espace rejoue
-une fois. Lien « accorder » à côté (banque avec tonalité et kicks, rumbles
-ou basses) et « désaccorder » une fois accordée ; bilan sous le titre
-(transposés, déjà dans le ton, sans note connue) ; badge bleu `+2` / `-4`
+une fois. Liens « accorder le live » et « désaccorder » sous la jauge de
+RAM ; bilan dessous (transposés, déjà dans le ton, sans note connue,
+banques sans tonalité) ; badge bleu `+2` / `-4`
 sur les samples transposés ; un clic sur leur nom les fait entendre tels
 qu'exportés (aussi pour Espace tenu). Les samples du
 live portent le badge de leurs banques dans la liste de la lib ; la case

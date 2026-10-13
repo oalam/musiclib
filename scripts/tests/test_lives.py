@@ -260,3 +260,26 @@ def test_tune_measures_missing_note(tmp_path: Path, lib: tuple[Manifest, Path],
     assert (kick.note, kick.shift, kick.name) == ("A", -4, "BD F Hard 01 k")
     lv.tune_bank(live, m, "A-HALF", root, reset=True)
     assert (kick.shift, kick.name) == (0, "BD Hard 01 k")
+
+
+def test_tune_live_all_banks(tmp_path: Path, lib: tuple[Manifest, Path]):
+    m, root = lib
+    m.entries[0].note = "F"
+    m.reserve[0].source = "d/drone C.wav"          # PD en C (nom du fichier)
+    live = _live(tmp_path)
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", root)
+    lv.add(live, m, ["d/drone C.wav"], "B-DNB", root)
+    kick, drone = live.items
+    lv.set_key(live, "A-HALF", "Sol m")
+    lv.set_key(live, "B-DNB", "Ré")
+    lv.tune_live(live, m, root)
+    assert (kick.shift, drone.shift) == (2, 2)
+    lv.set_key(live, "B-DNB", "")                  # banque sans tonalite : hauteur d'origine
+    lv.tune_live(live, m, root)
+    assert (kick.shift, drone.shift) == (2, 0)
+    lv.set_key(live, "B-DNB", "??")                # tout ou rien
+    with pytest.raises(lv.LiveError):
+        lv.tune_live(live, m, root)
+    assert kick.shift == 2
+    lv.tune_live(live, m, root, reset=True)
+    assert (kick.shift, drone.shift) == (0, 0)
