@@ -1017,7 +1017,12 @@ On garde une boucle d'une à huit mesures, sans couture.
   Champs neutres omis du JSON : hash des rendus antérieurs inchangé ; les
   couches entrent dans le hash quand il y en a.
 
-## Phase 9 — Générateur MIDI acid (à venir, cadrée le 2026-10-12)
+## Phase 9 — Générateur MIDI acid (arrêtée après 9.C2 le 2026-10-13)
+
+**Arrêt** (décision du 2026-10-13) : résultat musical jugé insuffisant, les
+lignes acid se font par d'autres moyens. 9.A-9.C2 restent livrées et
+utilisables (vue « Acid · MIDI ») ; 9.D-9.H abandonnées, comme le
+renforcement du contraste d'accent envisagé.
 
 **But** : un générateur de lignes acid dans le front, inspiré de **Sting**
 (if-tah, plugin VST3 / AU / CLAP ; manuel lu le 2026-10-12,
@@ -1052,11 +1057,11 @@ des slides.
 | 9.B | **Lecture temps réel** : cible DT2 (horloge et Start de la DT2, AUTO CHANNEL ou `CHAN` d'une track MIDI, comme `Dt2Sender`) ou cible Mac (horloge interne, port virtuel IAC vers le VST) ; réglages pris en compte au tour suivant ; panique (all notes off) ; CC de slide optionnel ; API (`acid_midi.py`, `/api/acid/...`) | fait (cible Mac validée via IAC le 2026-10-12 ; cible DT2 à valider) |
 | 9.C | **Vue front « Acid »** : potards de la vue compacte (Mode, Type, Density, Steps, Offset, Accent, Gate, Root, Scale), grille éditable note / accent / gate / octave, verrous, Generate, choix de la cible et du port, lecture / arrêt (potards de la vue Sound design) ; outil « Acid · MIDI » de la colonne du sound design (`web/src/lib/sd/AcidView.svelte`), gammes servies par `GET /api/acid/scales` ; `Mode` (Arp, Bass, Counterpoint) attend 9.F-9.G | fait (à valider dans le front) |
 | 9.C2 | **Séquenceur étendu** (demandé le 2026-10-12) : 32 pas (deux mesures, `Density` comptée par mesure de 16, une séquence de 16 pas est complétée par sa répétition) ; `Steps` 1-32, `Offset` 0-31 et repère du pas de départ dans la grille ; lecture arrêtée après 1 à 8 mesures (`bars`, pour échantillonner) ; mode **Arp** : arpège des triades de la gamme sur une progression (`GET /api/acid/progressions`), un accord par mesure ou demi-mesure, motif montant / descendant / aller-retour / hasard | fait (à valider à l'oreille) |
-| 9.D | **Slots** (8 banks × 16, JSON versionnés dans le vault) et `Auto Generate` (division de 1/64 à 32 mesures) | à venir |
-| 9.E | **Modulation** : 2 LFO (sinus, rampes, triangle, carré, aléatoire, drunk, séquence 16 pas ; sync / libre), matrice cibles × sources autour du potard ; `Step Jitter`, `Polymeter Reset` | à venir |
-| 9.F | Moteurs **Arp** et **Bass** sur entrée MIDI (Maschine, clavier) ; tonique suivie en temps réel | à venir |
-| 9.G | **Counterpoint** : 4 voix sur 4 canaux, `Weight`, `Harmonic Density`, transposition et mute par voix | à venir |
-| 9.H | **Import MIDI** : une mesure = gabarit éditable ; plus long = statistiques par pas et hauteur ; source possible : les `.mid` des banks (`library/digitakt/<slug>/pNN.mid`) | à venir |
+| 9.D | **Slots** (8 banks × 16, JSON versionnés dans le vault) et `Auto Generate` (division de 1/64 à 32 mesures) | abandonnée |
+| 9.E | **Modulation** : 2 LFO (sinus, rampes, triangle, carré, aléatoire, drunk, séquence 16 pas ; sync / libre), matrice cibles × sources autour du potard ; `Step Jitter`, `Polymeter Reset` | abandonnée |
+| 9.F | Moteurs **Arp** et **Bass** sur entrée MIDI (Maschine, clavier) ; tonique suivie en temps réel | abandonnée |
+| 9.G | **Counterpoint** : 4 voix sur 4 canaux, `Weight`, `Harmonic Density`, transposition et mute par voix | abandonnée |
+| 9.H | **Import MIDI** : une mesure = gabarit éditable ; plus long = statistiques par pas et hauteur ; source possible : les `.mid` des banks (`library/digitakt/<slug>/pNN.mid`) | abandonnée |
 
 **Décisions 9** (arbitrées le 2026-10-12) :
 - **Générateur dans le front** (vue Svelte + API du projet), pas de plugin
