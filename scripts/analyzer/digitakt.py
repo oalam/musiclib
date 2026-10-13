@@ -66,6 +66,30 @@ _PYIN_MIN_VOICED = 0.3      # part de frames voisees pour qu'un pas ait une note
 # d'attaque d'amplitude, les trigs viennent donc des debuts de note pYIN.
 _NOTE_MIN_S = 0.04          # segment pYIN plus court = glitch (transition, harmonique)
 _START_SHARE = 0.5          # part des mesures jouees ou une note demarre a ce pas
+# Frappes de drums : evenements (onsets du stem) classes par montee d'energie
+# dans la bande de chaque track, au pas le plus proche. Le max de l'enveloppe
+# d'onset par pas, seuille, retenait le fond (cymbales, pluie) et rangeait une
+# frappe un peu en avance sur le pas d'avant.
+_HIT_RISE_DB = 6.0          # montee minimale de la bande a l'onset pour compter une frappe
+_HIT_PRE = 3                # frames (hop _HOP) avant l'onset : niveau de reference
+_HIT_POST = 4               # frames apres l'onset : pic de la frappe
+_HIT_SHARE = 0.5            # part des mesures jouees ou la frappe tombe sur ce pas
+# Kick et clap/snare : une frappe qui fait monter les deux bandes est rangee
+# selon l'ecart de niveau clap - kick (chaque bande rapportee a son centile 99).
+# La bande kick monte aussi aux snares et un kick distordu remplit la bande
+# clap : pas de seuil fixe, les ecarts du morceau forment deux familles que
+# separe un seuil d'Otsu, s'il y en a bien deux.
+_HIT_REF_PCT = 99           # centile de la bande pris comme niveau de reference
+_SPLIT_MIN_D = 2.0          # separation minimale (d') des deux familles
+_SPLIT_MIN_N = 8            # frappes communes minimales pour estimer le seuil
+# Fuite de basse dans le stem drums : frappe kick ecartee si la basse monte au
+# meme instant et domine nettement la bande kick du stem drums.
+_LEAK_DB = 6.0              # basse au-dessus du kick (dB) pour conclure a une fuite
+_KICK, _CLAP = 1, 3
+# Frappes du kick cherchees aussi dans le corps (120-300 Hz), montee mesuree
+# par sous-bande : un sub ou un rumble continu sature 30-120 Hz et y masque la
+# montee d'un kick distordu, et dilue aussi une bande 30-300 Hz sommee.
+_KICK_BODY = (120.0, 300.0)
 
 
 @dataclass(frozen=True)
@@ -85,7 +109,7 @@ class TrackSpec:
 TRACKS: tuple[TrackSpec, ...] = (
     TrackSpec(1, "Kick", "drums", 30, 120),
     TrackSpec(2, "Rumble", "drums", 30, 90, kind="rumble", exclude=(1,)),
-    TrackSpec(3, "Clap / snare", "drums", 300, 3000, exclude=(1,)),
+    TrackSpec(3, "Clap / snare", "drums", 300, 3000),
     TrackSpec(4, "Hat ferme", "drums", 7000, 16000),
     TrackSpec(5, "Hat ouvert", "drums", 5000, 12000),
     TrackSpec(6, "Ride", "drums", 3000, 6000),
@@ -115,6 +139,8 @@ class StepFeatures:
     pitch: dict[int, np.ndarray] = field(default_factory=dict)
     # track monophonique -> (n_steps,) note qui demarre a ce pas (nan sinon)
     note_on: dict[int, np.ndarray] = field(default_factory=dict)
+    # track drums (hit) -> (n_steps,) montee en dB de la frappe placee a ce pas (0 sinon)
+    hits: dict[int, np.ndarray] = field(default_factory=dict)
 
 
 # --- grille ------------------------------------------------------------------
@@ -199,6 +225,10 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
         chroma: dict[int, np.ndarray] = {}
         pitch: dict[int, np.ndarray] = {}
         note_on: dict[int, np.ndarray] = {}
+        drum_envs: dict[int, np.ndarray] = {}
+        drum_frames: np.ndarray | None = None
+        drum_times: np.ndarray | None = None
+        bass_env: np.ndarray | None = None
         for stem, (y, sr) in stems.items():
             if y.size == 0:
                 continue
@@ -211,6 +241,15 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
             times = librosa.frames_to_time(np.arange(spec.shape[1]), sr=sr,
                                            hop_length=_HOP)
             stem_chroma: np.ndarray | None = None
+            if stem == "drums":
+                drum_frames = librosa.onset.onset_detect(
+                    onset_envelope=librosa.onset.onset_strength(
+                        S=librosa.power_to_db(power, ref=np.max), sr=sr),
+                    sr=sr, hop_length=_HOP)
+                drum_times = times
+            if stem == "bass":
+                kick = TRACKS[_KICK - 1]
+                bass_env = power[(freqs >= kick.lo) & (freqs < kick.hi)].sum(axis=0)
             for spec_t in TRACKS:
                 if spec_t.stem != stem:
                     continue
@@ -221,6 +260,12 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
                 env = librosa.onset.onset_strength(
                     S=librosa.power_to_db(band, ref=np.max), sr=sr)
                 onset[spec_t.index] = _reduce_to_steps(env, times, bounds, "max")
+                if spec_t.stem == "drums" and spec_t.kind == "hit":
+                    drum_envs[spec_t.index] = band.sum(axis=0)
+                    if spec_t.index == _KICK:
+                        lo, hi = _KICK_BODY
+                        body = power[(freqs >= lo) & (freqs < hi)].sum(axis=0)
+                        drum_envs[_KICK] = np.stack([drum_envs[_KICK], body])
                 energy[spec_t.index] = _reduce_to_steps(
                     band.sum(axis=0), times, bounds, "mean")
                 if spec_t.kind == "tonal":
@@ -234,7 +279,103 @@ def stem_features(stems: dict[str, tuple[np.ndarray, int]],
                     pitch[spec_t.index] = _steps_from_frames(midi, f_times, bounds)
                     note_on[spec_t.index] = _note_starts(y_low, midi, f_times,
                                                          bounds)
-    return StepFeatures(bounds, onset, energy, chroma, pitch, note_on)
+    hits: dict[int, np.ndarray] = {}
+    if drum_envs and drum_frames is not None and drum_times is not None:
+        hits = drum_hits(drum_envs, drum_frames, drum_times, bounds, bass_env)
+    return StepFeatures(bounds, onset, energy, chroma, pitch, note_on, hits)
+
+
+def onset_profile(env: np.ndarray, onset_frames: np.ndarray
+                  ) -> tuple[np.ndarray, np.ndarray]:
+    """Montee (dB) et pic (puissance) d'une enveloppe de bande a chaque onset :
+    pic sur _HIT_POST frames apres, reference moyenne sur _HIT_PRE frames avant."""
+    rise = np.full(len(onset_frames), -np.inf)
+    peak = np.zeros(len(onset_frames))
+    for k, fr in enumerate(onset_frames):
+        if fr < 1 or fr >= env.size:
+            continue
+        before = float(env[max(0, fr - _HIT_PRE):fr].mean()) + 1e-12
+        peak[k] = float(env[fr:fr + _HIT_POST].max())
+        rise[k] = 10 * np.log10(peak[k] / before + 1e-12)
+    return rise, peak
+
+
+def kick_clap_cut(diff: np.ndarray) -> float | None:
+    """Seuil d'Otsu sur les ecarts clap - kick (dB) des frappes communes : en
+    dessous un kick, au-dessus un clap. None si les ecarts ne forment pas deux
+    familles separees (d' < _SPLIT_MIN_D) : chaque bande garde alors ses frappes."""
+    x = np.sort(diff[np.isfinite(diff)])
+    if x.size < _SPLIT_MIN_N:
+        return None
+    best, k_best = -1.0, 0
+    for k in range(1, x.size):
+        v = k * (x.size - k) * (x[:k].mean() - x[k:].mean()) ** 2
+        if v > best:
+            best, k_best = v, k
+    lo, hi = x[:k_best], x[k_best:]
+    spread = np.sqrt((lo.var() + hi.var()) / 2) + 1e-9
+    if (hi.mean() - lo.mean()) / spread < _SPLIT_MIN_D:
+        return None
+    return float((lo[-1] + hi[0]) / 2)
+
+
+def drum_hits(envs: dict[int, np.ndarray], onset_frames: np.ndarray,
+              times: np.ndarray, bounds: np.ndarray,
+              bass_env: np.ndarray | None = None) -> dict[int, np.ndarray]:
+    """Frappes par track drums : montee (dB) de la bande a chaque onset du stem,
+    placee au pas le plus proche (0 sinon). Une frappe compte si sa bande monte
+    d'au moins _HIT_RISE_DB ; kick et clap se la partagent selon leur niveau
+    relatif, et un kick domine par la basse au meme instant est ecarte.
+
+    Une enveloppe 2D (sous-bandes, frames) compte la sous-bande qui monte le
+    plus a chaque onset ; la premiere sert a la comparaison avec la basse."""
+    rise: dict[int, np.ndarray] = {}
+    keep: dict[int, np.ndarray] = {}
+    level: dict[int, np.ndarray] = {}
+    peaks: dict[int, np.ndarray] = {}
+    for i, env in envs.items():
+        rows = env if env.ndim == 2 else env[None, :]
+        r_all, p_all, l_all = [], [], []
+        for row in rows:
+            r, pk = onset_profile(row, onset_frames)
+            ref = float(np.percentile(row, _HIT_REF_PCT)) + 1e-12
+            r_all.append(r)
+            p_all.append(pk)
+            l_all.append(10 * np.log10(pk / ref + 1e-12))
+        best = np.argmax(np.stack(r_all), axis=0)
+        cols = np.arange(len(onset_frames))
+        rise[i] = np.stack(r_all)[best, cols]
+        level[i] = np.stack(l_all)[best, cols]
+        peaks[i] = p_all[0]
+        keep[i] = rise[i] >= _HIT_RISE_DB
+    if _KICK in envs and _CLAP in envs:
+        both = keep[_KICK] & keep[_CLAP]
+        diff = level[_CLAP] - level[_KICK]
+        cut = kick_clap_cut(diff[both])
+        if cut is not None:
+            keep[_KICK] &= ~(both & (diff > cut))
+            keep[_CLAP] &= ~(both & (diff <= cut))
+    if _KICK in envs and bass_env is not None:
+        b_rise, b_peak = onset_profile(bass_env, onset_frames)
+        over = 10 * np.log10((b_peak + 1e-12) / (peaks[_KICK] + 1e-12))
+        keep[_KICK] &= ~((b_rise >= _HIT_RISE_DB) & (over >= _LEAK_DB))
+    n_steps = len(bounds) - 1
+    out: dict[int, np.ndarray] = {}
+    for i in envs:
+        out[i] = np.zeros(n_steps)
+        for k in np.where(keep[i])[0]:
+            fr = int(onset_frames[k])
+            if fr >= times.size:
+                continue
+            step = _nearest_step(float(times[fr]), bounds)
+            if step is not None:
+                out[i][step] = max(out[i][step], float(rise[i][k]))
+    return out
+
+
+def _nearest_step(t: float, bounds: np.ndarray) -> int | None:
+    i = int(np.argmin(np.abs(bounds - t)))
+    return i if i < len(bounds) - 1 else None
 
 
 def _pyin_frames(y: np.ndarray, sr: int, pitch_range: tuple[float, float],
@@ -322,8 +463,8 @@ def place_starts(segments: list[tuple[float, int]], bounds: np.ndarray) -> np.nd
     n_steps = len(bounds) - 1
     out = np.full(n_steps, np.nan)
     for t, n in segments:
-        i = int(np.argmin(np.abs(bounds - t)))
-        if i < n_steps and np.isnan(out[i]):
+        i = _nearest_step(t, bounds)
+        if i is not None and np.isnan(out[i]):
             out[i] = float(n)
     return out
 
@@ -352,6 +493,7 @@ def shift_features(feat: StepFeatures, shift: int) -> StepFeatures:
         {k: v[shift:] for k, v in feat.chroma.items()},
         {k: v[shift:] for k, v in feat.pitch.items()},
         {k: v[shift:] for k, v in feat.note_on.items()},
+        {k: v[shift:] for k, v in feat.hits.items()},
     )
 
 
@@ -603,6 +745,31 @@ def fold_note_starts(note_on: np.ndarray, bars: list[int], steps_per_bar: int,
     return out
 
 
+def fold_hits(hits: np.ndarray, bars: list[int], steps_per_bar: int, p_bars: int,
+              share: float = _HIT_SHARE) -> tuple[list[int], np.ndarray]:
+    """Pas replies ou une frappe tombe dans au moins `share` des mesures jouees
+    du slot, et force relative (0-1, moyenne des montees) pour la velocite."""
+    n = p_bars * steps_per_bar
+    count = np.zeros(n)
+    total = np.zeros(n)
+    seen = np.zeros(p_bars)
+    for b in bars:
+        chunk = hits[b * steps_per_bar:(b + 1) * steps_per_bar]
+        if len(chunk) < steps_per_bar:
+            continue
+        slot = b % p_bars
+        seen[slot] += 1
+        sl = slice(slot * steps_per_bar, (slot + 1) * steps_per_bar)
+        count[sl] += chunk > 0
+        total[sl] += chunk
+    need = np.repeat(seen, steps_per_bar) * share
+    keep = (count > 0) & (count >= need)
+    strength = np.where(keep, total / np.maximum(count, 1), 0.0)
+    if strength.max() > 0:
+        strength = strength / strength.max()
+    return [int(i) for i in np.where(keep)[0]], strength
+
+
 def pick_hits(pattern: np.ndarray, threshold: float) -> tuple[list[int], np.ndarray]:
     """Pas au-dessus du seuil relatif apres etirement robuste.
 
@@ -734,6 +901,10 @@ def _section_pattern(slot: int, label: str, b0: int, b1: int, feat: StepFeatures
             continue
         # repliage relatif au debut de section : le pas 0 = 1er temps de la section
         rel = [b - b0 for b in bars]
+        if spec.index in feat.hits:
+            hits_by_track[spec.index] = fold_hits(
+                feat.hits[spec.index][b0 * spb:b1 * spb], rel, spb, p_bars)
+            continue
         src = feat.energy if spec.kind in ("rumble", "sustain") else feat.onset
         values = src[spec.index][b0 * spb:b1 * spb]
         pattern = fold_steps(values, rel, spb, p_bars)

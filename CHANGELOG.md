@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.B] Frappes de drums des banks : événements (onsets du stem drums)
+  classés par montée d'énergie dans la bande de chaque track, au pas le
+  plus proche, au lieu du max d'enveloppe par pas qui retenait le fond
+  (cymbales, pluie) et avançait une frappe d'un pas. Kick et clap / snare
+  départagés par l'écart de niveau entre bandes (seuil d'Otsu sur le
+  morceau), kick cherché aussi dans le corps 120-300 Hz (sub ou rumble
+  continu), fuite de basse écartée ; banks Kodaman régénérées.
 - [9.C] Vue Acid : le rack audio masqué restait affiché sous la colonne
   des traitements (règle `.sd` plus forte que `.hide`) et coupait la vue ;
   boutons Notes / Accent / Gate / Octave inversés, comme les « Randomize »

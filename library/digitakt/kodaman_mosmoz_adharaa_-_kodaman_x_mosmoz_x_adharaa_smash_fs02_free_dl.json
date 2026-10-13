@@ -152,25 +152,9 @@
           "index": 3,
           "role": "Clap / snare",
           "source": "drums 300-3000 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 125,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 4,
@@ -327,82 +311,12 @@
           "level": 0.25,
           "trigs": [
             {
-              "step": 3,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 4,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 8,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 36,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 89,
-              "note": null
-            },
-            {
               "step": 52,
-              "velocity": 124,
+              "velocity": 116,
               "note": null
             },
             {
               "step": 56,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 63,
               "velocity": 127,
               "note": null
             }
@@ -412,45 +326,9 @@
           "index": 4,
           "role": "Hat ferme",
           "source": "drums 7000-16000 Hz",
-          "active": true,
+          "active": false,
           "level": 0.0,
-          "trigs": [
-            {
-              "step": 3,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 88,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 93,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 5,
@@ -468,58 +346,28 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 8,
-              "velocity": 114,
+              "step": 4,
+              "velocity": 102,
               "note": null
             },
             {
               "step": 16,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 28,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
+              "velocity": 97,
               "note": null
             },
             {
               "step": 40,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 44,
-              "velocity": 127,
+              "velocity": 99,
               "note": null
             },
             {
               "step": 52,
-              "velocity": 94,
+              "velocity": 105,
               "note": null
             },
             {
               "step": 56,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 92,
+              "velocity": 127,
               "note": null
             }
           ]
@@ -548,69 +396,9 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 2,
-              "velocity": 94,
-              "note": 39
-            },
-            {
-              "step": 9,
-              "velocity": 106,
-              "note": 39
-            },
-            {
-              "step": 19,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 20,
-              "velocity": 98,
-              "note": 45
-            },
-            {
-              "step": 27,
-              "velocity": 120,
-              "note": 39
-            },
-            {
-              "step": 29,
-              "velocity": 118,
-              "note": 45
-            },
-            {
-              "step": 30,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 33,
-              "velocity": 127,
-              "note": 39
-            },
-            {
-              "step": 43,
-              "velocity": 115,
-              "note": 45
-            },
-            {
-              "step": 44,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 45,
-              "velocity": 101,
-              "note": 45
-            },
-            {
-              "step": 50,
-              "velocity": 107,
-              "note": 39
-            },
-            {
-              "step": 53,
-              "velocity": 106,
-              "note": 45
+              "step": 0,
+              "velocity": 40,
+              "note": 26
             }
           ]
         },
@@ -745,43 +533,28 @@
           "level": 0.25,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 1,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 17,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 33,
-              "velocity": 105,
-              "note": null
-            },
-            {
               "step": 48,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 50,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 49,
-              "velocity": 105,
+              "step": 54,
+              "velocity": 89,
+              "note": null
+            },
+            {
+              "step": 55,
+              "velocity": 93,
+              "note": null
+            },
+            {
+              "step": 58,
+              "velocity": 64,
               "note": null
             }
           ]
@@ -802,68 +575,33 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 3,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 5,
-              "velocity": 94,
+              "step": 0,
+              "velocity": 121,
               "note": null
             },
             {
               "step": 8,
-              "velocity": 84,
+              "velocity": 94,
               "note": null
             },
             {
-              "step": 11,
-              "velocity": 127,
+              "step": 12,
+              "velocity": 109,
               "note": null
             },
             {
-              "step": 15,
+              "step": 20,
               "velocity": 92,
               "note": null
             },
             {
-              "step": 24,
-              "velocity": 116,
+              "step": 32,
+              "velocity": 100,
               "note": null
             },
             {
-              "step": 27,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 51,
+              "step": 44,
               "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 54,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 57,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 87,
               "note": null
             }
           ]
@@ -877,12 +615,17 @@
           "trigs": [
             {
               "step": 44,
-              "velocity": 87,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 50,
+              "velocity": 40,
               "note": null
             },
             {
               "step": 57,
-              "velocity": 127,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -896,72 +639,27 @@
           "trigs": [
             {
               "step": 0,
-              "velocity": 111,
-              "note": null
-            },
-            {
-              "step": 2,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 12,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 111,
-              "note": null
-            },
-            {
-              "step": 18,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 24,
               "velocity": 40,
               "note": null
             },
             {
-              "step": 27,
-              "velocity": 45,
+              "step": 12,
+              "velocity": 40,
               "note": null
             },
             {
               "step": 32,
-              "velocity": 111,
+              "velocity": 79,
               "note": null
             },
             {
-              "step": 34,
-              "velocity": 100,
+              "step": 47,
+              "velocity": 70,
               "note": null
             },
             {
-              "step": 35,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 45,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 93,
+              "step": 56,
+              "velocity": 69,
               "note": null
             }
           ]
@@ -970,77 +668,31 @@
           "index": 6,
           "role": "Ride",
           "source": "drums 3000-6000 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 3,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 45,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 28,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 29,
-              "velocity": 40,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 7,
           "role": "Perc A",
           "source": "drums 120-400 Hz",
-          "active": false,
+          "active": true,
           "level": 0.25,
-          "trigs": []
+          "trigs": [
+            {
+              "step": 52,
+              "velocity": 127,
+              "note": null
+            }
+          ]
         },
         {
           "index": 8,
           "role": "Perc B",
           "source": "drums 400-1500 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 20,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 96,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 9,
@@ -1052,32 +704,32 @@
             {
               "step": 3,
               "velocity": 84,
-              "note": 45
+              "note": 26
             },
             {
               "step": 4,
               "velocity": 127,
-              "note": 45
+              "note": 26
             },
             {
               "step": 5,
               "velocity": 108,
-              "note": 45
+              "note": 26
             },
             {
               "step": 19,
               "velocity": 84,
-              "note": 36
+              "note": 26
             },
             {
               "step": 20,
               "velocity": 127,
-              "note": 42
+              "note": 26
             },
             {
               "step": 21,
               "velocity": 108,
-              "note": 36
+              "note": 26
             },
             {
               "step": 35,
@@ -1269,192 +921,147 @@
           "trigs": [
             {
               "step": 0,
-              "velocity": 103,
+              "velocity": 104,
               "note": null
             },
             {
               "step": 4,
-              "velocity": 107,
+              "velocity": 121,
               "note": null
             },
             {
               "step": 8,
-              "velocity": 127,
+              "velocity": 125,
               "note": null
             },
             {
               "step": 12,
-              "velocity": 92,
+              "velocity": 117,
               "note": null
             },
             {
               "step": 16,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 113,
+              "velocity": 121,
               "note": null
             },
             {
               "step": 20,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 91,
+              "velocity": 127,
               "note": null
             },
             {
               "step": 24,
-              "velocity": 89,
+              "velocity": 121,
               "note": null
             },
             {
               "step": 28,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 34,
               "velocity": 118,
               "note": null
             },
             {
+              "step": 32,
+              "velocity": 122,
+              "note": null
+            },
+            {
               "step": 36,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 44,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 115,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 64,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 68,
-              "velocity": 111,
-              "note": null
-            },
-            {
-              "step": 71,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 76,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 79,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 80,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 84,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 88,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 91,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 92,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 95,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 100,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 104,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 107,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 112,
               "velocity": 116,
               "note": null
             },
             {
+              "step": 40,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 121,
+              "note": null
+            },
+            {
+              "step": 48,
+              "velocity": 119,
+              "note": null
+            },
+            {
+              "step": 52,
+              "velocity": 116,
+              "note": null
+            },
+            {
+              "step": 64,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 68,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 72,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 76,
+              "velocity": 115,
+              "note": null
+            },
+            {
+              "step": 80,
+              "velocity": 120,
+              "note": null
+            },
+            {
+              "step": 84,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 88,
+              "velocity": 117,
+              "note": null
+            },
+            {
+              "step": 92,
+              "velocity": 116,
+              "note": null
+            },
+            {
+              "step": 96,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 100,
+              "velocity": 110,
+              "note": null
+            },
+            {
+              "step": 104,
+              "velocity": 105,
+              "note": null
+            },
+            {
+              "step": 108,
+              "velocity": 110,
+              "note": null
+            },
+            {
+              "step": 112,
+              "velocity": 114,
+              "note": null
+            },
+            {
               "step": 116,
-              "velocity": 127,
+              "velocity": 113,
               "note": null
             },
             {
-              "step": 124,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 127,
-              "velocity": 107,
+              "step": 120,
+              "velocity": 76,
               "note": null
             }
           ]
@@ -1552,11 +1159,6 @@
               "note": null
             },
             {
-              "step": 72,
-              "velocity": 96,
-              "note": null
-            },
-            {
               "step": 73,
               "velocity": 119,
               "note": null
@@ -1626,68 +1228,33 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 7,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 118,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 83,
+              "step": 14,
               "velocity": 111,
               "note": null
             },
             {
-              "step": 93,
-              "velocity": 83,
+              "step": 46,
+              "velocity": 88,
+              "note": null
+            },
+            {
+              "step": 50,
+              "velocity": 85,
+              "note": null
+            },
+            {
+              "step": 56,
+              "velocity": 99,
+              "note": null
+            },
+            {
+              "step": 94,
+              "velocity": 94,
+              "note": null
+            },
+            {
+              "step": 124,
+              "velocity": 127,
               "note": null
             }
           ]
@@ -1700,98 +1267,13 @@
           "level": 0.92,
           "trigs": [
             {
-              "step": 3,
-              "velocity": 102,
+              "step": 44,
+              "velocity": 101,
               "note": null
             },
             {
-              "step": 7,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 29,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 71,
-              "velocity": 59,
-              "note": null
-            },
-            {
-              "step": 79,
-              "velocity": 62,
-              "note": null
-            },
-            {
-              "step": 95,
-              "velocity": 92,
+              "step": 100,
+              "velocity": 91,
               "note": null
             }
           ]
@@ -1804,38 +1286,78 @@
           "level": 0.92,
           "trigs": [
             {
-              "step": 27,
+              "step": 8,
+              "velocity": 94,
+              "note": null
+            },
+            {
+              "step": 10,
+              "velocity": 96,
+              "note": null
+            },
+            {
+              "step": 14,
+              "velocity": 119,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 97,
+              "note": null
+            },
+            {
+              "step": 22,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 26,
+              "velocity": 126,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 98,
+              "note": null
+            },
+            {
+              "step": 34,
+              "velocity": 100,
+              "note": null
+            },
+            {
+              "step": 46,
+              "velocity": 100,
+              "note": null
+            },
+            {
+              "step": 50,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 33,
-              "velocity": 90,
-              "note": null
-            },
-            {
-              "step": 41,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 79,
-              "note": null
-            },
-            {
-              "step": 45,
+              "step": 56,
               "velocity": 102,
               "note": null
             },
             {
-              "step": 51,
-              "velocity": 115,
+              "step": 90,
+              "velocity": 92,
               "note": null
             },
             {
-              "step": 83,
-              "velocity": 72,
+              "step": 94,
+              "velocity": 106,
+              "note": null
+            },
+            {
+              "step": 106,
+              "velocity": 114,
+              "note": null
+            },
+            {
+              "step": 112,
+              "velocity": 103,
               "note": null
             }
           ]
@@ -1856,33 +1378,8 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 3,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 67,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 72,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 75,
-              "velocity": 117,
-              "note": null
-            },
-            {
-              "step": 96,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 111,
-              "velocity": 88,
+              "step": 59,
+              "velocity": 68,
               "note": null
             }
           ]
@@ -1895,13 +1392,83 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 75,
-              "velocity": 86,
+              "step": 4,
+              "velocity": 76,
               "note": null
             },
             {
-              "step": 87,
-              "velocity": 96,
+              "step": 8,
+              "velocity": 91,
+              "note": null
+            },
+            {
+              "step": 16,
+              "velocity": 76,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 91,
+              "note": null
+            },
+            {
+              "step": 28,
+              "velocity": 77,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 77,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 91,
+              "note": null
+            },
+            {
+              "step": 40,
+              "velocity": 78,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 93,
+              "note": null
+            },
+            {
+              "step": 52,
+              "velocity": 80,
+              "note": null
+            },
+            {
+              "step": 64,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 76,
+              "velocity": 80,
+              "note": null
+            },
+            {
+              "step": 88,
+              "velocity": 82,
+              "note": null
+            },
+            {
+              "step": 96,
+              "velocity": 75,
+              "note": null
+            },
+            {
+              "step": 100,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 112,
+              "velocity": 85,
               "note": null
             }
           ]
@@ -1914,144 +1481,144 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 1,
-              "velocity": 127,
-              "note": 39
+              "step": 2,
+              "velocity": 42,
+              "note": 26
             },
             {
-              "step": 5,
-              "velocity": 125,
-              "note": 39
+              "step": 6,
+              "velocity": 48,
+              "note": 26
             },
             {
-              "step": 9,
-              "velocity": 127,
-              "note": 45
+              "step": 10,
+              "velocity": 59,
+              "note": 26
             },
             {
-              "step": 13,
-              "velocity": 119,
-              "note": 38
+              "step": 14,
+              "velocity": 43,
+              "note": 26
             },
             {
-              "step": 17,
-              "velocity": 126,
-              "note": 39
+              "step": 18,
+              "velocity": 46,
+              "note": 26
             },
             {
-              "step": 21,
-              "velocity": 127,
-              "note": 39
+              "step": 22,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 25,
-              "velocity": 122,
-              "note": 41
+              "step": 26,
+              "velocity": 41,
+              "note": 26
             },
             {
-              "step": 33,
-              "velocity": 127,
-              "note": 45
+              "step": 30,
+              "velocity": 63,
+              "note": 25
             },
             {
-              "step": 37,
-              "velocity": 127,
-              "note": 39
+              "step": 34,
+              "velocity": 51,
+              "note": 26
             },
             {
-              "step": 41,
-              "velocity": 127,
-              "note": 39
+              "step": 38,
+              "velocity": 44,
+              "note": 26
             },
             {
-              "step": 45,
-              "velocity": 115,
-              "note": 39
+              "step": 42,
+              "velocity": 60,
+              "note": 26
             },
             {
-              "step": 49,
-              "velocity": 110,
-              "note": 39
+              "step": 46,
+              "velocity": 71,
+              "note": 26
             },
             {
-              "step": 53,
-              "velocity": 127,
-              "note": 40
+              "step": 50,
+              "velocity": 49,
+              "note": 26
             },
             {
-              "step": 57,
-              "velocity": 85,
-              "note": 41
+              "step": 54,
+              "velocity": 71,
+              "note": 26
             },
             {
-              "step": 65,
-              "velocity": 100,
-              "note": 45
+              "step": 66,
+              "velocity": 49,
+              "note": 26
             },
             {
-              "step": 69,
-              "velocity": 118,
-              "note": 40
+              "step": 70,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 73,
-              "velocity": 107,
-              "note": 36
+              "step": 74,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 77,
-              "velocity": 109,
-              "note": 41
+              "step": 78,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 81,
-              "velocity": 112,
-              "note": 39
+              "step": 82,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 85,
-              "velocity": 106,
-              "note": 38
+              "step": 86,
+              "velocity": 41,
+              "note": 26
             },
             {
-              "step": 89,
-              "velocity": 118,
-              "note": 40
+              "step": 90,
+              "velocity": 66,
+              "note": 26
             },
             {
-              "step": 93,
-              "velocity": 98,
-              "note": 39
+              "step": 94,
+              "velocity": 50,
+              "note": 26
             },
             {
-              "step": 101,
-              "velocity": 122,
-              "note": 45
+              "step": 98,
+              "velocity": 42,
+              "note": 26
             },
             {
-              "step": 105,
-              "velocity": 95,
-              "note": 39
+              "step": 102,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 109,
-              "velocity": 83,
-              "note": 39
+              "step": 106,
+              "velocity": 61,
+              "note": 26
             },
             {
-              "step": 113,
-              "velocity": 116,
-              "note": 41
+              "step": 110,
+              "velocity": 69,
+              "note": 26
             },
             {
-              "step": 117,
-              "velocity": 98,
-              "note": 39
+              "step": 114,
+              "velocity": 55,
+              "note": 26
             },
             {
-              "step": 119,
-              "velocity": 85,
-              "note": 41
+              "step": 118,
+              "velocity": 40,
+              "note": 26
             }
           ]
         },
@@ -2213,23 +1780,33 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 2,
-              "velocity": 107,
+              "step": 0,
+              "velocity": 116,
+              "note": null
+            },
+            {
+              "step": 4,
+              "velocity": 113,
               "note": null
             },
             {
               "step": 8,
-              "velocity": 84,
+              "velocity": 124,
               "note": null
             },
             {
-              "step": 11,
-              "velocity": 119,
+              "step": 12,
+              "velocity": 114,
               "note": null
             },
             {
-              "step": 19,
-              "velocity": 100,
+              "step": 16,
+              "velocity": 116,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 116,
               "note": null
             },
             {
@@ -2239,42 +1816,42 @@
             },
             {
               "step": 28,
-              "velocity": 123,
+              "velocity": 105,
               "note": null
             },
             {
-              "step": 31,
-              "velocity": 120,
+              "step": 32,
+              "velocity": 124,
+              "note": null
+            },
+            {
+              "step": 35,
+              "velocity": 65,
               "note": null
             },
             {
               "step": 36,
-              "velocity": 127,
+              "velocity": 116,
               "note": null
             },
             {
               "step": 40,
-              "velocity": 127,
+              "velocity": 113,
               "note": null
             },
             {
-              "step": 46,
-              "velocity": 115,
+              "step": 44,
+              "velocity": 122,
+              "note": null
+            },
+            {
+              "step": 48,
+              "velocity": 102,
               "note": null
             },
             {
               "step": 52,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 97,
+              "velocity": 119,
               "note": null
             }
           ]
@@ -2302,28 +1879,13 @@
               "note": null
             },
             {
-              "step": 12,
-              "velocity": 102,
-              "note": null
-            },
-            {
               "step": 13,
               "velocity": 112,
               "note": null
             },
             {
-              "step": 16,
-              "velocity": 103,
-              "note": null
-            },
-            {
               "step": 17,
               "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 93,
               "note": null
             },
             {
@@ -2381,63 +1943,48 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 5,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 100,
+              "step": 10,
+              "velocity": 119,
               "note": null
             },
             {
               "step": 13,
-              "velocity": 90,
+              "velocity": 114,
               "note": null
             },
             {
-              "step": 15,
-              "velocity": 127,
+              "step": 14,
+              "velocity": 78,
               "note": null
             },
             {
-              "step": 23,
-              "velocity": 127,
+              "step": 18,
+              "velocity": 77,
               "note": null
             },
             {
-              "step": 27,
-              "velocity": 127,
+              "step": 22,
+              "velocity": 77,
               "note": null
             },
             {
               "step": 29,
-              "velocity": 123,
+              "velocity": 127,
               "note": null
             },
             {
-              "step": 34,
-              "velocity": 90,
+              "step": 38,
+              "velocity": 79,
               "note": null
             },
             {
-              "step": 39,
-              "velocity": 102,
+              "step": 49,
+              "velocity": 100,
               "note": null
             },
             {
-              "step": 43,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 123,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 115,
+              "step": 50,
+              "velocity": 76,
               "note": null
             }
           ]
@@ -2450,83 +1997,38 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 7,
-              "velocity": 76,
-              "note": null
-            },
-            {
               "step": 9,
-              "velocity": 112,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 101,
+              "velocity": 64,
               "note": null
             },
             {
               "step": 13,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 120,
+              "velocity": 100,
               "note": null
             },
             {
               "step": 17,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 127,
+              "velocity": 97,
               "note": null
             },
             {
               "step": 25,
-              "velocity": 120,
-              "note": null
-            },
-            {
-              "step": 29,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 37,
               "velocity": 104,
               "note": null
             },
             {
-              "step": 39,
-              "velocity": 109,
+              "step": 29,
+              "velocity": 117,
               "note": null
             },
             {
               "step": 41,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 53,
+              "velocity": 111,
               "note": null
             },
             {
               "step": 49,
-              "velocity": 95,
+              "velocity": 127,
               "note": null
             }
           ]
@@ -2539,33 +2041,58 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 1,
-              "velocity": 88,
+              "step": 10,
+              "velocity": 67,
               "note": null
             },
             {
-              "step": 19,
-              "velocity": 73,
+              "step": 14,
+              "velocity": 76,
               "note": null
             },
             {
-              "step": 27,
-              "velocity": 111,
+              "step": 20,
+              "velocity": 40,
               "note": null
             },
             {
-              "step": 43,
-              "velocity": 83,
+              "step": 22,
+              "velocity": 66,
               "note": null
             },
             {
-              "step": 51,
-              "velocity": 102,
+              "step": 26,
+              "velocity": 81,
               "note": null
             },
             {
-              "step": 53,
-              "velocity": 121,
+              "step": 33,
+              "velocity": 104,
+              "note": null
+            },
+            {
+              "step": 34,
+              "velocity": 68,
+              "note": null
+            },
+            {
+              "step": 38,
+              "velocity": 76,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 67,
+              "note": null
+            },
+            {
+              "step": 46,
+              "velocity": 66,
+              "note": null
+            },
+            {
+              "step": 50,
+              "velocity": 80,
               "note": null
             }
           ]
@@ -2586,13 +2113,8 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 85,
+              "step": 3,
+              "velocity": 72,
               "note": null
             }
           ]
@@ -2601,9 +2123,40 @@
           "index": 8,
           "role": "Perc B",
           "source": "drums 400-1500 Hz",
-          "active": false,
+          "active": true,
           "level": 1.0,
-          "trigs": []
+          "trigs": [
+            {
+              "step": 3,
+              "velocity": 64,
+              "note": null
+            },
+            {
+              "step": 8,
+              "velocity": 75,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 72,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 63,
+              "note": null
+            },
+            {
+              "step": 40,
+              "velocity": 64,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 72,
+              "note": null
+            }
+          ]
         },
         {
           "index": 9,
@@ -2613,79 +2166,79 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 1,
-              "velocity": 92,
-              "note": 43
+              "step": 2,
+              "velocity": 55,
+              "note": 26
             },
             {
-              "step": 5,
-              "velocity": 120,
-              "note": 38
+              "step": 6,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 9,
-              "velocity": 115,
-              "note": 45
+              "step": 10,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 13,
-              "velocity": 86,
-              "note": 41
+              "step": 14,
+              "velocity": 48,
+              "note": 26
             },
             {
-              "step": 17,
-              "velocity": 114,
-              "note": 43
+              "step": 18,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 21,
-              "velocity": 127,
-              "note": 38
+              "step": 22,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 25,
-              "velocity": 127,
-              "note": 37
+              "step": 26,
+              "velocity": 53,
+              "note": 26
             },
             {
-              "step": 29,
-              "velocity": 127,
-              "note": 37
+              "step": 30,
+              "velocity": 80,
+              "note": 26
             },
             {
-              "step": 33,
-              "velocity": 117,
-              "note": 42
+              "step": 34,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 37,
-              "velocity": 106,
-              "note": 38
+              "step": 38,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 41,
-              "velocity": 117,
-              "note": 46
+              "step": 42,
+              "velocity": 44,
+              "note": 26
             },
             {
-              "step": 45,
-              "velocity": 127,
-              "note": 46
+              "step": 46,
+              "velocity": 43,
+              "note": 26
             },
             {
-              "step": 49,
-              "velocity": 105,
-              "note": 40
+              "step": 50,
+              "velocity": 48,
+              "note": 26
             },
             {
-              "step": 53,
-              "velocity": 95,
-              "note": 40
+              "step": 54,
+              "velocity": 62,
+              "note": 26
             },
             {
               "step": 58,
               "velocity": 119,
-              "note": 45
+              "note": 26
             }
           ]
         },
@@ -2856,9 +2409,15 @@
           "index": 15,
           "role": "FX",
           "source": "structure (heuristique)",
-          "active": false,
+          "active": true,
           "level": 0.0,
-          "trigs": []
+          "trigs": [
+            {
+              "step": 0,
+              "velocity": 127,
+              "note": null
+            }
+          ]
         },
         {
           "index": 16,
@@ -2883,75 +2442,9 @@
           "index": 1,
           "role": "Kick",
           "source": "drums 30-120 Hz",
-          "active": true,
+          "active": false,
           "level": 0.5,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 90,
-              "note": null
-            },
-            {
-              "step": 2,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 4,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 5,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 90,
-              "note": null
-            },
-            {
-              "step": 34,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 36,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 90,
-              "note": null
-            },
-            {
-              "step": 50,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 53,
-              "velocity": 84,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 2,
@@ -3026,15 +2519,9 @@
           "index": 3,
           "role": "Clap / snare",
           "source": "drums 300-3000 Hz",
-          "active": true,
+          "active": false,
           "level": 0.25,
-          "trigs": [
-            {
-              "step": 16,
-              "velocity": 127,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 4,
@@ -3044,23 +2531,23 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 30,
+              "step": 24,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 26,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 28,
               "velocity": 113,
               "note": null
             },
             {
-              "step": 49,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 53,
-              "velocity": 68,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 96,
+              "step": 30,
+              "velocity": 100,
               "note": null
             }
           ]
@@ -3073,73 +2560,8 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 5,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 75,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 14,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 75,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
               "step": 32,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 57,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 62,
-              "velocity": 40,
+              "velocity": 111,
               "note": null
             }
           ]
@@ -3148,15 +2570,9 @@
           "index": 6,
           "role": "Ride",
           "source": "drums 3000-6000 Hz",
-          "active": true,
+          "active": false,
           "level": 0.5,
-          "trigs": [
-            {
-              "step": 59,
-              "velocity": 58,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 7,
@@ -3170,50 +2586,9 @@
           "index": 8,
           "role": "Perc B",
           "source": "drums 400-1500 Hz",
-          "active": true,
+          "active": false,
           "level": 0.25,
-          "trigs": [
-            {
-              "step": 2,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 8,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 18,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 34,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 50,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 127,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 9,
@@ -3225,22 +2600,62 @@
             {
               "step": 0,
               "velocity": 127,
-              "note": 38
+              "note": 49
             },
             {
-              "step": 16,
-              "velocity": 127,
+              "step": 1,
+              "velocity": 40,
+              "note": 48
+            },
+            {
+              "step": 2,
+              "velocity": 40,
+              "note": 46
+            },
+            {
+              "step": 3,
+              "velocity": 40,
+              "note": 45
+            },
+            {
+              "step": 4,
+              "velocity": 46,
+              "note": 42
+            },
+            {
+              "step": 6,
+              "velocity": 40,
               "note": 41
             },
             {
-              "step": 32,
-              "velocity": 127,
-              "note": 44
+              "step": 7,
+              "velocity": 76,
+              "note": 40
             },
             {
-              "step": 48,
-              "velocity": 127,
-              "note": 42
+              "step": 8,
+              "velocity": 40,
+              "note": 39
+            },
+            {
+              "step": 9,
+              "velocity": 40,
+              "note": 38
+            },
+            {
+              "step": 10,
+              "velocity": 46,
+              "note": 37
+            },
+            {
+              "step": 11,
+              "velocity": 40,
+              "note": 36
+            },
+            {
+              "step": 14,
+              "velocity": 40,
+              "note": 53
             }
           ]
         },
@@ -3453,122 +2868,147 @@
           "trigs": [
             {
               "step": 0,
-              "velocity": 127,
+              "velocity": 100,
               "note": null
             },
             {
               "step": 4,
-              "velocity": 91,
+              "velocity": 100,
+              "note": null
+            },
+            {
+              "step": 8,
+              "velocity": 102,
               "note": null
             },
             {
               "step": 12,
-              "velocity": 98,
+              "velocity": 108,
+              "note": null
+            },
+            {
+              "step": 16,
+              "velocity": 108,
               "note": null
             },
             {
               "step": 20,
-              "velocity": 91,
+              "velocity": 106,
               "note": null
             },
             {
               "step": 24,
-              "velocity": 115,
+              "velocity": 114,
+              "note": null
+            },
+            {
+              "step": 28,
+              "velocity": 105,
               "note": null
             },
             {
               "step": 32,
-              "velocity": 117,
+              "velocity": 106,
               "note": null
             },
             {
               "step": 36,
-              "velocity": 118,
+              "velocity": 116,
               "note": null
             },
             {
               "step": 40,
-              "velocity": 87,
+              "velocity": 107,
               "note": null
             },
             {
               "step": 44,
-              "velocity": 127,
+              "velocity": 106,
               "note": null
             },
             {
               "step": 48,
-              "velocity": 127,
+              "velocity": 107,
               "note": null
             },
             {
               "step": 52,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 127,
+              "velocity": 114,
               "note": null
             },
             {
               "step": 64,
-              "velocity": 127,
+              "velocity": 91,
               "note": null
             },
             {
               "step": 68,
-              "velocity": 85,
+              "velocity": 102,
               "note": null
             },
             {
               "step": 72,
+              "velocity": 106,
+              "note": null
+            },
+            {
+              "step": 76,
               "velocity": 99,
               "note": null
             },
             {
               "step": 80,
-              "velocity": 95,
+              "velocity": 110,
+              "note": null
+            },
+            {
+              "step": 84,
+              "velocity": 103,
               "note": null
             },
             {
               "step": 88,
-              "velocity": 127,
+              "velocity": 114,
               "note": null
             },
             {
               "step": 92,
-              "velocity": 108,
+              "velocity": 110,
+              "note": null
+            },
+            {
+              "step": 96,
+              "velocity": 105,
               "note": null
             },
             {
               "step": 100,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 111,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 112,
-              "velocity": 125,
-              "note": null
-            },
-            {
-              "step": 116,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 123,
-              "velocity": 87,
+              "step": 104,
+              "velocity": 112,
+              "note": null
+            },
+            {
+              "step": 108,
+              "velocity": 104,
+              "note": null
+            },
+            {
+              "step": 112,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 116,
+              "velocity": 108,
               "note": null
             },
             {
               "step": 124,
-              "velocity": 88,
+              "velocity": 72,
               "note": null
             }
           ]
@@ -3710,63 +3150,88 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 7,
-              "velocity": 102,
+              "step": 2,
+              "velocity": 88,
               "note": null
             },
             {
-              "step": 11,
+              "step": 14,
+              "velocity": 100,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 108,
+              "note": null
+            },
+            {
+              "step": 34,
+              "velocity": 79,
+              "note": null
+            },
+            {
+              "step": 46,
               "velocity": 93,
               "note": null
             },
             {
-              "step": 19,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 43,
+              "step": 50,
               "velocity": 119,
               "note": null
             },
             {
-              "step": 45,
+              "step": 54,
+              "velocity": 81,
+              "note": null
+            },
+            {
+              "step": 60,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 51,
-              "velocity": 127,
+              "step": 66,
+              "velocity": 85,
               "note": null
             },
             {
-              "step": 57,
-              "velocity": 123,
+              "step": 82,
+              "velocity": 87,
               "note": null
             },
             {
-              "step": 71,
+              "step": 94,
+              "velocity": 83,
+              "note": null
+            },
+            {
+              "step": 98,
               "velocity": 90,
               "note": null
             },
             {
-              "step": 83,
-              "velocity": 127,
+              "step": 103,
+              "velocity": 92,
               "note": null
             },
             {
-              "step": 87,
-              "velocity": 97,
+              "step": 109,
+              "velocity": 93,
+              "note": null
+            },
+            {
+              "step": 110,
+              "velocity": 111,
+              "note": null
+            },
+            {
+              "step": 111,
+              "velocity": 80,
+              "note": null
+            },
+            {
+              "step": 118,
+              "velocity": 82,
               "note": null
             }
           ]
@@ -3779,63 +3244,88 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 15,
-              "velocity": 118,
+              "step": 4,
+              "velocity": 100,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 40,
               "note": null
             },
             {
               "step": 34,
-              "velocity": 96,
+              "velocity": 73,
               "note": null
             },
             {
               "step": 36,
-              "velocity": 118,
+              "velocity": 88,
               "note": null
             },
             {
               "step": 44,
-              "velocity": 64,
+              "velocity": 73,
               "note": null
             },
             {
-              "step": 53,
-              "velocity": 127,
+              "step": 46,
+              "velocity": 74,
+              "note": null
+            },
+            {
+              "step": 54,
+              "velocity": 107,
+              "note": null
+            },
+            {
+              "step": 60,
+              "velocity": 89,
               "note": null
             },
             {
               "step": 62,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 64,
-              "velocity": 125,
+              "velocity": 90,
               "note": null
             },
             {
               "step": 68,
-              "velocity": 62,
+              "velocity": 76,
+              "note": null
+            },
+            {
+              "step": 72,
+              "velocity": 89,
+              "note": null
+            },
+            {
+              "step": 80,
+              "velocity": 74,
               "note": null
             },
             {
               "step": 92,
-              "velocity": 66,
+              "velocity": 76,
               "note": null
             },
             {
-              "step": 101,
-              "velocity": 124,
+              "step": 103,
+              "velocity": 74,
+              "note": null
+            },
+            {
+              "step": 109,
+              "velocity": 78,
               "note": null
             },
             {
               "step": 111,
-              "velocity": 111,
+              "velocity": 40,
               "note": null
             },
             {
               "step": 121,
-              "velocity": 91,
+              "velocity": 75,
               "note": null
             }
           ]
@@ -3848,98 +3338,143 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 13,
-              "velocity": 106,
+              "step": 2,
+              "velocity": 84,
               "note": null
             },
             {
-              "step": 19,
-              "velocity": 93,
+              "step": 10,
+              "velocity": 73,
               "note": null
             },
             {
-              "step": 21,
-              "velocity": 127,
+              "step": 12,
+              "velocity": 81,
               "note": null
             },
             {
-              "step": 25,
-              "velocity": 104,
+              "step": 14,
+              "velocity": 86,
               "note": null
             },
             {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 30,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 68,
-              "note": null
-            },
-            {
-              "step": 37,
+              "step": 18,
               "velocity": 108,
               "note": null
             },
             {
+              "step": 22,
+              "velocity": 73,
+              "note": null
+            },
+            {
+              "step": 24,
+              "velocity": 85,
+              "note": null
+            },
+            {
+              "step": 26,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 103,
+              "note": null
+            },
+            {
               "step": 38,
-              "velocity": 107,
+              "velocity": 90,
               "note": null
             },
             {
-              "step": 40,
+              "step": 50,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 42,
-              "velocity": 120,
+              "step": 58,
+              "velocity": 79,
               "note": null
             },
             {
-              "step": 43,
-              "velocity": 72,
+              "step": 70,
+              "velocity": 77,
               "note": null
             },
             {
-              "step": 45,
-              "velocity": 127,
+              "step": 78,
+              "velocity": 40,
               "note": null
             },
             {
-              "step": 51,
-              "velocity": 127,
+              "step": 82,
+              "velocity": 40,
               "note": null
             },
             {
-              "step": 57,
-              "velocity": 127,
+              "step": 88,
+              "velocity": 115,
               "note": null
             },
             {
-              "step": 61,
-              "velocity": 72,
+              "step": 94,
+              "velocity": 79,
               "note": null
             },
             {
-              "step": 83,
+              "step": 96,
+              "velocity": 92,
+              "note": null
+            },
+            {
+              "step": 98,
+              "velocity": 86,
+              "note": null
+            },
+            {
+              "step": 100,
+              "velocity": 119,
+              "note": null
+            },
+            {
+              "step": 102,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 104,
+              "velocity": 76,
+              "note": null
+            },
+            {
+              "step": 110,
+              "velocity": 98,
+              "note": null
+            },
+            {
+              "step": 114,
+              "velocity": 118,
+              "note": null
+            },
+            {
+              "step": 116,
+              "velocity": 80,
+              "note": null
+            },
+            {
+              "step": 118,
+              "velocity": 84,
+              "note": null
+            },
+            {
+              "step": 122,
               "velocity": 97,
               "note": null
             },
             {
-              "step": 87,
-              "velocity": 75,
-              "note": null
-            },
-            {
-              "step": 99,
-              "velocity": 102,
+              "step": 124,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -3948,15 +3483,9 @@
           "index": 6,
           "role": "Ride",
           "source": "drums 3000-6000 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 48,
-              "velocity": 105,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 7,
@@ -3966,28 +3495,43 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 8,
-              "velocity": 84,
+              "step": 62,
+              "velocity": 67,
               "note": null
             },
             {
-              "step": 16,
-              "velocity": 103,
+              "step": 99,
+              "velocity": 75,
               "note": null
             },
             {
-              "step": 28,
-              "velocity": 88,
+              "step": 101,
+              "velocity": 67,
               "note": null
             },
             {
-              "step": 76,
-              "velocity": 89,
+              "step": 105,
+              "velocity": 74,
               "note": null
             },
             {
-              "step": 96,
-              "velocity": 88,
+              "step": 107,
+              "velocity": 67,
+              "note": null
+            },
+            {
+              "step": 115,
+              "velocity": 61,
+              "note": null
+            },
+            {
+              "step": 117,
+              "velocity": 57,
+              "note": null
+            },
+            {
+              "step": 121,
+              "velocity": 57,
               "note": null
             }
           ]
@@ -4000,13 +3544,113 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 30,
-              "velocity": 83,
+              "step": 4,
+              "velocity": 104,
+              "note": null
+            },
+            {
+              "step": 8,
+              "velocity": 77,
+              "note": null
+            },
+            {
+              "step": 10,
+              "velocity": 82,
+              "note": null
+            },
+            {
+              "step": 12,
+              "velocity": 86,
+              "note": null
+            },
+            {
+              "step": 20,
+              "velocity": 74,
+              "note": null
+            },
+            {
+              "step": 24,
+              "velocity": 90,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 75,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 89,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 75,
+              "note": null
+            },
+            {
+              "step": 68,
+              "velocity": 77,
               "note": null
             },
             {
               "step": 72,
-              "velocity": 94,
+              "velocity": 92,
+              "note": null
+            },
+            {
+              "step": 76,
+              "velocity": 68,
+              "note": null
+            },
+            {
+              "step": 80,
+              "velocity": 78,
+              "note": null
+            },
+            {
+              "step": 88,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 92,
+              "velocity": 80,
+              "note": null
+            },
+            {
+              "step": 96,
+              "velocity": 98,
+              "note": null
+            },
+            {
+              "step": 99,
+              "velocity": 71,
+              "note": null
+            },
+            {
+              "step": 100,
+              "velocity": 125,
+              "note": null
+            },
+            {
+              "step": 104,
+              "velocity": 83,
+              "note": null
+            },
+            {
+              "step": 105,
+              "velocity": 72,
+              "note": null
+            },
+            {
+              "step": 112,
+              "velocity": 68,
+              "note": null
+            },
+            {
+              "step": 116,
+              "velocity": 84,
               "note": null
             }
           ]
@@ -4019,164 +3663,164 @@
           "level": 0.88,
           "trigs": [
             {
-              "step": 1,
-              "velocity": 91,
-              "note": 36
+              "step": 2,
+              "velocity": 64,
+              "note": 26
             },
             {
-              "step": 5,
-              "velocity": 127,
-              "note": 40
+              "step": 6,
+              "velocity": 53,
+              "note": 26
             },
             {
-              "step": 9,
-              "velocity": 127,
-              "note": 45
+              "step": 10,
+              "velocity": 44,
+              "note": 26
             },
             {
-              "step": 13,
-              "velocity": 127,
-              "note": 37
+              "step": 14,
+              "velocity": 61,
+              "note": 26
             },
             {
-              "step": 17,
-              "velocity": 94,
-              "note": 40
+              "step": 18,
+              "velocity": 52,
+              "note": 26
             },
             {
-              "step": 21,
-              "velocity": 121,
-              "note": 40
+              "step": 22,
+              "velocity": 69,
+              "note": 26
             },
             {
-              "step": 25,
-              "velocity": 120,
-              "note": 40
+              "step": 26,
+              "velocity": 63,
+              "note": 26
             },
             {
               "step": 30,
               "velocity": 95,
-              "note": 45
+              "note": 26
             },
             {
-              "step": 37,
-              "velocity": 127,
-              "note": 41
+              "step": 34,
+              "velocity": 82,
+              "note": 26
             },
             {
               "step": 38,
               "velocity": 86,
-              "note": 45
+              "note": 26
             },
             {
-              "step": 53,
-              "velocity": 97,
-              "note": 40
+              "step": 42,
+              "velocity": 68,
+              "note": 26
             },
             {
-              "step": 57,
-              "velocity": 127,
-              "note": 40
+              "step": 46,
+              "velocity": 70,
+              "note": 26
             },
             {
-              "step": 61,
-              "velocity": 116,
-              "note": 44
+              "step": 50,
+              "velocity": 58,
+              "note": 26
+            },
+            {
+              "step": 54,
+              "velocity": 53,
+              "note": 26
+            },
+            {
+              "step": 58,
+              "velocity": 71,
+              "note": 26
+            },
+            {
+              "step": 62,
+              "velocity": 79,
+              "note": 26
             },
             {
               "step": 66,
               "velocity": 95,
-              "note": 45
+              "note": 26
             },
             {
-              "step": 69,
-              "velocity": 127,
-              "note": 40
+              "step": 70,
+              "velocity": 75,
+              "note": 26
             },
             {
-              "step": 73,
-              "velocity": 93,
-              "note": 45
+              "step": 74,
+              "velocity": 71,
+              "note": 26
             },
             {
-              "step": 77,
-              "velocity": 113,
-              "note": 41
+              "step": 78,
+              "velocity": 53,
+              "note": 26
             },
             {
-              "step": 81,
-              "velocity": 112,
-              "note": 41
+              "step": 82,
+              "velocity": 78,
+              "note": 26
             },
             {
-              "step": 85,
-              "velocity": 107,
-              "note": 45
+              "step": 86,
+              "velocity": 44,
+              "note": 26
             },
             {
-              "step": 89,
-              "velocity": 127,
-              "note": 43
-            },
-            {
-              "step": 93,
-              "velocity": 110,
-              "note": 41
+              "step": 90,
+              "velocity": 56,
+              "note": 26
             },
             {
               "step": 94,
               "velocity": 92,
-              "note": 45
-            },
-            {
-              "step": 97,
-              "velocity": 95,
-              "note": 40
+              "note": 26
             },
             {
               "step": 98,
               "velocity": 101,
-              "note": 46
+              "note": 26
             },
             {
-              "step": 101,
-              "velocity": 115,
-              "note": 38
+              "step": 102,
+              "velocity": 75,
+              "note": 26
             },
             {
-              "step": 105,
-              "velocity": 121,
-              "note": 40
+              "step": 106,
+              "velocity": 51,
+              "note": 26
             },
             {
               "step": 110,
               "velocity": 122,
-              "note": 40
+              "note": 26
             },
             {
-              "step": 113,
-              "velocity": 105,
-              "note": 36
-            },
-            {
-              "step": 117,
-              "velocity": 117,
-              "note": 38
+              "step": 114,
+              "velocity": 44,
+              "note": 26
             },
             {
               "step": 118,
               "velocity": 85,
-              "note": 39
+              "note": 26
             },
             {
-              "step": 121,
-              "velocity": 106,
-              "note": 47
+              "step": 122,
+              "velocity": 54,
+              "note": 26
             },
             {
-              "step": 125,
-              "velocity": 126,
-              "note": 36
+              "step": 126,
+              "velocity": 57,
+              "note": 26
             }
           ]
         },
@@ -4336,48 +3980,13 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 33,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 34,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 127,
-              "note": null
-            },
-            {
               "step": 38,
-              "velocity": 127,
+              "velocity": 73,
               "note": null
             },
             {
               "step": 42,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 127,
+              "velocity": 68,
               "note": null
             },
             {
@@ -4387,12 +3996,7 @@
             },
             {
               "step": 46,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 93,
+              "velocity": 57,
               "note": null
             }
           ]
@@ -4405,13 +4009,28 @@
           "level": 0.5,
           "trigs": [
             {
+              "step": 0,
+              "velocity": 127,
+              "note": null
+            },
+            {
               "step": 1,
               "velocity": 98,
               "note": null
             },
             {
+              "step": 16,
+              "velocity": 127,
+              "note": null
+            },
+            {
               "step": 17,
               "velocity": 98,
+              "note": null
+            },
+            {
+              "step": 48,
+              "velocity": 127,
               "note": null
             },
             {
@@ -4429,38 +4048,18 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 3,
-              "velocity": 98,
+              "step": 23,
+              "velocity": 104,
               "note": null
             },
             {
-              "step": 7,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 105,
+              "step": 40,
+              "velocity": 62,
               "note": null
             },
             {
               "step": 55,
               "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 98,
               "note": null
             }
           ]
@@ -4474,27 +4073,37 @@
           "trigs": [
             {
               "step": 23,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 45,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 46,
-              "velocity": 59,
-              "note": null
-            },
-            {
-              "step": 47,
+              "step": 36,
               "velocity": 84,
               "note": null
             },
             {
-              "step": 51,
-              "velocity": 101,
+              "step": 40,
+              "velocity": 116,
+              "note": null
+            },
+            {
+              "step": 42,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 45,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 46,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 47,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -4507,43 +4116,23 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 34,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 38,
-              "velocity": 127,
+              "step": 4,
+              "velocity": 92,
               "note": null
             },
             {
               "step": 39,
-              "velocity": 76,
-              "note": null
-            },
-            {
-              "step": 41,
-              "velocity": 88,
+              "velocity": 40,
               "note": null
             },
             {
               "step": 44,
-              "velocity": 115,
+              "velocity": 84,
               "note": null
             },
             {
               "step": 55,
-              "velocity": 108,
+              "velocity": 126,
               "note": null
             }
           ]
@@ -4552,30 +4141,9 @@
           "index": 6,
           "role": "Ride",
           "source": "drums 3000-6000 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 11,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 74,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 100,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 7,
@@ -4585,28 +4153,8 @@
           "level": 0.25,
           "trigs": [
             {
-              "step": 5,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 53,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 127,
+              "step": 33,
+              "velocity": 88,
               "note": null
             }
           ]
@@ -4619,18 +4167,8 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 23,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 120,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 84,
+              "step": 44,
+              "velocity": 63,
               "note": null
             }
           ]
@@ -4643,39 +4181,34 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 6,
-              "velocity": 84,
-              "note": 38
+              "step": 33,
+              "velocity": 51,
+              "note": 27
             },
             {
-              "step": 12,
-              "velocity": 127,
-              "note": 45
+              "step": 34,
+              "velocity": 42,
+              "note": 26
             },
             {
-              "step": 22,
-              "velocity": 84,
-              "note": 43
-            },
-            {
-              "step": 28,
-              "velocity": 127,
-              "note": 36
-            },
-            {
-              "step": 38,
-              "velocity": 84,
-              "note": 36
+              "step": 39,
+              "velocity": 66,
+              "note": 27
             },
             {
               "step": 44,
               "velocity": 127,
-              "note": 36
+              "note": 27
             },
             {
-              "step": 59,
-              "velocity": 127,
-              "note": 45
+              "step": 45,
+              "velocity": 48,
+              "note": 26
+            },
+            {
+              "step": 62,
+              "velocity": 40,
+              "note": 53
             }
           ]
         },
@@ -4837,48 +4370,43 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 6,
-              "velocity": 117,
+              "step": 4,
+              "velocity": 86,
               "note": null
             },
             {
               "step": 12,
-              "velocity": 108,
+              "velocity": 107,
               "note": null
             },
             {
               "step": 16,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 28,
-              "velocity": 127,
+              "velocity": 77,
               "note": null
             },
             {
               "step": 32,
-              "velocity": 104,
+              "velocity": 127,
               "note": null
             },
             {
-              "step": 37,
-              "velocity": 112,
+              "step": 35,
+              "velocity": 59,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 71,
               "note": null
             },
             {
               "step": 38,
-              "velocity": 85,
+              "velocity": 89,
               "note": null
             },
             {
-              "step": 43,
-              "velocity": 127,
+              "step": 42,
+              "velocity": 55,
               "note": null
             },
             {
@@ -4887,13 +4415,8 @@
               "note": null
             },
             {
-              "step": 54,
-              "velocity": 117,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 108,
+              "step": 46,
+              "velocity": 58,
               "note": null
             }
           ]
@@ -4911,8 +4434,28 @@
               "note": null
             },
             {
+              "step": 6,
+              "velocity": 96,
+              "note": null
+            },
+            {
+              "step": 28,
+              "velocity": 105,
+              "note": null
+            },
+            {
               "step": 48,
               "velocity": 122,
+              "note": null
+            },
+            {
+              "step": 54,
+              "velocity": 96,
+              "note": null
+            },
+            {
+              "step": 60,
+              "velocity": 127,
               "note": null
             }
           ]
@@ -4925,52 +4468,32 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 0,
+              "step": 8,
               "velocity": 85,
               "note": null
             },
             {
-              "step": 2,
-              "velocity": 96,
+              "step": 10,
+              "velocity": 66,
               "note": null
             },
             {
-              "step": 3,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 34,
+              "step": 24,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 35,
-              "velocity": 127,
+              "step": 39,
+              "velocity": 92,
+              "note": null
+            },
+            {
+              "step": 40,
+              "velocity": 76,
               "note": null
             },
             {
               "step": 56,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 61,
               "velocity": 83,
               "note": null
             }
@@ -4984,33 +4507,43 @@
           "level": 0.75,
           "trigs": [
             {
+              "step": 8,
+              "velocity": 127,
+              "note": null
+            },
+            {
               "step": 10,
-              "velocity": 101,
+              "velocity": 40,
+              "note": null
+            },
+            {
+              "step": 16,
+              "velocity": 40,
               "note": null
             },
             {
               "step": 24,
-              "velocity": 64,
+              "velocity": 126,
               "note": null
             },
             {
               "step": 32,
-              "velocity": 48,
+              "velocity": 40,
               "note": null
             },
             {
-              "step": 36,
+              "step": 40,
               "velocity": 40,
               "note": null
             },
             {
               "step": 42,
-              "velocity": 101,
+              "velocity": 40,
               "note": null
             },
             {
-              "step": 48,
-              "velocity": 127,
+              "step": 45,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -5023,48 +4556,8 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 3,
-              "velocity": 78,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 12,
-              "velocity": 79,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 34,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 78,
-              "note": null
-            },
-            {
               "step": 39,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 44,
-              "velocity": 79,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 127,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -5077,28 +4570,8 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 43,
-              "velocity": 40,
-              "note": null
-            },
-            {
               "step": 56,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 79,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 127,
+              "velocity": 126,
               "note": null
             }
           ]
@@ -5111,8 +4584,8 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 5,
-              "velocity": 105,
+              "step": 1,
+              "velocity": 55,
               "note": null
             }
           ]
@@ -5125,53 +4598,8 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 5,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 100,
-              "note": null
-            },
-            {
               "step": 12,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 18,
-              "velocity": 117,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 28,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 44,
-              "velocity": 91,
+              "velocity": 95,
               "note": null
             }
           ]
@@ -5184,69 +4612,54 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 98,
-              "note": 41
+              "step": 2,
+              "velocity": 48,
+              "note": 26
             },
             {
-              "step": 6,
-              "velocity": 127,
-              "note": 36
+              "step": 7,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 12,
-              "velocity": 124,
-              "note": 36
+              "step": 13,
+              "velocity": 45,
+              "note": 26
             },
             {
-              "step": 16,
-              "velocity": 127,
-              "note": 41
+              "step": 17,
+              "velocity": 73,
+              "note": 26
             },
             {
-              "step": 27,
-              "velocity": 87,
-              "note": 39
+              "step": 18,
+              "velocity": 54,
+              "note": 26
             },
             {
-              "step": 28,
-              "velocity": 127,
-              "note": 39
+              "step": 29,
+              "velocity": 75,
+              "note": 29
             },
             {
-              "step": 32,
-              "velocity": 108,
-              "note": 46
+              "step": 33,
+              "velocity": 44,
+              "note": 27
             },
             {
-              "step": 38,
-              "velocity": 96,
-              "note": 36
+              "step": 34,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 44,
-              "velocity": 127,
-              "note": 36
+              "step": 39,
+              "velocity": 40,
+              "note": 26
             },
             {
               "step": 45,
               "velocity": 88,
-              "note": 45
-            },
-            {
-              "step": 48,
-              "velocity": 98,
-              "note": 41
-            },
-            {
-              "step": 54,
-              "velocity": 127,
-              "note": 36
-            },
-            {
-              "step": 60,
-              "velocity": 124,
-              "note": 45
+              "note": 27
             }
           ]
         },
@@ -5468,38 +4881,53 @@
           "level": 0.75,
           "trigs": [
             {
+              "step": 0,
+              "velocity": 51,
+              "note": null
+            },
+            {
               "step": 8,
               "velocity": 127,
               "note": null
             },
             {
               "step": 16,
-              "velocity": 127,
+              "velocity": 68,
+              "note": null
+            },
+            {
+              "step": 24,
+              "velocity": 93,
               "note": null
             },
             {
               "step": 28,
-              "velocity": 127,
+              "velocity": 69,
+              "note": null
+            },
+            {
+              "step": 32,
+              "velocity": 103,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 55,
+              "note": null
+            },
+            {
+              "step": 38,
+              "velocity": 62,
               "note": null
             },
             {
               "step": 40,
-              "velocity": 101,
+              "velocity": 116,
               "note": null
             },
             {
               "step": 44,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 127,
+              "velocity": 59,
               "note": null
             }
           ]
@@ -5512,23 +4940,13 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 113,
-              "note": null
-            },
-            {
               "step": 48,
               "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 56,
+              "velocity": 122,
               "note": null
             }
           ]
@@ -5541,72 +4959,7 @@
           "level": 0.25,
           "trigs": [
             {
-              "step": 4,
-              "velocity": 118,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 101,
-              "note": null
-            },
-            {
               "step": 12,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 118,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 36,
-              "velocity": 118,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 118,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 60,
               "velocity": 127,
               "note": null
             }
@@ -5621,67 +4974,12 @@
           "trigs": [
             {
               "step": 8,
-              "velocity": 110,
+              "velocity": 127,
               "note": null
             },
             {
               "step": 10,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 64,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 42,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 78,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -5694,43 +4992,8 @@
           "level": 0.25,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 127,
-              "note": null
-            },
-            {
               "step": 12,
-              "velocity": 78,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 64,
-              "note": null
-            },
-            {
-              "step": 26,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 29,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 64,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 64,
+              "velocity": 115,
               "note": null
             }
           ]
@@ -5739,59 +5002,17 @@
           "index": 6,
           "role": "Ride",
           "source": "drums 3000-6000 Hz",
-          "active": true,
+          "active": false,
           "level": 0.25,
-          "trigs": [
-            {
-              "step": 28,
-              "velocity": 78,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 44,
-              "velocity": 78,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 7,
           "role": "Perc A",
           "source": "drums 120-400 Hz",
-          "active": true,
+          "active": false,
           "level": 0.5,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 99,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 8,
@@ -5801,23 +5022,18 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 94,
+              "step": 8,
+              "velocity": 70,
               "note": null
             },
             {
-              "step": 16,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 48,
+              "step": 56,
               "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 58,
+              "velocity": 66,
               "note": null
             }
           ]
@@ -5830,64 +5046,54 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 87,
-              "note": 41
+              "step": 1,
+              "velocity": 73,
+              "note": 26
             },
             {
-              "step": 8,
-              "velocity": 127,
-              "note": 46
+              "step": 9,
+              "velocity": 83,
+              "note": 26
             },
             {
               "step": 17,
               "velocity": 113,
+              "note": 26
+            },
+            {
+              "step": 25,
+              "velocity": 49,
+              "note": 26
+            },
+            {
+              "step": 30,
+              "velocity": 40,
               "note": 39
             },
             {
-              "step": 24,
-              "velocity": 127,
-              "note": 46
+              "step": 34,
+              "velocity": 44,
+              "note": 26
             },
             {
-              "step": 29,
-              "velocity": 103,
-              "note": 38
+              "step": 42,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 33,
-              "velocity": 127,
-              "note": 41
+              "step": 49,
+              "velocity": 43,
+              "note": 26
             },
             {
-              "step": 40,
-              "velocity": 104,
-              "note": 46
+              "step": 57,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 47,
-              "velocity": 124,
-              "note": 37
-            },
-            {
-              "step": 48,
-              "velocity": 101,
-              "note": 41
-            },
-            {
-              "step": 55,
-              "velocity": 127,
-              "note": 39
-            },
-            {
-              "step": 59,
-              "velocity": 120,
-              "note": 41
-            },
-            {
-              "step": 60,
-              "velocity": 112,
-              "note": 41
+              "step": 62,
+              "velocity": 40,
+              "note": 50
             }
           ]
         },
@@ -6120,103 +5326,53 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 2,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 4,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 6,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 8,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 18,
-              "velocity": 87,
-              "note": null
-            },
-            {
               "step": 20,
-              "velocity": 109,
+              "velocity": 75,
               "note": null
             },
             {
               "step": 22,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 104,
+              "velocity": 64,
               "note": null
             },
             {
               "step": 24,
-              "velocity": 91,
+              "velocity": 127,
               "note": null
             },
             {
-              "step": 35,
-              "velocity": 84,
+              "step": 32,
+              "velocity": 86,
               "note": null
             },
             {
-              "step": 38,
-              "velocity": 109,
+              "step": 34,
+              "velocity": 65,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 102,
+              "note": null
+            },
+            {
+              "step": 40,
+              "velocity": 85,
               "note": null
             },
             {
               "step": 44,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 127,
+              "velocity": 73,
               "note": null
             },
             {
               "step": 56,
-              "velocity": 127,
+              "velocity": 78,
               "note": null
             },
             {
-              "step": 58,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 127,
+              "step": 59,
+              "velocity": 64,
               "note": null
             }
           ]
@@ -6229,23 +5385,23 @@
           "level": 0.25,
           "trigs": [
             {
-              "step": 8,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 104,
+              "step": 32,
+              "velocity": 91,
               "note": null
             },
             {
               "step": 36,
-              "velocity": 93,
+              "velocity": 127,
               "note": null
             },
             {
               "step": 40,
-              "velocity": 104,
+              "velocity": 109,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 78,
               "note": null
             }
           ]
@@ -6254,45 +5410,9 @@
           "index": 5,
           "role": "Hat ouvert",
           "source": "drums 5000-12000 Hz",
-          "active": true,
+          "active": false,
           "level": 0.25,
-          "trigs": [
-            {
-              "step": 3,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 4,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 82,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 40,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 6,
@@ -6302,28 +5422,8 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 20,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 127,
-              "note": null
-            },
-            {
               "step": 56,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 45,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 73,
+              "velocity": 40,
               "note": null
             }
           ]
@@ -6340,15 +5440,9 @@
           "index": 8,
           "role": "Perc B",
           "source": "drums 400-1500 Hz",
-          "active": true,
+          "active": false,
           "level": 0.75,
-          "trigs": [
-            {
-              "step": 36,
-              "velocity": 86,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 9,
@@ -6358,59 +5452,54 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 0,
-              "velocity": 127,
-              "note": 41
+              "step": 2,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 1,
-              "velocity": 87,
-              "note": 45
+              "step": 5,
+              "velocity": 64,
+              "note": 27
             },
             {
-              "step": 8,
-              "velocity": 127,
-              "note": 47
+              "step": 6,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 24,
-              "velocity": 102,
-              "note": 36
+              "step": 10,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 27,
-              "velocity": 123,
-              "note": 45
+              "step": 14,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 40,
-              "velocity": 127,
-              "note": 36
+              "step": 17,
+              "velocity": 45,
+              "note": 26
             },
             {
-              "step": 42,
-              "velocity": 95,
-              "note": 36
+              "step": 20,
+              "velocity": 62,
+              "note": 25
             },
             {
-              "step": 47,
-              "velocity": 125,
-              "note": 38
+              "step": 21,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 48,
-              "velocity": 127,
-              "note": 44
+              "step": 25,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 49,
-              "velocity": 87,
-              "note": 39
-            },
-            {
-              "step": 56,
-              "velocity": 127,
-              "note": 45
+              "step": 29,
+              "velocity": 46,
+              "note": 26
             }
           ]
         },
@@ -6618,73 +5707,33 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 31,
+              "step": 0,
+              "velocity": 93,
+              "note": null
+            },
+            {
+              "step": 28,
               "velocity": 85,
               "note": null
             },
             {
-              "step": 35,
-              "velocity": 108,
-              "note": null
-            },
-            {
               "step": 36,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 38,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 40,
               "velocity": 113,
               "note": null
             },
             {
-              "step": 43,
-              "velocity": 101,
-              "note": null
-            },
-            {
               "step": 44,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 101,
+              "velocity": 97,
               "note": null
             },
             {
               "step": 48,
-              "velocity": 106,
+              "velocity": 117,
               "note": null
             },
             {
               "step": 52,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 89,
+              "velocity": 103,
               "note": null
             },
             {
@@ -6797,25 +5846,9 @@
           "index": 3,
           "role": "Clap / snare",
           "source": "drums 300-3000 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 27,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 92,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 4,
@@ -6845,30 +5878,9 @@
           "index": 7,
           "role": "Perc A",
           "source": "drums 120-400 Hz",
-          "active": true,
+          "active": false,
           "level": 1.0,
-          "trigs": [
-            {
-              "step": 15,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 22,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 26,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 121,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 8,
@@ -6878,8 +5890,18 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 22,
-              "velocity": 87,
+              "step": 36,
+              "velocity": 115,
+              "note": null
+            },
+            {
+              "step": 44,
+              "velocity": 95,
+              "note": null
+            },
+            {
+              "step": 60,
+              "velocity": 127,
               "note": null
             }
           ]
@@ -6892,74 +5914,79 @@
           "level": 1.0,
           "trigs": [
             {
-              "step": 13,
-              "velocity": 126,
-              "note": 42
+              "step": 2,
+              "velocity": 40,
+              "note": 26
+            },
+            {
+              "step": 10,
+              "velocity": 40,
+              "note": 26
+            },
+            {
+              "step": 14,
+              "velocity": 40,
+              "note": 26
             },
             {
               "step": 17,
               "velocity": 102,
-              "note": 42
+              "note": 26
             },
             {
-              "step": 21,
-              "velocity": 120,
-              "note": 45
+              "step": 22,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 25,
-              "velocity": 127,
-              "note": 45
+              "step": 26,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 29,
-              "velocity": 96,
-              "note": 45
+              "step": 30,
+              "velocity": 42,
+              "note": 26
             },
             {
-              "step": 33,
-              "velocity": 127,
-              "note": 46
+              "step": 34,
+              "velocity": 54,
+              "note": 26
             },
             {
-              "step": 37,
-              "velocity": 111,
-              "note": 45
+              "step": 38,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 41,
-              "velocity": 106,
-              "note": 45
+              "step": 42,
+              "velocity": 45,
+              "note": 26
             },
             {
-              "step": 45,
-              "velocity": 127,
-              "note": 36
+              "step": 46,
+              "velocity": 58,
+              "note": 26
             },
             {
-              "step": 49,
-              "velocity": 113,
-              "note": 36
+              "step": 50,
+              "velocity": 40,
+              "note": 26
             },
             {
-              "step": 53,
-              "velocity": 127,
-              "note": 37
+              "step": 54,
+              "velocity": 44,
+              "note": 26
             },
             {
-              "step": 57,
-              "velocity": 123,
-              "note": 42
-            },
-            {
-              "step": 61,
-              "velocity": 125,
-              "note": 38
+              "step": 58,
+              "velocity": 56,
+              "note": 26
             },
             {
               "step": 62,
               "velocity": 85,
-              "note": 39
+              "note": 26
             }
           ]
         },
@@ -7094,21 +6121,6 @@
               "step": 0,
               "velocity": 127,
               "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 127,
-              "note": null
             }
           ]
         },
@@ -7209,63 +6221,38 @@
           "level": 0.75,
           "trigs": [
             {
+              "step": 2,
+              "velocity": 127,
+              "note": null
+            },
+            {
               "step": 3,
-              "velocity": 106,
+              "velocity": 91,
               "note": null
             },
             {
               "step": 7,
-              "velocity": 96,
+              "velocity": 98,
               "note": null
             },
             {
-              "step": 11,
-              "velocity": 127,
+              "step": 9,
+              "velocity": 96,
               "note": null
             },
             {
               "step": 15,
-              "velocity": 115,
+              "velocity": 87,
               "note": null
             },
             {
-              "step": 17,
-              "velocity": 100,
+              "step": 22,
+              "velocity": 83,
               "note": null
             },
             {
-              "step": 19,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 55,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 115,
+              "step": 28,
+              "velocity": 93,
               "note": null
             }
           ]
@@ -7278,48 +6265,43 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 1,
-              "velocity": 92,
-              "note": null
-            },
-            {
               "step": 3,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 5,
-              "velocity": 127,
+              "velocity": 88,
               "note": null
             },
             {
               "step": 7,
-              "velocity": 77,
+              "velocity": 103,
               "note": null
             },
             {
               "step": 9,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 119,
+              "velocity": 97,
               "note": null
             },
             {
               "step": 15,
-              "velocity": 77,
+              "velocity": 86,
               "note": null
             },
             {
               "step": 17,
-              "velocity": 127,
+              "velocity": 87,
+              "note": null
+            },
+            {
+              "step": 22,
+              "velocity": 97,
+              "note": null
+            },
+            {
+              "step": 28,
+              "velocity": 101,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 82,
               "note": null
             }
           ]
@@ -7333,47 +6315,22 @@
           "trigs": [
             {
               "step": 0,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 53,
               "velocity": 127,
               "note": null
             },
             {
-              "step": 55,
-              "velocity": 77,
+              "step": 2,
+              "velocity": 120,
               "note": null
             },
             {
-              "step": 57,
-              "velocity": 127,
+              "step": 24,
+              "velocity": 83,
               "note": null
             },
             {
-              "step": 59,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 77,
+              "step": 44,
+              "velocity": 84,
               "note": null
             }
           ]
@@ -7382,20 +6339,9 @@
           "index": 6,
           "role": "Ride",
           "source": "drums 3000-6000 Hz",
-          "active": true,
+          "active": false,
           "level": 0.75,
-          "trigs": [
-            {
-              "step": 48,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 92,
-              "note": null
-            }
-          ]
+          "trigs": []
         },
         {
           "index": 7,
@@ -7405,28 +6351,38 @@
           "level": 0.5,
           "trigs": [
             {
-              "step": 9,
-              "velocity": 94,
+              "step": 5,
+              "velocity": 73,
               "note": null
             },
             {
-              "step": 28,
-              "velocity": 127,
+              "step": 11,
+              "velocity": 81,
               "note": null
             },
             {
-              "step": 35,
-              "velocity": 95,
+              "step": 13,
+              "velocity": 77,
               "note": null
             },
             {
-              "step": 41,
-              "velocity": 94,
+              "step": 17,
+              "velocity": 75,
               "note": null
             },
             {
-              "step": 57,
-              "velocity": 94,
+              "step": 20,
+              "velocity": 62,
+              "note": null
+            },
+            {
+              "step": 24,
+              "velocity": 72,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 59,
               "note": null
             }
           ]
@@ -7439,8 +6395,28 @@
           "level": 0.75,
           "trigs": [
             {
-              "step": 28,
-              "velocity": 88,
+              "step": 0,
+              "velocity": 127,
+              "note": null
+            },
+            {
+              "step": 13,
+              "velocity": 82,
+              "note": null
+            },
+            {
+              "step": 24,
+              "velocity": 79,
+              "note": null
+            },
+            {
+              "step": 30,
+              "velocity": 86,
+              "note": null
+            },
+            {
+              "step": 36,
+              "velocity": 83,
               "note": null
             }
           ]
@@ -7603,2284 +6579,6 @@
               "note": null
             }
           ]
-        },
-        {
-          "index": 16,
-          "role": "Reserve",
-          "source": "",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
-        }
-      ]
-    },
-    {
-      "slot": 14,
-      "label": "peak",
-      "start_s": 131.67,
-      "end_s": 162.64,
-      "bars": 8,
-      "steps": 128,
-      "repeats": 2.5,
-      "tracks": [
-        {
-          "index": 1,
-          "role": "Kick",
-          "source": "drums 30-120 Hz",
-          "active": true,
-          "level": 0.95,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 4,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 8,
-              "velocity": 112,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 12,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 28,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 36,
-              "velocity": 117,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 90,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 108,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 64,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 68,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 76,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 80,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 84,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 88,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 92,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 96,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 100,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 108,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 112,
-              "velocity": 88,
-              "note": null
-            },
-            {
-              "step": 116,
-              "velocity": 88,
-              "note": null
-            },
-            {
-              "step": 120,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 122,
-              "velocity": 91,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 2,
-          "role": "Rumble",
-          "source": "drums 30-90 Hz",
-          "active": true,
-          "level": 0.95,
-          "trigs": [
-            {
-              "step": 1,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 5,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 17,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 117,
-              "note": null
-            },
-            {
-              "step": 33,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 41,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 120,
-              "note": null
-            },
-            {
-              "step": 53,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 65,
-              "velocity": 123,
-              "note": null
-            },
-            {
-              "step": 69,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 73,
-              "velocity": 125,
-              "note": null
-            },
-            {
-              "step": 77,
-              "velocity": 106,
-              "note": null
-            },
-            {
-              "step": 81,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 85,
-              "velocity": 112,
-              "note": null
-            },
-            {
-              "step": 89,
-              "velocity": 112,
-              "note": null
-            },
-            {
-              "step": 93,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 97,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 113,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 117,
-              "velocity": 106,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 3,
-          "role": "Clap / snare",
-          "source": "drums 300-3000 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 7,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 111,
-              "note": null
-            },
-            {
-              "step": 72,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 83,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 91,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 103,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 107,
-              "velocity": 83,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 4,
-          "role": "Hat ferme",
-          "source": "drums 7000-16000 Hz",
-          "active": true,
-          "level": 0.95,
-          "trigs": [
-            {
-              "step": 4,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 7,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 59,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 23,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 33,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 80,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 117,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 76,
-              "velocity": 71,
-              "note": null
-            },
-            {
-              "step": 100,
-              "velocity": 108,
-              "note": null
-            },
-            {
-              "step": 103,
-              "velocity": 94,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 5,
-          "role": "Hat ouvert",
-          "source": "drums 5000-12000 Hz",
-          "active": true,
-          "level": 0.9,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 72,
-              "note": null
-            },
-            {
-              "step": 8,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 115,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 35,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 79,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 64,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 88,
-              "velocity": 102,
-              "note": null
-            },
-            {
-              "step": 91,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 93,
-              "velocity": 46,
-              "note": null
-            },
-            {
-              "step": 102,
-              "velocity": 115,
-              "note": null
-            },
-            {
-              "step": 105,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 107,
-              "velocity": 40,
-              "note": null
-            },
-            {
-              "step": 109,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 111,
-              "velocity": 71,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 6,
-          "role": "Ride",
-          "source": "drums 3000-6000 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 56,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 7,
-          "role": "Perc A",
-          "source": "drums 120-400 Hz",
-          "active": true,
-          "level": 0.95,
-          "trigs": [
-            {
-              "step": 67,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 71,
-              "velocity": 88,
-              "note": null
-            },
-            {
-              "step": 79,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 119,
-              "velocity": 93,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 8,
-          "role": "Perc B",
-          "source": "drums 400-1500 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 36,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 67,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 79,
-              "velocity": 86,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 9,
-          "role": "Basse",
-          "source": "bass 40-400 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 1,
-              "velocity": 94,
-              "note": 40
-            },
-            {
-              "step": 2,
-              "velocity": 95,
-              "note": 39
-            },
-            {
-              "step": 5,
-              "velocity": 122,
-              "note": 37
-            },
-            {
-              "step": 6,
-              "velocity": 101,
-              "note": 45
-            },
-            {
-              "step": 9,
-              "velocity": 113,
-              "note": 46
-            },
-            {
-              "step": 10,
-              "velocity": 94,
-              "note": 39
-            },
-            {
-              "step": 13,
-              "velocity": 127,
-              "note": 40
-            },
-            {
-              "step": 14,
-              "velocity": 88,
-              "note": 39
-            },
-            {
-              "step": 17,
-              "velocity": 117,
-              "note": 38
-            },
-            {
-              "step": 18,
-              "velocity": 90,
-              "note": 39
-            },
-            {
-              "step": 21,
-              "velocity": 95,
-              "note": 40
-            },
-            {
-              "step": 22,
-              "velocity": 103,
-              "note": 39
-            },
-            {
-              "step": 25,
-              "velocity": 108,
-              "note": 42
-            },
-            {
-              "step": 26,
-              "velocity": 87,
-              "note": 39
-            },
-            {
-              "step": 33,
-              "velocity": 89,
-              "note": 39
-            },
-            {
-              "step": 34,
-              "velocity": 103,
-              "note": 39
-            },
-            {
-              "step": 37,
-              "velocity": 127,
-              "note": 38
-            },
-            {
-              "step": 41,
-              "velocity": 104,
-              "note": 40
-            },
-            {
-              "step": 42,
-              "velocity": 97,
-              "note": 39
-            },
-            {
-              "step": 45,
-              "velocity": 119,
-              "note": 38
-            },
-            {
-              "step": 49,
-              "velocity": 114,
-              "note": 38
-            },
-            {
-              "step": 53,
-              "velocity": 84,
-              "note": 39
-            },
-            {
-              "step": 54,
-              "velocity": 106,
-              "note": 39
-            },
-            {
-              "step": 61,
-              "velocity": 91,
-              "note": 45
-            },
-            {
-              "step": 65,
-              "velocity": 89,
-              "note": 39
-            },
-            {
-              "step": 66,
-              "velocity": 101,
-              "note": 39
-            },
-            {
-              "step": 70,
-              "velocity": 117,
-              "note": 39
-            },
-            {
-              "step": 74,
-              "velocity": 127,
-              "note": 39
-            },
-            {
-              "step": 77,
-              "velocity": 127,
-              "note": 38
-            },
-            {
-              "step": 78,
-              "velocity": 105,
-              "note": 39
-            },
-            {
-              "step": 81,
-              "velocity": 93,
-              "note": 39
-            },
-            {
-              "step": 85,
-              "velocity": 113,
-              "note": 39
-            },
-            {
-              "step": 86,
-              "velocity": 83,
-              "note": 39
-            },
-            {
-              "step": 89,
-              "velocity": 94,
-              "note": 44
-            },
-            {
-              "step": 90,
-              "velocity": 123,
-              "note": 39
-            },
-            {
-              "step": 93,
-              "velocity": 127,
-              "note": 38
-            },
-            {
-              "step": 97,
-              "velocity": 127,
-              "note": 38
-            },
-            {
-              "step": 98,
-              "velocity": 93,
-              "note": 39
-            },
-            {
-              "step": 101,
-              "velocity": 127,
-              "note": 41
-            },
-            {
-              "step": 102,
-              "velocity": 104,
-              "note": 39
-            },
-            {
-              "step": 105,
-              "velocity": 97,
-              "note": 44
-            },
-            {
-              "step": 109,
-              "velocity": 91,
-              "note": 39
-            },
-            {
-              "step": 118,
-              "velocity": 101,
-              "note": 44
-            }
-          ]
-        },
-        {
-          "index": 10,
-          "role": "Lead",
-          "source": "other 300-4000 Hz",
-          "active": true,
-          "level": 0.75,
-          "trigs": [
-            {
-              "step": 6,
-              "velocity": 127,
-              "note": 70
-            },
-            {
-              "step": 11,
-              "velocity": 125,
-              "note": 69
-            },
-            {
-              "step": 12,
-              "velocity": 127,
-              "note": 70
-            },
-            {
-              "step": 13,
-              "velocity": 123,
-              "note": 61
-            },
-            {
-              "step": 19,
-              "velocity": 109,
-              "note": 70
-            },
-            {
-              "step": 22,
-              "velocity": 119,
-              "note": 62
-            },
-            {
-              "step": 23,
-              "velocity": 119,
-              "note": 69
-            },
-            {
-              "step": 24,
-              "velocity": 86,
-              "note": 62
-            },
-            {
-              "step": 26,
-              "velocity": 98,
-              "note": 69
-            },
-            {
-              "step": 32,
-              "velocity": 118,
-              "note": 69
-            },
-            {
-              "step": 34,
-              "velocity": 111,
-              "note": 63
-            },
-            {
-              "step": 39,
-              "velocity": 127,
-              "note": 70
-            },
-            {
-              "step": 43,
-              "velocity": 116,
-              "note": 69
-            },
-            {
-              "step": 45,
-              "velocity": 104,
-              "note": 69
-            },
-            {
-              "step": 51,
-              "velocity": 117,
-              "note": 65
-            },
-            {
-              "step": 55,
-              "velocity": 94,
-              "note": 69
-            },
-            {
-              "step": 71,
-              "velocity": 127,
-              "note": 68
-            },
-            {
-              "step": 75,
-              "velocity": 95,
-              "note": 60
-            },
-            {
-              "step": 77,
-              "velocity": 127,
-              "note": 67
-            },
-            {
-              "step": 83,
-              "velocity": 87,
-              "note": 70
-            },
-            {
-              "step": 89,
-              "velocity": 91,
-              "note": 70
-            },
-            {
-              "step": 93,
-              "velocity": 110,
-              "note": 60
-            },
-            {
-              "step": 103,
-              "velocity": 105,
-              "note": 70
-            },
-            {
-              "step": 106,
-              "velocity": 100,
-              "note": 66
-            },
-            {
-              "step": 107,
-              "velocity": 127,
-              "note": 68
-            },
-            {
-              "step": 109,
-              "velocity": 127,
-              "note": 61
-            },
-            {
-              "step": 118,
-              "velocity": 96,
-              "note": 70
-            },
-            {
-              "step": 124,
-              "velocity": 94,
-              "note": 60
-            }
-          ]
-        },
-        {
-          "index": 11,
-          "role": "Atmo",
-          "source": "other 100-8000 Hz",
-          "active": true,
-          "level": 0.85,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 40,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 12,
-          "role": "Id1",
-          "source": "",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
-        },
-        {
-          "index": 13,
-          "role": "Id2",
-          "source": "",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
-        },
-        {
-          "index": 14,
-          "role": "Vocal",
-          "source": "vocals 200-5000 Hz",
-          "active": true,
-          "level": 0.35,
-          "trigs": [
-            {
-              "step": 2,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 3,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 6,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 18,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 22,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 36,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 41,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 50,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 54,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 58,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 70,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 73,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 81,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 83,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 86,
-              "velocity": 111,
-              "note": null
-            },
-            {
-              "step": 88,
-              "velocity": 88,
-              "note": null
-            },
-            {
-              "step": 90,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 105,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 118,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 120,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 121,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 124,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 15,
-          "role": "FX",
-          "source": "structure (heuristique)",
-          "active": true,
-          "level": 0.0,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 16,
-          "role": "Reserve",
-          "source": "",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
-        }
-      ]
-    },
-    {
-      "slot": 15,
-      "label": "outro",
-      "start_s": 162.64,
-      "end_s": 179.69,
-      "bars": 8,
-      "steps": 128,
-      "repeats": 1.4,
-      "tracks": [
-        {
-          "index": 1,
-          "role": "Kick",
-          "source": "drums 30-120 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 4,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 8,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 12,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 20,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 125,
-              "note": null
-            },
-            {
-              "step": 32,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 36,
-              "velocity": 108,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 44,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 60,
-              "velocity": 87,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 64,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 68,
-              "velocity": 110,
-              "note": null
-            },
-            {
-              "step": 71,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 80,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 87,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 88,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 99,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 107,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 108,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 111,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 112,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 115,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 116,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 120,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 122,
-              "velocity": 103,
-              "note": null
-            },
-            {
-              "step": 124,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 2,
-          "role": "Rumble",
-          "source": "drums 30-90 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 1,
-              "velocity": 115,
-              "note": null
-            },
-            {
-              "step": 5,
-              "velocity": 125,
-              "note": null
-            },
-            {
-              "step": 9,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 16,
-              "velocity": 93,
-              "note": null
-            },
-            {
-              "step": 17,
-              "velocity": 120,
-              "note": null
-            },
-            {
-              "step": 21,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 25,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 29,
-              "velocity": 125,
-              "note": null
-            },
-            {
-              "step": 33,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 37,
-              "velocity": 118,
-              "note": null
-            },
-            {
-              "step": 41,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 49,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 53,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 65,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 69,
-              "velocity": 109,
-              "note": null
-            },
-            {
-              "step": 72,
-              "velocity": 92,
-              "note": null
-            },
-            {
-              "step": 73,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 77,
-              "velocity": 126,
-              "note": null
-            },
-            {
-              "step": 81,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 85,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 89,
-              "velocity": 94,
-              "note": null
-            },
-            {
-              "step": 101,
-              "velocity": 108,
-              "note": null
-            },
-            {
-              "step": 104,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 105,
-              "velocity": 124,
-              "note": null
-            },
-            {
-              "step": 109,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 113,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 117,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 3,
-          "role": "Clap / snare",
-          "source": "drums 300-3000 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 39,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 85,
-              "note": null
-            },
-            {
-              "step": 67,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 75,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 77,
-              "velocity": 122,
-              "note": null
-            },
-            {
-              "step": 79,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 83,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 89,
-              "velocity": 112,
-              "note": null
-            },
-            {
-              "step": 91,
-              "velocity": 104,
-              "note": null
-            },
-            {
-              "step": 95,
-              "velocity": 97,
-              "note": null
-            },
-            {
-              "step": 103,
-              "velocity": 101,
-              "note": null
-            },
-            {
-              "step": 109,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 113,
-              "velocity": 119,
-              "note": null
-            },
-            {
-              "step": 123,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 4,
-          "role": "Hat ferme",
-          "source": "drums 7000-16000 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 15,
-              "velocity": 59,
-              "note": null
-            },
-            {
-              "step": 39,
-              "velocity": 95,
-              "note": null
-            },
-            {
-              "step": 71,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 79,
-              "velocity": 115,
-              "note": null
-            },
-            {
-              "step": 87,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 91,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 95,
-              "velocity": 98,
-              "note": null
-            },
-            {
-              "step": 103,
-              "velocity": 121,
-              "note": null
-            },
-            {
-              "step": 111,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 5,
-          "role": "Hat ouvert",
-          "source": "drums 5000-12000 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 84,
-              "note": null
-            },
-            {
-              "step": 48,
-              "velocity": 100,
-              "note": null
-            },
-            {
-              "step": 75,
-              "velocity": 81,
-              "note": null
-            },
-            {
-              "step": 83,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 99,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 107,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 115,
-              "velocity": 111,
-              "note": null
-            },
-            {
-              "step": 123,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 6,
-          "role": "Ride",
-          "source": "drums 3000-6000 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 77,
-              "velocity": 113,
-              "note": null
-            },
-            {
-              "step": 89,
-              "velocity": 90,
-              "note": null
-            },
-            {
-              "step": 113,
-              "velocity": 42,
-              "note": null
-            },
-            {
-              "step": 120,
-              "velocity": 127,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 7,
-          "role": "Perc A",
-          "source": "drums 120-400 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 7,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 11,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 19,
-              "velocity": 114,
-              "note": null
-            },
-            {
-              "step": 27,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 43,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 51,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 52,
-              "velocity": 91,
-              "note": null
-            },
-            {
-              "step": 57,
-              "velocity": 116,
-              "note": null
-            },
-            {
-              "step": 59,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 76,
-              "velocity": 109,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 8,
-          "role": "Perc B",
-          "source": "drums 400-1500 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 8,
-              "velocity": 105,
-              "note": null
-            },
-            {
-              "step": 12,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 86,
-              "note": null
-            },
-            {
-              "step": 76,
-              "velocity": 89,
-              "note": null
-            },
-            {
-              "step": 124,
-              "velocity": 92,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 9,
-          "role": "Basse",
-          "source": "bass 40-400 Hz",
-          "active": true,
-          "level": 1.0,
-          "trigs": [
-            {
-              "step": 1,
-              "velocity": 99,
-              "note": 45
-            },
-            {
-              "step": 2,
-              "velocity": 86,
-              "note": 39
-            },
-            {
-              "step": 5,
-              "velocity": 93,
-              "note": 41
-            },
-            {
-              "step": 6,
-              "velocity": 90,
-              "note": 45
-            },
-            {
-              "step": 9,
-              "velocity": 98,
-              "note": 45
-            },
-            {
-              "step": 10,
-              "velocity": 86,
-              "note": 45
-            },
-            {
-              "step": 17,
-              "velocity": 108,
-              "note": 45
-            },
-            {
-              "step": 21,
-              "velocity": 123,
-              "note": 39
-            },
-            {
-              "step": 25,
-              "velocity": 111,
-              "note": 41
-            },
-            {
-              "step": 33,
-              "velocity": 112,
-              "note": 45
-            },
-            {
-              "step": 37,
-              "velocity": 118,
-              "note": 40
-            },
-            {
-              "step": 41,
-              "velocity": 115,
-              "note": 46
-            },
-            {
-              "step": 45,
-              "velocity": 127,
-              "note": 41
-            },
-            {
-              "step": 49,
-              "velocity": 114,
-              "note": 43
-            },
-            {
-              "step": 50,
-              "velocity": 84,
-              "note": 45
-            },
-            {
-              "step": 53,
-              "velocity": 99,
-              "note": 43
-            },
-            {
-              "step": 65,
-              "velocity": 108,
-              "note": 43
-            },
-            {
-              "step": 69,
-              "velocity": 126,
-              "note": 44
-            },
-            {
-              "step": 73,
-              "velocity": 88,
-              "note": 46
-            },
-            {
-              "step": 77,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 81,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 85,
-              "velocity": 105,
-              "note": 44
-            },
-            {
-              "step": 89,
-              "velocity": 127,
-              "note": 44
-            },
-            {
-              "step": 97,
-              "velocity": 112,
-              "note": 41
-            },
-            {
-              "step": 101,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 105,
-              "velocity": 127,
-              "note": 45
-            },
-            {
-              "step": 109,
-              "velocity": 105,
-              "note": 46
-            },
-            {
-              "step": 113,
-              "velocity": 102,
-              "note": 43
-            },
-            {
-              "step": 117,
-              "velocity": 127,
-              "note": 41
-            },
-            {
-              "step": 122,
-              "velocity": 98,
-              "note": 36
-            }
-          ]
-        },
-        {
-          "index": 10,
-          "role": "Lead",
-          "source": "other 300-4000 Hz",
-          "active": true,
-          "level": 0.27,
-          "trigs": [
-            {
-              "step": 2,
-              "velocity": 85,
-              "note": 69
-            },
-            {
-              "step": 5,
-              "velocity": 127,
-              "note": 69
-            },
-            {
-              "step": 18,
-              "velocity": 85,
-              "note": 63
-            },
-            {
-              "step": 21,
-              "velocity": 127,
-              "note": 66
-            },
-            {
-              "step": 34,
-              "velocity": 85,
-              "note": 61
-            },
-            {
-              "step": 37,
-              "velocity": 127,
-              "note": 71
-            },
-            {
-              "step": 50,
-              "velocity": 85,
-              "note": 63
-            },
-            {
-              "step": 53,
-              "velocity": 127,
-              "note": 65
-            },
-            {
-              "step": 66,
-              "velocity": 85,
-              "note": 70
-            },
-            {
-              "step": 69,
-              "velocity": 127,
-              "note": 69
-            },
-            {
-              "step": 81,
-              "velocity": 106,
-              "note": 69
-            },
-            {
-              "step": 93,
-              "velocity": 127,
-              "note": 69
-            },
-            {
-              "step": 98,
-              "velocity": 85,
-              "note": 70
-            },
-            {
-              "step": 101,
-              "velocity": 127,
-              "note": 69
-            },
-            {
-              "step": 112,
-              "velocity": 91,
-              "note": 69
-            },
-            {
-              "step": 113,
-              "velocity": 127,
-              "note": 67
-            },
-            {
-              "step": 117,
-              "velocity": 84,
-              "note": 66
-            }
-          ]
-        },
-        {
-          "index": 11,
-          "role": "Atmo",
-          "source": "other 100-8000 Hz",
-          "active": true,
-          "level": 0.36,
-          "trigs": [
-            {
-              "step": 0,
-              "velocity": 47,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 12,
-          "role": "Id1",
-          "source": "",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
-        },
-        {
-          "index": 13,
-          "role": "Id2",
-          "source": "",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
-        },
-        {
-          "index": 14,
-          "role": "Vocal",
-          "source": "vocals 200-5000 Hz",
-          "active": true,
-          "level": 0.18,
-          "trigs": [
-            {
-              "step": 8,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 13,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 14,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 15,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 24,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 29,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 30,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 31,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 40,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 45,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 46,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 47,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 56,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 61,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 62,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 63,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 66,
-              "velocity": 96,
-              "note": null
-            },
-            {
-              "step": 73,
-              "velocity": 88,
-              "note": null
-            },
-            {
-              "step": 88,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 93,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 94,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 95,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 104,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 109,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 110,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 111,
-              "velocity": 83,
-              "note": null
-            },
-            {
-              "step": 120,
-              "velocity": 107,
-              "note": null
-            },
-            {
-              "step": 125,
-              "velocity": 127,
-              "note": null
-            },
-            {
-              "step": 126,
-              "velocity": 99,
-              "note": null
-            },
-            {
-              "step": 127,
-              "velocity": 83,
-              "note": null
-            }
-          ]
-        },
-        {
-          "index": 15,
-          "role": "FX",
-          "source": "structure (heuristique)",
-          "active": false,
-          "level": 0.0,
-          "trigs": []
         },
         {
           "index": 16,
@@ -10146,7 +6844,7 @@
       "bars": 20,
       "start_s": 131.67,
       "end_s": 162.64,
-      "pattern_slot": 14,
+      "pattern_slot": 5,
       "active": [
         1,
         2,
@@ -10168,7 +6866,7 @@
       "bars": 11,
       "start_s": 162.64,
       "end_s": 179.69,
-      "pattern_slot": 15,
+      "pattern_slot": 4,
       "active": [
         1,
         2,
@@ -10188,7 +6886,6 @@
       "bar": 0,
       "pattern_slot": 1,
       "active": [
-        3,
         14
       ]
     },
@@ -10210,8 +6907,6 @@
         3,
         4,
         5,
-        6,
-        8,
         14,
         15
       ]
@@ -10277,9 +6972,11 @@
         4,
         5,
         7,
+        8,
         9,
         10,
-        11
+        11,
+        15
       ]
     },
     {
@@ -10287,11 +6984,9 @@
       "bar": 37,
       "pattern_slot": 6,
       "active": [
-        1,
         2,
         4,
         5,
-        6,
         10,
         11
       ]
@@ -10306,7 +7001,6 @@
         3,
         4,
         5,
-        6,
         7,
         8,
         9,
@@ -10323,7 +7017,6 @@
         3,
         4,
         5,
-        6,
         7,
         8,
         9,
@@ -10340,7 +7033,6 @@
         3,
         4,
         5,
-        6,
         8,
         9,
         10,
@@ -10373,7 +7065,6 @@
       "active": [
         1,
         2,
-        7,
         8,
         9,
         10,
@@ -10388,7 +7079,6 @@
       "active": [
         3,
         6,
-        8,
         9,
         10,
         11,
@@ -10403,8 +7093,6 @@
       "active": [
         1,
         2,
-        3,
-        7,
         8,
         9,
         10,
@@ -10420,7 +7108,6 @@
         3,
         4,
         5,
-        6,
         7,
         8,
         10,
@@ -10431,14 +7118,13 @@
     {
       "start_s": 131.67,
       "bar": 81,
-      "pattern_slot": 14,
+      "pattern_slot": 5,
       "active": [
         1,
         2,
         3,
         4,
         5,
-        6,
         7,
         8,
         9,
@@ -10451,14 +7137,13 @@
     {
       "start_s": 144.06,
       "bar": 89,
-      "pattern_slot": 14,
+      "pattern_slot": 5,
       "active": [
         1,
         2,
         3,
         4,
         5,
-        6,
         7,
         8,
         9,
@@ -10470,14 +7155,13 @@
     {
       "start_s": 156.46,
       "bar": 97,
-      "pattern_slot": 14,
+      "pattern_slot": 5,
       "active": [
         1,
         2,
         3,
         4,
         5,
-        6,
         7,
         8,
         9,
@@ -10489,38 +7173,38 @@
     {
       "start_s": 162.64,
       "bar": 101,
-      "pattern_slot": 15,
+      "pattern_slot": 4,
       "active": [
         1,
         2,
         3,
         4,
         5,
-        6,
         7,
         8,
         9,
-        11
+        11,
+        15
       ]
     },
     {
       "start_s": 175.03,
       "bar": 109,
-      "pattern_slot": 15,
+      "pattern_slot": 4,
       "active": [
         1,
         2,
         3,
         4,
         5,
-        6,
         7,
         8,
-        9
+        9,
+        15
       ]
     }
   ],
-  "generated_at": "2026-10-06T15:49:41+00:00",
+  "generated_at": "2026-10-07T18:58:07+00:00",
   "method": "stem_band_fold_v2",
   "chain": [
     1,
@@ -10536,7 +7220,7 @@
     11,
     12,
     13,
-    14,
-    15
+    5,
+    4
   ]
 }
