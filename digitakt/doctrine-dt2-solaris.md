@@ -44,20 +44,7 @@ Une tonique stable par section, et on monte d'un ton (+2 demi-tons) pour relance
 
 Six banques dans un seul projet : une par section, plus une pour les jokers. Même disposition de pistes partout, pour que les mutes et la Control All tombent toujours au même endroit.
 
-**Disposition des pistes (identique dans tous les patterns)**
-
-| Piste | Rôle |
-| --- | --- |
-| T1 | Kick |
-| T2 | Sub |
-| T3 | Rumble (sections tribe) |
-| T4 | Snare / clap |
-| T5-T6 | Hats |
-| T7-T8 | Percs |
-| T9 | Acid |
-| T10 | Drone / nappe |
-| T11 | FX |
-| T12-T13 | Breaks découpés |
+**Disposition des pistes (identique dans tous les patterns)** : la grille 16 tracks de [[doctrine]] §1 fait foi (1 kick, 2 rumble / sub, 3 clap / snare, 4 ride, 5-6 hats, 7-8 percs, 9 basse, 10 lead / acid, 11 atmo / drone, 12 vocal, 13-14 Id1 / Id2, 15 FX, 16 réserve).
 
 **Banques**
 

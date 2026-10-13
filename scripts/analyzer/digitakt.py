@@ -4,8 +4,8 @@
 (<= 16 patterns, <= 128 pas = 8 mesures), reparti sur la grille fixe des
 16 tracks de la doctrine (`digitakt/doctrine.md`) :
 
-    1 kick / 2 rumble / 3 clap / 4 hat ferme / 5 hat ouvert / 6 ride /
-    7-8 percs / 9 basse / 10 lead / 11 atmo / 12-13 Id1-Id2 / 14 vocal /
+    1 kick / 2 rumble / 3 clap / 4 ride / 5 hat ferme / 6 hat ouvert /
+    7-8 percs / 9 basse / 10 lead / 11 atmo / 12 vocal / 13-14 Id1-Id2 /
     15 FX / 16 reserve
 
 Pipeline :
@@ -23,7 +23,7 @@ Pipeline :
 6. Partition de mutes : activite de chaque track par phrase de N mesures.
 
 Ce n'est PAS une transcription : c'est un point de depart pour bootstraper une
-bank. Id1 / Id2 (12-13) restent vides, c'est a l'oreille de les choisir.
+bank. Id1 / Id2 (13-14) restent vides, c'est a l'oreille de les choisir.
 """
 from __future__ import annotations
 
@@ -110,18 +110,18 @@ TRACKS: tuple[TrackSpec, ...] = (
     TrackSpec(1, "Kick", "drums", 30, 120),
     TrackSpec(2, "Rumble", "drums", 30, 90, kind="rumble", exclude=(1,)),
     TrackSpec(3, "Clap / snare", "drums", 300, 3000),
-    TrackSpec(4, "Hat ferme", "drums", 7000, 16000),
-    TrackSpec(5, "Hat ouvert", "drums", 5000, 12000),
-    TrackSpec(6, "Ride", "drums", 3000, 6000),
+    TrackSpec(4, "Ride", "drums", 3000, 6000),
+    TrackSpec(5, "Hat ferme", "drums", 7000, 16000),
+    TrackSpec(6, "Hat ouvert", "drums", 5000, 12000),
     TrackSpec(7, "Perc A", "drums", 120, 400, exclude=(1, 3)),
     TrackSpec(8, "Perc B", "drums", 400, 1500, exclude=(3,)),
     TrackSpec(9, "Basse", "bass", 40, 400, kind="tonal", base_note=36,
               pitch_range=(35.0, 300.0)),
     TrackSpec(10, "Lead", "other", 300, 4000, kind="tonal", base_note=60),
     TrackSpec(11, "Atmo", "other", 100, 8000, kind="sustain"),
-    TrackSpec(12, "Id1", None, kind="none"),
-    TrackSpec(13, "Id2", None, kind="none"),
-    TrackSpec(14, "Vocal", "vocals", 200, 5000),
+    TrackSpec(12, "Vocal", "vocals", 200, 5000),
+    TrackSpec(13, "Id1", None, kind="none"),
+    TrackSpec(14, "Id2", None, kind="none"),
     TrackSpec(15, "FX", None, kind="fx"),
     TrackSpec(16, "Reserve", None, kind="none"),
 )

@@ -40,17 +40,17 @@
   // ordre des tracks de la doctrine (digitakt/doctrine.md § 1) : rythmique
   // (tracks 1 a 8, boucles rythmiques en fin), puis melodique (9 a 16)
   const LOOPS = ['BR', 'DL', 'PL', 'ML', 'BL']
-  const RHYTHM = ['BD', 'RM', 'SD', 'CP', 'HH', 'OH', 'CY', 'TM', 'PC', 'BR', 'DL', 'PL']
+  const RHYTHM = ['BD', 'RM', 'SD', 'CP', 'CY', 'HH', 'OH', 'TM', 'PC', 'BR', 'DL', 'PL']
   const MELODIC = ['BS', 'BL', 'ST', 'ML', 'PD', 'VX', 'FX', 'RS']
   const CODE_ORDER = [...RHYTHM, ...MELODIC]
   const CODE_HELP: Record<string, string> = {
     BD: 'Kick (bass drum) · track 1', RM: 'Rumble, sub (rendu du sound design) · track 2', SD: 'Snare (caisse claire) · track 3', CP: 'Clap · track 3',
-    HH: 'Hat fermé · track 4', OH: 'Hat ouvert · track 5', CY: 'Cymbale, ride, crash · track 6',
+    CY: 'Cymbale, ride, crash · track 4', HH: 'Hat fermé · track 5', OH: 'Hat ouvert · track 6',
     TM: 'Tom · track 7 (perc A)', PC: 'Percussion (conga, shaker, cowbell…) · tracks 7-8',
     BR: 'Boucle break (amen…) · rythmique', DL: 'Boucle drums · rythmique', PL: 'Boucle percussions, hats, tops · rythmique',
     BS: 'Basse one-shot · track 9', BL: 'Boucle de basse · track 9', ST: 'Stab, accord, synthé, instrument · track 10',
     ML: 'Boucle mélodique (lead, séquence, accords) · track 10', PD: 'Nappe, pad, drone · track 11',
-    VX: 'Voix, samples parlés · track 14', FX: 'FX de transition (riser, impact, noise…) · track 15',
+    VX: 'Voix, samples parlés · track 12', FX: 'FX de transition (riser, impact, noise…) · track 15',
     RS: 'Resample, enregistrement maison · track 16 (joker)',
   }
   // libelle court d'un code pour l'arbre : « Kick (bass drum) · track 1 » -> « Kick, bass drum »

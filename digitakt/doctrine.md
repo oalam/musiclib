@@ -7,10 +7,9 @@ status: living document
 
 # Doctrine Digitakt II — live techno
 
-> **Grille des pistes caduque (2026-10-13)** : la disposition des pistes de
-> [[doctrine-dt2-solaris]] remplace la grille 16 tracks du §1 (cf. SPEC
-> « Décisions 7.L »). Les sections qui citent un numéro de track (§1, §4,
-> §9, §10, §12) suivent l'ancienne grille.
+> **Grille révisée le 2026-10-13** : 4 ride, 5-6 hats, 12 vocal, 13-14
+> Id1 / Id2. Cette grille fait foi pour tous les lives, y compris
+> [[doctrine-dt2-solaris]] (cf. SPEC « Décisions 7.L »).
 
 Règles **arbitrées** pour préparer et jouer un live sur Digitakt II. Elles
 servent aussi de contrat à l'analyzer [[../scripts/README|digitakt.py]]
@@ -31,35 +30,35 @@ coupe la basse. Les mutes et les réflexes en dépendent.
 
 ### Rythmique — tracks 1 à 8 (première rangée de touches)
 
-| Track | Rôle | Bande dominante | Notes |
-|---|---|---|---|
-| 1 | **Kick** | 40-120 Hz + click 2-5 kHz | Même sample, même réglage dans tout le set (cf. §3) |
-| 2 | **Rumble / sub** | 30-80 Hz | Kick resamplé + reverb + saturation + passe-bas ; même pas que le kick + ducking (cf. §9) |
-| 3 | **Clap / snare** | 200 Hz-2 kHz | Temps 2 et 4 en four-on-floor, plus libre en tribe |
-| 4 | **Hat fermé** | 6-12 kHz | Contretemps, doubles croches |
-| 5 | **Hat ouvert** | 5-10 kHz | Un seul bien placé vaut mieux qu'un empilement |
-| 6 | **Ride** | 4-10 kHz | Couleur de « plein régime », sort en peak |
-| 7 | **Perc A** | variable | Toms, rims… |
-| 8 | **Perc B** | variable | Shakers, claves, métalliques… |
+| Track | Rôle             | Bande dominante           | Notes                                                                                     |
+|-------| ---------------- | ------------------------- | ----------------------------------------------------------------------------------------- |
+| 1     | **Kick**         | 40-120 Hz + click 2-5 kHz | Même sample, même réglage dans tout le set (cf. §3)                                       |
+| 2     | **Rumble / sub** | 30-80 Hz                  | Kick resamplé + reverb + saturation + passe-bas ; même pas que le kick + ducking (cf. §9) |
+| 3     | **Clap / snare** | 200 Hz-2 kHz              | Temps 2 et 4 en four-on-floor, plus libre en tribe                                        |
+| 4     | **Ride**         | 4-10 kHz                  | Couleur de « plein régime », sort en peak                                                 |
+| 5     | **Hat fermé**    | 6-12 kHz                  | Contretemps, doubles croches                                                              |
+| 6     | **Hat ouvert**   | 5-10 kHz                  | Un seul bien placé vaut mieux qu'un empilement                                            |
+| 7     | **Perc A**       | variable                  | Toms, rims…                                                                               |
+| 8     | **Perc B**       | variable                  | Shakers, claves, métalliques…                                                             |
 
 ### Mélodique et textures — tracks 9 à 16 (seconde rangée)
 
 | Track | Rôle | Bande dominante | Notes |
-|---|---|---|---|
-| 9 | **Basse** | 80-250 Hz + harmoniques | Sacrée avec le kick ; contretemps, attaque franche, decay court (cf. §9) |
-| 10 | **Séquence / lead** | 300 Hz-4 kHz | Acid line, stabs, arpèges |
-| 11 | **Atmo / drone** | large, faible niveau | Nappe, drone, room tone ; souvent sample Stretch |
-| 12 | **Id1** | variable | Identité du pattern : rythmique, ambiance ou mélodie |
-| 13 | **Id2** | variable | Seconde identité, en dialogue ou en remplacement de Id1 |
-| 14 | **Vocal / one-shots** | 300 Hz-4 kHz | Voix, samples parlés, cris, hooks |
-| 15 | **FX de transition** | large | Risers, noise, impacts, downlifters, reverses (cf. §5) |
-| 16 | **Réserve / MIDI** | — | Track MIDI vers une machine externe, ou joker |
+|-------|---|---|---|
+| 9     | **Basse** | 80-250 Hz + harmoniques | Sacrée avec le kick ; contretemps, attaque franche, decay court (cf. §9) |
+| 10    | **Séquence / lead** | 300 Hz-4 kHz | Acid line, stabs, arpèges |
+| 11    | **Atmo / drone** | large, faible niveau | Nappe, drone, room tone ; souvent sample Stretch |
+| 12    | **Vocal / one-shots** | 300 Hz-4 kHz | Voix, samples parlés, cris, hooks |
+| 13    | **Id1** | variable | Identité du pattern : rythmique, ambiance ou mélodie |
+| 14    | **Id2** | variable | Seconde identité, en dialogue ou en remplacement de Id1 |
+| 15    | **FX de transition** | large | Risers, noise, impacts, downlifters, reverses (cf. §5) |
+| 16    | **Réserve / MIDI** | — | Track MIDI vers une machine externe, ou joker |
 
 **Règles dérivées** :
 
 - Une track vide reste vide, **jamais réaffectée à un autre rôle** pour « gagner
-  une place ». Un pattern qui n'a pas besoin de ride laisse la 6 vide.
-- Id1 / Id2 (12-13) sont les seules tracks dont le *contenu* change franchement
+  une place ». Un pattern qui n'a pas besoin de ride laisse la 4 vide.
+- Id1 / Id2 (13-14) sont les seules tracks dont le *contenu* change franchement
   d'un pattern à l'autre. C'est là qu'on reconnaît « le morceau ».
 - Les 8 premières touches = le corps, les 8 suivantes = la tête. Muter toute la
   seconde rangée = break percussif ; muter la première = break mélodique.
@@ -114,8 +113,8 @@ Un pattern plein + un ordre de mutes = un morceau. Ordre type pour une montée
 (une entrée à la fois, toutes les 8 / 16 / 32 mesures) :
 
 ```
-kick seul (1) → +rumble (2) → +hat fermé (4) → +basse (9) → +clap (3)
-→ +percs (7-8) → +Id1 (12) → +lead (10) → +hat ouvert (5) → +ride (6) = peak
+kick seul (1) → +rumble (2) → +hat fermé (5) → +basse (9) → +clap (3)
+→ +percs (7-8) → +Id1 (13) → +lead (10) → +hat ouvert (6) → +ride (4) = peak
 ```
 
 Et pour un break : muter 1 + 2 + 9 (kick, rumble, basse) en début de phrase,
@@ -416,7 +415,7 @@ pattern modèle.
 - La **grille §1 reste identique** dans les trois kits : les réflexes de mutes
   et de fills restent valables tout le set.
 - **Presets fil rouge** partagés entre kits : une texture retravaillée, les FX
-  de transition (15), une perc signature ou un vocal (14), mêmes réglages de
+  de transition (15), une perc signature ou un vocal (12), mêmes réglages de
   reverb et delay.
 - **Jonctions** : derniers patterns d'une bank et premiers de la suivante pensés
   comme ponts, en mélangeant des presets des deux kits.
