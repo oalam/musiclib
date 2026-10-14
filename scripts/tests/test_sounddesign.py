@@ -338,6 +338,7 @@ def test_rumble_name_mirrors_the_kick():
     assert sd.rumble_name("BD G Apart 01 rth", "Grit") == "RM G Apar Grit rth"    # tag a la place du numero, 18 max
     assert sd.rumble_name("BD Hard k", "Deep") == "RM Hard Deep k"               # sans numero : avant le pack
     assert sd.rumble_name("BD F# Longdescr 03 dbr", "Kick") == "RM F# Lon Kick dbr"   # note, tag et pack gardes
+    assert sd.rumble_name("BD G# Shinra 01 rth") == "RM G# Shinr 01 rth"         # numero garde, mot tronque
     assert sd.rumble_name("BD k") == "RM k"
 
 

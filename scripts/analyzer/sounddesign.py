@@ -1242,8 +1242,10 @@ def rumble_name(kick_name: str, tag: str = "") -> str:
     """Nom DT2 d'un rumble en miroir de son kick : code RM, le reste inchange
     (`BD G Apart 01 rth` -> `RM G Apart 01 rth`). `tag` (plusieurs presets sur
     la banque) remplace le numero de variante, ou s'insere avant le pack
-    (`RM G Apart Grit rth`) ; la description est tronquee s'il faut. Le tempo
-    n'y figure pas : c'est celui de la banque."""
+    (`RM G Apart Grit rth`) ; trop long (note d'origine en diese...), la
+    description est tronquee, note, numero ou tag et pack gardes
+    (`BD G# Shinra 01 rth` -> `RM G# Shinr 01 rth`). Le tempo n'y figure
+    pas : c'est celui de la banque."""
     words = kick_name.split()
     body, pack = words[1:-1], words[-1:]
     if tag:
@@ -1255,7 +1257,7 @@ def rumble_name(kick_name: str, tag: str = "") -> str:
     if len(name) <= smp.NAME_MAX:
         return name
     note = body[:1] if body and re.fullmatch(r"[A-G]#?", body[0]) else []
-    tail = body[-1:] if tag else []
+    tail = body[-1:] if tag or (len(body) > len(note) and body[-1].isdigit()) else []
     desc = body[len(note):len(body) - len(tail)]
     fixed = " ".join(["RM", *note])
     budget = smp.NAME_MAX - len(fixed) - sum(len(w) + 1 for w in [*tail, *pack]) - 1
