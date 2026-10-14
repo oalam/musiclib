@@ -341,6 +341,18 @@ def test_rumble_live_covers_banks_with_presets_and_follows_preset_edits(tmp_path
     assert len(rm) == 1 and rm[0].source != first and (samples_root / first).is_file()   # l'ancien reste dans la lib
     assert len(list(out.glob("rumble/*.wav"))) == 2
 
+    # purge des supplantes : l'ancien seulement, pas le courant ni un rendu fait a la main
+    manual = sd.write_render(sd.render(_preset(), sd.load_source(samples_root / "k" / "kick.wav")),
+                             str(samples_root / "k" / "kick.wav"), _preset(), out, "RM Main k", "", "RM")
+    sd.verse(manual, out, samples_root, overrides)
+    orphans = sd.orphan_rumbles([live], out)
+    assert [sd.verse_key(r) for r in orphans] == [first] and first in overrides and orphans[0].rumble == "t"
+    assert sd.purge_renders(orphans, out, samples_root, overrides) == 3
+    assert not (samples_root / first).is_file() and first not in overrides
+    assert sd.orphan_rumbles([live], out) == [] and sd.purge_renders(orphans, out, samples_root, overrides) == 0
+    assert (samples_root / rm[0].source).is_file() and (samples_root / sd.verse_key(manual)).is_file()
+    assert len(list(out.glob("rumble/*.wav"))) == 2
+
 
 def test_rumble_of_a_tuned_kick_inherits_its_tuning(tmp_path: Path):
     import soundfile as sf

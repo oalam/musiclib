@@ -485,6 +485,8 @@ export interface RenderRecord {
   slices: number
   /** Couches 1.. du rendu (8.J), absentes sans layering. */
   layers?: string[]
+  /** Preset du rumble genere pour une banque de live (8.L2) ; "" = rendu a la main. */
+  rumble: string
 }
 
 /** Nom DT2 propose et dossier de rangement d'un rendu (8.E). */

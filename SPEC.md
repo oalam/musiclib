@@ -1117,7 +1117,9 @@ On garde une boucle d'une à huit mesures, sans couture.
   passe d'abord `rumble_bank` sur chaque banque à presets, si bien qu'un
   preset édité ou un tempo changé donne de nouveaux rendus qui remplacent
   les anciens dans la banque avant la copie ; l'ancien fichier reste dans
-  la lib (pas de suppression implicite).
+  la lib (pas de suppression implicite), `sounddesign.py purge` retire
+  explicitement les rendus supplantés (sidecar marqué `rumble`, plus
+  référencés par aucun live), jamais un rendu fait à la main.
   **Nom DT2 en miroir du kick** (arbitré le 2026-10-14) : `BD G Apart 01 rth`
   → `RM G Apart 01 rth`, ni tempo (celui de la banque) ni preset dans le
   nom ; avec plusieurs presets sur la banque, le tag du preset (4 premières

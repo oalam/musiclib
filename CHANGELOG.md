@@ -15,6 +15,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   puis la copie vers `00-live`. Le bilan du front annonce les rumbles à
   rendre (« Rendre et copier »), CLI `sounddesign.py rumbles <live>` sans
   banque pour toutes les banques à presets.
+- [8.L2] Purge des rumbles supplantés : le sidecar d'un rendu généré pour
+  une banque porte `rumble` (le preset) ; `sounddesign.orphan_rumbles`
+  retient ceux que plus aucun live ne référence, `purge_renders` retire
+  wav, sidecar, copie versée et override ; CLI `sounddesign.py purge
+  [--dry-run]`. Un rendu fait à la main (sans `rumble`) n'est jamais
+  retenu. Les 72 sidecars existants ont été marqués (one-shot).
 - [8.L2] Rumbles par banque de live : presets de rumble associés à chaque
   banque (`Live.rumbles`, 5 au plus, `PUT /api/lives/{live}/rumbles`) ;
   `sounddesign.rumble_bank` rend un rumble par kick de la banque et par

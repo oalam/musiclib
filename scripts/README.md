@@ -959,7 +959,11 @@ associé : rien n'est généré. Sans tempo : 422. `rumble_live` enchaîne
 `POST /api/lives/{live}/export` (bilan par banque dans `rumbles`, en
 `dry_run` aussi), si bien qu'un clic sur « Exporter » suffit après un
 changement de preset ou de tempo. CLI : `sounddesign.py rumbles <live>
-[banque] [--dry-run]`.
+[banque] [--dry-run]`. Les rendus supplantés restent dans la lib jusqu'à
+`sounddesign.py purge [--dry-run]` (`orphan_rumbles` : sidecar marqué
+`rumble` par `rumble_bank`, plus référencé par aucun live ; `purge_renders`
+retire wav, sidecar, copie versée et override, le manifeste suit à la
+réanalyse). Un rendu fait à la main, sans `rumble`, n'est jamais purgé.
 CLI : `sounddesign.py rumbles <live> <banque> [--dry-run]`.
 
 Accordage (7.L4, `lives.tune_live`, banque par banque avec `tune_bank`) :

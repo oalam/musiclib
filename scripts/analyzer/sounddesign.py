@@ -147,6 +147,7 @@ class RenderRecord(BaseModel):
     code: str = ""                   # code DT2 effectif ("" : celui du traitement, rendus anterieurs a 8.I)
     slices: int = 0                  # nombre de tranches GRID (variations, 8.I) ; 0 : un seul son
     layers: list[str] = Field(default_factory=list, exclude_if=lambda v: not v)  # couches 1.. (8.J)
+    rumble: str = ""                 # preset du rumble genere pour une banque de live (8.L2) ; "" : rendu a la main
     versed: str | None = None        # cle du manifeste si verse dans le pack (rempli a la lecture)
     folder: str = ""                 # dossier de rangement une fois verse (rempli a la lecture)
 
@@ -1101,10 +1102,11 @@ def output_name(name: str, preset: Preset, layers: list[str] | None = None) -> s
 
 def write_render(audio: np.ndarray, source_label: str, preset: Preset, out_root: Path,
                  name: str, sub: str = "", code: str = "",
-                 layers: list[str] | None = None) -> RenderRecord:
+                 layers: list[str] | None = None, rumble: str = "") -> RenderRecord:
     """Ecrit `<out_root>/<traitement>/<nom> <hash>.wav` (24 bits) et son sidecar `.json`.
 
     `layers` : etiquettes des couches 1.. (8.J), gardees au sidecar et au hash.
+    `rumble` : preset, quand le rendu est genere pour une banque de live (8.L2).
     """
     import soundfile as sf
     if not re.fullmatch(NAME_RX, name) or len(name) > smp.NAME_MAX:
@@ -1117,7 +1119,7 @@ def write_render(audio: np.ndarray, source_label: str, preset: Preset, out_root:
         sr=SR, seconds=round(audio.shape[1] / SR, 4),
         created_at=datetime.now().isoformat(timespec="seconds"), name=name, sub=sub,
         code=code or TREATMENTS[preset.treatment].spec.code, slices=slice_count(preset),
-        layers=list(layers or []))
+        layers=list(layers or []), rumble=rumble)
     path.with_suffix(".json").write_text(record.model_dump_json(indent=2) + "\n",
                                          encoding="utf-8")
     return record
@@ -1327,7 +1329,7 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
                     continue
                 audio = render(preset, load_source(path))
                 record = write_render(audio, f"{samples_root.name}/{kick.source}", preset, out_root,
-                                      name, planned.sub, planned.code)
+                                      name, planned.sub, planned.code, rumble=pid)
                 records.append(record)
             if dry_run:
                 continue
@@ -1354,6 +1356,32 @@ def rumble_live(live: lv.Live, presets_root: Path, manifest: smp.Manifest, out_r
     par banque traitee ; une banque sans preset n'en produit pas."""
     return [rumble_bank(live, bank, presets_root, manifest, out_root, samples_root, overrides, dry_run)
             for bank in live.banks if live.rumbles.get(bank)]
+
+
+def orphan_rumbles(lives: list[lv.Live], out_root: Path) -> list[RenderRecord]:
+    """Rendus de rumble supplantes (8.L2) : generes pour une banque de live
+    (`RenderRecord.rumble`) mais que plus aucun live ne reference, parce qu'un
+    tempo ou un preset a change depuis. Un rendu fait a la main (sans
+    `rumble`) ou un rumble encore en banque n'est jamais retenu."""
+    used = {it.source for live in lives for it in live.items}
+    return [r for r in list_renders(out_root, "rumble") if r.rumble and verse_key(r) not in used]
+
+
+def purge_renders(records: list[RenderRecord], out_root: Path, samples_root: Path,
+                  overrides: dict[str, smp.Override]) -> int:
+    """Retire chaque rendu de la lib : wav et sidecar dans `out_root`, copie
+    versee sous `samples_root` et son override (modifie en place, a
+    enregistrer par l'appelant). Rejouable ; renvoie le nombre de fichiers
+    supprimes. Le manifeste garde l'entree jusqu'a la reanalyse."""
+    removed = 0
+    for record in records:
+        wav = out_root / record.file
+        for path in (samples_root / verse_key(record), wav, wav.with_suffix(".json")):
+            if path.is_file():
+                path.unlink()
+                removed += 1
+        overrides.pop(verse_key(record), None)
+    return removed
 
 
 def with_overrides(preset: Preset, settings: dict[str, float], mute: list[str],

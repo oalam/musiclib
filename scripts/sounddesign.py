@@ -60,6 +60,8 @@ from analyzer.sounddesign import (
     load_source,
     needs_source,
     render,
+    orphan_rumbles,
+    purge_renders,
     rumble_bank,
     rumble_live,
     slice_count,
@@ -199,6 +201,26 @@ def _cmd_rumbles(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_purge(args: argparse.Namespace) -> int:
+    if not media_ok():
+        return 1
+    lives = [lv.load_live(LIVES_META_DIR, p.stem) for p in sorted(LIVES_META_DIR.glob("*.json"))
+             if not p.name.endswith(".export.json")]
+    orphans = orphan_rumbles(lives, SOUNDDESIGN_OUT_DIR)
+    verb = "a purger" if args.dry_run else "purges"
+    print(f"{len(orphans)} rumble(s) supplante(s) {verb} (lives : {', '.join(x.name for x in lives) or 'aucun'})")
+    for r in orphans:
+        bpm = r.preset.settings.get("bpm")
+        print(f"  {r.name:20} {r.preset.id} a {bpm:g} BPM  {r.file}")
+    if args.dry_run or not orphans:
+        return 0
+    overrides = load_overrides(OVERRIDES_FILE)
+    removed = purge_renders(orphans, SOUNDDESIGN_OUT_DIR, SAMPLES_SRC_DIR, overrides)
+    save_overrides(overrides, OVERRIDES_FILE)
+    print(f"-> {removed} fichier(s) supprimes, overrides enregistres ; relancer samples.py pour le manifeste")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Sound design par chaines de plugins.")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -224,8 +246,12 @@ def main() -> int:
     b.add_argument("live")
     b.add_argument("bank", nargs="?", help="une banque seulement (defaut : toutes celles qui ont des presets)")
     b.add_argument("--dry-run", action="store_true", help="bilan sans rendu ni ecriture")
+    g = sub.add_parser("purge", help="retire les rumbles supplantes (tempo ou preset change) de la lib (8.L2)")
+    g.add_argument("--dry-run", action="store_true", help="liste sans supprimer")
     args = parser.parse_args()
     try:
+        if args.cmd == "purge":
+            return _cmd_purge(args)
         if args.cmd == "list":
             return _cmd_list()
         if args.cmd == "devices":

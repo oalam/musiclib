@@ -183,7 +183,9 @@ modifier le preset.
    banques à presets avant la copie** : après avoir corrigé un preset, un
    clic suffit, le bilan annonce les rumbles à rendre (« Rendre et
    copier »). En ligne de commande :
-   `sounddesign.py rumbles solaris [C-TRIBE] --dry-run`. Pour travailler un
+   `sounddesign.py rumbles solaris [C-TRIBE] --dry-run`, puis
+   `sounddesign.py purge --dry-run` pour lister et retirer les anciens
+   rendus supplantés (rien n'est supprimé sans cette commande). Pour travailler un
    rumble à la main, écouter son kick dans le panneau Live : il devient la
    source du sound design.
 4. Sur la machine : **track 2**, juste après le kick (cf.
