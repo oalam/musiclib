@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.L1] Parenté kick → rendu du sound design : le versement écrit
+  `parent` (clé du sample d'origine) dans `overrides.json` ; l'entrée du
+  manifeste et l'item de live (`LiveItem.parent`) le reprennent,
+  `samples.children_of` liste les rendus issus d'un sample. Exposé par les
+  API existantes (entrées, lives), sans affichage dans le front.
 - [7.J8] Note de transmission [[kt-banque-samples]] : préparer l'audio
   (seuils du pré-filtre), nomenclature des fichiers maison, classement,
   corrections et envoi sur la DT2 via un live.

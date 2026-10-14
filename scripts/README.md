@@ -774,7 +774,9 @@ BL basse.
 - **Overrides** : `library/samples/overrides.json`, clé = chemin relatif à
   `Samples/`, champs `family` (genre ou SAMPLE), `code`, `sub` (7.J8 :
   sous-catégorie forcée, `""` = racine du code), `name`, `exclude`, et
-  depuis 7.J4 `tags`, `stars` (1 à 5), `trash`. Une sous-catégorie forcée
+  depuis 7.J4 `tags`, `stars` (1 à 5), `trash`, et depuis 8.L1 `parent`
+  (rendu du sound design : clé du sample d'origine, posé au versement, copié
+  dans l'entrée du manifeste et l'item de live). Une sous-catégorie forcée
   n'est jamais remontée. `exclude` ignore le fichier ; `trash` (corbeille, posé
   depuis le front) le garde listé et restaurable. Une clé terminée par `/`
   vise un kit ou un pack entier (7.J5) : `{"rthm/packs/neurotek/": {"tags":
@@ -1029,8 +1031,8 @@ python sounddesign.py render variations drive_tints --source <kick> --set slices
 ```
 
 `--verse` copie aussi le rendu dans le pack `Samples/SoundDesign/` et écrit
-son override de rangement (`DRUMS/RM/<sous-dossier du kick>`, nom DT2) ;
-relancer `samples.py` pour le classer. `--set one_shot=1` rend un seul
+son override de rangement (`DRUMS/RM/<sous-dossier du kick>`, nom DT2,
+`parent` = clé du kick, 8.L1) ; relancer `samples.py` pour le classer. `--set one_shot=1` rend un seul
 coup (`--set length_beats=2` : longueur en temps au tempo, 1 par défaut,
 fondu de 20 ms). Le nom DT2 est proposé à partir de
 celui de la source (`BD C Punch 01 dbr` → `RM 150 C Punch dbr`), `--name`
@@ -1249,7 +1251,7 @@ erreur sur un fichier annule tout le lot, rien n'est écrit.
 | GET | `/api/sounddesign/target?treatment=&source=&bpm=&slices=&folder=` | `{name, sub, folder}` : nom DT2 proposé et dossier de rangement (8.E) ; `folder` impose le dossier et le code du nom proposé (422 si inconnu) |
 | GET | `/api/sounddesign/renders?treatment=` | rendus écrits, du plus récent au plus ancien |
 | GET | `/api/sounddesign/renders/audio?file=` | wav d'un rendu listé (404 sinon) |
-| POST | `/api/sounddesign/verse` | `{file}` → `RenderRecord` avec `versed` (clé du manifeste) ; copie dans `Samples/SoundDesign/` et override de rangement (code, sous-dossier, nom) ; 409 pendant une réanalyse, 422 pour un rendu sans nom DT2 |
+| POST | `/api/sounddesign/verse` | `{file}` → `RenderRecord` avec `versed` (clé du manifeste) ; copie dans `Samples/SoundDesign/` et override de rangement (code, sous-dossier, nom, `parent`) ; 409 pendant une réanalyse, 422 pour un rendu sans nom DT2 |
 | GET | `/api/sounddesign/notebook/{traitement}` | `{path, markdown}` du notebook du vault (404 s'il manque) |
 
 **Ajout d'un morceau (7.I)** : bouton « + Ajouter un morceau » de la barre du

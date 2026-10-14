@@ -1165,6 +1165,22 @@ def verse_key(record: RenderRecord) -> str:
     return f"{VERSE_PACK}/{record.file}"
 
 
+def record_parent(record: RenderRecord, samples_root: Path) -> str | None:
+    """Source du rendu en cle du manifeste (8.L1) : le sidecar la garde relative
+    au disque (`Samples/k/kick.wav`, ou absolue hors du disque), le manifeste
+    relative a `<samples_root>`. None pour un rendu sans sample (bruit genere)
+    ou une source hors de `Samples/`."""
+    if not record.source:
+        return None
+    path = Path(record.source)
+    if not path.is_absolute():
+        path = samples_root.parent / path          # <MEDIA>/Samples/... : le disque est le parent
+    try:
+        return path.resolve().relative_to(samples_root.resolve()).as_posix()
+    except ValueError:
+        return None
+
+
 def verse(record: RenderRecord, out_root: Path, samples_root: Path,
           overrides: dict[str, smp.Override]) -> str:
     """Copie le rendu dans le pack SoundDesign et le range par override.
@@ -1188,7 +1204,7 @@ def verse(record: RenderRecord, out_root: Path, samples_root: Path,
     tags = sorted({*overrides.get(key, smp.Override()).tags,
                    *([smp.SLICES_TAG] if record.slices else [])})
     smp.set_override(overrides, key, code=record_code(record), sub=record.sub,
-                     name=record.name, tags=tags)
+                     name=record.name, tags=tags, parent=record_parent(record, samples_root))
     return key
 
 

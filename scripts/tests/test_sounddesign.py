@@ -216,7 +216,7 @@ def test_target_inherits_sub_and_stays_unique():
 def test_verse_copies_once_marks_and_ranges_in_rm(tmp_path: Path):
     from analyzer.samples import folder_of
     out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
-    record = sd.write_render(sd.render(_preset(), _kick()), "x", _preset(), out,
+    record = sd.write_render(sd.render(_preset(), _kick()), "Samples/k/kick.wav", _preset(), out,
                              "RM 150 C Punch dbr", "CLEAN")
     assert sd.mark_versed([record], samples_root)[0].versed is None
     overrides: dict = {}
@@ -224,6 +224,7 @@ def test_verse_copies_once_marks_and_ranges_in_rm(tmp_path: Path):
     assert key == f"SoundDesign/{record.file}"
     ov = overrides[key]
     assert folder_of("UNIVERSEL", ov.code, ov.sub) == "DRUMS/RM/CLEAN" and ov.name == record.name
+    assert ov.parent == "k/kick.wav"                                # parente kick -> rumble (8.L1)
     mtime = (samples_root / key).stat().st_mtime_ns
     assert sd.verse(record, out, samples_root, overrides) == key   # rejouable, pas de recopie
     assert (samples_root / key).stat().st_mtime_ns == mtime
@@ -234,9 +235,9 @@ def test_verse_copies_once_marks_and_ranges_in_rm(tmp_path: Path):
 
 
 def test_versed_render_lands_in_drums_rm(tmp_path: Path):
-    from analyzer.samples import build_manifest
+    from analyzer.samples import build_manifest, children_of
     out, samples_root = tmp_path / "SoundDesign", tmp_path / "Samples"
-    record = sd.write_render(sd.render(_preset(), _kick()), "x", _preset(), out,
+    record = sd.write_render(sd.render(_preset(), _kick()), "Samples/k/kick.wav", _preset(), out,
                              "RM 150 C Punch dbr", "CLEAN")
     overrides: dict = {}
     key = sd.verse(record, out, samples_root, overrides)
@@ -244,6 +245,20 @@ def test_versed_render_lands_in_drums_rm(tmp_path: Path):
     entry = next(e for e in m.entries if e.source == key)
     assert (entry.folder, entry.name) == ("DRUMS/RM/CLEAN", "RM 150 C Punch dbr")
     assert not {"blanc", "long"} & set(entry.flags or [])
+    assert entry.parent == "k/kick.wav"                             # porte par le manifeste (8.L1)
+    assert [e.source for e in children_of(m, "k/kick.wav")] == [key]
+
+
+def test_record_parent_is_manifest_key_or_none(tmp_path: Path):
+    root = tmp_path / "Samples"
+
+    def parent(src: str) -> str | None:
+        return sd.record_parent(sd.RenderRecord(file="rumble/x.wav", source=src, preset=_preset(),
+                                                sr=sd.SR, seconds=1.0, created_at="2026-10-14"), root)
+    assert parent("Samples/k/kick.wav") == "k/kick.wav"             # relative au disque (prod)
+    assert parent(str(root / "k" / "kick.wav")) == "k/kick.wav"     # absolue sous Samples/
+    assert parent("") is None                                       # bruit genere (riser)
+    assert parent("Mix/x.wav") is None                              # hors de Samples/
 
 
 def test_loop_starts_and_ends_in_the_duck():

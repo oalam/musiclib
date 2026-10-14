@@ -91,6 +91,7 @@ class LiveItem(BaseModel):
     ram: int | None = None           # octets en RAM DT2, None : en-tete illisible
     note: str | None = None          # note de la source (dieses), relevee a l'accordage
     shift: int = 0                   # demi-tons de varispeed appliques a l'export
+    parent: str | None = None        # sample d'origine d'un rendu du sound design (8.L1)
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -389,7 +390,7 @@ def _new_item(live: Live, manifest: Manifest, source: str, root: Path) -> LiveIt
     if family == "SAMPLE" and live.pack:
         name = _with_pack(name, live.pack)
     return LiveItem(source=source, code=code, branch=branch, name=name, banks=[],
-                    ram=ram_bytes(root / source))
+                    ram=ram_bytes(root / source), parent=entry.parent if entry else None)
 
 
 def add(live: Live, manifest: Manifest, sources: list[str], bank: str, root: Path) -> None:

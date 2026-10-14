@@ -634,7 +634,7 @@ def test_sounddesign_verse_and_notebook(sd_client: TestClient, tmp_path: Path):
     versed = sd_client.post("/api/sounddesign/verse", json={"file": record["file"]}).json()
     assert (tmp_path / "Samples" / versed["versed"]).is_file()
     ov = api.samples.load_overrides(tmp_path / "overrides.json")[versed["versed"]]
-    assert (ov.code, ov.sub, ov.name) == ("RM", "CLEAN", "RM 150 C Punch k")
+    assert (ov.code, ov.sub, ov.name, ov.parent) == ("RM", "CLEAN", "RM 150 C Punch k", "k/kick.wav")
     assert versed["folder"] == "DRUMS/RM/CLEAN"
     assert sd_client.get("/api/sounddesign/renders").json()[0]["versed"] == versed["versed"]
     assert sd_client.post("/api/sounddesign/verse", json={"file": "../x.wav"}).status_code == 404

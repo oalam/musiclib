@@ -1011,6 +1011,7 @@ On garde une boucle d'une à huit mesures, sans couture.
 | 8.I | Traitement **variations** : un one-shot rendu N fois (4 / 8 / 16 / 32, grille GRID de la DT2) en tranches égales dans un seul fichier, paramètres étagés de la tranche 1 (sobre) à N (marquée) par `params_end` + aléa reproductible, niveau égalisé (RMS des 150 premières ms) ; rangé avec la source (`BD V8 …`, même code et dossier), tag `slices` (pas de contrôle « long ») ; presets `drive_tints`, `rumble_tints` ; notebook [[sounddesign/variations]] | fait (à valider à l'oreille) |
 | 8.J | **Layering** : buffer de couches (source = couche 0, « + couche » choisit un autre sample dans la vue Samples, 3 au plus), couche lue par chaque chaîne (`layer`), calage automatique des attaques puis décalage `offset_ms` (±50 ms), gain de fin de chaîne `gain_db_end` (mélange variable dans le temps ou d'une tranche à l'autre) ; boîte « Source » en tête des devices ; `layers` dans la requête, le sidecar et le hash ; `--layer` en CLI ; preset `layer_blend` | fait (à valider à l'oreille) |
 | 8.K | Devices **Overdrive**, **Dynamic Tube** et **Saturator** (8 courbes, Color, Waveshaper, Post clip) (émulations maison des devices de Live, `analyzer/saturation.py`) : passe-bande / saturation asymétrique / tonalité / dynamique / dry-wet ; lampe à modèles A / B / C, bias modulé par l'enveloppe, tonalité par pré- et désaccentuation ; interface de plugin pedalboard, donc automatisables (`params_end`) ; mode **Hi-Quality** du tube (suréchantillonnage × 4, filtres à état, 0,33 ms de latence) ; presets `variations/tube_tints`, `saturator_tints` ; potards affichés selon un sélecteur (`active_when` : WS en Waveshaper, Color) | fait (à valider à l'oreille) |
+| 8.L | **Rumbles liés aux kicks**. 8.L1 : parenté kick → rendu (`parent` dans l'override posé au versement, l'entrée du manifeste et l'item de live ; `children_of`) ; 8.L2 : presets de rumble **associés à chaque banque** du live (jusqu'à 5), génération d'un rumble par kick de la banque et par preset, au tempo de la banque, versé et ajouté à la banque, rejouable ; sans preset, pas de rumble | 8.L1 fait (données + API) ; 8.L2 à venir |
 
 **Décisions 8** (arbitrées le 2026-10-10) :
 - **Mute à deux niveaux** : `bypass` par device (bouton on/off d'un device
@@ -1098,6 +1099,20 @@ On garde une boucle d'une à huit mesures, sans couture.
   (`gain_db_end`, interpolé en dB), même mécanisme en temps et en tranches.
   Champs neutres omis du JSON : hash des rendus antérieurs inchangé ; les
   couches entrent dans le hash quand il y en a.
+- **Parenté** (8.L1, arbitré le 2026-10-14) : un rendu versé porte la clé
+  du sample dont il est issu (`parent`, relative à `Samples/`), écrite dans
+  `overrides.json` au versement et recopiée dans l'entrée du manifeste et
+  l'item de live. Champ générique (rumble, variations, riser sur sample) ;
+  `None` pour un rendu de bruit généré. Le lien n'est pas inféré d'un nom
+  de fichier. Pas d'affichage dans le front en 8.L1.
+- **Rumbles par banque** (8.L2, arbitré le 2026-10-14) : les presets de
+  rumble sont **associés à la banque** du live (0 à 5 presets par banque,
+  dans le modèle `Live`) ; la génération rend un rumble par kick (BD) de la
+  banque et par preset, au tempo de la banque, le verse et l'ajoute à la
+  banque. **Aucun preset associé = aucun rumble généré.** L'item de live
+  est construit depuis le rendu (code, nom DT2, `parent`), sans attendre
+  la réanalyse du manifeste. Rejouable : même kick, même preset, même
+  tempo = même fichier (hash), un rumble déjà présent est compté inchangé.
 
 ## Phase 9 — Générateur MIDI acid (arrêtée après 9.C2 le 2026-10-13)
 

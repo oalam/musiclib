@@ -19,11 +19,13 @@ def _wav(path: Path, seconds: float, sr: int = 44_100, channels: int = 2) -> Non
 @pytest.fixture
 def lib(tmp_path: Path) -> tuple[Manifest, Path]:
     root = tmp_path / "Samples"
-    for rel in ("k/kick.wav", "k/hat.wav", "d/drone C.wav", "me/rec.wav"):
+    for rel in ("k/kick.wav", "k/hat.wav", "d/drone C.wav", "me/rec.wav", "SoundDesign/rumble/r.wav"):
         _wav(root / rel, 1.0)
     entries = [
         SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
                     name="BD F Hard 01 k", duration=1.0, rank=1),
+        SampleEntry(source="SoundDesign/rumble/r.wav", family="UNIVERSEL", code="RM", pack="sou",
+                    name="RM 150 F Hard k", duration=1.0, rank=1, parent="k/kick.wav"),
         SampleEntry(source="k/hat.wav", family="TRIBE", code="HH", pack="k",
                     name="HH Tick k", duration=1.0, rank=1),
         SampleEntry(source="me/rec.wav", family="SAMPLE", code="BL", pack="me",
@@ -67,6 +69,16 @@ def test_add_and_common(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert kick.folder == "B-DNB"
     lv.remove(live, ["k/hat.wav"])
     assert [it.source for it in live.items] == ["k/kick.wav"]
+
+
+def test_add_keeps_parent_of_a_render(tmp_path: Path, lib: tuple[Manifest, Path]):
+    # un rumble verse garde la cle de son kick (8.L1) ; un sample ordinaire n'en a pas
+    m, root = lib
+    live = _live(tmp_path)
+    lv.add(live, m, ["k/kick.wav", "SoundDesign/rumble/r.wav"], "A-HALF", root)
+    by = {it.source: it for it in live.items}
+    assert by["SoundDesign/rumble/r.wav"].parent == "k/kick.wav"
+    assert by["k/kick.wav"].parent is None
 
 
 def test_add_reserve_sample_and_live_pack(tmp_path: Path, lib: tuple[Manifest, Path]):

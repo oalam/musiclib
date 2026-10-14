@@ -394,6 +394,7 @@ class SampleEntry(BaseModel):
     note_src: NoteSrc | None = None  # None : pas mesuree (ou code non tonal)
     overflow: bool = False          # reserve hors plafond, vue par kit (7.J5), jamais stocke
     sub: str = ""                   # sous-categorie (7.J8), "" = racine du code
+    parent: str | None = None       # sample dont ce rendu est issu (8.L1), copie de l'override
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -417,6 +418,9 @@ class Override(BaseModel):
     trash: bool = False     # corbeille : hors de toutes les cases, restaurable
     no_auto: list[str] = Field(default_factory=list)   # tags inferes masques (7.J6)
     sub: str | None = None  # sous-categorie forcee, "" = racine du code (7.J8)
+    # rendu du sound design : source du rendu (cle relative a Samples/), ecrit
+    # au versement (8.L1) ; un kick connait ainsi ses rumbles, un rumble son kick
+    parent: str | None = None
 
 
 class LooseSample(BaseModel):
@@ -1220,7 +1224,7 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                 status=prev_status.get(r.source, "pending"), flags=flags[r.source],
                 bpm=bpm, bpm_est=est, tags=tags_of(overrides, r.source), stars=ov.stars,
                 auto_tags=auto_tags_of(overrides, r.source),
-                note=note, note_hz=note_hz, note_src=note_src))
+                note=note, note_hz=note_hz, note_src=note_src, parent=ov.parent))
         select(cell_entries, q)
         entries.extend(cell_entries)
 
@@ -1273,6 +1277,11 @@ def _reserved(manifest: Manifest, source: str) -> ReserveSample | None:
     return next((r for r in manifest.reserve if r.source == source), None)
 
 
+def children_of(manifest: Manifest, source: str) -> list[SampleEntry]:
+    """Rendus du sound design issus de `source` (8.L1), dans l'ordre du manifeste."""
+    return [e for e in manifest.entries if e.parent == source]
+
+
 def known(manifest: Manifest, source: str) -> bool:
     """Fichier du manifeste : candidat, reserve, non classe ou en corbeille."""
     return (_entry(manifest, source) is not None or source in manifest.unclassified
@@ -1321,7 +1330,7 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str, sub: str,
         flags=measure_fn(path, code) if measure_fn is not None and present else None,
         bpm=bpm, bpm_est=est, tags=tags_of(overrides, source), stars=ov.stars,
         auto_tags=auto_tags_of(overrides, source),
-        note=notes[0], note_hz=notes[1], note_src=notes[2])
+        note=notes[0], note_hz=notes[1], note_src=notes[2], parent=ov.parent)
     manifest.entries.append(entry)
     _reselect(manifest, folder)
     return entry
