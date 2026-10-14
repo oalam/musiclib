@@ -12,6 +12,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   (seuils du pré-filtre), nomenclature des fichiers maison, classement,
   corrections et envoi sur la DT2 via un live.
 
+### Modifié
+
+- [7.L4] Panneau Live : « Exporter… » remonte dans l'en-tête, à droite du
+  sélecteur de live, avec une icône et la couleur d'accent ; le bilan
+  d'export s'affiche sous l'en-tête. « accorder le live » /
+  « désaccorder » deviennent un seul bouton à bascule (diapason, bleu de
+  la transposition, allumé quand le live est accordé) à côté.
+
 ### Corrigé
 
 - [7.J8] Samples : les voix de `Movie tracks` restaient non classées. La

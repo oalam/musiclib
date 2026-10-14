@@ -271,8 +271,40 @@
       <option value={NEW}>nouveau live…</option>
     </select>
     {#if sum?.live.pack}<span class="muted small" title="pack des samples maison du live">pack {sum.live.pack}</span>{/if}
+    {#if sum && !creating}
+      {@const live = sum.live}
+      <!-- accorder / desaccorder : un seul bouton a bascule, allume quand le live est accorde -->
+      <button class="small tune" class:on={shifted} aria-pressed={shifted}
+        disabled={busy || !tunable.length || (!shifted && !keyed.length)}
+        title={shifted ? 'Live accordé · clic : remet tout le live à sa hauteur d\'origine'
+          : !tunable.length ? 'Aucun kick, rumble, basse, pad ni stab à accorder'
+          : keyed.length ? `Ramène les kicks, rumbles, basses, pads et stabs de chaque banque sur la tonique de sa tonalité (${keyed.map(b => `${b} : ${live.keys[b]}`).join(', ')}) ; une banque sans tonalité garde la hauteur d'origine. Varispeed à l'export, la lib n'est pas touchée.`
+          : 'Saisir d\'abord la tonalité des banques (double-clic sur une banque)'}
+        onclick={() => tune(shifted)}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 1.5v5a3 3 0 0 0 6 0v-5M8 9.5V14.5M6 14.5h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{shifted ? 'Accordé' : 'Accorder'}</button>
+      <button class="small exp" disabled={exporting || !live.items.length}
+        title="Copie le live vers Live/00-live/{live.name} (banque / branche / nom DT2), à synchroniser avec Transfer"
+        onclick={() => runExport(true)}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 11.5v2h11v-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{exporting ? 'Export…' : 'Exporter…'}</button>
+    {/if}
   </header>
   {#if error}<p class="err">{error}</p>{/if}
+  {#if report && !creating}
+    {@const r = report}
+    <div class="export small">
+      <strong>{r.dry_run ? 'Bilan de l’export' : 'Export terminé'}</strong>
+      <span class="muted">→ {r.dest}</span>
+      <p>
+        {r.files} fichiers ({mo(r.bytes)}) : {r.copied.length} {r.dry_run ? 'à copier' : 'copiés'},
+        {r.unchanged} inchangés, {r.removed.length} {r.dry_run ? 'à retirer' : 'retirés'}.
+      </p>
+      {#if r.missing.length}<p class="err">Sources absentes ({r.missing.length}) : {r.missing.slice(0, 5).join(', ')}</p>{/if}
+      {#if r.conflicts.length}<p class="err">Fichiers posés à la main, non écrasés ({r.conflicts.length}) : {r.conflicts.slice(0, 5).join(', ')}</p>{/if}
+      {#if r.dry_run}
+        <button class="small" disabled={exporting || (!r.copied.length && !r.removed.length)}
+          onclick={() => runExport(false)}>{exporting ? 'Copie…' : 'Copier'}</button>
+      {/if}
+      <button class="small" onclick={() => (report = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
+    </div>
+  {/if}
 
   {#if creating}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -293,12 +325,6 @@
     <p class="small gauge-txt" class:err={ratio > 1}>
       RAM {mo(s.ram)} / {mo(s.ram_limit)} ({Math.round(ratio * 100)} %) · {s.live.items.length} samples
       {#if s.unknown_ram}<span class="muted"> · {s.unknown_ram} non mesuré{s.unknown_ram > 1 ? 's' : ''}</span>{/if}
-      {#if tunable.length}
-        · <button class="small link" disabled={busy || !keyed.length}
-          title={keyed.length ? `Ramène les kicks, rumbles, basses, pads et stabs de chaque banque sur la tonique de sa tonalité (${keyed.map(b => `${b} : ${s.live.keys[b]}`).join(', ')}) ; une banque sans tonalité garde la hauteur d'origine. Varispeed à l'export, la lib n'est pas touchée.` : 'Saisir d\'abord la tonalité des banques (double-clic sur une banque)'}
-          onclick={() => tune(false)}>accorder le live</button>
-        {#if shifted}<button class="small link" disabled={busy} title="Remet tout le live à sa hauteur d'origine" onclick={() => tune(true)}>désaccorder</button>{/if}
-      {/if}
     </p>
     {#if tuneInfo}<p class="small muted tuneinfo">{tuneInfo} <button class="untag" title="Fermer" onclick={() => (tuneInfo = '')}>×</button></p>{/if}
 
@@ -391,30 +417,6 @@
       {/each}
     </ul>
     </div>
-
-    <div class="foot">
-      <button class="small" disabled={exporting || !s.live.items.length}
-        title="Copie le live vers Live/00-live/{s.live.name} (banque / branche / nom DT2), à synchroniser avec Transfer"
-        onclick={() => runExport(true)}>{exporting ? 'Export…' : 'Exporter…'}</button>
-    </div>
-    {#if report}
-      {@const r = report}
-      <div class="export small">
-        <strong>{r.dry_run ? 'Bilan de l’export' : 'Export terminé'}</strong>
-        <span class="muted">→ {r.dest}</span>
-        <p>
-          {r.files} fichiers ({mo(r.bytes)}) : {r.copied.length} {r.dry_run ? 'à copier' : 'copiés'},
-          {r.unchanged} inchangés, {r.removed.length} {r.dry_run ? 'à retirer' : 'retirés'}.
-        </p>
-        {#if r.missing.length}<p class="err">Sources absentes ({r.missing.length}) : {r.missing.slice(0, 5).join(', ')}</p>{/if}
-        {#if r.conflicts.length}<p class="err">Fichiers posés à la main, non écrasés ({r.conflicts.length}) : {r.conflicts.slice(0, 5).join(', ')}</p>{/if}
-        {#if r.dry_run}
-          <button class="small" disabled={exporting || (!r.copied.length && !r.removed.length)}
-            onclick={() => runExport(false)}>{exporting ? 'Copie…' : 'Copier'}</button>
-        {/if}
-        <button class="small" onclick={() => (report = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
-      </div>
-    {/if}
   {:else if !error}
     <p class="muted small">Choisis un live ou crées-en un : une sélection de la lib rangée par banque, exportée vers <span class="mono">Live/00-live</span>.</p>
   {/if}
@@ -475,7 +477,11 @@
   .untag { border: 0; background: none; padding: 0 2px; cursor: pointer; color: var(--muted); font-size: 11px; }
   .untag:hover { color: #dc2626; }
   .flag { font-size: 10px; padding: 0 3px; border-radius: 3px; background: #dc2626; color: #fff; }
-  .foot { display: flex; justify-content: flex-end; margin-top: 4px; }
+  .tune, .exp { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+  .tune { margin-left: auto; border-color: #2563eb; color: #2563eb; }
+  .tune.on { background: #2563eb; color: #fff; }
+  .exp { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tune:hover:not(:disabled), .exp:hover:not(:disabled) { filter: brightness(1.1); }
   .export { padding: 8px 10px; border: 1px solid var(--accent); border-radius: 4px; background: var(--panel); }
   .export p { margin: 6px 0; }
   .err { color: #dc2626; font-size: 12px; margin: 0; }
