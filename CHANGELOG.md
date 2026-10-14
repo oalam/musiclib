@@ -8,6 +8,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.J8] Samples : les voix de `Movie tracks` restaient non classées. La
+  règle du code `VX` ne connaissait ni le dossier `VX/` ni le mot « choir »
+  (reconnu seulement pour la sous-catégorie `CHANT`). Ajout de `vx` (mot
+  entier) et de `choir` aux règles `VX` (one-shots et boucles) : les 11
+  samples de films vont en `VX/CHANT` et `VX/SPEECH`, sans effet sur le
+  reste du disque (vérifié sur `/Volumes/xtreme/Samples`).
 - [7.J2] Vue Samples : le sample en cours sortait de l'écran en naviguant
   aux flèches dans une longue liste. La ligne était cherchée par
   `getElementById` avec un id passé par `CSS.escape`, qui ne correspondait

@@ -275,7 +275,7 @@ CODE_RULES: tuple[tuple[str, str], ...] = (
     ("TM", rf"{_B}tom|{_B}[lmh]t\d"),
     ("PC", rf"perc|conga|bongo|shaker|tamb|cowbell|clave|block|cabasa|{_B}pc{_E}|gourd|stick|tick"),
     ("BS", rf"bass|{_B}sub{_E}|reese|808"),
-    ("VX", r"vox|vocal|voice|shout|chant|speech|acapella|adlib"),
+    ("VX", rf"vox|vocal|voice|shout|chant|choir|speech|acapella|adlib|{_B}vx{_E}"),   # dossier VX/ (Movie tracks)
     ("FX", rf"{_B}fx|sfx|rise|riser|downlift|uplift|impact|sweep|noise|glitch|cartoon|whoosh|reverse|drop"
            r"|thump|transition"),   # cinematic Noiiz : Low End Thumps, Transitions
     ("PD", r"pad|drone|texture|ambien|atmos|cinematic"),
@@ -287,7 +287,7 @@ _CODE_RX = tuple((c, re.compile(p)) for c, p in CODE_RULES)
 # Une boucle se reconnait au chemin ; son code depend ensuite de son contenu.
 _LOOP_RX = re.compile(rf"loop|{_B}grooves?{_E}|sequence|{_B}tops?{_E}|{_B}fill|{_B}builds?{_E}")
 LOOP_RULES: tuple[tuple[str, str], ...] = (
-    ("VX", r"vox|vocal|voice|chant|adlib|acapella"),
+    ("VX", r"vox|vocal|voice|chant|choir|adlib|acapella"),
     ("ML", r"pad|drone|atmos|ambien|texture"),            # boucle de nappe : LOOPS/ML/PADS (7.J8)
     ("FX", rf"{_B}fx|sfx|rise|sweep|noise|glitch|{_B}builds?{_E}"),
     ("BL", rf"bass|{_B}sub{_E}|reese|808"),

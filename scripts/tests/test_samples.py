@@ -73,6 +73,8 @@ def test_family_rules(rel: str, family: str) -> None:
     ("x/OpenHH Willada.wav", "OH"),
     ("x/Closed Hihat 2.wav", "HH"),
     ("MPC_Kit/clk01.wav", None),
+    ("Movie tracks/VX/Matrix/agent_smith_interrogates_morpheus_01.wav", "VX"),
+    ("Movie tracks/Ghost In the shell/gits_choir_01.wav", "VX"),
 ])
 def test_code_rules(rel: str, code: str | None) -> None:
     assert smp.code_of(rel, 0.3) == code
