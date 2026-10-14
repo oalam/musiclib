@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.L2] Rumbles par banque de live : presets de rumble associés à chaque
+  banque (`Live.rumbles`, 5 au plus, `PUT /api/lives/{live}/rumbles`) ;
+  `sounddesign.rumble_bank` rend un rumble par kick de la banque et par
+  preset au tempo de la banque, le verse (avec `parent`) et l'ajoute à la
+  banque sans attendre la réanalyse (`lives.render_item`, `add_item`).
+  Rejouable : rendu existant réutilisé, versement sans recopie, rumble déjà
+  présent inchangé ; aucun preset associé = rien de généré. Route
+  `POST /api/lives/{live}/rumbles` (`dry_run`), CLI `sounddesign.py
+  rumbles <live> <banque>`, panneau Live : cases à cocher et bouton
+  « Rumbles » sur la ligne de la banque, bilan sur une ligne.
 - [8.L1] Parenté kick → rendu du sound design : le versement écrit
   `parent` (clé du sample d'origine) dans `overrides.json` ; l'entrée du
   manifeste et l'item de live (`LiveItem.parent`) le reprennent,

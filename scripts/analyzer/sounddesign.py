@@ -36,6 +36,7 @@ from typing import Literal, NamedTuple
 import numpy as np
 from pydantic import BaseModel, Field
 
+from analyzer import lives as lv
 from analyzer import samples as smp
 from analyzer import saturation
 
@@ -1029,7 +1030,7 @@ def slice_count(preset: Preset) -> int:
 
 
 def target(source: str, manifest: smp.Manifest, treatment: str,
-           bpm: float | None, slices: int = 0, folder: str = "") -> Target:
+           bpm: float | None, slices: int = 0, folder: str = "", tag: str = "") -> Target:
     """Nom DT2 propose, sous-dossier et code d'un rendu de `source` (relatif a Samples/).
 
     Le sous-dossier est celui du traitement s'il en fixe un (riser : FX/RISE),
@@ -1043,6 +1044,9 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
     `folder` (un de `samples.target_folders()`) impose le dossier, donc le
     code et le sous-dossier : le nom propose prend ce code
     (`DRUMS/RM/SUB` pour une variation de kick -> `RM V8 C Punch dbr`).
+
+    `tag` : mot insere apres le tempo (rumbles d'une banque, 8.L2 : le preset,
+    `RM 165 Deep C# Kik dbr`) ; les variations ont le leur (`V<tranches>`).
     """
     spec = TREATMENTS[treatment].spec
     forced = _forced_folder(folder)
@@ -1065,7 +1069,7 @@ def target(source: str, manifest: smp.Manifest, treatment: str,
         code, sub = forced
     pack = found.pack if found else smp.pack_of(source)
     src_name = entry.name if entry else smp.short_name(source, src_code or code, pack)
-    name = propose_name(src_name, src_code, code, bpm, f"V{slices}" if slices else "")
+    name = propose_name(src_name, src_code, code, bpm, tag or (f"V{slices}" if slices else ""))
     dest = smp.folder_of("", code, sub)
     taken = {e.name for e in manifest.entries if e.folder == dest}
     return Target(smp.unique_name(name, taken), sub, code)
@@ -1206,6 +1210,97 @@ def verse(record: RenderRecord, out_root: Path, samples_root: Path,
     smp.set_override(overrides, key, code=record_code(record), sub=record.sub,
                      name=record.name, tags=tags, parent=record_parent(record, samples_root))
     return key
+
+
+# ---------------------------------------------------------------------------
+# Rumbles d'une banque de live (8.L2)
+# ---------------------------------------------------------------------------
+
+class BankRumbleReport(BaseModel):
+    """Bilan de `rumble_bank` : noms DT2 par sort, rejouable (relancer = tout inchange)."""
+
+    bank: str
+    bpm: float | None = None
+    presets: list[str]               # presets de rumble associes a la banque
+    kicks: int = 0                   # BD de la banque
+    dry_run: bool = False
+    rendered: list[str] = Field(default_factory=list)   # rendus (ou a rendre) cette fois
+    reused: list[str] = Field(default_factory=list)     # rendus deja sur disque
+    added: list[str] = Field(default_factory=list)      # ajoutes a la banque
+    unchanged: list[str] = Field(default_factory=list)  # deja dans la banque
+    skipped: list[str] = Field(default_factory=list)    # `kick : motif`
+
+
+def rumble_tag(preset_id: str) -> str:
+    """Mot du nom DT2 qui distingue les rumbles d'un meme kick : `deep` -> `Deep`,
+    `kick_rumble` -> `Kick`."""
+    return preset_id[:4].capitalize()
+
+
+def _existing_rumble(records: list[RenderRecord], preset: Preset, parent: str,
+                     samples_root: Path) -> RenderRecord | None:
+    """Rendu deja ecrit pour ce kick et ce preset effectif (meme tempo compris)."""
+    wanted = preset.model_dump_json()
+    return next((r for r in records if record_parent(r, samples_root) == parent
+                 and r.preset.model_dump_json() == wanted), None)
+
+
+def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Manifest,
+                out_root: Path, samples_root: Path, overrides: dict[str, smp.Override],
+                dry_run: bool = False) -> BankRumbleReport:
+    """Un rumble par kick (BD) de `bank` et par preset associe a la banque, au
+    tempo de la banque : rendu, verse dans le pack et ajoute a la banque (8.L2).
+
+    Rejouable : un rendu deja ecrit pour ce kick et ce preset effectif est
+    reutilise (meme fichier), le versement ne recopie pas, un rumble deja dans
+    la banque est compte inchange. Sans preset associe : rien n'est genere.
+    `dry_run` : bilan sans rendu, ni ecriture, ni ajout. `live` et `overrides`
+    sont modifies en place, a enregistrer par l'appelant.
+    """
+    if bank not in live.banks:
+        raise lv.LiveError(f"banque absente du live : {bank}")
+    ids = live.rumbles.get(bank, [])
+    bpm = live.tempos.get(bank)
+    report = BankRumbleReport(bank=bank, bpm=bpm, presets=ids, dry_run=dry_run)
+    if not ids:
+        return report
+    if bpm is None:
+        raise lv.LiveError(f"{bank} n'a pas de tempo : le saisir d'abord")
+    presets = {p.id: p for p in load_presets("rumble", presets_root)}
+    unknown = [i for i in ids if i not in presets]
+    if unknown:
+        raise PresetError(f"preset de rumble inconnu pour {bank} : {', '.join(unknown)}")
+    kicks = [it for it in live.items if it.code == "BD" and bank in it.banks]
+    report.kicks = len(kicks)
+    records = list_renders(out_root, "rumble")
+    taken = {it.name for it in live.items}   # noms DT2 deja pris dans le live
+    for pid in ids:
+        preset = with_overrides(presets[pid], {"bpm": bpm}, [], [])
+        for kick in kicks:
+            path = samples_root / kick.source
+            if not path.is_file():
+                report.skipped.append(f"{kick.name} : fichier absent")
+                continue
+            record = _existing_rumble(records, preset, kick.source, samples_root)
+            if record is not None:
+                report.reused.append(record.name)
+            else:
+                planned = target(kick.source, manifest, "rumble", bpm, tag=rumble_tag(pid))
+                name = smp.unique_name(planned.name, taken)
+                taken.add(name)
+                report.rendered.append(name)
+                if dry_run:
+                    continue
+                audio = render(preset, load_source(path))
+                record = write_render(audio, f"{samples_root.name}/{kick.source}", preset, out_root,
+                                      name, planned.sub, planned.code)
+                records.append(record)
+            if dry_run:
+                continue
+            key = verse(record, out_root, samples_root, overrides)
+            item = lv.render_item(key, record_code(record), record.name, samples_root, kick.source)
+            (report.added if lv.add_item(live, item, bank) else report.unchanged).append(record.name)
+    return report
 
 
 def with_overrides(preset: Preset, settings: dict[str, float], mute: list[str],

@@ -936,7 +936,22 @@ saisie de la banque, vide pour la retirer), `POST .../tempo` (`bank`, `bpm`
 de 30 à 300, `null` pour le retirer), `POST .../tune` (`reset` : accorde ou
 désaccorde tout le live), `GET .../audio?source=` (écoute telle
 qu'exportée : rendu varispeed si le sample est accordé), `POST .../rename`, `POST .../export`
-(`dry_run`, vrai par défaut).
+(`dry_run`, vrai par défaut), `PUT .../rumbles` (`bank`, `presets` : presets
+de rumble associés à la banque, 5 au plus, vide pour n'en générer aucun ;
+422 pour un preset inconnu), `POST .../rumbles` (`bank`, `dry_run`) →
+`BankRumbleReport`.
+
+Rumbles par banque (8.L2, `sounddesign.rumble_bank`) : pour chaque kick (BD)
+de la banque et chaque preset associé (`live.rumbles[bank]`), un rumble est
+rendu au tempo de la banque (`settings.bpm` du preset remplacé), versé dans
+`Samples/SoundDesign/rumble/` avec son `parent` et ajouté à la banque sans
+attendre la réanalyse (`lives.render_item` + `add_item`). Nom DT2 : tag du
+preset après le tempo (`deep` → `RM 165 Deep C# Kik dbr`), unique dans le
+live. Rejouable : même kick + même preset + même tempo = même fichier
+(réutilisé), versement sans recopie, rumble déjà dans la banque compté
+inchangé ; changer le tempo produit de nouveaux rendus. Aucun preset
+associé : rien n'est généré. Sans tempo : 422. CLI :
+`sounddesign.py rumbles <live> <banque> [--dry-run]`.
 
 Accordage (7.L4, `lives.tune_live`, banque par banque avec `tune_bank`) :
 appliqué au live entier ; dans chaque banque qui a une tonalité (0-COMMON
@@ -959,6 +974,10 @@ nom, pack, banques séparées par des espaces), jauge de RAM, grille banques
 affichée entre parenthèses, ex. `A-HALF (Fa m)` ; clic sur un compteur : son
 dossier, rouge au-delà de 64), liste avec écoute au clic, renommage au
 double-clic, retrait par banque ou du live, export (bilan puis copie).
+Sur la ligne de la banque active : « rumbles : … » (cases à cocher parmi
+les presets du traitement rumble, 5 au plus) et le bouton « Rumbles » qui
+lance la génération et affiche le bilan (rendus / réutilisés / ajoutés /
+inchangés).
 Ajout : glisser des samples de la liste sur une ligne de banque ou sur la
 liste de la banque en cours, ou `L`
 (sélection, sinon sample en cours) ou `Entrée` (sample en cours seul) vers

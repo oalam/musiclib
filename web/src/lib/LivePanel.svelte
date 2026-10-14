@@ -7,7 +7,7 @@
   // la banque active (selection, sinon sample en cours). Un sample pris par
   // deux banques ou plus part dans 0-COMMON (regle de l'API).
   import { onMount } from 'svelte'
-  import { api, type LiveItem, type LiveSummary, type SampleExportReport } from './api'
+  import { api, type LiveItem, type LiveSummary, type SampleExportReport, type SdPreset } from './api'
 
   let {
     play,
@@ -56,6 +56,14 @@
   let tuneInfo = $state('')
   let report = $state<SampleExportReport | null>(null)
   let exporting = $state(false)
+  // rumbles de la banque active (8.L2) : presets associes, generation, bilan
+  const RUMBLES_MAX = 5                                       // lives.RUMBLE_PRESETS_MAX
+  let rumblePresets = $state<SdPreset[]>([])                  // presets du traitement rumble, charges au besoin
+  let editingRumbles = $state(false)
+  let rumbleSel = $state<string[]>([])
+  let rumbling = $state(false)
+  let rumbleInfo = $state('')
+  const bankRumbles = $derived(sum?.live.rumbles[bank] ?? [])
 
   const rows = $derived(sum ? [COMMON, ...sum.live.banks] : [])
   const byPath = $derived(new Map((sum?.folders ?? []).map(f => [f.path, f])))
@@ -92,6 +100,8 @@
 
   async function choose(name: string) {
     tuneInfo = ''
+    rumbleInfo = ''
+    editingRumbles = false
     report = null
     editingBanks = false
     renaming = null
@@ -180,6 +190,38 @@
     tuneInfo = `${moved} transposé${moved > 1 ? 's' : ''}, ${inKey.length - moved - unknown} déjà dans le ton`
       + (unknown ? `, ${unknown} sans note connue` : '')
       + (keyless.length ? ` · sans tonalité : ${keyless.join(', ')}` : '')
+  }
+
+  /** Presets de rumble de la banque active : coche parmi ceux du traitement rumble. */
+  async function startRumbles() {
+    if (!rumblePresets.length) {
+      try { rumblePresets = await api.sdPresets('rumble') } catch (e) { fail(e); return }
+    }
+    rumbleSel = [...bankRumbles]
+    editingRumbles = true
+  }
+
+  function toggleRumble(id: string) {
+    rumbleSel = rumbleSel.includes(id) ? rumbleSel.filter(p => p !== id)
+      : rumbleSel.length < RUMBLES_MAX ? [...rumbleSel, id] : rumbleSel
+  }
+
+  async function saveRumbles() {
+    if (await run(() => api.liveRumbles(current, bank, rumbleSel))) editingRumbles = false
+  }
+
+  /** Un rumble par kick de la banque et par preset associe, au tempo de la banque ; rejouable. */
+  async function runRumbles() {
+    if (rumbling || !current || bank === COMMON) return
+    rumbling = true
+    try {
+      const r = await api.liveRumblesRun(current, bank)
+      const n = (xs: string[], w: string) => `${xs.length} ${w}${xs.length > 1 ? 's' : ''}`
+      rumbleInfo = `${bank} à ${r.bpm} BPM, ${r.kicks} kick${r.kicks > 1 ? 's' : ''} × ${r.presets.join(', ')} : `
+        + `${n(r.rendered, 'rendu')}, ${n(r.reused, 'réutilisé')}, ${n(r.added, 'ajouté')}, ${n(r.unchanged, 'inchangé')}`
+        + (r.skipped.length ? ` · ignorés : ${r.skipped.join(' ; ')}` : '')
+      apply(await api.live(current))
+    } catch (e) { fail(e) } finally { rumbling = false }
   }
 
   /** Ecoute telle qu'exportee : rendu varispeed de l'API si le sample est accorde. */
@@ -389,7 +431,34 @@
         <input type="number" min="30" max="300" step="0.1" placeholder="—" value={s.live.tempos[bank] ?? ''}
           onchange={saveTempo} onkeydown={e => { if (e.key === 'Enter' || e.key === 'Escape') (e.target as HTMLElement).blur() }} /> BPM
       </label>
+      {#if bank !== COMMON}
+        <button class="small link" disabled={busy}
+          title="Presets de rumble de {bank} ({RUMBLES_MAX} au plus) : un rumble par kick et par preset, au tempo de la banque. Aucun preset : aucun rumble."
+          onclick={startRumbles}>rumbles : {bankRumbles.length ? bankRumbles.join(', ') : 'aucun'}</button>
+        <button class="small rum" disabled={rumbling || busy || !bankRumbles.length || !s.live.tempos[bank]}
+          title={!bankRumbles.length ? 'Associer d\'abord des presets de rumble à la banque'
+            : !s.live.tempos[bank] ? 'Saisir d\'abord le tempo de la banque'
+            : `Rend un rumble par kick de ${bank} et par preset (${bankRumbles.join(', ')}) à ${s.live.tempos[bank]} BPM, le verse dans Samples/SoundDesign et l'ajoute à la banque. Rejouable : un rumble déjà rendu est réutilisé.`}
+          onclick={runRumbles}><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M1.5 8h2l1.5-4 2 8 2-6 1.5 2h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{rumbling ? 'Rumbles…' : 'Rumbles'}</button>
+      {/if}
     </h4>
+    {#if editingRumbles}
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="form small" onkeydown={e => onFormKey(e, saveRumbles, () => (editingRumbles = false))}>
+        {#each rumblePresets as p (p.id)}
+          <label title={p.description}><input type="checkbox" checked={rumbleSel.includes(p.id)}
+            disabled={!rumbleSel.includes(p.id) && rumbleSel.length >= RUMBLES_MAX}
+            onchange={() => toggleRumble(p.id)} /> {p.label} <span class="muted mono">{p.id}</span></label>
+        {:else}
+          <span class="muted">Aucun preset de rumble : en créer un dans la vue Sound design.</span>
+        {/each}
+        <span>
+          <button class="small" disabled={busy} onclick={saveRumbles}>Enregistrer</button>
+          <button class="small" onclick={() => (editingRumbles = false)}>Annuler</button>
+        </span>
+      </div>
+    {/if}
+    {#if rumbleInfo}<p class="small muted tuneinfo">{rumbleInfo} <button class="untag" title="Fermer" onclick={() => (rumbleInfo = '')}>×</button></p>{/if}
     <ul class="items small">
       {#each shown as it (it.source)}
         <li id="live-{it.source}" class:cur={it.source === cur} class:kbd={focused && it.source === cur}>
@@ -477,7 +546,9 @@
   .untag { border: 0; background: none; padding: 0 2px; cursor: pointer; color: var(--muted); font-size: 11px; }
   .untag:hover { color: #dc2626; }
   .flag { font-size: 10px; padding: 0 3px; border-radius: 3px; background: #dc2626; color: #fff; }
-  .tune, .exp { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+  .tune, .exp, .rum { display: inline-flex; align-items: center; gap: 5px; font-weight: 600; }
+  .rum { border-color: var(--rhythm); color: var(--rhythm); font-size: 11px; padding: 0 6px; }
+  .rum:hover:not(:disabled) { background: var(--rhythm); color: #fff; }
   .tune { margin-left: auto; border-color: #2563eb; color: #2563eb; }
   .tune.on { background: #2563eb; color: #fff; }
   .exp { background: var(--accent); border-color: var(--accent); color: #fff; }

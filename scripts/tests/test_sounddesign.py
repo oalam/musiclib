@@ -249,6 +249,55 @@ def test_versed_render_lands_in_drums_rm(tmp_path: Path):
     assert [e.source for e in children_of(m, "k/kick.wav")] == [key]
 
 
+def test_rumble_bank_renders_verses_adds_and_replays(tmp_path: Path):
+    import soundfile as sf
+    from analyzer import lives as lv
+    from analyzer.samples import Manifest, SampleEntry
+    samples_root, out, presets = tmp_path / "Samples", tmp_path / "SoundDesign", tmp_path / "presets"
+    (samples_root / "k").mkdir(parents=True)
+    for f in ("kick.wav", "kick2.wav"):
+        sf.write(samples_root / "k" / f, _kick()[0], sd.SR)
+    m = Manifest(source_root=str(samples_root), total=2, entries=[
+        SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
+                    name="BD C Punch 01 k", duration=0.3, rank=1, sub="CLEAN"),
+        SampleEntry(source="k/kick2.wav", family="TRIBE", code="BD", pack="k",
+                    name="BD D Hard 02 k", duration=0.3, rank=2)])
+    sd.save_preset(_preset(), presets)                       # id `t`
+    live = lv.create_live(tmp_path / "lives", "solaris", ["A-HALF", "B-DNB"])
+    lv.add(live, m, ["k/kick.wav", "k/kick2.wav"], "A-HALF", samples_root)
+    overrides: dict = {}
+    run = lambda **kw: sd.rumble_bank(live, "A-HALF", presets, m, out, samples_root, overrides, **kw)  # noqa: E731
+
+    assert run().presets == [] and len(live.items) == 2    # sans preset associe : rien
+    lv.set_rumbles(live, "A-HALF", ["t"])
+    with pytest.raises(lv.LiveError, match="tempo"):
+        run()
+    lv.set_tempo(live, "A-HALF", 165)
+    names = ["RM 165 T C Punch k", "RM 165 T D Hard k"]     # tag du preset, tempo de la banque
+    dry = run(dry_run=True)
+    assert (dry.kicks, dry.rendered, dry.added) == (2, names, [])
+    assert not out.exists() and len(live.items) == 2 and not overrides
+
+    r1 = run()
+    assert (r1.rendered, r1.reused, r1.added, r1.unchanged) == (names, [], names, [])
+    rm = [it for it in live.items if it.code == "RM"]
+    assert [it.name for it in rm] == names and [it.parent for it in rm] == ["k/kick.wav", "k/kick2.wav"]
+    assert rm[0].banks == ["A-HALF"] and rm[0].branch == "DRUMS" and rm[0].ram
+    key = rm[0].source
+    assert key.startswith("SoundDesign/rumble/RM 165 T C Punch k ") and (samples_root / key).is_file()
+    assert (overrides[key].parent, overrides[key].sub, overrides[key].code) == ("k/kick.wav", "CLEAN", "RM")
+
+    r2 = run()                                              # rejouable : tout inchange
+    assert (r2.rendered, r2.reused, r2.added, r2.unchanged) == ([], names, [], names)
+    assert len(live.items) == 4 and len(list(out.glob("rumble/*.wav"))) == 2
+
+    lv.set_tempo(live, "A-HALF", 170)                        # autre tempo : autres rendus
+    r3 = run()
+    assert r3.rendered == ["RM 170 T C Punch k", "RM 170 T D Hard k"] and len(live.items) == 6
+    with pytest.raises(lv.LiveError, match="banque absente"):
+        sd.rumble_bank(live, "Z-NONE", presets, m, out, samples_root, overrides)
+
+
 def test_record_parent_is_manifest_key_or_none(tmp_path: Path):
     root = tmp_path / "Samples"
 

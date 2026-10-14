@@ -518,7 +518,19 @@ def test_sample_rebuild(samples_client: TestClient, monkeypatch: pytest.MonkeyPa
 # --- Sound design (Phase 8.B) ---------------------------------------------
 
 @pytest.fixture
-def sd_client(tmp_path: Path) -> TestClient:
+def sd_client(sd_client_factory) -> TestClient:
+    return sd_client_factory()
+
+
+@pytest.fixture
+def sd_client_factory(tmp_path: Path):
+    """Client sound design (un kick classe, un preset `t`) ; `**extra` pour create_app."""
+    def make(**extra: Path) -> TestClient:
+        return _sd_client(tmp_path, **extra)
+    return make
+
+
+def _sd_client(tmp_path: Path, **extra: Path) -> TestClient:
     import soundfile as sf
     from analyzer.samples import Manifest, SampleEntry, select
     from tests.test_sounddesign import _kick, _preset
@@ -539,7 +551,7 @@ def sd_client(tmp_path: Path) -> TestClient:
     return TestClient(api.create_app(library_file=lib, samples_manifest=manifest, samples_src=src,
                                      samples_overrides=tmp_path / "overrides.json",
                                      sounddesign_presets=presets,
-                                     sounddesign_out=tmp_path / "SoundDesign"))
+                                     sounddesign_out=tmp_path / "SoundDesign", **extra))
 
 
 def test_sounddesign_catalogue(sd_client: TestClient):
@@ -692,6 +704,33 @@ def test_sounddesign_layers_must_be_in_manifest(sd_client: TestClient):
 
 
 # --- Lives (7.L) --------------------------------------------------------------
+
+def test_lives_rumbles_per_bank(sd_client_factory, tmp_path: Path):
+    client = sd_client_factory(lives_meta=tmp_path / "lives")
+    client.post("/api/lives", json={"name": "solaris", "banks": ["A-HALF"]})
+    client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "A-HALF"})
+    r = client.put("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "presets": ["nope"]})
+    assert r.status_code == 422 and "inconnu" in r.json()["detail"]
+    r = client.put("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "presets": ["t"]})
+    assert r.json()["live"]["rumbles"] == {"A-HALF": ["t"]}
+    r = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"})
+    assert r.status_code == 422 and "tempo" in r.json()["detail"]
+    client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 165})
+    dry = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "dry_run": True}).json()
+    assert dry["rendered"] == ["RM 165 T C Punch k"] and dry["added"] == []
+    assert len(client.get("/api/lives/solaris").json()["live"]["items"]) == 1
+    rep = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()
+    assert (rep["rendered"], rep["added"]) == (["RM 165 T C Punch k"], ["RM 165 T C Punch k"])
+    items = client.get("/api/lives/solaris").json()["live"]["items"]
+    rm = next(it for it in items if it["code"] == "RM")
+    assert rm["parent"] == "k/kick.wav" and rm["banks"] == ["A-HALF"]
+    assert api.samples.load_overrides(tmp_path / "overrides.json")[rm["source"]].parent == "k/kick.wav"
+    again = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()
+    assert (again["rendered"], again["reused"], again["unchanged"]) == ([], ["RM 165 T C Punch k"], ["RM 165 T C Punch k"])
+    r = client.put("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "presets": []})
+    assert r.json()["live"]["rumbles"] == {}
+    assert client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()["presets"] == []
+
 
 def test_lives_flow(tmp_path: Path):
     import soundfile as sf

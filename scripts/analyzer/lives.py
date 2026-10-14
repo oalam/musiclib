@@ -68,6 +68,8 @@ KEY_MAX = 12                     # tonalite d'une banque, texte libre (Fa m, sol
 TEMPO_RANGE = (30.0, 300.0)      # BPM de la DT2
 EXPORT_SUFFIX = ".export.json"
 TUNABLE = frozenset({"BD", "RM", "BS", "PD", "ST"})   # one-shots accordes sur la tonique de la banque
+RUMBLE_PRESETS_MAX = 5           # presets de rumble associes a une banque (8.L2)
+PRESET_ID = re.compile(r"[a-z0-9_]{1,32}")   # id de preset du sound design (nom de fichier)
 PITCH_CLASSES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 _SOLFEGE = {"do": "C", "re": "D", "mi": "E", "fa": "F", "sol": "G", "la": "A", "si": "B"}
 _KEY_RX = re.compile(
@@ -106,6 +108,9 @@ class Live(BaseModel):
     banks: list[str] = Field(default_factory=list)   # sans 0-COMMON, toujours present
     keys: dict[str, str] = Field(default_factory=dict)  # tonalite saisie par banque (ex. A-HALF : Fa m)
     tempos: dict[str, float] = Field(default_factory=dict)  # BPM par banque (ecoute au clavier du front)
+    # presets de rumble par banque (8.L2) : un rumble par kick de la banque et par
+    # preset, au tempo de la banque ; banque absente = aucun rumble genere
+    rumbles: dict[str, list[str]] = Field(default_factory=dict)
     items: list[LiveItem] = Field(default_factory=list)
 
 
@@ -212,6 +217,7 @@ def set_banks(live: Live, banks: list[str]) -> None:
     live.items = [it for it in live.items if it.banks]
     live.keys = {b: k for b, k in live.keys.items() if b in kept}
     live.tempos = {b: t for b, t in live.tempos.items() if b in kept}
+    live.rumbles = {b: p for b, p in live.rumbles.items() if b in kept}
 
 
 def set_tempo(live: Live, bank: str, bpm: float | None) -> None:
@@ -238,6 +244,24 @@ def set_key(live: Live, bank: str, key: str) -> None:
         live.keys[bank] = key
     else:
         live.keys.pop(bank, None)
+
+
+def set_rumbles(live: Live, bank: str, presets: list[str]) -> None:
+    """Presets de rumble d'une banque (8.L2), dedoublonnes dans l'ordre donne,
+    RUMBLE_PRESETS_MAX au plus ; vide : plus de rumble pour cette banque.
+    Pas pour 0-COMMON : un kick commun est traite par chacune de ses banques."""
+    if bank not in live.banks:
+        raise LiveError(f"banque absente du live : {bank}")
+    ids = list(dict.fromkeys(p.strip() for p in presets if p.strip()))
+    bad = [p for p in ids if not PRESET_ID.fullmatch(p)]
+    if bad:
+        raise LiveError(f"id de preset invalide : {', '.join(bad)}")
+    if len(ids) > RUMBLE_PRESETS_MAX:
+        raise LiveError(f"{len(ids)} presets pour {bank} ({RUMBLE_PRESETS_MAX} au plus)")
+    if ids:
+        live.rumbles[bank] = ids
+    else:
+        live.rumbles.pop(bank, None)
 
 
 def key_root(key: str) -> str | None:
@@ -405,6 +429,32 @@ def add(live: Live, manifest: Manifest, sources: list[str], bank: str, root: Pat
     for s in sources:
         it = by_source[s]
         it.banks = _ordered(live, [*it.banks, bank])
+
+
+def render_item(source: str, code: str, name: str, root: Path, parent: str | None) -> LiveItem:
+    """Item d'un rendu du sound design verse (8.L2), construit depuis son
+    sidecar sans attendre la reanalyse du manifeste (le nom DT2 est celui du
+    rendu, la note s'y lit a l'accordage)."""
+    branch = branch_of("", code)
+    if branch not in LIVE_BRANCHES:
+        raise LiveError(f"code {code} sans branche de live : {source}")
+    return LiveItem(source=source, code=code, branch=branch, name=name, banks=[],
+                    ram=ram_bytes(root / source), parent=parent)
+
+
+def add_item(live: Live, item: LiveItem, bank: str) -> bool:
+    """Ajoute `item` a `bank` (le sample deja dans le live y est rejoint) ;
+    False s'il y etait deja."""
+    if bank != COMMON and bank not in live.banks:
+        raise LiveError(f"banque absente du live : {bank}")
+    it = next((x for x in live.items if x.source == item.source), None)
+    if it is None:
+        live.items.append(item)
+        it = item
+    if bank in it.banks:
+        return False
+    it.banks = _ordered(live, [*it.banks, bank])
+    return True
 
 
 def remove(live: Live, sources: list[str], bank: str | None = None) -> None:

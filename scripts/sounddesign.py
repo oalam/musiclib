@@ -19,6 +19,10 @@ Usage:
     sounddesign.py render variations drive_tints --source <kick> --verse
                                   # 8 variantes en tranches GRID, rangees avec le kick
                                                   # Samples/SoundDesign (relancer samples.py)
+    sounddesign.py rumbles solaris C-TRIBE [--dry-run]
+                                  # un rumble par kick de la banque et par preset associe
+                                  # (presets poses dans le front, tempo de la banque), verse
+                                  # et ajoute a la banque (8.L2) ; rejouable
 
 `--source` : chemin absolu, ou relatif a `<MEDIA>/Samples`.
 `--bypass CHAINE:INDEX` : index du device dans la chaine (0 = premier),
@@ -44,6 +48,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from analyzer import lives as lv
 from analyzer.sounddesign import (
     NO_SOURCE,
     SR,
@@ -55,6 +60,7 @@ from analyzer.sounddesign import (
     load_source,
     needs_source,
     render,
+    rumble_bank,
     slice_count,
     target,
     verse,
@@ -63,7 +69,14 @@ from analyzer.sounddesign import (
 )
 from analyzer.samples import Manifest
 from samples import MANIFEST_FILE, OVERRIDES_FILE, load_manifest, load_overrides, save_overrides
-from paths import SAMPLES_SRC_DIR, SOUNDDESIGN_OUT_DIR, SOUNDDESIGN_PRESETS_DIR, media_ok, media_relative
+from paths import (
+    LIVES_META_DIR,
+    SAMPLES_SRC_DIR,
+    SOUNDDESIGN_OUT_DIR,
+    SOUNDDESIGN_PRESETS_DIR,
+    media_ok,
+    media_relative,
+)
 
 
 def _cmd_list() -> int:
@@ -151,6 +164,33 @@ def _cmd_render(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_rumbles(args: argparse.Namespace) -> int:
+    if not media_ok():
+        return 1
+    live = lv.load_live(LIVES_META_DIR, args.live)
+    manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
+    overrides = load_overrides(OVERRIDES_FILE)
+    report = rumble_bank(live, args.bank, SOUNDDESIGN_PRESETS_DIR, manifest, SOUNDDESIGN_OUT_DIR,
+                         SAMPLES_SRC_DIR, overrides, args.dry_run)
+    if not report.presets:
+        print(f"{args.live}/{args.bank} : aucun preset de rumble associe, rien a generer")
+        return 0
+    verb = "a rendre" if args.dry_run else "rendus"
+    print(f"{args.live}/{args.bank} a {report.bpm:g} BPM, presets {', '.join(report.presets)}, "
+          f"{report.kicks} kick(s) : {len(report.rendered)} {verb}, {len(report.reused)} reutilises, "
+          f"{len(report.added)} ajoutes, {len(report.unchanged)} inchanges, {len(report.skipped)} ignores")
+    for line in report.skipped:
+        print(f"  ignore : {line}")
+    if args.dry_run:
+        for name in report.rendered:
+            print(f"  {name}")
+        return 0
+    save_overrides(overrides, OVERRIDES_FILE)
+    lv.save_live(live, LIVES_META_DIR)
+    print("-> relancer samples.py pour classer les rumbles verses")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Sound design par chaines de plugins.")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -172,14 +212,20 @@ def main() -> int:
     r.add_argument("--verse", action="store_true",
                    help="copie aussi le rendu dans le pack Samples/SoundDesign")
     r.add_argument("--name", help="nom DT2 (defaut : propose a partir de la source)")
+    b = sub.add_parser("rumbles", help="rumbles des kicks d'une banque de live (8.L2)")
+    b.add_argument("live")
+    b.add_argument("bank")
+    b.add_argument("--dry-run", action="store_true", help="bilan sans rendu ni ecriture")
     args = parser.parse_args()
     try:
         if args.cmd == "list":
             return _cmd_list()
         if args.cmd == "devices":
             return _cmd_devices()
+        if args.cmd == "rumbles":
+            return _cmd_rumbles(args)
         return _cmd_render(args)
-    except (PresetError, SourceError) as exc:
+    except (PresetError, SourceError, lv.LiveError) as exc:
         print(f"[sounddesign] {exc}", file=sys.stderr)
         return 1
 

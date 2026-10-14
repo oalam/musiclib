@@ -356,7 +356,29 @@ export interface LiveItem {
   /** banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques */
   folder: string
 }
-export interface Live { name: string; pack: string; banks: string[]; keys: Record<string, string>; tempos: Record<string, number>; items: LiveItem[] }
+export interface Live {
+  name: string
+  pack: string
+  banks: string[]
+  keys: Record<string, string>
+  tempos: Record<string, number>
+  /** presets de rumble par banque (8.L2) : un rumble par kick et par preset, au tempo de la banque */
+  rumbles: Record<string, string[]>
+  items: LiveItem[]
+}
+/** Bilan de la generation des rumbles d'une banque (8.L2, sounddesign.rumble_bank), noms DT2 par sort. */
+export interface BankRumbleReport {
+  bank: string
+  bpm: number | null
+  presets: string[]
+  kicks: number
+  dry_run: boolean
+  rendered: string[]
+  reused: string[]
+  added: string[]
+  unchanged: string[]
+  skipped: string[]
+}
 export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean }
 export interface LiveSummary { live: Live; folders: LiveFolder[]; ram: number; ram_limit: number; unknown_ram: number }
 /** Case = dossier final du +Drive (7.J8) : DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX. */
@@ -594,6 +616,12 @@ export const api = {
   liveTempo: (name: string, bank: string, bpm: number | null) => livePost(`/${enc(name)}/tempo`, { bank, bpm }),
   /** Accorde les one-shots tonals (BD, RM, BS, PD, ST) de chaque banque sur sa tonalite ; reset : hauteur d'origine. */
   liveTune: (name: string, reset = false) => livePost(`/${enc(name)}/tune`, { reset }),
+  liveRumbles: (name: string, bank: string, presets: string[]) =>
+    fetch(`/api/lives/${enc(name)}/rumbles`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bank, presets }) })
+      .then(r => json<LiveSummary>(r)),
+  liveRumblesRun: (name: string, bank: string, dryRun = false) =>
+    fetch(`/api/lives/${enc(name)}/rumbles`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bank, dry_run: dryRun }) })
+      .then(r => json<BankRumbleReport>(r)),
   liveRename: (name: string, source: string, newName: string) => livePost(`/${enc(name)}/rename`, { source, name: newName }),
   liveExport: (name: string, dryRun: boolean) =>
     fetch(`/api/lives/${enc(name)}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })

@@ -71,6 +71,34 @@ def test_add_and_common(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert [it.source for it in live.items] == ["k/kick.wav"]
 
 
+def test_set_rumbles_and_banks_drop_them(tmp_path: Path):
+    live = _live(tmp_path)
+    lv.set_rumbles(live, "A-HALF", ["deep", " gritty ", "deep"])
+    assert live.rumbles == {"A-HALF": ["deep", "gritty"]}          # dedoublonne, ordre garde
+    for bad in (["Deep"], ["a/b"], [f"p{i}" for i in range(6)]):
+        with pytest.raises(lv.LiveError):
+            lv.set_rumbles(live, "A-HALF", bad)
+    with pytest.raises(lv.LiveError):
+        lv.set_rumbles(live, lv.COMMON, ["deep"])
+    lv.set_rumbles(live, "B-DNB", ["deep"])
+    lv.set_rumbles(live, "A-HALF", [])
+    assert live.rumbles == {"B-DNB": ["deep"]}
+    lv.set_banks(live, ["A-HALF"])
+    assert live.rumbles == {}
+
+
+def test_render_item_and_add_item(tmp_path: Path, lib: tuple[Manifest, Path]):
+    _m, root = lib
+    live = _live(tmp_path)
+    item = lv.render_item("SoundDesign/rumble/r.wav", "RM", "RM 165 F Hard k", root, "k/kick.wav")
+    assert (item.branch, item.parent, item.ram) == ("DRUMS", "k/kick.wav", 192_000)   # 1 s stereo
+    assert lv.add_item(live, item, "A-HALF") and live.items == [item] and item.banks == ["A-HALF"]
+    assert not lv.add_item(live, item.model_copy(), "A-HALF")        # deja dans la banque
+    assert lv.add_item(live, item.model_copy(), "B-DNB") and item.folder == lv.COMMON
+    with pytest.raises(lv.LiveError):                                # branche SAMPLE : hors live
+        lv.render_item("x.wav", "RS", "RS x", root, None)
+
+
 def test_add_keeps_parent_of_a_render(tmp_path: Path, lib: tuple[Manifest, Path]):
     # un rumble verse garde la cle de son kick (8.L1) ; un sample ordinaire n'en a pas
     m, root = lib

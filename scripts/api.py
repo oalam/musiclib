@@ -389,6 +389,16 @@ class LiveTune(BaseModel):
     reset: bool = False         # remet tout le live a sa hauteur d'origine
 
 
+class LiveRumbles(BaseModel):
+    bank: str
+    presets: list[str] = Field(default_factory=list, max_length=lv.RUMBLE_PRESETS_MAX)  # vide : aucun rumble
+
+
+class LiveRumbleRun(BaseModel):
+    bank: str
+    dry_run: bool = False       # bilan sans rendu, ni versement, ni ajout
+
+
 class SampleTags(BaseModel):
     sources: Sources
     add: TagList = Field(default_factory=list, max_length=20)
@@ -1014,6 +1024,41 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         media_or_503()   # la RAM se remesure sur le fichier source
         m = manifest()
         return live_edit(name, lambda live: lv.tune_live(live, m, samples_src, req.reset))
+
+    @app.put("/api/lives/{name}/rumbles", response_model=lv.LiveSummary)
+    def live_rumbles(name: str, req: LiveRumbles) -> lv.LiveSummary:
+        """Presets de rumble associes a une banque (8.L2) ; liste vide : aucun rumble."""
+        try:
+            known_ids = {p.id for p in sd.load_presets("rumble", sounddesign_presets)}
+        except sd.PresetError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        unknown = [p for p in req.presets if p not in known_ids]
+        if unknown:
+            raise HTTPException(422, f"preset de rumble inconnu : {', '.join(unknown)}")
+        return live_edit(name, lambda live: lv.set_rumbles(live, req.bank, req.presets))
+
+    @app.post("/api/lives/{name}/rumbles", response_model=sd.BankRumbleReport)
+    def live_rumbles_run(name: str, req: LiveRumbleRun) -> sd.BankRumbleReport:
+        """Rend, verse et ajoute a la banque un rumble par kick et par preset
+        associe, au tempo de la banque (8.L2) ; rejouable. Verrous : live,
+        puis overrides (versement), puis rendu."""
+        media_or_503()
+        m = manifest()
+        with lives_lock:
+            live = live_or_error(name)
+            with samples_lock:
+                refuse_if_rebuilding()
+                overrides = samples.load_overrides(samples_overrides)
+                try:
+                    with render_lock:
+                        report = sd.rumble_bank(live, req.bank, sounddesign_presets, m,
+                                                sounddesign_out, samples_src, overrides, req.dry_run)
+                except (lv.LiveError, sd.PresetError, sd.SourceError) as exc:
+                    raise HTTPException(422, str(exc)) from exc
+                if not req.dry_run:
+                    samples.save_overrides(overrides, samples_overrides)
+                    lv.save_live(live, lives_meta)
+        return report
 
     @app.get("/api/lives/{name}/audio")
     def live_audio(name: str, source: str) -> Response:

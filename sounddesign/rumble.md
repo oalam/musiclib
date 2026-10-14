@@ -165,6 +165,18 @@ modifier le preset.
    bibliothèque, en `DRUMS/RM/<sous-dossier du kick>` (un kick de
    `DRUMS/BD/CLEAN` donne `DRUMS/RM/CLEAN`). Il suit ensuite le circuit
    habituel : écoute garder / écarter, puis export vers Transfer.
+   Le rendu versé garde la clé de son kick (`parent`) : le lien ne dépend
+   pas du nom.
+
+   **Par banque de live** (8.L2), sans passer par les étapes 1 à 3 : dans
+   le panneau Live, sur la ligne de la banque active, « rumbles : … »
+   associe jusqu'à 5 presets à la banque (aucun preset : aucun rumble) ;
+   le bouton « Rumbles » rend un rumble par kick de la banque et par
+   preset, **au tempo de la banque**, le verse et l'ajoute à la banque
+   (`RM 165 Deep C# Kik dbr` : le tag du preset suit le tempo). Rejouable :
+   relancer après avoir ajouté un kick ne rend que le sien ; changer le
+   tempo de la banque rend de nouveaux rumbles. En ligne de commande :
+   `sounddesign.py rumbles solaris C-TRIBE --dry-run`.
 4. Sur la machine : **track 2**, juste après le kick (cf.
    [[../digitakt/doctrine|doctrine]] § 1 et 9). Rendu **Boucle** : sample
    en lecture **loop**, un trig au premier pas de chaque mesure. Rendu
