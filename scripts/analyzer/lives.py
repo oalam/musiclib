@@ -94,6 +94,7 @@ class LiveItem(BaseModel):
     note: str | None = None          # note de la source (dieses), relevee a l'accordage
     shift: int = 0                   # demi-tons de varispeed appliques a l'export
     parent: str | None = None        # sample d'origine d'un rendu du sound design (8.L1)
+    rumble: str | None = None        # preset du rumble genere pour la banque (8.L2)
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -431,7 +432,8 @@ def add(live: Live, manifest: Manifest, sources: list[str], bank: str, root: Pat
         it.banks = _ordered(live, [*it.banks, bank])
 
 
-def render_item(source: str, code: str, name: str, root: Path, parent: str | None) -> LiveItem:
+def render_item(source: str, code: str, name: str, root: Path, parent: str | None,
+                rumble: str | None = None) -> LiveItem:
     """Item d'un rendu du sound design verse (8.L2), construit depuis son
     sidecar sans attendre la reanalyse du manifeste (le nom DT2 est celui du
     rendu, la note s'y lit a l'accordage)."""
@@ -439,12 +441,12 @@ def render_item(source: str, code: str, name: str, root: Path, parent: str | Non
     if branch not in LIVE_BRANCHES:
         raise LiveError(f"code {code} sans branche de live : {source}")
     return LiveItem(source=source, code=code, branch=branch, name=name, banks=[],
-                    ram=ram_bytes(root / source), parent=parent)
+                    ram=ram_bytes(root / source), parent=parent, rumble=rumble)
 
 
-def add_item(live: Live, item: LiveItem, bank: str) -> bool:
-    """Ajoute `item` a `bank` (le sample deja dans le live y est rejoint) ;
-    False s'il y etait deja."""
+def add_item(live: Live, item: LiveItem, bank: str) -> tuple[LiveItem, bool]:
+    """Ajoute `item` a `bank` (le sample deja dans le live y est rejoint).
+    Renvoie l'item du live et False s'il etait deja dans la banque."""
     if bank != COMMON and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     it = next((x for x in live.items if x.source == item.source), None)
@@ -452,9 +454,27 @@ def add_item(live: Live, item: LiveItem, bank: str) -> bool:
         live.items.append(item)
         it = item
     if bank in it.banks:
-        return False
+        return it, False
     it.banks = _ordered(live, [*it.banks, bank])
-    return True
+    return it, True
+
+
+def untuned_name(item: LiveItem) -> str:
+    """Nom DT2 de l'item avec sa note d'origine (avant accordage)."""
+    if item.shift and item.note:
+        return _renote(item.name, transpose(item.note, item.shift), item.note)
+    return item.name
+
+
+def inherit_tuning(item: LiveItem, parent: LiveItem, root: Path) -> None:
+    """Un rendu issu de `parent` (rumble d'un kick accorde) prend sa note, son
+    decalage et sa note affichee : il sort accorde comme lui a l'export."""
+    if not parent.shift or not parent.note:
+        return
+    item.note = parent.note
+    item.shift = parent.shift
+    item.name = _renote(item.name, parent.note, transpose(parent.note, parent.shift))
+    item.ram = ram_bytes(root / item.source, item.shift)
 
 
 def remove(live: Live, sources: list[str], bank: str | None = None) -> None:

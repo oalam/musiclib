@@ -90,11 +90,17 @@ def test_set_rumbles_and_banks_drop_them(tmp_path: Path):
 def test_render_item_and_add_item(tmp_path: Path, lib: tuple[Manifest, Path]):
     _m, root = lib
     live = _live(tmp_path)
-    item = lv.render_item("SoundDesign/rumble/r.wav", "RM", "RM 165 F Hard k", root, "k/kick.wav")
-    assert (item.branch, item.parent, item.ram) == ("DRUMS", "k/kick.wav", 192_000)   # 1 s stereo
-    assert lv.add_item(live, item, "A-HALF") and live.items == [item] and item.banks == ["A-HALF"]
-    assert not lv.add_item(live, item.model_copy(), "A-HALF")        # deja dans la banque
-    assert lv.add_item(live, item.model_copy(), "B-DNB") and item.folder == lv.COMMON
+    item = lv.render_item("SoundDesign/rumble/r.wav", "RM", "RM F Hard 01 k", root, "k/kick.wav", "deep")
+    assert (item.branch, item.parent, item.rumble, item.ram) == ("DRUMS", "k/kick.wav", "deep", 192_000)
+    assert lv.add_item(live, item, "A-HALF") == (item, True) and live.items == [item] and item.banks == ["A-HALF"]
+    assert lv.add_item(live, item.model_copy(), "A-HALF") == (item, False)   # deja dans la banque
+    assert lv.add_item(live, item.model_copy(), "B-DNB") == (item, True) and item.folder == lv.COMMON
+    # accordage herite du kick : note affichee, decalage, RAM au varispeed
+    kick = lv.LiveItem(source="k/kick.wav", code="BD", branch="DRUMS", name="BD G Hard 01 k",
+                       banks=["A-HALF"], note="F", shift=2)
+    assert lv.untuned_name(kick) == "BD F Hard 01 k"
+    lv.inherit_tuning(item, kick, root)
+    assert (item.name, item.note, item.shift) == ("RM G Hard 01 k", "F", 2) and item.ram and item.ram < 192_000
     with pytest.raises(lv.LiveError):                                # branche SAMPLE : hors live
         lv.render_item("x.wav", "RS", "RS x", root, None)
 

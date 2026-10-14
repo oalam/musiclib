@@ -1113,10 +1113,19 @@ On garde une boucle d'une à huit mesures, sans couture.
   est construit depuis le rendu (code, nom DT2, `parent`), sans attendre
   la réanalyse du manifeste. Rejouable : même kick, même preset, même
   tempo = même fichier (hash), un rumble déjà présent est compté inchangé.
-  Nom DT2 : le tag du preset (4 premières lettres, `Deep`, `Grit`, `Kick`)
-  après le tempo distingue les rumbles d'un même kick ; la description du
-  kick est tronquée si besoin, le lien exact est `parent`. 0-COMMON n'a
-  pas de presets : un kick commun est traité par chacune de ses banques.
+  **Nom DT2 en miroir du kick** (arbitré le 2026-10-14) : `BD G Apart 01 rth`
+  → `RM G Apart 01 rth`, ni tempo (celui de la banque) ni preset dans le
+  nom ; avec plusieurs presets sur la banque, le tag du preset (4 premières
+  lettres) remplace le numéro de variante (`RM G Apar Grit rth`, 18
+  caractères). Le fichier rendu porte la note d'origine du kick ; l'item du
+  live hérite de l'accordage du kick (note affichée, `shift`) et garde le
+  preset (`rumble`) : quand le tempo de la banque change, le rumble du même
+  kick et du même preset est remplacé dans la banque. Le lien exact est
+  `parent`. 0-COMMON n'a pas de presets : un kick commun est traité par
+  chacune de ses banques.
+- **Source depuis le live** (8.L2) : écouter un sample dans le panneau Live
+  en fait la source du sound design, même s'il est hors de la liste
+  courante de la lib (un rendu versé n'est source qu'après réanalyse).
 
 ## Phase 9 — Générateur MIDI acid (arrêtée après 9.C2 le 2026-10-13)
 

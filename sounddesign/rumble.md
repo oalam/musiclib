@@ -172,11 +172,16 @@ modifier le preset.
    le panneau Live, sur la ligne de la banque active, « rumbles : … »
    associe jusqu'à 5 presets à la banque (aucun preset : aucun rumble) ;
    le bouton « Rumbles » rend un rumble par kick de la banque et par
-   preset, **au tempo de la banque**, le verse et l'ajoute à la banque
-   (`RM 165 Deep C# Kik dbr` : le tag du preset suit le tempo). Rejouable :
-   relancer après avoir ajouté un kick ne rend que le sien ; changer le
-   tempo de la banque rend de nouveaux rumbles. En ligne de commande :
-   `sounddesign.py rumbles solaris C-TRIBE --dry-run`.
+   preset, **au tempo de la banque**, le verse et l'ajoute à la banque.
+   Nom en miroir du kick : `BD G Apart 01 rth` → `RM G Apart 01 rth`
+   (plusieurs presets : `RM G Apar Grit rth`) ; tempo et preset s'affichent
+   à côté dans la liste. Un kick accordé donne un rumble accordé pareil.
+   Rejouable : relancer après avoir ajouté un kick ne rend que le sien ;
+   changer le tempo de la banque rend de nouveaux rumbles qui remplacent
+   les anciens. En ligne de commande :
+   `sounddesign.py rumbles solaris C-TRIBE --dry-run`. Pour travailler un
+   rumble à la main, écouter son kick dans le panneau Live : il devient la
+   source du sound design.
 4. Sur la machine : **track 2**, juste après le kick (cf.
    [[../digitakt/doctrine|doctrine]] § 1 et 9). Rendu **Boucle** : sample
    en lecture **loop**, un trig au premier pas de chaque mesure. Rendu

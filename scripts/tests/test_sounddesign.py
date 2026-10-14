@@ -273,7 +273,7 @@ def test_rumble_bank_renders_verses_adds_and_replays(tmp_path: Path):
     with pytest.raises(lv.LiveError, match="tempo"):
         run()
     lv.set_tempo(live, "A-HALF", 165)
-    names = ["RM 165 T C Punch k", "RM 165 T D Hard k"]     # tag du preset, tempo de la banque
+    names = ["RM C Punch 01 k", "RM D Hard 02 k"]           # miroir du kick, ni tempo ni preset
     dry = run(dry_run=True)
     assert (dry.kicks, dry.rendered, dry.added) == (2, names, [])
     assert not out.exists() and len(live.items) == 2 and not overrides
@@ -282,20 +282,63 @@ def test_rumble_bank_renders_verses_adds_and_replays(tmp_path: Path):
     assert (r1.rendered, r1.reused, r1.added, r1.unchanged) == (names, [], names, [])
     rm = [it for it in live.items if it.code == "RM"]
     assert [it.name for it in rm] == names and [it.parent for it in rm] == ["k/kick.wav", "k/kick2.wav"]
-    assert rm[0].banks == ["A-HALF"] and rm[0].branch == "DRUMS" and rm[0].ram
+    assert rm[0].banks == ["A-HALF"] and rm[0].branch == "DRUMS" and rm[0].ram and rm[0].rumble == "t"
     key = rm[0].source
-    assert key.startswith("SoundDesign/rumble/RM 165 T C Punch k ") and (samples_root / key).is_file()
+    assert key.startswith("SoundDesign/rumble/RM C Punch 01 k ") and (samples_root / key).is_file()
     assert (overrides[key].parent, overrides[key].sub, overrides[key].code) == ("k/kick.wav", "CLEAN", "RM")
 
     r2 = run()                                              # rejouable : tout inchange
     assert (r2.rendered, r2.reused, r2.added, r2.unchanged) == ([], names, [], names)
     assert len(live.items) == 4 and len(list(out.glob("rumble/*.wav"))) == 2
 
-    lv.set_tempo(live, "A-HALF", 170)                        # autre tempo : autres rendus
+    lv.set_tempo(live, "A-HALF", 170)                        # autre tempo : nouveaux rendus, les anciens cedent la place
     r3 = run()
-    assert r3.rendered == ["RM 170 T C Punch k", "RM 170 T D Hard k"] and len(live.items) == 6
+    assert (r3.rendered, r3.added, r3.replaced) == (names, names, names)
+    assert len(live.items) == 4 and len(list(out.glob("rumble/*.wav"))) == 4
+    assert all(it.source != key for it in live.items)
+
+    sd.save_preset(_preset().model_copy(update={"id": "u"}), presets)   # 2 presets : tag a la place du numero
+    lv.set_rumbles(live, "A-HALF", ["t", "u"])
+    r4 = run()
+    assert r4.reused == names                               # rendus `t` deja ecrits, nom du fichier garde
+    assert r4.rendered == ["RM C Punch U k", "RM D Hard U k"] and len(live.items) == 6
     with pytest.raises(lv.LiveError, match="banque absente"):
         sd.rumble_bank(live, "Z-NONE", presets, m, out, samples_root, overrides)
+
+
+def test_rumble_of_a_tuned_kick_inherits_its_tuning(tmp_path: Path):
+    import soundfile as sf
+    from analyzer import lives as lv
+    from analyzer.samples import Manifest, SampleEntry
+    samples_root, out, presets = tmp_path / "Samples", tmp_path / "SoundDesign", tmp_path / "presets"
+    (samples_root / "k").mkdir(parents=True)
+    sf.write(samples_root / "k" / "kick.wav", _kick()[0], sd.SR)
+    m = Manifest(source_root=str(samples_root), total=1, entries=[
+        SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
+                    name="BD C Punch 01 k", duration=0.3, rank=1, note="C")])
+    sd.save_preset(_preset(), presets)
+    live = lv.create_live(tmp_path / "lives", "solaris", ["A-HALF"])
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", samples_root)
+    lv.set_key(live, "A-HALF", "Re")
+    lv.tune_bank(live, m, "A-HALF", samples_root)
+    kick = live.items[0]
+    assert (kick.name, kick.shift) == ("BD D Punch 01 k", 2)
+    lv.set_rumbles(live, "A-HALF", ["t"])
+    lv.set_tempo(live, "A-HALF", 165)
+    r = sd.rumble_bank(live, "A-HALF", presets, m, out, samples_root, {})
+    rm = live.items[1]
+    # fichier rendu a la note d'origine, item du live accorde comme le kick
+    assert r.rendered == ["RM C Punch 01 k"] and rm.source.startswith("SoundDesign/rumble/RM C Punch 01 k ")
+    assert (rm.name, rm.note, rm.shift) == ("RM D Punch 01 k", "C", 2)
+    assert lv.tune_bank(live, m, "A-HALF", samples_root) and (rm.name, rm.shift) == ("RM D Punch 01 k", 2)
+
+
+def test_rumble_name_mirrors_the_kick():
+    assert sd.rumble_name("BD G Apart 01 rth") == "RM G Apart 01 rth"
+    assert sd.rumble_name("BD G Apart 01 rth", "Grit") == "RM G Apar Grit rth"    # tag a la place du numero, 18 max
+    assert sd.rumble_name("BD Hard k", "Deep") == "RM Hard Deep k"               # sans numero : avant le pack
+    assert sd.rumble_name("BD F# Longdescr 03 dbr", "Kick") == "RM F# Lon Kick dbr"   # note, tag et pack gardes
+    assert sd.rumble_name("BD k") == "RM k"
 
 
 def test_record_parent_is_manifest_key_or_none(tmp_path: Path):

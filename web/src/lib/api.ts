@@ -355,6 +355,10 @@ export interface LiveItem {
   shift: number
   /** banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques */
   folder: string
+  /** sample d'origine d'un rendu du sound design (8.L1) */
+  parent: string | null
+  /** preset du rumble genere pour la banque (8.L2) */
+  rumble: string | null
 }
 export interface Live {
   name: string
@@ -377,6 +381,7 @@ export interface BankRumbleReport {
   reused: string[]
   added: string[]
   unchanged: string[]
+  replaced: string[]
   skipped: string[]
 }
 export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean }

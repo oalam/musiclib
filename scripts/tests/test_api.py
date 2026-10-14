@@ -717,16 +717,16 @@ def test_lives_rumbles_per_bank(sd_client_factory, tmp_path: Path):
     assert r.status_code == 422 and "tempo" in r.json()["detail"]
     client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 165})
     dry = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "dry_run": True}).json()
-    assert dry["rendered"] == ["RM 165 T C Punch k"] and dry["added"] == []
+    assert dry["rendered"] == ["RM C Punch 01 k"] and dry["added"] == []
     assert len(client.get("/api/lives/solaris").json()["live"]["items"]) == 1
     rep = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()
-    assert (rep["rendered"], rep["added"]) == (["RM 165 T C Punch k"], ["RM 165 T C Punch k"])
+    assert (rep["rendered"], rep["added"], rep["replaced"]) == (["RM C Punch 01 k"], ["RM C Punch 01 k"], [])
     items = client.get("/api/lives/solaris").json()["live"]["items"]
     rm = next(it for it in items if it["code"] == "RM")
-    assert rm["parent"] == "k/kick.wav" and rm["banks"] == ["A-HALF"]
+    assert (rm["parent"], rm["rumble"], rm["banks"]) == ("k/kick.wav", "t", ["A-HALF"])
     assert api.samples.load_overrides(tmp_path / "overrides.json")[rm["source"]].parent == "k/kick.wav"
     again = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()
-    assert (again["rendered"], again["reused"], again["unchanged"]) == ([], ["RM 165 T C Punch k"], ["RM 165 T C Punch k"])
+    assert (again["rendered"], again["reused"], again["unchanged"]) == ([], ["RM C Punch 01 k"], ["RM C Punch 01 k"])
     r = client.put("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "presets": []})
     assert r.json()["live"]["rumbles"] == {}
     assert client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()["presets"] == []

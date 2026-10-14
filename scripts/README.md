@@ -945,13 +945,16 @@ Rumbles par banque (8.L2, `sounddesign.rumble_bank`) : pour chaque kick (BD)
 de la banque et chaque preset associé (`live.rumbles[bank]`), un rumble est
 rendu au tempo de la banque (`settings.bpm` du preset remplacé), versé dans
 `Samples/SoundDesign/rumble/` avec son `parent` et ajouté à la banque sans
-attendre la réanalyse (`lives.render_item` + `add_item`). Nom DT2 : tag du
-preset après le tempo (`deep` → `RM 165 Deep C# Kik dbr`), unique dans le
-live. Rejouable : même kick + même preset + même tempo = même fichier
-(réutilisé), versement sans recopie, rumble déjà dans la banque compté
-inchangé ; changer le tempo produit de nouveaux rendus. Aucun preset
-associé : rien n'est généré. Sans tempo : 422. CLI :
-`sounddesign.py rumbles <live> <banque> [--dry-run]`.
+attendre la réanalyse (`lives.render_item` + `add_item`). Nom DT2 en miroir
+du kick (`rumble_name` : `BD G Apart 01 rth` → `RM G Apart 01 rth`) ; avec
+plusieurs presets, le tag du preset remplace le numéro (`RM G Apar Grit
+rth`). Le fichier porte la note d'origine du kick, l'item du live hérite de
+son accordage (`inherit_tuning`) et garde le preset (`rumble`). Rejouable :
+même kick + même preset + même tempo = même fichier (réutilisé), versement
+sans recopie, rumble déjà dans la banque compté inchangé ; changer le tempo
+rend de nouveaux rumbles qui remplacent les anciens dans la banque
+(`replaced`). Aucun preset associé : rien n'est généré. Sans tempo : 422.
+CLI : `sounddesign.py rumbles <live> <banque> [--dry-run]`.
 
 Accordage (7.L4, `lives.tune_live`, banque par banque avec `tune_bank`) :
 appliqué au live entier ; dans chaque banque qui a une tonalité (0-COMMON
@@ -977,7 +980,8 @@ double-clic, retrait par banque ou du live, export (bilan puis copie).
 Sur la ligne de la banque active : « rumbles : … » (cases à cocher parmi
 les presets du traitement rumble, 5 au plus) et le bouton « Rumbles » qui
 lance la génération et affiche le bilan (rendus / réutilisés / ajoutés /
-inchangés).
+inchangés / remplacés) ; un rumble généré porte `<tempo> · <preset>` dans
+la liste. Écouter un sample du live en fait la source du sound design.
 Ajout : glisser des samples de la liste sur une ligne de banque ou sur la
 liste de la banque en cours, ou `L`
 (sélection, sinon sample en cours) ou `Entrée` (sample en cours seul) vers

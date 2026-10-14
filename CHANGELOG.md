@@ -18,6 +18,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   `POST /api/lives/{live}/rumbles` (`dry_run`), CLI `sounddesign.py
   rumbles <live> <banque>`, panneau Live : cases à cocher et bouton
   « Rumbles » sur la ligne de la banque, bilan sur une ligne.
+- [8.L2] Nom DT2 du rumble en miroir du kick (`BD G Apart 01 rth` →
+  `RM G Apart 01 rth`, tag du preset à la place du numéro avec plusieurs
+  presets), note d'origine dans le fichier et accordage hérité du kick
+  (`lives.inherit_tuning`), `LiveItem.rumble` (preset) affiché avec le tempo
+  dans la liste ; au changement de tempo, le rumble du même kick et du même
+  preset est remplacé dans la banque (`replaced`).
+- [8.L2] Écouter un sample dans le panneau Live en fait la source du sound
+  design (`focus.set`), même hors de la liste courante de la lib.
 - [8.L1] Parenté kick → rendu du sound design : le versement écrit
   `parent` (clé du sample d'origine) dans `overrides.json` ; l'entrée du
   manifeste et l'item de live (`LiveItem.parent`) le reprennent,

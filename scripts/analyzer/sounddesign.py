@@ -1228,6 +1228,7 @@ class BankRumbleReport(BaseModel):
     reused: list[str] = Field(default_factory=list)     # rendus deja sur disque
     added: list[str] = Field(default_factory=list)      # ajoutes a la banque
     unchanged: list[str] = Field(default_factory=list)  # deja dans la banque
+    replaced: list[str] = Field(default_factory=list)   # retires de la banque (meme kick, meme preset, autre tempo)
     skipped: list[str] = Field(default_factory=list)    # `kick : motif`
 
 
@@ -1235,6 +1236,31 @@ def rumble_tag(preset_id: str) -> str:
     """Mot du nom DT2 qui distingue les rumbles d'un meme kick : `deep` -> `Deep`,
     `kick_rumble` -> `Kick`."""
     return preset_id[:4].capitalize()
+
+
+def rumble_name(kick_name: str, tag: str = "") -> str:
+    """Nom DT2 d'un rumble en miroir de son kick : code RM, le reste inchange
+    (`BD G Apart 01 rth` -> `RM G Apart 01 rth`). `tag` (plusieurs presets sur
+    la banque) remplace le numero de variante, ou s'insere avant le pack
+    (`RM G Apart Grit rth`) ; la description est tronquee s'il faut. Le tempo
+    n'y figure pas : c'est celui de la banque."""
+    words = kick_name.split()
+    body, pack = words[1:-1], words[-1:]
+    if tag:
+        if body and body[-1].isdigit():
+            body[-1] = tag
+        else:
+            body.append(tag)
+    name = " ".join(["RM", *body, *pack])
+    if len(name) <= smp.NAME_MAX:
+        return name
+    note = body[:1] if body and re.fullmatch(r"[A-G]#?", body[0]) else []
+    tail = body[-1:] if tag else []
+    desc = body[len(note):len(body) - len(tail)]
+    fixed = " ".join(["RM", *note])
+    budget = smp.NAME_MAX - len(fixed) - sum(len(w) + 1 for w in [*tail, *pack]) - 1
+    short = " ".join(desc)[:max(budget, 0)].rstrip()
+    return " ".join(w for w in [fixed, short, *tail, *pack] if w)
 
 
 def _existing_rumble(records: list[RenderRecord], preset: Preset, parent: str,
@@ -1253,9 +1279,15 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
 
     Rejouable : un rendu deja ecrit pour ce kick et ce preset effectif est
     reutilise (meme fichier), le versement ne recopie pas, un rumble deja dans
-    la banque est compte inchange. Sans preset associe : rien n'est genere.
-    `dry_run` : bilan sans rendu, ni ecriture, ni ajout. `live` et `overrides`
-    sont modifies en place, a enregistrer par l'appelant.
+    la banque est compte inchange. Le rumble du meme kick et du meme preset a
+    un autre tempo (tempo de la banque change) est retire de la banque. Sans
+    preset associe : rien n'est genere. `dry_run` : bilan sans rendu, ni
+    ecriture, ni ajout. `live` et `overrides` sont modifies en place, a
+    enregistrer par l'appelant.
+
+    Nom DT2 en miroir du kick (`rumble_name`), note d'origine dans le fichier
+    rendu ; l'item du live herite de l'accordage du kick (note affichee,
+    `shift`), comme s'il avait ete accorde avec lui.
     """
     if bank not in live.banks:
         raise lv.LiveError(f"banque absente du live : {bank}")
@@ -1273,9 +1305,9 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
     kicks = [it for it in live.items if it.code == "BD" and bank in it.banks]
     report.kicks = len(kicks)
     records = list_renders(out_root, "rumble")
-    taken = {it.name for it in live.items}   # noms DT2 deja pris dans le live
     for pid in ids:
         preset = with_overrides(presets[pid], {"bpm": bpm}, [], [])
+        tag = rumble_tag(pid) if len(ids) > 1 else ""
         for kick in kicks:
             path = samples_root / kick.source
             if not path.is_file():
@@ -1285,9 +1317,8 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
             if record is not None:
                 report.reused.append(record.name)
             else:
-                planned = target(kick.source, manifest, "rumble", bpm, tag=rumble_tag(pid))
-                name = smp.unique_name(planned.name, taken)
-                taken.add(name)
+                planned = target(kick.source, manifest, "rumble", bpm)   # sous-dossier et code
+                name = rumble_name(lv.untuned_name(kick), tag)
                 report.rendered.append(name)
                 if dry_run:
                     continue
@@ -1298,8 +1329,16 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
             if dry_run:
                 continue
             key = verse(record, out_root, samples_root, overrides)
-            item = lv.render_item(key, record_code(record), record.name, samples_root, kick.source)
-            (report.added if lv.add_item(live, item, bank) else report.unchanged).append(record.name)
+            # l'ancien rumble du meme kick et du meme preset (autre tempo) cede sa place
+            for old in [it for it in live.items if it.rumble == pid and it.parent == kick.source
+                        and bank in it.banks and it.source != key]:
+                lv.remove(live, [old.source], bank)
+                report.replaced.append(old.name)
+            item, added = lv.add_item(live, lv.render_item(key, record_code(record), record.name,
+                                                           samples_root, kick.source, pid), bank)
+            if added:
+                lv.inherit_tuning(item, kick, samples_root)
+            (report.added if added else report.unchanged).append(item.name)
     return report
 
 

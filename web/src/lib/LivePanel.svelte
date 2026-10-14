@@ -8,6 +8,7 @@
   // deux banques ou plus part dans 0-COMMON (regle de l'API).
   import { onMount } from 'svelte'
   import { api, type LiveItem, type LiveSummary, type SampleExportReport, type SdPreset } from './api'
+  import { focus } from './focus.svelte'
 
   let {
     play,
@@ -219,6 +220,7 @@
       const n = (xs: string[], w: string) => `${xs.length} ${w}${xs.length > 1 ? 's' : ''}`
       rumbleInfo = `${bank} à ${r.bpm} BPM, ${r.kicks} kick${r.kicks > 1 ? 's' : ''} × ${r.presets.join(', ')} : `
         + `${n(r.rendered, 'rendu')}, ${n(r.reused, 'réutilisé')}, ${n(r.added, 'ajouté')}, ${n(r.unchanged, 'inchangé')}`
+        + (r.replaced.length ? `, ${n(r.replaced, 'remplacé')} (autre tempo)` : '')
         + (r.skipped.length ? ` · ignorés : ${r.skipped.join(' ; ')}` : '')
       apply(await api.live(current))
     } catch (e) { fail(e) } finally { rumbling = false }
@@ -230,6 +232,8 @@
 
   function listen(it: LiveItem) {
     cur = it.source
+    // source du sound design (8.E) : le sample ecoute ici, meme hors de la liste de la lib
+    focus.set({ source: it.source, name: it.name, code: it.code, folder: `${current}/${it.folder}` })
     play(it.source, it.shift ? api.liveAudioUrl(current, it.source, it.shift) : undefined)
     queueMicrotask(() => document.getElementById(`live-${it.source}`)?.scrollIntoView({ block: 'nearest' }))
   }
@@ -471,6 +475,7 @@
               onclick={ev => { if (ev.detail < 2) listen(it) }} ondblclick={() => startRename(it)}>{it.name}</button>
           {/if}
           {#if !folder}<span class="muted br">{it.branch}</span>{/if}
+          {#if it.rumble}<span class="muted br" title="rumble généré pour la banque : preset {it.rumble}{s.live.tempos[bank] ? `, ${s.live.tempos[bank]} BPM` : ''}, kick {it.parent}">{s.live.tempos[bank] ?? '—'} · {it.rumble}</span>{/if}
           {#if it.shift}<span class="flag shift" title="{it.note} → transposé de {fmtShift(it.shift)} demi-ton{Math.abs(it.shift) > 1 ? 's' : ''} à l'export (varispeed ; clic sur le nom : écoute accordée)">{fmtShift(it.shift)}</span>{/if}
           {#if it.ram == null}<span class="flag" title="en-tête illisible : RAM non comptée">ram ?</span>{/if}
           <span class="banks">
