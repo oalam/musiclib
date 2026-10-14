@@ -743,7 +743,8 @@ modifiée) en famille / code / sous-catégorie, range les candidats par dossier
 final du +Drive, nomme les candidats pour l'écran de la DT2 et écrit
 `library/samples/manifest.json`. Règles et plafonds : [[SPEC]] § 7.J et 7.J8,
 tables `FAMILY_RULES`, `PACK_CODES`, `CODE_RULES`, `SUB_RULES` de
-`analyzer/samples.py`.
+`analyzer/samples.py`. Préparer et nommer ses propres samples :
+[[kt-banque-samples]].
 
 Arbre (7.J8) : `<BRANCHE>/<CODE>/[<SOUS>]`, avec les branches DRUMS
 (BD … PC), TONAL (BS ST PD), LOOPS (BR DL PL ML BL), FX (`FX/<SOUS>`), VX
