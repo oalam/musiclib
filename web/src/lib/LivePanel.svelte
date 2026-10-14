@@ -7,7 +7,7 @@
   // la banque active (selection, sinon sample en cours). Un sample pris par
   // deux banques ou plus part dans 0-COMMON (regle de l'API).
   import { onMount } from 'svelte'
-  import { api, type LiveItem, type LiveSummary, type SampleExportReport, type SdPreset } from './api'
+  import { api, type BankRumbleReport, type LiveExportReport, type LiveItem, type LiveSummary, type SdPreset } from './api'
   import { focus } from './focus.svelte'
 
   let {
@@ -55,7 +55,7 @@
   let renameText = $state('')
   // bilan du dernier accordage (banque -> message)
   let tuneInfo = $state('')
-  let report = $state<SampleExportReport | null>(null)
+  let report = $state<LiveExportReport | null>(null)
   let exporting = $state(false)
   // rumbles de la banque active (8.L2) : presets associes, generation, bilan
   const RUMBLES_MAX = 5                                       // lives.RUMBLE_PRESETS_MAX
@@ -216,14 +216,18 @@
     if (rumbling || !current || bank === COMMON) return
     rumbling = true
     try {
-      const r = await api.liveRumblesRun(current, bank)
-      const n = (xs: string[], w: string) => `${xs.length} ${w}${xs.length > 1 ? 's' : ''}`
-      rumbleInfo = `${bank} à ${r.bpm} BPM, ${r.kicks} kick${r.kicks > 1 ? 's' : ''} × ${r.presets.join(', ')} : `
-        + `${n(r.rendered, 'rendu')}, ${n(r.reused, 'réutilisé')}, ${n(r.added, 'ajouté')}, ${n(r.unchanged, 'inchangé')}`
-        + (r.replaced.length ? `, ${n(r.replaced, 'remplacé')} (autre tempo)` : '')
-        + (r.skipped.length ? ` · ignorés : ${r.skipped.join(' ; ')}` : '')
+      rumbleInfo = rumbleLine(await api.liveRumblesRun(current, bank))
       apply(await api.live(current))
     } catch (e) { fail(e) } finally { rumbling = false }
+  }
+
+  /** Bilan d'une banque sur une ligne : « A-TRIBE à 165 BPM, 18 kicks × gritty : 18 rendus, … ». */
+  function rumbleLine(r: BankRumbleReport): string {
+    const n = (xs: string[], w: string) => `${xs.length} ${w}${xs.length > 1 ? 's' : ''}`
+    return `${r.bank} à ${r.bpm} BPM, ${r.kicks} kick${r.kicks > 1 ? 's' : ''} × ${r.presets.join(', ')} : `
+      + `${n(r.rendered, r.dry_run ? 'à rendre' : 'rendu')}, ${n(r.reused, 'réutilisé')}, ${n(r.added, 'ajouté')}, ${n(r.unchanged, 'inchangé')}`
+      + (r.replaced.length ? `, ${n(r.replaced, 'remplacé')} (autre tempo ou preset modifié)` : '')
+      + (r.skipped.length ? ` · ignorés : ${r.skipped.join(' ; ')}` : '')
   }
 
   /** Ecoute telle qu'exportee : rendu varispeed de l'API si le sample est accorde. */
@@ -280,7 +284,11 @@
   async function runExport(dryRun: boolean) {
     if (exporting || !current) return
     exporting = true
-    try { report = await api.liveExport(current, dryRun); error = '' } catch (e) { fail(e) } finally { exporting = false }
+    try {
+      report = await api.liveExport(current, dryRun)
+      error = ''
+      if (!dryRun && report.rumbles.length) apply(await api.live(current))   // rumbles (re)generes avant la copie
+    } catch (e) { fail(e) } finally { exporting = false }
   }
 
   // depot : sources posees par la liste de la vue Samples (text/plain, une par ligne)
@@ -328,7 +336,7 @@
           : 'Saisir d\'abord la tonalité des banques (double-clic sur une banque)'}
         onclick={() => tune(shifted)}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 1.5v5a3 3 0 0 0 6 0v-5M8 9.5V14.5M6 14.5h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{shifted ? 'Accordé' : 'Accorder'}</button>
       <button class="small exp" disabled={exporting || !live.items.length}
-        title="Copie le live vers Live/00-live/{live.name} (banque / branche / nom DT2), à synchroniser avec Transfer"
+        title="Régénère les rumbles des banques à presets (tempo et preset courants), puis copie le live vers Live/00-live/{live.name} (banque / branche / nom DT2), à synchroniser avec Transfer"
         onclick={() => runExport(true)}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 11.5v2h11v-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{exporting ? 'Export…' : 'Exporter…'}</button>
     {/if}
   </header>
@@ -338,15 +346,17 @@
     <div class="export small">
       <strong>{r.dry_run ? 'Bilan de l’export' : 'Export terminé'}</strong>
       <span class="muted">→ {r.dest}</span>
+      {#each r.rumbles as b (b.bank)}<p class="muted">Rumbles {rumbleLine(b)}</p>{/each}
       <p>
         {r.files} fichiers ({mo(r.bytes)}) : {r.copied.length} {r.dry_run ? 'à copier' : 'copiés'},
         {r.unchanged} inchangés, {r.removed.length} {r.dry_run ? 'à retirer' : 'retirés'}.
+        {#if r.dry_run && r.rumbles.some(b => b.rendered.length)}<span class="muted">Les rumbles à rendre s’ajouteront à la copie.</span>{/if}
       </p>
       {#if r.missing.length}<p class="err">Sources absentes ({r.missing.length}) : {r.missing.slice(0, 5).join(', ')}</p>{/if}
       {#if r.conflicts.length}<p class="err">Fichiers posés à la main, non écrasés ({r.conflicts.length}) : {r.conflicts.slice(0, 5).join(', ')}</p>{/if}
       {#if r.dry_run}
-        <button class="small" disabled={exporting || (!r.copied.length && !r.removed.length)}
-          onclick={() => runExport(false)}>{exporting ? 'Copie…' : 'Copier'}</button>
+        <button class="small" disabled={exporting || (!r.copied.length && !r.removed.length && !r.rumbles.some(b => b.rendered.length))}
+          onclick={() => runExport(false)}>{exporting ? 'Rendu et copie…' : r.rumbles.some(b => b.rendered.length) ? 'Rendre et copier' : 'Copier'}</button>
       {/if}
       <button class="small" onclick={() => (report = null)}>{r.dry_run ? 'Annuler' : 'Fermer'}</button>
     </div>

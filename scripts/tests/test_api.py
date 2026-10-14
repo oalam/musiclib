@@ -706,7 +706,7 @@ def test_sounddesign_layers_must_be_in_manifest(sd_client: TestClient):
 # --- Lives (7.L) --------------------------------------------------------------
 
 def test_lives_rumbles_per_bank(sd_client_factory, tmp_path: Path):
-    client = sd_client_factory(lives_meta=tmp_path / "lives")
+    client = sd_client_factory(lives_meta=tmp_path / "lives", lives_export=tmp_path / "00-live")
     client.post("/api/lives", json={"name": "solaris", "banks": ["A-HALF"]})
     client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "A-HALF"})
     r = client.put("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "presets": ["nope"]})
@@ -727,9 +727,24 @@ def test_lives_rumbles_per_bank(sd_client_factory, tmp_path: Path):
     assert api.samples.load_overrides(tmp_path / "overrides.json")[rm["source"]].parent == "k/kick.wav"
     again = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()
     assert (again["rendered"], again["reused"], again["unchanged"]) == ([], ["RM C Punch 01 k"], ["RM C Punch 01 k"])
+
+    # l'export regenere d'abord les rumbles des banques a presets : preset edite -> nouveau rendu
+    from tests.test_sounddesign import _preset
+    api.sd.save_preset(_preset(devices=[{"type": "lowpass", "params": {"cutoff_frequency_hz": 120}}]),
+                       tmp_path / "presets")
+    plan = client.post("/api/lives/solaris/export", json={"dry_run": True}).json()
+    assert [b["bank"] for b in plan["rumbles"]] == ["A-HALF"] and plan["rumbles"][0]["rendered"] == ["RM C Punch 01 k"]
+    assert plan["rumbles"][0]["dry_run"] and plan["rumbles"][0]["replaced"] == [] and not (tmp_path / "00-live").exists()
+    done = client.post("/api/lives/solaris/export", json={"dry_run": False}).json()
+    assert done["rumbles"][0]["replaced"] == ["RM C Punch 01 k"] and done["rumbles"][0]["added"] == ["RM C Punch 01 k"]
+    assert "A-HALF/DRUMS/RM C Punch 01 k.wav" in done["copied"]
+    new = next(it for it in client.get("/api/lives/solaris").json()["live"]["items"] if it["code"] == "RM")
+    assert new["source"] != rm["source"]
+    assert client.post("/api/lives/solaris/export", json={"dry_run": True}).json()["rumbles"][0]["rendered"] == []
     r = client.put("/api/lives/solaris/rumbles", json={"bank": "A-HALF", "presets": []})
     assert r.json()["live"]["rumbles"] == {}
     assert client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()["presets"] == []
+    assert client.post("/api/lives/solaris/export", json={"dry_run": True}).json()["rumbles"] == []
 
 
 def test_lives_flow(tmp_path: Path):

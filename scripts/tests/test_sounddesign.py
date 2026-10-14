@@ -306,6 +306,42 @@ def test_rumble_bank_renders_verses_adds_and_replays(tmp_path: Path):
         sd.rumble_bank(live, "Z-NONE", presets, m, out, samples_root, overrides)
 
 
+def test_rumble_live_covers_banks_with_presets_and_follows_preset_edits(tmp_path: Path):
+    import soundfile as sf
+    from analyzer import lives as lv
+    from analyzer.samples import Manifest, SampleEntry
+    samples_root, out, presets = tmp_path / "Samples", tmp_path / "SoundDesign", tmp_path / "presets"
+    (samples_root / "k").mkdir(parents=True)
+    sf.write(samples_root / "k" / "kick.wav", _kick()[0], sd.SR)
+    m = Manifest(source_root=str(samples_root), total=1, entries=[
+        SampleEntry(source="k/kick.wav", family="TRIBE", code="BD", pack="k",
+                    name="BD C Punch 01 k", duration=0.3, rank=1)])
+    sd.save_preset(_preset(), presets)
+    live = lv.create_live(tmp_path / "lives", "solaris", ["A-HALF", "B-DNB"])
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", samples_root)
+    lv.add(live, m, ["k/kick.wav"], "B-DNB", samples_root)
+    lv.set_tempo(live, "A-HALF", 165)
+    overrides: dict = {}
+    run = lambda **kw: sd.rumble_live(live, presets, m, out, samples_root, overrides, **kw)  # noqa: E731
+
+    assert run() == []                                      # aucune banque a presets
+    lv.set_rumbles(live, "A-HALF", ["t"])                   # B-DNB sans preset : pas de bilan
+    r1 = run()
+    assert [r.bank for r in r1] == ["A-HALF"] and r1[0].added == ["RM C Punch 01 k"]
+    first = next(it.source for it in live.items if it.code == "RM")
+    assert run()[0].unchanged == ["RM C Punch 01 k"]
+
+    sd.save_preset(_preset(devices=[{"type": "lowpass", "params": {"cutoff_frequency_hz": 120}}]), presets)
+    dry = run(dry_run=True)[0]                              # preset edite : nouveau rendu annonce, rien d'ecrit
+    assert (dry.rendered, dry.replaced) == (["RM C Punch 01 k"], [])
+    assert next(it.source for it in live.items if it.code == "RM") == first
+    r2 = run()[0]
+    assert (r2.rendered, r2.added, r2.replaced) == (["RM C Punch 01 k"],) * 3
+    rm = [it for it in live.items if it.code == "RM"]
+    assert len(rm) == 1 and rm[0].source != first and (samples_root / first).is_file()   # l'ancien reste dans la lib
+    assert len(list(out.glob("rumble/*.wav"))) == 2
+
+
 def test_rumble_of_a_tuned_kick_inherits_its_tuning(tmp_path: Path):
     import soundfile as sf
     from analyzer import lives as lv

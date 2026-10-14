@@ -61,6 +61,7 @@ from analyzer.sounddesign import (
     needs_source,
     render,
     rumble_bank,
+    rumble_live,
     slice_count,
     target,
     verse,
@@ -170,20 +171,27 @@ def _cmd_rumbles(args: argparse.Namespace) -> int:
     live = lv.load_live(LIVES_META_DIR, args.live)
     manifest = load_manifest(MANIFEST_FILE) or Manifest(source_root=str(SAMPLES_SRC_DIR), total=0)
     overrides = load_overrides(OVERRIDES_FILE)
-    report = rumble_bank(live, args.bank, SOUNDDESIGN_PRESETS_DIR, manifest, SOUNDDESIGN_OUT_DIR,
-                         SAMPLES_SRC_DIR, overrides, args.dry_run)
-    if not report.presets:
-        print(f"{args.live}/{args.bank} : aucun preset de rumble associe, rien a generer")
+    common = (SOUNDDESIGN_PRESETS_DIR, manifest, SOUNDDESIGN_OUT_DIR, SAMPLES_SRC_DIR, overrides, args.dry_run)
+    if args.bank:
+        reports = [rumble_bank(live, args.bank, *common)]
+    else:
+        reports = rumble_live(live, *common)
+    if not any(r.presets for r in reports):
+        where = f"{args.live}/{args.bank}" if args.bank else args.live
+        print(f"{where} : aucun preset de rumble associe, rien a generer")
         return 0
     verb = "a rendre" if args.dry_run else "rendus"
-    print(f"{args.live}/{args.bank} a {report.bpm:g} BPM, presets {', '.join(report.presets)}, "
-          f"{report.kicks} kick(s) : {len(report.rendered)} {verb}, {len(report.reused)} reutilises, "
-          f"{len(report.added)} ajoutes, {len(report.unchanged)} inchanges, {len(report.skipped)} ignores")
-    for line in report.skipped:
-        print(f"  ignore : {line}")
+    for report in reports:
+        print(f"{args.live}/{report.bank} a {report.bpm:g} BPM, presets {', '.join(report.presets)}, "
+              f"{report.kicks} kick(s) : {len(report.rendered)} {verb}, {len(report.reused)} reutilises, "
+              f"{len(report.added)} ajoutes, {len(report.unchanged)} inchanges, "
+              f"{len(report.replaced)} remplaces, {len(report.skipped)} ignores")
+        for line in report.skipped:
+            print(f"  ignore : {line}")
+        if args.dry_run:
+            for name in report.rendered:
+                print(f"  {name}")
     if args.dry_run:
-        for name in report.rendered:
-            print(f"  {name}")
         return 0
     save_overrides(overrides, OVERRIDES_FILE)
     lv.save_live(live, LIVES_META_DIR)
@@ -212,9 +220,9 @@ def main() -> int:
     r.add_argument("--verse", action="store_true",
                    help="copie aussi le rendu dans le pack Samples/SoundDesign")
     r.add_argument("--name", help="nom DT2 (defaut : propose a partir de la source)")
-    b = sub.add_parser("rumbles", help="rumbles des kicks d'une banque de live (8.L2)")
+    b = sub.add_parser("rumbles", help="rumbles des kicks d'un live, par banque a presets (8.L2)")
     b.add_argument("live")
-    b.add_argument("bank")
+    b.add_argument("bank", nargs="?", help="une banque seulement (defaut : toutes celles qui ont des presets)")
     b.add_argument("--dry-run", action="store_true", help="bilan sans rendu ni ecriture")
     args = parser.parse_args()
     try:

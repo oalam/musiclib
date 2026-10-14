@@ -399,6 +399,12 @@ class LiveRumbleRun(BaseModel):
     dry_run: bool = False       # bilan sans rendu, ni versement, ni ajout
 
 
+class LiveExportReport(ExportReport):
+    """Export d'un live : les rumbles des banques a presets sont (re)generes
+    d'abord (8.L2), un bilan par banque traitee."""
+    rumbles: list[sd.BankRumbleReport] = Field(default_factory=list)
+
+
 class SampleTags(BaseModel):
     sources: Sources
     add: TagList = Field(default_factory=list, max_length=20)
@@ -1037,6 +1043,27 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(422, f"preset de rumble inconnu : {', '.join(unknown)}")
         return live_edit(name, lambda live: lv.set_rumbles(live, req.bank, req.presets))
 
+    def rumble_live(live: lv.Live, dry_run: bool) -> list[sd.BankRumbleReport]:
+        """Rumbles de toutes les banques a presets du live (8.L2), sous les
+        verrous overrides (versement) puis rendu ; l'appelant tient `lives_lock`.
+        Enregistre overrides et live sauf `dry_run`. Rien a faire sans preset."""
+        if not any(live.rumbles.values()):
+            return []
+        m = manifest()
+        with samples_lock:
+            refuse_if_rebuilding()
+            overrides = samples.load_overrides(samples_overrides)
+            try:
+                with render_lock:
+                    reports = sd.rumble_live(live, sounddesign_presets, m, sounddesign_out,
+                                             samples_src, overrides, dry_run)
+            except (lv.LiveError, sd.PresetError, sd.SourceError) as exc:
+                raise HTTPException(422, str(exc)) from exc
+            if not dry_run:
+                samples.save_overrides(overrides, samples_overrides)
+                lv.save_live(live, lives_meta)
+        return reports
+
     @app.post("/api/lives/{name}/rumbles", response_model=sd.BankRumbleReport)
     def live_rumbles_run(name: str, req: LiveRumbleRun) -> sd.BankRumbleReport:
         """Rend, verse et ajoute a la banque un rumble par kick et par preset
@@ -1077,16 +1104,20 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         write_varispeed(path, buf, it.shift)
         return Response(buf.getvalue(), media_type="audio/wav")
 
-    @app.post("/api/lives/{name}/export", response_model=ExportReport)
-    def live_export(name: str, req: SampleExport) -> ExportReport:
-        """Copie le live vers `<MEDIA>/Live/00-live/<live>` ; `dry_run` : bilan."""
+    @app.post("/api/lives/{name}/export", response_model=LiveExportReport)
+    def live_export(name: str, req: SampleExport) -> LiveExportReport:
+        """(Re)genere les rumbles des banques a presets, puis copie le live vers
+        `<MEDIA>/Live/00-live/<live>` ; `dry_run` : bilan des deux etapes (le
+        plan de copie porte alors sur le live tel quel, avant les rendus)."""
         media_or_503()
         with lives_lock:
             live = live_or_error(name)
+            rumbles = rumble_live(live, req.dry_run)
             try:
-                return lv.export_live(live, samples_src, lives_export, lives_meta, dry_run=req.dry_run)
+                rep = lv.export_live(live, samples_src, lives_export, lives_meta, dry_run=req.dry_run)
             except lv.LiveError as exc:
                 raise HTTPException(422, str(exc)) from exc
+        return LiveExportReport(**rep.model_dump(), rumbles=rumbles)
 
     # --- Sound design (Phase 8) -------------------------------------------
     render_lock = threading.Lock()   # un rendu a la fois (CPU, ecriture des sidecars)

@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [8.L2] L'export d'un live régénère d'abord les rumbles de toutes les
+  banques à presets (`sounddesign.rumble_live`, `POST /api/lives/{live}/export`
+  renvoie un bilan par banque dans `rumbles`) : un preset édité ou un tempo
+  changé donne de nouveaux rendus qui remplacent les anciens dans la banque,
+  puis la copie vers `00-live`. Le bilan du front annonce les rumbles à
+  rendre (« Rendre et copier »), CLI `sounddesign.py rumbles <live>` sans
+  banque pour toutes les banques à presets.
 - [8.L2] Rumbles par banque de live : presets de rumble associés à chaque
   banque (`Live.rumbles`, 5 au plus, `PUT /api/lives/{live}/rumbles`) ;
   `sounddesign.rumble_bank` rend un rumble par kick de la banque et par

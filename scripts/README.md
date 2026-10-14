@@ -952,8 +952,14 @@ rth`). Le fichier porte la note d'origine du kick, l'item du live hérite de
 son accordage (`inherit_tuning`) et garde le preset (`rumble`). Rejouable :
 même kick + même preset + même tempo = même fichier (réutilisé), versement
 sans recopie, rumble déjà dans la banque compté inchangé ; changer le tempo
-rend de nouveaux rumbles qui remplacent les anciens dans la banque
-(`replaced`). Aucun preset associé : rien n'est généré. Sans tempo : 422.
+ou éditer le preset rend de nouveaux rumbles qui remplacent les anciens dans
+la banque (`replaced` ; l'ancien fichier reste dans la lib). Aucun preset
+associé : rien n'est généré. Sans tempo : 422. `rumble_live` enchaîne
+`rumble_bank` sur toutes les banques à presets : c'est la première étape de
+`POST /api/lives/{live}/export` (bilan par banque dans `rumbles`, en
+`dry_run` aussi), si bien qu'un clic sur « Exporter » suffit après un
+changement de preset ou de tempo. CLI : `sounddesign.py rumbles <live>
+[banque] [--dry-run]`.
 CLI : `sounddesign.py rumbles <live> <banque> [--dry-run]`.
 
 Accordage (7.L4, `lives.tune_live`, banque par banque avec `tune_bank`) :

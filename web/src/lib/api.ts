@@ -384,6 +384,8 @@ export interface BankRumbleReport {
   replaced: string[]
   skipped: string[]
 }
+/** Export d'un live : les rumbles des banques a presets sont (re)generes d'abord, un bilan par banque. */
+export interface LiveExportReport extends SampleExportReport { rumbles: BankRumbleReport[] }
 export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean }
 export interface LiveSummary { live: Live; folders: LiveFolder[]; ram: number; ram_limit: number; unknown_ram: number }
 /** Case = dossier final du +Drive (7.J8) : DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX. */
@@ -630,7 +632,7 @@ export const api = {
   liveRename: (name: string, source: string, newName: string) => livePost(`/${enc(name)}/rename`, { source, name: newName }),
   liveExport: (name: string, dryRun: boolean) =>
     fetch(`/api/lives/${enc(name)}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })
-      .then(r => json<SampleExportReport>(r)),
+      .then(r => json<LiveExportReport>(r)),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
   /** Sample du live tel qu'exporte (transpose par l'accordage) ; shift : cle de cache du navigateur. */
   liveAudioUrl: (name: string, source: string, shift: number) =>

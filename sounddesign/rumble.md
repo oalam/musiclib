@@ -177,9 +177,13 @@ modifier le preset.
    (plusieurs presets : `RM G Apar Grit rth`) ; tempo et preset s'affichent
    à côté dans la liste. Un kick accordé donne un rumble accordé pareil.
    Rejouable : relancer après avoir ajouté un kick ne rend que le sien ;
-   changer le tempo de la banque rend de nouveaux rumbles qui remplacent
-   les anciens. En ligne de commande :
-   `sounddesign.py rumbles solaris C-TRIBE --dry-run`. Pour travailler un
+   changer le tempo de la banque ou éditer le preset rend de nouveaux
+   rumbles qui remplacent les anciens dans la banque (l'ancien fichier
+   reste dans la lib). **« Exporter » refait ce passage sur toutes les
+   banques à presets avant la copie** : après avoir corrigé un preset, un
+   clic suffit, le bilan annonce les rumbles à rendre (« Rendre et
+   copier »). En ligne de commande :
+   `sounddesign.py rumbles solaris [C-TRIBE] --dry-run`. Pour travailler un
    rumble à la main, écouter son kick dans le panneau Live : il devient la
    source du sound design.
 4. Sur la machine : **track 2**, juste après le kick (cf.

@@ -1228,7 +1228,7 @@ class BankRumbleReport(BaseModel):
     reused: list[str] = Field(default_factory=list)     # rendus deja sur disque
     added: list[str] = Field(default_factory=list)      # ajoutes a la banque
     unchanged: list[str] = Field(default_factory=list)  # deja dans la banque
-    replaced: list[str] = Field(default_factory=list)   # retires de la banque (meme kick, meme preset, autre tempo)
+    replaced: list[str] = Field(default_factory=list)   # retires de la banque (meme kick, meme preset : autre tempo ou preset modifie)
     skipped: list[str] = Field(default_factory=list)    # `kick : motif`
 
 
@@ -1281,8 +1281,9 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
 
     Rejouable : un rendu deja ecrit pour ce kick et ce preset effectif est
     reutilise (meme fichier), le versement ne recopie pas, un rumble deja dans
-    la banque est compte inchange. Le rumble du meme kick et du meme preset a
-    un autre tempo (tempo de la banque change) est retire de la banque. Sans
+    la banque est compte inchange. Le rumble du meme kick et du meme preset
+    rendu avec d'autres reglages (tempo de la banque change, preset edite) est
+    retire de la banque au profit du nouveau ; son fichier reste dans la lib. Sans
     preset associe : rien n'est genere. `dry_run` : bilan sans rendu, ni
     ecriture, ni ajout. `live` et `overrides` sont modifies en place, a
     enregistrer par l'appelant.
@@ -1331,7 +1332,7 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
             if dry_run:
                 continue
             key = verse(record, out_root, samples_root, overrides)
-            # l'ancien rumble du meme kick et du meme preset (autre tempo) cede sa place
+            # l'ancien rumble du meme kick et du meme preset (autre tempo, preset edite) cede sa place
             for old in [it for it in live.items if it.rumble == pid and it.parent == kick.source
                         and bank in it.banks and it.source != key]:
                 lv.remove(live, [old.source], bank)
@@ -1342,6 +1343,17 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
                 lv.inherit_tuning(item, kick, samples_root)
             (report.added if added else report.unchanged).append(item.name)
     return report
+
+
+def rumble_live(live: lv.Live, presets_root: Path, manifest: smp.Manifest, out_root: Path,
+                samples_root: Path, overrides: dict[str, smp.Override],
+                dry_run: bool = False) -> list[BankRumbleReport]:
+    """`rumble_bank` sur chaque banque du live qui a des presets associes, dans
+    l'ordre des banques : c'est l'etape qui precede l'export du live, pour que
+    les rumbles de la DT2 suivent les tempos et les presets courants. Un bilan
+    par banque traitee ; une banque sans preset n'en produit pas."""
+    return [rumble_bank(live, bank, presets_root, manifest, out_root, samples_root, overrides, dry_run)
+            for bank in live.banks if live.rumbles.get(bank)]
 
 
 def with_overrides(preset: Preset, settings: dict[str, float], mute: list[str],
