@@ -2,15 +2,17 @@
 """Base de connaissance Digitakt II (Phase 7.D, 7.F) : notes markdown + recherche.
 
 Corpus = `digitakt/kb/**/*.md` (fiches machine a la racine, notes de KT
-theorie dans `theorie/`, hubs `_index.md` compris) + `digitakt/doctrine.md`,
-decoupes en sections (titres `##` / `###`). Recherche plein texte sans index
+theorie dans `theorie/`, hubs `_index.md` compris) + les doctrines
+`digitakt/doctrine*.md` (doctrine generale et doctrines de live), decoupes
+en sections (titres `##` / `###`). Recherche plein texte sans index
 ni RAG : le corpus tient en memoire, on le relit a chaque requete (les notes
 editees dans Obsidian sont vues tout de suite).
 
 Sommaire (7.M2) : un groupe par dossier (`fiches` = racine, puis un groupe
 par sous-dossier), chaque groupe range ses notes par `lot` puis `ordre` ; les
 noms des lots viennent du hub `_index.md` du dossier (`## Lot N — nom` ou
-`### Lot N — nom`).
+`### Lot N — nom`). Les doctrines forment le groupe `doctrine` (un seul lot,
+dans l'ordre des fichiers : la doctrine generale d'abord).
 
 Lien avec le manuel PDF (7.F) : le sommaire du PDF donne la page de chaque
 paragraphe `§x.y` ; les references du frontmatter `manuel` et celles citees
@@ -46,6 +48,7 @@ _SECTION_REF = re.compile(r"§(\d+(?:\.\d+)*)(?:\s*-\s*(\d+(?:\.\d+)*))?")
 _DOCTRINE_BEFORE = re.compile(r"doctrine\]*\s*\(?\s*$", re.IGNORECASE)  # « doctrine §3 », « [[../doctrine]] (§3 »
 _LOT_HEADING = re.compile(r"^#{2,3}\s+Lot\s+(\d+)\s*[—–-]\s*(.+?)\s*$", re.MULTILINE)
 ROOT_GROUP = "fiches"   # groupe des notes a la racine de `digitakt/kb/`
+DOCTRINE_GROUP = "doctrine"   # doctrine generale + doctrines de live (`digitakt/doctrine*.md`)
 
 
 class KbHit(BaseModel):
@@ -131,9 +134,15 @@ def parse_frontmatter(text: str) -> dict[str, str]:
     return out
 
 
+def doctrine_files() -> list[Path]:
+    """`digitakt/doctrine.md` d'abord, puis les doctrines de live (`doctrine-*.md`)."""
+    others = sorted(p for p in DOCTRINE.parent.glob("doctrine-*.md") if p.is_file())
+    return ([DOCTRINE] if DOCTRINE.exists() else []) + others
+
+
 def corpus_files() -> list[Path]:
     files = sorted(KB_DIR.rglob("*.md")) if KB_DIR.exists() else []
-    return ([DOCTRINE] if DOCTRINE.exists() else []) + files
+    return doctrine_files() + files
 
 
 def split_sections(text: str, rel_path: str) -> list[KbSection]:
@@ -265,7 +274,7 @@ def read_note(rel_path: str) -> KbNote | None:
     m = re.search(r"^#\s+(.+)$", text, re.MULTILINE)
     outline = manual_outline()
     header = manual_refs(parse_frontmatter(raw).get("manuel", ""), outline)
-    index = {r.section: r for r in header + manual_refs(text, outline, path == DOCTRINE)}
+    index = {r.section: r for r in header + manual_refs(text, outline, path in doctrine_files())}
     return KbNote(path=rel_path, title=m.group(1).strip() if m else path.stem, markdown=text,
                   manual=header, manual_index=index)
 
@@ -286,13 +295,14 @@ def table_of_contents() -> list[KbLot]:
     (le front montre ainsi la structure prevue, ex. la KB theorie)."""
     lots: dict[tuple[str, int], list[KbEntry]] = {}
     hubs: dict[str, Path] = {}
+    doctrines = doctrine_files()
     for hub in sorted(KB_DIR.rglob("_index.md")) if KB_DIR.exists() else []:
         group = ROOT_GROUP if hub.parent == KB_DIR else hub.parent.relative_to(KB_DIR).as_posix()
         hubs[group] = hub
         for n in _lot_names(hub):
             lots.setdefault((group, n), [])
     for f in corpus_files():
-        if f == DOCTRINE:
+        if f in doctrines:
             continue
         raw = f.read_text(encoding="utf-8")
         fm = parse_frontmatter(raw)
@@ -308,11 +318,21 @@ def table_of_contents() -> list[KbLot]:
             statut=fm.get("statut", "")))
     names = {group: _lot_names(hub) for group, hub in hubs.items()}
     order = sorted(lots, key=lambda k: (k[0] != ROOT_GROUP, k[0], k[1]))
-    return [KbLot(number=n, name=names[g].get(n, f"Lot {n}"),
-                  notes=sorted(lots[(g, n)], key=lambda e: (e.ordre, e.title)),
-                  group=g,
-                  hub=hubs[g].relative_to(VAULT_ROOT).as_posix() if hubs[g].exists() else "")
-            for g, n in order]
+    out = [KbLot(number=n, name=names[g].get(n, f"Lot {n}"),
+                 notes=sorted(lots[(g, n)], key=lambda e: (e.ordre, e.title)),
+                 group=g,
+                 hub=hubs[g].relative_to(VAULT_ROOT).as_posix() if hubs[g].exists() else "")
+           for g, n in order]
+    if doctrines:
+        entries = []
+        for i, f in enumerate(doctrines, start=1):
+            raw = f.read_text(encoding="utf-8")
+            m = re.search(r"^#\s+(.+)$", strip_frontmatter(raw), re.MULTILINE)
+            entries.append(KbEntry(path=f.relative_to(VAULT_ROOT).as_posix(),
+                                   title=m.group(1).strip() if m else f.stem, ordre=i,
+                                   statut=parse_frontmatter(raw).get("status", "")))
+        out.insert(1, KbLot(number=1, name="Doctrine", notes=entries, group=DOCTRINE_GROUP))
+    return out
 
 
 def main() -> int:

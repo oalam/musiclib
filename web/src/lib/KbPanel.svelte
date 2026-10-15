@@ -24,11 +24,25 @@
   const DOCTRINE = 'digitakt/doctrine.md'
   const known = $derived(new Set([DOCTRINE, ...toc.flatMap(l => [l.hub, ...l.notes.map(n => n.path)])].filter(Boolean)))
 
-  // groupes du sommaire (7.M2) : fiches machine, puis théorie
-  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', theorie: 'Théorie (notes de KT)' }
+  // groupes du sommaire (7.M2), un onglet chacun (7.M3) : fiches machine, doctrine, théorie
+  type Group = 'fiches' | 'doctrine' | 'theorie'
+  const TABS: { key: Group; label: string }[] = [
+    { key: 'fiches', label: 'Fiches machine' },
+    { key: 'doctrine', label: 'Doctrine' },
+    { key: 'theorie', label: 'Théorie' },
+  ]
+  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', doctrine: 'Doctrine', theorie: 'Théorie (notes de KT)' }
   const GROUP_HINTS: Record<string, string> = {
-    fiches: "Fiches dans l'ordre de préparation d'un set.",
+    fiches: "Le geste sur la machine, dans l'ordre de préparation d'un set.",
+    doctrine: 'Les règles arbitrées : grille des 16 tracks, banks, mutes, grave, tonalité ; puis une doctrine par live.',
     theorie: 'Le pourquoi et le vocabulaire, style par style ; les fiches donnent le geste.',
+  }
+  let tab = $state<Group>('fiches')
+  /** Onglet d'une note du corpus, d'après son chemin. */
+  function groupOf(path: string): Group {
+    if (path.startsWith('digitakt/doctrine')) return 'doctrine'
+    if (path.startsWith('digitakt/kb/theorie/')) return 'theorie'
+    return 'fiches'
   }
   const groups = $derived.by(() => {
     const out: { key: string; hub: string; lots: KbLot[] }[] = []
@@ -74,7 +88,7 @@
   $effect(() => {
     void html
     const index = note?.manual_index ?? {}
-    const inDoctrine = note?.path === DOCTRINE
+    const inDoctrine = groupOf(note?.path ?? '') === 'doctrine'
     if (!body) return
     const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT, {
       acceptNode: n => (n.parentElement?.closest('a, code, pre, button') ? NodeFilter.FILTER_REJECT
@@ -135,6 +149,7 @@
     try {
       if (note?.path !== path) note = await api.kbNote(path)
       view = 'note'
+      tab = groupOf(path)   // « ← Sommaire » revient sur l'onglet de la note
       error = ''
       await tick()
       const target = section ? body?.querySelector(`[id^="${CSS.escape(section)}"]`) : null
@@ -190,6 +205,7 @@
     try {
       if (note?.path !== h.path) note = await api.kbNote(h.path)
       view = 'note'
+      tab = groupOf(h.path)
       error = ''
       await tick()
       const target = h.anchor ? body?.querySelector(`#${CSS.escape(h.anchor)}`) : null
@@ -249,19 +265,21 @@
 
     {#if view === 'toc'}
       <div class="toc">
-        <p class="muted small">Touche <kbd>/</kbd> pour chercher dans les fiches, la théorie et la doctrine.</p>
-        <button class="hit" onclick={() => openPath(DOCTRINE)}><span>Doctrine (grille des 16 tracks, banks, mutes)</span></button>
-        {#each groups as g (g.key)}
-          <h2 class="grp">
-            {#if g.hub}
+        <nav class="tabs" aria-label="Groupes du sommaire">
+          {#each TABS as t (t.key)}
+            <button class="small" class:on={tab === t.key} onclick={() => (tab = t.key)}>{t.label}</button>
+          {/each}
+        </nav>
+        <p class="muted small">Touche <kbd>/</kbd> pour chercher dans les fiches, la doctrine et la théorie.</p>
+        {#each groups.filter(g => g.key === tab) as g (g.key)}
+          {#if g.hub}
+            <h2 class="grp">
               <button class="hub" onclick={() => openPath(g.hub)} title="Ouvrir le hub du groupe">{GROUP_LABELS[g.key] ?? g.key}</button>
-            {:else}
-              {GROUP_LABELS[g.key] ?? g.key}
-            {/if}
-          </h2>
-          {#if GROUP_HINTS[g.key]}<p class="muted small">{GROUP_HINTS[g.key]}</p>{/if}
+            </h2>
+          {/if}
+          {#if GROUP_HINTS[g.key]}<p class="muted small hint">{GROUP_HINTS[g.key]}</p>{/if}
           {#each g.lots as lot (lot.number)}
-            <h3>Lot {lot.number} · {lot.name}</h3>
+            {#if g.key !== 'doctrine'}<h3>Lot {lot.number} · {lot.name}</h3>{/if}
             <ul>
               {#each lot.notes as n (n.path)}
                 <li>
@@ -275,6 +293,8 @@
               {/each}
             </ul>
           {/each}
+        {:else}
+          <p class="muted small none">Aucune note dans ce groupe.</p>
         {/each}
       </div>
     {:else if view === 'note' && note}
@@ -338,8 +358,10 @@
   .toc { flex: 1; overflow-y: auto; padding: 4px 4px 24px; }
   .toc > p { padding: 6px 10px 0; margin: 0 0 6px; }
   .toc h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 14px 10px 4px; }
-  .toc h2.grp { font-size: 14px; margin: 18px 10px 2px; padding-top: 10px; border-top: 1px solid var(--border); }
-  .toc h2.grp + p { padding: 0 10px; margin: 0; }
+  .tabs { display: flex; gap: 4px; padding: 8px 10px 4px; position: sticky; top: 0; background: var(--panel); z-index: 1; }
+  .tabs button { flex: 1; }
+  .toc h2.grp { font-size: 14px; margin: 10px 10px 2px; }
+  .toc p.hint { padding: 0 10px; margin: 0 0 4px; }
   .hub { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
   .hub:hover { color: var(--accent); }
   .toc ul { list-style: none; margin: 0; padding: 0; }

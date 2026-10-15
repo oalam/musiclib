@@ -56,6 +56,10 @@ def vault(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     (kb_dir / "fill.md").write_text(NOTE, encoding="utf-8")
     (tmp_path / "digitakt" / "doctrine.md").write_text(
         "# Doctrine\n\n## Mutes\n\nLe mute est le vrai sequenceur.\n", encoding="utf-8")
+    # doctrine de live : groupe `doctrine` du sommaire, apres la doctrine generale
+    (tmp_path / "digitakt" / "doctrine-dt2-solaris.md").write_text(
+        "---\nstatus: en cours\n---\n\n# Live solaris\n\n## Structure du set\n\n"
+        "Half-time puis DnB ; voir la doctrine §1 et le manuel §10.7.\n", encoding="utf-8")
     (tmp_path / "secret.md").write_text("# hors corpus\n", encoding="utf-8")
     monkeypatch.setattr(kb, "VAULT_ROOT", tmp_path)
     monkeypatch.setattr(kb, "KB_DIR", kb_dir)
@@ -152,12 +156,26 @@ def test_table_of_contents_groups_by_lot(vault: Path):
     toc = kb.table_of_contents()
     assert [(lot.group, lot.number, lot.name, lot.hub) for lot in toc] == [
         ("fiches", 2, "Remplir les patterns", "digitakt/kb/_index.md"),
+        ("doctrine", 1, "Doctrine", ""),
         ("theorie", 2, "Socle rythmique", "digitakt/kb/theorie/_index.md"),
         ("theorie", 3, "Styles cœur", "digitakt/kb/theorie/_index.md")]
     assert toc[0].notes[0].model_dump() == {
         "path": "digitakt/kb/fill.md", "title": "FILL et conditions", "ordre": 7, "statut": "draft"}
-    assert toc[1].notes[0].path == "digitakt/kb/theorie/kt-cellules.md"
-    assert toc[2].notes == []  # lot declare dans le hub, aucune note encore
+    # doctrine generale d'abord, puis les doctrines de live, titre du `#` et `status`
+    assert [(e.path, e.title, e.ordre, e.statut) for e in toc[1].notes] == [
+        ("digitakt/doctrine.md", "Doctrine", 1, ""),
+        ("digitakt/doctrine-dt2-solaris.md", "Live solaris", 2, "en cours")]
+    assert toc[2].notes[0].path == "digitakt/kb/theorie/kt-cellules.md"
+    assert toc[3].notes == []  # lot declare dans le hub, aucune note encore
+
+
+def test_live_doctrine_in_corpus_and_doctrine_refs(vault: Path):
+    hits = kb.search("half-time", kb.load_corpus())
+    assert [h.path for h in hits] == ["digitakt/doctrine-dt2-solaris.md"]
+    note = kb.read_note("digitakt/doctrine-dt2-solaris.md")
+    assert note is not None and note.title == "Live solaris"
+    # « doctrine §1 » vise la doctrine, « §10.7 » le manuel (meme regle que doctrine.md)
+    assert list(note.manual_index) == []  # 10.7 absent de l'OUTLINE de test, 1 = doctrine
 
 
 def test_theorie_notes_searchable_and_readable(vault: Path):
