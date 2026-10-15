@@ -24,6 +24,11 @@ trois colonnes ensemble.
 """
 from __future__ import annotations
 
+import argparse
+import json
+import sys
+import warnings
+
 import numpy as np
 warnings.filterwarnings("ignore")
 import librosa
