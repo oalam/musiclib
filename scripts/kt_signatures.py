@@ -53,8 +53,23 @@ STYLES: dict[str, list[str]] = {
         "a_laan_-_live_extract",
         "axolotl_-_remix_psylotribe",
     ],
-    "hard_techno": ["beauz_-_bel_mercy"],
+    "hard_techno": [
+        "beauz_-_bel_mercy",
+        "sara_landry_shlmo_-_play_with_me",
+        "999999999_-_300000003",
+        "i_hate_models_-_daydream",
+    ],
+    "schranz": [
+        "chris_liebing_andre_walter_-_american_madness",
+        "dj_rush_-_motherfucking_bass",
+    ],
     "hardcore": ["maureen_-_kompet_x_jiggle", "mad_dog_-_wild_for_the_night"],
+    "frenchcore": [
+        "*dr_peacock_-_trip_to_russia",
+        "sefa_-_leven_is_lijden",
+        "imperials_-_ravage",
+        "maissouille_kriptonic_-_rock_the_beat",
+    ],
     "dnb": [
         "dimension_-_uk",
         "document_one_-_1964",

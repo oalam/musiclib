@@ -145,9 +145,9 @@ Le contretemps `..x.` est la syncope la plus simple : l'oreille tient le
 temps grâce au kick, le hat ouvert tombe exactement à l'opposé, et
 l'alternance kick-hat fait le balancement house et techno. Déplacer ce
 hat d'un pas en arrière (sur le « a », `...x`) change le balancement en
-poussée : c'est toute la différence entre le hard techno (hat sur le
-« et », `swing` 0,37, l'énergie suit) et le tribe (coups sur le « a »,
-`swing` 0,70-0,88, l'énergie précède). Avec un même kick, le pattern de
+poussée : c'est toute la différence entre un groove qui suit (Beauz, hat sur
+le « et », `swing` 0,37) et un groove qui précède (tribe, coups sur le
+« a », `swing` 0,70-0,88) ; les deux existent en hard techno (KT13). Avec un même kick, le pattern de
 hats décide du style : la bande high mesurée du hub est la plus
 différente d'un style à l'autre (tribe `Xx.Xx.xxXx.xX.xx` en croches
 avec le « a », acid `xxxXxxxXxxxXx.xX` en doubles croches accentuées sur
@@ -160,8 +160,8 @@ le hat ouvert est **un** trig par temps au plus, coupé par le fermé
 (choke, même voix ou AMP courte), sinon le haut du spectre se bouche et
 la syncope disparaît dans la masse. La syncope se mesure dans le hub
 par `sync` : 0,35 à 0,52 en tribe (peu d'énergie hors temps, la syncope
-est dans les toms), 0,64 en hard techno (hat ouvert et rumble entre les
-temps), 0,52 à 0,70 en DnB (le kick lui-même syncope, KT4).
+est dans les toms), 0,50 à 0,64 en hard techno (rumble et shaker entre
+les temps), 0,64 à 0,71 en frenchcore, 0,52 à 0,70 en DnB (le kick lui-même syncope, KT4).
 
 **Densité comme levier de tension.** La veille et la doctrine §6 le
 disent : retrancher crée autant d'énergie qu'ajouter. Les conditions

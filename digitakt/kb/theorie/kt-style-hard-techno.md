@@ -20,19 +20,22 @@ la ligne mélodique tourne sur 3 mesures contre 4 ; cette KT cadre la
 
 ## Signature
 
-Référence disponible ([[_index]]) : Beauz *Bel Mercy (hard techno
-remix)*, 161,5 BPM, un seul morceau. **À compléter après grab** de deux
-ou trois références (hub, « À grabber ») : la colonne mesurée n'est pas
-une moyenne.
+Références ([[_index]], grabs du 2026-10-15) : hard techno Beauz *Bel
+Mercy (hard techno remix)* (161,5), Sara Landry & Shlømo *Play With Me*
+(160,7), 999999999 *300000003* (136, sans doute lu en dessous), I Hate
+Models *Daydream* (136) ; schranz Chris Liebing & André Walter *American
+Madness* (134) et DJ Rush *Motherfucking Bass* (136), tempos à vérifier à
+l'oreille.
 
-| Élément | Théorique | Mesuré (Beauz) | Lecture |
+| Élément | Théorique | Mesuré | Lecture |
 |---|---|---|---|
-| Tempo | 150-160, schranz 150-170 | 161,5 | dans la fourchette haute |
-| Kick + rumble (sub) | kick `X...X...X...X...`, rumble `.xxx.xxx.xxx.xxx` | `.XxxxxxXxx..xXx.` | sub quasi continu : le rumble remplit tout ; le repliage n'a pas calé le downbeat (phase non garantie) |
-| Basse, pression (mid) | `..x...x...x...x.` ou `.xxx` | `x.Xx.xXX...xxXxx` | mid chargé sur les pas 3-4 et 7-8 : contretemps et « a » |
-| Hats, shaker (high) | hat ouvert `..x...x...x...x.`, shaker `xxxxxxxxxxxxxxxx` | `.xX.XxXxx.X.xXX.` | high dense avec des creux : le shaker à vélocités variables |
-| Harmonie | atonal ou mineur sur une tonique | B blues, `E5 E E5 G#dim E Fdim E G#dim` | quintes nues et accords diminués (triton, KT7) : la tension industrielle sur une tonique fixe |
-| Syncope, swing | droit, pression continue | `sync` 0,64, `swing` 0,37 | énergie **après** le temps (le « e »), à l'inverse du tribe : le rumble suit le kick |
+| Tempo | 150-160, schranz 150-170 | 160,7-161,5 (Beauz, Sara Landry), 134-136 (les quatre autres) | deux générations : le hard techno 2023+ à 160, les classiques lus à 135 (probablement 140-150 réels) |
+| Kick + rumble (sub) | kick `X...X...X...X...`, rumble `.xxx.xxx.xxx.xxx` | Sara Landry `X...X...X...X.x.`, Beauz `.XxxxxxXxx..xXx.`, moyenne `Xx.xx.x.X..xXx.x` | deux écritures : kick net et rumble ducké (Sara Landry), ou sub continu où le rumble remplit tout (Beauz) |
+| Basse, pression (mid) | `..x...x...x...x.` ou `.xxx` | moyenne `X.xXxxxXx..Xxx.X`, Sara Landry `XxXXx.xXXx.XX.xx` | mid chargé sur les pas 3-4 : contretemps et « a », la pression |
+| Hats, shaker (high) | hat ouvert `..x...x...x...x.`, shaker `xxxxxxxxxxxxxxxx` | moyenne `X.XxxxXxXxxxXXXx`, 999999999 `X.xxXXXXXX.XXXX.` | high presque continu : le shaker en doubles croches, plus dense que le tribe |
+| Schranz (sub) | boucles roulantes | Liebing `XXxxX.X.Xxx.X.X.`, DJ Rush `X.xxXxx.XxXXxxx.`, `sync` 0,58-0,69 | kick sur les temps et roulements entre : la percussion roule, pas de trou |
+| Harmonie | atonal ou mineur sur une tonique | Beauz `E5 G#dim E Fdim`, Sara Landry E phrygien `Fsus2 Fm Gsus2 F#m`, 999999999 `G#sus2 G# … Dsus2`, IHM `G#dim Am`, Liebing `G5 Gsus2` | pédale de quinte nue et tensions de demi-ton ou de triton au-dessus (KT6, KT7) : phrygien et diminué sur un grave fixe |
+| Syncope, anticipation | droit, pression continue | `sync` 0,50-0,64 ; `swing` Sara Landry 0,75, 999999999 0,64, IHM 0,55, Beauz 0,37 | trois sur quatre **anticipent** comme le tribe ; Beauz, qui suit, est l'exception (voir ci-dessous) |
 
 ## Vocabulaire
 
@@ -78,13 +81,20 @@ respire au rythme du kick**. Le son du rumble, lui, est traité ailleurs
 (fiche [[../rumble-grave]], notebook [[../../../sounddesign/rumble]],
 presets par banque de live 8.L2).
 
-**Énergie après le temps.** Le `swing` mesuré de Beauz (0,37) est le seul
-sous 0,5 des styles cœur : l'énergie tombe sur le « e », après le temps,
-pas sur le « a » avant. C'est le rumble qui gonfle après le kick, et le
-hat ouvert sur le « et ». Le tribe et le mental **anticipent** (KT3,
-KT10, KT11), le hard techno **suit** : deux groove opposés sur le même
-four-on-floor. Sur la DT2, ce sont les pas 2-3 de chaque temps qui
-portent les trigs (rumble, hat ouvert), pas le pas 4.
+**Anticiper ou suivre : les deux groove du hard techno.** Avec un seul
+morceau (Beauz, `swing` 0,37), la première version de cette KT concluait
+que le hard techno « suit » le temps, à l'inverse du tribe. Les trois
+références ajoutées disent le contraire : Sara Landry 0,75, 999999999
+0,64, I Hate Models 0,55 mettent l'énergie sur le « a », avant le temps,
+comme le tribe et le mental (KT3, KT10, KT11). Ce qui distingue le hard
+techno n'est donc pas le sens du groove mais la **pression** : un sub
+plein (`sync` 0,50-0,64) et un haut du spectre presque continu (shaker),
+là où le tribe laisse des trous. Beauz, avec son rumble qui gonfle après
+le kick et son hat ouvert sur le « et », est la version « qui suit » :
+elle existe, mais c'est une option, pas la règle. Sur la DT2, les deux se
+programment : trigs de rumble et de hat ouvert sur les pas 2-3 du temps
+pour suivre, trigs de shaker accentués et de basse sur le pas 4 pour
+anticiper ; ne pas mélanger les deux sur le même pattern.
 
 **Hats offbeat et shaker.** Le hat ouvert sur le contretemps est le
 balancier ; le shaker en 16 doubles croches à vélocités variables (KT3,
@@ -103,7 +113,8 @@ entre des quintes nues : tension industrielle sur un grave fixe.
 **Forme.** Intro 16-32, plateaux de 16 ou 32, break de 8 à 16 avec le
 kick coupé mais le rumble ou la pression maintenus, retour (KT9). Le
 reverse kick sur la 15 (doctrine §5) juste avant le 1 du drop. Schranz et
-hard groove ne sont pas sourcés par écrit : à documenter après grab.
+hard groove ne sont pas sourcés par écrit ; les deux schranz grabés
+confirment les boucles roulantes (sub `XXxxX.X.Xxx.X.X.`, `sync` 0,58-0,69).
 
 ## Sur la DT2
 
@@ -137,8 +148,10 @@ ouvert 6, perc B 8 (shaker), basse 9, lead 10, FX 15. Gestes :
   la respiration du style.
 - Juger le rumble sur des enceintes de bureau : toujours trop fort ;
   casque ou sub (fiche [[../rumble-grave]]).
-- Un seul morceau de référence : la colonne mesurée de la signature ne
-  vaut pas moyenne, et le repliage n'a pas calé le temps 1 (sub continu).
+- Le repliage de la passe cale le maximum, pas le temps 1 : sur un sub
+  continu (Beauz) la phase est inconnue ; lire les motifs. Les tempos de
+  999999999, I Hate Models et des deux schranz (134-136) sont sans doute
+  lus en dessous : vérifier à l'oreille avant de s'en servir en set.
 - Ligne de 48 pas et conditions `A:B` : les tours comptent sur 48, pas
   sur 64 (fiche [[../fill-conditions]], KT2).
 - Risque de doublon avec [[../rumble-grave]] : cette KT ne parle que de

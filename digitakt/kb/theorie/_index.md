@@ -135,13 +135,46 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
 | axolotl_-_remix_psylotribe | 184.6 | `X.x.X.x.X.X.X.X.` | `Xx.XXX.XX.xXx.xX` | `xx.xxX.Xx.xXxxxX` | 0.45 | 0.69 | 0.90 |
 | **moyenne (6)** | | `X.x.X.x.X.x.X.x.` | `Xx.XXxxXX.xXX.xX` | `xx.Xxx.Xx.xXx.xX` | | | |
 
-### hard_techno, hardcore, dnb, dubstep, techno lente
+### frenchcore (grabs du lot 3, tempo forcé 198,8)
+
+| morceau | BPM | sub | mid | high | sync | swing | pulse |
+|---|---|---|---|---|---|---|---|
+| dr_peacock_-_trip_to_russia_ft_cyclon | 198.8 | `.x..x.xxXX.xX..x` | `xx..xXX.XX..xxx.` | `.x.x.XXXxXxX..xx` | 0.67 | 0.39 | 0.92 |
+| sefa_-_leven_is_lijden | 198.8 | `X.xXX.xXx.xXx..X` | `Xx.Xxx.Xxx.XXx.x` | `xx.XXxxXxx.XxxxX` | 0.64 | 0.87 | 0.92 |
+| imperials_-_ravage | 198.8 | `XX.X.x...X..x..x` | `XXXxxXX.XXXxx.XX` | `XXx..XXxxXx..xXx` | 0.69 | 0.26 | 0.94 |
+| maissouille_kriptonic_-_rock_the_beat_fe | 198.8 | `.......X...xx..X` | `.x.....X..x...xX` | `x...xxxXx.x...XX` | 0.71 | 0.85 | 0.96 |
+| **moyenne (4)** | | `xx.xx.xxxx.xx..X` | `xxxx.xxxxXxxx.xx` | `xx.xxXXXxxxx..xX` | | | |
+
+### hardcore (Maureen réanalysée à 215,3)
+
+| morceau | BPM | sub | mid | high | sync | swing | pulse |
+|---|---|---|---|---|---|---|---|
+| maureen_-_kompet_x_jiggle | 215.3 | `...XXxXx...XXXXx` | `XxxXX.xXXxXxXxxx` | `xXXXX.xXXxXXxxXx` | 0.59 | 0.72 | 0.96 |
+| mad_dog_-_wild_for_the_night_mutation_ep | 161.5 | `xxX..xX..xX..XX.` | `XxxxXx..Xxx.XX..` | `XxX...X.x.X.xxX.` | 0.52 | 0.18 | 0.96 |
+| **moyenne (2)** | | `..xXxxX..xxxxXX.` | `XxxXX.xxXxx.XXxx` | `XXXXX.XxXxXxxxX.` | | | |
+
+### hard_techno (grabs du lot 3)
+
+| morceau | BPM | sub | mid | high | sync | swing | pulse |
+|---|---|---|---|---|---|---|---|
+| beauz_-_bel_mercy_beauz_hard_techno_remi | 161.5 | `.XxxxxxXxx..xXx.` | `x.Xx.xXX...xxXxx` | `.xX.XxXxx.X.xXX.` | 0.64 | 0.37 | 0.91 |
+| sara_landry_shlmo_-_play_with_me | 160.7 | `X...X...X...X.x.` | `XxXXx.xXXx.XX.xx` | `x.XXx.XxxxXxX.Xx` | 0.50 | 0.75 | 0.92 |
+| 999999999_-_300000003 | 136.0 | `Xx.X.xx.X.XXxx.x` | `x..xxx.xX..Xx..X` | `X.xxXXXXXX.XXXX.` | 0.60 | 0.64 | 0.88 |
+| i_hate_models_-_daydream | 136.0 | `X.XxX.x.X.xxX..x` | `X..Xxx.Xx..Xxx.X` | `XxxxxXx.xXXxxXxx` | 0.52 | 0.55 | 0.92 |
+| **moyenne (4)** | | `Xx.xx.x.X..xXx.x` | `X.xXxxxXx..Xxx.X` | `X.XxxxXxXxxxXXXx` | | | |
+
+### schranz (grabs du lot 3)
+
+| morceau | BPM | sub | mid | high | sync | swing | pulse |
+|---|---|---|---|---|---|---|---|
+| chris_liebing_andre_walter_-_american_ma | 133.9 | `XXxxX.X.Xxx.X.X.` | `xX.X.X.XXx.XXxXx` | `xX.X.X.XxXxXxxxX` | 0.69 | 0.52 | 0.90 |
+| dj_rush_-_motherfucking_bass | 136.0 | `X.xxXxx.XxXXxxx.` | `X.xxxx.XX.xxxxxX` | `X.xxxX.X.x.X.x.X` | 0.58 | 0.64 | 0.95 |
+| **moyenne (2)** | | `XxxxX.x.XxXxX.X.` | `Xx.XxX.XXx.xxxxX` | `xx.X.X.Xxx.Xxx.X` | | | |
+
+### dnb, dubstep, techno lente
 
 | style | morceau | BPM | sub | mid | high | sync | swing | pulse |
 |---|---|---|---|---|---|---|---|---|
-| hard techno | beauz_-_bel_mercy_hard_techno_remix | 161.5 | `.XxxxxxXxx..xXx.` | `x.Xx.xXX...xxXxx` | `.xX.XxXxx.X.xXX.` | 0.64 | 0.37 | 0.91 |
-| hardcore | maureen_-_kompet_x_jiggle | 215.3 | `X..xX...X..xX...` | `X..xX..xX..xX..x` | `X..XX..xxXxxx..X` | 0.41 | 0.81 | 0.96 |
-| hardcore | mad_dog_-_wild_for_the_night (ajouté le 2026-10-15, lot 3) | 161.5 | `xxX..xX..xX..XX.` | `XxxxXx..Xxx.XX..` | `XxX...X.x.X.xxX.` | 0.52 | 0.18 | 0.96 |
 | dnb | dimension_-_uk | 172.3 | `.xX.....xxXx..xx` | `xXX..XXxxxXX.XXx` | `xx.x.XX..x.X.xXx` | 0.70 | 0.44 | 0.94 |
 | dnb | document_one_-_1964 | 172.3 | `x.xXx..x...x..xX` | `XXXxxx..xXXxxxXX` | `XXx.....XXXXXXXX` | 0.66 | 0.58 | 0.95 |
 | dnb | tim_reaper_-_scorched_earth_a2 | 161.5 | `XX...XXXxx...xxX` | `xX.xXXXxXX.Xx...` | `xX..XXXXxXxxx.xX` | 0.67 | 0.42 | 0.89 |
@@ -171,31 +204,52 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
 - **Techno lente (Polar Inertia, Kangding Ray)** : sub dense et syncope
   0,8 : le repliage par maximum n'a pas trouvé de downbeat franc ; ces
   signatures ne servent pas de référence (KT14, KT15).
-- **Manques dans la library** : un seul hard techno, un seul hardcore (et
-  pas de frenchcore), pas de dub techno, hypnotique, industrial, electro,
-  trance / psy. **À grabber avant KT12-KT17 et KT19** (2 ou 3 morceaux
-  chacun via `scripts/grab.py`), puis ajouter leurs slugs à `STYLES`.
+- **Frenchcore (4 morceaux à 198,8)** : sub plein entre les kicks chez Sefa
+  (`X.xXX.xXx.xXx..X` : kick puis coups sur les pas 3-4 de chaque temps, la
+  basse offbeat `.xxx` vue à moitié) ; `sync` 0,64-0,71, le plus syncopé des
+  styles cœur ; `swing` partagé (Sefa 0,87, Maissouille 0,85 contre Dr.
+  Peacock 0,39, Imperials 0,26). Harmonie : Dr. Peacock alterne Bm et B5 (la
+  tierce apparaît, portée par le kick), Sefa enchaîne B, G#, A, C# (i, bVI,
+  bVII en quintes nues : la progression frenchcore), Maissouille G5 / Gdim /
+  C#5 (triton). Argument pour KT12.
+- **Hard techno (4 morceaux)** : Beauz était l'exception. Sara Landry
+  `X...X...X...X.x.` net avec `swing` 0,75, 999999999 0,64, I Hate Models
+  0,55 : trois sur quatre anticipent comme le tribe ; seule la pression
+  (sub plein, `sync` 0,50-0,64) les distingue. Harmonie : demi-tons et
+  diminués sur pédale (Sara Landry E phrygien `Fsus2 Fm Gsus2 F#m`,
+  999999999 G# pédale et Dsus2 au triton, IHM G#dim / Am). KT13 recalée.
+- **Schranz (2 morceaux, 134-136 lus, tempo à vérifier)** : sub roulant
+  (`XXxxX.X.Xxx.X.X.`, `X.xxXxx.XxXXxxx.`), `sync` 0,58-0,69 ; Liebing en
+  pédale G5 / Gsus2 phrygienne. Boucles roulantes confirmées.
+- **Manques dans la library** (état du 2026-10-15 matin) : un seul hard
+  techno, un seul hardcore, pas de frenchcore ; comblé pour le lot 3 (voir
+  « Grabs du lot 3 »). Restent dub techno, hypnotique, industrial, electro,
+  trance / psy, à grabber avant le lot 4.
 
-### À grabber (disque média requis)
+### Grabs du lot 3 (2026-10-15)
 
-Le grab du 2026-10-15 pour le lot 3 n'a pas pu se faire : `/Volumes/xtreme`
-absent, `grab.py` exige le SSD (`paths.require_media`). KT12 et KT13 sont
-rédigées sur Maureen, Mad Dog et Beauz seuls, colonnes « mesuré » à
-refaire après grab. Requêtes proposées (références connues, à valider ou
-remplacer avant de lancer ; `scripts/.venv/bin/python scripts/grab.py
---analyze-quality --folder <style> "<requête>"`) :
+Neuf requêtes lancées par `grab.py --analyze-quality` ; la recherche libre a
+retenu quatre mauvais candidats (un set complet de 2 h de Sara Landry, un
+titre sans rapport pour « 999999999 - X-TR-AM », « Bangbop » à 129 BPM pour
+Chris Liebing, et une remix de Maissouille pour « The Sickest Squad -
+Bounce »), retirés ou remplacés à la main. Retenus et ajoutés à `STYLES` :
 
-| Style | Requêtes proposées | Pour |
-|---|---|---|
-| frenchcore | `Dr. Peacock - Trip to Russia`, `Sefa - Leven is Lijden`, `Billx - Ravage` | KT12 : kick long + basse `.xxx`, pitched kick |
-| bouncy | `The Sickest Squad - Bounce`, un titre 2022+ tagué bouncy au choix | KT12 : galop, kick rebondissant |
-| hard techno | `Sara Landry - Bodies`, `999999999 - X-TR-AM`, `I Hate Models - Daydream` | KT13 : double kick, pression, ligne sur 3 mesures |
-| schranz | `Chris Liebing - Bang`, `DJ Rush - Motherfucking Bass` | KT13 : boucles roulantes |
-| dub techno, hypnotique, industrial, electro, trance / psy | à proposer au lot 4 | KT14-KT17, KT19 |
+| Style | Morceau | BPM library | Remarque |
+|---|---|---|---|
+| frenchcore | Dr. Peacock, *Trip to Russia* (ft. Cyclon) | 198,8 | sidecar d'abord lu à 100,4 (moitié), réanalysé avec le tempo de la library |
+| frenchcore | Sefa, *Leven is Lijden* | 198,8 | idem |
+| frenchcore | Imperials, *Ravage* | 198,8 | pris pour « Billx - Ravage » ; frenchcore à 199, gardé |
+| frenchcore | Maissouille & Kriptonic, *Rock the Beat* (The Sickest Squad remix) | 198,8 | pris pour « Bounce » ; frenchcore, gardé comme seul proxy bouncy |
+| hard techno | Sara Landry & Shlømo, *Play With Me* | 161,5 | remplace le set complet |
+| hard techno | 999999999, *300000003* | 136,0 | tempo sans doute lu en dessous (à l'oreille) |
+| hard techno | I Hate Models, *Daydream* | 136,0 | acid trance / hard techno 2017 |
+| schranz | Chris Liebing & André Walter, *American Madness* | 136,0 | remplace « Bangbop » ; tempo à vérifier |
+| schranz | DJ Rush, *Motherfucking Bass* | 136,0 | SoundCloud AAC 160 |
 
-Après grab : ajouter les slugs à `STYLES` de `scripts/kt_signatures.py`,
-relancer `kt_signatures.py hard_techno hardcore` et `--harmony`, coller
-ici, puis mettre à jour les tableaux « Signature » de KT12 et KT13.
+Restent à grabber avant le lot 4 : dub techno, hypnotique, industrial,
+electro, trance / psy (2 ou 3 chacun). Piège constaté : une requête
+« Artiste - Titre » dont le titre n'existe pas sur YouTube renvoie un set ou
+un titre voisin avec un `match` de 60-70 % ; passer par `--dry-run` d'abord.
 
 ## Passe harmonique — gamme et accords par style
 
@@ -244,17 +298,37 @@ des accords `5` ou `sus2` dans la section principale.
 | a_laan_-_live_extract_big_brother_is_rav | G# pentatonique mineure | 0.63 (incertain) | Gsus2 F#sus2 |
 | axolotl_-_remix_psylotribe_lemon_preview | sans analyse |  | — |
 
-### hard_techno
+### frenchcore
 
 | morceau | gamme détectée | score | accords (section principale) |
 |---|---|---|---|
-| beauz_-_bel_mercy_beauz_hard_techno_remi | B blues | 0.82 | E5 E E5 G#dim E Fdim E G#dim |
+| dr_peacock_-_trip_to_russia_ft_cyclon | B pentatonique mineure | 0.62 | Bm B5 Bm B5 Bm |
+| sefa_-_leven_is_lijden | B pentatonique majeure | 0.56 | Bsus2 G#m G#5 A C#5 Bsus2 B5 Bsus2 |
+| imperials_-_ravage | F locrien | 0.75 (incertain) | Asus2 A#sus2 A# Bm E5 C E5 Fm |
+| maissouille_kriptonic_-_rock_the_beat_fe | G# pentatonique mineure | 0.61 (incertain) | G5 Gdim C#5 Gdim G5 Gdim C#5 Gdim |
 
 ### hardcore
 
 | morceau | gamme détectée | score | accords (section principale) |
 |---|---|---|---|
 | maureen_-_kompet_x_jiggle | D blues | 0.79 | C#5 C#sus2 C#5 C#sus2 C#5 Csus2 D5 C#5 |
+| mad_dog_-_wild_for_the_night_mutation_ep | G mineur harmonique | 0.69 | Gsus2 G5 Dsus4 G5 D G5 Gsus4 Gsus2 |
+
+### hard_techno
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| beauz_-_bel_mercy_beauz_hard_techno_remi | B blues | 0.82 | E5 E E5 G#dim E Fdim E G#dim |
+| sara_landry_shlmo_-_play_with_me | E phrygien | 0.57 (incertain) | Fsus2 Fm Gsus2 F#m |
+| 999999999_-_300000003 | A pentatonique mineure | 0.65 (incertain) | G#sus2 G# G#sus2 G# G#sus2 G# Dsus2 |
+| i_hate_models_-_daydream | C# locrien | 0.83 (incertain) | G#dim Am G#dim |
+
+### schranz
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| chris_liebing_andre_walter_-_american_ma | G phrygien | 0.78 (incertain) | G5 Gsus2 G5 Gsus2 G5 Gsus2 G5 Gsus2 |
+| dj_rush_-_motherfucking_bass | G# pentatonique majeure | 0.61 (incertain) | F5 Gsus2 Dsus2 G# A#5 |
 
 ### dnb
 
@@ -288,5 +362,5 @@ des accords `5` ou `sus2` dans la section principale.
 |---|---|---|
 | 1 | KT1-KT4 socle rythmique | fait le 2026-10-15 (draft, exercices à jouer) |
 | 2 | KT5-KT9 socle harmonique et forme | fait le 2026-10-15 (draft, exercices à jouer) |
-| 3 | KT10-KT13 styles cœur | fait le 2026-10-15 (draft ; KT12-KT13 à recaler après les grabs frenchcore et hard techno, voir « À grabber ») |
+| 3 | KT10-KT13 styles cœur | fait le 2026-10-15 (draft) ; grabs frenchcore / hard techno / schranz faits, KT12-KT13 recalées le soir même |
 | 4 | KT14-KT19 styles connexes | à venir (grabs avant) |

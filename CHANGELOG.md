@@ -8,6 +8,21 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] Grabs du lot 3 et recalage de KT12-KT13 : neuf références ajoutées
+  à la library (frenchcore Dr. Peacock, Sefa, Imperials, Maissouille &
+  Kriptonic ; hard techno Sara Landry & Shlømo, 999999999, I Hate Models ;
+  schranz Chris Liebing & André Walter, DJ Rush), quatre mauvais candidats
+  de la recherche libre retirés (set complet, titre sans rapport, Bangbop,
+  artiste « 08. Dr. Peacock » corrigé), sidecars frenchcore et Maureen
+  réanalysés avec le tempo de la library (lus à la moitié), passe
+  harmonique sur les neuf. `kt_signatures.py` : styles `frenchcore` et
+  `schranz`, `hard_techno` à quatre morceaux. Hub : tables par style,
+  lecture rapide, bilan des grabs. KT12 : signature mesurée (basse offbeat
+  vue à moitié chez Sefa, galop chez Imperials et Mad Dog, progression i →
+  bVI → bVII chez Sefa, triton chez Maissouille). KT13 : signature à six
+  morceaux ; la conclusion « le hard techno suit le temps » tenue sur
+  Beauz seul est corrigée, trois références sur quatre anticipent comme le
+  tribe, la pression est le vrai critère ; KT3 nuancée en conséquence.
 - [7.M] KT3 : les hats et la syncope (fermé = grille, ouvert = contretemps,
   « a » = anticipation, ride), définitions de syncope et de contretemps,
   lecture de la métrique `sync` du hub par style, exercice « le hat ouvert

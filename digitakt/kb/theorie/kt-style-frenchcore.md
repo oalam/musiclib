@@ -19,18 +19,22 @@ la basse dans le kick (kickbass), et le bouncy ajoute le galop
 
 ## Signature
 
-Références disponibles ([[_index]]) : Maureen *Kompet x Jiggle*
-(hardcore, 216 BPM, lu 108 par le détecteur) et Mad Dog *Wild for the
-Night* (hardcore techno, 161,5). **Aucun frenchcore ni bouncy dans la
-library** : la signature ci-dessous est théorique sur ces deux colonnes,
-à compléter après grab (liste dans le hub, « À grabber »).
+Références ([[_index]], grabs du 2026-10-15) : frenchcore Dr. Peacock
+*Trip to Russia*, Sefa *Leven is Lijden*, Imperials *Ravage*, Maissouille &
+Kriptonic *Rock the Beat* (The Sickest Squad remix, seul proxy « bouncy »),
+tous à 198,8 BPM (sidecars réanalysés avec le tempo de la library, le
+détecteur les lisait à 100,4) ; hardcore Maureen *Kompet x Jiggle* (215,3,
+réanalysée) et Mad Dog *Wild for the Night* (161,5).
 
-| Élément | Théorique | Mesuré (hardcore) | Lecture |
+| Élément | Théorique | Mesuré | Lecture |
 |---|---|---|---|
-| Tempo | hardcore 160-200, frenchcore 180-220 | 216 (Maureen), 161,5 (Mad Dog) | Maureen est lu à la moitié : à 216 BPM, 1 pas = 69 ms, le détecteur voit le 108 (KT4) |
-| Kick (sub) | gabber `X...X...X...X...` ; frenchcore kick long `X...` + basse `.xxx` | Maureen `X..xX...X..xX...` ; Mad Dog `xxX..xX..xX..XX.` | Maureen : kick et un coup sur le « a » (anticipation, KT3) ; Mad Dog : cellule `x..x..x..x..` = tresillo enchaîné, le **galop** (KT1) |
-| Médium | hoover, screech, basse offbeat saturée | Maureen `X..xX..xX..xX..x` : la même cellule 3+1 partout | une seule cellule rythmique sur toutes les bandes : le hardcore est monolithique |
-| Harmonie | mineur, progression portée par le pitch du kick | Maureen C#5 / Csus2 / D5 (demi-tons autour de C#), Mad Dog Gsus2 / G5 / Dsus4 / D | mouvements de fondamentale par demi-ton et quinte, en quintes nues : c'est le kick qui change de note (KT8) |
+| Tempo | hardcore 160-200, frenchcore 180-220 | frenchcore 198,8 (× 4), hardcore 215,3 et 161,5 | à 199 BPM, 1 pas = 60 / 198,8 / 4 = 75,5 ms ; le détecteur lit la moitié, à corriger à la main (KT4) |
+| Kick + basse offbeat (sub) | kick `X...` + basse `.xxx` | Sefa `X.xXX.xXx.xXx..X`, Dr. Peacock `.x..x.xxXX.xX..x` | Sefa : kick sur chaque temps puis coups sur les pas 3-4, la basse `.xxx` vue à moitié (le pas 2 est mangé par la queue du kick) ; sub plein, aucun trou |
+| Galop | `x..xx..x` | Mad Dog `xxX..xX..xX..XX.`, Imperials `XX.X.x...X..x..x` | cellule `x..` enchaînée : le tresillo (KT1) appliqué au kick |
+| Médium | hoover, screech | Imperials `XXXxxXX.XXXxx.XX`, Maureen `XxxXX.xXXxXxXxxx` | mid presque plein : hoovers et basse saturée occupent tout |
+| Syncope | pression continue | `sync` 0,64-0,71 (frenchcore), 0,59 (Maureen) | le style le plus syncopé des styles cœur : presque tout tombe hors des temps, le kick seul les tient |
+| Anticipation | droit | `swing` Sefa 0,87, Maissouille 0,85 ; Dr. Peacock 0,39, Imperials 0,26 | deux écoles : basse qui pousse vers le temps, ou basse qui suit (KT3) |
+| Harmonie | mineur, progression portée par le pitch du kick | Dr. Peacock `Bm B5 Bm B5`, Sefa `Bsus2 G#m G#5 A C#5`, Maissouille `G5 Gdim C#5 Gdim`, Maureen `C#5 Csus2 D5` | la tierce apparaît (Bm), les fondamentales bougent i → bVI → bVII (Sefa : B, G#, A), le triton G → C# chez Maissouille : c'est le kick qui change de note (KT8) |
 
 ## Vocabulaire
 
@@ -88,12 +92,13 @@ prolongé (KT1). Le kick n'est plus sur les temps mais sur un cycle de 3
 pas qui se recale tous les 16 : la polymétrie de KT2 dans le kick
 lui-même. Un galop `x..xx..x` par temps double la densité du kick sans
 le mettre en double-time (KT4) : deux coups rapprochés puis un vide, ce
-qui rebondit. Le bouncy, non sourcé par écrit, est à documenter par
-cette passe sur deux ou trois morceaux grabés.
+qui rebondit. Imperials (`XX.X.x...X..x..x`) montre la même cellule à
+199 BPM. Le bouncy, non sourcé par écrit, n'a pour l'instant qu'un proxy
+dans la library.
 
-**Hardcore monolithique.** Chez Maureen, sub, mid et high montrent la
-même cellule `X..x` : le kick et son anticipation sur toutes les bandes,
-une seule idée rythmique, martelée. Pas de percs en appel-réponse (KT9),
+**Hardcore monolithique.** Chez Maureen (réanalysée à 215 BPM), mid et
+high sont presque pleins (`XxxXX.xXXxXxXxxx`) et le sub se concentre sur
+deux temps : une seule idée rythmique, martelée sur toutes les bandes. Pas de percs en appel-réponse (KT9),
 pas de polymétrie : la variation vient du pitch du kick, des hoovers et
 des breaks. Le hardcore est l'inverse du tribe sur ce point : le tribe
 varie la rythmique sur un kick fixe, le hardcore varie la hauteur sur une
@@ -144,8 +149,9 @@ le temps de fabriquer, basse 9. Gestes : [[../sampling-resampling]],
 - Le tag `genre` de la library (« hardcore », « breakbeat ») ne
   distingue pas frenchcore, gabber et bouncy : trier à l'oreille après
   grab.
-- Références manquantes : KT12 reste théorique sur frenchcore et bouncy
-  jusqu'au grab ; ne pas vérifier les exercices contre Maureen seul.
+- Le bouncy n'a qu'un proxy (la remix de Maissouille par The Sickest
+  Squad) : la colonne galop s'appuie sur Mad Dog et Imperials, à confirmer
+  sur un vrai bouncy 2022+.
 
 ## Ressources
 
@@ -157,8 +163,8 @@ le temps de fabriquer, basse 9. Gestes : [[../sampling-resampling]],
 - Ableton, *Sara Landry high-end hard techno* (kick en premier,
   distorsion multi-étages) :
   <https://www.ableton.com/en/blog/sara-landry-high-end-hard-techno/> `[V]`
-- Aucune source écrite sur le bouncy 2022+ : `rhythm_signature` sur des
-  morceaux grabés (hub, « À grabber »).
+- Aucune source écrite sur le bouncy 2022+ : passe `rhythm_signature` du
+  hub (« Grabs du lot 3 »).
 
 ## Liens
 
