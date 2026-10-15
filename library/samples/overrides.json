@@ -67,9 +67,117 @@
   "name": "RM 160 D Tranc er1",
   "sub": ""
  },
+ "SoundDesign/rumble/RM A Attac 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM A Attac 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/AttacKick_SP_01.wav"
+ },
+ "SoundDesign/rumble/RM A Shinra 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM A Shinra 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM B Matte 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM B Matte 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/MatteKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM Box 03 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM Box 03 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_03.wav"
+ },
+ "SoundDesign/rumble/RM Bubble 03 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM Bubble 03 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/BubbleKick_SP_03.wav"
+ },
+ "SoundDesign/rumble/RM C# Kicks 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM C# Kicks 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/90sKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM D Indust 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM D Indust 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/IndustrialKick_SP_02.wav"
+ },
  "SoundDesign/rumble/RM D Trance 90 er1 890944.wav": {
   "code": "RM",
   "sub": "CLEAN"
+ },
+ "SoundDesign/rumble/RM D# Dive 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM D# Dive 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/DiveKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM F Box 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM F Box 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM F# Apart 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM F# Apart 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM F# Dive 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM F# Dive 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/DiveKick_SP_01.wav"
+ },
+ "SoundDesign/rumble/RM F# Kicks 02 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM F# Kicks 02 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/KickKick_SP_02.wav"
+ },
+ "SoundDesign/rumble/RM F# Shinr 03 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM F# Shinr 03 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_03.wav"
+ },
+ "SoundDesign/rumble/RM G# Air 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM G# Air 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/AirKick_SP_01.wav"
+ },
+ "SoundDesign/rumble/RM G# Apart 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM G# Apart 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav"
+ },
+ "SoundDesign/rumble/RM G# Box 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM G# Box 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_01.wav"
+ },
+ "SoundDesign/rumble/RM G# Shinr 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM G# Shinr 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_01.wav"
+ },
+ "SoundDesign/rumble/RM Kicks 01 rth b7d885.wav": {
+  "code": "RM",
+  "name": "RM Kicks 01 rth",
+  "sub": "",
+  "parent": "rthm/packs/neurotek/Kicks/OpenKick_SP_01.wav"
  },
  "SoundDesign/rumble/RM Kik Db 01 dbr 890944.wav": {
   "code": "RM",
@@ -103,6 +211,9 @@
  "bass/oneshot/170_E_DownBass_01_516.wav": {
   "family": "TRIBE",
   "code": "BS"
+ },
+ "bass/oneshot/BUZZBASS.wav": {
+  "stars": 5
  },
  "cinematic Noiiz/": {
   "tags": [

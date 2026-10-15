@@ -1,0 +1,1772 @@
+{
+ "0-COMMON/DRUMS/BD Tool 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/ToolKIck_SP_01.wav",
+  "size": 49056,
+  "mtime_ns": 1791384646378039692
+ },
+ "0-COMMON/DRUMS/BD Tool 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/ToolKIck_SP_02.wav",
+  "size": 48920,
+  "mtime_ns": 1791384645998693532
+ },
+ "0-COMMON/DRUMS/BD V8 Clean 01 909.wav": {
+  "source": "SoundDesign/variations/BD V8 Clean 01 909 b4e0be.wav",
+  "size": 921644,
+  "mtime_ns": 1791725593122445707
+ },
+ "0-COMMON/DRUMS/CY Crashe 01 909.wav": {
+  "source": "909/BVKER - 909 Kit/Drum Shots/Cymbals/Crashes/BVKER - 909 Kit - Crash 01.wav",
+  "size": 317564,
+  "mtime_ns": 1584213364000000000
+ },
+ "0-COMMON/DRUMS/HH Clean 04 909.wav": {
+  "source": "909/BPB Cassette 909/clean/hh04.wav",
+  "size": 30708,
+  "mtime_ns": 1397824908000000000
+ },
+ "0-COMMON/DRUMS/HH Korger 01 er1.wav": {
+  "source": "KORGER1Samples/HH-ER1-909open.wav",
+  "size": 63386,
+  "mtime_ns": 1791378249009848421
+ },
+ "0-COMMON/DRUMS/OH Clean 04 909.wav": {
+  "source": "909/BPB Cassette 909/clean/oh04.wav",
+  "size": 83340,
+  "mtime_ns": 1397921044000000000
+ },
+ "0-COMMON/DRUMS/SD Snares 01 909.wav": {
+  "source": "909/BVKER - 909 Kit/Drum Shots/Snares/BVKER - 909 Kit - Snare 01.wav",
+  "size": 91964,
+  "mtime_ns": 1584195565000000000
+ },
+ "0-COMMON/FX/FX Alarm 27 meg.wav": {
+  "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Alarm 27.wav",
+  "size": 415768,
+  "mtime_ns": 1791391733318687001
+ },
+ "0-COMMON/FX/FX Alien Tu 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/AlienTubaImpact_01_531.wav",
+  "size": 965368,
+  "mtime_ns": 1791304653338519208
+ },
+ "0-COMMON/FX/FX Atmos Distan ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Ambience/Atmos Distant.wav",
+  "size": 1994796,
+  "mtime_ns": 1791387530953497376
+ },
+ "0-COMMON/FX/FX Bang Blips j89.wav": {
+  "source": "Jungle 89  to 99/FX/Bang Blips.wav",
+  "size": 614700,
+  "mtime_ns": 1791393151205120027
+ },
+ "0-COMMON/FX/FX Black Heart ni.wav": {
+  "source": "Native instrument/drop squad/one shot/SFX/SFX BlackHeart.wav",
+  "size": 460884,
+  "mtime_ns": 1791387408286646672
+ },
+ "0-COMMON/FX/FX Distant ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Stab & Hit/Hit Distant.wav",
+  "size": 724132,
+  "mtime_ns": 1791387352467991600
+ },
+ "0-COMMON/FX/FX Esper To 01 noi.wav": {
+  "source": "cinematic Noiiz/Subsonic Drops/EsperToneSubDrop_01_531.wav",
+  "size": 996108,
+  "mtime_ns": 1791304789362509422
+ },
+ "0-COMMON/FX/FX Fluid Clang j89.wav": {
+  "source": "Jungle 89  to 99/FX/Fluid Clang Hit.wav",
+  "size": 1107888,
+  "mtime_ns": 1791393114815146987
+ },
+ "0-COMMON/FX/FX Glass Hi 02 meg.wav": {
+  "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Glass Hit.wav",
+  "size": 614856,
+  "mtime_ns": 1791391688190185604
+ },
+ "0-COMMON/FX/FX Horn Capo Ko ni.wav": {
+  "source": "Native instrument/caribean/oneshot/SFX/Horn CapoKotta.wav",
+  "size": 2071180,
+  "mtime_ns": 1791388153496025570
+ },
+ "0-COMMON/FX/FX Marbles Sli j89.wav": {
+  "source": "Jungle 89  to 99/FX/Marbles Slide.wav",
+  "size": 202548,
+  "mtime_ns": 1791393064899261242
+ },
+ "0-COMMON/FX/FX Modular ni.wav": {
+  "source": "Native instrument/community drive/one shot/drum/SFX RD Modular.wav",
+  "size": 298104,
+  "mtime_ns": 1791387781188688580
+ },
+ "0-COMMON/FX/FX Screamin 01 noi.wav": {
+  "source": "cinematic Noiiz/Whooshes/ScreamingWhoosh_01_531.wav",
+  "size": 703252,
+  "mtime_ns": 1791304869500656851
+ },
+ "0-COMMON/FX/FX Track Drop mmg.wav": {
+  "source": "minimoog synth/SYNTH-TrackDrop.wav",
+  "size": 906924,
+  "mtime_ns": 1791378628685690021
+ },
+ "0-COMMON/FX/FX Trancega 26 meg.wav": {
+  "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Trancegate Crash 26.wav",
+  "size": 2241624,
+  "mtime_ns": 1791391351069799235
+ },
+ "0-COMMON/TONAL/BS D Upper 01 bas.wav": {
+  "source": "bass/oneshot/170_D_UpperBass_01_516.wav",
+  "size": 134648,
+  "mtime_ns": 1791300357490112305
+ },
+ "0-COMMON/TONAL/BS G Synth 12 bas.wav": {
+  "source": "bass/oneshot/GHT_G_Synth_Bass_12.wav",
+  "size": 137440,
+  "mtime_ns": 1791300396110120260
+ },
+ "A-HALF/DRUMS/BD F Kick 03 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Kick/Kick_03.wav",
+  "size": 82460,
+  "mtime_ns": 1791384531138842203,
+  "shift": -4
+ },
+ "A-HALF/DRUMS/BD F Kick 11 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Kick/Kick_11.wav",
+  "size": 82456,
+  "mtime_ns": 1791384529219582333,
+  "shift": -5
+ },
+ "A-HALF/DRUMS/BD F Kick 34 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Kick/Kick_34.wav",
+  "size": 82368,
+  "mtime_ns": 1791384523202873004,
+  "shift": -4
+ },
+ "A-HALF/DRUMS/BD Kick 07 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Kick/Kick_07.wav",
+  "size": 41316,
+  "mtime_ns": 1791384530133549955
+ },
+ "A-HALF/DRUMS/HH Hats 01 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_01.wav",
+  "size": 41316,
+  "mtime_ns": 1791384540669548507
+ },
+ "A-HALF/DRUMS/HH Hats 05 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_05.wav",
+  "size": 41316,
+  "mtime_ns": 1791384539657433387
+ },
+ "A-HALF/DRUMS/HH Hats 12 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_12.wav",
+  "size": 20744,
+  "mtime_ns": 1791384538498402292
+ },
+ "A-HALF/DRUMS/HH Hats 14 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_14.wav",
+  "size": 61888,
+  "mtime_ns": 1791384538133956917
+ },
+ "A-HALF/DRUMS/HH Hats 34 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_34.wav",
+  "size": 41316,
+  "mtime_ns": 1791384534061531865
+ },
+ "A-HALF/DRUMS/PC Perc 01 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_01.wav",
+  "size": 103032,
+  "mtime_ns": 1791384518580230120
+ },
+ "A-HALF/DRUMS/PC Perc 02 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_02.wav",
+  "size": 92744,
+  "mtime_ns": 1791384518208284541
+ },
+ "A-HALF/DRUMS/PC Perc 03 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_03.wav",
+  "size": 103032,
+  "mtime_ns": 1791384517910735676
+ },
+ "A-HALF/DRUMS/PC Perc 06 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_06.wav",
+  "size": 164744,
+  "mtime_ns": 1791384517084746804
+ },
+ "A-HALF/DRUMS/PC Perc 10 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_10.wav",
+  "size": 72176,
+  "mtime_ns": 1791384516081415889
+ },
+ "A-HALF/DRUMS/PC Perc 27 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_27.wav",
+  "size": 103032,
+  "mtime_ns": 1791384511763396991
+ },
+ "A-HALF/DRUMS/PC Perc 38 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_38.wav",
+  "size": 164744,
+  "mtime_ns": 1791384509346829223
+ },
+ "A-HALF/DRUMS/PC Perc 39 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_39.wav",
+  "size": 82460,
+  "mtime_ns": 1791384508873265272
+ },
+ "A-HALF/DRUMS/SD Snare 02 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Snare/Snare_02.wav",
+  "size": 164744,
+  "mtime_ns": 1791384505445442134
+ },
+ "A-HALF/DRUMS/SD Snare 03 rth.wav": {
+  "source": "rthm/packs/tortured dubstep/Snare/Snare_03.wav",
+  "size": 103032,
+  "mtime_ns": 1791384505010052416
+ },
+ "A-HALF/DRUMS/SD Snare 06 rth.wav": {
+  "source": "rthm/Snare/EDB_Snare_06.wav",
+  "size": 264260,
+  "mtime_ns": 1791391841533138875
+ },
+ "A-HALF/FX/FX Atmos Black ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Ambience/Atmos BlackHeart.wav",
+  "size": 2660400,
+  "mtime_ns": 1791387536410664551
+ },
+ "A-HALF/FX/FX Boing 04 rth.wav": {
+  "source": "rthm/cartoon/Classic SFX/Boing 04.wav",
+  "size": 128728,
+  "mtime_ns": 1791390835367383472
+ },
+ "A-HALF/FX/FX Bubu ni.wav": {
+  "source": "Native instrument/caribean/oneshot/SFX/SFX Bubu.wav",
+  "size": 489948,
+  "mtime_ns": 1791388133087873846
+ },
+ "A-HALF/FX/FX Doppler 17 meg.wav": {
+  "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Doppler 17.wav",
+  "size": 498864,
+  "mtime_ns": 1791391713933386159
+ },
+ "A-HALF/FX/FX Mech Ale 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/MechAlertImpact_01_531.wav",
+  "size": 1659408,
+  "mtime_ns": 1791304673737120159
+ },
+ "A-HALF/FX/FX Power Bl 01 noi.wav": {
+  "source": "cinematic Noiiz/Whooshes/PowerBladeWhoosh_01_531.wav",
+  "size": 981752,
+  "mtime_ns": 1791304863368428173
+ },
+ "A-HALF/FX/FX Power Do 17 meg.wav": {
+  "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 3/LS-SFX3 Power Down Fx 17.wav",
+  "size": 538432,
+  "mtime_ns": 1791391649898187020
+ },
+ "A-HALF/FX/FX Stereo G 70 meg.wav": {
+  "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Stereo Gated FX 070.wav",
+  "size": 1058172,
+  "mtime_ns": 1791391355905431072
+ },
+ "A-HALF/FX/FX Trancefor 01 ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Stab & Hit/Stab Tranceformer 1.wav",
+  "size": 268224,
+  "mtime_ns": 1791387346048700046
+ },
+ "A-HALF/FX/FX Younger Bro ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Synth Note/Synth F YoungerBro MSV .wav",
+  "size": 710556,
+  "mtime_ns": 1791387222893837509
+ },
+ "A-HALF/LOOPS/BL 170 F Al 01 bas.wav": {
+  "source": "bass/loops/170_F_AlleyBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300192071051571
+ },
+ "A-HALF/LOOPS/BL 170 F# 01 5 bas.wav": {
+  "source": "bass/loops/170_F#_InvaderBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300187212341933
+ },
+ "A-HALF/LOOPS/BR 108 Kilter rth.wav": {
+  "source": "rthm/loops/breakbeat/US_ME_Drum_108_kilter_FULL_multitrack.wav",
+  "size": 1706840,
+  "mtime_ns": 1791389783060697393
+ },
+ "A-HALF/LOOPS/BR 110 Top 17 rth.wav": {
+  "source": "rthm/loops/breakbeat/GH2_Top_Loop_17_110bpm.wav",
+  "size": 1675812,
+  "mtime_ns": 1791389847879208048
+ },
+ "A-HALF/LOOPS/BR 110 Trivial rth.wav": {
+  "source": "rthm/loops/breakbeat/110 Trivial Break.wav",
+  "size": 837996,
+  "mtime_ns": 1791389912432682782
+ },
+ "A-HALF/LOOPS/BR 120 Unvital rth.wav": {
+  "source": "rthm/loops/breakbeat/120 Unvital Break.wav",
+  "size": 769176,
+  "mtime_ns": 1791389898387799666
+ },
+ "A-HALF/LOOPS/BR 125 Dust 01 rth.wav": {
+  "source": "rthm/loops/breakbeat/XT_125_Dusty_Drums_Full_1.wav",
+  "size": 737452,
+  "mtime_ns": 1791389774048682129
+ },
+ "A-HALF/LOOPS/BR 134 Brea 02 rth.wav": {
+  "source": "rthm/loops/breakbeat/HTB_134_DrumLoop_02.wav",
+  "size": 1375700,
+  "mtime_ns": 1791389828066799014
+ },
+ "A-HALF/LOOPS/BR 135 Proofwi rth.wav": {
+  "source": "rthm/loops/breakbeat/135 Proofwider Break.wav",
+  "size": 682840,
+  "mtime_ns": 1791389879082259646
+ },
+ "A-HALF/LOOPS/BR 140 Defined rth.wav": {
+  "source": "rthm/loops/breakbeat/140 Defined Break.wav",
+  "size": 658460,
+  "mtime_ns": 1791389877540315732
+ },
+ "A-HALF/LOOPS/BR 140 Separat rth.wav": {
+  "source": "rthm/loops/breakbeat/140 Separatist Break.wav",
+  "size": 1316744,
+  "mtime_ns": 1791389863503622990
+ },
+ "A-HALF/LOOPS/DL 112 Dubs 07 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_07c.wav",
+  "size": 658460,
+  "mtime_ns": 1791389729008940762
+ },
+ "A-HALF/LOOPS/DL 140 Dubs 02 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_02e.wav",
+  "size": 1316744,
+  "mtime_ns": 1791389757118131700
+ },
+ "A-HALF/LOOPS/DL 140 Dubs 03 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_03d.wav",
+  "size": 658460,
+  "mtime_ns": 1791389749133857753
+ },
+ "A-HALF/LOOPS/DL 140 Dubs 04 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_04a.wav",
+  "size": 658460,
+  "mtime_ns": 1791389745709772098
+ },
+ "A-HALF/LOOPS/DL 140 Dubs 05 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_05a.wav",
+  "size": 1316744,
+  "mtime_ns": 1791389738909482363
+ },
+ "A-HALF/LOOPS/DL 140 Dubs 08 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_08a.wav",
+  "size": 1316744,
+  "mtime_ns": 1791389722178723824
+ },
+ "A-HALF/LOOPS/DL 140 Dubs 11 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_11b.wav",
+  "size": 658460,
+  "mtime_ns": 1791389682999397070
+ },
+ "A-HALF/LOOPS/DL 142 Blut 07 rth.wav": {
+  "source": "rthm/loops/blutotnium 142/142BPM_007.wav",
+  "size": 649188,
+  "mtime_ns": 1791390097617857605
+ },
+ "A-HALF/LOOPS/DL 142 Blut 26 rth.wav": {
+  "source": "rthm/loops/blutotnium 142/142BPM_026.wav",
+  "size": 649188,
+  "mtime_ns": 1791390064072515036
+ },
+ "A-HALF/LOOPS/DL 142 Blut 29 rth.wav": {
+  "source": "rthm/loops/blutotnium 142/142BPM_029.wav",
+  "size": 649188,
+  "mtime_ns": 1791390059202361121
+ },
+ "A-HALF/LOOPS/DL 92 Dubst 04 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_04b.wav",
+  "size": 658460,
+  "mtime_ns": 1791389744007728498
+ },
+ "A-HALF/LOOPS/DL 92 Dubst 07 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_07d.wav",
+  "size": 658460,
+  "mtime_ns": 1791389727320955994
+ },
+ "A-HALF/LOOPS/DL 92 Dubst 10 rth.wav": {
+  "source": "rthm/loops/dubstep/DubstepBeats_10b.wav",
+  "size": 658460,
+  "mtime_ns": 1791389693276223703
+ },
+ "A-HALF/TONAL/BS F Arnham Di bas.wav": {
+  "source": "bass/oneshot/SI_D_Arnham_Digiri_Syn_Bass_processed_.wav",
+  "size": 1920172,
+  "mtime_ns": 1791300426283002442,
+  "shift": 3
+ },
+ "A-HALF/TONAL/BS F Kit Sy 01 bas.wav": {
+  "source": "bass/oneshot/X1K_Kit3_F_Syn_Bass_1.wav",
+  "size": 191408,
+  "mtime_ns": 1791300437046018607
+ },
+ "A-HALF/TONAL/BS F Wrap 01 bas.wav": {
+  "source": "bass/oneshot/170_F#_WrapUpBass_01_516.wav",
+  "size": 135760,
+  "mtime_ns": 1791300363593456537,
+  "shift": -1
+ },
+ "A-HALF/TONAL/BS F Ya Ya 01 bas.wav": {
+  "source": "bass/oneshot/170_G#_YaYaBass_01_516.wav",
+  "size": 135736,
+  "mtime_ns": 1791300372800512554,
+  "shift": -3
+ },
+ "A-HALF/VX/VX Maasai T 25 voc.wav": {
+  "source": "vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_123_25_multitrack.wav",
+  "size": 1498708,
+  "mtime_ns": 1791391196840317836
+ },
+ "A-HALF/VX/VX Maasai T 3 voc.wav": {
+  "source": "vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_103_01_multitrack(2).wav",
+  "size": 447552,
+  "mtime_ns": 1791391198746234325
+ },
+ "B-DNB/DRUMS/BD F Kicks rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Kicks/BassKick_516.wav",
+  "size": 53004,
+  "mtime_ns": 1791384554404083468
+ },
+ "B-DNB/DRUMS/BD F Rounded rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Kicks/RoundedKick_516.wav",
+  "size": 39872,
+  "mtime_ns": 1791384553804132451,
+  "shift": 4
+ },
+ "B-DNB/DRUMS/CP Tamb rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Percussion/ClapTamb_516.wav",
+  "size": 79656,
+  "mtime_ns": 1791384550590797798
+ },
+ "B-DNB/DRUMS/CY Crash 01 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Crash Cymbals/CrashCymbal_01_516.wav",
+  "size": 209616,
+  "mtime_ns": 1791384557581271014
+ },
+ "B-DNB/DRUMS/CY Crash 03 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Crash Cymbals/CrashCymbal_03_516.wav",
+  "size": 209616,
+  "mtime_ns": 1791384556717904575
+ },
+ "B-DNB/DRUMS/CY Rides 01 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Rides/RideCymbal_01_516.wav",
+  "size": 209624,
+  "mtime_ns": 1791384546558490019
+ },
+ "B-DNB/DRUMS/CY Rides 03 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Rides/RideCymbal_03_516.wav",
+  "size": 209624,
+  "mtime_ns": 1791384545658452056
+ },
+ "B-DNB/DRUMS/HH Closed 01 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Closed HiHats/HiHatClosed_01_516.wav",
+  "size": 209496,
+  "mtime_ns": 1791384559759675474
+ },
+ "B-DNB/DRUMS/HH Closed 03 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Closed HiHats/HiHatClosed_03_516.wav",
+  "size": 209044,
+  "mtime_ns": 1791384559217065932
+ },
+ "B-DNB/DRUMS/HH Closed 11 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Closed HiHats/HiHatClosed_11_516.wav",
+  "size": 82404,
+  "mtime_ns": 1791384557829090983
+ },
+ "B-DNB/DRUMS/OH Open 01 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Open HiHats/HiHatOpen_01_516.wav",
+  "size": 209564,
+  "mtime_ns": 1791384553330939085
+ },
+ "B-DNB/DRUMS/OH Open 03 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Open HiHats/HiHatOpen_03_516.wav",
+  "size": 209624,
+  "mtime_ns": 1791384552402278385
+ },
+ "B-DNB/DRUMS/PC Effected 01 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Percussion/EffectedPercussion_01_516.wav",
+  "size": 17604,
+  "mtime_ns": 1791384549252965327
+ },
+ "B-DNB/DRUMS/PC Effected 02 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Percussion/EffectedPercussion_02_516.wav",
+  "size": 35644,
+  "mtime_ns": 1791384549131251132
+ },
+ "B-DNB/DRUMS/PC Shaker 04 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Shakers/Shaker_04_516.wav",
+  "size": 79968,
+  "mtime_ns": 1791384544095366687
+ },
+ "B-DNB/DRUMS/PC Shaker 05 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Shakers/Shaker_05_516.wav",
+  "size": 104820,
+  "mtime_ns": 1791384543924926683
+ },
+ "B-DNB/DRUMS/PC Wooden B 02 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Percussion/WoodenBlock_02_516.wav",
+  "size": 104884,
+  "mtime_ns": 1791384547629767653
+ },
+ "B-DNB/DRUMS/PC Wooden B 03 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Percussion/WoodenBlock_03_516.wav",
+  "size": 104900,
+  "mtime_ns": 1791384547359442402
+ },
+ "B-DNB/DRUMS/SD Effected 01 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Snares/EffectedSnare_01_516.wav",
+  "size": 104868,
+  "mtime_ns": 1791384543647608393
+ },
+ "B-DNB/DRUMS/SD Effected 02 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Snares/EffectedSnare_02_516.wav",
+  "size": 104808,
+  "mtime_ns": 1791384543376301143
+ },
+ "B-DNB/DRUMS/SD Effected 03 rth.wav": {
+  "source": "rthm/packs/nightmares dnb/Snares/EffectedSnare_03_516.wav",
+  "size": 78336,
+  "mtime_ns": 1791384543076656862
+ },
+ "B-DNB/DRUMS/SD Lo Fi 13 meg.wav": {
+  "source": "SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Lo-Fi Snare 13.wav",
+  "size": 103828,
+  "mtime_ns": 1791391390621458647
+ },
+ "B-DNB/FX/FX Downfilt 06 meg.wav": {
+  "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Downfilter Long 06.wav",
+  "size": 1022128,
+  "mtime_ns": 1791391712831119352
+ },
+ "B-DNB/FX/FX Drum 02 ni.wav": {
+  "source": "Native instrument/community drive/one shot/drum/SFX TTA Drive 2.wav",
+  "size": 95540,
+  "mtime_ns": 1791387779751563331
+ },
+ "B-DNB/FX/FX Ethnic B 09 meg.wav": {
+  "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 1/LS-SFX1 - Ethnic Bonsuri - 5-9.wav",
+  "size": 743140,
+  "mtime_ns": 1791391771919386960
+ },
+ "B-DNB/FX/FX Kraftwer 02 er1.wav": {
+  "source": "KORGER1Samples/FX-ER-Kraftwerkcity2.wav",
+  "size": 165678,
+  "mtime_ns": 1791378226985273959
+ },
+ "B-DNB/FX/FX Lazer Supern ni.wav": {
+  "source": "Native instrument/lone forest/oneshot/SFX/Lazer Supernova.wav",
+  "size": 287528,
+  "mtime_ns": 1791386581725064386
+ },
+ "B-DNB/FX/FX Mech Clu 01 noi.wav": {
+  "source": "cinematic Noiiz/Transitions/MechClutchTransition_01_531.wav",
+  "size": 800112,
+  "mtime_ns": 1791304838213097949
+ },
+ "B-DNB/FX/FX Psytranc 30 meg.wav": {
+  "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Psytrance FX 30.wav",
+  "size": 1054756,
+  "mtime_ns": 1791391358125079602
+ },
+ "B-DNB/FX/FX Squid ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Stab & Hit/Hit Squid.wav",
+  "size": 452744,
+  "mtime_ns": 1791387350918988047
+ },
+ "B-DNB/FX/FX Trancefor 02 ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Stab & Hit/Stab Tranceformer 2.wav",
+  "size": 347916,
+  "mtime_ns": 1791387345392153021
+ },
+ "B-DNB/FX/FX Uriel ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Ambience/Ambience Uriel.wav",
+  "size": 2048164,
+  "mtime_ns": 1791387540659432722
+ },
+ "B-DNB/FX/FX Warewolf 10 ni.wav": {
+  "source": "Native instrument/chromatique fire/one shot/SFX/SFX Warewolf 10.wav",
+  "size": 139860,
+  "mtime_ns": 1791387883140021709
+ },
+ "B-DNB/LOOPS/BL 170 D Ta 01 bas.wav": {
+  "source": "bass/loops/170_D_BassTalker_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300164951653478
+ },
+ "B-DNB/LOOPS/BL 170 E St 01 bas.wav": {
+  "source": "bass/loops/170_E_StickyBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300167732977081
+ },
+ "B-DNB/LOOPS/BL 170 E St 02 bas.wav": {
+  "source": "bass/loops/170_E_StickyBass_02_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300169996910325
+ },
+ "B-DNB/LOOPS/BL 170 F# 01 3 bas.wav": {
+  "source": "bass/loops/170_F#_ErrorBass_01_516 - 1.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300178256989017
+ },
+ "B-DNB/LOOPS/BL 170 F# 01 4 bas.wav": {
+  "source": "bass/loops/170_F#_ErrorConsoleBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300182716815830
+ },
+ "B-DNB/LOOPS/BL 170 F# 01 6 bas.wav": {
+  "source": "bass/loops/170_F#_RapidFireBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300189467695249
+ },
+ "B-DNB/LOOPS/BL 170 F# 02 bas.wav": {
+  "source": "bass/loops/170_F#_ErrorConsoleBass_02_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300184966741374
+ },
+ "B-DNB/LOOPS/BL 170 G# 01 bas.wav": {
+  "source": "bass/loops/170_G#_ChopChopBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300220747618808
+ },
+ "B-DNB/LOOPS/BR 165 Jung 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/165_Break_295_SP_01.wav",
+  "size": 1117264,
+  "mtime_ns": 1791389349945368715
+ },
+ "B-DNB/LOOPS/BR 170 Jung 02 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_Break_295_SP_02.wav",
+  "size": 1084412,
+  "mtime_ns": 1791389324890622518
+ },
+ "B-DNB/LOOPS/BR 170 Jung 05 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_Break_295_SP_05.wav",
+  "size": 1084412,
+  "mtime_ns": 1791389312335912921
+ },
+ "B-DNB/LOOPS/BR 175 Dn T 02 rth.wav": {
+  "source": "rthm/loops/jungle dnb/BBF_175_DnB_Break_Top_02.wav",
+  "size": 1053432,
+  "mtime_ns": 1791389170620725408
+ },
+ "B-DNB/LOOPS/BR 175 Mult 06 rth.wav": {
+  "source": "rthm/loops/jungle dnb/06_CBDNB_Break_Loop_175_multitrack.wav",
+  "size": 2106688,
+  "mtime_ns": 1791389389407740216
+ },
+ "B-DNB/LOOPS/DL 170 Bell 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_BellBoyBeat_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389333506186863
+ },
+ "B-DNB/LOOPS/DL 170 Busy 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_BusyBeat_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389309814372209
+ },
+ "B-DNB/LOOPS/DL 170 Chas 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_ChaserBeat_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791389304124278083
+ },
+ "B-DNB/LOOPS/DL 170 Fat 02 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_FatLipBeat_02_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389270988700585
+ },
+ "B-DNB/LOOPS/DL 170 Howl 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_HowlerBeat_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389259903858929
+ },
+ "B-DNB/LOOPS/DL 170 Lone 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_LoneSoldierBeat_1_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389246664370247
+ },
+ "B-DNB/LOOPS/DL 170 Metr 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_MetroBeat_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389240380573656
+ },
+ "B-DNB/LOOPS/DL 170 Sawn 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_SawnOffBeat_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389207641293150
+ },
+ "B-DNB/LOOPS/DL 170 Tin 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/170_TinBeat_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791389185605797962
+ },
+ "B-DNB/LOOPS/DL 170 Virt 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/Fills/170_VirtuosoFill_01_516.wav",
+  "size": 271228,
+  "mtime_ns": 1791384783465899051
+ },
+ "B-DNB/LOOPS/DL 172 Drum 02 rth.wav": {
+  "source": "rthm/loops/jungle dnb/172_DRUMLOOP_25_STP_02_multitrack.wav",
+  "size": 1071800,
+  "mtime_ns": 1791389178070490175
+ },
+ "B-DNB/LOOPS/DL 172 Fill 10 rth.wav": {
+  "source": "rthm/loops/jungle dnb/GS_FLUX_172_Drum_Fill_10_multitrack.wav",
+  "size": 134124,
+  "mtime_ns": 1791389156116230185
+ },
+ "B-DNB/LOOPS/DL 172 Fill 14 rth.wav": {
+  "source": "rthm/loops/jungle dnb/GS_FLUX_172_Drum_Fill_14_multitrack.wav",
+  "size": 134124,
+  "mtime_ns": 1791389155501632437
+ },
+ "B-DNB/LOOPS/DL 174 Mult 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/12L_174_Drums_1_multitrack.wav",
+  "size": 1059484,
+  "mtime_ns": 1791389380245689215
+ },
+ "B-DNB/LOOPS/DL 174 Mult 06 rth.wav": {
+  "source": "rthm/loops/jungle dnb/12L_174_Drums_6_multitrack.wav",
+  "size": 1059484,
+  "mtime_ns": 1791389372826611492
+ },
+ "B-DNB/LOOPS/DL 174 Mult 07 rth.wav": {
+  "source": "rthm/loops/jungle dnb/12L_174_Drums_7_multitrack.wav",
+  "size": 1059484,
+  "mtime_ns": 1791389370362554307
+ },
+ "B-DNB/LOOPS/DL 174 Mult 2 rth.wav": {
+  "source": "rthm/loops/jungle dnb/GS_DBRS_174_Drum_Loop_10_V1_multitrack.wav",
+  "size": 2118792,
+  "mtime_ns": 1791389168137041391
+ },
+ "B-DNB/LOOPS/DL 176 Fill 03 rth.wav": {
+  "source": "rthm/loops/jungle dnb/HNDNB_Fill03_176_multitrack.wav",
+  "size": 2048172,
+  "mtime_ns": 1791389103990685858
+ },
+ "B-DNB/LOOPS/PL 170 Airy 01 rth.wav": {
+  "source": "rthm/loops/jungle dnb/Tops/170_AiryTop_01_516.wav",
+  "size": 542288,
+  "mtime_ns": 1791384782431055025
+ },
+ "B-DNB/TONAL/BS F Bn Slo 00 bas.wav": {
+  "source": "bass/oneshot/BN_E0_SLOWFILT.wav",
+  "size": 371672,
+  "mtime_ns": 1791300383751168007,
+  "shift": 1
+ },
+ "B-DNB/TONAL/BS F Flip 01 bas.wav": {
+  "source": "bass/oneshot/170_D_FlipBass_01_516.wav",
+  "size": 66872,
+  "mtime_ns": 1791300356603414640,
+  "shift": 3
+ },
+ "B-DNB/TONAL/BS F Flyby 01 bas.wav": {
+  "source": "bass/oneshot/170_G_FlybyBass_01_516.wav",
+  "size": 135720,
+  "mtime_ns": 1791300376425907432,
+  "shift": -2
+ },
+ "B-DNB/TONAL/BS F Merzba M bas.wav": {
+  "source": "bass/oneshot/GS_ABYSS_140_F#_BASS_MERZBA_multitrack.wav",
+  "size": 1316744,
+  "mtime_ns": 1791300398811496191,
+  "shift": -1
+ },
+ "B-DNB/TONAL/BS F No Ra 01 bas.wav": {
+  "source": "bass/oneshot/170_G#_NoRawBass_01_516.wav",
+  "size": 67968,
+  "mtime_ns": 1791300369600846362,
+  "shift": -3
+ },
+ "B-DNB/TONAL/BS F Off 01 bas.wav": {
+  "source": "bass/oneshot/170_G_OffBass_01_516.wav",
+  "size": 67792,
+  "mtime_ns": 1791300378927392785,
+  "shift": -2
+ },
+ "B-DNB/TONAL/BS F Ow 01 bas.wav": {
+  "source": "bass/oneshot/170_D_OwBass_01_516.wav",
+  "size": 66216,
+  "mtime_ns": 1791300356987331226,
+  "shift": 3
+ },
+ "B-DNB/TONAL/BS F Power 01 bas.wav": {
+  "source": "bass/oneshot/170_G#_PowerBass_01_516.wav",
+  "size": 271180,
+  "mtime_ns": 1791300370369601074,
+  "shift": -3
+ },
+ "B-DNB/TONAL/BS F Raw 01 bas.wav": {
+  "source": "bass/oneshot/170_G#_RawBass_01_516.wav",
+  "size": 67900,
+  "mtime_ns": 1791300370760809842,
+  "shift": -3
+ },
+ "B-DNB/TONAL/BS F Rolle 02 bas.wav": {
+  "source": "bass/oneshot/170_F#_RollerBass_02_516.wav",
+  "size": 135648,
+  "mtime_ns": 1791300362153418724,
+  "shift": -1
+ },
+ "B-DNB/TONAL/BS F Syn 09 bas.wav": {
+  "source": "bass/oneshot/X1K_F_Syn_Bass_09.wav",
+  "size": 672172,
+  "mtime_ns": 1791300433912427346
+ },
+ "B-DNB/VX/VX Mouth 20 rth.wav": {
+  "source": "rthm/cartoon/Vocal/Mouth Fx 20.wav",
+  "size": 219408,
+  "mtime_ns": 1791390476590305034
+ },
+ "C-TRIBE/DRUMS/BD Box 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/BoxKick_SP_03.wav",
+  "size": 37728,
+  "mtime_ns": 1791384680981351932
+ },
+ "C-TRIBE/DRUMS/BD Bubble 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/BubbleKick_SP_03.wav",
+  "size": 67648,
+  "mtime_ns": 1791384678600788064
+ },
+ "C-TRIBE/DRUMS/BD G Air 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/AirKick_SP_01.wav",
+  "size": 87692,
+  "mtime_ns": 1791384685956563904,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/BD G Apart 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav",
+  "size": 73288,
+  "mtime_ns": 1791384680620183556,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/BD G Apart 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_02.wav",
+  "size": 80080,
+  "mtime_ns": 1791384680187857171,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/BD G Attac 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/AttacKick_SP_01.wav",
+  "size": 81140,
+  "mtime_ns": 1791384684638568966,
+  "shift": -2
+ },
+ "C-TRIBE/DRUMS/BD G Box 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/BoxKick_SP_01.wav",
+  "size": 46284,
+  "mtime_ns": 1791384681746031957,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/BD G Box 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/BoxKick_SP_02.wav",
+  "size": 44028,
+  "mtime_ns": 1791384681335981853,
+  "shift": 2
+ },
+ "C-TRIBE/DRUMS/BD G Dive 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/DiveKick_SP_01.wav",
+  "size": 92240,
+  "mtime_ns": 1791384674471178246,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/BD G Dive 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/DiveKick_SP_02.wav",
+  "size": 90696,
+  "mtime_ns": 1791384674017955495,
+  "shift": 4
+ },
+ "C-TRIBE/DRUMS/BD G Indust 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/IndustrialKick_SP_02.wav",
+  "size": 54008,
+  "mtime_ns": 1791384669334173473,
+  "shift": 5
+ },
+ "C-TRIBE/DRUMS/BD G Kicks 0 2 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/KickKick_SP_02.wav",
+  "size": 89876,
+  "mtime_ns": 1791384668215524819,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/BD G Kicks 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/90sKick_SP_02.wav",
+  "size": 48472,
+  "mtime_ns": 1791384686691056443,
+  "shift": -6
+ },
+ "C-TRIBE/DRUMS/BD G Matte 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/MatteKick_SP_02.wav",
+  "size": 90176,
+  "mtime_ns": 1791384666171960588,
+  "shift": -4
+ },
+ "C-TRIBE/DRUMS/BD G Shinra 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/ShinraKick_SP_01.wav",
+  "size": 53692,
+  "mtime_ns": 1791384653245120465,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/BD G Shinra 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/ShinraKick_SP_02.wav",
+  "size": 53676,
+  "mtime_ns": 1791384652857968266,
+  "shift": -2
+ },
+ "C-TRIBE/DRUMS/BD G Shinra 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/ShinraKick_SP_03.wav",
+  "size": 53676,
+  "mtime_ns": 1791384652434397794,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/BD Kicks 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/OpenKick_SP_01.wav",
+  "size": 73312,
+  "mtime_ns": 1791384662329695555
+ },
+ "C-TRIBE/DRUMS/CP Finger S 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/FingerSnap_SP_01.wav",
+  "size": 93240,
+  "mtime_ns": 1791384632723178235
+ },
+ "C-TRIBE/DRUMS/CP Finger S 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/FingerSnap_SP_02.wav",
+  "size": 71988,
+  "mtime_ns": 1791384632334671455
+ },
+ "C-TRIBE/DRUMS/CP Finger S 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/FingerSnap_SP_03.wav",
+  "size": 67504,
+  "mtime_ns": 1791384631972409537
+ },
+ "C-TRIBE/DRUMS/CY Bell 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/BellRide_SP_01.wav",
+  "size": 646188,
+  "mtime_ns": 1791384731371221403
+ },
+ "C-TRIBE/DRUMS/CY Bell 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/BellRide_SP_02.wav",
+  "size": 766172,
+  "mtime_ns": 1791384729867140674
+ },
+ "C-TRIBE/DRUMS/CY Bell 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/BellRide_SP_03.wav",
+  "size": 466376,
+  "mtime_ns": 1791384728181536072
+ },
+ "C-TRIBE/DRUMS/CY Cymbal 05 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/Crash_SP_05.wav",
+  "size": 685124,
+  "mtime_ns": 1791384716779197792
+ },
+ "C-TRIBE/DRUMS/CY Cymbal 06 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/Crash_SP_06.wav",
+  "size": 649180,
+  "mtime_ns": 1791384715195703059
+ },
+ "C-TRIBE/DRUMS/CY Laid Bac 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/LaidBackRide_SP_01.wav",
+  "size": 198936,
+  "mtime_ns": 1791384700933675047
+ },
+ "C-TRIBE/DRUMS/CY Raw 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/RawRide_SP_01.wav",
+  "size": 230468,
+  "mtime_ns": 1791384693882426358
+ },
+ "C-TRIBE/DRUMS/CY Wide 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/WideRide_SP_01.wav",
+  "size": 568912,
+  "mtime_ns": 1791384688444291973
+ },
+ "C-TRIBE/DRUMS/HH Hi 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_01.wav",
+  "size": 41560,
+  "mtime_ns": 1791384706093202267
+ },
+ "C-TRIBE/DRUMS/HH Hi 06 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_06.wav",
+  "size": 49248,
+  "mtime_ns": 1791384704451513645
+ },
+ "C-TRIBE/DRUMS/HH Hi 11 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_11.wav",
+  "size": 21060,
+  "mtime_ns": 1791384703107005259
+ },
+ "C-TRIBE/DRUMS/HH Hi 16 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_16.wav",
+  "size": 51836,
+  "mtime_ns": 1791384701644499596
+ },
+ "C-TRIBE/DRUMS/HH Noise 11 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/NoiseHat_SP_11.wav",
+  "size": 52328,
+  "mtime_ns": 1791384695765954371
+ },
+ "C-TRIBE/DRUMS/HH Noise 12 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/NoiseHat_SP_12.wav",
+  "size": 51896,
+  "mtime_ns": 1791384695489562664
+ },
+ "C-TRIBE/DRUMS/PC Chime 04 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/Chime_SP_04.wav",
+  "size": 161540,
+  "mtime_ns": 1791384640390643433
+ },
+ "C-TRIBE/DRUMS/PC Click Tr 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/ClickTrack_SP_03.wav",
+  "size": 106944,
+  "mtime_ns": 1791384639039878634
+ },
+ "C-TRIBE/DRUMS/PC Cowbell 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/Cowbell_SP_01.wav",
+  "size": 55896,
+  "mtime_ns": 1791384638623861992
+ },
+ "C-TRIBE/DRUMS/PC Crunchy 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/Crunchy_SP_01.wav",
+  "size": 134692,
+  "mtime_ns": 1791384637918596523
+ },
+ "C-TRIBE/DRUMS/PC Cutlery 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/CutleryFlam_SP_01.wav",
+  "size": 111992,
+  "mtime_ns": 1791384635602648083
+ },
+ "C-TRIBE/DRUMS/PC Demon 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/DemonPerc_SP_02.wav",
+  "size": 75176,
+  "mtime_ns": 1791384634727322609
+ },
+ "C-TRIBE/DRUMS/PC Demon 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/DemonPerc_SP_03.wav",
+  "size": 75172,
+  "mtime_ns": 1791384634365027900
+ },
+ "C-TRIBE/DRUMS/PC Fork Hit 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/ForkHit_SP_01.wav",
+  "size": 103652,
+  "mtime_ns": 1791384631611307619
+ },
+ "C-TRIBE/DRUMS/PC Glass Hi 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/GlassHit_SP_01.wav",
+  "size": 51804,
+  "mtime_ns": 1791384631189331021
+ },
+ "C-TRIBE/DRUMS/PC Glass Hi 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/GlassHit_SP_02.wav",
+  "size": 90004,
+  "mtime_ns": 1791384630872518915
+ },
+ "C-TRIBE/DRUMS/PC Glass Hi 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/GlassHit_SP_03.wav",
+  "size": 71048,
+  "mtime_ns": 1791384630473164015
+ },
+ "C-TRIBE/DRUMS/PC Junk 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/Junk_SP_01.wav",
+  "size": 100320,
+  "mtime_ns": 1791384628487782008
+ },
+ "C-TRIBE/DRUMS/PC Shaker C 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/ShakerCup_SP_01.wav",
+  "size": 168420,
+  "mtime_ns": 1791384621973956323
+ },
+ "C-TRIBE/DRUMS/PC Whisk 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/Whisk_SP_01.wav",
+  "size": 134120,
+  "mtime_ns": 1791384610599147865
+ },
+ "C-TRIBE/DRUMS/PC Whisk 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/Whisk_SP_02.wav",
+  "size": 378392,
+  "mtime_ns": 1791384610124931914
+ },
+ "C-TRIBE/DRUMS/PC Whisk Tr 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Percussion & Foley/WhiskTray_SP_01.wav",
+  "size": 118600,
+  "mtime_ns": 1791384611050000324
+ },
+ "C-TRIBE/DRUMS/RM Box 03 rth.wav": {
+  "source": "SoundDesign/rumble/RM Box 03 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419880248392
+ },
+ "C-TRIBE/DRUMS/RM Bubble 03 rth.wav": {
+  "source": "SoundDesign/rumble/RM Bubble 03 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419916192342
+ },
+ "C-TRIBE/DRUMS/RM G Air 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM G# Air 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419843847445,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/RM G Apart 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM G# Apart 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419891805904,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/RM G Apart 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM F# Apart 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419904109956,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/RM G Attac 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM A Attac 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419856445454,
+  "shift": -2
+ },
+ "C-TRIBE/DRUMS/RM G Box 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM G# Box 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419818297469,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/RM G Box 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM F Box 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419868420548,
+  "shift": 2
+ },
+ "C-TRIBE/DRUMS/RM G Dive 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM F# Dive 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419928329227,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/RM G Dive 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM D# Dive 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419940912195,
+  "shift": 4
+ },
+ "C-TRIBE/DRUMS/RM G Indust 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM D Indust 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419953217454,
+  "shift": 5
+ },
+ "C-TRIBE/DRUMS/RM G Kicks 0 2 rth.wav": {
+  "source": "SoundDesign/rumble/RM F# Kicks 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419965258715,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/RM G Kicks 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM C# Kicks 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419830585562,
+  "shift": -6
+ },
+ "C-TRIBE/DRUMS/RM G Matte 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM B Matte 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419976997060,
+  "shift": -4
+ },
+ "C-TRIBE/DRUMS/RM G Shinr 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM G# Shinr 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995420000452749,
+  "shift": -1
+ },
+ "C-TRIBE/DRUMS/RM G Shinr 03 rth.wav": {
+  "source": "SoundDesign/rumble/RM F# Shinr 03 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995420024738478,
+  "shift": 1
+ },
+ "C-TRIBE/DRUMS/RM G Shinra 02 rth.wav": {
+  "source": "SoundDesign/rumble/RM A Shinra 02 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995420012931134,
+  "shift": -2
+ },
+ "C-TRIBE/DRUMS/RM Kicks 01 rth.wav": {
+  "source": "SoundDesign/rumble/RM Kicks 01 rth b7d885.wav",
+  "size": 104774,
+  "mtime_ns": 1791995419988783030
+ },
+ "C-TRIBE/DRUMS/SD Air 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/AirSnare_SP_01.wav",
+  "size": 125420,
+  "mtime_ns": 1791384607805924643
+ },
+ "C-TRIBE/DRUMS/SD Air 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/AirSnare_SP_02.wav",
+  "size": 143712,
+  "mtime_ns": 1791384607293182295
+ },
+ "C-TRIBE/DRUMS/SD Basic Bs 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/BasicBSnare_SP_01.wav",
+  "size": 90176,
+  "mtime_ns": 1791384605235131404
+ },
+ "C-TRIBE/DRUMS/SD Bit Room 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/BitRoomSnare_SP_01.wav",
+  "size": 90004,
+  "mtime_ns": 1791384603890294603
+ },
+ "C-TRIBE/DRUMS/SD Chunk 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/ChunkSnare_SP_01.wav",
+  "size": 76052,
+  "mtime_ns": 1791384601988497765
+ },
+ "C-TRIBE/DRUMS/SD Crunch 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/CrunchSnare_SP_01.wav",
+  "size": 96172,
+  "mtime_ns": 1791384599683833779
+ },
+ "C-TRIBE/DRUMS/SD Diver 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/DiverSnare_SP_01.wav",
+  "size": 107724,
+  "mtime_ns": 1791384598024925996
+ },
+ "C-TRIBE/DRUMS/SD Flit 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/FlitSnare_SP_02.wav",
+  "size": 122004,
+  "mtime_ns": 1791384594597804232
+ },
+ "C-TRIBE/DRUMS/SD Fryda 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/FrydaSnare_SP_01.wav",
+  "size": 51632,
+  "mtime_ns": 1791384590260734718
+ },
+ "C-TRIBE/DRUMS/SD Gunshot 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/GunshotSnare_SP_01.wav",
+  "size": 141964,
+  "mtime_ns": 1791384589206452034
+ },
+ "C-TRIBE/DRUMS/SD Metal Bl 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/MetalBlipSnare_SP_01.wav",
+  "size": 90160,
+  "mtime_ns": 1791384587490299195
+ },
+ "C-TRIBE/DRUMS/SD Note 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/NoteSnare_SP_01.wav",
+  "size": 66412,
+  "mtime_ns": 1791384582338457804
+ },
+ "C-TRIBE/DRUMS/SD Pride 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/PrideSnare_SP_01.wav",
+  "size": 47032,
+  "mtime_ns": 1791384578881834052
+ },
+ "C-TRIBE/DRUMS/SD Skin 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/SkinSnare_SP_01.wav",
+  "size": 36568,
+  "mtime_ns": 1791384573202995695
+ },
+ "C-TRIBE/DRUMS/SD Snares 01 elk.wav": {
+  "source": "elektron pack/Mega Mechs/Mega Mechs 16bit 48khz Stereo/Snares/Snare 1.wav",
+  "size": 71392,
+  "mtime_ns": 1791368662576858491
+ },
+ "C-TRIBE/DRUMS/SD Uamsnare 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/UAMSnare_SP_02.wav",
+  "size": 70288,
+  "mtime_ns": 1791384563175717828
+ },
+ "C-TRIBE/FX/FX Behind Y 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/BehindYouImpact_01_531.wav",
+  "size": 1277328,
+  "mtime_ns": 1791304658440303843
+ },
+ "C-TRIBE/FX/FX Calm Downer j89.wav": {
+  "source": "Jungle 89  to 99/FX/Calm Downer.wav",
+  "size": 402856,
+  "mtime_ns": 1791393141973235826
+ },
+ "C-TRIBE/FX/FX Cloud Mac 02 ni.wav": {
+  "source": "Native instrument/drop squad/one shot/SFX/SFX CloudMachine 2.wav",
+  "size": 1863716,
+  "mtime_ns": 1791387404813914485
+ },
+ "C-TRIBE/FX/FX Club Tra 76 meg.wav": {
+  "source": "SAMPLES MEGABIT/Large FX Collection/LS-LFXC Club-Trance 076.wav",
+  "size": 1103964,
+  "mtime_ns": 1791391456366640926
+ },
+ "C-TRIBE/FX/FX Cyborg I 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/CyborgImpact_01_531.wav",
+  "size": 1013508,
+  "mtime_ns": 1791304666454525023
+ },
+ "C-TRIBE/FX/FX Lazer Reform ni.wav": {
+  "source": "Native instrument/lone forest/oneshot/SFX/Lazer Reformation.wav",
+  "size": 286100,
+  "mtime_ns": 1791386582415922358
+ },
+ "C-TRIBE/FX/FX Mass Dri 01 noi.wav": {
+  "source": "cinematic Noiiz/Subsonic Drops/MassDriverSubDrop_01_531.wav",
+  "size": 878480,
+  "mtime_ns": 1791304799765809746
+ },
+ "C-TRIBE/FX/FX Portal I 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/PortalImpact_01_531.wav",
+  "size": 1041420,
+  "mtime_ns": 1791304678868188065
+ },
+ "C-TRIBE/FX/FX Sharp 50 hcf.wav": {
+  "source": "Hardcore free samples/Hardstyle Fx/LS-HFX Sharp FX 50.wav",
+  "size": 784712,
+  "mtime_ns": 1791377479050083464
+ },
+ "C-TRIBE/FX/FX Trancega 01 meg.wav": {
+  "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Trancegate Fx 01.wav",
+  "size": 2013600,
+  "mtime_ns": 1791391346449838119
+ },
+ "C-TRIBE/FX/FX Trancega 13 meg.wav": {
+  "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Trancegate Clap 13.wav",
+  "size": 1287836,
+  "mtime_ns": 1791391353714519831
+ },
+ "C-TRIBE/FX/FX Warewolf 11 ni.wav": {
+  "source": "Native instrument/chromatique fire/one shot/SFX/SFX Warewolf 11.wav",
+  "size": 401080,
+  "mtime_ns": 1791387882743260071
+ },
+ "C-TRIBE/LOOPS/DL 123 Cymb 07 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/Crash_SP_07.wav",
+  "size": 1259720,
+  "mtime_ns": 1791384713751700928
+ },
+ "C-TRIBE/TONAL/BS G Angry Mul bas.wav": {
+  "source": "bass/oneshot/OSR_808_angry_F_multitrack.wav",
+  "size": 768172,
+  "mtime_ns": 1791300408715069927,
+  "shift": 2
+ },
+ "C-TRIBE/TONAL/BS G Arpeg 01 bas.wav": {
+  "source": "bass/loops/170_F#_ArpeggSynth_01_516.wav",
+  "size": 67940,
+  "mtime_ns": 1791300171111201551,
+  "shift": 1
+ },
+ "C-TRIBE/TONAL/BS G Gs Ces 01 bgr.wav": {
+  "source": "bass graves/GS_CESTRA_808_05_F_V1.wav",
+  "size": 175992,
+  "mtime_ns": 1791304554580555300,
+  "shift": 2
+ },
+ "C-TRIBE/TONAL/BS G Gs Ces 02 bgr.wav": {
+  "source": "bass graves/GS_CESTRA_FOGHORN_06_F_V2.wav",
+  "size": 804884,
+  "mtime_ns": 1791304557891990412,
+  "shift": 2
+ },
+ "C-TRIBE/TONAL/BS G Gs Ces 3 bgr.wav": {
+  "source": "bass graves/GS_CESTRA_FOGHORN_02_F_V2.wav",
+  "size": 876216,
+  "mtime_ns": 1791304556285074890,
+  "shift": 2
+ },
+ "C-TRIBE/TONAL/BS G Nate 06 bas.wav": {
+  "source": "bass/oneshot/Nate06.wav",
+  "size": 48996,
+  "mtime_ns": 1791300404942197409,
+  "shift": -1
+ },
+ "C-TRIBE/TONAL/BS G Onesh 01 bas.wav": {
+  "source": "bass/oneshot/170_G#_SubBass_01_516.wav",
+  "size": 135684,
+  "mtime_ns": 1791300371278749366,
+  "shift": -1
+ },
+ "C-TRIBE/TONAL/BS G Ouch 01 bas.wav": {
+  "source": "bass/oneshot/170_F_OuchBass_01_516.wav",
+  "size": 68000,
+  "mtime_ns": 1791300367239089718,
+  "shift": 2
+ },
+ "C-TRIBE/TONAL/BS G Passby 01 bas.wav": {
+  "source": "bass/oneshot/170_F_PassbyBass_01_516.wav",
+  "size": 67984,
+  "mtime_ns": 1791300367629448240,
+  "shift": 2
+ },
+ "C-TRIBE/TONAL/BS G Plump bas.wav": {
+  "source": "bass/oneshot/ST_plump_D.wav",
+  "size": 214120,
+  "mtime_ns": 1791300431159530683,
+  "shift": 5
+ },
+ "C-TRIBE/TONAL/BS G Pounde 01 bas.wav": {
+  "source": "bass/loops/170_G_PounderSynth_01_516.wav",
+  "size": 67960,
+  "mtime_ns": 1791300265879892493
+ },
+ "C-TRIBE/TONAL/BS G Syn 01 bas.wav": {
+  "source": "bass/oneshot/SKR_FM_Syn_Bass_D_1.wav",
+  "size": 765972,
+  "mtime_ns": 1791300427941298433,
+  "shift": 5
+ },
+ "C-TRIBE/TONAL/BS G Syn 03 bas.wav": {
+  "source": "bass/oneshot/OXI_E_Sub_Syn_Bass_3.wav",
+  "size": 187420,
+  "mtime_ns": 1791300409680149645,
+  "shift": 3
+ },
+ "C-TRIBE/TONAL/BS G Syn 04 bas.wav": {
+  "source": "bass/oneshot/X1K_D_Syn_Bass_04.wav",
+  "size": 83196,
+  "mtime_ns": 1791300431956876501,
+  "shift": 5
+ },
+ "C-TRIBE/TONAL/BS G Syn 10 bas.wav": {
+  "source": "bass/oneshot/AR2_Syn_Bass_10_Am.wav",
+  "size": 125980,
+  "mtime_ns": 1791300381251356481,
+  "shift": -2
+ },
+ "C-TRIBE/TONAL/BS G Syn 14 bas.wav": {
+  "source": "bass/oneshot/LUK_C_Syn_Bass_14.wav",
+  "size": 88948,
+  "mtime_ns": 1791300402825926971,
+  "shift": -5
+ },
+ "C-TRIBE/TONAL/BS G Trigun 01 bas.wav": {
+  "source": "bass/oneshot/MTD_sub_trigun_zip_E1.wav",
+  "size": 533856,
+  "mtime_ns": 1791300404578120543,
+  "shift": 3
+ },
+ "C-TRIBE/TONAL/BS G Wuab 04 bas.wav": {
+  "source": "bass/oneshot/Wuab04.wav",
+  "size": 65240,
+  "mtime_ns": 1791300431528088741,
+  "shift": -3
+ },
+ "C-TRIBE/TONAL/BS Nate 14 bas.wav": {
+  "source": "bass/oneshot/Nate14.wav",
+  "size": 80576,
+  "mtime_ns": 1791300405348924330
+ },
+ "C-TRIBE/VX/VX Blue j89.wav": {
+  "source": "Jungle 89  to 99/Vocals/Blue Vox.wav",
+  "size": 974840,
+  "mtime_ns": 1791392584066414325
+ },
+ "C-TRIBE/VX/VX Sardauka 01 mov.wav": {
+  "source": "Movie tracks/Dune/dune_sardaukar_chant_01.wav",
+  "size": 1221490,
+  "mtime_ns": 1791965968719895472
+ },
+ "C-TRIBE/VX/VX Sardauka 02 mov.wav": {
+  "source": "Movie tracks/Dune/dune_sardaukar_chant_02.wav",
+  "size": 1366928,
+  "mtime_ns": 1791965968727701783
+ },
+ "C-TRIBE/VX/VX Sardauka 03 mov.wav": {
+  "source": "Movie tracks/Dune/dune_sardaukar_chant_03.wav",
+  "size": 1410554,
+  "mtime_ns": 1791965968735331886
+ },
+ "C-TRIBE/VX/VX Sardauka 04 mov.wav": {
+  "source": "Movie tracks/Dune/dune_sardaukar_chant_04.wav",
+  "size": 1615368,
+  "mtime_ns": 1791965968743903278
+ },
+ "C-TRIBE/VX/VX Spoken M 10 voc.wav": {
+  "source": "vocal/US_10_VOICE_MALE_SPOKEN_131BPM_G#m_multitrack.wav",
+  "size": 1407196,
+  "mtime_ns": 1791379217401239537
+ },
+ "C-TRIBE/VX/VX Spoken Miss voc.wav": {
+  "source": "vocal/LFH_Spoken_Mission_multitrack.wav",
+  "size": 5760172,
+  "mtime_ns": 1791379016693316732
+ },
+ "C-TRIBE/VX/VX Way Bloodcl j89.wav": {
+  "source": "Jungle 89  to 99/Vocals/Way Bloodclart.wav",
+  "size": 563580,
+  "mtime_ns": 1791392367941558872
+ },
+ "D-RESPI/FX/FX Algerian ni.wav": {
+  "source": "Native instrument/rising/one shot/SFX/SFX Algerian.wav",
+  "size": 308188,
+  "mtime_ns": 1791386406633955782
+ },
+ "D-RESPI/FX/FX Almond L 01 noi.wav": {
+  "source": "cinematic Noiiz/Low End Thumps/AlmondLightLowThump_01_531.wav",
+  "size": 930196,
+  "mtime_ns": 1791304697491738836
+ },
+ "D-RESPI/FX/FX Black Sky ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Drums/Combo/Combo BlackSky.wav",
+  "size": 1366704,
+  "mtime_ns": 1791383984739307269
+ },
+ "D-RESPI/FX/FX Clasic D 01 rth.wav": {
+  "source": "rthm/cartoon/Classic SFX/Clasic Droid 01.wav",
+  "size": 582468,
+  "mtime_ns": 1791390833459464192
+ },
+ "D-RESPI/FX/FX Darkness 43 hcf.wav": {
+  "source": "Hardcore free samples/Hardstyle Fx/LS-HFX Darkness Sound 43.wav",
+  "size": 3047596,
+  "mtime_ns": 1791377456653149116
+ },
+ "D-RESPI/FX/FX Dcat Syn 23 sfx.wav": {
+  "source": "sfx/DCAT1_SYN023.wav",
+  "size": 1814572,
+  "mtime_ns": 1791378793049043362
+ },
+ "D-RESPI/FX/FX Effect 07 meg.wav": {
+  "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Effect 1 07.wav",
+  "size": 1237172,
+  "mtime_ns": 1791391369965952645
+ },
+ "D-RESPI/FX/FX Glassdrum 01 ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Drums/Hand Drum/Glassdrum Tribe 1.wav",
+  "size": 459684,
+  "mtime_ns": 1791383951753012388
+ },
+ "D-RESPI/FX/FX Mystis ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Ambience/Ambience Mystis.wav",
+  "size": 1911844,
+  "mtime_ns": 1791387544563235929
+ },
+ "D-RESPI/FX/FX Over Cliff rth.wav": {
+  "source": "rthm/cartoon/Scenes _ Themes/Over the Cliff.wav",
+  "size": 2136172,
+  "mtime_ns": 1791390531349509027
+ },
+ "D-RESPI/FX/FX Slam Dun 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/SlamDunkImpact_01_531.wav",
+  "size": 1147356,
+  "mtime_ns": 1791304688743753443
+ },
+ "D-RESPI/FX/FX Slapper ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Synth Note/Pad F Slapper MSV.wav",
+  "size": 987604,
+  "mtime_ns": 1791387238757659999
+ },
+ "D-RESPI/LOOPS/BL 170 F Sy 13 bas.wav": {
+  "source": "bass/loops/170_F_Synthshot 13_516.wav",
+  "size": 467168,
+  "mtime_ns": 1791300207037836340
+ },
+ "D-RESPI/LOOPS/BL 170 G# 01 bas.wav": {
+  "source": "bass/loops/170_G#_HummerBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300228224455424
+ },
+ "D-RESPI/TONAL/BS G Drive 01 bas.wav": {
+  "source": "bass/oneshot/SDBH_A1_Drive_Sub_Bass.wav",
+  "size": 769100,
+  "mtime_ns": 1791300411815205182,
+  "shift": -2
+ },
+ "D-RESPI/TONAL/BS G Emu Proce bas.wav": {
+  "source": "bass/oneshot/SI_A_Emu_Sub_Bass_processed_.wav",
+  "size": 768172,
+  "mtime_ns": 1791300414305128993,
+  "shift": -2
+ },
+ "D-RESPI/TONAL/BS G Synth 02 bas.wav": {
+  "source": "bass/oneshot/GS_DBRS_D_SynthBass_02_multitrack.wav",
+  "size": 132584,
+  "mtime_ns": 1791300399359981731,
+  "shift": 5
+ },
+ "D-RESPI/TONAL/BS Onesho 28 bas.wav": {
+  "source": "bass/oneshot/STSU_Sub_28.wav",
+  "size": 1228980,
+  "mtime_ns": 1791300430473987633
+ },
+ "D-RESPI/VX/VX Gits Cho 01 mov.wav": {
+  "source": "Movie tracks/Ghost In the shell/gits_choir_01.wav",
+  "size": 1796884,
+  "mtime_ns": 1791961687156608080
+ },
+ "D-RESPI/VX/VX Gits Cho 02 mov.wav": {
+  "source": "Movie tracks/Ghost In the shell/gits_choir_02.wav",
+  "size": 4393488,
+  "mtime_ns": 1791961687078006908
+ },
+ "D-RESPI/VX/VX Monk Chant voc.wav": {
+  "source": "vocal/300 vocal one shot/300VS_Monk Chant.wav",
+  "size": 1680172,
+  "mtime_ns": 1791391239567281396
+ },
+ "E-SATURE/DRUMS/BD A Filte 41 hcf.wav": {
+  "source": "Hardcore free samples/Hardstyle Kicks/LS-HK Filtered Kick 41 F#.wav",
+  "size": 92516,
+  "mtime_ns": 1791377490677134864,
+  "shift": 3
+ },
+ "E-SATURE/DRUMS/BD A Nasty 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/NastyKick_SP_01.wav",
+  "size": 127728,
+  "mtime_ns": 1791384665307344150,
+  "shift": 4
+ },
+ "E-SATURE/DRUMS/BD A Nasty 02 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/NastyKick_SP_02.wav",
+  "size": 128692,
+  "mtime_ns": 1791384664783516806,
+  "shift": 4
+ },
+ "E-SATURE/DRUMS/BD A Nasty 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Kicks/NastyKick_SP_03.wav",
+  "size": 69044,
+  "mtime_ns": 1791384664251462300,
+  "shift": -1
+ },
+ "E-SATURE/DRUMS/HH Noise 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Cymbals/NoiseHat_SP_01.wav",
+  "size": 118600,
+  "mtime_ns": 1791384699232269618
+ },
+ "E-SATURE/DRUMS/SD Alien 01 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/AlienSnare_SP_01.wav",
+  "size": 112896,
+  "mtime_ns": 1791384606737745466
+ },
+ "E-SATURE/DRUMS/SD Iron 03 rth.wav": {
+  "source": "rthm/packs/neurotek/Snares/IronSnare_SP_03.wav",
+  "size": 56624,
+  "mtime_ns": 1791384587897296508
+ },
+ "E-SATURE/FX/FX Calm Fake M j89.wav": {
+  "source": "Jungle 89  to 99/FX/Calm Fake Mentasm.wav",
+  "size": 317752,
+  "mtime_ns": 1791393140848221474
+ },
+ "E-SATURE/FX/FX Chrome I 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/ChromeImpact_01_531.wav",
+  "size": 1220624,
+  "mtime_ns": 1791304662718574620
+ },
+ "E-SATURE/FX/FX Cloud Machin ni.wav": {
+  "source": "Native instrument/drop squad/one shot/Ambience/Ambience CloudMachine.wav",
+  "size": 1316744,
+  "mtime_ns": 1791387547293375828
+ },
+ "E-SATURE/FX/FX Dark Thu 01 noi.wav": {
+  "source": "cinematic Noiiz/Low End Thumps/DarkLowThump_01_531.wav",
+  "size": 908160,
+  "mtime_ns": 1791304706581282215
+ },
+ "E-SATURE/FX/FX Fade Out 37 hcf.wav": {
+  "source": "Hardcore free samples/Hardstyle Fx/LS-HFX Fade Out 37.wav",
+  "size": 1979312,
+  "mtime_ns": 1791377466390357676
+ },
+ "E-SATURE/FX/FX Recharge Hi j89.wav": {
+  "source": "Jungle 89  to 99/FX/Recharge Hit.wav",
+  "size": 361900,
+  "mtime_ns": 1791393028774596670
+ },
+ "E-SATURE/FX/FX Rolling 01 noi.wav": {
+  "source": "cinematic Noiiz/Hybrid Trailer Impacts/RollingThunderImpact_01_531.wav",
+  "size": 1900488,
+  "mtime_ns": 1791304682591418793
+ },
+ "E-SATURE/FX/FX Scanner 01 noi.wav": {
+  "source": "cinematic Noiiz/Transitions/ScannerTransition_01_531.wav",
+  "size": 821072,
+  "mtime_ns": 1791304841039370977
+ },
+ "E-SATURE/FX/FX Spacerip 01 noi.wav": {
+  "source": "cinematic Noiiz/Subsonic Drops/SpaceripSubDrop_01_531.wav",
+  "size": 853972,
+  "mtime_ns": 1791304816840544369
+ },
+ "E-SATURE/LOOPS/BL 170 G Co 01 bas.wav": {
+  "source": "bass/loops/170_G_CoderBass_01_516.wav",
+  "size": 1084404,
+  "mtime_ns": 1791300258687662610
+ },
+ "E-SATURE/LOOPS/BL 175 Fill 01 rth.wav": {
+  "source": "rthm/loops/hardcore/11_CBDNB_Bassdrum_Fill_175_multitrack - 1.wav",
+  "size": 198604,
+  "mtime_ns": 1791389491609282380
+ },
+ "E-SATURE/LOOPS/BL 175 Fill 02 rth.wav": {
+  "source": "rthm/loops/hardcore/02_CBDNB_Bassdrum_Fill_175_multitrack(2).wav",
+  "size": 526800,
+  "mtime_ns": 1791389493813036245
+ },
+ "E-SATURE/LOOPS/BL 175 Fill 03 rth.wav": {
+  "source": "rthm/loops/hardcore/03_CBDNB_Bassdrum_Fill_175_multitrack.wav",
+  "size": 526800,
+  "mtime_ns": 1791389492702301564
+ },
+ "E-SATURE/LOOPS/BL 175 Fill 2 rth.wav": {
+  "source": "rthm/loops/hardcore/02_CBDNB_Bassdrum_Fill_175_multitrack.wav",
+  "size": 526800,
+  "mtime_ns": 1791389494933012510
+ },
+ "E-SATURE/TONAL/BS A Berlin 01 bas.wav": {
+  "source": "bass/oneshot/170_G_BerlinBass_01_516.wav",
+  "size": 271228,
+  "mtime_ns": 1791300373592893347,
+  "shift": 2
+ },
+ "E-SATURE/TONAL/BS A Electr 01 bas.wav": {
+  "source": "bass/oneshot/170_G_ElectricShockBass_01_516.wav",
+  "size": 135648,
+  "mtime_ns": 1791300374112072950,
+  "shift": 2
+ },
+ "E-SATURE/TONAL/BS A Fail 01 bas.wav": {
+  "source": "bass/oneshot/170_E_FailBass_01_516.wav",
+  "size": 117468,
+  "mtime_ns": 1791300358758852104,
+  "shift": 5
+ },
+ "E-SATURE/TONAL/BS A Static 01 bas.wav": {
+  "source": "bass/oneshot/170_G_StaticBass_01_516.wav",
+  "size": 134124,
+  "mtime_ns": 1791300379961453090,
+  "shift": 2
+ },
+ "E-SATURE/VX/VX Smith Sp 01 mov.wav": {
+  "source": "Movie tracks/Matrix/matrix_smith_speech_01.wav",
+  "size": 880216,
+  "mtime_ns": 1791963406900882753
+ },
+ "E-SATURE/VX/VX Smith Sp 02 mov.wav": {
+  "source": "Movie tracks/Matrix/matrix_smith_speech_02.wav",
+  "size": 976098,
+  "mtime_ns": 1791963406917577550
+ },
+ "E-SATURE/VX/VX Smith Sp 03 mov.wav": {
+  "source": "Movie tracks/Matrix/matrix_smith_speech_03.wav",
+  "size": 1390360,
+  "mtime_ns": 1791963406936372670
+ },
+ "E-SATURE/VX/VX Smith Sp 04 mov.wav": {
+  "source": "Movie tracks/Matrix/matrix_smith_speech_04.wav",
+  "size": 998472,
+  "mtime_ns": 1791963406948539196
+ },
+ "E-SATURE/VX/VX Smith Sp 05 mov.wav": {
+  "source": "Movie tracks/Matrix/matrix_smith_speech_05.wav",
+  "size": 1172914,
+  "mtime_ns": 1791963407047462441
+ },
+ "E-SATURE/VX/VX Spoken Powe voc.wav": {
+  "source": "vocal/CV_Spoken_Powers of a God_multitrack.wav",
+  "size": 1536172,
+  "mtime_ns": 1791378974059263817
+ }
+}

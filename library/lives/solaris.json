@@ -1,0 +1,4784 @@
+{
+ "name": "solaris",
+ "pack": "zrg",
+ "banks": [
+  "A-HALF",
+  "B-DNB",
+  "C-TRIBE",
+  "D-RESPI",
+  "E-SATURE",
+  "F-JOKER"
+ ],
+ "keys": {
+  "A-HALF": "F m",
+  "B-DNB": "F phrg",
+  "C-TRIBE": "G m",
+  "D-RESPI": "G phrg",
+  "E-SATURE": "A m"
+ },
+ "tempos": {
+  "B-DNB": 170.0,
+  "C-TRIBE": 165.0,
+  "D-RESPI": 170.0,
+  "E-SATURE": 172.0,
+  "A-HALF": 80.0
+ },
+ "rumbles": {
+  "C-TRIBE": [
+   "gritty"
+  ]
+ },
+ "items": [
+  {
+   "source": "SoundDesign/variations/BD V8 Clean 01 909 b4e0be.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD V8 Clean 01 909",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 614400,
+   "note": "A#",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "909/BVKER - 909 Kit/Drum Shots/Cymbals/Crashes/BVKER - 909 Kit - Crash 01.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Crashe 01 909",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 230400,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_103_01_multitrack(2).wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Maasai T 3 voc",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 447380,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_123_25_multitrack.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Maasai T 25 voc",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1498536,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "vocal/300 vocal one shot/300VS_Monk Chant.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Monk Chant voc",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1680000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/cartoon/Vocal/Mouth Fx 20.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Mouth 20 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 219236,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "vocal/LFH_Spoken_Mission_multitrack.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Spoken Miss voc",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 5760000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "vocal/CV_Spoken_Powers of a God_multitrack.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Spoken Powe voc",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1536000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "vocal/US_10_VOICE_MALE_SPOKEN_131BPM_G#m_multitrack.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Spoken M 10 voc",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1407024,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "KORGER1Samples/HH-ER1-909open.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Korger 01 er1",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 63214,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "909/BPB Cassette 909/clean/hh04.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Clean 04 909",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 21874,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "909/BPB Cassette 909/clean/oh04.wav",
+   "code": "OH",
+   "branch": "DRUMS",
+   "name": "OH Clean 04 909",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 60066,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Hardcore free samples/Hardstyle Kicks/LS-HK Filtered Kick 41 F#.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD A Filte 41 hcf",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 77652,
+   "note": "F#",
+   "shift": 3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "909/BVKER - 909 Kit/Drum Shots/Snares/BVKER - 909 Kit - Snare 01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Snares 01 909",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 66700,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Lo-Fi Snare 13.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Lo Fi 13 meg",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 103656,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "elektron pack/Mega Mechs/Mega Mechs 16bit 48khz Stereo/Snares/Snare 1.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Snares 01 elk",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 71220,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/Snare/EDB_Snare_06.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Snare 06 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 264088,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Snares/EffectedSnare_02_516.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Effected 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 104636,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Snare/Snare_02.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Snare 02 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 164572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/AlienSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Alien 01 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 112724,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Snares/EffectedSnare_03_516.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Effected 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 78164,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Snare/Snare_03.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Snare 03 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 102860,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Kick/Kick_03.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD F Kick 03 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 103680,
+   "note": "A",
+   "shift": -4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Kick/Kick_11.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD F Kick 11 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 109836,
+   "note": "A#",
+   "shift": -5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Kick/Kick_07.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD Kick 07 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 41144,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Kick/Kick_34.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD F Kick 34 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 103564,
+   "note": "A",
+   "shift": -4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_05.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hats 05 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 41144,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_14.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hats 14 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 61716,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Kicks/BassKick_516.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD F Kicks rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 52832,
+   "note": "F",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Snares/EffectedSnare_01_516.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Effected 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 104696,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Kicks/RoundedKick_516.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD F Rounded rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 31512,
+   "note": "C#",
+   "shift": 4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Percussion/ClapTamb_516.wav",
+   "code": "CP",
+   "branch": "DRUMS",
+   "name": "CP Tamb rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 79484,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Crash Cymbals/CrashCymbal_01_516.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Crash 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209444,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Rides/RideCymbal_01_516.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Rides 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209452,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Crash Cymbals/CrashCymbal_03_516.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Crash 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209444,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Rides/RideCymbal_03_516.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Rides 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209452,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Closed HiHats/HiHatClosed_03_516.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Closed 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 208872,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Closed HiHats/HiHatClosed_01_516.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Closed 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209324,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Closed HiHats/HiHatClosed_11_516.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Closed 11 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 82232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Open HiHats/HiHatOpen_01_516.wav",
+   "code": "OH",
+   "branch": "DRUMS",
+   "name": "OH Open 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209392,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Open HiHats/HiHatOpen_03_516.wav",
+   "code": "OH",
+   "branch": "DRUMS",
+   "name": "OH Open 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 209452,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Percussion/EffectedPercussion_02_516.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Effected 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 35472,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Percussion/EffectedPercussion_01_516.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Effected 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 17432,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Shakers/Shaker_04_516.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Shaker 04 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 79796,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Shakers/Shaker_05_516.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Shaker 05 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 104648,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Percussion/WoodenBlock_02_516.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Wooden B 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 104712,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/nightmares dnb/Percussion/WoodenBlock_03_516.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Wooden B 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 104728,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_01.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hats 01 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 41144,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_12.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hats 12 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 20572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Hats & Cymbal/Hats_34.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hats 34 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 41144,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 01 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 102860,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_02.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 02 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 92572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_03.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 03 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 102860,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_06.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 06 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 164572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_10.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 10 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 72004,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_27.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 27 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 102860,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_38.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 38 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 164572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/tortured dubstep/Perc & FX/Perc_39.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Perc 39 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 82288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/BoxKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Box 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 48856,
+   "note": "G#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/90sKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Kicks 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 68308,
+   "note": "C#",
+   "shift": -6,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/AirKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Air 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 92728,
+   "note": "G#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/AttacKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Attac 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 90884,
+   "note": "A",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/BoxKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Box 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 39072,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/BoxKick_SP_03.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD Box 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 37556,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Apart 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 77464,
+   "note": "G#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Apart 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 75424,
+   "note": "F#",
+   "shift": 1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/BubbleKick_SP_03.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD Bubble 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 67476,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/DiveKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Dive 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 86904,
+   "note": "F#",
+   "shift": 1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/DiveKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Dive 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 71852,
+   "note": "D#",
+   "shift": 4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/IndustrialKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Indust 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 40332,
+   "note": "D",
+   "shift": 5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/KickKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Kicks 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 84672,
+   "note": "F#",
+   "shift": 1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/MatteKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Matte 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 113400,
+   "note": "B",
+   "shift": -4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/NastyKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD A Nasty 01 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 101244,
+   "note": "F",
+   "shift": 4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/NastyKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD A Nasty 02 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 102008,
+   "note": "F",
+   "shift": 4,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/NastyKick_SP_03.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD A Nasty 03 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 72968,
+   "note": "A#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/OpenKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD Kicks 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 73140,
+   "note": "G",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/ShinraKick_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Shinra 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 56704,
+   "note": "G#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/ShinraKick_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Shinra 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 60060,
+   "note": "A",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/ShinraKick_SP_03.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD G Shinra 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 50504,
+   "note": "F#",
+   "shift": 1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/ToolKIck_SP_01.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD Tool 01 rth",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 48884,
+   "note": "G",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Kicks/ToolKIck_SP_02.wav",
+   "code": "BD",
+   "branch": "DRUMS",
+   "name": "BD Tool 02 rth",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 48748,
+   "note": "F",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/AirSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Air 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 125248,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/AirSnare_SP_02.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Air 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 143540,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/BasicBSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Basic Bs 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 90004,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/BitRoomSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Bit Room 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 89832,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/ChunkSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Chunk 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 75880,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/CrunchSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Crunch 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 96000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/DiverSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Diver 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 107552,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/FlitSnare_SP_02.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Flit 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 121832,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/FrydaSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Fryda 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 51460,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/GunshotSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Gunshot 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 141792,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/IronSnare_SP_03.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Iron 03 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 56452,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/MetalBlipSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Metal Bl 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 89988,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/NoteSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Note 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 66240,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/PrideSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Pride 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 46860,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/SkinSnare_SP_01.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Skin 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 36396,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Snares/UAMSnare_SP_02.wav",
+   "code": "SD",
+   "branch": "DRUMS",
+   "name": "SD Uamsnare 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 70116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/FingerSnap_SP_01.wav",
+   "code": "CP",
+   "branch": "DRUMS",
+   "name": "CP Finger S 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 93068,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/FingerSnap_SP_02.wav",
+   "code": "CP",
+   "branch": "DRUMS",
+   "name": "CP Finger S 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 71816,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/FingerSnap_SP_03.wav",
+   "code": "CP",
+   "branch": "DRUMS",
+   "name": "CP Finger S 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 67332,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/BellRide_SP_01.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Bell 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 646016,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/BellRide_SP_02.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Bell 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 766000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/BellRide_SP_03.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Bell 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 466204,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/Crash_SP_05.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Cymbal 05 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 684952,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/Crash_SP_06.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Cymbal 06 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 649008,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/LaidBackRide_SP_01.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Laid Bac 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 198764,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/RawRide_SP_01.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Raw 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 230296,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/WideRide_SP_01.wav",
+   "code": "CY",
+   "branch": "DRUMS",
+   "name": "CY Wide 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 568740,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_01.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hi 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 41388,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_06.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hi 06 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 49076,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_11.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hi 11 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 20888,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/HiHat_SP_16.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Hi 16 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 51664,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/NoiseHat_SP_01.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Noise 01 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 118428,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/NoiseHat_SP_11.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Noise 11 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 52156,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/NoiseHat_SP_12.wav",
+   "code": "HH",
+   "branch": "DRUMS",
+   "name": "HH Noise 12 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 51724,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/CutleryFlam_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Cutlery 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 111820,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/Crunchy_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Crunchy 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 134520,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/DemonPerc_SP_02.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Demon 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 75004,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/DemonPerc_SP_03.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Demon 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 75000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/ForkHit_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Fork Hit 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 103480,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/GlassHit_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Glass Hi 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 51632,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/GlassHit_SP_02.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Glass Hi 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 89832,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/GlassHit_SP_03.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Glass Hi 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 70876,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/Junk_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Junk 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 100148,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/Whisk_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Whisk 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 133948,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/Whisk_SP_02.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Whisk 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 378220,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/WhiskTray_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Whisk Tr 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 118428,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/Chime_SP_04.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Chime 04 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 161368,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/Cowbell_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Cowbell 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 55724,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/ShakerCup_SP_01.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Shaker C 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 168248,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Percussion & Foley/ClickTrack_SP_03.wav",
+   "code": "PC",
+   "branch": "DRUMS",
+   "name": "PC Click Tr 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 106772,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/packs/neurotek/Cymbals/Crash_SP_07.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 123 Cymb 07 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1259548,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/110 Trivial Break.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 110 Trivial rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 837824,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/GH2_Top_Loop_17_110bpm.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 110 Top 17 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1675640,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/US_ME_Drum_108_kilter_FULL_multitrack.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 108 Kilter rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1706668,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/120 Unvital Break.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 120 Unvital rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 769004,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/135 Proofwider Break.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 135 Proofwi rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 682668,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/140 Defined Break.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 140 Defined rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/140 Separatist Break.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 140 Separat rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1316572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/HTB_134_DrumLoop_02.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 134 Brea 02 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1375528,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/breakbeat/XT_125_Dusty_Drums_Full_1.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 125 Dust 01 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 737280,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/06_CBDNB_Break_Loop_175_multitrack.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 175 Mult 06 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 2106516,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/165_Break_295_SP_01.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 165 Jung 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1117092,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_Break_295_SP_02.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 170 Jung 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084240,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_Break_295_SP_05.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 170 Jung 05 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084240,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/BBF_175_DnB_Break_Top_02.wav",
+   "code": "BR",
+   "branch": "LOOPS",
+   "name": "BR 175 Dn T 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1053260,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_04b.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 92 Dubst 04 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_07c.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 112 Dubs 07 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_07d.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 92 Dubst 07 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_10b.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 92 Dubst 10 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_02e.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 140 Dubs 02 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1316572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/blutotnium 142/142BPM_007.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 142 Blut 07 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 649016,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_03d.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 140 Dubs 03 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_04a.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 140 Dubs 04 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_05a.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 140 Dubs 05 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1316572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_08a.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 140 Dubs 08 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1316572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/dubstep/DubstepBeats_11b.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 140 Dubs 11 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 658288,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/blutotnium 142/142BPM_026.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 142 Blut 26 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 649016,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/blutotnium 142/142BPM_029.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 142 Blut 29 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 649016,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/12L_174_Drums_1_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 174 Mult 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1059312,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/12L_174_Drums_6_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 174 Mult 06 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1059312,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/12L_174_Drums_7_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 174 Mult 07 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1059312,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_BellBoyBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Bell 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_BusyBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Busy 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_ChaserBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Chas 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/Fills/170_VirtuosoFill_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Virt 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 271056,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_FatLipBeat_02_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Fat 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_HowlerBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Howl 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_LoneSoldierBeat_1_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Lone 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_MetroBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Metr 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_SawnOffBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Sawn 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/170_TinBeat_01_516.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 170 Tin 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/172_DRUMLOOP_25_STP_02_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 172 Drum 02 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1071628,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/GS_DBRS_174_Drum_Loop_10_V1_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 174 Mult 2 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 2118620,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/GS_FLUX_172_Drum_Fill_14_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 172 Fill 14 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 133952,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/GS_FLUX_172_Drum_Fill_10_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 172 Fill 10 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 133952,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/HNDNB_Fill03_176_multitrack.wav",
+   "code": "DL",
+   "branch": "LOOPS",
+   "name": "DL 176 Fill 03 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 2048000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/jungle dnb/Tops/170_AiryTop_01_516.wav",
+   "code": "PL",
+   "branch": "LOOPS",
+   "name": "PL 170 Airy 01 rth",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 542116,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/hardcore/02_CBDNB_Bassdrum_Fill_175_multitrack(2).wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 175 Fill 02 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 526628,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/hardcore/02_CBDNB_Bassdrum_Fill_175_multitrack.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 175 Fill 2 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 526628,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/hardcore/03_CBDNB_Bassdrum_Fill_175_multitrack.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 175 Fill 03 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 526628,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/loops/hardcore/11_CBDNB_Bassdrum_Fill_175_multitrack - 1.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 175 Fill 01 rth",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 198432,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/GS_ABYSS_140_F#_BASS_MERZBA_multitrack.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Merzba M bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1394860,
+   "note": "F#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/SI_D_Arnham_Digiri_Syn_Bass_processed_.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Arnham Di bas",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1614524,
+   "note": "D",
+   "shift": 3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/SKR_FM_Syn_Bass_D_1.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Syn 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 573704,
+   "note": "D",
+   "shift": 5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/X1K_F_Syn_Bass_09.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Syn 09 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 672000,
+   "note": "F",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_D_UpperBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS D Upper 01 bas",
+   "banks": [
+    "B-DNB",
+    "E-SATURE"
+   ],
+   "ram": 134476,
+   "note": "D",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_E_FailBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS A Fail 01 bas",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 87876,
+   "note": "E",
+   "shift": 5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_F#_WrapUpBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Wrap 01 bas",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 143652,
+   "note": "F#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_F#_RollerBass_02_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Rolle 02 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 143532,
+   "note": "F#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G#_PowerBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Power 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 322288,
+   "note": "G#",
+   "shift": -3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G#_YaYaBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Ya Ya 01 bas",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 161216,
+   "note": "G#",
+   "shift": -3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G_BerlinBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS A Berlin 01 bas",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 241484,
+   "note": "G",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G_ElectricShockBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS A Electr 01 bas",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 120696,
+   "note": "G",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G_FlybyBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Flyby 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 152148,
+   "note": "G",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G_StaticBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS A Static 01 bas",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 119340,
+   "note": "G",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/AR2_Syn_Bass_10_Am.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Syn 10 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 141216,
+   "note": "A",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/BN_E0_SLOWFILT.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Bn Slo 00 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 350652,
+   "note": "E",
+   "shift": 1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/GHT_G_Synth_Bass_12.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Synth 12 bas",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 137268,
+   "note": "G",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/GS_DBRS_D_SynthBass_02_multitrack.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Synth 02 bas",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 99200,
+   "note": "D",
+   "shift": 5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/ST_plump_D.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Plump bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 160280,
+   "note": "D",
+   "shift": 5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/X1K_Kit3_F_Syn_Bass_1.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Kit Sy 01 bas",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 191236,
+   "note": "F",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F#_ArpeggSynth_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Arpeg 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 63968,
+   "note": "F#",
+   "shift": 1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_D_FlipBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Flip 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 56088,
+   "note": "D",
+   "shift": 3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_D_OwBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Ow 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 55540,
+   "note": "D",
+   "shift": 3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_G_PounderSynth_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Pounde 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 67788,
+   "note": "G",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_F_OuchBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Ouch 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 60428,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_F_PassbyBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Passby 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 60416,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G#_NoRawBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F No Ra 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 80624,
+   "note": "G#",
+   "shift": -3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G#_RawBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Raw 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 80544,
+   "note": "G#",
+   "shift": -3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G_OffBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS F Off 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 75904,
+   "note": "G",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/LUK_C_Syn_Bass_14.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Syn 14 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 118504,
+   "note": "C",
+   "shift": -5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/Nate06.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Nate 06 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 51728,
+   "note": "G#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/Nate14.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS Nate 14 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 80404,
+   "note": "G",
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/Wuab04.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Wuab 04 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 77380,
+   "note": "A#",
+   "shift": -3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/X1K_D_Syn_Bass_04.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Syn 04 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 62200,
+   "note": "D",
+   "shift": 5,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/170_G#_SubBass_01_516.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Onesh 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 143572,
+   "note": "G#",
+   "shift": -1,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/MTD_sub_trigun_zip_E1.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Trigun 01 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 448776,
+   "note": "E",
+   "shift": 3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/OSR_808_angry_F_multitrack.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Angry Mul bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 684212,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/OXI_E_Sub_Syn_Bass_3.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Syn 03 bas",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 157460,
+   "note": "E",
+   "shift": 3,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/SDBH_A1_Drive_Sub_Bass.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Drive 01 bas",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 863096,
+   "note": "A",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/SI_A_Emu_Sub_Bass_processed_.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Emu Proce bas",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 862052,
+   "note": "A",
+   "shift": -2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/oneshot/STSU_Sub_28.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS Onesho 28 bas",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1228808,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_D_BassTalker_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 D Ta 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_E_StickyBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 E St 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_E_StickyBass_02_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 E St 02 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F#_ErrorBass_01_516 - 1.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F# 01 3 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F#_ErrorConsoleBass_02_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F# 02 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F#_ErrorConsoleBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F# 01 4 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F#_InvaderBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F# 01 5 bas",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F#_RapidFireBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F# 01 6 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F_AlleyBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F Al 01 bas",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_F_Synthshot 13_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 F Sy 13 bas",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 466996,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_G#_ChopChopBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 G# 01 bas",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_G#_HummerBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 G# 01 bas",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass/loops/170_G_CoderBass_01_516.wav",
+   "code": "BL",
+   "branch": "LOOPS",
+   "name": "BL 170 G Co 01 bas",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1084232,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass graves/GS_CESTRA_FOGHORN_06_F_V2.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Gs Ces 02 bgr",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 716920,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass graves/GS_CESTRA_FOGHORN_02_F_V2.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Gs Ces 3 bgr",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 780468,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "bass graves/GS_CESTRA_808_05_F_V1.wav",
+   "code": "BS",
+   "branch": "TONAL",
+   "name": "BS G Gs Ces 01 bgr",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 156640,
+   "note": "F",
+   "shift": 2,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/Vocals/Blue Vox.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Blue j89",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 974668,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/Vocals/Way Bloodclart.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Way Bloodcl j89",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 563408,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/FX/Bang Blips.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Bang Blips j89",
+   "banks": [
+    "0-COMMON",
+    "C-TRIBE"
+   ],
+   "ram": 614528,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/FX/Marbles Slide.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Marbles Sli j89",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 202376,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/caribean/oneshot/SFX/Horn CapoKotta.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Horn Capo Ko ni",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 2071008,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Alarm 27.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Alarm 27 meg",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 415596,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/community drive/one shot/drum/SFX RD Modular.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Modular ni",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 297932,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Hardcore free samples/Hardstyle Fx/LS-HFX Darkness Sound 43.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Darkness 43 hcf",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 3047424,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Effect 1 07.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Effect 07 meg",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1237000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/cartoon/Scenes _ Themes/Over the Cliff.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Over Cliff rth",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 2136000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/lone forest/oneshot/SFX/Lazer Reformation.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Lazer Reform ni",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 285928,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/rising/one shot/SFX/SFX Algerian.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Algerian ni",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 308016,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Hardcore free samples/Hardstyle Fx/LS-HFX Fade Out 37.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Fade Out 37 hcf",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1979140,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "KORGER1Samples/FX-ER-Kraftwerkcity2.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Kraftwer 02 er1",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 165506,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/chromatique fire/one shot/SFX/SFX Warewolf 10.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Warewolf 10 ni",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 139688,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/community drive/one shot/drum/SFX TTA Drive 2.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Drum 02 ni",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 95368,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/lone forest/oneshot/SFX/Lazer Supernova.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Lazer Supern ni",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 287356,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Psytrance FX 30.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Psytranc 30 meg",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1054584,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/chromatique fire/one shot/SFX/SFX Warewolf 11.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Warewolf 11 ni",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 400908,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Doppler 17.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Doppler 17 meg",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 498692,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 3/LS-SFX3 Power Down Fx 17.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Power Do 17 meg",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 538260,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Stereo Gated FX 070.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Stereo G 70 meg",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1058000,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/cartoon/Classic SFX/Boing 04.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Boing 04 rth",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 128556,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 1/LS-SFX1 - Ethnic Bonsuri - 5-9.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Ethnic B 09 meg",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 742968,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Downfilter Long 06.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Downfilt 06 meg",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 1021956,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Large FX Collection/LS-LFXC Club-Trance 076.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Club Tra 76 meg",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1103792,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Trancegate Clap 13.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Trancega 13 meg",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1287664,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Trancegate Fx 01.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Trancega 01 meg",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 2013428,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Hardcore free samples/Hardstyle Fx/LS-HFX Sharp FX 50.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Sharp 50 hcf",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 784540,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/FX/Calm Downer.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Calm Downer j89",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 402684,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "sfx/DCAT1_SYN023.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Dcat Syn 23 sfx",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1814400,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/FX/Calm Fake Mentasm.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Calm Fake M j89",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 317580,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/caribean/oneshot/SFX/SFX Bubu.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Bubu ni",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 489776,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "rthm/cartoon/Classic SFX/Clasic Droid 01.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Clasic D 01 rth",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 582296,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Whooshes/ScreamingWhoosh_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Screamin 01 noi",
+   "banks": [
+    "C-TRIBE",
+    "E-SATURE"
+   ],
+   "ram": 703080,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Drums/Combo/Combo BlackSky.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Black Sky ni",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1366532,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Drums/Hand Drum/Glassdrum Tribe 1.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Glassdrum 01 ni",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 459512,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/AlienTubaImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Alien Tu 01 noi",
+   "banks": [
+    "C-TRIBE",
+    "D-RESPI"
+   ],
+   "ram": 965196,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Ambience/Ambience CloudMachine.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Cloud Machin ni",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1316572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/Psygate FX/LS-PFX Trancegate Crash 26.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Trancega 26 meg",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 2241452,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "minimoog synth/SYNTH-TrackDrop.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Track Drop mmg",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 906752,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Ambience/Ambience Mystis.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Mystis ni",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1911672,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Stab & Hit/Hit Distant.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Distant ni",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 723960,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Glass Hit.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Glass Hi 02 meg",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 614684,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Subsonic Drops/EsperToneSubDrop_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Esper To 01 noi",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 995936,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/FX/Fluid Clang Hit.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Fluid Clang j89",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 1107716,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Ambience/Ambience Uriel.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Uriel ni",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 2047992,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Stab & Hit/Hit Squid.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Squid ni",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 452572,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Ambience/Atmos BlackHeart.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Atmos Black ni",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 2660228,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/ChromeImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Chrome I 01 noi",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1220452,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Low End Thumps/DarkLowThump_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Dark Thu 01 noi",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 907988,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Ambience/Atmos Distant.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Atmos Distan ni",
+   "banks": [
+    "C-TRIBE",
+    "E-SATURE"
+   ],
+   "ram": 1994624,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/CyborgImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Cyborg I 01 noi",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1013336,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Synth Note/Pad F Slapper MSV.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Slapper ni",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 987432,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/SFX/SFX BlackHeart.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Black Heart ni",
+   "banks": [
+    "0-COMMON"
+   ],
+   "ram": 460712,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Subsonic Drops/MassDriverSubDrop_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Mass Dri 01 noi",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 878308,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Stab & Hit/Stab Tranceformer 1.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Trancefor 01 ni",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 268052,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/MechAlertImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Mech Ale 01 noi",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 1659236,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Stab & Hit/Stab Tranceformer 2.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Trancefor 02 ni",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 347744,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/PortalImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Portal I 01 noi",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1041248,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/SFX/SFX CloudMachine 2.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Cloud Mac 02 ni",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1863544,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/RollingThunderImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Rolling 01 noi",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1900316,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Jungle 89  to 99/FX/Recharge Hit.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Recharge Hi j89",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 361728,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/SlamDunkImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Slam Dun 01 noi",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1147184,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Subsonic Drops/SpaceripSubDrop_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Spacerip 01 noi",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 853800,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Native instrument/drop squad/one shot/Synth Note/Synth F YoungerBro MSV .wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Younger Bro ni",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 710384,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Whooshes/PowerBladeWhoosh_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Power Bl 01 noi",
+   "banks": [
+    "A-HALF"
+   ],
+   "ram": 981580,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Low End Thumps/AlmondLightLowThump_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Almond L 01 noi",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 930024,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Hybrid Trailer Impacts/BehindYouImpact_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Behind Y 01 noi",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1277156,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Transitions/MechClutchTransition_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Mech Clu 01 noi",
+   "banks": [
+    "B-DNB"
+   ],
+   "ram": 799940,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "cinematic Noiiz/Transitions/ScannerTransition_01_531.wav",
+   "code": "FX",
+   "branch": "FX",
+   "name": "FX Scanner 01 noi",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 820900,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Dune/dune_sardaukar_chant_01.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Sardauka 01 mov",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1221392,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Ghost In the shell/gits_choir_01.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Gits Cho 01 mov",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 1796690,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Dune/dune_sardaukar_chant_02.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Sardauka 02 mov",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1366830,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Ghost In the shell/gits_choir_02.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Gits Cho 02 mov",
+   "banks": [
+    "D-RESPI"
+   ],
+   "ram": 4393294,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Dune/dune_sardaukar_chant_03.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Sardauka 03 mov",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1410456,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Dune/dune_sardaukar_chant_04.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Sardauka 04 mov",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 1615270,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Matrix/matrix_smith_speech_01.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Smith Sp 01 mov",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 880008,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Matrix/matrix_smith_speech_04.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Smith Sp 04 mov",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 998264,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Matrix/matrix_smith_speech_05.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Smith Sp 05 mov",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1172736,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Matrix/matrix_smith_speech_02.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Smith Sp 02 mov",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 975890,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "Movie tracks/Matrix/matrix_smith_speech_03.wav",
+   "code": "VX",
+   "branch": "VX",
+   "name": "VX Smith Sp 03 mov",
+   "banks": [
+    "E-SATURE"
+   ],
+   "ram": 1390152,
+   "note": null,
+   "shift": 0,
+   "parent": null,
+   "rumble": null
+  },
+  {
+   "source": "SoundDesign/rumble/RM G# Box 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Box 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 73972,
+   "note": "G#",
+   "shift": -1,
+   "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM C# Kicks 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Kicks 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 98744,
+   "note": "C#",
+   "shift": -6,
+   "parent": "rthm/packs/neurotek/Kicks/90sKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM G# Air 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Air 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 73972,
+   "note": "G#",
+   "shift": -1,
+   "parent": "rthm/packs/neurotek/Kicks/AirKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM A Attac 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Attac 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 78372,
+   "note": "A",
+   "shift": -2,
+   "parent": "rthm/packs/neurotek/Kicks/AttacKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM F Box 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Box 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 62204,
+   "note": "F",
+   "shift": 2,
+   "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM Box 03 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM Box 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 69820,
+   "note": null,
+   "shift": 0,
+   "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_03.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM G# Apart 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Apart 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 73972,
+   "note": "G#",
+   "shift": -1,
+   "parent": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM F# Apart 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Apart 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 65904,
+   "note": "F#",
+   "shift": 1,
+   "parent": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM Bubble 03 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM Bubble 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 69820,
+   "note": null,
+   "shift": 0,
+   "parent": "rthm/packs/neurotek/Kicks/BubbleKick_SP_03.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM F# Dive 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Dive 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 65904,
+   "note": "F#",
+   "shift": 1,
+   "parent": "rthm/packs/neurotek/Kicks/DiveKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM D# Dive 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Dive 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 55420,
+   "note": "D#",
+   "shift": 4,
+   "parent": "rthm/packs/neurotek/Kicks/DiveKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM D Indust 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Indust 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 52308,
+   "note": "D",
+   "shift": 5,
+   "parent": "rthm/packs/neurotek/Kicks/IndustrialKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM F# Kicks 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Kicks 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 65904,
+   "note": "F#",
+   "shift": 1,
+   "parent": "rthm/packs/neurotek/Kicks/KickKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM B Matte 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Matte 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 87968,
+   "note": "B",
+   "shift": -4,
+   "parent": "rthm/packs/neurotek/Kicks/MatteKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM Kicks 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM Kicks 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 69820,
+   "note": null,
+   "shift": 0,
+   "parent": "rthm/packs/neurotek/Kicks/OpenKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM G# Shinr 01 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Shinr 01 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 73972,
+   "note": "G#",
+   "shift": -1,
+   "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_01.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM A Shinra 02 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Shinra 02 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 78372,
+   "note": "A",
+   "shift": -2,
+   "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_02.wav",
+   "rumble": "gritty"
+  },
+  {
+   "source": "SoundDesign/rumble/RM F# Shinr 03 rth b7d885.wav",
+   "code": "RM",
+   "branch": "DRUMS",
+   "name": "RM G Shinr 03 rth",
+   "banks": [
+    "C-TRIBE"
+   ],
+   "ram": 65904,
+   "note": "F#",
+   "shift": 1,
+   "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_03.wav",
+   "rumble": "gritty"
+  }
+ ]
+}
