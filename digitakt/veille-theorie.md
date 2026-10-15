@@ -57,8 +57,9 @@ Notation : 16 pas = 1 mesure 4/4 en doubles croches, `x` trig, `.` vide,
   (E(5,8)) ; **clave son** 3-2 `x..x..x...x.x...`, **rumba**
   `x..x...x..x.x...` ; **hémiole** 3:2 (`x.x.x.` contre `x..x..` sur 6 pas).
 - **Euclidien E(k,n)** (Toussaint) : k attaques réparties au plus
-  régulièrement sur n pas. E(3,8) tresillo, E(5,8) cinquillo, E(7,16)
-  `x..x..x..x..x...`, E(4,7) `x.x.x.x`, E(3,12). La rotation d'un pas change
+  régulièrement sur n pas. E(3,8) tresillo, E(5,8) cinquillo, E(5,16)
+  `x..x..x..x..x...`, E(7,16) `x..x.x.x..x.x.x.` (corrigé le 2026-10-15,
+  cf. [[kb/theorie/kt-cellules-rythmiques]]), E(4,7) `x.x.x.x`, E(3,12). La rotation d'un pas change
   la clave (3-2 devient 2-3).
 - **Polyrythmie** (subdivisions concurrentes dans un même cycle : 3:2, 3:4,
   5:4) contre **polymétrie** (cycles de longueurs différentes qui dérivent

@@ -8,6 +8,21 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB théorie, lot 1 (socle rythmique) : KT1 cellules rythmiques
+  (tresillo, cinquillo, claves, hémiole, table E(k, n) canonique, rotation),
+  KT2 polymétrie / polyrythmie / dissonance métrique (table des ppcm contre
+  16 pas en mesures et en secondes à 190 BPM, groupement / déplacement de
+  Butler, trois voies de polyrythmie sur la DT2), KT3 swing / microtiming /
+  ghost notes / densité (table swing en millisecondes à 190 et 130 BPM,
+  lecture de la métrique `swing` du hub : l'ornement tribe anticipe le
+  temps au lieu de shuffler), KT4 backbeat / half-time / passerelles de
+  tempo (90 / 180, 140 / 186,7 par 3 contre 4, 175 / 190 par nudge, chemin
+  tribe → DnB sans changer de tempo). Chaque KT : signature théorique et
+  mesurée, vocabulaire, trois exercices sur la grille de la doctrine,
+  pièges, sources écrites. Hub `digitakt/kb/theorie/_index.md` : liens,
+  statuts `draft`, passe `rhythm_signature` relancée (BPM réanalysés, deux
+  lectures à la moitié du tempo). Veille : E(7, 16) corrigé (la forme
+  notée était E(5, 16)).
 - [7.M] KB théorie : veille `digitakt/veille-theorie.md` (socle rythme /
   harmonie / forme, 4 styles cœur, 6 styles connexes, ressources avec statut
   de vérification, exercices DT2), décisions 7.M dans le SPEC, hub

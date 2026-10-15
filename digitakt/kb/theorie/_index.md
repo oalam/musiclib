@@ -47,10 +47,10 @@ SORT lot ASC, ordre ASC
 
 | # | KT | Fichier | Apporte | Renvoie à | Statut |
 |---|---|---|---|---|---|
-| 1 | Cellules rythmiques | `kt-cellules-rythmiques` | tresillo, cinquillo, claves son / rumba, hémiole, table E(k,n), rotation | [[../euclidien]] | à rédiger |
-| 2 | Polymétrie, polyrythmie, dissonance métrique | `kt-polymetrie-polyrythmie` | ppcm, 3:4, 5:4, 7:8, groupement / déplacement (Butler), cycles | [[../polymetrie]] | à rédiger |
-| 3 | Swing, microtiming, ghost notes, densité | `kt-swing-microtiming` | binaire / ternaire, pourcentages, vélocité, accents, conditions comme densité | [[../microtiming-retrigs]], [[../fill-conditions]] | à rédiger |
-| 4 | Backbeat, half-time, passerelles de tempo | `kt-halftime-passerelles` | 90 / 180, 140 / 186, 175 ; ouvrir un live à 190 vers DnB et dubstep | [[../slice-breaks]] | à rédiger |
+| 1 | Cellules rythmiques | [[kt-cellules-rythmiques]] | tresillo, cinquillo, claves son / rumba, hémiole, table E(k,n), rotation | [[../euclidien]] | draft |
+| 2 | Polymétrie, polyrythmie, dissonance métrique | [[kt-polymetrie-polyrythmie]] | ppcm, 3:4, 5:4, 7:8, groupement / déplacement (Butler), cycles | [[../polymetrie]] | draft |
+| 3 | Swing, microtiming, ghost notes, densité | [[kt-swing-microtiming]] | binaire / ternaire, pourcentages, vélocité, accents, conditions comme densité | [[../microtiming-retrigs]], [[../fill-conditions]] | draft |
+| 4 | Backbeat, half-time, passerelles de tempo | [[kt-halftime-passerelles]] | 90 / 180, 140 / 186, 175 ; ouvrir un live à 190 vers DnB et dubstep | [[../slice-breaks]] | draft |
 
 ### Lot 2 — Socle harmonique et forme
 
@@ -91,7 +91,10 @@ repliés sur 16 pas par bande (sub 20-200 Hz, mid 200-2000 Hz, high > 2 kHz),
 (le repliage cale le maximum, pas le downbeat) ; `sync` = énergie hors temps ;
 `swing` = part d'énergie sur le « a » (4e double croche) contre le « e »
 (2e), 0,5 = équilibré, > 0,5 = anticipations avant le temps ; `pulse` =
-régularité. Sortie du 2026-10-15 :
+régularité. Sortie du 2026-10-15 (relancée le 2026-10-15 avant le lot 1 :
+patterns identiques, seuls quelques BPM diffèrent après réanalyse des
+sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
+90,7 et Maureen 215,3 → 108,2, commentées dans [[kt-halftime-passerelles]]) :
 
 ### tribe
 
@@ -176,7 +179,7 @@ régularité. Sortie du 2026-10-15 :
 
 | Lot | Contenu | Statut |
 |---|---|---|
-| 1 | KT1-KT4 socle rythmique | à venir |
+| 1 | KT1-KT4 socle rythmique | fait le 2026-10-15 (draft, exercices à jouer) |
 | 2 | KT5-KT9 socle harmonique et forme | à venir |
 | 3 | KT10-KT13 styles cœur | à venir (grabs frenchcore et hard techno avant KT12-KT13) |
 | 4 | KT14-KT19 styles connexes | à venir (grabs avant) |
