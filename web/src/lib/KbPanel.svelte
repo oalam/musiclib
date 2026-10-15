@@ -22,14 +22,49 @@
   // notes locales du vault (lib/markdown.ts) ; wikilinks Obsidian rendus en lien ou en texte
   const marked = createMarked()
   const DOCTRINE = 'digitakt/doctrine.md'
-  const known = $derived(new Set([DOCTRINE, ...toc.flatMap(l => l.notes.map(n => n.path))]))
+  const known = $derived(new Set([DOCTRINE, ...toc.flatMap(l => [l.hub, ...l.notes.map(n => n.path)])].filter(Boolean)))
+
+  // groupes du sommaire (7.M2) : fiches machine, puis théorie
+  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', theorie: 'Théorie (notes de KT)' }
+  const GROUP_HINTS: Record<string, string> = {
+    fiches: "Fiches dans l'ordre de préparation d'un set.",
+    theorie: 'Le pourquoi et le vocabulaire, style par style ; les fiches donnent le geste.',
+  }
+  const groups = $derived.by(() => {
+    const out: { key: string; hub: string; lots: KbLot[] }[] = []
+    for (const lot of toc) {
+      const g = out.find(x => x.key === lot.group)
+      if (g) g.lots.push(lot)
+      else out.push({ key: lot.group, hub: lot.hub, lots: [lot] })
+    }
+    return out
+  })
+
+  /** Cible d'un wikilink Obsidian -> chemin du corpus, ou null.
+   *  `[[../euclidien]]` et `[[theorie/_index]]` se résolvent depuis le dossier de la
+   *  note ouverte ; `[[polymetrie]]` (chemin court Obsidian) par le nom de fichier. */
+  function resolveWikilink(target: string): string | null {
+    const clean = target.split('#')[0].replace(/\.md$/, '')
+    const base = clean.split('/').pop() ?? ''
+    if (!base) return null
+    if (base === 'doctrine') return DOCTRINE
+    if (clean.includes('/')) {
+      const dir = (note?.path ?? 'digitakt/kb/_').split('/').slice(0, -1)
+      for (const seg of clean.split('/')) {
+        if (seg === '..') dir.pop()
+        else if (seg && seg !== '.') dir.push(seg)
+      }
+      const path = dir.join('/') + '.md'
+      if (known.has(path)) return path
+    }
+    return [...known].find(p => p.endsWith('/' + base + '.md')) ?? null
+  }
 
   /** Wikilink Obsidian -> lien interne vers la fiche si elle est dans le corpus, texte sinon. */
   function wikilink(target: string, alias: string): string {
-    const base = target.split('#')[0].split('/').pop() ?? target
-    const path = base === 'doctrine' ? DOCTRINE : `digitakt/kb/${base}.md`
-    const label = alias || base
-    return known.has(path) ? `[${label}](#kb:${path})` : label
+    const path = resolveWikilink(target)
+    const label = alias || (target.split('#')[0].split('/').pop() ?? target)
+    return path ? `[${label}](#kb:${path})` : label
   }
   const html = $derived(note
     ? marked.parse(replaceWikilinks(note.markdown, wikilink), { async: false })
@@ -214,20 +249,32 @@
 
     {#if view === 'toc'}
       <div class="toc">
-        <p class="muted small">Fiches dans l'ordre de préparation d'un set. Touche <kbd>/</kbd> pour chercher.</p>
+        <p class="muted small">Touche <kbd>/</kbd> pour chercher dans les fiches, la théorie et la doctrine.</p>
         <button class="hit" onclick={() => openPath(DOCTRINE)}><span>Doctrine (grille des 16 tracks, banks, mutes)</span></button>
-        {#each toc as lot (lot.number)}
-          <h3>Lot {lot.number} · {lot.name}</h3>
-          <ul>
-            {#each lot.notes as n (n.path)}
-              <li>
-                <button class="hit row" class:cur={note?.path === n.path} onclick={() => openPath(n.path)}>
-                  <span class="mono muted">{n.ordre}</span> <span>{n.title}</span>
-                  {#if n.statut}<span class="st small" class:draft={n.statut === 'draft'}>{n.statut}</span>{/if}
-                </button>
-              </li>
-            {/each}
-          </ul>
+        {#each groups as g (g.key)}
+          <h2 class="grp">
+            {#if g.hub}
+              <button class="hub" onclick={() => openPath(g.hub)} title="Ouvrir le hub du groupe">{GROUP_LABELS[g.key] ?? g.key}</button>
+            {:else}
+              {GROUP_LABELS[g.key] ?? g.key}
+            {/if}
+          </h2>
+          {#if GROUP_HINTS[g.key]}<p class="muted small">{GROUP_HINTS[g.key]}</p>{/if}
+          {#each g.lots as lot (lot.number)}
+            <h3>Lot {lot.number} · {lot.name}</h3>
+            <ul>
+              {#each lot.notes as n (n.path)}
+                <li>
+                  <button class="hit row" class:cur={note?.path === n.path} onclick={() => openPath(n.path)}>
+                    <span class="mono muted">{n.ordre}</span> <span>{n.title}</span>
+                    {#if n.statut}<span class="st small" class:draft={n.statut !== 'vérifié'}>{n.statut}</span>{/if}
+                  </button>
+                </li>
+              {:else}
+                <li class="muted small none">Aucune note encore : voir le hub du groupe.</li>
+              {/each}
+            </ul>
+          {/each}
         {/each}
       </div>
     {:else if view === 'note' && note}
@@ -291,6 +338,10 @@
   .toc { flex: 1; overflow-y: auto; padding: 4px 4px 24px; }
   .toc > p { padding: 6px 10px 0; margin: 0 0 6px; }
   .toc h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 14px 10px 4px; }
+  .toc h2.grp { font-size: 14px; margin: 18px 10px 2px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .toc h2.grp + p { padding: 0 10px; margin: 0; }
+  .hub { padding: 0; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; }
+  .hub:hover { color: var(--accent); }
   .toc ul { list-style: none; margin: 0; padding: 0; }
   .hit.row { flex-direction: row; align-items: baseline; gap: 8px; }
   .hit.row .mono { width: 18px; text-align: right; }

@@ -165,7 +165,8 @@ export interface KbNote {
 }
 
 export interface KbEntry { path: string; title: string; ordre: number; statut: string }
-export interface KbLot { number: number; name: string; notes: KbEntry[] }
+/** Lot du sommaire ; `group` = `fiches` (racine de digitakt/kb) ou sous-dossier (`theorie`), `hub` = son _index.md. */
+export interface KbLot { number: number; name: string; notes: KbEntry[]; group: string; hub: string }
 
 /** Candidat d'acquisition (7.I), miroir de grab.CandidateInfo. */
 export interface Candidate {

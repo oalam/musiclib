@@ -523,6 +523,20 @@ python setbuilder.py groove-clusters --k 6 --write  # écrit groove_cluster
 
 Le clustering est **indicatif** : sur une petite library, viser ~5-8 familles.
 
+### Passe de signatures pour la KB théorie (`kt_signatures.py`)
+
+```bash
+python kt_signatures.py             # tous les styles
+python kt_signatures.py tribe dnb   # certains styles
+```
+
+Imprime en markdown, pour les morceaux de référence de chaque style (dict
+`STYLES` du script, globs de slugs), les patterns 16 pas par bande (`X` ≥ 0,6,
+`x` ≥ 0,3), la syncope, le swing et la clarté de pulsation, puis la moyenne
+du style. Sert à ancrer les notes de KT de `digitakt/kb/theorie/` (SPEC 7.M,
+décision 4) ; la sortie est collée dans `digitakt/kb/theorie/_index.md`.
+Lecture seule des sidecars, pas de dépendance au disque média.
+
 ## Export groove jouable (`groove.py`)
 
 Transcrit le pattern en hits discrets kick/snare/hat et l'exporte en `.mid`
@@ -878,16 +892,23 @@ BL basse.
 
 # kb.py — base de connaissance Digitakt II (Phase 7.D, 7.F)
 
-Corpus : `digitakt/kb/*.md` + `digitakt/doctrine.md`, découpés en sections
-(`##` / `###`). Recherche plein texte **sans index ni RAG** : le corpus est
-relu à chaque requête (une note éditée dans Obsidian est vue tout de suite).
-Tous les termes doivent être présents dans la section, sans tenir compte des
-accents ni de la casse ; score = occurrences, ×5 dans le titre.
+Corpus : `digitakt/kb/**/*.md` (fiches machine à la racine, notes de KT
+théorie dans `theorie/`, hubs `_index.md` compris, cf. SPEC 7.M2) +
+`digitakt/doctrine.md`, découpés en sections (`##` / `###`). Recherche plein
+texte **sans index ni RAG** : le corpus est relu à chaque requête (une note
+éditée dans Obsidian est vue tout de suite). Tous les termes doivent être
+présents dans la section, sans tenir compte des accents ni de la casse ;
+score = occurrences, ×5 dans le titre.
 
 ```bash
 python kb.py search "pattern modele"
-python kb.py toc                         # fiches par lot (noms tirés de _index.md)
+python kb.py toc                         # notes par groupe et lot (noms tirés du _index.md du dossier)
 ```
+
+Sommaire : un **groupe** par dossier (`fiches` = racine, puis `theorie`…),
+lots rangés par `lot` puis `ordre` ; les noms de lots viennent du hub
+`_index.md` du dossier (`## Lot N — nom` ou `### Lot N — nom`) et un lot
+déclaré sans note est émis vide, pour montrer la structure prévue.
 
 **Lien avec le manuel (7.F)** : le sommaire du PDF
 `refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf` (lu par `pypdf`, mis en
@@ -899,11 +920,13 @@ niveau visent la doctrine, pas le manuel. Le PDF est ignoré par git : à
 déposer dans `refs/` pour activer les liens.
 
 Dans le front : bouton **Base de connaissance** du bandeau (ou touche `/`,
-`Échap` pour fermer). Le panneau s'ouvre sur le **sommaire par lot** (statut
-draft visible), la recherche surligne les extraits. Une fiche affiche ses
-**pages du manuel** en tête (`§11.7 amp page p56`), les `§` du texte et les
-wikilinks deviennent cliquables (manuel, section de la doctrine, autre
-fiche). Le manuel s'ouvre dans le panneau élargi à la bonne page
+`Échap` pour fermer). Le panneau s'ouvre sur le **sommaire par groupe et
+lot** (en-tête de groupe = son hub, statut non vérifié surligné), la
+recherche surligne les extraits. Une fiche affiche ses **pages du manuel**
+en tête (`§11.7 amp page p56`), les `§` du texte et les wikilinks deviennent
+cliquables (manuel, section de la doctrine, autre note : `[[../euclidien]]`
+et `[[theorie/_index]]` résolus depuis le dossier de la note, `[[polymetrie]]`
+par nom court). Le manuel s'ouvre dans le panneau élargi à la bonne page
 (`#page=N`, visionneuse PDF du navigateur) ou dans un nouvel onglet.
 
 # Lives DT2 (Phase 7.L, `analyzer/lives.py`)
@@ -1254,7 +1277,7 @@ dans library.md) :
 | POST | `/api/tracks/{slug}/bank` | génère la bank |
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
 | GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
-| GET | `/api/kb/toc` | fiches par lot (`KbLot`) |
+| GET | `/api/kb/toc` | notes par groupe (`fiches`, `theorie`) et lot (`KbLot`, `group`, `hub`) |
 | GET | `/api/samples?tag=&min_stars=` | cases de la bibliothèque de samples, une par dossier final (`SampleCell` : `folder`, `branch`, `code`, `sub`, plafond, retenus, keep, drop, à écouter, signalés) ; filtres optionnels |
 | GET | `/api/samples/folders` | dossiers cibles d'un rangement (7.J8), racine du code puis sous-catégories, dans l'ordre de l'arbre |
 | GET | `/api/samples/cell?folder=` | candidats d'une case par rang (`SampleEntry`, avec `tags` et `stars`) |

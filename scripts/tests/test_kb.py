@@ -62,6 +62,15 @@ def vault(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(kb, "DOCTRINE", tmp_path / "digitakt" / "doctrine.md")
     (kb_dir / "_index.md").write_text("# Hub\n\n## Lot 2 — Remplir les patterns\n", encoding="utf-8")
     monkeypatch.setattr(kb, "KB_INDEX", kb_dir / "_index.md")
+    # sous-dossier theorie (7.M2) : son propre hub, ses propres lots (numeros en collision voulue)
+    theorie = kb_dir / "theorie"
+    theorie.mkdir()
+    (theorie / "_index.md").write_text(
+        "# KB théorie\n\n### Lot 2 — Socle rythmique\n\n### Lot 3 — Styles cœur\n", encoding="utf-8")
+    (theorie / "kt-cellules.md").write_text(
+        "---\nlot: 2\nordre: 1\ntheme: Cellules rythmiques\nstatut: à rédiger\n---\n\n"
+        "# Cellules rythmiques\n\n## Tresillo\n\nLe tresillo `x..x..x.` ; voir [[../euclidien]].\n",
+        encoding="utf-8")
     monkeypatch.setattr(kb, "MANUAL_PDF", tmp_path / "refs" / "manuel.pdf")
     monkeypatch.setattr(kb, "manual_outline", lambda: OUTLINE)
     return tmp_path
@@ -141,9 +150,22 @@ def test_read_note_includes_manual_refs(vault: Path):
 
 def test_table_of_contents_groups_by_lot(vault: Path):
     toc = kb.table_of_contents()
-    assert [(lot.number, lot.name) for lot in toc] == [(2, "Remplir les patterns")]
+    assert [(lot.group, lot.number, lot.name, lot.hub) for lot in toc] == [
+        ("fiches", 2, "Remplir les patterns", "digitakt/kb/_index.md"),
+        ("theorie", 2, "Socle rythmique", "digitakt/kb/theorie/_index.md"),
+        ("theorie", 3, "Styles cœur", "digitakt/kb/theorie/_index.md")]
     assert toc[0].notes[0].model_dump() == {
         "path": "digitakt/kb/fill.md", "title": "FILL et conditions", "ordre": 7, "statut": "draft"}
+    assert toc[1].notes[0].path == "digitakt/kb/theorie/kt-cellules.md"
+    assert toc[2].notes == []  # lot declare dans le hub, aucune note encore
+
+
+def test_theorie_notes_searchable_and_readable(vault: Path):
+    hits = kb.search("tresillo", kb.load_corpus())
+    assert [(h.path, h.heading) for h in hits] == [("digitakt/kb/theorie/kt-cellules.md", "Tresillo")]
+    note = kb.read_note("digitakt/kb/theorie/kt-cellules.md")
+    assert note is not None and note.title == "Cellules rythmiques"
+    assert kb.read_note("digitakt/kb/theorie/_index.md") is not None  # hub lisible dans le front
 
 
 def test_outline_from_pdf(tmp_path: Path):

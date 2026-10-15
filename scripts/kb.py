@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Base de connaissance Digitakt II (Phase 7.D, 7.F) : notes markdown + recherche.
 
-Corpus = `digitakt/kb/*.md` + `digitakt/doctrine.md`, decoupes en sections
-(titres `##` / `###`). Recherche plein texte sans index ni RAG : le corpus
-tient en memoire, on le relit a chaque requete (les notes editees dans
-Obsidian sont vues tout de suite).
+Corpus = `digitakt/kb/**/*.md` (fiches machine a la racine, notes de KT
+theorie dans `theorie/`, hubs `_index.md` compris) + `digitakt/doctrine.md`,
+decoupes en sections (titres `##` / `###`). Recherche plein texte sans index
+ni RAG : le corpus tient en memoire, on le relit a chaque requete (les notes
+editees dans Obsidian sont vues tout de suite).
+
+Sommaire (7.M2) : un groupe par dossier (`fiches` = racine, puis un groupe
+par sous-dossier), chaque groupe range ses notes par `lot` puis `ordre` ; les
+noms des lots viennent du hub `_index.md` du dossier (`## Lot N — nom` ou
+`### Lot N — nom`).
 
 Lien avec le manuel PDF (7.F) : le sommaire du PDF donne la page de chaque
 paragraphe `§x.y` ; les references du frontmatter `manuel` et celles citees
@@ -38,7 +44,8 @@ _SNIPPET_CHARS = 90
 _HEADING_BONUS = 5
 _SECTION_REF = re.compile(r"§(\d+(?:\.\d+)*)(?:\s*-\s*(\d+(?:\.\d+)*))?")
 _DOCTRINE_BEFORE = re.compile(r"doctrine\]*\s*\(?\s*$", re.IGNORECASE)  # « doctrine §3 », « [[../doctrine]] (§3 »
-_LOT_HEADING = re.compile(r"^##\s+Lot\s+(\d+)\s*[—–-]\s*(.+?)\s*$", re.MULTILINE)
+_LOT_HEADING = re.compile(r"^#{2,3}\s+Lot\s+(\d+)\s*[—–-]\s*(.+?)\s*$", re.MULTILINE)
+ROOT_GROUP = "fiches"   # groupe des notes a la racine de `digitakt/kb/`
 
 
 class KbHit(BaseModel):
@@ -77,6 +84,8 @@ class KbLot(BaseModel):
     number: int
     name: str
     notes: list[KbEntry]
+    group: str = ROOT_GROUP   # `fiches` (racine) ou nom du sous-dossier, ex. `theorie`
+    hub: str = ""             # chemin du `_index.md` du groupe, "" si absent
 
 
 @dataclass(frozen=True)
@@ -123,7 +132,7 @@ def parse_frontmatter(text: str) -> dict[str, str]:
 
 
 def corpus_files() -> list[Path]:
-    files = sorted(KB_DIR.glob("*.md")) if KB_DIR.exists() else []
+    files = sorted(KB_DIR.rglob("*.md")) if KB_DIR.exists() else []
     return ([DOCTRINE] if DOCTRINE.exists() else []) + files
 
 
@@ -261,11 +270,27 @@ def read_note(rel_path: str) -> KbNote | None:
                   manual=header, manual_index=index)
 
 
+def _lot_names(hub: Path) -> dict[int, str]:
+    """Noms des lots declares dans un hub `_index.md` ({} si absent)."""
+    if not hub.exists():
+        return {}
+    return {int(n): name for n, name in _LOT_HEADING.findall(hub.read_text(encoding="utf-8"))}
+
+
 def table_of_contents() -> list[KbLot]:
-    """Fiches rangees par lot puis `ordre` ; noms des lots tires du hub `_index.md`."""
-    names = ({int(n): name for n, name in _LOT_HEADING.findall(KB_INDEX.read_text(encoding="utf-8"))}
-             if KB_INDEX.exists() else {})
-    lots: dict[int, list[KbEntry]] = {}
+    """Notes rangees par groupe (dossier), lot puis `ordre`.
+
+    Le groupe `fiches` (racine) vient en premier, puis les sous-dossiers dans
+    l'ordre alphabetique ; les noms des lots sont tires du `_index.md` du
+    dossier. Un lot declare dans un hub sans note encore ecrite est emis vide
+    (le front montre ainsi la structure prevue, ex. la KB theorie)."""
+    lots: dict[tuple[str, int], list[KbEntry]] = {}
+    hubs: dict[str, Path] = {}
+    for hub in sorted(KB_DIR.rglob("_index.md")) if KB_DIR.exists() else []:
+        group = ROOT_GROUP if hub.parent == KB_DIR else hub.parent.relative_to(KB_DIR).as_posix()
+        hubs[group] = hub
+        for n in _lot_names(hub):
+            lots.setdefault((group, n), [])
     for f in corpus_files():
         if f == DOCTRINE:
             continue
@@ -273,15 +298,21 @@ def table_of_contents() -> list[KbLot]:
         fm = parse_frontmatter(raw)
         if not fm.get("lot", "").isdigit():
             continue
+        group = ROOT_GROUP if f.parent == KB_DIR else f.parent.relative_to(KB_DIR).as_posix()
+        hubs.setdefault(group, f.parent / "_index.md")
         m = re.search(r"^#\s+(.+)$", strip_frontmatter(raw), re.MULTILINE)
-        lots.setdefault(int(fm["lot"]), []).append(KbEntry(
+        lots.setdefault((group, int(fm["lot"])), []).append(KbEntry(
             path=f.relative_to(VAULT_ROOT).as_posix(),
             title=fm.get("theme") or (m.group(1).strip() if m else f.stem),
             ordre=int(fm["ordre"]) if fm.get("ordre", "").isdigit() else 0,
             statut=fm.get("statut", "")))
-    return [KbLot(number=n, name=names.get(n, f"Lot {n}"),
-                  notes=sorted(entries, key=lambda e: (e.ordre, e.title)))
-            for n, entries in sorted(lots.items())]
+    names = {group: _lot_names(hub) for group, hub in hubs.items()}
+    order = sorted(lots, key=lambda k: (k[0] != ROOT_GROUP, k[0], k[1]))
+    return [KbLot(number=n, name=names[g].get(n, f"Lot {n}"),
+                  notes=sorted(lots[(g, n)], key=lambda e: (e.ordre, e.title)),
+                  group=g,
+                  hub=hubs[g].relative_to(VAULT_ROOT).as_posix() if hubs[g].exists() else "")
+            for g, n in order]
 
 
 def main() -> int:
@@ -299,7 +330,7 @@ def main() -> int:
             print(f"       {h.snippet}")
     elif args.cmd == "toc":
         for lot in table_of_contents():
-            print(f"Lot {lot.number} — {lot.name}")
+            print(f"[{lot.group}] Lot {lot.number} — {lot.name}")
             for e in lot.notes:
                 print(f"  {e.ordre:2d}  {e.title}  ({e.path}, {e.statut})")
     return 0

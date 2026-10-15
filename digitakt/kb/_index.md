@@ -20,6 +20,11 @@ testé sur la machine.
 
 Recherche : panneau `/` du front ou `python scripts/kb.py search "..."`.
 
+**Théorie** : les notes de KT (transmission) sur la construction rythmique
+et harmonique, style par style, vivent dans [[theorie/_index]] (SPEC
+§ 7.M). Elles donnent le *pourquoi* et le vocabulaire ; les fiches ci-dessous
+gardent le *comment* sur la machine.
+
 ## Parcours dans l'ordre (Dataview)
 
 Fiches rédigées, triées par lot puis par `ordre` (le numéro des tableaux

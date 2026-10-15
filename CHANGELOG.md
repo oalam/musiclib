@@ -8,6 +8,22 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB théorie : veille `digitakt/veille-theorie.md` (socle rythme /
+  harmonie / forme, 4 styles cœur, 6 styles connexes, ressources avec statut
+  de vérification, exercices DT2), décisions 7.M dans le SPEC, hub
+  `digitakt/kb/theorie/_index.md` avec les 19 KT à rédiger et la passe
+  `rhythm_signature` sur les morceaux de référence par style (patterns 16
+  pas tirés des sidecars). Aucune KT rédigée encore.
+- [7.M2] KB théorie visible dans le front : `kb.corpus_files` lit
+  `digitakt/kb/` récursivement (recherche et lecture des notes de
+  `theorie/`, hubs compris) ; `kb.table_of_contents` range les lots par
+  groupe (`KbLot.group` = `fiches` ou nom du sous-dossier, `KbLot.hub` =
+  son `_index.md`), noms des lots lus dans le hub du dossier (`##` ou
+  `###`), lots déclarés sans note émis vides. Panneau KB : un en-tête par
+  groupe (clic = hub), lots vides signalés, wikilinks résolus depuis le
+  dossier de la note ouverte puis par nom court ; statut autre que
+  `vérifié` surligné. CLI `kb.py toc` préfixe le groupe.
+
 - [8.L2] L'export d'un live régénère d'abord les rumbles de toutes les
   banques à presets (`sounddesign.rumble_live`, `POST /api/lives/{live}/export`
   renvoie un bilan par banque dans `rumbles`) : un preset édité ou un tempo
