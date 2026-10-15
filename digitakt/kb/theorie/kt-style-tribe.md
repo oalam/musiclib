@@ -28,7 +28,7 @@ Floxytek, Kodaman, Area 23, Apre, Liberté Naturel, Tekotak).
 | Kick (sub) | `X...X...X...X...` | 4 morceaux nets ; Floxytek `XXx.XXx.XXXxXXXx`, Kodaman `XxX.xXx.XXXxXXXX` | chez Floxytek et Kodaman le sub est plein entre les kicks : rumble ou basse sous 200 Hz (KT5) |
 | Toms, percs (mid) | `...x..x.....x.x.` en réponse au kick | moyenne `Xxxxx.xxXx.xXxxx` ; Tekotak `X..XX.xXX.xXX.Xx`, Area 23 `X.xXX.xXX..XX.xX` | le motif `X..X` par temps (kick et pickup sur le « a ») domine : anticipation (KT3) |
 | Hats (high) | `x.x.x.x.x.x.x.x.` croches, shuffle 50-56 % | moyenne `Xx.Xx.xxXx.xX.xx` | croches avec un « a » marqué ; `swing` 0,70-0,88 sur 4 morceaux sur 7 |
-| Rebond du kick | `X...X...X...X.X.` une mesure sur 2 ou 3 | trace : `x` sur les pas 2-3 d'un temps (Kodaman `XxX.xXx.`, Tekotak `X...X...X.x.X.x.`) ; par mesure (`kt_kick_bars.py`) sur *Smash* : 21 mesures sur les temps, 21 décalées d'une croche, 20 de roulement | le repliage moyenne les mesures : le doublé apparaît en coup faible ; la passe par mesure montre le rebond, le roulement et le déplacement |
+| Rebond du kick | `X...X...X...X.X.` une mesure sur 2 ou 3 | trace : `x` sur les pas 2-3 d'un temps (Kodaman `XxX.xXx.`, Tekotak `X...X...X.x.X.x.`) ; par mesure (`kt_kick_bars.py`, grille de la bank) sur *Smash* : 64 mesures sur les temps, 10 de roulement, 19 avec rebond, 18 vides, halte de deux temps à chaque phrase de 4 | le repliage moyenne les mesures : le doublé apparaît en coup faible ; la passe par mesure montre le rebond, le halte et les roulements |
 | Tonalité | pentatonique mineure sur la tonique du kick | Kodaman D pentatonique mineure (0,81), Apre F pentatonique mineure, Floxytek F phrygien | peu de notes, accords D5 / Dsus2 seuls (KT8) |
 | Structure | plateaux de 8-16 mesures, breakdowns de 4-8 | Kodaman : sections de 4 à 28 mesures, 13 tracks actives en main, 4 à 5 en breakdown | la bank générée ([[../../../library/digitakt/kodaman_-_beton]]) donne l'ordre d'entrée des tracks |
 
@@ -110,34 +110,101 @@ par mesure avec `scripts/kt_kick_bars.py` (stem drums, 8 croches par
 mesure), ou s'écoute.
 
 **Le martial par excellence : Kodaman x Mosmoz x Adharaa, *Smash*.** La
-passe par mesure sur le stem drums (152 BPM, 115 mesures) donne :
+passe par mesure (`scripts/kt_kick_bars.py`, stem drums, grille re-suivie
+par la bank à 156,6 BPM, 111 mesures) donne 64 mesures de kick sur les
+temps, 10 de roulement de croches, 19 mixtes (rebonds), 18 vides, et
+**aucune** mesure décalée d'une croche (une première passe sur la grille
+fixe du sidecar à 152 BPM en avait montré 21 : c'était la dérive de la
+grille, 3 % d'écart font glisser d'une croche en 4 mesures ; le script lit
+maintenant la grille de la bank). Ce que le morceau fait vraiment :
 
 ```
-sur les temps   X.X.X.X.   21 mesures
-décalé d'1 croche .X.X.X.X   21 mesures
-roulement       XXXXXXXX   20 mesures (1 à 2 mesures d'affilée)
-mixte, rebonds  X.X.X.Xx   33 mesures
-séquence : E1 R2 E4 m2 T3 R1 m1 R1 m2 E3 m1 R1 T2 … E5 R2 T5
+mesures  1 à 4 d'une phrase (kick, 8 croches par mesure)
+  ..X.X.X.  X.X.X.X.  X.X.X.X.  X.X.X...     le « halte » : deux temps sans kick à la jointure
+  X.X.X.XX  XxX.X.X.  X.X.X.X.  X.X.X...     le rebond : 4, « et », 1, « et » = roulement de 4 croches autour du 1
+  ..XXXxXx  XxXxX.Xx  X.XxX.X.  X.X.X.XX     le roulement long (peak, mesures 81 à 94)
 ```
 
-Le rebond y est poussé jusqu'au **déplacement** : un roulement de kick en
-croches d'une ou deux mesures, à longueur impaire, fait retomber le
-four-on-floor une croche plus tard, et la salle marche pendant 3 à 5
-mesures avec un kick **sur le « et »** (dissonance de déplacement D+2 de
-KT2), jusqu'au roulement suivant qui le ramène sur le temps. Le « martial »
-vient de cette alternance : roulement de tambour, pas cadencé, roulement,
-pas cadencé, et d'un kick qui, décalé, sonne comme une réponse au kick
-« normal ». Le simple rebond (`X.X.X.Xx`, 33 mesures « mixtes ») en est la
-forme courte ; le roulement d'une mesure (`XXXXXXXX`) en est la forme
-longue. À confirmer à l'oreille : la grille de beats du sidecar est fixe,
-donc le déplacement mesuré est bien dans le morceau, pas dans l'analyse.
-Sur la DT2, le roulement est un retrig `RATE` 1/8 sur une mesure (fiche
-[[../microtiming-retrigs]]) ; le déplacement se prépare dans un pattern
-réservoir (slots 9-12, doctrine §2) avec le kick posé sur les pas 3, 7, 11,
-15, que l'on enchaîne pour 4 mesures puis quitte par le roulement. Sur la DT2, il ne touche pas au kick sacré : un trig de plus
-sur le pas 15 de la track 1 en condition `2:2` ou `3:3`, ou un retrig
-`RATE` 1/8 `LEN` 1 sur le kick du pas 13 sous la même condition ; variante
-sur les toms (7) pour le doublé sans toucher à la 1.
+Trois gestes, donc. Le **halte** : le kick se tait sur le temps 4 de la
+dernière mesure et sur le temps 1 de la première, à chaque phrase de 4 ;
+deux temps de silence du grave qui font « stop… marche ». Le **rebond**
+avant le 1, comme décrit plus haut, mais sous forme de roulement de quatre
+croches à cheval sur la barre (`X.X.X.XX | XxX.`), une phrase sur deux
+dans les plateaux. Le **roulement long** en croches continues sur 6 à 8
+mesures au peak, qui est le même geste étiré. Le martial vient de
+l'alternance stricte halte / roulement / pas cadencé, à l'échelle de la
+phrase de 4. Kodaman *Béton* (bank à 161,5, 137 mesures : 53 sur les temps,
+0 décalée, 22 de roulement, 28 rebonds) fait exactement la même chose,
+avec deux roulements longs de 6 à 8 mesures au peak : c'est une signature
+d'écriture de Kodaman. Chez Floxytek (banks générées pour l'occasion,
+grille re-suivie) : *Roots* est un four-on-floor droit, 81 mesures sur les
+temps, 0 roulement, 17 rebonds ; *Micro Tribe* roule à l'intro
+(`XxXxXxXx`, croches à accents alternés, 9 mesures) et fait 35 mesures
+mixtes. Le halte et le roulement autour du 1 ne sont donc pas « le »
+tribe, ils sont le martial de Kodaman ; le rebond simple, lui, est
+partout.
+
+**Partition rythmique de *Smash*, mesure type du plateau** (pattern 04 de
+la bank, 8 mesures ; draft `digitakt.py` sur les stems, seuil 0,5 ; grille
+de la doctrine §1, rôles actuels) :
+
+| Pas | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 Kick | X | | | | X | | | | X | | | | X | | | |
+| 2 Rumble | | x | | | | x | | | | x | | | | x | | |
+| 3 Clap | | | | | | | | | | | | | | | x | |
+| 5 Hat fermé | | | | | | | | | | | | | x | | | |
+| 6 Hat ouvert | | | | | | | | | x | | x | | | | x | |
+| 8 Perc B | | | | | x | | | | x | | | | | | | |
+| 9 Basse | | | x | | | | x | | | | x | | | | x | |
+
+Lecture : le **rumble** est détecté sur le pas qui suit chaque kick (il
+gonfle après l'attaque, ducké pendant, doctrine §9) ; la **basse** est en
+contretemps strict (pas 3, 7, 11, 15, KT21) ; le clap tombe sur le pas 15,
+une **anticipation** du 1 plutôt qu'un backbeat ; le hat ouvert vit sur la
+seconde moitié de mesure (pas 9, 11, 15) ; la perc B double les temps 2 et
+3. Au peak (pattern 07) : clap sur 3 et 15, hat ouvert en `..x.......x.x.x.`,
+perc B en `....x...x.x.x...`, basse qui ajoute le pas 16 ; la dernière
+mesure de chaque phrase de 4 retire le kick du pas 13 et la première celui
+du pas 1 (le halte). Rebond : kick ajouté sur le pas 15 de la mesure 4 et
+le pas 3 de la mesure 1. Sur la DT2 : halte par `NOT` condition ou lock
+trig (deux trigs de kick en `4:4` et `1:4` retirés), rebond par deux trigs
+ajoutés sous la même condition, roulement par retrig `RATE` 1/8 sur une
+mesure (fiche [[../microtiming-retrigs]]).
+
+**Le kick et le rumble de Kodaman, mesurés** (`scripts/kt_kick_profile.py`,
+kick moyen sur 45 à 54 coups d'un plateau, stems Demucs) :
+
+| | *Smash* (156,6, 54 kicks) | *Béton* (161,5, 45 kicks) |
+|---|---|---|
+| Enveloppe | pic, −12 dB à 4 ms, −24 dB à 72 ms : un click très fort puis un corps de 70 ms | −12 dB à 2 ms, −24 dB à 28 ms : kick très court, 30 ms |
+| Hauteur de la queue | 91 Hz à 20 ms → 79 → 67 → 63 → 56 Hz (A1) à 130 ms : pitch envelope d'une octave sur 100 ms | 92 → 62 → 57 Hz (A#1) à 40-60 ms, puis plus rien : la descente est faite en 40 ms |
+| Spectre du corps | 60-120 Hz dominant, sub 30-60 à −4 dB, 120-300 à −8, 300-1k à −13, 1-3k à −16 : riche jusqu'à 3 kHz | 60-120 dominant, 120-300 à −3 dB, 300-1k à −10 : encore plus d'harmoniques graves |
+| Saturation | facteur de crête 5,6 dB, 9 % des échantillons à plus de 85 % du pic : crêtes **aplaties**, clipping ou saturation dure | facteur de crête 13,8 dB, 2 % : harmoniques riches mais crêtes intactes, saturation douce ou distorsion avant un transitoire préservé |
+| La pointe d'aigus | centroïde des 8 premières ms à 2,6 kHz, 3-8 kHz à +9 dB sur l'attaque par rapport au corps : un click 1-3 kHz collé devant | centroïde à 670 Hz, 60-300 Hz à +7 dB sur l'attaque : un « knock » bas-médium plutôt qu'un click |
+| Rumble entre les kicks | stem drums à **+7 dB** du sub de l'attaque, bass à −1 dB : le rumble est dans les drums, plus fort que le kick lui-même | drums à −13 dB, **bass à +12 dB** : le sub entre les kicks est tenu par la basse, le kick n'a pas de queue |
+| Profil du sub sur un temps | 0, +3, +3, −8, −27, −33, −46, −16 dB par huitième de temps : gonfle 140 ms puis coupé net | 0, −6, −19, −24… : le sub du kick meurt en 100 ms |
+
+Lecture pour la DT2. *Smash* est un **kick en deux étages** : un click
+1-3 kHz de quelques millisecondes (c'est lui qui donne la « pointe
+d'aigus »), puis un corps saturé à crêtes aplaties avec un pitch envelope
+d'une octave, 90 vers 56 Hz, sur 100 ms (le « bouncy »), accordé sur A1.
+Le rumble n'est pas une longue queue : c'est une **bosse de sub** qui
+gonfle pendant 140 ms après chaque kick, 7 dB au-dessus du sub du kick,
+puis **gate** net à la moitié du temps (chute de 30 à 45 dB) pour laisser
+la basse en contretemps ; la bank le voit sur le pas qui suit le kick
+(partition ci-dessus). *Béton* fait l'inverse : kick très court et
+« knock » dans les bas-médiums, sans click, et un **rumble porté par la
+basse** (stem bass à +12 dB) qui roule entre les kicks, la variante
+« sans basse » de la doctrine §9. Recette *Smash* sur la machine :
+click sur une track à part ou sample en couches (fiche
+[[../kick-mental-vst]], trois couches de KT12), overdrive en deux étages
+puis bitreduction légère (fiche [[../amp-overdrive-bitreduction]]), LFO
+exponentiel sur `TUNE` relancé au trig (+12 demi-tons, 100 ms, fiche
+[[../lfo]]) ; rumble 2 avec AMP attaque 20 ms / decay 120 ms et ducking
+(fiche [[../rumble-grave]]), donc une bosse, pas une nappe. Réserve :
+Demucs range le rumble tonal dans `bass` ou `drums` selon le morceau, d'où
+les deux colonnes lues ensemble.
 
 **Les hats en léger shuffle.** La veille donne 50-56 % ; KT3 montre
 qu'à 165-190 BPM, 56 % vaut 7 à 10 ms, à peine audible mais présent. Ce

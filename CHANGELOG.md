@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] `scripts/kt_kick_profile.py` : kick moyen d'un plateau depuis les
+  stems (enveloppe, pitch envelope et note de la queue, spectre attaque /
+  corps, indices de saturation, click, rumble par stem et profil du sub sur
+  un temps). KT10 : kick et rumble de Kodaman mesurés (*Smash* : click
+  1-3 kHz puis corps saturé à crêtes aplaties, pitch envelope 91 → 56 Hz
+  sur 100 ms, rumble en bosse de 140 ms à +7 dB gatée à la moitié du temps ;
+  *Béton* : kick de 30 ms à knock bas-médium, rumble porté par la basse),
+  recette DT2 correspondante ; passe par mesure sur Béton et Floxytek
+  (banks générées) : zéro mesure décalée, le halte et le roulement autour
+  du 1 sont une signature de Kodaman, le rebond simple est partout.
 - [7.M] `scripts/kt_kick_bars.py` : kick mesure par mesure en croches depuis
   le stem drums (attaque détectée par la montée d'enveloppe 35-130 Hz),
   période des coups sur chaque « et », séquence des mesures (temps /
@@ -15,6 +25,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   Adharaa *Smash* : 21 mesures sur les temps, 21 décalées d'une croche, 20
   de roulement ; KT10 documente le rebond poussé jusqu'au déplacement du
   kick, le morceau ajouté aux références tribe du hub.
+- [7.M] Correction : le « déplacement » mesuré sur *Smash* était un artefact
+  de la grille fixe du sidecar (152 BPM contre 156,6 réels, dérive d'une
+  croche en 4 mesures). `kt_kick_bars.py` lit désormais la grille re-suivie
+  de la bank Digitakt quand elle existe ; sur *Smash* : 64 mesures sur les
+  temps, 0 décalée, 10 de roulement, 19 rebonds. KT10 réécrite en
+  conséquence : halte de deux temps à chaque phrase de 4, rebond en
+  roulement de 4 croches autour du 1, roulement long au peak, et partition
+  rythmique de la mesure type (kick, rumble sur le pas suivant, clap en
+  anticipation, hats, perc, basse en contretemps) tirée de la bank.
 - [7.M] KT20 hats, ride et haut du spectre (bande high par style depuis
   le hub, fermé = grille, ouvert = contretemps avec choke par AMP ou
   preset lock, profils de vélocité de grille, polymétrie des hats,

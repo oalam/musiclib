@@ -15,14 +15,18 @@ met le plus d'energie sur les temps.
 
     scripts/.venv/bin/python kt_kick_bars.py kodaman_mosmoz_adharaa_-_kodaman_x_mosmoz_x_adharaa_smash_fs02_free_dl
 
-Exemple (Kodaman x Mosmoz x Adharaa, *Smash*, 152 BPM, 115 mesures) : 21
-mesures sur les temps, 21 decalees d'une croche, 20 de roulement ; les
-roulements de 1-2 mesures a longueur impaire font basculer le four-on-floor
-sur le « et » pour 3 a 5 mesures, puis le ramenent : le « martial » de KT10.
+Exemple (Kodaman x Mosmoz x Adharaa, *Smash*, bank a 156,6 BPM, 111 mesures) :
+64 mesures sur les temps, 0 decalee, 10 de roulement, 19 mixtes, 18 vides ;
+le kick se tait deux temps a chaque jointure de phrase de 4 (le « halte ») et
+roule sur 4 croches autour du 1 une phrase sur deux (le rebond, KT10). Sur la
+grille fixe du sidecar (152 BPM, 3 % d'ecart) la meme passe donnait 21
+mesures « decalees d'une croche » : un artefact de derive, d'ou la grille
+de la bank quand elle existe.
 """
 from __future__ import annotations
 
 import argparse, json, sys, warnings
+from pathlib import Path
 import numpy as np
 warnings.filterwarnings("ignore")
 import librosa
@@ -36,7 +40,15 @@ import glob, os
 stem = glob.glob(f"/Volumes/xtreme/Mix/stems/{slug}/*drums*")
 path = stem[0] if stem else "/Volumes/xtreme/Mix/" + d["file_path"]
 print("source :", os.path.basename(path))
-beats = np.array(d["beats"]["beat_times_s"])
+beats = np.array(d["beats"]["beat_times_s"])  # grille fixe du sidecar (override library)
+bank = Path(f"library/digitakt/{slug}.json")
+if bank.exists():
+    # grille re-suivie sur le kick du stem drums (digitakt.py, decision 7.B) : fiable
+    bars_t = np.array(json.loads(bank.read_text())["bar_times_s"])
+    beats = np.concatenate([np.linspace(a, b, 4, endpoint=False) for a, b in zip(bars_t[:-1], bars_t[1:])])
+    print(f"grille : bank Digitakt ({json.loads(bank.read_text())['bpm']} BPM, re-suivie sur le stem drums)")
+else:
+    print(f"grille : sidecar, tempo fixe {d['beats']['tempo_bpm']} BPM (un ecart de 1 % fait deriver d'une croche en 12 mesures : verifier)")
 y, sr = librosa.load(path, sr=22050, mono=True)
 sos = butter(4, [35, 130], btype="band", fs=sr, output="sos")
 low = sosfilt(sos, y)

@@ -193,18 +193,32 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
 | techno lente | polar_inertia_-_hell_frozen_over | 129.2 | `.xXXXX.xxXx.xxxx` | `.xXXXXXXxXx.xXXx` | `XXX.xXXx.xX.x...` | 0.81 | 0.50 | 0.94 |
 | techno lente | kangding_ray_-_amber_decay | 123.0 | `XXXXxXXXxxXX.xXX` | `xXx..xx..xx.xXxx` | `.XxXx.Xx..x.x..x` | 0.74 | 0.48 | 0.94 |
 
-### Passe par mesure — `kt_kick_bars.py` (rebond, déplacement, roulements)
+### Passe par mesure — `kt_kick_bars.py` (rebond, halte, roulements)
 
 Le repliage sur 16 pas moyenne les mesures et cache tout ce qui a une
-période de 2 ou 3 mesures. `scripts/kt_kick_bars.py <slug>` lit le stem
-drums (ou le mix), détecte l'attaque du kick dans 35-130 Hz et imprime 8
-croches par mesure, puis la séquence des mesures : T sur les temps, E
-décalé d'une croche, R roulement, m mixte (rebond), _ vide. Sortie du
-2026-10-15 sur Kodaman x Mosmoz x Adharaa, *Smash* (152 BPM, 115 mesures) :
-T 21, E 21, R 20, m 33, _ 20 ; séquence `E1 R2 E4 m2 T3 R1 m1 R1 m2 E3 m1 R1
-T2 m1 T1 R2 … E5 R2 T5`. Lecture dans [[kt-style-tribe]] (le rebond poussé
-jusqu'au déplacement du kick sur le « et »). À passer sur les autres tribe
-avant de généraliser.
+période de 2 à 4 mesures. `scripts/kt_kick_bars.py <slug>` lit le stem
+drums (sans stem, la basse en contretemps compte comme un kick : résultat
+inutilisable), prend la grille de beats de la bank Digitakt si elle existe
+(re-suivie sur le kick du stem, décision 7.B ; sinon la grille fixe du
+sidecar, dont 1 % d'écart de tempo fait dériver d'une croche en 12 mesures
+et fabrique de faux « décalages »), détecte l'attaque du kick dans
+35-130 Hz et imprime 8 croches par mesure, puis la séquence des mesures :
+T sur les temps, E décalé d'une croche, R roulement, m mixte (rebond),
+_ vide.
+
+| Morceau | Grille | T | E | R | m | _ | Lecture |
+|---|---|---|---|---|---|---|---|
+| Kodaman x Mosmoz x Adharaa, *Smash* (156,6) | bank | 64 | 0 | 10 | 19 | 18 | halte de 2 temps à chaque phrase de 4, rebond en roulement de 4 croches autour du 1, roulement long au peak ; une passe sur la grille fixe à 152 donnait E 21, artefact de dérive |
+| Kodaman, *Béton* (161,5) | bank | 53 | 0 | 22 | 28 | 34 | même recette : halte `..X.X.X.` en tête de phrase, rebond `X.X.X.XX \| XXX.X.X.` autour du 1, deux roulements longs de 6 à 8 mesures (31-38, 39-44) ; sur la grille fixe du sidecar la passe donnait E 17 |
+| Floxytek, *Roots* (161,5, bank générée le 2026-10-15) | bank | 81 | 0 | 0 | 17 | 75 | four-on-floor droit, pas de roulement, rebonds rares |
+| Floxytek, *Micro Tribe* (161,5, bank générée) | bank | 36 | 0 | 9 | 35 | 56 | roulements à accents alternés `XxXxXxXx` à l'intro, beaucoup de mesures mixtes ; sur la grille fixe la passe donnait E 13 |
+
+Sans stem (Area 23, Apre, Liberté Naturel, Tekotak) : non analysables, la
+basse compte comme un kick. Les quatre passes sur grille fixe donnaient
+13 à 26 mesures « décalées » chacune : toutes artefacts. Détail dans
+[[kt-style-tribe]], qui ajoute le profil du kick et du rumble de Kodaman
+(`scripts/kt_kick_profile.py <slug> <mesure> <mesure>` : enveloppe,
+hauteur de la queue, spectre, saturation, click, rumble par stem).
 
 ### Lecture rapide (à confirmer à l'oreille)
 
