@@ -99,6 +99,18 @@ serrés : le motif « part ». Sur la DT2 le paramètre `RO1` (fiche
 [[../euclidien]]) tourne la cellule en direct ; écouter les 8 rotations
 d'un tresillo vaut une leçon.
 
+**Les deux cellules de 4 pas : contretemps et anticipation.** Avant
+toute cellule de 8 ou 16 pas, un temps de four-on-floor se découpe en
+quatre pas, `1 e et a`. Le kick tient le `1` ; les deux cellules les plus
+courantes de la techno placent un coup sur l'une des trois autres
+positions : le **contretemps** `..x.` (le « et », la place du hat ouvert
+et de la basse tribe, la syncope de base) et l'**anticipation** `...x`
+(le « a », la place des toms tribe et des accents acid, qui tire vers le
+temps suivant). Répétées quatre fois, elles donnent `..x...x...x...x.` et
+`...x...x...x...x` ; mêlées à un tresillo, elles en sont les
+constituants (le tresillo contient un « a » au pas 4 et un « et » au pas
+7). Le rôle des hats dans cette syncope est détaillé dans KT3.
+
 **Hémiole** : sur une track de 6 pas (KT2 pour la polymétrie), `x.x.x.`
 contre `x..x..` ; en 12 pas, hats `x...x...x...` contre perc `x..x..x..x..`.
 Les deux cycles se retrouvent tous les 12 pas ; c'est la cellule de la

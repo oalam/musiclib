@@ -13,7 +13,9 @@ updated: 2026-10-15
 **En une phrase** : le groove d'une boucle droite vient de trois leviers
 indépendants, le décalage temporel (swing global ou micro timing par
 trig), la vélocité (accents et ghost notes) et la densité (combien de
-coups, décidés par les conditions) ; en tribe à 190 BPM, les morceaux de
+coups, décidés par les conditions), et sur un four-on-floor c'est aux
+hats que revient la syncope, le fermé qui tient la grille et l'ouvert qui
+marque le contretemps ; en tribe à 190 BPM, les morceaux de
 référence montrent que le levier dominant n'est pas le swing mais
 l'anticipation, un coup placé sur le pas qui précède le temps.
 
@@ -25,6 +27,8 @@ l'anticipation, un coup placé sur le pas qui précède le temps.
 | Hats shuffle 56 % | `x.x.x.x.x.x.x.x.` avec les pas pairs retardés | tribe `swing` 0,70-0,88, acid 0,76-0,95 | le « a » porte plus d'énergie que le « e » dans 13 morceaux sur 21 |
 | Ghost notes | `..g...g...g...g.` à vélocité 20-40 | mid acid `X.xXx.xxX.xxX.xx` : des `x` entre les `X` | un fond faible et continu sous les accents |
 | Contre-exemple | | floxytek `swing` 0,20-0,26, diuko303 0,27 | énergie sur le « e » : motifs qui suivent le temps, à écouter pour comparer |
+| Hat ouvert offbeat | `..x...x...x...x.` | hard techno high `.xX.XxXxx.X.xXX.`, `sync` 0,64 | le contretemps (pas 3, 7, 11, 15) porte la syncope ; `sync` = part d'énergie hors des temps |
+| Hats par style (high) | tribe croches, acid 16es, DnB continu | tribe `Xx.Xx.xxXx.xX.xx`, acid `xxxXxxxXxxxXx.xX`, dnb `XxxxxxxxxXxX.xXx` | la bande high est le pattern de hats : c'est elle qui dit le style au-dessus d'un même kick |
 
 Rappel de la métrique du hub ([[_index]]) : `swing` = part d'énergie sur le
 « a » (4e double croche de chaque temps) contre le « e » (2e) ; 0,5 =
@@ -44,6 +48,16 @@ Rappel de la métrique du hub ([[_index]]) : `swing` = part d'énergie sur le
   [[../microtiming-retrigs]]).
 - **Anticipation** (pickup) : coup posé sur le pas qui précède le temps ;
   il crée la poussée sans décaler quoi que ce soit (KT1).
+- **Syncope** : accent sur une position faible (le « et », le « a »)
+  alors que la position forte (le temps) reste vide ou plus faible ; la
+  métrique `sync` du hub mesure la part d'énergie hors des temps.
+- **Contretemps** (offbeat) : la syncope la plus simple, un coup sur le
+  « et » de chaque temps (`..x.`) ; c'est la place du hat ouvert et de la
+  basse tribe.
+- **Hat fermé / hat ouvert** : le fermé (5) tient la grille en croches ou
+  doubles croches, l'ouvert (6) marque le contretemps et se coupe au hat
+  fermé suivant (choke) ; un seul ouvert bien placé vaut un empilement
+  (doctrine §1).
 - **Accent** : trig à vélocité pleine, souvent doublé d'une ouverture de
   filtre ; **ghost note** : trig à vélocité faible qui texture sans
   marquer.
@@ -114,6 +128,41 @@ fort. Les ghost notes de clap (vélocité 20-35 sur les pas 4 et 12 autour
 du backbeat, KT4) donnent le feel « drum and bass » sans changer un seul
 placement.
 
+**Les hats : la syncope habite le haut du spectre.** Sur un
+four-on-floor, le kick occupe les temps ; tout ce qui syncope doit donc
+vivre entre les temps et au-dessus du grave, et c'est le rôle des hats.
+Trois couches, trois fonctions :
+
+| Couche | Pattern | Fonction | Track |
+|---|---|---|---|
+| Hat fermé en doubles croches | `xxxxxxxxxxxxxxxx` à vélocités variées | la **grille** : rend audibles les 16 pas, donc rend lisibles les syncopes des autres tracks | 5 |
+| Hat fermé en croches | `x.x.x.x.x.x.x.x.` | la grille allégée ; le « e » et le « a » restent vides, donc disponibles | 5 |
+| Hat ouvert au contretemps | `..x...x...x...x.` | la **syncope de base** : un coup sur chaque « et », le balancier ; il se coupe au hat fermé suivant | 6 |
+| Hat ou ride sur le « a » | `...x...x...x...x` | l'**anticipation** : tire vers le temps suivant (tribe, acid) | 5 ou 4 |
+| Ride | croches ou noires | couleur de plein régime, sort en breakdown (doctrine §1) | 4 |
+
+Le contretemps `..x.` est la syncope la plus simple : l'oreille tient le
+temps grâce au kick, le hat ouvert tombe exactement à l'opposé, et
+l'alternance kick-hat fait le balancement house et techno. Déplacer ce
+hat d'un pas en arrière (sur le « a », `...x`) change le balancement en
+poussée : c'est toute la différence entre le hard techno (hat sur le
+« et », `swing` 0,37, l'énergie suit) et le tribe (coups sur le « a »,
+`swing` 0,70-0,88, l'énergie précède). Avec un même kick, le pattern de
+hats décide du style : la bande high mesurée du hub est la plus
+différente d'un style à l'autre (tribe `Xx.Xx.xxXx.xX.xx` en croches
+avec le « a », acid `xxxXxxxXxxxXx.xX` en doubles croches accentuées sur
+le « a », DnB `XxxxxxxxxXxX.xXx` presque continu).
+
+Deux règles pour la DT2 : le hat fermé en doubles croches n'est pas plat,
+ses vélocités dessinent la syncope (exercice 3 : 100 / 30 / 70 / 30 ou
+100 / 30 / 30 / 70 selon que l'accent va sur le « et » ou le « a ») ; et
+le hat ouvert est **un** trig par temps au plus, coupé par le fermé
+(choke, même voix ou AMP courte), sinon le haut du spectre se bouche et
+la syncope disparaît dans la masse. La syncope se mesure dans le hub
+par `sync` : 0,35 à 0,52 en tribe (peu d'énergie hors temps, la syncope
+est dans les toms), 0,64 en hard techno (hat ouvert et rumble entre les
+temps), 0,52 à 0,70 en DnB (le kick lui-même syncope, KT4).
+
 **Densité comme levier de tension.** La veille et la doctrine §6 le
 disent : retrancher crée autant d'énergie qu'ajouter. Les conditions
 rendent la densité **variable dans le temps** sans changer de pattern :
@@ -143,6 +192,12 @@ ouvert 6, perc A 7, perc B 8.
    9, 13, `VEL` 70 sur 3, 7, 11, 15, `VEL` 30 ailleurs (locks par trig).
    Puis `PROB` 60 % sur les trigs à 30 (fiche [[../fill-conditions]]).
    Sans aucun swing, la boucle respire.
+4. **Le hat ouvert décide du style (5 min).** Kick 1, hat fermé 5 en
+   croches. Hat ouvert 6 sur 3, 7, 11, 15 (le « et ») : balancement
+   techno. Le déplacer sur 4, 8, 12, 16 (le « a ») : poussée tribe. Le
+   mettre sur les deux : bouché. Puis un seul hat ouvert par mesure, sur
+   le pas 15 seulement : la syncope devient un turnaround (KT9). AMP du
+   hat ouvert courte pour qu'il se coupe au fermé suivant.
 
 ## Pièges
 

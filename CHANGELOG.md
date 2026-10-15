@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KT3 : les hats et la syncope (fermé = grille, ouvert = contretemps,
+  « a » = anticipation, ride), définitions de syncope et de contretemps,
+  lecture de la métrique `sync` du hub par style, exercice « le hat ouvert
+  décide du style » ; KT1 : les deux cellules de 4 pas, contretemps `..x.`
+  et anticipation `...x`.
 - [7.M] KB théorie, lot 3 (styles cœur du live) : KT10 tribe / hardtek
   (boucle de référence en six tracks, pitch envelope, toms en
   appel-réponse qui anticipent, plateaux et points d'orgue, bank Kodaman

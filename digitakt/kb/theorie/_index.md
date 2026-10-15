@@ -49,7 +49,7 @@ SORT lot ASC, ordre ASC
 |---|---|---|---|---|---|
 | 1 | Cellules rythmiques | [[kt-cellules-rythmiques]] | tresillo, cinquillo, claves son / rumba, hémiole, table E(k,n), rotation | [[../euclidien]] | draft |
 | 2 | Polymétrie, polyrythmie, dissonance métrique | [[kt-polymetrie-polyrythmie]] | ppcm, 3:4, 5:4, 7:8, groupement / déplacement (Butler), cycles | [[../polymetrie]] | draft |
-| 3 | Swing, microtiming, ghost notes, densité | [[kt-swing-microtiming]] | binaire / ternaire, pourcentages, vélocité, accents, conditions comme densité | [[../microtiming-retrigs]], [[../fill-conditions]] | draft |
+| 3 | Swing, microtiming, ghost notes, densité | [[kt-swing-microtiming]] | binaire / ternaire, pourcentages, vélocité, accents, conditions comme densité ; hats fermé / ouvert, contretemps et syncope (`sync`) | [[../microtiming-retrigs]], [[../fill-conditions]] | draft |
 | 4 | Backbeat, half-time, passerelles de tempo | [[kt-halftime-passerelles]] | 90 / 180, 140 / 186, 175 ; ouvrir un live à 190 vers DnB et dubstep | [[../slice-breaks]] | draft |
 
 ### Lot 2 — Socle harmonique et forme
