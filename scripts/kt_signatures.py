@@ -34,6 +34,7 @@ STYLES: dict[str, list[str]] = {
         "apre_-_contrast",
         "liberte_naturel_-_tracknard",
         "tekotak_-_lokapi",
+        "kodaman_mosmoz_adharaa_-_kodaman_x_mosmoz",
     ],
     "acidcore_mental": [
         "six_ou_sept_-_acid_pirate",

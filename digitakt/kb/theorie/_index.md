@@ -110,7 +110,8 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
 | apre_-_contrast | 161.5 | `X.x.X.x.X...X.x.` | `XxXXX.xXXx.XXxXx` | `xxxXx..Xxx.Xx..x` | 0.52 | 0.72 | 0.91 |
 | liberte_naturel_-_tracknard | 184.6 | `X...X...X...X...` | `X..Xx.XxX..xX..x` | `X..XxxXxX..XX.xx` | 0.35 | 0.78 | 0.94 |
 | tekotak_-_lokapi | 172.3 | `X...X...X.x.X.x.` | `X..XX.xXX.xXX.Xx` | `xX.Xx..XxX.Xx.xX` | 0.44 | 0.70 | 0.91 |
-| **moyenne (7)** | | `Xxx.X.x.Xx..Xxxx` | `Xxxxx.xxXx.xXxxx` | `Xx.Xx.xxXx.xX.xx` | | | |
+| kodaman_mosmoz_adharaa_-_smash (ajouté le 2026-10-15, KT10 rebond) | 152.0 | `XXx.XxX.X.XxXXX.` | `XxxxX.X.X.XxX.X.` | `X.xxX.X.xxXxX.Xx` | 0.33 | 0.53 | 0.90 |
+| **moyenne (8)** | | `Xxx.X.x.Xxx.Xxxx` | `Xxxxx.xxXxxxXxxx` | `Xx.Xx.xxXx.xX.xx` | | | |
 
 ### acidcore_mental
 
@@ -191,6 +192,19 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
 | dubstep | **moyenne (4)** | | `X...Xx..Xxx.X...` | `Xx.xxxxxXxxxXxxx` | `x..XxxxXx..Xx..x` | | | |
 | techno lente | polar_inertia_-_hell_frozen_over | 129.2 | `.xXXXX.xxXx.xxxx` | `.xXXXXXXxXx.xXXx` | `XXX.xXXx.xX.x...` | 0.81 | 0.50 | 0.94 |
 | techno lente | kangding_ray_-_amber_decay | 123.0 | `XXXXxXXXxxXX.xXX` | `xXx..xx..xx.xXxx` | `.XxXx.Xx..x.x..x` | 0.74 | 0.48 | 0.94 |
+
+### Passe par mesure — `kt_kick_bars.py` (rebond, déplacement, roulements)
+
+Le repliage sur 16 pas moyenne les mesures et cache tout ce qui a une
+période de 2 ou 3 mesures. `scripts/kt_kick_bars.py <slug>` lit le stem
+drums (ou le mix), détecte l'attaque du kick dans 35-130 Hz et imprime 8
+croches par mesure, puis la séquence des mesures : T sur les temps, E
+décalé d'une croche, R roulement, m mixte (rebond), _ vide. Sortie du
+2026-10-15 sur Kodaman x Mosmoz x Adharaa, *Smash* (152 BPM, 115 mesures) :
+T 21, E 21, R 20, m 33, _ 20 ; séquence `E1 R2 E4 m2 T3 R1 m1 R1 m2 E3 m1 R1
+T2 m1 T1 R2 … E5 R2 T5`. Lecture dans [[kt-style-tribe]] (le rebond poussé
+jusqu'au déplacement du kick sur le « et »). À passer sur les autres tribe
+avant de généraliser.
 
 ### Lecture rapide (à confirmer à l'oreille)
 

@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] `scripts/kt_kick_bars.py` : kick mesure par mesure en croches depuis
+  le stem drums (attaque détectée par la montée d'enveloppe 35-130 Hz),
+  période des coups sur chaque « et », séquence des mesures (temps /
+  décalé d'une croche / roulement / mixte). Sur Kodaman x Mosmoz &
+  Adharaa *Smash* : 21 mesures sur les temps, 21 décalées d'une croche, 20
+  de roulement ; KT10 documente le rebond poussé jusqu'au déplacement du
+  kick, le morceau ajouté aux références tribe du hub.
 - [7.M] KT20 hats, ride et haut du spectre (bande high par style depuis
   le hub, fermé = grille, ouvert = contretemps avec choke par AMP ou
   preset lock, profils de vélocité de grille, polymétrie des hats,

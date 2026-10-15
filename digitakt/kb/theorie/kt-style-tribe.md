@@ -28,7 +28,7 @@ Floxytek, Kodaman, Area 23, Apre, Liberté Naturel, Tekotak).
 | Kick (sub) | `X...X...X...X...` | 4 morceaux nets ; Floxytek `XXx.XXx.XXXxXXXx`, Kodaman `XxX.xXx.XXXxXXXX` | chez Floxytek et Kodaman le sub est plein entre les kicks : rumble ou basse sous 200 Hz (KT5) |
 | Toms, percs (mid) | `...x..x.....x.x.` en réponse au kick | moyenne `Xxxxx.xxXx.xXxxx` ; Tekotak `X..XX.xXX.xXX.Xx`, Area 23 `X.xXX.xXX..XX.xX` | le motif `X..X` par temps (kick et pickup sur le « a ») domine : anticipation (KT3) |
 | Hats (high) | `x.x.x.x.x.x.x.x.` croches, shuffle 50-56 % | moyenne `Xx.Xx.xxXx.xX.xx` | croches avec un « a » marqué ; `swing` 0,70-0,88 sur 4 morceaux sur 7 |
-| Rebond du kick | `X...X...X...X.X.` une mesure sur 2 ou 3 | trace : `x` sur les pas 2-3 d'un temps (Kodaman `XxX.xXx.`, Tekotak `X...X...X.x.X.x.`) | le repliage moyenne les mesures : le doublé apparaît en coup faible, sa périodicité (2 ou 3 mesures) est invisible, à écouter |
+| Rebond du kick | `X...X...X...X.X.` une mesure sur 2 ou 3 | trace : `x` sur les pas 2-3 d'un temps (Kodaman `XxX.xXx.`, Tekotak `X...X...X.x.X.x.`) ; par mesure (`kt_kick_bars.py`) sur *Smash* : 21 mesures sur les temps, 21 décalées d'une croche, 20 de roulement | le repliage moyenne les mesures : le doublé apparaît en coup faible ; la passe par mesure montre le rebond, le roulement et le déplacement |
 | Tonalité | pentatonique mineure sur la tonique du kick | Kodaman D pentatonique mineure (0,81), Apre F pentatonique mineure, Floxytek F phrygien | peu de notes, accords D5 / Dsus2 seuls (KT8) |
 | Structure | plateaux de 8-16 mesures, breakdowns de 4-8 | Kodaman : sections de 4 à 28 mesures, 13 tracks actives en main, 4 à 5 en breakdown | la bank générée ([[../../../library/digitakt/kodaman_-_beton]]) donne l'ordre d'entrée des tracks |
 
@@ -105,8 +105,36 @@ repart droite. Trois choses font l'effet « martial » :
 Le rebond tire **vers** le 1 : c'est une anticipation (KT1, KT3) à
 l'échelle de la mesure, comme le « a » l'est à l'échelle du temps. La
 passe du hub n'en montre que la trace (un `x` faible sur les pas 2-3,
-puisque le repliage moyenne les mesures) ; la périodicité s'écoute sur les
-références. Sur la DT2, il ne touche pas au kick sacré : un trig de plus
+puisque le repliage moyenne les mesures) ; la périodicité se lit mesure
+par mesure avec `scripts/kt_kick_bars.py` (stem drums, 8 croches par
+mesure), ou s'écoute.
+
+**Le martial par excellence : Kodaman x Mosmoz x Adharaa, *Smash*.** La
+passe par mesure sur le stem drums (152 BPM, 115 mesures) donne :
+
+```
+sur les temps   X.X.X.X.   21 mesures
+décalé d'1 croche .X.X.X.X   21 mesures
+roulement       XXXXXXXX   20 mesures (1 à 2 mesures d'affilée)
+mixte, rebonds  X.X.X.Xx   33 mesures
+séquence : E1 R2 E4 m2 T3 R1 m1 R1 m2 E3 m1 R1 T2 … E5 R2 T5
+```
+
+Le rebond y est poussé jusqu'au **déplacement** : un roulement de kick en
+croches d'une ou deux mesures, à longueur impaire, fait retomber le
+four-on-floor une croche plus tard, et la salle marche pendant 3 à 5
+mesures avec un kick **sur le « et »** (dissonance de déplacement D+2 de
+KT2), jusqu'au roulement suivant qui le ramène sur le temps. Le « martial »
+vient de cette alternance : roulement de tambour, pas cadencé, roulement,
+pas cadencé, et d'un kick qui, décalé, sonne comme une réponse au kick
+« normal ». Le simple rebond (`X.X.X.Xx`, 33 mesures « mixtes ») en est la
+forme courte ; le roulement d'une mesure (`XXXXXXXX`) en est la forme
+longue. À confirmer à l'oreille : la grille de beats du sidecar est fixe,
+donc le déplacement mesuré est bien dans le morceau, pas dans l'analyse.
+Sur la DT2, le roulement est un retrig `RATE` 1/8 sur une mesure (fiche
+[[../microtiming-retrigs]]) ; le déplacement se prépare dans un pattern
+réservoir (slots 9-12, doctrine §2) avec le kick posé sur les pas 3, 7, 11,
+15, que l'on enchaîne pour 4 mesures puis quitte par le roulement. Sur la DT2, il ne touche pas au kick sacré : un trig de plus
 sur le pas 15 de la track 1 en condition `2:2` ou `3:3`, ou un retrig
 `RATE` 1/8 `LEN` 1 sur le kick du pas 13 sous la même condition ; variante
 sur les toms (7) pour le doublé sans toucher à la 1.
