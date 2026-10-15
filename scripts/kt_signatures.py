@@ -8,6 +8,11 @@ puis la moyenne du style. Sortie à coller dans `digitakt/kb/theorie/_index.md`.
 
     python kt_signatures.py            # tous les styles
     python kt_signatures.py tribe dnb  # certains styles
+    python kt_signatures.py --harmony  # passe harmonique (gamme, accords)
+
+Passe harmonique (lot 2, KT5-KT9) : gamme detectee (`harmony.scale` du
+sidecar, score et incertitude) et accords distincts de la section principale
+(`harmony.progression`), pour comparer la theorie des modes aux morceaux.
 """
 
 from __future__ import annotations
@@ -116,14 +121,48 @@ def report(style: str, patterns: list[str]) -> list[str]:
     return lines
 
 
+def harmony_report(style: str, patterns: list[str]) -> list[str]:
+    """Lignes markdown : gamme detectee et accords de la section principale."""
+    lines = [
+        f"### {style}",
+        "",
+        "| morceau | gamme détectée | score | accords (section principale) |",
+        "|---|---|---|---|",
+    ]
+    for pat in patterns:
+        files = sorted(glob.glob(str(ROOT / "library" / "quality" / f"{pat}*.json")))
+        if not files:
+            lines.append(f"| `{pat}` | absent de la library | | |")
+            continue
+        data = json.loads(Path(files[0]).read_text())
+        harm = data.get("harmony") or {}
+        scale = harm.get("scale") or {}
+        prog = harm.get("progression") or []
+        main_sec = next((p for p in prog if p.get("label") == "main"), prog[0] if prog else None)
+        chords = (main_sec or {}).get("chords") or []
+        distinct = [c for i, c in enumerate(chords) if i == 0 or c != chords[i - 1]]
+        score = f"{scale['score']:.2f}" if "score" in scale else ""
+        if scale.get("uncertain"):
+            score += " (incertain)"
+        lines.append(
+            f"| {Path(files[0]).stem[:40]} | {scale.get('label', 'sans analyse')} | {score} | "
+            f"{' '.join(distinct[:8]) or '—'} |"
+        )
+    lines.append("")
+    return lines
+
+
 def main(argv: list[str]) -> int:
+    harmony = "--harmony" in argv
+    argv = [a for a in argv if a != "--harmony"]
     wanted = argv or list(STYLES)
     unknown = [s for s in wanted if s not in STYLES]
     if unknown:
         print(f"styles inconnus : {', '.join(unknown)} (connus : {', '.join(STYLES)})")
         return 2
     for style in wanted:
-        print("\n".join(report(style, STYLES[style])))
+        fn = harmony_report if harmony else report
+        print("\n".join(fn(style, STYLES[style])))
     return 0
 
 

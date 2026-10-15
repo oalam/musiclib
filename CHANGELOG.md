@@ -8,37 +8,19 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
-- [7.M] KB théorie, lot 1 (socle rythmique) : KT1 cellules rythmiques
-  (tresillo, cinquillo, claves, hémiole, table E(k, n) canonique, rotation),
-  KT2 polymétrie / polyrythmie / dissonance métrique (table des ppcm contre
-  16 pas en mesures et en secondes à 190 BPM, groupement / déplacement de
-  Butler, trois voies de polyrythmie sur la DT2), KT3 swing / microtiming /
-  ghost notes / densité (table swing en millisecondes à 190 et 130 BPM,
-  lecture de la métrique `swing` du hub : l'ornement tribe anticipe le
-  temps au lieu de shuffler), KT4 backbeat / half-time / passerelles de
-  tempo (90 / 180, 140 / 186,7 par 3 contre 4, 175 / 190 par nudge, chemin
-  tribe → DnB sans changer de tempo). Chaque KT : signature théorique et
-  mesurée, vocabulaire, trois exercices sur la grille de la doctrine,
-  pièges, sources écrites. Hub `digitakt/kb/theorie/_index.md` : liens,
-  statuts `draft`, passe `rhythm_signature` relancée (BPM réanalysés, deux
-  lectures à la moitié du tempo). Veille : E(7, 16) corrigé (la forme
-  notée était E(5, 16)).
-- [7.M] KB théorie : veille `digitakt/veille-theorie.md` (socle rythme /
-  harmonie / forme, 4 styles cœur, 6 styles connexes, ressources avec statut
-  de vérification, exercices DT2), décisions 7.M dans le SPEC, hub
-  `digitakt/kb/theorie/_index.md` avec les 19 KT à rédiger et la passe
-  `rhythm_signature` sur les morceaux de référence par style (patterns 16
-  pas tirés des sidecars). Aucune KT rédigée encore.
-- [7.M2] KB théorie visible dans le front : `kb.corpus_files` lit
-  `digitakt/kb/` récursivement (recherche et lecture des notes de
-  `theorie/`, hubs compris) ; `kb.table_of_contents` range les lots par
-  groupe (`KbLot.group` = `fiches` ou nom du sous-dossier, `KbLot.hub` =
-  son `_index.md`), noms des lots lus dans le hub du dossier (`##` ou
-  `###`), lots déclarés sans note émis vides. Panneau KB : un en-tête par
-  groupe (clic = hub), lots vides signalés, wikilinks résolus depuis le
-  dossier de la note ouverte puis par nom court ; statut autre que
-  `vérifié` surligné. CLI `kb.py toc` préfixe le groupe.
-
+- [7.M] KB théorie, lot 2 (socle harmonique et forme) : KT5 tonalité du
+  grave (notes du sub en hertz, une note sous 120 Hz, partage des bandes et
+  du temps, kickbass), KT6 modes de la techno (cinq modes sur une tonique,
+  note caractéristique, tonique fixe), KT7 tensions et lignes
+  (pentatonique sûre, blue note, b2, triton, rapports d'intervalles, règle
+  du retour), KT8 accords, voicings, rythme harmonique (qualités, voicing
+  sans doublure grave, progressions lentes sur pédale, accords sur track
+  monophonique, Camelot du setbuilder), KT9 phrasage et tension (phrases
+  de 4 / 8 / 16 / 32 en secondes, soustraction, appel-réponse, turnaround,
+  arc). Passe harmonique `scripts/kt_signatures.py --harmony` (gamme
+  détectée, score, accords de la section principale par morceau de
+  référence), table dans le hub ; lecture : 17 morceaux sur 32 incertains,
+  quintes nues et sus2 dans 27, pentatonique ou blues dans 25.
 - [8.L2] L'export d'un live régénère d'abord les rumbles de toutes les
   banques à presets (`sounddesign.rumble_live`, `POST /api/lives/{live}/export`
   renvoie un bilan par banque dans `rumbles`) : un preset édité ou un tempo

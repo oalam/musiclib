@@ -56,11 +56,11 @@ SORT lot ASC, ordre ASC
 
 | # | KT | Fichier | Apporte | Renvoie à | Statut |
 |---|---|---|---|---|---|
-| 5 | Tonalité du grave | `kt-tonalite-du-grave` | kick / rumble / basse accordés, Hz, kickbass, bandes | doctrine §11, [[../rumble-grave]], [[../kick-mental-vst]], [[../../../sounddesign/rumble]] | à rédiger |
-| 6 | Modes de la techno | `kt-modes-techno` | éolien, phrygien, dorien, phrygien dominant, mineur harmonique ; mode sur tonique fixe | [[../keyboard-gammes]] | à rédiger |
-| 7 | Tensions et lignes | `kt-tensions-lignes` | pentatonique, blue note, b2, triton, chromatisme, atonalité contrôlée | générateur acid 9.A | à rédiger |
-| 8 | Accords, voicings, rythme harmonique | `kt-accords-voicings` | min7 / min9 / sus / quintes nues, voicing ouvert, accords monophoniques, Camelot | doctrine §11 | à rédiger |
-| 9 | Phrasage et tension | `kt-phrasage-tension` | 4 / 8 / 16 / 32, build / breakdown / drop, soustraction, call and response, turnaround | doctrine §6, [[../mutes]], [[../patterns-chaines]] | à rédiger |
+| 5 | Tonalité du grave | [[kt-tonalite-du-grave]] | kick / rumble / basse accordés, Hz, kickbass, bandes | doctrine §11, [[../rumble-grave]], [[../kick-mental-vst]], [[../../../sounddesign/rumble]] | draft |
+| 6 | Modes de la techno | [[kt-modes-techno]] | éolien, phrygien, dorien, phrygien dominant, mineur harmonique ; mode sur tonique fixe | [[../keyboard-gammes]] | draft |
+| 7 | Tensions et lignes | [[kt-tensions-lignes]] | pentatonique, blue note, b2, triton, chromatisme, atonalité contrôlée | générateur acid 9.A | draft |
+| 8 | Accords, voicings, rythme harmonique | [[kt-accords-voicings]] | min7 / min9 / sus / quintes nues, voicing ouvert, accords monophoniques, Camelot | doctrine §11 | draft |
+| 9 | Phrasage et tension | [[kt-phrasage-tension]] | 4 / 8 / 16 / 32, build / breakdown / drop, soustraction, call and response, turnaround | doctrine §6, [[../mutes]], [[../patterns-chaines]] | draft |
 
 ### Lot 3 — Styles cœur du live
 
@@ -175,11 +175,96 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
   trance / psy. **À grabber avant KT12-KT17 et KT19** (2 ou 3 morceaux
   chacun via `scripts/grab.py`), puis ajouter leurs slugs à `STYLES`.
 
+## Passe harmonique — gamme et accords par style
+
+Commande : `python scripts/kt_signatures.py --harmony` (mêmes morceaux que
+ci-dessus). Lecture : gamme détectée par `analyzer.harmony` sur le sidecar
+(score, « incertain » = marge inférieure à 0,05 entre les deux premières
+candidates ; la pentatonique majeure détectée est souvent la relative de la
+mineure) et accords distincts de la section principale (`5` = quinte nue,
+`sus2`, `dim`, `N` ignoré). Sortie du 2026-10-15, consommée par KT5-KT8 :
+sur 32 morceaux analysés, 17 incertains, 25 pentatoniques ou blues, 27 avec
+des accords `5` ou `sus2` dans la section principale.
+
+### tribe
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| floxytek_-_micro_tribe | F phrygien | 0.61 | Fsus2 Csus4 Fsus2 F5 Fsus2 F Fsus2 F5 |
+| floxytek_-_roots | C blues | 0.77 (incertain) | Bdim Fsus4 F |
+| kodaman_-_beton | D pentatonique mineure | 0.81 | D5 |
+| area_23_-_indian_tribe_acidcore | C majeur (ionien) | 0.60 (incertain) | C5 A#sus2 Adim Gdim Fm C5 F5 C5 |
+| apre_-_contrast | F pentatonique mineure | 0.63 (incertain) | D#sus2 |
+| liberte_naturel_-_tracknard | E pentatonique majeure | 0.59 (incertain) | F5 |
+| tekotak_-_lokapi | A# pentatonique majeure | 0.55 (incertain) | Bdim Bsus2 Esus2 Bsus2 B5 |
+
+### acidcore_mental
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| six_ou_sept_-_acid_pirate_vendetta_acidc | B blues | 0.86 | E5 F5 |
+| nailik_hypnotik_-_nailik_le_renard_de_la | A# pentatonique mineure | 0.63 (incertain) | A5 |
+| diuko303_-_diuko_mirages | sans analyse |  | — |
+| captain_303_-_acidcore_captain_303_human | C pentatonique mineure | 0.55 (incertain) | B5 |
+| luche_-_whispers_farfa_d_digital_ep_10 | G# mineur harmonique | 0.60 | G#sus2 G#5 G#sus2 G#5 |
+| spice_up_teksa_vorteks_-_soldiers | E pentatonique majeure | 0.87 | E Bsus4 E5 |
+| ktc_smk_-_ktc_cykada_free_download | C# blues | 0.58 (incertain) | G5 G Cm G5 |
+| berio_-_path | G pentatonique majeure | 0.58 (incertain) | C#5 F#sus2 C#5 G#sus2 C#5 F#sus2 C#5 G#5 |
+
+### tekno_rapide
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| unkomun_-_akira | D# pentatonique majeure | 0.63 (incertain) | — |
+| ciklo_-_vrech | G# pentatonique mineure | 0.64 (incertain) | — |
+| moldetek_-_cybertekno_forthcoming_on_cc_ | G# pentatonique mineure | 0.92 (incertain) | D#dim C#m D#dim E |
+| neurotribe_kokko_-_neurotribe_vs_kokko_c | F# pentatonique mineure | 0.63 (incertain) | Esus2 F5 Esus2 F5 Esus2 F5 Esus2 F5 |
+| a_laan_-_live_extract_big_brother_is_rav | G# pentatonique mineure | 0.63 (incertain) | Gsus2 F#sus2 |
+| axolotl_-_remix_psylotribe_lemon_preview | sans analyse |  | — |
+
+### hard_techno
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| beauz_-_bel_mercy_beauz_hard_techno_remi | B blues | 0.82 | E5 E E5 G#dim E Fdim E G#dim |
+
+### hardcore
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| maureen_-_kompet_x_jiggle | D blues | 0.79 | C#5 C#sus2 C#5 C#sus2 C#5 Csus2 D5 C#5 |
+
+### dnb
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| dimension_-_uk | C# lydien | 1.11 | F#5 Fsus2 Bsus4 C#dim Csus4 Bsus4 Csus4 A#sus2 |
+| document_one_-_1964 | D# pentatonique mineure | 0.84 | D#5 D#m D#5 D#m D#5 D#m D#5 D#m |
+| tim_reaper_-_scorched_earth_a2 | D blues | 0.71 (incertain) | G Gsus2 G A#m G#dim G A#m G |
+| noisia_-_the_hole_pt_1 | E pentatonique mineure | 0.96 | E E5 E Esus2 E Em Esus2 E |
+| dizrupt_mkjay_-_room_service | C# pentatonique majeure | 0.56 | F#5 C#sus2 F#5 C#sus2 F#5 C#sus2 F#5 C#sus2 |
+
+### dubstep
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| 2hot2play_-_keep_the_balance | F blues | 0.73 | Fm |
+| densha_crisis_-_monster | F mineur mélodique | 0.74 | E Am G#sus2 A#5 Gm Dsus4 Bdim |
+| excision_downlink_-_resistance | F pentatonique mineure | 0.56 (incertain) | D#dim F#sus2 Fsus2 F#sus2 Gdim Am C#sus2 E5 |
+| utk_-_kaiono | E pentatonique majeure | 0.58 (incertain) | C#m Esus2 C#m A5 |
+
+### techno_lente_dub
+
+| morceau | gamme détectée | score | accords (section principale) |
+|---|---|---|---|
+| polar_inertia_-_hell_frozen_over | E mineur harmonique | 0.64 | D#sus2 Esus4 D#sus2 Em D#sus2 Em D#sus2 |
+| kangding_ray_-_kangding_ray_amber_decay | E mineur (éolien) | 0.93 | D#5 E5 |
+
 ## Avancement
 
 | Lot | Contenu | Statut |
 |---|---|---|
 | 1 | KT1-KT4 socle rythmique | fait le 2026-10-15 (draft, exercices à jouer) |
-| 2 | KT5-KT9 socle harmonique et forme | à venir |
+| 2 | KT5-KT9 socle harmonique et forme | fait le 2026-10-15 (draft, exercices à jouer) |
 | 3 | KT10-KT13 styles cœur | à venir (grabs frenchcore et hard techno avant KT12-KT13) |
 | 4 | KT14-KT19 styles connexes | à venir (grabs avant) |
