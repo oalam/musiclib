@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KT20 hats, ride et haut du spectre (bande high par style depuis
+  le hub, fermé = grille, ouvert = contretemps avec choke par AMP ou
+  preset lock, profils de vélocité de grille, polymétrie des hats,
+  masquage avec l'acid, quatre exercices) et KT21 basses, rythmes et
+  rôles (dix rythmes de basse sur une note, le contretemps comme défaut et
+  non comme limite, ducking contre contretemps, basse-Id, basse comme voix
+  harmonique), ajoutées au lot 1 : 21 KT, SPEC « Décisions 7.M » complétée.
+  KT10 : le rebond du kick (doublé martial une croche avant le 1, une
+  mesure sur 2 ou 3, trig ajouté sous condition `2:2` / `3:3`), signature,
+  vocabulaire, exercice, pièges.
 - [7.M] Grabs du lot 3 et recalage de KT12-KT13 : neuf références ajoutées
   à la library (frenchcore Dr. Peacock, Sefa, Imperials, Maissouille &
   Kriptonic ; hard techno Sara Landry & Shlømo, 999999999, I Hate Models ;

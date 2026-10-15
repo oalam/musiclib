@@ -7,7 +7,8 @@ spec: "7.M"
 # KB théorie — notes de KT
 
 Notes de transmission (KT) sur la **construction rythmique et harmonique**
-d'un morceau, style par style, pour enrichir le vocabulaire de musicien par
+d'un morceau (19 arbitrées le 2026-10-15, plus KT20 hats et KT21 basses
+ajoutées le soir même au lot 1), style par style, pour enrichir le vocabulaire de musicien par
 la pratique. Source : [[../../veille-theorie]] (veille du 2026-10-15) ;
 décisions : [[../../../SPEC]] « Décisions 7.M ». Les fiches de [[../_index]]
 disent *comment* faire le geste sur la machine ; une KT dit *pourquoi* et
@@ -34,7 +35,7 @@ exercices joués). Sections, dans cet ordre :
 Convention : 16 pas = 1 mesure 4/4 en doubles croches ; `x` trig, `.` vide,
 `X` accent.
 
-## Les 19 KT (Dataview)
+## Les 21 KT (Dataview)
 
 ```dataview
 TABLE WITHOUT ID ordre AS "#", file.link AS "KT", lot AS "Lot", styles AS "Styles", statut AS "Statut"
@@ -51,6 +52,8 @@ SORT lot ASC, ordre ASC
 | 2 | Polymétrie, polyrythmie, dissonance métrique | [[kt-polymetrie-polyrythmie]] | ppcm, 3:4, 5:4, 7:8, groupement / déplacement (Butler), cycles | [[../polymetrie]] | draft |
 | 3 | Swing, microtiming, ghost notes, densité | [[kt-swing-microtiming]] | binaire / ternaire, pourcentages, vélocité, accents, conditions comme densité ; hats fermé / ouvert, contretemps et syncope (`sync`) | [[../microtiming-retrigs]], [[../fill-conditions]] | draft |
 | 4 | Backbeat, half-time, passerelles de tempo | [[kt-halftime-passerelles]] | 90 / 180, 140 / 186, 175 ; ouvrir un live à 190 vers DnB et dubstep | [[../slice-breaks]] | draft |
+| 20 | Hats, ride et haut du spectre | [[kt-hats]] | fermé = grille, ouvert = contretemps, « a » = anticipation, vélocités de grille, choke, bande high par style, polymétrie des hats, masquage | [[../parameter-preset-locks]], [[../microtiming-retrigs]], [[../polymetrie]] | draft |
+| 21 | Basses : rythmes et rôles | [[kt-basses]] | dix rythmes de basse sur une note (contretemps, rolling, galop, tenue, absente), ducking contre contretemps, basse-Id, basse comme voix harmonique | [[../rumble-grave]], [[../send-fx-compresseur]] | draft |
 
 ### Lot 2 — Socle harmonique et forme
 

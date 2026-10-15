@@ -28,6 +28,7 @@ Floxytek, Kodaman, Area 23, Apre, Liberté Naturel, Tekotak).
 | Kick (sub) | `X...X...X...X...` | 4 morceaux nets ; Floxytek `XXx.XXx.XXXxXXXx`, Kodaman `XxX.xXx.XXXxXXXX` | chez Floxytek et Kodaman le sub est plein entre les kicks : rumble ou basse sous 200 Hz (KT5) |
 | Toms, percs (mid) | `...x..x.....x.x.` en réponse au kick | moyenne `Xxxxx.xxXx.xXxxx` ; Tekotak `X..XX.xXX.xXX.Xx`, Area 23 `X.xXX.xXX..XX.xX` | le motif `X..X` par temps (kick et pickup sur le « a ») domine : anticipation (KT3) |
 | Hats (high) | `x.x.x.x.x.x.x.x.` croches, shuffle 50-56 % | moyenne `Xx.Xx.xxXx.xX.xx` | croches avec un « a » marqué ; `swing` 0,70-0,88 sur 4 morceaux sur 7 |
+| Rebond du kick | `X...X...X...X.X.` une mesure sur 2 ou 3 | trace : `x` sur les pas 2-3 d'un temps (Kodaman `XxX.xXx.`, Tekotak `X...X...X.x.X.x.`) | le repliage moyenne les mesures : le doublé apparaît en coup faible, sa périodicité (2 ou 3 mesures) est invisible, à écouter |
 | Tonalité | pentatonique mineure sur la tonique du kick | Kodaman D pentatonique mineure (0,81), Apre F pentatonique mineure, Floxytek F phrygien | peu de notes, accords D5 / Dsus2 seuls (KT8) |
 | Structure | plateaux de 8-16 mesures, breakdowns de 4-8 | Kodaman : sections de 4 à 28 mesures, 13 tracks actives en main, 4 à 5 en breakdown | la bank générée ([[../../../library/digitakt/kodaman_-_beton]]) donne l'ordre d'entrée des tracks |
 
@@ -50,6 +51,9 @@ Floxytek, Kodaman, Area 23, Apre, Liberté Naturel, Tekotak).
   ou une Id.
 - **Drop-out** : retrait brutal d'un élément (souvent le kick) pour une
   mesure, puis retour.
+- **Rebond** (doublé martial) : un kick supplémentaire une croche avant
+  le 1 (`X.X.` sur le temps 4), une mesure sur deux ou sur trois ; le
+  roulement de marche du tribe.
 - **Hardtek** : tribe plus rapide (180-190) et plus saturé, kick plus
   dur, percs moins nombreuses ; le pont vers le mental (KT11).
 
@@ -79,6 +83,33 @@ tribe ne sont pas en retard, ils **tirent** vers le temps. Le tresillo
 `x..x..x.` sur les toms (KT1) la contient naturellement ; l'appel-réponse
 entre 7 et 8 (KT9) répartit ces anticipations sur deux voix pour que
 l'oreille suive un dialogue plutôt qu'un roulement.
+
+**Le rebond du kick : le doublé martial.** Le kick tribe ne bouge pas
+(doctrine §3), sauf une fois toutes les deux ou trois mesures : un coup
+supplémentaire sur le « et » du temps 4, une croche avant le 1
+(`X...X...X...X.X.`), le temps d'un bégaiement, puis la mesure suivante
+repart droite. Trois choses font l'effet « martial » :
+
+1. **le doublé lui-même** : deux kicks à une croche d'écart, soit à
+   170 BPM 60 / 170 / 2 = 176 ms, à 190 BPM 158 ms ; c'est la vitesse
+   d'un « ra » de tambour militaire, le double stroke d'une marche ;
+2. **la rareté** : à chaque mesure ce serait un pattern différent ; une
+   mesure sur deux ou trois, la salle l'attend sans pouvoir le prévoir et
+   chaque retour « remet au pas » ; c'est un turnaround (KT9) joué par le
+   kick lui-même, ce qu'aucun autre style cœur ne se permet ;
+3. **le cycle** : sur 2 mesures, le rebond tombe toujours au même endroit
+   d'une phrase de 4 ou 8, carré ; sur 3 mesures, il glisse par rapport à
+   la phrase (polymétrie de KT2, ppcm(3, 4) = 12 mesures, ppcm(3, 8) =
+   24) et se réaligne de loin en loin : la « marche forcée ».
+
+Le rebond tire **vers** le 1 : c'est une anticipation (KT1, KT3) à
+l'échelle de la mesure, comme le « a » l'est à l'échelle du temps. La
+passe du hub n'en montre que la trace (un `x` faible sur les pas 2-3,
+puisque le repliage moyenne les mesures) ; la périodicité s'écoute sur les
+références. Sur la DT2, il ne touche pas au kick sacré : un trig de plus
+sur le pas 15 de la track 1 en condition `2:2` ou `3:3`, ou un retrig
+`RATE` 1/8 `LEN` 1 sur le kick du pas 13 sous la même condition ; variante
+sur les toms (7) pour le doublé sans toucher à la 1.
 
 **Les hats en léger shuffle.** La veille donne 50-56 % ; KT3 montre
 qu'à 165-190 BPM, 56 % vaut 7 à 10 ms, à peine audible mais présent. Ce
@@ -122,7 +153,12 @@ Patch Tidal équivalent : [[../../../technique/patches/tribe]].
    exponentielle descendante, `TRIG` relancé, vitesse rapide, profondeur
    +12 puis +24 (fiche [[../lfo]]). Comparer avec un kick sec. Le
    « bouncy » apparaît entre les deux ; garder le réglage en preset.
-3. **Plateaux et point d'orgue (10 min).** Pattern complet, vocal sur
+3. **Rebond (5 min).** Kick 1 en four-on-floor, un trig de plus sur le
+   pas 15, `COND` = `2:2` (fiche [[../fill-conditions]]) : 8 mesures.
+   Puis `3:3` : 12 mesures, le temps que le rebond retombe sur le 1 d'une
+   phrase de 4. Puis le trig sur le pas 14 (deux croches avant) : plus
+   « roulé », moins martial. Garder `3:3` sur le pas 15.
+4. **Plateaux et point d'orgue (10 min).** Pattern complet, vocal sur
    12 en `1:8`. Jouer 6 phrases de 8 mesures aux mutes : phrase 1 kick,
    rumble, hats ; 2 + basse ; 3 + toms ; 4 + perc B ; 5 drop-out du kick
    sur la dernière mesure (mute et démute à la main) ; 6 tout. Compter.
@@ -133,6 +169,10 @@ Patch Tidal équivalent : [[../../../technique/patches/tribe]].
 - Trop de percs polymétriques à la fois (KT2) : une ou deux suffisent ;
   les références n'ont pas plus de trois couches percussives.
 - Hats swingués à 60 % et plus à 165-190 BPM : flou, pas groove (KT3).
+- Rebond à chaque mesure : ce n'est plus un rebond, c'est un pattern à
+  cinq kicks, et l'effet martial disparaît ; `2:2` au plus serré.
+- Rebond par micro timing ou en déplaçant un kick : le kick sacré bouge ;
+  toujours un trig **ajouté** sous condition, le four-on-floor intact.
 - Un kick trop long sous une basse en contretemps : les deux se masquent
   dans le sub (KT5) ; raccourcir l'AMP du kick ou retirer la basse.
 - Un breakdown de plus de 16 mesures à ce tempo fait retomber la salle

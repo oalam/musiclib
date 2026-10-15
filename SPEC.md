@@ -427,6 +427,9 @@ mutes, FX de transition, principes d'arc).
    §11-12 reste l'arbitrage.
 2. Granularité : 19 KT telles que listées dans [[digitakt/veille-theorie]]
    § E (9 socle, 4 styles cœur, 6 connexes), pas de regroupement.
+   Complément du 2026-10-15 (soir) : KT20 hats et KT21 basses ajoutées au
+   lot 1 (socle rythmique), 21 KT au total ; le rebond du kick (doublé
+   martial) est rangé dans KT10 tribe.
 3. Ordre de rédaction : socle KT1-KT9 d'abord, puis styles cœur, puis
    connexes. Un lot par session.
 4. Ancrage : avant chaque KT, passe `rhythm_signature` (sidecars
