@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KT10 : passe par mesure et profil du kick sur Floxytek (*Micro
+  Tribe*, *Roots*) et Tekotak (*L'okapi*, stems Demucs et bank générés).
+  Tekotak mesure le doublé martial : kick sur le « et » du 1 toutes les
+  2 mesures, accentué toutes les 4, halte long de 3 temps et demi toutes
+  les 8, zéro mesure décalée. Trois architectures du grave : kick-sub
+  écrêté sans rumble (Floxytek, 15 % des échantillons au pic, pas de pitch
+  envelope), kick saturé plus rumble en bosse (Kodaman), kick de médiums
+  avec tout le sub dans la basse (Tekotak, stem bass à +17,5 dB). Limite
+  notée : Demucs range le kick-sub de Floxytek dans le stem bass sur la
+  moitié des morceaux, zones non analysables.
 - [7.M] `scripts/kt_kick_profile.py` : kick moyen d'un plateau depuis les
   stems (enveloppe, pitch envelope et note de la queue, spectre attaque /
   corps, indices de saturation, click, rumble par stem et profil du sub sur

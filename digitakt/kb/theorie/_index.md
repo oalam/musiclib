@@ -211,14 +211,18 @@ _ vide.
 | Kodaman x Mosmoz x Adharaa, *Smash* (156,6) | bank | 64 | 0 | 10 | 19 | 18 | halte de 2 temps à chaque phrase de 4, rebond en roulement de 4 croches autour du 1, roulement long au peak ; une passe sur la grille fixe à 152 donnait E 21, artefact de dérive |
 | Kodaman, *Béton* (161,5) | bank | 53 | 0 | 22 | 28 | 34 | même recette : halte `..X.X.X.` en tête de phrase, rebond `X.X.X.XX \| XXX.X.X.` autour du 1, deux roulements longs de 6 à 8 mesures (31-38, 39-44) ; sur la grille fixe du sidecar la passe donnait E 17 |
 | Floxytek, *Roots* (161,5, bank générée le 2026-10-15) | bank | 81 | 0 | 0 | 17 | 75 | four-on-floor droit, pas de roulement, rebonds rares |
-| Floxytek, *Micro Tribe* (161,5, bank générée) | bank | 36 | 0 | 9 | 35 | 56 | roulements à accents alternés `XxXxXxXx` à l'intro, beaucoup de mesures mixtes ; sur la grille fixe la passe donnait E 13 |
+| Floxytek, *Micro Tribe* (161,5, bank générée) | bank | 36 | 0 | 9 | 35 | 56 | roulements à accents alternés `XxXxXxXx` à l'intro, beaucoup de mesures mixtes ; sur la grille fixe la passe donnait E 13 ; mesures 97 à 136 vides parce que Demucs y range le kick dans le stem bass |
+| Tekotak, *L'okapi* (172,3, stems et bank générés le 2026-10-15) | bank | 168 | 0 | 7 | 31 | 37 | cycle de 4 mesures `X.X.X.X. \| XxX.X.X. \| X.X.X.X. \| XXX.X.X.` : doublé sur le « et » du 1 toutes les 2 mesures (52 écarts de 2 sur 80 occurrences), accentué toutes les 4 ; halte long `X....... \| ..X.X.X.` toutes les 8 mesures ; roulement de fin de phrase `.xXXXXX.` avec une croche vide avant le 1 |
 
-Sans stem (Area 23, Apre, Liberté Naturel, Tekotak) : non analysables, la
-basse compte comme un kick. Les quatre passes sur grille fixe donnaient
-13 à 26 mesures « décalées » chacune : toutes artefacts. Détail dans
-[[kt-style-tribe]], qui ajoute le profil du kick et du rumble de Kodaman
+Sans stem (Area 23, Apre, Liberté Naturel) : non analysables, la basse
+compte comme un kick. Les passes sur grille fixe donnaient 13 à 26 mesures
+« décalées » chacune : toutes artefacts. Détail dans [[kt-style-tribe]],
+qui ajoute le profil du kick et du rumble des cinq morceaux avec stems
 (`scripts/kt_kick_profile.py <slug> <mesure> <mesure>` : enveloppe,
-hauteur de la queue, spectre, saturation, click, rumble par stem).
+hauteur de la queue, spectre, saturation, click, rumble par stem) : trois
+architectures du grave, kick-sub écrêté sans rumble chez Floxytek, kick
+saturé plus rumble en bosse chez Kodaman, kick de médiums et sub tenu par
+la basse chez Tekotak.
 
 ### Lecture rapide (à confirmer à l'oreille)
 

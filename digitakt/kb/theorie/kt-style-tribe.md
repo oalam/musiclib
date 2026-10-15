@@ -144,6 +144,34 @@ mixtes. Le halte et le roulement autour du 1 ne sont donc pas « le »
 tribe, ils sont le martial de Kodaman ; le rebond simple, lui, est
 partout.
 
+**Tekotak, *L'okapi* : le doublé à période fixe.** Stems et bank générés
+le 2026-10-15 (172,3 BPM, 243 mesures : 168 sur les temps, 0 décalée, 7
+de roulement, 31 mixtes, 37 vides). Les plateaux sont écrits sur un cycle
+de 4 mesures d'une régularité de métronome :
+
+```
+  X.X.X.X.  XxX.X.X.  X.X.X.X.  XXX.X.X.     le doublé sur le « et » du 1, faible une mesure sur deux, plein une sur quatre
+  X.......  ..X.X.X.                          le halte long : le 1, puis rien jusqu'au temps 2 de la mesure suivante (3 temps et demi)
+  X.X.X.XX  XXX.X.X.                          le rebond Kodaman, en tête des phrases du second plateau (mesures 113 à 125)
+  X.X.X...  .xXXXXX.  X.X.X.X.                le roulement de fin de phrase : 6 croches, puis une croche vide avant le 1
+```
+
+C'est le **doublé martial** décrit plus haut, mesuré : un coup
+supplémentaire d'une demi-croche tous les 2 mesures (80 mesures sur 243
+ont un kick sur le « et » du 1, 52 fois à 2 mesures d'écart, 17 fois à 4),
+accentué toutes les 4 pour marquer la phrase. Ici il tombe **après** le
+1 (`XxX.`), pas avant : le « et » du 4 n'a aucune périodicité (22 mesures,
+écarts quelconques). La position avant le 1 décrite plus haut reste
+celle du rebond de Kodaman (`.XX | XxX.`) ; Tekotak place le même geste
+de l'autre côté de la barre, ce qui donne un pas moins « tiré » et plus
+« tamponné ». Son halte est plus long que celui de Kodaman (3 temps et
+demi contre 2, toutes les 8 mesures dans le second plateau : mesures 37,
+149, 157, 173) et son roulement de fin de phrase laisse une croche vide
+avant le 1 (`.xXXXXX. | X.`), le trou avant la reprise. Trois écritures
+martiales, donc : Kodaman alterne halte, rebond et roulement à l'échelle
+de la phrase ; Tekotak tient un doublé à période 2 et ponctue la phrase ;
+Floxytek ne fait ni l'un ni l'autre et roule à l'intro.
+
 **Partition rythmique de *Smash*, mesure type du plateau** (pattern 04 de
 la bank, 8 mesures ; draft `digitakt.py` sur les stems, seuil 0,5 ; grille
 de la doctrine §1, rôles actuels) :
@@ -205,6 +233,43 @@ exponentiel sur `TUNE` relancé au trig (+12 demi-tons, 100 ms, fiche
 (fiche [[../rumble-grave]]), donc une bosse, pas une nappe. Réserve :
 Demucs range le rumble tonal dans `bass` ou `drums` selon le morceau, d'où
 les deux colonnes lues ensemble.
+
+**Les kicks de Floxytek et de Tekotak, même passe** (plateaux : *Micro
+Tribe* mesures 65 à 90, *Roots* 113 à 125, *L'okapi* 89 à 108) :
+
+| | *Micro Tribe* (161,5, 88 kicks) | *Roots* (161,5, 51 kicks) | Tekotak *L'okapi* (172,3, 79 kicks) |
+|---|---|---|---|
+| Enveloppe | −12 dB à 4 ms, −24 dB à 94 ms : corps de 90 ms | large bande morte en 14 ms, mais le sub tient 130 ms (profil ci-dessous) | −12 dB à 8 ms, −24 dB à 58 ms : corps de 60 ms |
+| Hauteur de la queue | 59 Hz à 5 ms puis 50 Hz (G1) stable de 20 à 90 ms : **pas** de pitch envelope | 57 Hz (A#1) à 5-20 ms, 44 Hz (F1) à 40 ms, puis 49-55 Hz : instable, posée sur F1, la tonique du morceau (F mineur) | 90 Hz à 5 ms → 85 → 76 → 66 Hz (C2) à 60 ms : pitch envelope de 5 demi-tons sur 60 ms, puis plus rien |
+| Spectre du corps | sub 30-60 dominant, 60-120 à −12, 120-300 à −16, 300-1k à −24 : un **sub pur** | sub dominant, 60-120 à −6, 120-300 à −16, 300-1k à −31 : sub pur, encore plus propre | 60-120 dominant, **sub 30-60 à −13**, 120-300 à −11, 300-1k à −12, 1-3k à −15, 3-8k à −16 : spectre plat, kick de médiums sans sub |
+| Saturation | facteur de crête 4,9 dB, **15 %** des échantillons au pic : le plus aplati des cinq, un sinus écrêté presque carré | facteur de crête 5,0 dB, 8 % : écrêté aussi | facteur de crête 12,1 dB, 1 % : crêtes intactes, harmoniques riches (−11 dB) et énergie jusqu'à 8 kHz : distorsion douce large bande, comme *Béton* |
+| La pointe d'aigus | centroïde à 330 Hz, 3-8 kHz à +5 dB sur l'attaque : pas de click | centroïde à 320 Hz mais 3-8 kHz à **+12 dB** sur l'attaque : un snap bref et clair, 14 ms | centroïde à 2,2 kHz, 3-8 kHz à +3 dB seulement : un click présent mais peu contrasté, le corps est déjà brillant |
+| Rumble entre les kicks | drums −10 dB, bass −11 dB : pas de rumble, le kick **est** le sub | drums **−6 dB**, bass −13 : rumble dans les drums, modéré | drums −9 dB, **bass +17,5 dB** : tout le sub est dans la basse |
+| Profil du sub sur un temps | 0, −1, −8, −11, −10, −9, −11, −9 : le kick puis une nappe plate à −10 dB | 0, −1, −1, −9, −20, −24, −24, −18 : sub tenu 130 ms puis coupé de 20 dB, bosse plate gatée | 0, −7, −14, −19, −13… : le sub du kick meurt en 100 ms |
+
+Lecture. Cinq kicks, trois architectures du grave. **Floxytek** : le kick
+est un sinus de sub écrêté, sans click ni pitch envelope (*Micro Tribe*),
+ou avec un snap bref devant (*Roots*) ; le rumble est faible ou absent,
+le kick remplit lui-même le 30-60 Hz, et le sub reste tenu entre les
+coups (nappe à −10 dB sur *Micro Tribe*, bosse plate de 130 ms gatée sur
+*Roots*). C'est le « kick-sub » hardtek, et Demucs le confirme à sa
+manière : sur toute la seconde moitié de *Micro Tribe* (mesures 97 à 136)
+et le long break de *Roots* (30 à 98), le kick passe dans le stem bass
+(35-130 Hz : drums à −37 dB, bass à −19 sur *Micro Tribe*), la passe par
+mesure y lit des mesures vides et ces zones ne sont pas analysables.
+**Tekotak** : l'inverse, un kick de médiums (le « tok », 60-120 Hz et
+300 Hz-3 kHz, sub à −13 dB) avec une petite pitch envelope et une
+distorsion douce, et **tout le sub dans la basse** (stem bass à +17,5 dB
+du sub du kick) : l'architecture acid tribe, où le kick laisse le grave à
+la ligne de basse (KT21) et peut donc être court, brillant et doublé sans
+embourber le sub. **Kodaman** est entre les deux : kick saturé qui descend
+jusqu'au sub, plus un rumble en bosse (*Smash*) ou une basse qui roule
+(*Béton*). Sur la DT2, le choix se fait avant le sound design : qui tient
+le 30-60 Hz, le kick (Floxytek : kick sinus long, `OVERDRIVE` fort,
+pas de rumble, basse en contretemps dans les médiums), le rumble (Kodaman,
+recette ci-dessus) ou la basse (Tekotak : kick court filtré passe-haut à
+60 Hz, basse 9 qui porte le sub, doctrine §9) ; les trois ne tiennent pas
+ensemble.
 
 **Les hats en léger shuffle.** La veille donne 50-56 % ; KT3 montre
 qu'à 165-190 BPM, 56 % vaut 7 à 10 ms, à peine audible mais présent. Ce
