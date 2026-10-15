@@ -66,10 +66,10 @@ SORT lot ASC, ordre ASC
 
 | # | KT | Fichier | Apporte | Renvoie à | Statut |
 |---|---|---|---|---|---|
-| 10 | Tribe / hardtek | `kt-style-tribe` | tribe kick et pitch envelope, toms en call and response, samples en points d'orgue, plateaux | [[../../../technique/patches/tribe]] | à rédiger |
-| 11 | Acid core / mental | `kt-style-acidcore` | acid line 303 (accents, slides, octaves, 13 / 15 pas), phrygien, kickbass, narration au filtre | 9.A, [[../kick-mental-vst]] | à rédiger |
-| 12 | Frenchcore / hardcore / bouncy | `kt-style-frenchcore` | offbeat bassline `.xxx`, galop, pitched kick, kick en trois couches, breaks 3/4 et 5/8 | | à rédiger |
-| 13 | Hard techno et schranz | `kt-style-hard-techno` | double kick, pression, hats offbeat, ligne sur 3 mesures ; cadrer sur la rythmique | [[../rumble-grave]] | à rédiger |
+| 10 | Tribe / hardtek | [[kt-style-tribe]] | tribe kick et pitch envelope, toms en call and response, samples en points d'orgue, plateaux | [[../../../technique/patches/tribe]] | draft |
+| 11 | Acid core / mental | [[kt-style-acidcore]] | acid line 303 (accents, slides, octaves, 13 / 15 pas), phrygien, kickbass, narration au filtre | 9.A, [[../kick-mental-vst]] | draft |
+| 12 | Frenchcore / hardcore / bouncy | [[kt-style-frenchcore]] | offbeat bassline `.xxx`, galop, pitched kick, kick en trois couches, breaks 3/4 et 5/8 | | draft |
+| 13 | Hard techno et schranz | [[kt-style-hard-techno]] | double kick, pression, hats offbeat, ligne sur 3 mesures ; cadrer sur la rythmique | [[../rumble-grave]] | draft |
 
 ### Lot 4 — Styles connexes
 
@@ -141,6 +141,7 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
 |---|---|---|---|---|---|---|---|---|
 | hard techno | beauz_-_bel_mercy_hard_techno_remix | 161.5 | `.XxxxxxXxx..xXx.` | `x.Xx.xXX...xxXxx` | `.xX.XxXxx.X.xXX.` | 0.64 | 0.37 | 0.91 |
 | hardcore | maureen_-_kompet_x_jiggle | 215.3 | `X..xX...X..xX...` | `X..xX..xX..xX..x` | `X..XX..xxXxxx..X` | 0.41 | 0.81 | 0.96 |
+| hardcore | mad_dog_-_wild_for_the_night (ajouté le 2026-10-15, lot 3) | 161.5 | `xxX..xX..xX..XX.` | `XxxxXx..Xxx.XX..` | `XxX...X.x.X.xxX.` | 0.52 | 0.18 | 0.96 |
 | dnb | dimension_-_uk | 172.3 | `.xX.....xxXx..xx` | `xXX..XXxxxXX.XXx` | `xx.x.XX..x.X.xXx` | 0.70 | 0.44 | 0.94 |
 | dnb | document_one_-_1964 | 172.3 | `x.xXx..x...x..xX` | `XXXxxx..xXXxxxXX` | `XXx.....XXXXXXXX` | 0.66 | 0.58 | 0.95 |
 | dnb | tim_reaper_-_scorched_earth_a2 | 161.5 | `XX...XXXxx...xxX` | `xX.xXXXxXX.Xx...` | `xX..XXXXxXxxx.xX` | 0.67 | 0.42 | 0.89 |
@@ -174,6 +175,27 @@ sidecars, dont deux lectures à la moitié du tempo, Liberté Naturel 184,6 →
   pas de frenchcore), pas de dub techno, hypnotique, industrial, electro,
   trance / psy. **À grabber avant KT12-KT17 et KT19** (2 ou 3 morceaux
   chacun via `scripts/grab.py`), puis ajouter leurs slugs à `STYLES`.
+
+### À grabber (disque média requis)
+
+Le grab du 2026-10-15 pour le lot 3 n'a pas pu se faire : `/Volumes/xtreme`
+absent, `grab.py` exige le SSD (`paths.require_media`). KT12 et KT13 sont
+rédigées sur Maureen, Mad Dog et Beauz seuls, colonnes « mesuré » à
+refaire après grab. Requêtes proposées (références connues, à valider ou
+remplacer avant de lancer ; `scripts/.venv/bin/python scripts/grab.py
+--analyze-quality --folder <style> "<requête>"`) :
+
+| Style | Requêtes proposées | Pour |
+|---|---|---|
+| frenchcore | `Dr. Peacock - Trip to Russia`, `Sefa - Leven is Lijden`, `Billx - Ravage` | KT12 : kick long + basse `.xxx`, pitched kick |
+| bouncy | `The Sickest Squad - Bounce`, un titre 2022+ tagué bouncy au choix | KT12 : galop, kick rebondissant |
+| hard techno | `Sara Landry - Bodies`, `999999999 - X-TR-AM`, `I Hate Models - Daydream` | KT13 : double kick, pression, ligne sur 3 mesures |
+| schranz | `Chris Liebing - Bang`, `DJ Rush - Motherfucking Bass` | KT13 : boucles roulantes |
+| dub techno, hypnotique, industrial, electro, trance / psy | à proposer au lot 4 | KT14-KT17, KT19 |
+
+Après grab : ajouter les slugs à `STYLES` de `scripts/kt_signatures.py`,
+relancer `kt_signatures.py hard_techno hardcore` et `--harmony`, coller
+ici, puis mettre à jour les tableaux « Signature » de KT12 et KT13.
 
 ## Passe harmonique — gamme et accords par style
 
@@ -266,5 +288,5 @@ des accords `5` ou `sus2` dans la section principale.
 |---|---|---|
 | 1 | KT1-KT4 socle rythmique | fait le 2026-10-15 (draft, exercices à jouer) |
 | 2 | KT5-KT9 socle harmonique et forme | fait le 2026-10-15 (draft, exercices à jouer) |
-| 3 | KT10-KT13 styles cœur | à venir (grabs frenchcore et hard techno avant KT12-KT13) |
+| 3 | KT10-KT13 styles cœur | fait le 2026-10-15 (draft ; KT12-KT13 à recaler après les grabs frenchcore et hard techno, voir « À grabber ») |
 | 4 | KT14-KT19 styles connexes | à venir (grabs avant) |

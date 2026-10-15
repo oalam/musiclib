@@ -54,7 +54,7 @@ STYLES: dict[str, list[str]] = {
         "axolotl_-_remix_psylotribe",
     ],
     "hard_techno": ["beauz_-_bel_mercy"],
-    "hardcore": ["maureen_-_kompet_x_jiggle"],
+    "hardcore": ["maureen_-_kompet_x_jiggle", "mad_dog_-_wild_for_the_night"],
     "dnb": [
         "dimension_-_uk",
         "document_one_-_1964",

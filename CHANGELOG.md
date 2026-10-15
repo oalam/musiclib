@@ -8,6 +8,20 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB théorie, lot 3 (styles cœur du live) : KT10 tribe / hardtek
+  (boucle de référence en six tracks, pitch envelope, toms en
+  appel-réponse qui anticipent, plateaux et points d'orgue, bank Kodaman
+  comme exemple de forme), KT11 acid core / mental (kickbass qui tient le
+  grave, acid line de trois notes, accents et slides d'abord, 15 pas,
+  narration au filtre, anticipation maximale des références), KT12
+  frenchcore / hardcore / bouncy (kick clippé donc mélodique, pitched
+  kick, basse offbeat `.xxx` = rolling bass, galop mesuré chez Mad Dog,
+  hardcore monolithique, breaks impairs), KT13 hard techno et schranz
+  (double kick en millisecondes, pression, énergie après le temps à
+  l'inverse du tribe, ligne sur 3 mesures ; cadré sur la rythmique, le
+  son reste dans `rumble-grave`). Mad Dog ajouté aux références hardcore.
+  Grab frenchcore / hard techno non fait (disque média absent) : requêtes
+  proposées dans le hub, « À grabber », KT12-KT13 à recaler ensuite.
 - [7.M] KB théorie, lot 2 (socle harmonique et forme) : KT5 tonalité du
   grave (notes du sub en hertz, une note sous 120 Hz, partage des bandes et
   du temps, kickbass), KT6 modes de la techno (cinq modes sur une tonique,
