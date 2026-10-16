@@ -6,7 +6,8 @@
   // rejouable vers 00-live (un dossier a plat par banque, 7.L5).
   // Ajout : glisser des samples de la liste sur une ligne de banque, ou L sur
   // la banque active (selection, sinon sample en cours). Un sample n'est que
-  // dans une banque : l'ajouter ailleurs le deplace. Dans le kit, un sample
+  // dans une banque : l'ajouter ailleurs le deplace, aussi en glissant une
+  // ligne de la liste du live sur une autre banque. Dans le kit, un sample
   // par track (1-16), numero modifiable en place.
   import { onMount } from 'svelte'
   import { api, type BankRumbleReport, type LiveExportReport, type LiveItem, type LiveSummary, type SdPreset } from './api'
@@ -323,6 +324,12 @@
     dropBank = b
   }
 
+  /** Une ligne de la liste du live se glisse sur une autre banque (deplacement) : meme donnee que la lib. */
+  function onItemDragStart(ev: DragEvent, it: LiveItem) {
+    ev.dataTransfer?.setData('text/plain', it.source)
+    if (ev.dataTransfer) ev.dataTransfer.effectAllowed = 'copyMove'
+  }
+
   function onDrop(ev: DragEvent, b: string) {
     ev.preventDefault()
     dropBank = null
@@ -499,7 +506,8 @@
     {#if rumbleInfo}<p class="small muted tuneinfo">{rumbleInfo} <button class="untag" title="Fermer" onclick={() => (rumbleInfo = '')}>×</button></p>{/if}
     <ul class="items small">
       {#each shown as it (it.source)}
-        <li id="live-{it.source}" class:cur={it.source === cur} class:kbd={focused && it.source === cur}>
+        <li id="live-{it.source}" class:cur={it.source === cur} class:kbd={focused && it.source === cur}
+          draggable="true" ondragstart={ev => onItemDragStart(ev, it)} title="glisser sur une banque : déplacer">
           {#if it.bank === KIT}
             {#if tracking === it.source}
               <!-- svelte-ignore a11y_autofocus -->
@@ -574,7 +582,7 @@
   .dropzone { border-radius: 4px; padding-bottom: 6px; }
   .dropzone.over { outline: 2px dashed var(--accent); outline-offset: 2px; }
   .items { list-style: none; margin: 0; padding: 0; min-height: 2em; }
-  .items li { display: flex; gap: 6px; align-items: center; padding: 2px 0; border-bottom: 1px solid var(--border); }
+  .items li { display: flex; gap: 6px; align-items: center; padding: 2px 0; border-bottom: 1px solid var(--border); cursor: grab; }
   .items li > * { flex: none; }
   .items li.muted { display: block; }
   .items li.cur .pick { color: var(--accent); }

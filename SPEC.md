@@ -1044,7 +1044,8 @@ révisés par 7.J8) :
 - Front : ligne `0-KIT` en tête de la grille (compte par branche conservé
   comme filtre local), numéro de track devant le nom dans la liste du kit,
   modifiable en place ; dépôt ou `L` sur `0-KIT` ajoute avec la track
-  proposée ; plus de badge multi-banques (un seul tag).
+  proposée ; plus de badge multi-banques (un seul tag). Une ligne de la
+  liste du live se glisse sur une autre banque (ou le kit) : déplacement.
 
 **Constat à traiter** : la dérive de grille de beats du sidecar (tempo constant
 légèrement faux) touche aussi `groove.py` et `rhythm_signature.py`, qui replient

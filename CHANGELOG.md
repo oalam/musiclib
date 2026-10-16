@@ -17,7 +17,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   tonalité et tempo propres. `POST /api/lives/{live}/track`. Plafond
   `LIVE_CAP` 127 par banque, compte par branche (`branches`) dans le bilan.
   Front : ligne 0-KIT en tête, numéro de track modifiable en place, compte
-  par branche en filtre local, plus de badge multi-banques. Décisions dans
+  par branche en filtre local, plus de badge multi-banques ; une ligne de
+  la liste du live se glisse sur une autre banque pour la déplacer. Décisions dans
   SPEC « Décisions 7.L5 », doctrine solaris et README à jour.
 
 ### Modifié
