@@ -348,14 +348,15 @@ export interface LiveItem {
   code: string
   branch: string
   name: string
-  banks: string[]
+  /** banque du live, ou 0-KIT (kit par defaut) : une seule par sample (7.L5) */
+  bank: string
+  /** track 1-16 dans le kit (0-KIT seulement) */
+  track: number | null
   ram: number | null
   /** note de la source (dieses), relevee a l'accordage */
   note: string | null
   /** demi-tons de varispeed appliques a l'export (accordage de la banque) */
   shift: number
-  /** banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques */
-  folder: string
   /** sample d'origine d'un rendu du sound design (8.L1) */
   parent: string | null
   /** preset du rumble genere pour la banque (8.L2) */
@@ -387,7 +388,8 @@ export interface BankRumbleReport {
 }
 /** Export d'un live : les rumbles des banques a presets sont (re)generes d'abord, un bilan par banque. */
 export interface LiveExportReport extends SampleExportReport { rumbles: BankRumbleReport[] }
-export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean }
+/** Un dossier par banque (a plat) ; `branches` : fichiers par branche, filtre local du panneau. */
+export interface LiveFolder { path: string; files: number; ram: number; over_cap: boolean; branches: Record<string, number> }
 export interface LiveSummary { live: Live; folders: LiveFolder[]; ram: number; ram_limit: number; unknown_ram: number }
 /** Case = dossier final du +Drive (7.J8) : DRUMS/BD/HARD, LOOPS/BR, FX/RISE, VX. */
 export interface SampleCell {
@@ -620,6 +622,8 @@ export const api = {
   liveAdd: (name: string, sources: string[], bank: string) => livePost(`/${enc(name)}/add`, { sources, bank }),
   /** `bank` null : retire du live entier. */
   liveRemove: (name: string, sources: string[], bank: string | null) => livePost(`/${enc(name)}/remove`, { sources, bank }),
+  /** track d'un sample du kit (1-16), echangee si prise */
+  liveTrack: (name: string, source: string, track: number) => livePost(`/${enc(name)}/track`, { source, track }),
   /** Tonalite d'une banque, texte libre ; vide : retiree. */
   liveKey: (name: string, bank: string, key: string) => livePost(`/${enc(name)}/key`, { bank, key }),
   /** Tempo d'une banque (30 a 300 BPM) ; null : retire. */

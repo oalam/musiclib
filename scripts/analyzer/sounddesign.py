@@ -1307,7 +1307,7 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
     unknown = [i for i in ids if i not in presets]
     if unknown:
         raise PresetError(f"preset de rumble inconnu pour {bank} : {', '.join(unknown)}")
-    kicks = [it for it in live.items if it.code == "BD" and bank in it.banks]
+    kicks = [it for it in live.items if it.code == "BD" and it.bank == bank]
     report.kicks = len(kicks)
     records = list_renders(out_root, "rumble")
     for pid in ids:
@@ -1336,7 +1336,7 @@ def rumble_bank(live: lv.Live, bank: str, presets_root: Path, manifest: smp.Mani
             key = verse(record, out_root, samples_root, overrides)
             # l'ancien rumble du meme kick et du meme preset (autre tempo, preset edite) cede sa place
             for old in [it for it in live.items if it.rumble == pid and it.parent == kick.source
-                        and bank in it.banks and it.source != key]:
+                        and it.bank == bank and it.source != key]:
                 lv.remove(live, [old.source], bank)
                 report.replaced.append(old.name)
             item, added = lv.add_item(live, lv.render_item(key, record_code(record), record.name,

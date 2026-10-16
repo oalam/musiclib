@@ -282,7 +282,7 @@ def test_rumble_bank_renders_verses_adds_and_replays(tmp_path: Path):
     assert (r1.rendered, r1.reused, r1.added, r1.unchanged) == (names, [], names, [])
     rm = [it for it in live.items if it.code == "RM"]
     assert [it.name for it in rm] == names and [it.parent for it in rm] == ["k/kick.wav", "k/kick2.wav"]
-    assert rm[0].banks == ["A-HALF"] and rm[0].branch == "DRUMS" and rm[0].ram and rm[0].rumble == "t"
+    assert rm[0].bank == "A-HALF" and rm[0].branch == "DRUMS" and rm[0].ram and rm[0].rumble == "t"
     key = rm[0].source
     assert key.startswith("SoundDesign/rumble/RM C Punch 01 k ") and (samples_root / key).is_file()
     assert (overrides[key].parent, overrides[key].sub, overrides[key].code) == ("k/kick.wav", "CLEAN", "RM")
@@ -318,8 +318,7 @@ def test_rumble_live_covers_banks_with_presets_and_follows_preset_edits(tmp_path
                     name="BD C Punch 01 k", duration=0.3, rank=1)])
     sd.save_preset(_preset(), presets)
     live = lv.create_live(tmp_path / "lives", "solaris", ["A-HALF", "B-DNB"])
-    lv.add(live, m, ["k/kick.wav"], "A-HALF", samples_root)
-    lv.add(live, m, ["k/kick.wav"], "B-DNB", samples_root)
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", samples_root)     # une seule banque par sample (7.L5)
     lv.set_tempo(live, "A-HALF", 165)
     overrides: dict = {}
     run = lambda **kw: sd.rumble_live(live, presets, m, out, samples_root, overrides, **kw)  # noqa: E731

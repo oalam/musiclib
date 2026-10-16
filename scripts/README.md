@@ -934,27 +934,44 @@ par nom court). Le manuel s'ouvre dans le panneau élargi à la bonne page
 Un live est une sélection de samples de la lib rangée par banque pour
 jouer (doctrine de live : [[../digitakt/doctrine-dt2-solaris]], décisions :
 [[SPEC]] § 7.L). Fichier `library/lives/<live>.json`, export vers
-`<MEDIA>/Live/00-live/<live>/<BANQUE>/<BRANCHE>/<nom>.wav`, que Transfer
-envoie tel quel sur le +Drive. Exemple :
+`<MEDIA>/Live/00-live/<live>/<BANQUE>/<nom>.wav` (à plat, 7.L5), que
+Transfer envoie tel quel sur le +Drive. Exemple :
 
 ```
-00-live/solaris/0-COMMON/DRUMS/BD F Hard 01 k.wav    # kick utilisé par A et C
-00-live/solaris/C-TRIBE/LOOPS/BL 168 AcidG1 slr.wav  # sample maison, pack du live
+00-live/solaris/0-KIT/01 BD F Hard 01 k.wav       # kit par défaut, track 1 (slot A01)
+00-live/solaris/C-TRIBE/BL 168 AcidG1 slr.wav     # sample maison, pack du live
 ```
 
 - Source : tout le catalogue classé (candidats et réserve), pas seulement
   les retenus ; un non classé, un fichier en corbeille ou un RS est refusé.
-- Un sample utilisé par deux banques ou plus va dans `0-COMMON`.
+- **Une seule banque par sample** (`bank`) : l'ajouter à une autre banque
+  le déplace. Banque de patterns = banque RAM de la DT2 (127 slots, manuel
+  §13.6.1 : `[FUNC] + [YES]` au chargement choisit la banque RAM) = dossier
+  du +Drive, chargé d'un coup.
+- **Kit par défaut `0-KIT`** : banque implicite, 16 samples au plus, un par
+  track de la doctrine (`track`, proposée d'après le code : BD 1, RM 2,
+  SD / CP 3, CY 4, HH 5, OH 6, PC / TM 7-8, BS 9, ST 10, PD 11, VX 12,
+  boucles 13-14, FX 15, sinon première libre ; `set_track` échange avec
+  l'occupant). Exporté `NN <nom>` (description tronquée à 15 caractères) :
+  chargé en premier dans la banque RAM A, il occupe les slots A01-A16 sur
+  lesquels pointe tout pattern vide. Tonalité et tempo propres, pas de
+  presets de rumble.
 - Nom : celui de la lib (`<CODE> [BPM|note] <desc> <pack>`), modifiable
   par live ; les samples maison (famille SAMPLE) prennent le pack du live.
 - RAM estimée au format de la DT2 (48 kHz / 16 bits, 400 Mo par projet),
-  mesurée sur l'en-tête à l'ajout ; plafond de 64 fichiers par dossier en
-  simple avertissement (`over_cap`).
-- Export rejouable (`samples.sync`, index `library/lives/<live>.export.json`).
+  mesurée sur l'en-tête à l'ajout ; plafond de 127 fichiers par banque en
+  simple avertissement (`over_cap`), compte par branche dans `branches`.
+- Export rejouable (`samples.sync`, index `library/lives/<live>.export.json`) ;
+  l'ancien arbre (`0-COMMON/`, sous-dossiers de branche) est retiré au
+  premier export après 7.L5.
+- Migration : un live d'avant 7.L5 (`banks` par item) est converti au
+  chargement (première banque gardée, `0-COMMON` fusionné dans la dernière
+  banque du live) et réécrit à la première sauvegarde.
 
 API : `GET/POST /api/lives`, `GET /api/lives/{live}` (bilan par dossier et
 RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
-(`bank` absent : retire du live), `POST .../key` (`bank`, `key` : tonalité
+(`bank` absent : retire du live), `POST .../track` (`source`, `track` 1-16 :
+track d'un sample du kit), `POST .../key` (`bank`, `key` : tonalité
 saisie de la banque, vide pour la retirer), `POST .../tempo` (`bank`, `bpm`
 de 30 à 300, `null` pour le retirer), `POST .../tune` (`reset` : accorde ou
 désaccorde tout le live), `GET .../audio?source=` (écoute telle
@@ -990,7 +1007,7 @@ réanalyse). Un rendu fait à la main, sans `rumble`, n'est jamais purgé.
 CLI : `sounddesign.py rumbles <live> <banque> [--dry-run]`.
 
 Accordage (7.L4, `lives.tune_live`, banque par banque avec `tune_bank`) :
-appliqué au live entier ; dans chaque banque qui a une tonalité (0-COMMON
+appliqué au live entier ; dans chaque banque qui a une tonalité (0-KIT
 compris), les BD, RM, BS, PD et ST (`TUNABLE`) sont ramenés sur la tonique de sa tonalité (`key_root` lit
 `Fa m`, `sol mineur`, `Si bémol`, `F#m`, `Bb`), par le plus court chemin de
 -6 à +5 demi-tons (à égalité on descend : un kick monté perd sa queue). Ex. :

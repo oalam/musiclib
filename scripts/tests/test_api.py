@@ -723,7 +723,7 @@ def test_lives_rumbles_per_bank(sd_client_factory, tmp_path: Path):
     assert (rep["rendered"], rep["added"], rep["replaced"]) == (["RM C Punch 01 k"], ["RM C Punch 01 k"], [])
     items = client.get("/api/lives/solaris").json()["live"]["items"]
     rm = next(it for it in items if it["code"] == "RM")
-    assert (rm["parent"], rm["rumble"], rm["banks"]) == ("k/kick.wav", "t", ["A-HALF"])
+    assert (rm["parent"], rm["rumble"], rm["bank"]) == ("k/kick.wav", "t", "A-HALF")
     assert api.samples.load_overrides(tmp_path / "overrides.json")[rm["source"]].parent == "k/kick.wav"
     again = client.post("/api/lives/solaris/rumbles", json={"bank": "A-HALF"}).json()
     assert (again["rendered"], again["reused"], again["unchanged"]) == ([], ["RM C Punch 01 k"], ["RM C Punch 01 k"])
@@ -737,7 +737,7 @@ def test_lives_rumbles_per_bank(sd_client_factory, tmp_path: Path):
     assert plan["rumbles"][0]["dry_run"] and plan["rumbles"][0]["replaced"] == [] and not (tmp_path / "00-live").exists()
     done = client.post("/api/lives/solaris/export", json={"dry_run": False}).json()
     assert done["rumbles"][0]["replaced"] == ["RM C Punch 01 k"] and done["rumbles"][0]["added"] == ["RM C Punch 01 k"]
-    assert "A-HALF/DRUMS/RM C Punch 01 k.wav" in done["copied"]
+    assert "A-HALF/RM C Punch 01 k.wav" in done["copied"]
     new = next(it for it in client.get("/api/lives/solaris").json()["live"]["items"] if it["code"] == "RM")
     assert new["source"] != rm["source"]
     assert client.post("/api/lives/solaris/export", json={"dry_run": True}).json()["rumbles"][0]["rendered"] == []
@@ -772,9 +772,14 @@ def test_lives_flow(tmp_path: Path):
 
     r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "A-HALF"})
     r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "B-DNB"})
-    body = r.json()
-    assert body["folders"] == [{"path": "0-COMMON/DRUMS", "files": 1, "ram": 96_000, "over_cap": False}]
-    assert body["live"]["items"][0]["folder"] == "0-COMMON"
+    body = r.json()      # une seule banque par sample : deplace
+    assert body["folders"] == [{"path": "B-DNB", "files": 1, "ram": 96_000, "over_cap": False, "branches": {"DRUMS": 1}}]
+    assert (body["live"]["items"][0]["bank"], body["live"]["items"][0]["track"]) == ("B-DNB", None)
+    r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "0-KIT"})
+    assert (r.json()["live"]["items"][0]["bank"], r.json()["live"]["items"][0]["track"]) == ("0-KIT", 1)
+    r = client.post("/api/lives/solaris/track", json={"source": "k/kick.wav", "track": 16})
+    assert r.json()["live"]["items"][0]["track"] == 16
+    assert client.post("/api/lives/solaris/track", json={"source": "k/kick.wav", "track": 17}).status_code == 422
     assert client.post("/api/lives/solaris/add",
                        json={"sources": ["k/absent.wav"], "bank": "A-HALF"}).status_code == 422
 
@@ -785,19 +790,19 @@ def test_lives_flow(tmp_path: Path):
     assert r.json()["live"]["tempos"] == {"A-HALF": 165.0}
     assert client.post("/api/lives/solaris/tempo", json={"bank": "A-HALF", "bpm": 10}).status_code == 422
     r = client.post("/api/lives/solaris/tune", json={})
-    assert r.status_code == 200 and r.json()["live"]["items"][0]["shift"] == 0   # 0-COMMON sans tonalite
+    assert r.status_code == 200 and r.json()["live"]["items"][0]["shift"] == 0   # kit sans tonalite
 
     r = client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD F Tribe slr"})
     assert r.json()["live"]["items"][0]["name"] == "BD F Tribe slr"
 
     r = client.post("/api/lives/solaris/export", json={"dry_run": True})
-    assert r.json()["copied"] == ["0-COMMON/DRUMS/BD F Tribe slr.wav"]
+    assert r.json()["copied"] == ["0-KIT/16 BD F Tribe slr.wav"]
     assert not (tmp_path / "00-live").exists()
     client.post("/api/lives/solaris/export", json={"dry_run": False})
-    assert (tmp_path / "00-live" / "solaris" / "0-COMMON" / "DRUMS" / "BD F Tribe slr.wav").is_file()
+    assert (tmp_path / "00-live" / "solaris" / "0-KIT" / "16 BD F Tribe slr.wav").is_file()
     r = client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav"})
     assert r.status_code == 200 and len(r.content) > 96_000                 # tel quel
-    client.post("/api/lives/solaris/key", json={"bank": "0-COMMON", "key": "Sol"})
+    client.post("/api/lives/solaris/key", json={"bank": "0-KIT", "key": "Sol"})
     r = client.post("/api/lives/solaris/tune", json={})
     assert r.json()["live"]["items"][0]["shift"] == 2
     r = client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav"})
@@ -805,6 +810,6 @@ def test_lives_flow(tmp_path: Path):
     assert client.get("/api/lives/solaris/audio", params={"source": "x.wav"}).status_code == 404
 
     r = client.put("/api/lives/solaris/banks", json={"banks": ["B-DNB"]})
-    assert r.json()["folders"][0]["path"] == "B-DNB/DRUMS"
+    assert r.json()["folders"][0]["path"] == "0-KIT"          # le kit survit aux banques
     r = client.post("/api/lives/solaris/remove", json={"sources": ["k/kick.wav"]})
     assert r.json()["live"]["items"] == []

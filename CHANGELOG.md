@@ -8,6 +8,26 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L5] Lives : **une seule banque par sample** (`bank`, l'ajouter ailleurs
+  le déplace), **dossiers à plat** `<live>/<BANQUE>/<nom>.wav` (une banque de
+  patterns = une banque RAM de la DT2 = un dossier chargé d'un coup) et **kit
+  par défaut `0-KIT`** : 16 samples au plus, un par track de la doctrine
+  (`track`, proposée d'après le code, `set_track` échange avec l'occupant),
+  exportés `NN <nom>` pour occuper les slots A01-A16 de tout pattern vide ;
+  tonalité et tempo propres. `POST /api/lives/{live}/track`. Plafond
+  `LIVE_CAP` 127 par banque, compte par branche (`branches`) dans le bilan.
+  Front : ligne 0-KIT en tête, numéro de track modifiable en place, compte
+  par branche en filtre local, plus de badge multi-banques. Décisions dans
+  SPEC « Décisions 7.L5 », doctrine solaris et README à jour.
+
+### Modifié
+
+- [7.L5] `0-COMMON` disparaît : un live existant est migré au chargement
+  (première banque gardée pour un sample de plusieurs banques, samples de
+  `0-COMMON` fusionnés dans la dernière banque du live, ici F-JOKER ;
+  tonalité, tempo et presets de `0-COMMON` oubliés). Le premier export
+  retire l'ancien arbre (`0-COMMON/`, sous-dossiers de branche).
+
 - [7.M] KT10 : passe par mesure et profil du kick sur Floxytek (*Micro
   Tribe*, *Roots*) et Tekotak (*L'okapi*, stems Demucs et bank générés).
   Tekotak mesure le doublé martial : kick sur le « et » du 1 toutes les

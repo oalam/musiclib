@@ -389,6 +389,11 @@ class LiveTune(BaseModel):
     reset: bool = False         # remet tout le live a sa hauteur d'origine
 
 
+class LiveTrack(BaseModel):
+    source: str
+    track: int = Field(ge=1, le=lv.KIT_TRACKS)   # track du kit (0-KIT) ; echange si prise
+
+
 class LiveRumbles(BaseModel):
     bank: str
     presets: list[str] = Field(default_factory=list, max_length=lv.RUMBLE_PRESETS_MAX)  # vide : aucun rumble
@@ -1023,6 +1028,10 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     @app.post("/api/lives/{name}/rename", response_model=lv.LiveSummary)
     def live_rename(name: str, req: LiveRename) -> lv.LiveSummary:
         return live_edit(name, lambda live: lv.rename(live, req.source, req.name))
+
+    @app.post("/api/lives/{name}/track", response_model=lv.LiveSummary)
+    def live_track(name: str, req: LiveTrack) -> lv.LiveSummary:
+        return live_edit(name, lambda live: lv.set_track(live, req.source, req.track))
 
     @app.post("/api/lives/{name}/tune", response_model=lv.LiveSummary)
     def live_tune(name: str, req: LiveTune) -> lv.LiveSummary:

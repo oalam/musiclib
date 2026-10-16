@@ -34,9 +34,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD V8 Clean 01 909",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 614400,
    "note": "A#",
    "shift": 0,
@@ -48,9 +47,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Crashe 01 909",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 230400,
    "note": null,
    "shift": 0,
@@ -62,9 +60,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Maasai T 3 voc",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 447380,
    "note": null,
    "shift": 0,
@@ -76,9 +73,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Maasai T 25 voc",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1498536,
    "note": null,
    "shift": 0,
@@ -90,9 +86,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Monk Chant voc",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1680000,
    "note": null,
    "shift": 0,
@@ -104,9 +99,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Mouth 20 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 219236,
    "note": null,
    "shift": 0,
@@ -118,9 +112,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Spoken Miss voc",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 5760000,
    "note": null,
    "shift": 0,
@@ -132,9 +125,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Spoken Powe voc",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1536000,
    "note": null,
    "shift": 0,
@@ -146,9 +138,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Spoken M 10 voc",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1407024,
    "note": null,
    "shift": 0,
@@ -160,9 +151,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Korger 01 er1",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 63214,
    "note": null,
    "shift": 0,
@@ -174,9 +164,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Clean 04 909",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 21874,
    "note": null,
    "shift": 0,
@@ -188,9 +177,8 @@
    "code": "OH",
    "branch": "DRUMS",
    "name": "OH Clean 04 909",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 60066,
    "note": null,
    "shift": 0,
@@ -202,9 +190,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD A Filte 41 hcf",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 77652,
    "note": "F#",
    "shift": 3,
@@ -216,9 +203,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Snares 01 909",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 66700,
    "note": null,
    "shift": 0,
@@ -230,9 +216,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Lo Fi 13 meg",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 103656,
    "note": null,
    "shift": 0,
@@ -244,9 +229,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Snares 01 elk",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 71220,
    "note": null,
    "shift": 0,
@@ -258,9 +242,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Snare 06 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 264088,
    "note": null,
    "shift": 0,
@@ -272,9 +255,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Effected 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 104636,
    "note": null,
    "shift": 0,
@@ -286,9 +268,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Snare 02 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 164572,
    "note": null,
    "shift": 0,
@@ -300,9 +281,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Alien 01 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 112724,
    "note": null,
    "shift": 0,
@@ -314,9 +294,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Effected 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 78164,
    "note": null,
    "shift": 0,
@@ -328,9 +307,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Snare 03 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 102860,
    "note": null,
    "shift": 0,
@@ -342,9 +320,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD F Kick 03 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 103680,
    "note": "A",
    "shift": -4,
@@ -356,9 +333,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD F Kick 11 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 109836,
    "note": "A#",
    "shift": -5,
@@ -370,9 +346,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD Kick 07 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 41144,
    "note": null,
    "shift": 0,
@@ -384,9 +359,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD F Kick 34 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 103564,
    "note": "A",
    "shift": -4,
@@ -398,9 +372,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hats 05 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 41144,
    "note": null,
    "shift": 0,
@@ -412,9 +385,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hats 14 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 61716,
    "note": null,
    "shift": 0,
@@ -426,9 +398,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD F Kicks rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 52832,
    "note": "F",
    "shift": 0,
@@ -440,9 +411,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Effected 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 104696,
    "note": null,
    "shift": 0,
@@ -454,9 +424,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD F Rounded rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 31512,
    "note": "C#",
    "shift": 4,
@@ -468,9 +437,8 @@
    "code": "CP",
    "branch": "DRUMS",
    "name": "CP Tamb rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 79484,
    "note": null,
    "shift": 0,
@@ -482,9 +450,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Crash 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209444,
    "note": null,
    "shift": 0,
@@ -496,9 +463,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Rides 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209452,
    "note": null,
    "shift": 0,
@@ -510,9 +476,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Crash 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209444,
    "note": null,
    "shift": 0,
@@ -524,9 +489,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Rides 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209452,
    "note": null,
    "shift": 0,
@@ -538,9 +502,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Closed 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 208872,
    "note": null,
    "shift": 0,
@@ -552,9 +515,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Closed 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209324,
    "note": null,
    "shift": 0,
@@ -566,9 +528,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Closed 11 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 82232,
    "note": null,
    "shift": 0,
@@ -580,9 +541,8 @@
    "code": "OH",
    "branch": "DRUMS",
    "name": "OH Open 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209392,
    "note": null,
    "shift": 0,
@@ -594,9 +554,8 @@
    "code": "OH",
    "branch": "DRUMS",
    "name": "OH Open 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 209452,
    "note": null,
    "shift": 0,
@@ -608,9 +567,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Effected 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 35472,
    "note": null,
    "shift": 0,
@@ -622,9 +580,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Effected 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 17432,
    "note": null,
    "shift": 0,
@@ -636,9 +593,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Shaker 04 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 79796,
    "note": null,
    "shift": 0,
@@ -650,9 +606,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Shaker 05 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 104648,
    "note": null,
    "shift": 0,
@@ -664,9 +619,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Wooden B 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 104712,
    "note": null,
    "shift": 0,
@@ -678,9 +632,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Wooden B 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 104728,
    "note": null,
    "shift": 0,
@@ -692,9 +645,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hats 01 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 41144,
    "note": null,
    "shift": 0,
@@ -706,9 +658,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hats 12 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 20572,
    "note": null,
    "shift": 0,
@@ -720,9 +671,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hats 34 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 41144,
    "note": null,
    "shift": 0,
@@ -734,9 +684,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 01 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 102860,
    "note": null,
    "shift": 0,
@@ -748,9 +697,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 02 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 92572,
    "note": null,
    "shift": 0,
@@ -762,9 +710,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 03 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 102860,
    "note": null,
    "shift": 0,
@@ -776,9 +723,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 06 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 164572,
    "note": null,
    "shift": 0,
@@ -790,9 +736,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 10 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 72004,
    "note": null,
    "shift": 0,
@@ -804,9 +749,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 27 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 102860,
    "note": null,
    "shift": 0,
@@ -818,9 +762,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 38 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 164572,
    "note": null,
    "shift": 0,
@@ -832,9 +775,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Perc 39 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 82288,
    "note": null,
    "shift": 0,
@@ -846,9 +788,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Box 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 48856,
    "note": "G#",
    "shift": -1,
@@ -860,9 +801,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Kicks 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 68308,
    "note": "C#",
    "shift": -6,
@@ -874,9 +814,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Air 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 92728,
    "note": "G#",
    "shift": -1,
@@ -888,9 +827,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Attac 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 90884,
    "note": "A",
    "shift": -2,
@@ -902,9 +840,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Box 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 39072,
    "note": "F",
    "shift": 2,
@@ -916,9 +853,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD Box 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 37556,
    "note": null,
    "shift": 0,
@@ -930,9 +866,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Apart 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 77464,
    "note": "G#",
    "shift": -1,
@@ -944,9 +879,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Apart 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 75424,
    "note": "F#",
    "shift": 1,
@@ -958,9 +892,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD Bubble 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 67476,
    "note": null,
    "shift": 0,
@@ -972,9 +905,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Dive 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 86904,
    "note": "F#",
    "shift": 1,
@@ -986,9 +918,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Dive 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 71852,
    "note": "D#",
    "shift": 4,
@@ -1000,9 +931,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Indust 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 40332,
    "note": "D",
    "shift": 5,
@@ -1014,9 +944,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Kicks 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 84672,
    "note": "F#",
    "shift": 1,
@@ -1028,9 +957,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Matte 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 113400,
    "note": "B",
    "shift": -4,
@@ -1042,9 +970,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD A Nasty 01 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 101244,
    "note": "F",
    "shift": 4,
@@ -1056,9 +983,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD A Nasty 02 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 102008,
    "note": "F",
    "shift": 4,
@@ -1070,9 +996,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD A Nasty 03 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 72968,
    "note": "A#",
    "shift": -1,
@@ -1084,9 +1009,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD Kicks 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 73140,
    "note": "G",
    "shift": 0,
@@ -1098,9 +1022,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Shinra 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 56704,
    "note": "G#",
    "shift": -1,
@@ -1112,9 +1035,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Shinra 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 60060,
    "note": "A",
    "shift": -2,
@@ -1126,9 +1048,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD G Shinra 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 50504,
    "note": "F#",
    "shift": 1,
@@ -1140,9 +1061,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD Tool 01 rth",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 48884,
    "note": "G",
    "shift": 0,
@@ -1154,9 +1074,8 @@
    "code": "BD",
    "branch": "DRUMS",
    "name": "BD Tool 02 rth",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 48748,
    "note": "F",
    "shift": 0,
@@ -1168,9 +1087,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Air 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 125248,
    "note": null,
    "shift": 0,
@@ -1182,9 +1100,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Air 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 143540,
    "note": null,
    "shift": 0,
@@ -1196,9 +1113,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Basic Bs 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 90004,
    "note": null,
    "shift": 0,
@@ -1210,9 +1126,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Bit Room 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 89832,
    "note": null,
    "shift": 0,
@@ -1224,9 +1139,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Chunk 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 75880,
    "note": null,
    "shift": 0,
@@ -1238,9 +1152,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Crunch 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 96000,
    "note": null,
    "shift": 0,
@@ -1252,9 +1165,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Diver 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 107552,
    "note": null,
    "shift": 0,
@@ -1266,9 +1178,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Flit 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 121832,
    "note": null,
    "shift": 0,
@@ -1280,9 +1191,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Fryda 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 51460,
    "note": null,
    "shift": 0,
@@ -1294,9 +1204,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Gunshot 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 141792,
    "note": null,
    "shift": 0,
@@ -1308,9 +1217,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Iron 03 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 56452,
    "note": null,
    "shift": 0,
@@ -1322,9 +1230,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Metal Bl 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 89988,
    "note": null,
    "shift": 0,
@@ -1336,9 +1243,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Note 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 66240,
    "note": null,
    "shift": 0,
@@ -1350,9 +1256,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Pride 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 46860,
    "note": null,
    "shift": 0,
@@ -1364,9 +1269,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Skin 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 36396,
    "note": null,
    "shift": 0,
@@ -1378,9 +1282,8 @@
    "code": "SD",
    "branch": "DRUMS",
    "name": "SD Uamsnare 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 70116,
    "note": null,
    "shift": 0,
@@ -1392,9 +1295,8 @@
    "code": "CP",
    "branch": "DRUMS",
    "name": "CP Finger S 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 93068,
    "note": null,
    "shift": 0,
@@ -1406,9 +1308,8 @@
    "code": "CP",
    "branch": "DRUMS",
    "name": "CP Finger S 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 71816,
    "note": null,
    "shift": 0,
@@ -1420,9 +1321,8 @@
    "code": "CP",
    "branch": "DRUMS",
    "name": "CP Finger S 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 67332,
    "note": null,
    "shift": 0,
@@ -1434,9 +1334,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Bell 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 646016,
    "note": null,
    "shift": 0,
@@ -1448,9 +1347,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Bell 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 766000,
    "note": null,
    "shift": 0,
@@ -1462,9 +1360,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Bell 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 466204,
    "note": null,
    "shift": 0,
@@ -1476,9 +1373,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Cymbal 05 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 684952,
    "note": null,
    "shift": 0,
@@ -1490,9 +1386,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Cymbal 06 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 649008,
    "note": null,
    "shift": 0,
@@ -1504,9 +1399,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Laid Bac 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 198764,
    "note": null,
    "shift": 0,
@@ -1518,9 +1412,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Raw 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 230296,
    "note": null,
    "shift": 0,
@@ -1532,9 +1425,8 @@
    "code": "CY",
    "branch": "DRUMS",
    "name": "CY Wide 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 568740,
    "note": null,
    "shift": 0,
@@ -1546,9 +1438,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hi 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 41388,
    "note": null,
    "shift": 0,
@@ -1560,9 +1451,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hi 06 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 49076,
    "note": null,
    "shift": 0,
@@ -1574,9 +1464,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hi 11 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 20888,
    "note": null,
    "shift": 0,
@@ -1588,9 +1477,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Hi 16 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 51664,
    "note": null,
    "shift": 0,
@@ -1602,9 +1490,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Noise 01 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 118428,
    "note": null,
    "shift": 0,
@@ -1616,9 +1503,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Noise 11 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 52156,
    "note": null,
    "shift": 0,
@@ -1630,9 +1516,8 @@
    "code": "HH",
    "branch": "DRUMS",
    "name": "HH Noise 12 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 51724,
    "note": null,
    "shift": 0,
@@ -1644,9 +1529,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Cutlery 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 111820,
    "note": null,
    "shift": 0,
@@ -1658,9 +1542,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Crunchy 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 134520,
    "note": null,
    "shift": 0,
@@ -1672,9 +1555,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Demon 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 75004,
    "note": null,
    "shift": 0,
@@ -1686,9 +1568,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Demon 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 75000,
    "note": null,
    "shift": 0,
@@ -1700,9 +1581,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Fork Hit 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 103480,
    "note": null,
    "shift": 0,
@@ -1714,9 +1594,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Glass Hi 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 51632,
    "note": null,
    "shift": 0,
@@ -1728,9 +1607,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Glass Hi 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 89832,
    "note": null,
    "shift": 0,
@@ -1742,9 +1620,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Glass Hi 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 70876,
    "note": null,
    "shift": 0,
@@ -1756,9 +1633,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Junk 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 100148,
    "note": null,
    "shift": 0,
@@ -1770,9 +1646,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Whisk 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 133948,
    "note": null,
    "shift": 0,
@@ -1784,9 +1659,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Whisk 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 378220,
    "note": null,
    "shift": 0,
@@ -1798,9 +1672,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Whisk Tr 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 118428,
    "note": null,
    "shift": 0,
@@ -1812,9 +1685,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Chime 04 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 161368,
    "note": null,
    "shift": 0,
@@ -1826,9 +1698,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Cowbell 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 55724,
    "note": null,
    "shift": 0,
@@ -1840,9 +1711,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Shaker C 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 168248,
    "note": null,
    "shift": 0,
@@ -1854,9 +1724,8 @@
    "code": "PC",
    "branch": "DRUMS",
    "name": "PC Click Tr 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 106772,
    "note": null,
    "shift": 0,
@@ -1868,9 +1737,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 123 Cymb 07 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1259548,
    "note": null,
    "shift": 0,
@@ -1882,9 +1750,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 110 Trivial rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 837824,
    "note": null,
    "shift": 0,
@@ -1896,9 +1763,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 110 Top 17 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1675640,
    "note": null,
    "shift": 0,
@@ -1910,9 +1776,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 108 Kilter rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1706668,
    "note": null,
    "shift": 0,
@@ -1924,9 +1789,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 120 Unvital rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 769004,
    "note": null,
    "shift": 0,
@@ -1938,9 +1802,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 135 Proofwi rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 682668,
    "note": null,
    "shift": 0,
@@ -1952,9 +1815,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 140 Defined rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -1966,9 +1828,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 140 Separat rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1316572,
    "note": null,
    "shift": 0,
@@ -1980,9 +1841,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 134 Brea 02 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1375528,
    "note": null,
    "shift": 0,
@@ -1994,9 +1854,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 125 Dust 01 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 737280,
    "note": null,
    "shift": 0,
@@ -2008,9 +1867,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 175 Mult 06 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 2106516,
    "note": null,
    "shift": 0,
@@ -2022,9 +1880,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 165 Jung 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1117092,
    "note": null,
    "shift": 0,
@@ -2036,9 +1893,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 170 Jung 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084240,
    "note": null,
    "shift": 0,
@@ -2050,9 +1906,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 170 Jung 05 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084240,
    "note": null,
    "shift": 0,
@@ -2064,9 +1919,8 @@
    "code": "BR",
    "branch": "LOOPS",
    "name": "BR 175 Dn T 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1053260,
    "note": null,
    "shift": 0,
@@ -2078,9 +1932,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 92 Dubst 04 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2092,9 +1945,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 112 Dubs 07 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2106,9 +1958,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 92 Dubst 07 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2120,9 +1971,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 92 Dubst 10 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2134,9 +1984,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 140 Dubs 02 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1316572,
    "note": null,
    "shift": 0,
@@ -2148,9 +1997,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 142 Blut 07 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 649016,
    "note": null,
    "shift": 0,
@@ -2162,9 +2010,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 140 Dubs 03 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2176,9 +2023,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 140 Dubs 04 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2190,9 +2036,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 140 Dubs 05 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1316572,
    "note": null,
    "shift": 0,
@@ -2204,9 +2049,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 140 Dubs 08 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1316572,
    "note": null,
    "shift": 0,
@@ -2218,9 +2062,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 140 Dubs 11 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 658288,
    "note": null,
    "shift": 0,
@@ -2232,9 +2075,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 142 Blut 26 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 649016,
    "note": null,
    "shift": 0,
@@ -2246,9 +2088,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 142 Blut 29 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 649016,
    "note": null,
    "shift": 0,
@@ -2260,9 +2101,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 174 Mult 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1059312,
    "note": null,
    "shift": 0,
@@ -2274,9 +2114,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 174 Mult 06 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1059312,
    "note": null,
    "shift": 0,
@@ -2288,9 +2127,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 174 Mult 07 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1059312,
    "note": null,
    "shift": 0,
@@ -2302,9 +2140,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Bell 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2316,9 +2153,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Busy 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2330,9 +2166,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Chas 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -2344,9 +2179,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Virt 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 271056,
    "note": null,
    "shift": 0,
@@ -2358,9 +2192,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Fat 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2372,9 +2205,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Howl 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2386,9 +2218,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Lone 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2400,9 +2231,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Metr 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2414,9 +2244,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Sawn 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2428,9 +2257,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 170 Tin 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2442,9 +2270,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 172 Drum 02 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1071628,
    "note": null,
    "shift": 0,
@@ -2456,9 +2283,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 174 Mult 2 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 2118620,
    "note": null,
    "shift": 0,
@@ -2470,9 +2296,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 172 Fill 14 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 133952,
    "note": null,
    "shift": 0,
@@ -2484,9 +2309,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 172 Fill 10 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 133952,
    "note": null,
    "shift": 0,
@@ -2498,9 +2322,8 @@
    "code": "DL",
    "branch": "LOOPS",
    "name": "DL 176 Fill 03 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 2048000,
    "note": null,
    "shift": 0,
@@ -2512,9 +2335,8 @@
    "code": "PL",
    "branch": "LOOPS",
    "name": "PL 170 Airy 01 rth",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 542116,
    "note": null,
    "shift": 0,
@@ -2526,9 +2348,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 175 Fill 02 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 526628,
    "note": null,
    "shift": 0,
@@ -2540,9 +2361,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 175 Fill 2 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 526628,
    "note": null,
    "shift": 0,
@@ -2554,9 +2374,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 175 Fill 03 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 526628,
    "note": null,
    "shift": 0,
@@ -2568,9 +2387,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 175 Fill 01 rth",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 198432,
    "note": null,
    "shift": 0,
@@ -2582,9 +2400,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Merzba M bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1394860,
    "note": "F#",
    "shift": -1,
@@ -2596,9 +2413,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Arnham Di bas",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1614524,
    "note": "D",
    "shift": 3,
@@ -2610,9 +2426,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Syn 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 573704,
    "note": "D",
    "shift": 5,
@@ -2624,9 +2439,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Syn 09 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 672000,
    "note": "F",
    "shift": 0,
@@ -2638,10 +2452,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS D Upper 01 bas",
-   "banks": [
-    "B-DNB",
-    "E-SATURE"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 134476,
    "note": "D",
    "shift": 0,
@@ -2653,9 +2465,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS A Fail 01 bas",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 87876,
    "note": "E",
    "shift": 5,
@@ -2667,9 +2478,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Wrap 01 bas",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 143652,
    "note": "F#",
    "shift": -1,
@@ -2681,9 +2491,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Rolle 02 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 143532,
    "note": "F#",
    "shift": -1,
@@ -2695,9 +2504,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Power 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 322288,
    "note": "G#",
    "shift": -3,
@@ -2709,9 +2517,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Ya Ya 01 bas",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 161216,
    "note": "G#",
    "shift": -3,
@@ -2723,9 +2530,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS A Berlin 01 bas",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 241484,
    "note": "G",
    "shift": 2,
@@ -2737,9 +2543,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS A Electr 01 bas",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 120696,
    "note": "G",
    "shift": 2,
@@ -2751,9 +2556,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Flyby 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 152148,
    "note": "G",
    "shift": -2,
@@ -2765,9 +2569,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS A Static 01 bas",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 119340,
    "note": "G",
    "shift": 2,
@@ -2779,9 +2582,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Syn 10 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 141216,
    "note": "A",
    "shift": -2,
@@ -2793,9 +2595,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Bn Slo 00 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 350652,
    "note": "E",
    "shift": 1,
@@ -2807,9 +2608,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Synth 12 bas",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 137268,
    "note": "G",
    "shift": 0,
@@ -2821,9 +2621,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Synth 02 bas",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 99200,
    "note": "D",
    "shift": 5,
@@ -2835,9 +2634,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Plump bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 160280,
    "note": "D",
    "shift": 5,
@@ -2849,9 +2647,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Kit Sy 01 bas",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 191236,
    "note": "F",
    "shift": 0,
@@ -2863,9 +2660,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Arpeg 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 63968,
    "note": "F#",
    "shift": 1,
@@ -2877,9 +2673,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Flip 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 56088,
    "note": "D",
    "shift": 3,
@@ -2891,9 +2686,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Ow 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 55540,
    "note": "D",
    "shift": 3,
@@ -2905,9 +2699,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Pounde 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 67788,
    "note": "G",
    "shift": 0,
@@ -2919,9 +2712,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Ouch 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 60428,
    "note": "F",
    "shift": 2,
@@ -2933,9 +2725,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Passby 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 60416,
    "note": "F",
    "shift": 2,
@@ -2947,9 +2738,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F No Ra 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 80624,
    "note": "G#",
    "shift": -3,
@@ -2961,9 +2751,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Raw 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 80544,
    "note": "G#",
    "shift": -3,
@@ -2975,9 +2764,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS F Off 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 75904,
    "note": "G",
    "shift": -2,
@@ -2989,9 +2777,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Syn 14 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 118504,
    "note": "C",
    "shift": -5,
@@ -3003,9 +2790,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Nate 06 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 51728,
    "note": "G#",
    "shift": -1,
@@ -3017,9 +2803,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS Nate 14 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 80404,
    "note": "G",
    "shift": 0,
@@ -3031,9 +2816,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Wuab 04 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 77380,
    "note": "A#",
    "shift": -3,
@@ -3045,9 +2829,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Syn 04 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 62200,
    "note": "D",
    "shift": 5,
@@ -3059,9 +2842,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Onesh 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 143572,
    "note": "G#",
    "shift": -1,
@@ -3073,9 +2855,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Trigun 01 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 448776,
    "note": "E",
    "shift": 3,
@@ -3087,9 +2868,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Angry Mul bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 684212,
    "note": "F",
    "shift": 2,
@@ -3101,9 +2881,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Syn 03 bas",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 157460,
    "note": "E",
    "shift": 3,
@@ -3115,9 +2894,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Drive 01 bas",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 863096,
    "note": "A",
    "shift": -2,
@@ -3129,9 +2907,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Emu Proce bas",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 862052,
    "note": "A",
    "shift": -2,
@@ -3143,9 +2920,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS Onesho 28 bas",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1228808,
    "note": null,
    "shift": 0,
@@ -3157,9 +2933,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 D Ta 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3171,9 +2946,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 E St 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3185,9 +2959,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 E St 02 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3199,9 +2972,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F# 01 3 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3213,9 +2985,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F# 02 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3227,9 +2998,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F# 01 4 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3241,9 +3011,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F# 01 5 bas",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3255,9 +3024,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F# 01 6 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3269,9 +3037,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F Al 01 bas",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3283,9 +3050,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 F Sy 13 bas",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 466996,
    "note": null,
    "shift": 0,
@@ -3297,9 +3063,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 G# 01 bas",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3311,9 +3076,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 G# 01 bas",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3325,9 +3089,8 @@
    "code": "BL",
    "branch": "LOOPS",
    "name": "BL 170 G Co 01 bas",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1084232,
    "note": null,
    "shift": 0,
@@ -3339,9 +3102,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Gs Ces 02 bgr",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 716920,
    "note": "F",
    "shift": 2,
@@ -3353,9 +3115,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Gs Ces 3 bgr",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 780468,
    "note": "F",
    "shift": 2,
@@ -3367,9 +3128,8 @@
    "code": "BS",
    "branch": "TONAL",
    "name": "BS G Gs Ces 01 bgr",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 156640,
    "note": "F",
    "shift": 2,
@@ -3381,9 +3141,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Blue j89",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 974668,
    "note": null,
    "shift": 0,
@@ -3395,9 +3154,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Way Bloodcl j89",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 563408,
    "note": null,
    "shift": 0,
@@ -3409,10 +3167,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Bang Blips j89",
-   "banks": [
-    "0-COMMON",
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 614528,
    "note": null,
    "shift": 0,
@@ -3424,9 +3180,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Marbles Sli j89",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 202376,
    "note": null,
    "shift": 0,
@@ -3438,9 +3193,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Horn Capo Ko ni",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 2071008,
    "note": null,
    "shift": 0,
@@ -3452,9 +3206,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Alarm 27 meg",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 415596,
    "note": null,
    "shift": 0,
@@ -3466,9 +3219,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Modular ni",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 297932,
    "note": null,
    "shift": 0,
@@ -3480,9 +3232,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Darkness 43 hcf",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 3047424,
    "note": null,
    "shift": 0,
@@ -3494,9 +3245,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Effect 07 meg",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1237000,
    "note": null,
    "shift": 0,
@@ -3508,9 +3258,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Over Cliff rth",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 2136000,
    "note": null,
    "shift": 0,
@@ -3522,9 +3271,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Lazer Reform ni",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 285928,
    "note": null,
    "shift": 0,
@@ -3536,9 +3284,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Algerian ni",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 308016,
    "note": null,
    "shift": 0,
@@ -3550,9 +3297,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Fade Out 37 hcf",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1979140,
    "note": null,
    "shift": 0,
@@ -3564,9 +3310,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Kraftwer 02 er1",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 165506,
    "note": null,
    "shift": 0,
@@ -3578,9 +3323,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Warewolf 10 ni",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 139688,
    "note": null,
    "shift": 0,
@@ -3592,9 +3336,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Drum 02 ni",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 95368,
    "note": null,
    "shift": 0,
@@ -3606,9 +3349,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Lazer Supern ni",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 287356,
    "note": null,
    "shift": 0,
@@ -3620,9 +3362,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Psytranc 30 meg",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1054584,
    "note": null,
    "shift": 0,
@@ -3634,9 +3375,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Warewolf 11 ni",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 400908,
    "note": null,
    "shift": 0,
@@ -3648,9 +3388,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Doppler 17 meg",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 498692,
    "note": null,
    "shift": 0,
@@ -3662,9 +3401,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Power Do 17 meg",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 538260,
    "note": null,
    "shift": 0,
@@ -3676,9 +3414,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Stereo G 70 meg",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1058000,
    "note": null,
    "shift": 0,
@@ -3690,9 +3427,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Boing 04 rth",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 128556,
    "note": null,
    "shift": 0,
@@ -3704,9 +3440,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Ethnic B 09 meg",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 742968,
    "note": null,
    "shift": 0,
@@ -3718,9 +3453,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Downfilt 06 meg",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 1021956,
    "note": null,
    "shift": 0,
@@ -3732,9 +3466,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Club Tra 76 meg",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1103792,
    "note": null,
    "shift": 0,
@@ -3746,9 +3479,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Trancega 13 meg",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1287664,
    "note": null,
    "shift": 0,
@@ -3760,9 +3492,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Trancega 01 meg",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 2013428,
    "note": null,
    "shift": 0,
@@ -3774,9 +3505,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Sharp 50 hcf",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 784540,
    "note": null,
    "shift": 0,
@@ -3788,9 +3518,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Calm Downer j89",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 402684,
    "note": null,
    "shift": 0,
@@ -3802,9 +3531,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Dcat Syn 23 sfx",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1814400,
    "note": null,
    "shift": 0,
@@ -3816,9 +3544,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Calm Fake M j89",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 317580,
    "note": null,
    "shift": 0,
@@ -3830,9 +3557,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Bubu ni",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 489776,
    "note": null,
    "shift": 0,
@@ -3844,9 +3570,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Clasic D 01 rth",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 582296,
    "note": null,
    "shift": 0,
@@ -3858,10 +3583,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Screamin 01 noi",
-   "banks": [
-    "C-TRIBE",
-    "E-SATURE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 703080,
    "note": null,
    "shift": 0,
@@ -3873,9 +3596,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Black Sky ni",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1366532,
    "note": null,
    "shift": 0,
@@ -3887,9 +3609,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Glassdrum 01 ni",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 459512,
    "note": null,
    "shift": 0,
@@ -3901,10 +3622,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Alien Tu 01 noi",
-   "banks": [
-    "C-TRIBE",
-    "D-RESPI"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 965196,
    "note": null,
    "shift": 0,
@@ -3916,9 +3635,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Cloud Machin ni",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1316572,
    "note": null,
    "shift": 0,
@@ -3930,9 +3648,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Trancega 26 meg",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 2241452,
    "note": null,
    "shift": 0,
@@ -3944,9 +3661,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Track Drop mmg",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 906752,
    "note": null,
    "shift": 0,
@@ -3958,9 +3674,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Mystis ni",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1911672,
    "note": null,
    "shift": 0,
@@ -3972,9 +3687,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Distant ni",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 723960,
    "note": null,
    "shift": 0,
@@ -3986,9 +3700,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Glass Hi 02 meg",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 614684,
    "note": null,
    "shift": 0,
@@ -4000,9 +3713,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Esper To 01 noi",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 995936,
    "note": null,
    "shift": 0,
@@ -4014,9 +3726,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Fluid Clang j89",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 1107716,
    "note": null,
    "shift": 0,
@@ -4028,9 +3739,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Uriel ni",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 2047992,
    "note": null,
    "shift": 0,
@@ -4042,9 +3752,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Squid ni",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 452572,
    "note": null,
    "shift": 0,
@@ -4056,9 +3765,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Atmos Black ni",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 2660228,
    "note": null,
    "shift": 0,
@@ -4070,9 +3778,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Chrome I 01 noi",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1220452,
    "note": null,
    "shift": 0,
@@ -4084,9 +3791,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Dark Thu 01 noi",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 907988,
    "note": null,
    "shift": 0,
@@ -4098,10 +3804,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Atmos Distan ni",
-   "banks": [
-    "C-TRIBE",
-    "E-SATURE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1994624,
    "note": null,
    "shift": 0,
@@ -4113,9 +3817,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Cyborg I 01 noi",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1013336,
    "note": null,
    "shift": 0,
@@ -4127,9 +3830,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Slapper ni",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 987432,
    "note": null,
    "shift": 0,
@@ -4141,9 +3843,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Black Heart ni",
-   "banks": [
-    "0-COMMON"
-   ],
+   "bank": "F-JOKER",
+   "track": null,
    "ram": 460712,
    "note": null,
    "shift": 0,
@@ -4155,9 +3856,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Mass Dri 01 noi",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 878308,
    "note": null,
    "shift": 0,
@@ -4169,9 +3869,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Trancefor 01 ni",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 268052,
    "note": null,
    "shift": 0,
@@ -4183,9 +3882,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Mech Ale 01 noi",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 1659236,
    "note": null,
    "shift": 0,
@@ -4197,9 +3895,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Trancefor 02 ni",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 347744,
    "note": null,
    "shift": 0,
@@ -4211,9 +3908,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Portal I 01 noi",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1041248,
    "note": null,
    "shift": 0,
@@ -4225,9 +3921,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Cloud Mac 02 ni",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1863544,
    "note": null,
    "shift": 0,
@@ -4239,9 +3934,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Rolling 01 noi",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1900316,
    "note": null,
    "shift": 0,
@@ -4253,9 +3947,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Recharge Hi j89",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 361728,
    "note": null,
    "shift": 0,
@@ -4267,9 +3960,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Slam Dun 01 noi",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1147184,
    "note": null,
    "shift": 0,
@@ -4281,9 +3973,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Spacerip 01 noi",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 853800,
    "note": null,
    "shift": 0,
@@ -4295,9 +3986,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Younger Bro ni",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 710384,
    "note": null,
    "shift": 0,
@@ -4309,9 +3999,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Power Bl 01 noi",
-   "banks": [
-    "A-HALF"
-   ],
+   "bank": "A-HALF",
+   "track": null,
    "ram": 981580,
    "note": null,
    "shift": 0,
@@ -4323,9 +4012,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Almond L 01 noi",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 930024,
    "note": null,
    "shift": 0,
@@ -4337,9 +4025,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Behind Y 01 noi",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1277156,
    "note": null,
    "shift": 0,
@@ -4351,9 +4038,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Mech Clu 01 noi",
-   "banks": [
-    "B-DNB"
-   ],
+   "bank": "B-DNB",
+   "track": null,
    "ram": 799940,
    "note": null,
    "shift": 0,
@@ -4365,9 +4051,8 @@
    "code": "FX",
    "branch": "FX",
    "name": "FX Scanner 01 noi",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 820900,
    "note": null,
    "shift": 0,
@@ -4379,9 +4064,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Sardauka 01 mov",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1221392,
    "note": null,
    "shift": 0,
@@ -4393,9 +4077,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Gits Cho 01 mov",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 1796690,
    "note": null,
    "shift": 0,
@@ -4407,9 +4090,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Sardauka 02 mov",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1366830,
    "note": null,
    "shift": 0,
@@ -4421,9 +4103,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Gits Cho 02 mov",
-   "banks": [
-    "D-RESPI"
-   ],
+   "bank": "D-RESPI",
+   "track": null,
    "ram": 4393294,
    "note": null,
    "shift": 0,
@@ -4435,9 +4116,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Sardauka 03 mov",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1410456,
    "note": null,
    "shift": 0,
@@ -4449,9 +4129,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Sardauka 04 mov",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 1615270,
    "note": null,
    "shift": 0,
@@ -4463,9 +4142,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Smith Sp 01 mov",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 880008,
    "note": null,
    "shift": 0,
@@ -4477,9 +4155,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Smith Sp 04 mov",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 998264,
    "note": null,
    "shift": 0,
@@ -4491,9 +4168,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Smith Sp 05 mov",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1172736,
    "note": null,
    "shift": 0,
@@ -4505,9 +4181,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Smith Sp 02 mov",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 975890,
    "note": null,
    "shift": 0,
@@ -4519,9 +4194,8 @@
    "code": "VX",
    "branch": "VX",
    "name": "VX Smith Sp 03 mov",
-   "banks": [
-    "E-SATURE"
-   ],
+   "bank": "E-SATURE",
+   "track": null,
    "ram": 1390152,
    "note": null,
    "shift": 0,
@@ -4533,9 +4207,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Box 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 73972,
    "note": "G#",
    "shift": -1,
@@ -4547,9 +4220,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Kicks 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 98744,
    "note": "C#",
    "shift": -6,
@@ -4561,9 +4233,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Air 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 73972,
    "note": "G#",
    "shift": -1,
@@ -4575,9 +4246,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Attac 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 78372,
    "note": "A",
    "shift": -2,
@@ -4589,9 +4259,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Box 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 62204,
    "note": "F",
    "shift": 2,
@@ -4603,9 +4272,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM Box 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 69820,
    "note": null,
    "shift": 0,
@@ -4617,9 +4285,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Apart 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 73972,
    "note": "G#",
    "shift": -1,
@@ -4631,9 +4298,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Apart 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 65904,
    "note": "F#",
    "shift": 1,
@@ -4645,9 +4311,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM Bubble 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 69820,
    "note": null,
    "shift": 0,
@@ -4659,9 +4324,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Dive 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 65904,
    "note": "F#",
    "shift": 1,
@@ -4673,9 +4337,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Dive 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 55420,
    "note": "D#",
    "shift": 4,
@@ -4687,9 +4350,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Indust 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 52308,
    "note": "D",
    "shift": 5,
@@ -4701,9 +4363,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Kicks 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 65904,
    "note": "F#",
    "shift": 1,
@@ -4715,9 +4376,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Matte 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 87968,
    "note": "B",
    "shift": -4,
@@ -4729,9 +4389,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM Kicks 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 69820,
    "note": null,
    "shift": 0,
@@ -4743,9 +4402,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Shinr 01 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 73972,
    "note": "G#",
    "shift": -1,
@@ -4757,9 +4415,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Shinra 02 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 78372,
    "note": "A",
    "shift": -2,
@@ -4771,9 +4428,8 @@
    "code": "RM",
    "branch": "DRUMS",
    "name": "RM G Shinr 03 rth",
-   "banks": [
-    "C-TRIBE"
-   ],
+   "bank": "C-TRIBE",
+   "track": null,
    "ram": 65904,
    "note": "F#",
    "shift": 1,

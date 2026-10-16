@@ -72,35 +72,22 @@ Tout doit tenir dans la mémoire sample d'un seul projet : surveille-la au fur e
 
 ### Arborescence des samples sur le +Drive
 
-Un dossier par banque, puis un niveau BRANCHE (DRUMS, TONAL, LOOPS, FX, VX), sans dossier par code : le préfixe du nom regroupe les fichiers au tri alphabétique. Les sons partagés entre banques vivent dans 0-COMMON, jamais dupliqués.
+Un dossier par banque, à plat (SPEC 7.L5) : une banque de patterns = une banque RAM de la DT2 (127 slots) = un dossier, que l'on sélectionne et charge d'un coup dans sa banque RAM (`[FUNC] + [YES]` au chargement). Pas de sous-dossier par branche ni par code : le préfixe du nom regroupe les fichiers au tri alphabétique. Un sample n'est que dans une banque.
+
+Le kit par défaut `0-KIT` tient 16 samples, un par track de la grille de [[doctrine]] §1, numérotés par track. Chargé en premier dans la banque RAM A, il occupe les slots A01 à A16, ceux sur lesquels pointe tout pattern vide : c'est la couleur de départ du live. Il a sa propre tonalité (celle de la banque qui ouvre le set, fa pour solaris) ; un pattern d'une autre banque corrige par le TUNE de la track ou un sample lock vers un son de sa banque.
 
 ```
 00-live/solaris/
-├── 0-COMMON/
-│   ├── DRUMS/   BD F Hard 01 slr · BD G Hard 01 slr · BD A Sat 01 slr · RM G Roll 01 slr · RM A Roll 01 slr
-│   ├── TONAL/   BS F Sine slr · BS F Reese 01 slr · PD C Drone 01 slr · PD D Drone 01 slr · PD G Drone 01 slr
-│   └── FX/      FX Rise 01 slr · FX Impact 01 slr
-├── A-HALF/
-│   ├── DRUMS/   CP… HH… PC… SD…
-│   └── TONAL/   BS… (wobbles)
-├── B-DNB/
-│   ├── DRUMS/   HH… PC… SD…
-│   ├── TONAL/   BS… (reese fa / sol bémol)
-│   └── LOOPS/   BR 160 Amen 01 slr · BR 170 Think 01 slr
-├── C-TRIBE/
-│   ├── DRUMS/   HH… OH… PC… TM…
-│   ├── TONAL/   BS G 303 Acc slr · BS G 303 Sld slr
-│   └── LOOPS/   BL 168 AcidG1 slr
-├── D-RESPI/
-│   ├── TONAL/   PD…
-│   └── LOOPS/   BL… (acid filtrée)
-├── E-SATURE/
-│   ├── DRUMS/   BD A KickRm 01 slr · CP… PC… SD…
-│   └── LOOPS/   BL 172 AcidA1 slr
-└── F-JOKER/
-    ├── FX/
-    └── VX/
+├── 0-KIT/      01 BD F Hard 01 slr · 02 RM F Roll 01 slr · 03 SD Tribe 01 slr · 04 CY Ride slr · 05 HH… · 06 OH… · 07 PC… · 08 PC… · 09 BS F Sine slr · 10 ST… · 11 PD F Drone slr · 12 VX… · 13 BR 170 Think slr · 14 BL 168 AcidF1 slr · 15 FX Rise 01 slr · 16 FX Impact 01 slr
+├── A-HALF/     BD F Kick 03 rth · BS F Wrap 01 bas · CP… HH… PC… SD… · DL 140 Dubs 02 rth · FX… VX…
+├── B-DNB/      BD F Kicks rth · BR 160 Amen 01 slr · BR 170 Think 01 slr · BS F Reese 01 slr · HH… PC… SD… · FX…
+├── C-TRIBE/    BD G Box 01 rth · RM G Box 01 rth · BS G 303 Acc slr · BL 168 AcidG1 slr · CY… HH… OH… PC… SD… · VX…
+├── D-RESPI/    BS G Drive 01 bas · BL 170 G# 01 bas · PD… · FX… VX…
+├── E-SATURE/   BD A Nasty 01 rth · BS A Berlin 01 bas · BL 172 AcidA1 slr · HH… SD… · FX… VX…
+└── F-JOKER/    BD Tool 01 rth · SD Snares 01 909 · HH Clean 04 909 · FX… (ex 0-COMMON)
 ```
+
+Chargement d'un projet neuf : `0-KIT` dans la banque RAM A, puis `A-HALF` à la suite dans A, `B-DNB` dans B, et ainsi de suite. Plafond de 127 fichiers par banque (C-TRIBE est à 129 : 2 à retirer ou à passer en F-JOKER).
 
 - **Noms** : nomenclature SPEC 7.J8, `<CODE> [BPM|note] <desc> <pack>`, 18 caractères max, code toujours en tête.
 - **Note dans le nom** pour kicks, rumbles, sub et drones, pour retrouver d'un coup d'œil le fa, le sol ou le la.

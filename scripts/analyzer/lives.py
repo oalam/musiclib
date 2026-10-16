@@ -7,11 +7,17 @@ branche (DRUMS, TONAL, LOOPS, FX, VX), son nom DT2 et les banques qui
 l'utilisent. Il est independant des decisions keep / drop de la lib : la
 source est tout le catalogue classe (candidats et reserve).
 
-Arbre de l'export, que Transfer envoie sur le +Drive :
-`<DT2_LIVES_DIR>/<live>/<BANQUE>/<BRANCHE>/<nom>.wav`. Un sample utilise par
-deux banques ou plus va dans `0-COMMON` (jamais duplique). Pas de dossier
-par code : le prefixe du nom regroupe au tri alphabetique. Plafond de
-LIVE_CAP fichiers par dossier, en simple avertissement.
+Arbre de l'export, que Transfer envoie sur le +Drive (7.L5) :
+`<DT2_LIVES_DIR>/<live>/<BANQUE>/<nom>.wav`, a plat : une banque de patterns
+= une banque RAM de la DT2 (127 slots) = un dossier, charge d'un coup. Un
+sample appartient a une seule banque (l'ajouter ailleurs le deplace). Pas de
+dossier par branche ni par code : le prefixe du nom regroupe au tri
+alphabetique. Plafond de LIVE_CAP fichiers par banque, en simple avertissement.
+
+Kit par defaut `0-KIT` : banque implicite de KIT_TRACKS samples au plus, un
+par track de la grille de la doctrine (`track`), exporte en
+`0-KIT/<NN> <nom>.wav` ; charge en premier dans la banque RAM A, il occupe les
+slots A01-A16 sur lesquels pointe tout pattern vide.
 
 RAM : la DT2 charge les samples en 48 kHz / 16 bits, 400 Mo par projet
 (manuel §9.1). La place d'un sample est estimee a ce format (Transfer
@@ -26,7 +32,7 @@ dont la note est connue sont ramenes sur la tonique de sa tonalite, par le
 plus court chemin (-6 a +5 demi-tons). Le decalage est garde dans le live et
 applique a l'export en varispeed (comme le pitch de la DT2 : la duree suit) ;
 la lib n'est pas touchee. L'accordage s'applique au live entier
-(`tune_live`) ; 0-COMMON n'est accorde que sur sa propre tonalite.
+(`tune_live`) ; 0-KIT a sa propre tonalite, comme une banque.
 """
 from __future__ import annotations
 
@@ -36,7 +42,7 @@ import re
 from pathlib import Path
 
 import soundfile as sf
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field, model_validator
 
 from .samples import (
     NAME_MAX,
@@ -55,14 +61,22 @@ from .samples import (
     unique_name,
 )
 
-COMMON = "0-COMMON"
-LIVE_CAP = 64                    # fichiers par dossier <BANQUE>/<BRANCHE>
+KIT = "0-KIT"                    # kit par defaut : slots A01-A16 du projet
+KIT_TRACKS = 16
+LEGACY_COMMON = "0-COMMON"       # banque implicite d'avant 7.L5, fusionnee a la migration
+LIVE_CAP = 127                   # fichiers par banque : une banque RAM de la DT2 (1016 / 8)
 LIVE_BRANCHES = ("DRUMS", "TONAL", "LOOPS", "FX", "VX")
+# tracks du kit proposees par code (grille de digitakt/doctrine §1, analyzer.digitakt.TRACKS)
+KIT_TRACK_FOR: dict[str, tuple[int, ...]] = {
+    "BD": (1,), "RM": (2,), "SD": (3,), "CP": (3,), "CY": (4,), "HH": (5,), "OH": (6,),
+    "PC": (7, 8), "TM": (7, 8), "BS": (9,), "ST": (10,), "PD": (11,), "VX": (12,),
+    "BR": (13, 14), "DL": (13, 14), "PL": (13, 14), "ML": (13, 14), "BL": (13, 14), "FX": (15,),
+}
 DT2_RATE = 48_000
 DT2_SAMPLE_BYTES = 2             # 16 bits
 RAM_LIMIT = 400_000_000          # 400 Mo par projet (manuel §9.1)
 LIVE_NAME = re.compile(r"[a-z0-9][a-z0-9_-]{0,31}")
-BANK_NAME = re.compile(r"[A-Z1-9][A-Z0-9-]{0,15}")   # 0-... reserve a 0-COMMON
+BANK_NAME = re.compile(r"[A-Z1-9][A-Z0-9-]{0,15}")   # 0-... reserve a 0-KIT
 PACK_NAME = re.compile(r"[a-z0-9]{2,4}")
 KEY_MAX = 12                     # tonalite d'une banque, texte libre (Fa m, sol mineur)
 TEMPO_RANGE = (30.0, 300.0)      # BPM de la DT2
@@ -89,24 +103,19 @@ class LiveItem(BaseModel):
     code: str
     branch: str                      # LIVE_BRANCHES
     name: str                        # nom DT2 voulu, sans extension (<= NAME_MAX)
-    banks: list[str]                 # banques qui l'utilisent, dans l'ordre du live
+    bank: str = ""                   # banque du live (ou KIT) ; vide : pas encore place (render_item)
+    track: int | None = None         # track 1-16 dans le kit (KIT seulement), unique
     ram: int | None = None           # octets en RAM DT2, None : en-tete illisible
     note: str | None = None          # note de la source (dieses), relevee a l'accordage
     shift: int = 0                   # demi-tons de varispeed appliques a l'export
     parent: str | None = None        # sample d'origine d'un rendu du sound design (8.L1)
     rumble: str | None = None        # preset du rumble genere pour la banque (8.L2)
 
-    @computed_field  # type: ignore[prop-decorator]
-    @property
-    def folder(self) -> str:
-        """Banque d'arrivee : 0-COMMON des que le sample sert a plusieurs banques."""
-        return COMMON if COMMON in self.banks or len(self.banks) > 1 else self.banks[0]
-
 
 class Live(BaseModel):
     name: str
     pack: str = ""                   # pack des samples maison du live (famille SAMPLE), ex. slr
-    banks: list[str] = Field(default_factory=list)   # sans 0-COMMON, toujours present
+    banks: list[str] = Field(default_factory=list)   # sans 0-KIT, toujours present
     keys: dict[str, str] = Field(default_factory=dict)  # tonalite saisie par banque (ex. A-HALF : Fa m)
     tempos: dict[str, float] = Field(default_factory=dict)  # BPM par banque (ecoute au clavier du front)
     # presets de rumble par banque (8.L2) : un rumble par kick de la banque et par
@@ -114,12 +123,38 @@ class Live(BaseModel):
     rumbles: dict[str, list[str]] = Field(default_factory=dict)
     items: list[LiveItem] = Field(default_factory=list)
 
+    @model_validator(mode="before")
+    @classmethod
+    def _migrate(cls, data: object) -> object:
+        """Live d'avant 7.L5 (`banks` par item, 0-COMMON) : un sample de plusieurs
+        banques garde la premiere, un sample de 0-COMMON rejoint la derniere
+        banque du live ; tonalite, tempo et presets de 0-COMMON sont oublies."""
+        if not isinstance(data, dict) or not isinstance(data.get("items"), list):
+            return data
+        banks = data.get("banks") or []
+        last = banks[-1] if banks else None
+        items = []
+        for it in data["items"]:
+            if isinstance(it, dict) and "banks" in it and "bank" not in it:
+                old = [b for b in it["banks"] if b != LEGACY_COMMON]
+                bank = old[0] if old else last
+                if bank is None:
+                    continue
+                it = {k: v for k, v in it.items() if k not in ("banks", "folder")} | {"bank": bank}
+            items.append(it)
+        data = {**data, "items": items}
+        for key in ("keys", "tempos", "rumbles"):
+            if isinstance(data.get(key), dict):
+                data[key] = {b: v for b, v in data[key].items() if b != LEGACY_COMMON}
+        return data
+
 
 class LiveFolder(BaseModel):
-    path: str                        # <BANQUE>/<BRANCHE>
+    path: str                        # <BANQUE> (ou KIT)
     files: int
     ram: int
     over_cap: bool
+    branches: dict[str, int] = Field(default_factory=dict)   # fichiers par branche (filtre du panneau)
 
 
 class LiveSummary(BaseModel):
@@ -139,7 +174,7 @@ def check_live_name(name: str) -> str:
 
 
 def check_bank(bank: str) -> str:
-    if bank != COMMON and not BANK_NAME.fullmatch(bank):
+    if bank != KIT and not BANK_NAME.fullmatch(bank):
         raise LiveError(f"banque invalide : {bank!r} (ex. A-HALF)")
     return bank
 
@@ -171,7 +206,7 @@ def load_live(meta_dir: Path, name: str) -> Live:
 def save_live(live: Live, meta_dir: Path) -> None:
     path = live_file(meta_dir, live.name)
     path.parent.mkdir(parents=True, exist_ok=True)
-    data = live.model_dump(exclude={"items": {"__all__": {"folder"}}})
+    data = live.model_dump()
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     tmp.replace(path)
@@ -206,24 +241,22 @@ def set_banks(live: Live, banks: list[str]) -> None:
     """Fixe la liste ordonnee des banques. Un sample perd les banques retirees ;
     sans banque, il sort du live."""
     for b in banks:
-        if b == COMMON:
-            raise LiveError(f"{COMMON} est implicite, ne pas le lister")
+        if b == KIT:
+            raise LiveError(f"{KIT} est implicite, ne pas le lister")
         check_bank(b)
     if len(set(banks)) != len(banks):
         raise LiveError("banque en double")
     live.banks = list(banks)
-    kept = set(banks) | {COMMON}
-    for it in live.items:
-        it.banks = _ordered(live, [b for b in it.banks if b in kept])
-    live.items = [it for it in live.items if it.banks]
+    kept = set(banks) | {KIT}
+    live.items = [it for it in live.items if it.bank in kept]
     live.keys = {b: k for b, k in live.keys.items() if b in kept}
     live.tempos = {b: t for b, t in live.tempos.items() if b in kept}
     live.rumbles = {b: p for b, p in live.rumbles.items() if b in kept}
 
 
 def set_tempo(live: Live, bank: str, bpm: float | None) -> None:
-    """Tempo d'une banque (ou de 0-COMMON), arrondi au dixieme ; None : retire."""
-    if bank != COMMON and bank not in live.banks:
+    """Tempo d'une banque (ou du kit), arrondi au dixieme ; None : retire."""
+    if bank != KIT and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     if bpm is None:
         live.tempos.pop(bank, None)
@@ -235,8 +268,8 @@ def set_tempo(live: Live, bank: str, bpm: float | None) -> None:
 
 
 def set_key(live: Live, bank: str, key: str) -> None:
-    """Tonalite d'une banque du live (ou de 0-COMMON) ; vide : retiree."""
-    if bank != COMMON and bank not in live.banks:
+    """Tonalite d'une banque du live (ou du kit) ; vide : retiree."""
+    if bank != KIT and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     key = " ".join(key.split())
     if len(key) > KEY_MAX:
@@ -250,7 +283,7 @@ def set_key(live: Live, bank: str, key: str) -> None:
 def set_rumbles(live: Live, bank: str, presets: list[str]) -> None:
     """Presets de rumble d'une banque (8.L2), dedoublonnes dans l'ordre donne,
     RUMBLE_PRESETS_MAX au plus ; vide : plus de rumble pour cette banque.
-    Pas pour 0-COMMON : un kick commun est traite par chacune de ses banques."""
+    Pas pour le kit : son rumble (track 2) se choisit a la main."""
     if bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     ids = list(dict.fromkeys(p.strip() for p in presets if p.strip()))
@@ -342,10 +375,10 @@ def _renote(name: str, old: str, new: str | None) -> str:
 
 def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
               reset: bool = False) -> list[LiveItem]:
-    """Accorde les TUNABLE d'une banque (ou de 0-COMMON) sur la tonique de sa
+    """Accorde les TUNABLE d'une banque (ou du kit) sur la tonique de sa
     tonalite ; `reset` : les remet a leur hauteur d'origine. Renvoie les
     samples TUNABLE de la banque (accordes ou sans note connue)."""
-    if bank != COMMON and bank not in live.banks:
+    if bank != KIT and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     target = None
     if not reset:
@@ -355,7 +388,7 @@ def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
         target = key_root(key)
         if target is None:
             raise LiveError(f"tonalite illisible pour {bank} : {key!r} (ex. Fa m, F#m, sol)")
-    touched = [it for it in live.items if it.folder == bank and it.code in TUNABLE]
+    touched = [it for it in live.items if it.bank == bank and it.code in TUNABLE]
     for it in touched:
         it.note = source_note(manifest, it, root)
         shift = semitones(it.note, target) if it.note and target else 0
@@ -372,11 +405,11 @@ def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
 
 
 def tune_live(live: Live, manifest: Manifest, root: Path, reset: bool = False) -> list[LiveItem]:
-    """Accorde tout le live : chaque banque (0-COMMON compris) qui a une
+    """Accorde tout le live : chaque banque (kit compris) qui a une
     tonalite ; les samples d'une banque sans tonalite reprennent leur hauteur
     d'origine. `reset` : tout le live a sa hauteur d'origine. Tout ou rien :
     une tonalite illisible arrete avant toute modification."""
-    rows = [COMMON, *live.banks]
+    rows = rows_of(live)
     if not reset:
         bad = [f"{b} ({live.keys[b]!r})" for b in rows if live.keys.get(b) and key_root(live.keys[b]) is None]
         if bad:
@@ -387,9 +420,47 @@ def tune_live(live: Live, manifest: Manifest, root: Path, reset: bool = False) -
     return touched
 
 
-def _ordered(live: Live, banks: list[str]) -> list[str]:
-    order = {b: i for i, b in enumerate([COMMON, *live.banks])}
-    return sorted(set(banks), key=lambda b: order[b])
+def rows_of(live: Live) -> list[str]:
+    """Dossiers du live dans l'ordre d'export : le kit, puis les banques."""
+    return [KIT, *live.banks]
+
+
+def _free_track(live: Live, code: str) -> int:
+    """Track proposee pour un nouveau sample du kit : la premiere libre parmi
+    celles de son code (KIT_TRACK_FOR), sinon la premiere libre du kit."""
+    taken = {it.track for it in live.items if it.bank == KIT}
+    for t in [*KIT_TRACK_FOR.get(code, ()), *range(1, KIT_TRACKS + 1)]:
+        if t not in taken:
+            return t
+    raise LiveError(f"kit plein : {KIT_TRACKS} samples, retirer d'abord")
+
+
+def _place(live: Live, it: LiveItem, bank: str) -> bool:
+    """Met `it` dans `bank` (deplace s'il etait ailleurs) ; False s'il y etait
+    deja. Dans le kit, la track est attribuee ; en sortir la rend."""
+    if it.bank == bank:
+        return False
+    if bank == KIT:
+        it.track = _free_track(live, it.code)
+    else:
+        it.track = None
+    it.bank = bank
+    return True
+
+
+def set_track(live: Live, source: str, track: int) -> LiveItem:
+    """Track d'un sample du kit (1 a KIT_TRACKS) ; une track deja prise est
+    echangee avec l'occupant."""
+    if not 1 <= track <= KIT_TRACKS:
+        raise LiveError(f"track hors grille : {track} (1 a {KIT_TRACKS})")
+    it = next((i for i in live.items if i.source == source), None)
+    if it is None or it.bank != KIT:
+        raise LiveError(f"sample absent du kit : {source}")
+    other = next((i for i in live.items if i.bank == KIT and i.track == track), None)
+    if other is not None and other is not it:
+        other.track = it.track
+    it.track = track
+    return it
 
 
 def _with_pack(name: str, pack: str) -> str:
@@ -400,6 +471,7 @@ def _with_pack(name: str, pack: str) -> str:
 
 
 def _new_item(live: Live, manifest: Manifest, source: str, root: Path) -> LiveItem:
+    """Item d'un sample du catalogue, pas encore place (`_place`)."""
     entry = _entry(manifest, source)
     reserve = None if entry else _reserved(manifest, source)
     if entry is not None:
@@ -414,22 +486,28 @@ def _new_item(live: Live, manifest: Manifest, source: str, root: Path) -> LiveIt
         raise LiveError(f"code {code} sans branche de live : ranger d'abord {source} sous un code d'instrument")
     if family == "SAMPLE" and live.pack:
         name = _with_pack(name, live.pack)
-    return LiveItem(source=source, code=code, branch=branch, name=name, banks=[],
+    return LiveItem(source=source, code=code, branch=branch, name=name,
                     ram=ram_bytes(root / source), parent=entry.parent if entry else None)
 
 
 def add(live: Live, manifest: Manifest, sources: list[str], bank: str, root: Path) -> None:
-    """Ajoute des samples a une banque (ou a 0-COMMON) ; tout ou rien."""
-    if bank != COMMON and bank not in live.banks:
+    """Ajoute des samples a une banque (ou au kit) ; un sample deja dans le live
+    y est deplace. Tout ou rien (catalogue, place dans le kit)."""
+    if bank != KIT and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     by_source = {it.source: it for it in live.items}
-    new = [_new_item(live, manifest, s, root) for s in dict.fromkeys(sources) if s not in by_source]
+    wanted = list(dict.fromkeys(sources))
+    new = [_new_item(live, manifest, s, root) for s in wanted if s not in by_source]
+    if bank == KIT:
+        moving = sum(1 for s in wanted if s not in by_source or by_source[s].bank != KIT)
+        room = KIT_TRACKS - sum(1 for it in live.items if it.bank == KIT)
+        if moving > room:
+            raise LiveError(f"kit plein : {moving} a placer pour {room} track(s) libre(s) sur {KIT_TRACKS}")
     for it in new:
         live.items.append(it)
         by_source[it.source] = it
-    for s in sources:
-        it = by_source[s]
-        it.banks = _ordered(live, [*it.banks, bank])
+    for s in wanted:
+        _place(live, by_source[s], bank)
 
 
 def render_item(source: str, code: str, name: str, root: Path, parent: str | None,
@@ -440,23 +518,20 @@ def render_item(source: str, code: str, name: str, root: Path, parent: str | Non
     branch = branch_of("", code)
     if branch not in LIVE_BRANCHES:
         raise LiveError(f"code {code} sans branche de live : {source}")
-    return LiveItem(source=source, code=code, branch=branch, name=name, banks=[],
+    return LiveItem(source=source, code=code, branch=branch, name=name,
                     ram=ram_bytes(root / source), parent=parent, rumble=rumble)
 
 
 def add_item(live: Live, item: LiveItem, bank: str) -> tuple[LiveItem, bool]:
-    """Ajoute `item` a `bank` (le sample deja dans le live y est rejoint).
+    """Ajoute `item` a `bank` (le sample deja dans le live y est deplace).
     Renvoie l'item du live et False s'il etait deja dans la banque."""
-    if bank != COMMON and bank not in live.banks:
+    if bank != KIT and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     it = next((x for x in live.items if x.source == item.source), None)
     if it is None:
         live.items.append(item)
         it = item
-    if bank in it.banks:
-        return it, False
-    it.banks = _ordered(live, [*it.banks, bank])
-    return it, True
+    return it, _place(live, it, bank)
 
 
 def untuned_name(item: LiveItem) -> str:
@@ -480,10 +555,8 @@ def inherit_tuning(item: LiveItem, parent: LiveItem, root: Path) -> None:
 def remove(live: Live, sources: list[str], bank: str | None = None) -> None:
     """Retire des samples d'une banque, ou du live entier (`bank` None)."""
     wanted = set(sources)
-    for it in live.items:
-        if it.source in wanted:
-            it.banks = [] if bank is None else [b for b in it.banks if b != bank]
-    live.items = [it for it in live.items if it.banks]
+    live.items = [it for it in live.items
+                  if it.source not in wanted or (bank is not None and it.bank != bank)]
 
 
 def rename(live: Live, source: str, name: str) -> LiveItem:
@@ -507,19 +580,29 @@ class _NoCase(set[str]):
 
 def plan(live: Live) -> dict[str, str]:
     """Chemin d'arrivee (relatif au dossier du live) -> source, noms rendus
-    uniques par dossier."""
+    uniques par banque."""
     return {rel: it.source for rel, it in _placed(live).items()}
+
+
+def export_name(it: LiveItem) -> str:
+    """Nom de fichier exporte, sans extension : dans le kit, le numero de track
+    en tete (`01 BD F Kick 03 rth`), la description tronquee pour tenir dans
+    NAME_MAX ; ailleurs le nom DT2."""
+    if it.bank == KIT and it.track:
+        return f"{it.track:02d} {it.name[:NAME_MAX - 3].rstrip()}"
+    return it.name
 
 
 def _placed(live: Live) -> dict[str, LiveItem]:
     out: dict[str, LiveItem] = {}
     taken: dict[str, _NoCase] = {}
-    for it in sorted(live.items, key=lambda i: (i.folder, i.branch, i.name, i.source)):
-        folder = f"{it.folder}/{it.branch}"
-        seen = taken.setdefault(folder, _NoCase())
-        name = unique_name(it.name, seen)
+    order = {b: i for i, b in enumerate(rows_of(live))}
+    for it in sorted(live.items, key=lambda i: (order.get(i.bank, len(order)), i.track or 0,
+                                                LIVE_BRANCHES.index(i.branch), i.name, i.source)):
+        seen = taken.setdefault(it.bank, _NoCase())
+        name = unique_name(export_name(it), seen)
         seen.add(name.lower())
-        out[f"{folder}/{name}.wav"] = it
+        out[f"{it.bank}/{name}.wav"] = it
     return out
 
 
@@ -527,16 +610,15 @@ def summary(live: Live) -> LiveSummary:
     folders: dict[str, LiveFolder] = {}
     unknown = 0
     for it in live.items:
-        path = f"{it.folder}/{it.branch}"
-        f = folders.setdefault(path, LiveFolder(path=path, files=0, ram=0, over_cap=False))
+        f = folders.setdefault(it.bank, LiveFolder(path=it.bank, files=0, ram=0, over_cap=False))
         f.files += 1
         f.ram += it.ram or 0
+        f.branches[it.branch] = f.branches.get(it.branch, 0) + 1
         unknown += it.ram is None
-    order = {b: i for i, b in enumerate([COMMON, *live.banks])}
-    rows = sorted(folders.values(), key=lambda f: (order.get(f.path.split("/")[0], len(order)),
-                                                  LIVE_BRANCHES.index(f.path.split("/")[1])))
+    order = {b: i for i, b in enumerate(rows_of(live))}
+    rows = sorted(folders.values(), key=lambda f: order.get(f.path, len(order)))
     for f in rows:
-        f.over_cap = f.files > LIVE_CAP
+        f.over_cap = f.files > (KIT_TRACKS if f.path == KIT else LIVE_CAP)
     return LiveSummary(live=live, folders=rows, ram=sum(f.ram for f in rows), unknown_ram=unknown)
 
 

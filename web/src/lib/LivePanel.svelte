@@ -1,11 +1,13 @@
 <script lang="ts">
   // Panneau du live (7.L2), troisieme colonne de la vue Samples : selecteur de
   // live (library/lives/<live>.json), jauge de RAM du projet au format DT2,
-  // grille banques x branches (0-COMMON en tete), liste du dossier ou de la
-  // banque choisie, renommage DT2 en place, export rejouable vers 00-live.
+  // grille banques x branches (0-KIT, le kit par defaut, en tete), liste de la
+  // banque choisie (filtre local par branche), renommage DT2 en place, export
+  // rejouable vers 00-live (un dossier a plat par banque, 7.L5).
   // Ajout : glisser des samples de la liste sur une ligne de banque, ou L sur
-  // la banque active (selection, sinon sample en cours). Un sample pris par
-  // deux banques ou plus part dans 0-COMMON (regle de l'API).
+  // la banque active (selection, sinon sample en cours). Un sample n'est que
+  // dans une banque : l'ajouter ailleurs le deplace. Dans le kit, un sample
+  // par track (1-16), numero modifiable en place.
   import { onMount } from 'svelte'
   import { api, type BankRumbleReport, type LiveExportReport, type LiveItem, type LiveSummary, type SdPreset } from './api'
   import { focus } from './focus.svelte'
@@ -23,9 +25,10 @@
     focused?: boolean
   } = $props()
 
-  const COMMON = '0-COMMON'
+  const KIT = '0-KIT'                                         // lives.KIT
+  const KIT_TRACKS = 16                                       // lives.KIT_TRACKS
   const BRANCHES = ['DRUMS', 'TONAL', 'LOOPS', 'FX', 'VX']   // lives.LIVE_BRANCHES
-  const CAP = 64                                              // lives.LIVE_CAP
+  const CAP = 127                                             // lives.LIVE_CAP (une banque RAM de la DT2)
   const NAME_MAX = 18
   const TUNABLE = ['BD', 'RM', 'BS', 'PD', 'ST']              // lives.TUNABLE
   const LIVE_KEY = 'ui:live'
@@ -36,9 +39,9 @@
   let sum = $state<LiveSummary | null>(null)
   let error = $state('')
   let busy = $state(false)
-  // banque active (cible de L) et dossier ouvert (<BANQUE>/<BRANCHE>, '' : toute la banque)
-  let bank = $state(COMMON)
-  let folder = $state('')
+  // banque active (cible de L) et branche filtree ('' : toute la banque)
+  let bank = $state(KIT)
+  let branch = $state('')
   let dropBank = $state<string | null>(null)
   // creation et edition des banques
   let creating = $state(false)
@@ -53,6 +56,9 @@
   // renommage DT2 en place
   let renaming = $state<string | null>(null)
   let renameText = $state('')
+  // track d'un sample du kit, saisie en place
+  let tracking = $state<string | null>(null)
+  let trackText = $state('')
   // bilan du dernier accordage (banque -> message)
   let tuneInfo = $state('')
   let report = $state<LiveExportReport | null>(null)
@@ -66,30 +72,30 @@
   let rumbleInfo = $state('')
   const bankRumbles = $derived(sum?.live.rumbles[bank] ?? [])
 
-  const rows = $derived(sum ? [COMMON, ...sum.live.banks] : [])
+  const rows = $derived(sum ? [KIT, ...sum.live.banks] : [])
   const byPath = $derived(new Map((sum?.folders ?? []).map(f => [f.path, f])))
   const shown = $derived.by((): LiveItem[] => {
     const items = sum?.live.items ?? []
-    const list = folder ? items.filter(i => `${i.folder}/${i.branch}` === folder) : items.filter(i => i.folder === bank)
-    return [...list].sort((a, b) => BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch) || a.name.localeCompare(b.name))
+    const list = items.filter(i => i.bank === bank && (!branch || i.branch === branch))
+    // le kit dans l'ordre des tracks, une banque par branche puis nom
+    return [...list].sort((a, b) => (a.track ?? 0) - (b.track ?? 0)
+      || BRANCHES.indexOf(a.branch) - BRANCHES.indexOf(b.branch) || a.name.localeCompare(b.name))
   })
   // accordage global du live : one-shots tonals, banques avec tonalite
   const tunable = $derived((sum?.live.items ?? []).filter(i => TUNABLE.includes(i.code)))
   const shifted = $derived(tunable.some(i => i.shift))
   const keyed = $derived(rows.filter(b => sum?.live.keys[b]))
   const ratio = $derived(sum ? sum.ram / sum.ram_limit : 0)
-  const rowFiles = (b: string) => (sum?.folders ?? []).filter(f => f.path.split('/')[0] === b).reduce((n, f) => n + f.files, 0)
-  // plusieurs banques -> le sample est rangé dans 0-COMMON, d'ou l'info « aussi en »
-  const usedBy = (b: string) => (sum?.live.items ?? []).filter(i => i.folder === COMMON && i.banks.includes(b)).length
+  const rowFiles = (b: string) => byPath.get(b)?.files ?? 0
+  const pad2 = (n: number | null) => (n == null ? '··' : String(n).padStart(2, '0'))
 
   const mo = (b: number) => `${(b / 1e6).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} Mo`
   const fail = (e: unknown) => { error = e instanceof Error ? e.message : String(e) }
 
   function apply(s: LiveSummary) {
     sum = s
-    inLive = new Map(s.live.items.map(i => [i.source, i.banks]))
-    if (!rows.includes(bank)) { bank = s.live.banks[0] ?? COMMON; folder = '' }
-    if (folder && !byPath.has(folder)) folder = ''
+    inLive = new Map(s.live.items.map(i => [i.source, [i.bank]]))
+    if (!rows.includes(bank)) { bank = s.live.banks[0] ?? KIT; branch = '' }
     error = ''
   }
 
@@ -111,10 +117,10 @@
     current = name
     try { localStorage.setItem(LIVE_KEY, name) } catch { /* stockage indisponible */ }
     if (!name) { sum = null; inLive = new Map(); return }
-    bank = COMMON
-    folder = ''
+    bank = KIT
+    branch = ''
     await run(() => api.live(name))
-    bank = sum?.live.banks[0] ?? COMMON
+    bank = sum?.live.banks[0] ?? KIT
   }
 
   const splitBanks = (t: string) => t.split(/[\s,]+/).map(b => b.trim().toUpperCase()).filter(Boolean)
@@ -137,7 +143,7 @@
   async function saveBanks() {
     if (!sum) return
     const banks = splitBanks(banksText)
-    const lost = sum.live.items.filter(i => !i.banks.some(b => b === COMMON || banks.includes(b)))
+    const lost = sum.live.items.filter(i => i.bank !== KIT && !banks.includes(i.bank))
     if (lost.length && !confirm(`${lost.length} sample(s) n'ont plus de banque et sortent du live. Continuer ?`)) return
     if (await run(() => api.liveBanks(current, banks))) editingBanks = false
   }
@@ -157,7 +163,7 @@
 
   export async function add(sources: string[], to: string = bank) {
     if (!current || !sources.length) return
-    if (await run(() => api.liveAdd(current, sources, to))) { bank = to; folder = '' }
+    if (await run(() => api.liveAdd(current, sources, to))) { bank = to; branch = '' }
   }
 
   const remove = (sources: string[], from: string | null) => run(() => api.liveRemove(current, sources, from))
@@ -184,10 +190,10 @@
     const live = sum!.live
     const items = live.items.filter(i => TUNABLE.includes(i.code))
     if (reset) { tuneInfo = `${items.length} remis à leur hauteur d'origine`; return }
-    const inKey = items.filter(i => live.keys[i.folder])
+    const inKey = items.filter(i => live.keys[i.bank])
     const moved = inKey.filter(i => i.shift).length
     const unknown = inKey.filter(i => !i.note).length
-    const keyless = [...new Set(items.filter(i => !live.keys[i.folder]).map(i => i.folder))]
+    const keyless = [...new Set(items.filter(i => !live.keys[i.bank]).map(i => i.bank))]
     tuneInfo = `${moved} transposé${moved > 1 ? 's' : ''}, ${inKey.length - moved - unknown} déjà dans le ton`
       + (unknown ? `, ${unknown} sans note connue` : '')
       + (keyless.length ? ` · sans tonalité : ${keyless.join(', ')}` : '')
@@ -213,7 +219,7 @@
 
   /** Un rumble par kick de la banque et par preset associe, au tempo de la banque ; rejouable. */
   async function runRumbles() {
-    if (rumbling || !current || bank === COMMON) return
+    if (rumbling || !current || bank === KIT) return
     rumbling = true
     try {
       rumbleInfo = rumbleLine(await api.liveRumblesRun(current, bank))
@@ -237,7 +243,7 @@
   function listen(it: LiveItem) {
     cur = it.source
     // source du sound design (8.E) : le sample ecoute ici, meme hors de la liste de la lib
-    focus.set({ source: it.source, name: it.name, code: it.code, folder: `${current}/${it.folder}` })
+    focus.set({ source: it.source, name: it.name, code: it.code, folder: `${current}/${it.bank}` })
     play(it.source, it.shift ? api.liveAudioUrl(current, it.source, it.shift) : undefined)
     queueMicrotask(() => document.getElementById(`live-${it.source}`)?.scrollIntoView({ block: 'nearest' }))
   }
@@ -254,7 +260,7 @@
     if (!rows.length) return
     const i = rows.indexOf(bank)
     bank = rows[(i + delta + rows.length) % rows.length]
-    folder = ''
+    branch = ''
     if (shown.length) listen(shown[0])
   }
 
@@ -274,6 +280,24 @@
   function onRenameKey(e: KeyboardEvent) {
     if (e.key === 'Enter') { e.preventDefault(); saveRename() }
     else if (e.key === 'Escape') { e.preventDefault(); renaming = null }
+  }
+
+  /** Track d'un sample du kit (1-16) ; une track prise est echangee avec l'occupant (API). */
+  function startTrack(it: LiveItem) {
+    tracking = it.source
+    trackText = String(it.track ?? '')
+  }
+
+  async function saveTrack() {
+    const source = tracking
+    const track = Number(trackText)
+    if (!source || !Number.isInteger(track) || track < 1 || track > KIT_TRACKS) { tracking = null; return }
+    if (await run(() => api.liveTrack(current, source, track))) tracking = null
+  }
+
+  function onTrackKey(e: KeyboardEvent) {
+    if (e.key === 'Enter') { e.preventDefault(); saveTrack() }
+    else if (e.key === 'Escape') { e.preventDefault(); tracking = null }
   }
 
   function onFormKey(e: KeyboardEvent, ok: () => void, cancel: () => void) {
@@ -336,7 +360,7 @@
           : 'Saisir d\'abord la tonalité des banques (double-clic sur une banque)'}
         onclick={() => tune(shifted)}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M5 1.5v5a3 3 0 0 0 6 0v-5M8 9.5V14.5M6 14.5h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{shifted ? 'Accordé' : 'Accorder'}</button>
       <button class="small exp" disabled={exporting || !live.items.length}
-        title="Régénère les rumbles des banques à presets (tempo et preset courants), puis copie le live vers Live/00-live/{live.name} (banque / branche / nom DT2), à synchroniser avec Transfer"
+        title="Régénère les rumbles des banques à presets (tempo et preset courants), puis copie le live vers Live/00-live/{live.name} (un dossier à plat par banque, 0-KIT numéroté par track), à synchroniser avec Transfer"
         onclick={() => runExport(true)}><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 11.5v2h11v-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>{exporting ? 'Export…' : 'Exporter…'}</button>
     {/if}
   </header>
@@ -367,7 +391,7 @@
     <div class="form small" onkeydown={e => onFormKey(e, create, () => (creating = false))}>
       <label>Nom <!-- svelte-ignore a11y_autofocus --><input autofocus placeholder="solaris" maxlength="32" bind:value={newName} /></label>
       <label>Pack <input placeholder="slr" maxlength="4" bind:value={newPack} title="pack des samples maison (2 à 4 caractères), optionnel" /></label>
-      <label class="wide">Banques <input bind:value={newBanks} title="séparées par des espaces ; 0-COMMON est implicite" /></label>
+      <label class="wide">Banques <input bind:value={newBanks} title="séparées par des espaces ; le kit par défaut 0-KIT est implicite" /></label>
       <span>
         <button class="small" disabled={!newName.trim() || busy} onclick={create}>Créer</button>
         <button class="small" onclick={() => (creating = false)}>Annuler</button>
@@ -412,18 +436,18 @@
                 <!-- svelte-ignore a11y_autofocus -->
                 <span class="keyedit">{b} (<input autofocus maxlength="12" placeholder="Fa m" bind:value={keyText} onkeydown={onKeyKey} onblur={() => (keying = null)} />)</span>
               {:else}
-              <button class="bank" class:on={bank === b && !folder}
-                title="{b} : {rowFiles(b)} fichiers{b === COMMON ? ' (samples de plusieurs banques)' : usedBy(b) ? `, plus ${usedBy(b)} rangés dans ${COMMON}` : ''} · clic : banque active (L), double-clic : tonalité, dépôt : ajout"
-                onclick={ev => { if (ev.detail < 2) { bank = b; folder = '' } }} ondblclick={() => startKey(b)}><span class="bname">{b}</span>{#if s.live.keys[b]}<span class="key" title={s.live.keys[b]}>({s.live.keys[b]})</span>{/if}</button>
+              <button class="bank" class:on={bank === b && !branch} class:cap={byPath.get(b)?.over_cap}
+                title="{b} : {rowFiles(b)} fichiers{b === KIT ? ` (kit par défaut : un sample par track, slots A01-A${KIT_TRACKS} de tout pattern vide)` : byPath.get(b)?.over_cap ? ` · plus de ${CAP} : déborde de la banque RAM de la DT2` : ''} · clic : banque active (L), double-clic : tonalité, dépôt : ajout (déplace un sample déjà dans le live)"
+                onclick={ev => { if (ev.detail < 2) { bank = b; branch = '' } }} ondblclick={() => startKey(b)}><span class="bname">{b}</span>{#if s.live.keys[b]}<span class="key" title={s.live.keys[b]}>({s.live.keys[b]})</span>{/if}</button>
               {/if}
             </th>
             {#each BRANCHES as br}
-              {@const f = byPath.get(`${b}/${br}`)}
+              {@const n = byPath.get(b)?.branches[br] ?? 0}
               <td>
-                {#if f}
-                  <button class="cnt" class:on={folder === f.path} class:cap={f.over_cap}
-                    title="{f.path} : {f.files} fichiers, {mo(f.ram)}{f.over_cap ? ` · plus de ${CAP} fichiers dans le dossier` : ''}"
-                    onclick={() => { bank = b; folder = f.path }}>{f.files}</button>
+                {#if n}
+                  <button class="cnt" class:on={bank === b && branch === br}
+                    title="{b} : {n} {br} · clic : ne lister que cette branche"
+                    onclick={() => { bank = b; branch = br }}>{n}</button>
                 {:else}<span class="muted">·</span>{/if}
               </td>
             {/each}
@@ -438,14 +462,14 @@
       ondragover={e => onDragOver(e, ':list')} ondragleave={() => { if (dropBank === ':list') dropBank = null }}
       ondrop={e => onDrop(e, bank)}>
     <h4 class="small">
-      {folder ? folder.replace('/', ' / ') : bank}
+      {bank}{#if branch}<span class="muted"> / {branch}</span>{/if}
       {#if s.live.keys[bank]}<span class="key">({s.live.keys[bank]})</span>{/if}
-      <span class="muted">· {shown.length} fichier{shown.length > 1 ? 's' : ''}</span>
+      <span class="muted">· {shown.length}{bank === KIT ? ` / ${KIT_TRACKS}` : ''} fichier{shown.length > 1 ? 's' : ''}</span>
       <label class="bpm muted" title="Tempo de {bank} : Espace tenu relance le sample en cours à chaque temps">
         <input type="number" min="30" max="300" step="0.1" placeholder="—" value={s.live.tempos[bank] ?? ''}
           onchange={saveTempo} onkeydown={e => { if (e.key === 'Enter' || e.key === 'Escape') (e.target as HTMLElement).blur() }} /> BPM
       </label>
-      {#if bank !== COMMON}
+      {#if bank !== KIT}
         <button class="small link" disabled={busy}
           title="Presets de rumble de {bank} ({RUMBLES_MAX} au plus) : un rumble par kick et par preset, au tempo de la banque. Aucun preset : aucun rumble."
           onclick={startRumbles}>rumbles : {bankRumbles.length ? bankRumbles.join(', ') : 'aucun'}</button>
@@ -476,6 +500,14 @@
     <ul class="items small">
       {#each shown as it (it.source)}
         <li id="live-{it.source}" class:cur={it.source === cur} class:kbd={focused && it.source === cur}>
+          {#if it.bank === KIT}
+            {#if tracking === it.source}
+              <!-- svelte-ignore a11y_autofocus -->
+              <input class="trk mono" type="number" min="1" max={KIT_TRACKS} autofocus bind:value={trackText} onkeydown={onTrackKey} onblur={() => (tracking = null)} />
+            {:else}
+              <button class="trk mono" title="track {it.track} du kit (slot A{pad2(it.track)}) · clic : changer de track, échange si elle est prise" onclick={() => startTrack(it)}>{pad2(it.track)}</button>
+            {/if}
+          {/if}
           {#if renaming === it.source}
             <!-- svelte-ignore a11y_autofocus -->
             <input class="rename mono" autofocus maxlength={NAME_MAX} bind:value={renameText} onkeydown={onRenameKey} onblur={() => (renaming = null)} />
@@ -484,20 +516,14 @@
             <button class="pick mono" title="{it.source} · clic : écouter, double-clic : renommer"
               onclick={ev => { if (ev.detail < 2) listen(it) }} ondblclick={() => startRename(it)}>{it.name}</button>
           {/if}
-          {#if !folder}<span class="muted br">{it.branch}</span>{/if}
+          {#if !branch}<span class="muted br">{it.branch}</span>{/if}
           {#if it.rumble}<span class="muted br" title="rumble généré pour la banque : preset {it.rumble}{s.live.tempos[bank] ? `, ${s.live.tempos[bank]} BPM` : ''}, kick {it.parent}">{s.live.tempos[bank] ?? '—'} · {it.rumble}</span>{/if}
           {#if it.shift}<span class="flag shift" title="{it.note} → transposé de {fmtShift(it.shift)} demi-ton{Math.abs(it.shift) > 1 ? 's' : ''} à l'export (varispeed ; clic sur le nom : écoute accordée)">{fmtShift(it.shift)}</span>{/if}
           {#if it.ram == null}<span class="flag" title="en-tête illisible : RAM non comptée">ram ?</span>{/if}
-          <span class="banks">
-            {#each it.banks as b}
-              <span class="tag" class:here={b === bank}>{b}<button class="untag" disabled={busy} title="Retirer de {b}"
-                onclick={() => remove([it.source], b)}>×</button></span>
-            {/each}
-          </span>
           <button class="untag out" disabled={busy} title="Retirer du live" onclick={() => remove([it.source], null)}>retirer</button>
         </li>
       {:else}
-        <li class="muted">Vide : glisse des samples ici ou sur une ligne de banque, ou <kbd>L</kbd> (sélection) / <kbd>Entrée</kbd> (sample en cours) pour la banque active.</li>
+        <li class="muted">{bank === KIT ? 'Kit vide (un sample par track, chargé en premier dans la banque RAM A)' : 'Vide'} : glisse des samples ici ou sur une ligne de banque, ou <kbd>L</kbd> (sélection) / <kbd>Entrée</kbd> (sample en cours) pour la banque active.</li>
       {/each}
     </ul>
     </div>
@@ -533,6 +559,10 @@
   .bank { display: inline-flex; align-items: baseline; gap: 4px; max-width: 100%; border: 0; background: none; padding: 1px 4px; font-family: ui-monospace, monospace; font-size: 12px; text-align: left; white-space: nowrap; cursor: pointer; color: var(--text); }
   .bname { flex: none; }
   .bank.on { background: var(--accent); color: #fff; border-radius: 3px; }
+  .bank.cap .bname { color: #dc2626; }
+  .trk { width: 2.2em; padding: 0 2px; font-size: 11px; text-align: center; }
+  button.trk { border: 1px solid var(--border); border-radius: 3px; background: none; color: var(--muted); cursor: pointer; }
+  button.trk:hover { border-color: var(--accent); color: var(--accent); }
   .key { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 400; opacity: 0.8; }
   .flag.shift { background: #2563eb; font-variant-numeric: tabular-nums; }
   .tuneinfo { margin: 0 0 4px; }
@@ -555,9 +585,6 @@
   .rename { width: 14em; font-size: 12px; }
   .mono { font-family: ui-monospace, monospace; }
   .br { font-size: 11px; }
-  .banks { display: inline-flex; gap: 3px; }
-  .tag { display: inline-flex; align-items: center; gap: 2px; padding: 0 4px; border: 1px solid var(--border); border-radius: 3px; font-size: 11px; }
-  .tag.here { border-color: var(--accent); }
   .untag { border: 0; background: none; padding: 0 2px; cursor: pointer; color: var(--muted); font-size: 11px; }
   .untag:hover { color: #dc2626; }
   .flag { font-size: 10px; padding: 0 3px; border-radius: 3px; background: #dc2626; color: #fff; }
