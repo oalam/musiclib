@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grille des 16 tracks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+</head>
+<body>
+<style>
+  /* Layout : la face avant de la DT2, deux rangées de 8 touches, un panneau de détail à droite,
+     une barre de spectre au-dessus de la rangée haute ; dessous, un séquenceur 16 pas qui
+     illustre les patterns de la doctrine et respecte les mutes de la face avant. */
+  :root {
+    --bg: #ecebe6;
+    --panel: #f7f6f2;
+    --fg: #1c1b19;
+    --muted: #6b675f;
+    --line: #cfccc3;
+    --key: #faf9f6;
+    --key-off: #dedbd2;
+    --accent: #c8521c;
+    --grave: #8a3d2a;
+    --medium: #b0792a;
+    --aigu: #3b7f9a;
+    --id: #5d4d8c;
+    --fx: #4f7a5a;
+    --idle: #8d8980;
+    --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+    --body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181a; --panel: #1f2124; --fg: #ece9e1; --muted: #9a968d; --line: #35373b;
+      --key: #26282c; --key-off: #1a1b1e; --accent: #ff7a3d;
+      --grave: #d9694a; --medium: #e0a94a; --aigu: #5fb6d6; --id: #a08fe0; --fx: #7fc08f; --idle: #6e6b64;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17181a; --panel: #1f2124; --fg: #ece9e1; --muted: #9a968d; --line: #35373b;
+    --key: #26282c; --key-off: #1a1b1e; --accent: #ff7a3d;
+    --grave: #d9694a; --medium: #e0a94a; --aigu: #5fb6d6; --id: #a08fe0; --fx: #7fc08f; --idle: #6e6b64;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--body); line-height: 1.45;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 40px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; }
+  h1 { font-family: var(--display); font-weight: 900; font-size: clamp(34px, 6vw, 56px); letter-spacing: .01em; margin: 0; line-height: 1; text-wrap: balance; }
+  header p { margin: 0; color: var(--muted); max-width: 60ch; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+
+  .board { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+  @media (max-width: 820px) { .board { grid-template-columns: 1fr; } }
+
+  .machine, aside, .seq { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
+  .machine { padding: 16px; display: grid; gap: 14px; }
+  .scroll { overflow-x: auto; }
+  .machine svg { display: block; width: 100%; height: auto; min-width: 560px; font-family: var(--body); }
+  .key { cursor: pointer; }
+  .key rect.cap { fill: var(--key); stroke: var(--line); stroke-width: 1; transition: fill .15s, stroke .15s; }
+  .key:hover rect.cap, .key:focus-visible rect.cap { stroke: var(--fg); }
+  .key:focus-visible { outline: none; }
+  .key.sel rect.cap { stroke: var(--accent); stroke-width: 2; }
+  .key rect.band { fill: var(--c); }
+  .key text { fill: var(--fg); }
+  .key .num { font-family: var(--display); font-weight: 700; font-size: 22px; }
+  .key .role { font-size: 11.5px; font-weight: 600; }
+  .key .codes { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+  .key.muted rect.cap { fill: var(--key-off); }
+  .key.muted text { fill: var(--muted); opacity: .7; }
+  .key.muted rect.band { opacity: .25; }
+  .key .led { fill: var(--accent); opacity: 0; }
+  .key.on .led { opacity: 1; }
+  .rowlab { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .12em; fill: var(--muted); }
+  .spec { font-size: 10.5px; fill: var(--muted); letter-spacing: .08em; }
+  .spectrum stop:nth-child(1) { stop-color: var(--grave); }
+  .spectrum stop:nth-child(2) { stop-color: var(--medium); }
+  .spectrum stop:nth-child(3) { stop-color: var(--aigu); }
+  .ordertag { font-family: var(--mono); font-size: 10px; fill: var(--panel); font-weight: 500; }
+  .ordertag-bg { fill: var(--accent); }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 0; max-width: 90ch; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  button {
+    font: 500 13px var(--body); color: var(--fg); background: var(--key); border: 1px solid var(--line);
+    border-radius: 4px; padding: 7px 12px; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  button:hover { border-color: var(--fg); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button[aria-pressed="true"] { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+  .step { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  label.bpm { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  input[type="number"] { font: 500 13px var(--mono); width: 64px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--key); color: var(--fg); }
+
+  aside { padding: 18px; display: grid; gap: 12px; align-content: start; }
+  aside .eyebrow { font-family: var(--display); font-weight: 700; letter-spacing: .14em; font-size: 13px; color: var(--c, var(--muted)); text-transform: uppercase; }
+  aside h2 { font-family: var(--display); font-weight: 900; font-size: 40px; line-height: .95; margin: 0; }
+  aside h2 small { font-size: 18px; font-weight: 500; color: var(--muted); display: block; margin-top: 4px; font-family: var(--body); }
+  dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13.5px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; min-width: 0; }
+  dd code, .seq code { font-family: var(--mono); font-size: 12.5px; background: var(--key-off); padding: 1px 5px; border-radius: 3px; }
+  .ref { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+
+  /* séquenceur 16 pas */
+  .seq { padding: 16px; display: grid; gap: 14px; }
+  .seq h2 { font-family: var(--display); font-weight: 900; font-size: 28px; margin: 0; line-height: 1; }
+  .seq .sub { color: var(--muted); font-size: 13.5px; margin: 0; max-width: 80ch; }
+  .grid { display: grid; grid-template-columns: 112px repeat(16, minmax(26px, 1fr)); gap: 4px; min-width: 640px; align-items: center; }
+  .grid .lab { font-size: 12.5px; font-weight: 600; padding-right: 8px; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .grid .lab i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); flex: none; }
+  .grid .lab b { font-family: var(--display); font-weight: 700; font-size: 15px; color: var(--muted); width: 20px; }
+  .grid .lab.off { color: var(--muted); text-decoration: line-through; }
+  .grid .hd { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-align: center; }
+  .grid .hd.beat { color: var(--fg); font-weight: 500; }
+  .cell { aspect-ratio: 1; min-width: 0; padding: 0; border-radius: 3px; background: var(--key-off); border: 1px solid transparent; cursor: pointer; }
+  .cell[data-beat="1"] { background: color-mix(in srgb, var(--key-off) 70%, var(--fg) 8%); }
+  .cell[aria-pressed="true"] { background: var(--c); border-color: var(--c); }
+  .cell:hover { border-color: var(--fg); }
+  .cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .cell.now { box-shadow: inset 0 0 0 2px var(--accent); }
+  .cell.row-off[aria-pressed="true"] { opacity: .3; }
+  .marks { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 12.5px; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Grille des 16 tracks</h1>
+    <p>Digitakt II, doctrine §1 révisée le 19 octobre 2026. Cliquer une touche pour la muter, survoler pour lire son rôle. Les touches 1 à 8 portent le corps, 9 à 16 la tête.</p>
+    <div class="legend">
+      <span style="--c: var(--grave)">grave</span>
+      <span style="--c: var(--medium)">médium</span>
+      <span style="--c: var(--aigu)">aigu</span>
+      <span style="--c: var(--id)">identité du pattern</span>
+      <span style="--c: var(--fx)">transition</span>
+      <span style="--c: var(--idle)">réserve</span>
+    </div>
+  </header>
+
+  <div class="board">
+    <section class="machine" aria-label="Face avant">
+      <div class="controls">
+        <button id="b-up" aria-pressed="false">Montée pas à pas</button>
+        <button id="b-grave" aria-pressed="false">Couper les basses</button>
+        <button id="b-aigu" aria-pressed="false">Couper l'aigu</button>
+        <button id="b-perc" aria-pressed="false">Break percussif</button>
+        <button id="b-melo" aria-pressed="false">Break mélodique</button>
+        <button id="b-reset">Tout démuter</button>
+        <span class="step" id="step"></span>
+      </div>
+      <div class="scroll">
+        <svg viewBox="0 0 880 372" role="img" aria-labelledby="svgt">
+          <title id="svgt">Deux rangées de huit touches, grille des tracks de la Digitakt II</title>
+          <defs>
+            <linearGradient id="g-spec" class="spectrum" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0"></stop><stop offset=".45"></stop><stop offset="1"></stop>
+            </linearGradient>
+          </defs>
+          <text class="spec" x="20" y="22">30 Hz</text>
+          <text class="spec" x="860" y="22" text-anchor="end">16 kHz</text>
+          <text class="spec" x="440" y="22" text-anchor="middle">LE SPECTRE MONTE DE GAUCHE À DROITE SUR LA RANGÉE HAUTE</text>
+          <rect x="20" y="30" width="840" height="5" rx="2.5" fill="url(#g-spec)"></rect>
+          <text class="rowlab" x="20" y="62">RYTHMIQUE · 1 À 8</text>
+          <text class="rowlab" x="20" y="218">MÉLODIQUE ET TEXTURES · 9 À 16</text>
+          <g id="keys"></g>
+        </svg>
+      </div>
+      <p class="hint">Le badge orange sous un numéro donne le rang d'entrée dans la montée type (doctrine §4) : kick seul, puis rumble, hat fermé, basse, clap, perc, Id1, lead, Id2, Id3, hat ouvert, ride au peak. « Couper les basses » mute 1 + 2 + 9 en début de phrase, riser sur la 15, puis les trois reviennent ensemble sur le 1 suivant.</p>
+    </section>
+
+    <aside id="detail" aria-live="polite"></aside>
+  </div>
+
+  <section class="seq" aria-label="Patterns sur 16 pas">
+    <h2>Patterns sur 16 pas</h2>
+    <p class="sub">Les cellules rythmiques de la doctrine et des KT, track par track. Cliquer un pas pour l'ajouter ou le retirer ; une track mutée sur la face avant ne joue pas ici non plus. Les sons sont de simples synthèses de repère, pas les samples du kit.</p>
+    <div class="controls">
+      <button class="preset" data-p="techno" aria-pressed="true">Techno balancée</button>
+      <button class="preset" data-p="tribe" aria-pressed="false">Tribe poussée</button>
+      <button class="preset" data-p="hard" aria-pressed="false">Hard techno</button>
+      <button class="preset" data-p="halftime" aria-pressed="false">Half-time</button>
+      <button class="preset" data-p="vide" aria-pressed="false">Vide</button>
+      <button id="b-play" aria-pressed="false">Jouer</button>
+      <label class="bpm">BPM <input type="number" id="bpm" min="60" max="220" step="1" value="170"></label>
+    </div>
+    <div class="scroll"><div class="grid" id="grid"></div></div>
+    <div class="marks">
+      <span>Hat ouvert sur <code>3 7 11 15</code>, le « et » : balancement techno.</span>
+      <span>Sur <code>4 8 12 16</code>, le « a » : poussée tribe.</span>
+      <span>Basse <code>..x...x...x...x.</code> : contretemps, jamais sur le kick.</span>
+      <span>Toms <code>...x..x.....x.x.</code> et perc <code>E(5,16)</code> tournée de 2 : signature tribe.</span>
+    </div>
+    <p class="hint" id="seqnote"></p>
+  </section>
+</div>
+
+<script>
+  const TRACKS = [
+    { n: 1,  role: "Kick",              codes: "BD",            band: "40-120 Hz + click 2-5 kHz", c: "grave",  up: 1,
+      note: "Même sample, même réglage dans tout le set (§3). Il donne la tonalité (§11)." },
+    { n: 2,  role: "Rumble / sub",      codes: "RM",            band: "30-80 Hz", c: "grave", up: 2,
+      note: "Kick resamplé + reverb + saturation + passe-bas ; mêmes pas que le kick, ducking (§9). NOT FILL : il disparaît avec le kick dans les breaks." },
+    { n: 3,  role: "Clap / snare",      codes: "SD, CP",        band: "200 Hz-2 kHz", c: "medium", up: 5,
+      note: "Temps 2 et 4 en four-on-floor, plus libre en tribe." },
+    { n: 4,  role: "Perc",              codes: "TM, PC",        band: "variable", c: "medium", up: 6,
+      note: "One-shots : toms, rims, shakers, claves, métalliques. Une seule voix ; la seconde se joue sur Id1 (5) pour un call and response." },
+    { n: 5,  role: "Id1 rythmique",     codes: "BR, DL, PL",    band: "toute bande, transitoires", c: "id", up: 7,
+      note: "Identité rythmique du pattern : break, boucle de drums ou de percs, ou seconde voix de perc en one-shots (TM, PC). Rythmique, donc sur la rangée haute (§12)." },
+    { n: 6,  role: "Hat fermé",         codes: "HH",            band: "6-12 kHz", c: "aigu", up: 3,
+      note: "Contretemps, doubles croches : la grille du groove." },
+    { n: 7,  role: "Hat ouvert",        codes: "OH",            band: "5-10 kHz", c: "aigu", up: 11,
+      note: "Un seul bien placé vaut mieux qu'un empilement ; coupé net par le hat fermé suivant." },
+    { n: 8,  role: "Ride",              codes: "CY",            band: "4-10 kHz", c: "aigu", up: 12,
+      note: "Couleur de plein régime, dernière entrée de la montée, sort en peak. Un pattern sans ride laisse la 8 vide." },
+    { n: 9,  role: "Basse",             codes: "BS, BL",        band: "40-250 Hz + harmoniques", c: "grave", up: 4,
+      note: "One-shot ou boucle, au choix mais jamais les deux. Possède le grave avec le kick et le rumble ; contretemps, attaque franche, decay court (§9)." },
+    { n: 10, role: "Séquence / lead",   codes: "ST",            band: "300 Hz-4 kHz", c: "medium", up: 8,
+      note: "Acid line, stabs, arpèges." },
+    { n: 11, role: "Atmo / drone",      codes: "PD",            band: "large, faible niveau", c: "medium", up: null,
+      note: "Nappe, drone, room tone ; souvent un sample Stretch. Tourne pendant les breaks." },
+    { n: 12, role: "Vocal / one-shots", codes: "VX",            band: "300 Hz-4 kHz", c: "medium", up: null,
+      note: "Voix, samples parlés, cris, hooks." },
+    { n: 13, role: "Id2 bas-médium",    codes: "BL, ML graves", band: "100-800 Hz, passe-haut au-dessus du sub", c: "id", up: 9,
+      note: "Identité tonale grave : boucle de basse ou mélodie grave, jamais dans le grave de la 9 (§12)." },
+    { n: 14, role: "Id3 médium-aigu",   codes: "ML, BL aiguës", band: "800 Hz-8 kHz", c: "id", up: 10,
+      note: "Identité tonale aiguë : boucle mélodique, stabs, chops ; en dialogue avec Id2." },
+    { n: 15, role: "FX de transition",  codes: "FX",            band: "large", c: "fx", up: null,
+      note: "Risers, noise, impacts, downlifters, reverses (§5). Le riser part pendant le break." },
+    { n: 16, role: "Réserve / MIDI",    codes: "RS",            band: "—", c: "idle", up: null,
+      note: "Track MIDI vers une machine externe, joker, resamples maison." },
+  ];
+  const UP_ORDER = TRACKS.filter(t => t.up).sort((a, b) => a.up - b.up).map(t => t.n);
+  const CNAME = { grave: "grave", medium: "médium", aigu: "aigu", id: "identité", fx: "transition", idle: "réserve" };
+  const MUTE_SETS = { grave: [1, 2, 9], aigu: [6, 7, 8], perc: [9, 10, 11, 12, 13, 14, 15, 16], melo: [1, 2, 3, 4, 5, 6, 7, 8] };
+
+  const muted = new Set();
+  let selected = 1, upStep = 0, upMode = false;
+  const svgNS = "http://www.w3.org/2000/svg";
+  const keysG = document.getElementById("keys");
+  const KW = 98, KH = 118, GAP = 8, X0 = 20, Y = { top: 74, bottom: 230 };
+
+  function el(tag, attrs, text) {
+    const e = document.createElementNS(svgNS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function splitRole(r) {
+    if (r.length <= 13) return [r];
+    const i = r.lastIndexOf(" ", 13);
+    return i > 0 ? [r.slice(0, i), r.slice(i + 1)] : [r];
+  }
+  TRACKS.forEach(t => {
+    const col = (t.n - 1) % 8, x = X0 + col * (KW + GAP), y = t.n <= 8 ? Y.top : Y.bottom;
+    const g = el("g", { class: "key", tabindex: "0", role: "button", "data-n": t.n, style: `--c: var(--${t.c})`,
+      "aria-label": `Track ${t.n}, ${t.role}, codes ${t.codes}` });
+    g.appendChild(el("rect", { class: "cap", x, y, width: KW, height: KH, rx: 5 }));
+    g.appendChild(el("rect", { class: "band", x: x + 1, y: y + 1, width: KW - 2, height: 6, rx: 2 }));
+    g.appendChild(el("circle", { class: "led", cx: x + KW - 12, cy: y + 20, r: 4 }));
+    g.appendChild(el("text", { class: "num", x: x + 10, y: y + 36 }, String(t.n).padStart(2, "0")));
+    splitRole(t.role).forEach((line, i) => g.appendChild(el("text", { class: "role", x: x + 10, y: y + 60 + i * 14 }, line)));
+    g.appendChild(el("text", { class: "codes", x: x + 10, y: y + 96 }, t.codes));
+    if (t.up) {
+      g.appendChild(el("rect", { class: "ordertag-bg", x: x + 10, y: y + 103, width: 22, height: 11, rx: 2 }));
+      g.appendChild(el("text", { class: "ordertag", x: x + 21, y: y + 111.5, "text-anchor": "middle" }, String(t.up)));
+    }
+    g.addEventListener("click", () => toggle(t.n));
+    g.addEventListener("mouseenter", () => show(t.n));
+    g.addEventListener("focus", () => show(t.n));
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(t.n); } });
+    keysG.appendChild(g);
+  });
+
+  function toggle(n) {
+    if (upMode) exitUp();
+    muted.has(n) ? muted.delete(n) : muted.add(n);
+    selected = n; render();
+  }
+  function show(n) { selected = n; render(); }
+  function setMutes(list) { muted.clear(); list.forEach(n => muted.add(n)); }
+
+  function render() {
+    document.querySelectorAll(".key").forEach(g => {
+      const n = +g.dataset.n;
+      g.classList.toggle("muted", muted.has(n));
+      g.classList.toggle("sel", n === selected);
+      g.classList.toggle("on", !muted.has(n));
+    });
+    const t = TRACKS[selected - 1];
+    const state = muted.has(t.n) ? "mutée" : "active";
+    document.getElementById("detail").innerHTML = `
+      <div class="eyebrow" style="--c: var(--${t.c})">Track ${String(t.n).padStart(2, "0")} · ${CNAME[t.c]}</div>
+      <h2>${t.role}<small>${state}${t.up ? ` · entre en ${t.up}${t.up === 1 ? "er" : "e"} dans la montée` : " · hors montée type"}</small></h2>
+      <dl>
+        <dt>Codes</dt><dd>${t.codes.split(", ").map(c => `<code>${c}</code>`).join(" ")}</dd>
+        <dt>Bande</dt><dd>${t.band}</dd>
+        <dt>Rangée</dt><dd>${t.n <= 8 ? "haute, le corps" : "basse, la tête"}</dd>
+        <dt>Rôle</dt><dd>${t.note}</dd>
+      </dl>
+      <div class="ref">Source : digitakt/doctrine.md §1, §4, §9, §12 · codes de analyzer/samples.py · ${muted.size} track${muted.size > 1 ? "s" : ""} mutée${muted.size > 1 ? "s" : ""}.</div>`;
+    for (const k in MUTE_SETS) {
+      const same = MUTE_SETS[k].length === muted.size && MUTE_SETS[k].every(n => muted.has(n));
+      document.getElementById("b-" + k).setAttribute("aria-pressed", same ? "true" : "false");
+    }
+    document.getElementById("b-up").setAttribute("aria-pressed", upMode ? "true" : "false");
+    document.getElementById("step").textContent = upMode ? `${upStep} / ${UP_ORDER.length} · cliquer encore pour la suite` : "";
+    renderSeqMutes();
+  }
+  function exitUp() { upMode = false; upStep = 0; }
+  document.getElementById("b-up").addEventListener("click", () => {
+    if (!upMode) { upMode = true; upStep = 0; }
+    upStep = Math.min(upStep + 1, UP_ORDER.length);
+    setMutes(TRACKS.map(t => t.n).filter(n => !UP_ORDER.slice(0, upStep).includes(n)));
+    selected = UP_ORDER[upStep - 1];
+    if (upStep === UP_ORDER.length) { render(); exitUp(); render(); return; }
+    render();
+  });
+  for (const k in MUTE_SETS) document.getElementById("b-" + k).addEventListener("click", () => { exitUp(); setMutes(MUTE_SETS[k]); render(); });
+  document.getElementById("b-reset").addEventListener("click", () => { exitUp(); muted.clear(); render(); });
+
+  /* ---------- séquenceur 16 pas ---------- */
+  const SEQ_TRACKS = [1, 2, 3, 4, 5, 6, 7, 9];
+  const PRESETS = {
+    techno:   { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "....x.......x...", 4: "................", 5: "................", 6: "x.x.x.x.x.x.x.x.", 7: "..x...x...x...x.", 9: "..x...x...x...x.",
+      note: "KT swing et micro-timing : hat fermé en croches, hat ouvert sur le « et », clap sur 2 et 4, basse en contretemps. Le balancement vient de l'ouvert." },
+    tribe:    { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "..............x.", 4: "...x..x.....x.x.", 5: "..x..x..x..x..x.", 6: "x.x.x.x.x.x.x.x.", 7: "...x...x...x...x", 9: "..x...x...x...x.",
+      note: "KT style tribe, boucle de référence à 165 BPM : toms sur la 4, E(5,16) tournée de 2 sur Id1, hat ouvert sur le « a », clap seul en fin de mesure. Vélocités des hats 100 / 65 / 65 / 80 par temps sur la machine." },
+    hard:     { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "....x.......x...", 4: "xxxxxxxxxxxxxxxx", 5: "................", 6: "x.x.x.x.x.x.x.x.", 7: "..x...x...x...x.", 9: ".xxx.xxx.xxx.xxx",
+      note: "KT hard techno : shaker en doubles croches sur la 4, basse rolling qui remplit tout sauf le kick, hats offbeat. La pression vient de la densité, le kick reste droit." },
+    halftime: { 1: "x.........x.....", 2: "x.........x.....", 3: "........x.......", 4: "................", 5: "x..x..x.x..x..x.", 6: "x.x.x.x.x.x.x.x.", 7: "................", 9: "..x.....x...x...",
+      note: "KT half-time et passerelles : kicks sur 1 et 11, clap sur 9 (le 2-step), break en tresillo sur Id1. Même tempo, ressenti divisé par deux : la passerelle tribe vers DnB." },
+    vide:     { 1: "................", 2: "................", 3: "................", 4: "................", 5: "................", 6: "................", 7: "................", 9: "................",
+      note: "Partir de rien : poser le kick sur 1, 5, 9, 13, puis le hat fermé, puis la basse entre les kicks." },
+  };
+  const pattern = {};
+  SEQ_TRACKS.forEach(n => pattern[n] = new Array(16).fill(false));
+  const grid = document.getElementById("grid");
+  grid.appendChild(Object.assign(document.createElement("div"), { className: "hd" }));
+  for (let s = 1; s <= 16; s++) {
+    const h = document.createElement("div"); h.className = "hd" + ((s - 1) % 4 === 0 ? " beat" : ""); h.textContent = s; grid.appendChild(h);
+  }
+  SEQ_TRACKS.forEach(n => {
+    const t = TRACKS[n - 1];
+    const lab = document.createElement("div"); lab.className = "lab"; lab.id = "lab-" + n; lab.style.setProperty("--c", `var(--${t.c})`);
+    lab.innerHTML = `<i></i><b>${String(n).padStart(2, "0")}</b>${t.role.replace(" / sub", "")}`;
+    grid.appendChild(lab);
+    for (let s = 0; s < 16; s++) {
+      const b = document.createElement("button"); b.className = "cell"; b.id = `c-${n}-${s}`; b.dataset.n = n; b.dataset.s = s;
+      b.dataset.beat = s % 4 === 0 ? "1" : "0"; b.style.setProperty("--c", `var(--${t.c})`);
+      b.setAttribute("aria-pressed", "false"); b.setAttribute("aria-label", `${t.role}, pas ${s + 1}`);
+      b.addEventListener("click", () => { pattern[n][s] = !pattern[n][s]; renderSeq(); clearPresetState(); });
+      grid.appendChild(b);
+    }
+  });
+  function renderSeq() {
+    SEQ_TRACKS.forEach(n => pattern[n].forEach((on, s) => document.getElementById(`c-${n}-${s}`).setAttribute("aria-pressed", on ? "true" : "false")));
+  }
+  function renderSeqMutes() {
+    SEQ_TRACKS.forEach(n => {
+      document.getElementById("lab-" + n).classList.toggle("off", muted.has(n));
+      for (let s = 0; s < 16; s++) document.getElementById(`c-${n}-${s}`).classList.toggle("row-off", muted.has(n));
+    });
+  }
+  function loadPreset(key) {
+    const p = PRESETS[key];
+    SEQ_TRACKS.forEach(n => pattern[n] = [...p[n]].map(ch => ch === "x"));
+    document.querySelectorAll(".preset").forEach(b => b.setAttribute("aria-pressed", b.dataset.p === key ? "true" : "false"));
+    document.getElementById("seqnote").textContent = p.note;
+    renderSeq();
+  }
+  function clearPresetState() {
+    document.querySelectorAll(".preset").forEach(b => b.setAttribute("aria-pressed", "false"));
+    document.getElementById("seqnote").textContent = "Pattern modifié à la main.";
+  }
+  document.querySelectorAll(".preset").forEach(b => b.addEventListener("click", () => loadPreset(b.dataset.p)));
+
+  /* lecture : horloge à anticipation, sons de repère synthétisés */
+  let ctx = null, playing = false, nextTime = 0, step = 0, timer = null, uiStep = -1;
+  const bpmInput = document.getElementById("bpm");
+  function stepDur() { const bpm = Math.min(220, Math.max(60, +bpmInput.value || 170)); return 60 / bpm / 4; }
+  function noise(dur, hp, gainV, t) {
+    const n = Math.ceil(ctx.sampleRate * dur), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource(); src.buffer = buf;
+    const f = ctx.createBiquadFilter(); f.type = "highpass"; f.frequency.value = hp;
+    const g = ctx.createGain(); g.gain.setValueAtTime(gainV, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(f).connect(g).connect(ctx.destination); src.start(t); src.stop(t + dur);
+  }
+  function tone(type, f0, f1, dur, gainV, t) {
+    const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(20, f1), t + dur * 0.6);
+    const g = ctx.createGain(); g.gain.setValueAtTime(gainV, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + dur);
+  }
+  const VOICES = {
+    1: t => tone("sine", 150, 45, 0.28, 0.9, t),
+    2: t => tone("sine", 60, 40, 0.5, 0.35, t),
+    3: t => noise(0.14, 900, 0.5, t),
+    4: t => tone("triangle", 260, 140, 0.18, 0.4, t),
+    5: t => tone("triangle", 420, 300, 0.1, 0.3, t),
+    6: t => noise(0.04, 7000, 0.35, t),
+    7: t => noise(0.22, 5000, 0.25, t),
+    9: t => tone("square", 87, 87, 0.16, 0.22, t),
+  };
+  function schedule() {
+    while (nextTime < ctx.currentTime + 0.12) {
+      const s = step;
+      SEQ_TRACKS.forEach(n => { if (pattern[n][s] && !muted.has(n)) VOICES[n](nextTime); });
+      const at = nextTime;
+      setTimeout(() => showStep(s), Math.max(0, (at - ctx.currentTime) * 1000));
+      nextTime += stepDur(); step = (step + 1) % 16;
+    }
+  }
+  function showStep(s) {
+    if (uiStep >= 0) SEQ_TRACKS.forEach(n => document.getElementById(`c-${n}-${uiStep}`).classList.remove("now"));
+    uiStep = s;
+    if (s >= 0) SEQ_TRACKS.forEach(n => document.getElementById(`c-${n}-${s}`).classList.add("now"));
+  }
+  const playBtn = document.getElementById("b-play");
+  playBtn.addEventListener("click", async () => {
+    if (!playing) {
+      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); await ctx.resume(); }
+      catch (e) { document.getElementById("seqnote").textContent = "Le son n'est pas disponible dans ce navigateur ; la tête de lecture ne peut pas tourner."; return; }
+      playing = true; step = 0; nextTime = ctx.currentTime + 0.05; timer = setInterval(schedule, 25);
+      playBtn.textContent = "Arrêter"; playBtn.setAttribute("aria-pressed", "true");
+    } else {
+      playing = false; clearInterval(timer); showStep(-1);
+      playBtn.textContent = "Jouer"; playBtn.setAttribute("aria-pressed", "false");
+    }
+  });
+
+  loadPreset("techno");
+  render();
+</script>
+</body>
+</html>

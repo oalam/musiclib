@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.L] `digitakt/grille.html` : grille des 16 tracks interactive (face avant
+  SVG avec mutes, coupures grave / aigu, breaks et montée pas à pas du §4 ;
+  séquenceur 16 pas avec presets techno, tribe, hard techno, half-time tirés
+  des KT, édition au clic, lecture WebAudio). Liée depuis la doctrine §1.
+
 - [7.M] KB : nouvelle rubrique **tutos** (`digitakt/kb/tutos/`, hub
   `_index.md`, lot 1 « Sessions complètes ») pour les sessions vidéo
   décortiquées trick par trick (track, instrument, pas, lien vers le

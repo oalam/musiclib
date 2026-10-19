@@ -30,6 +30,12 @@ dubstep, ralentis.
 live, les doigts doivent savoir sans regarder que le 1 coupe le kick et que le 9
 coupe la basse. Les mutes et les réflexes en dépendent.
 
+**Version interactive** : `digitakt/grille.html` (à ouvrir dans un navigateur,
+hors Obsidian) ou [la même page en ligne](https://claude.ai/artifact/YJs4sbz4wshM3k3yFCfg5D) :
+face avant avec mutes (coupures grave / aigu, breaks, montée pas à pas du §4)
+et séquenceur 16 pas avec les patterns de référence des KT (techno, tribe,
+hard techno, half-time), édition au clic et lecture.
+
 ### Rythmique — tracks 1 à 8 (première rangée de touches)
 
 Les codes sont ceux des samples de la lib (`analyzer/samples.py`, SPEC 7.J) ;
