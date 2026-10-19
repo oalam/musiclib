@@ -116,16 +116,19 @@
   .seq { padding: 16px; display: grid; gap: 14px; }
   .seq h2 { font-family: var(--display); font-weight: 900; font-size: 28px; margin: 0; line-height: 1; }
   .seq .sub { color: var(--muted); font-size: 13.5px; margin: 0; max-width: 80ch; }
-  .grid { display: grid; grid-template-columns: 112px repeat(16, minmax(26px, 1fr)); gap: 4px; min-width: 640px; align-items: center; }
-  .grid .lab { font-size: 12.5px; font-weight: 600; padding-right: 8px; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-  .grid .lab i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); flex: none; }
-  .grid .lab b { font-family: var(--display); font-weight: 700; font-size: 15px; color: var(--muted); width: 20px; }
-  .grid .lab.off { color: var(--muted); text-decoration: line-through; }
-  .grid .hd { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-align: center; }
-  .grid .hd.beat { color: var(--fg); font-weight: 500; }
-  .cell { aspect-ratio: 1; min-width: 0; padding: 0; border-radius: 3px; background: var(--key-off); border: 1px solid transparent; cursor: pointer; }
-  .cell[data-beat="1"] { background: color-mix(in srgb, var(--key-off) 70%, var(--fg) 8%); }
-  .cell[aria-pressed="true"] { background: var(--c); border-color: var(--c); }
+  /* une carte par track : deux rangées de 8 pas, comme les touches de la DT2 */
+  .tracks { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .trk { border: 1px solid var(--line); border-radius: 6px; padding: 10px 10px 12px; display: grid; gap: 8px; background: var(--key); border-top: 3px solid var(--c); }
+  .trk .lab { font-size: 12.5px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; white-space: nowrap; min-width: 0; }
+  .trk .lab b { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--c); }
+  .trk .lab span { overflow: hidden; text-overflow: ellipsis; }
+  .trk .lab em { font: 400 11px var(--mono); color: var(--muted); margin-left: auto; }
+  .trk .lab.off { color: var(--muted); text-decoration: line-through; }
+  .pads { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+  .pads .half { grid-column: 1 / -1; height: 1px; background: var(--line); margin: 2px 0; }
+  .cell { aspect-ratio: 1; min-width: 0; padding: 0; border-radius: 3px; background: var(--key-off); border: 1px solid transparent; cursor: pointer; font: 400 9.5px var(--mono); color: var(--muted); display: grid; place-items: end start; padding-left: 3px; line-height: 1; }
+  .cell[data-beat="1"] { background: color-mix(in srgb, var(--key-off) 70%, var(--fg) 8%); color: var(--fg); }
+  .cell[aria-pressed="true"] { background: var(--c); border-color: var(--c); color: var(--panel); }
   .cell:hover { border-color: var(--fg); }
   .cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
   .cell.now { box-shadow: inset 0 0 0 2px var(--accent); }
@@ -184,7 +187,7 @@
 
   <section class="seq" aria-label="Patterns sur 16 pas">
     <h2>Patterns sur 16 pas</h2>
-    <p class="sub">Les cellules rythmiques de la doctrine et des KT, track par track. Cliquer un pas pour l'ajouter ou le retirer ; une track mutée sur la face avant ne joue pas ici non plus. Les sons sont de simples synthèses de repère, pas les samples du kit.</p>
+    <p class="sub">Les cellules rythmiques de la doctrine et des KT, une carte par track, les pas 1 à 8 en haut et 9 à 16 en bas comme sur les touches de la machine. Cliquer un pas pour l'ajouter ou le retirer ; une track mutée sur la face avant ne joue pas ici non plus. Les sons sont de simples synthèses de repère, pas les samples du kit.</p>
     <div class="controls">
       <button class="preset" data-p="techno" aria-pressed="true">Techno balancée</button>
       <button class="preset" data-p="tribe" aria-pressed="false">Tribe poussée</button>
@@ -194,7 +197,7 @@
       <button id="b-play" aria-pressed="false">Jouer</button>
       <label class="bpm">BPM <input type="number" id="bpm" min="60" max="220" step="1" value="170"></label>
     </div>
-    <div class="scroll"><div class="grid" id="grid"></div></div>
+    <div class="tracks" id="grid"></div>
     <div class="marks">
       <span>Hat ouvert sur <code>3 7 11 15</code>, le « et » : balancement techno.</span>
       <span>Sur <code>4 8 12 16</code>, le « a » : poussée tribe.</span>
@@ -346,22 +349,22 @@
   const pattern = {};
   SEQ_TRACKS.forEach(n => pattern[n] = new Array(16).fill(false));
   const grid = document.getElementById("grid");
-  grid.appendChild(Object.assign(document.createElement("div"), { className: "hd" }));
-  for (let s = 1; s <= 16; s++) {
-    const h = document.createElement("div"); h.className = "hd" + ((s - 1) % 4 === 0 ? " beat" : ""); h.textContent = s; grid.appendChild(h);
-  }
   SEQ_TRACKS.forEach(n => {
     const t = TRACKS[n - 1];
-    const lab = document.createElement("div"); lab.className = "lab"; lab.id = "lab-" + n; lab.style.setProperty("--c", `var(--${t.c})`);
-    lab.innerHTML = `<i></i><b>${String(n).padStart(2, "0")}</b>${t.role.replace(" / sub", "")}`;
-    grid.appendChild(lab);
+    const card = document.createElement("div"); card.className = "trk"; card.style.setProperty("--c", `var(--${t.c})`);
+    const lab = document.createElement("div"); lab.className = "lab"; lab.id = "lab-" + n;
+    lab.innerHTML = `<b>${String(n).padStart(2, "0")}</b><span>${t.role.replace(" / sub", "")}</span><em>${t.codes.split(",")[0]}</em>`;
+    card.appendChild(lab);
+    const pads = document.createElement("div"); pads.className = "pads";
     for (let s = 0; s < 16; s++) {
+      if (s === 8) pads.appendChild(Object.assign(document.createElement("div"), { className: "half" }));
       const b = document.createElement("button"); b.className = "cell"; b.id = `c-${n}-${s}`; b.dataset.n = n; b.dataset.s = s;
-      b.dataset.beat = s % 4 === 0 ? "1" : "0"; b.style.setProperty("--c", `var(--${t.c})`);
+      b.dataset.beat = s % 4 === 0 ? "1" : "0"; b.textContent = s + 1;
       b.setAttribute("aria-pressed", "false"); b.setAttribute("aria-label", `${t.role}, pas ${s + 1}`);
       b.addEventListener("click", () => { pattern[n][s] = !pattern[n][s]; renderSeq(); clearPresetState(); });
-      grid.appendChild(b);
+      pads.appendChild(b);
     }
+    card.appendChild(pads); grid.appendChild(card);
   });
   function renderSeq() {
     SEQ_TRACKS.forEach(n => pattern[n].forEach((on, s) => document.getElementById(`c-${n}-${s}`).setAttribute("aria-pressed", on ? "true" : "false")));
