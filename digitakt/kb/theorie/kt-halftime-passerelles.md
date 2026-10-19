@@ -114,15 +114,15 @@ choix de ressenti, pas une mesure.
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : kick 1, clap 3, hat fermé 5, basse 9,
-Id1 13. Tempo : fiche [[../tempo-metronome]] ; vitesse par track : fiche
+Grille de la [[../../doctrine]] §1 : kick 1, clap 3, hat fermé 6, basse 9,
+Id1 5. Tempo : fiche [[../tempo-metronome]] ; vitesse par track : fiche
 [[../page-setup]].
 
 1. **Même pattern, deux ressentis (5 min).** 180 BPM, kick `X...X...X...X...`,
    clap sur 5 et 13, hats 16 pas. Copier le pattern dans le slot suivant
    (fiche [[../copier-coller]]) : clap sur 9 seul, kicks sur 1 et 11 (le
    2-step). Chaîner les deux, 8 mesures chacun, en comptant à voix haute :
-   180 puis 90. Variante : track 5 à `SPEED` 1/2X, le hat passe en croches
+   180 puis 90. Variante : track 6 à `SPEED` 1/2X, le hat passe en croches
    ressenties sans changer un trig.
 2. **La passerelle 3/4 (10 min).** 140 BPM, kick sur 1, snare sur 9, hats
    sur 1, 4, 7, 10, 13, 16 (le 3/16, fiche [[../euclidien]] avec E(6, 16)
@@ -132,7 +132,7 @@ Id1 13. Tempo : fiche [[../tempo-metronome]] ; vitesse par track : fiche
    kick entre les deux (doctrine §13).
 3. **Tribe vers DnB sans changer de tempo (10 min).** 180 BPM, pattern
    tribe four-on-floor ; pattern 2 : même kick, clap sur 9 ; pattern 3 :
-   break Amen sur Id1 13 en 16 tranches (fiche [[../slice-breaks]]) sous
+   break Amen sur Id1 5 en 16 tranches (fiche [[../slice-breaks]]) sous
    le kick en half-time ; pattern 4 : kick tribe muté, 2-step sur la 1
    (pas 1 et 11), snare sur 5 et 13. Quatre patterns, zéro changement de
    tempo, un set qui est passé de la tribe à la DnB. Retour par le chemin

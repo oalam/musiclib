@@ -29,11 +29,11 @@ générateur), `TRO` (rotation des deux), `OP` : `OR` (tous les coups), `XOR`
 
 ## Pas à pas : perc tribe 3 contre 8
 
-1. Track 7 (perc A), `[FUNC] + [AMP]`, `EUC` on.
+1. Track 4 (perc), `[FUNC] + [AMP]`, `EUC` on.
 2. `PL1` = 3, `PL2` = 0, en PER TRACK `LEN` = 8 (cf. [[page-setup]]) : le
    tresillo `x..x..x.`.
 3. `RO1` pour placer le premier coup hors du kick.
-4. Track 8 : `PL1` = 5, `LEN` = 16, `TRO` à l'oreille : les deux percs se
+4. Track 5 (Id1, seconde perc) : `PL1` = 5, `LEN` = 16, `TRO` à l'oreille : les deux percs se
    croisent.
 5. Locker la vélocité ou le pitch sur les trigs générés si besoin.
 
@@ -57,7 +57,7 @@ générateur), `TRO` (rotation des deux), `OP` : `OR` (tous les coups), `XOR`
 
 ## À essayer (5 min)
 
-Track 7 en 3/8, track 8 en 5/16, puis tourner `TRO` de la track 8 sur une
+Track 4 en 3/8, track 5 en 5/16, puis tourner `TRO` de la track 5 sur une
 boucle de 4 mesures et noter les deux réglages qui sonnent le mieux.
 
 Source : manuel DT2 OS 1.17, §10.3, §10.7.

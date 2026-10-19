@@ -73,13 +73,13 @@ s'obtiennent par rotation) :
 
 | E(k, n) | Pattern | Nom usuel | Usage DT2 |
 |---|---|---|---|
-| E(3, 8) | `x..x..x.` | tresillo | toms (7), basse galop (9) |
-| E(5, 8) | `x.xx.xx.` | cinquillo | perc B (8) dense |
+| E(3, 8) | `x..x..x.` | tresillo | toms (4), basse galop (9) |
+| E(5, 8) | `x.xx.xx.` | cinquillo | seconde perc, Id1 (5), dense |
 | E(3, 4) | `x.xx` | | tom court sur 4 pas |
 | E(4, 7) | `x.x.x.x` | | perc sur 7 pas, polymétrie (KT2) |
 | E(5, 12) | `x..x.x..x.x.` | Venda | hats sur 12 pas |
 | E(5, 16) | `x..x..x..x..x...` | bossa nova | perc A sur une mesure |
-| E(7, 16) | `x..x.x.x..x.x.x.` | samba | ride (4) ou perc B |
+| E(7, 16) | `x..x.x.x..x.x.x.` | samba | ride (8) ou perc |
 | E(9, 16) | `x.xx.x.x.xx.x.x.` | | hats « cassés » |
 
 Correction au passage : [[../../veille-theorie]] §A1 note E(7, 16) comme
@@ -119,20 +119,20 @@ techno « broken » 3+3+4+3+3 (KT16) et des rolls en triolets
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : kick 1, clap 3, hat fermé 5, perc A 7,
-perc B 8, basse 9. Geste euclidien : fiche [[../euclidien]].
+Grille de la [[../../doctrine]] §1 : kick 1, clap 3, hat fermé 6, perc 4,
+seconde perc sur Id1 5, basse 9. Geste euclidien : fiche [[../euclidien]].
 
-1. **Huit rotations du tresillo (5 min).** Kick 1 en 16 pas. Track 7 en
+1. **Huit rotations du tresillo (5 min).** Kick 1 en 16 pas. Track 4 en
    mode euclidien, `PL1` = 3, `LEN` = 8 (PER TRACK, fiche
    [[../page-setup]]). Tourner `RO1` de 0 à 7, une mesure chacune, en
    notant les deux rotations qui groovent et celle qui flotte. Garder la
    meilleure en la convertissant (`[FUNC]` + `EUC` off).
-2. **Banque de claves (10 min).** Track 8 en 16 pas, à la main : clave
+2. **Banque de claves (10 min).** Track 5 en 16 pas, à la main : clave
    son 3-2, puis rumba (le coup du pas 7 va au pas 8), puis 2-3 (tout
    tourné de 8 pas). Sous chacune, basse 9 en `..x...x...x...x.`. Écouter
    laquelle « répond » à la basse et laquelle se superpose à elle.
-3. **Anticipation contre temps (5 min).** Hat fermé 5 en `x.x.x.x.x.x.x.x.`.
-   Ajouter sur la track 7 un seul coup sur le pas 4, puis le déplacer sur
+3. **Anticipation contre temps (5 min).** Hat fermé 6 en `x.x.x.x.x.x.x.x.`.
+   Ajouter sur la track 4 un seul coup sur le pas 4, puis le déplacer sur
    le pas 5 (temps 2), puis sur le pas 6. Le pas 4 tire, le 5 double le
    clap, le 6 traîne. C'est le mécanisme du « a » des morceaux de
    référence.

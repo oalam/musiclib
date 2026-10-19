@@ -110,22 +110,22 @@ TRACKS: tuple[TrackSpec, ...] = (
     TrackSpec(1, "Kick", "drums", 30, 120),
     TrackSpec(2, "Rumble", "drums", 30, 90, kind="rumble", exclude=(1,)),
     TrackSpec(3, "Clap / snare", "drums", 300, 3000),
-    TrackSpec(4, "Ride", "drums", 3000, 6000),
-    TrackSpec(5, "Hat ferme", "drums", 7000, 16000),
-    TrackSpec(6, "Hat ouvert", "drums", 5000, 12000),
-    TrackSpec(7, "Perc A", "drums", 120, 400, exclude=(1, 3)),
-    TrackSpec(8, "Perc B", "drums", 400, 1500, exclude=(3,)),
+    TrackSpec(4, "Perc", "drums", 120, 1500, exclude=(1, 3)),
+    TrackSpec(5, "Id1", None, kind="none"),          # identite rythmique (boucle ou 2e perc)
+    TrackSpec(6, "Hat ferme", "drums", 7000, 16000),
+    TrackSpec(7, "Hat ouvert", "drums", 5000, 12000),
+    TrackSpec(8, "Ride", "drums", 3000, 6000),
     TrackSpec(9, "Basse", "bass", 40, 400, kind="tonal", base_note=36,
               pitch_range=(35.0, 300.0)),
     TrackSpec(10, "Lead", "other", 300, 4000, kind="tonal", base_note=60),
     TrackSpec(11, "Atmo", "other", 100, 8000, kind="sustain"),
     TrackSpec(12, "Vocal", "vocals", 200, 5000),
-    TrackSpec(13, "Id1", None, kind="none"),
-    TrackSpec(14, "Id2", None, kind="none"),
+    TrackSpec(13, "Id2", None, kind="none"),         # identite bas-medium
+    TrackSpec(14, "Id3", None, kind="none"),         # identite medium-aigu
     TrackSpec(15, "FX", None, kind="fx"),
     TrackSpec(16, "Reserve", None, kind="none"),
 )
-_HAT_FAMILY = (4, 5, 6)
+_HAT_FAMILY = (6, 7, 8)
 
 
 @dataclass
@@ -796,23 +796,23 @@ def _velocity(v: float) -> int:
 
 
 def classify_hats(hits: list[int], energy: dict[int, np.ndarray]) -> dict[int, list[int]]:
-    """Repartit les hits de la famille hats sur 4 (ferme) / 5 (ouvert) / 6 (ride).
+    """Repartit les hits de la famille hats sur 6 (ferme) / 7 (ouvert) / 8 (ride).
 
     - ouvert : l'energie 5-12 kHz tient encore au pas suivant (decroissance lente)
     - ride   : 3-6 kHz domine 7-16 kHz
     - sinon  : ferme"""
-    out: dict[int, list[int]] = {4: [], 5: [], 6: []}
-    e_closed, e_open, e_ride = energy.get(4), energy.get(5), energy.get(6)
+    out: dict[int, list[int]] = {6: [], 7: [], 8: []}
+    e_closed, e_open, e_ride = energy.get(6), energy.get(7), energy.get(8)
     n = len(e_closed) if e_closed is not None else 0
     for s in hits:
         if e_open is not None and n and e_open[s] > 0 and \
                 e_open[(s + 1) % n] / e_open[s] > 0.75:
-            out[5].append(s)
+            out[7].append(s)
         elif e_ride is not None and e_closed is not None and \
                 e_ride[s] > 1.5 * e_closed[s]:
-            out[6].append(s)
+            out[8].append(s)
         else:
-            out[4].append(s)
+            out[6].append(s)
     return out
 
 

@@ -152,8 +152,8 @@ def test_classify_hats_open_and_closed():
     open_ = np.zeros(16)
     open_[2] = 1.0
     open_[3] = 0.9  # tient au pas suivant → ouvert
-    out = classify_hats([0, 2], {4: closed, 5: open_, 6: np.zeros(16)})
-    assert out[4] == [0] and out[5] == [2] and out[6] == []
+    out = classify_hats([0, 2], {6: closed, 7: open_, 8: np.zeros(16)})
+    assert out[6] == [0] and out[7] == [2] and out[8] == []
 
 
 def _features(n_bars: int) -> StepFeatures:

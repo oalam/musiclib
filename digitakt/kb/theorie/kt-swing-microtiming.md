@@ -54,8 +54,8 @@ Rappel de la métrique du hub ([[_index]]) : `swing` = part d'énergie sur le
 - **Contretemps** (offbeat) : la syncope la plus simple, un coup sur le
   « et » de chaque temps (`..x.`) ; c'est la place du hat ouvert et de la
   basse tribe.
-- **Hat fermé / hat ouvert** : le fermé (5) tient la grille en croches ou
-  doubles croches, l'ouvert (6) marque le contretemps et se coupe au hat
+- **Hat fermé / hat ouvert** : le fermé (6) tient la grille en croches ou
+  doubles croches, l'ouvert (7) marque le contretemps et se coupe au hat
   fermé suivant (choke) ; un seul ouvert bien placé vaut un empilement
   (doctrine §1).
 - **Accent** : trig à vélocité pleine, souvent doublé d'une ouverture de
@@ -171,13 +171,13 @@ fait), `1:4` sur un hat ouvert (une mesure sur quatre), `FILL` sur un roll
 (densité maximale à la demande), `A:B` en appel / réponse entre deux
 tracks (KT9). Un retrig (fiche [[../microtiming-retrigs]]) est une pointe
 de densité sur un seul pas. La densité spectrale compte autant : retirer
-le ride (4) et le hat ouvert (6) vide le haut du spectre, l'énergie
+le ride (8) et le hat ouvert (7) vide le haut du spectre, l'énergie
 perçue chute même si le nombre de coups est identique.
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : kick 1, clap 3, hat fermé 5, hat
-ouvert 6, perc A 7, perc B 8.
+Grille de la [[../../doctrine]] §1 : kick 1, clap 3, hat fermé 6, hat
+ouvert 7, perc 4, seconde perc sur Id1 5.
 
 1. **Seuil du swing à 190 (5 min).** Kick 1, clap 3 sur 5 et 13, hat
    fermé 5 en 16 pas à vélocité égale. `[TEMPO]`, knob D : 50, 54, 58, 66,
@@ -185,15 +185,15 @@ ouvert 6, perc A 7, perc B 8.
    se brouille. Refaire à 130 BPM : les seuils montent.
 2. **Swing contre anticipation (10 min).** Même boucle, swing à 50.
    Variante A : micro timing +3 ticks sur les hats des pas pairs (fiche
-   [[../microtiming-retrigs]]). Variante B : micro timing à 0, mais perc A
-   7 avec un coup sur les pas 4, 8, 12, 16 à vélocité 60. A tire, B
+   [[../microtiming-retrigs]]). Variante B : micro timing à 0, mais perc
+   4 avec un coup sur les pas 4, 8, 12, 16 à vélocité 60. A tire, B
    pousse. B est le groove des morceaux de référence.
-3. **Vélocité seule (5 min).** Hat fermé 5, 16 pas, `VEL` 100 sur 1, 5,
+3. **Vélocité seule (5 min).** Hat fermé 6, 16 pas, `VEL` 100 sur 1, 5,
    9, 13, `VEL` 70 sur 3, 7, 11, 15, `VEL` 30 ailleurs (locks par trig).
    Puis `PROB` 60 % sur les trigs à 30 (fiche [[../fill-conditions]]).
    Sans aucun swing, la boucle respire.
-4. **Le hat ouvert décide du style (5 min).** Kick 1, hat fermé 5 en
-   croches. Hat ouvert 6 sur 3, 7, 11, 15 (le « et ») : balancement
+4. **Le hat ouvert décide du style (5 min).** Kick 1, hat fermé 6 en
+   croches. Hat ouvert 7 sur 3, 7, 11, 15 (le « et ») : balancement
    techno. Le déplacer sur 4, 8, 12, 16 (le « a ») : poussée tribe. Le
    mettre sur les deux : bouché. Puis un seul hat ouvert par mesure, sur
    le pas 15 seulement : la syncope devient un turnaround (KT9). AMP du

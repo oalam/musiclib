@@ -49,7 +49,7 @@ juste sous le niveau du kick.
 - **Pont entre deux morceaux** : figer la fin du morceau A, changer de
   pattern (kit B), laisser la boucle A tourner sur la 16 sous le nouveau
   socle, puis la filtrer jusqu'à la sortir (doctrine §13, jonctions).
-- **Libérer des tracks** : figer une combinaison de percs complexe (7, 8,
+- **Libérer des tracks** : figer une combinaison de percs complexe (4, 5,
   12) pour réutiliser ces tracks avec d'autres sons.
 - **Break sans perdre le groove** : boucle figée du plein régime, mutes sur
   toutes les tracks sauf la 16, puis filtre qui se ferme : le break garde

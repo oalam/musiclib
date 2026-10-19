@@ -72,7 +72,7 @@ processus de couches qui entrent et sortent sur des multiples de 4, et le
 DJ compte en 8 et 32 pour mixer.
 
 **Tension par soustraction.** Une boucle de 10 tracks qui tourne 32
-mesures a installé une normale. Retirer la 4 (ride) et la 6 (hat ouvert)
+mesures a installé une normale. Retirer la 8 (ride) et la 7 (hat ouvert)
 au 1 d'une phrase : l'énergie baisse, la salle attend. Retirer la 1 et la
 2 : breakdown. Remettre les quatre d'un coup sur le 1 suivant : drop. Le
 même contenu, trois états, zéro nouveau son ; la tension était dans la

@@ -31,9 +31,9 @@ de ppcm(N, 16) pas :
 
 | Track | Longueur | Retour en phase | Effet |
 |---|---|---|---|
-| Hat fermé (4) | 12 | ppcm(12, 16) = 48 pas = 3 mesures | balancement ternaire sur un kick droit |
-| Perc A (7) | 6 | ppcm(6, 16) = 48 pas = 3 mesures | tresillo qui tourne |
-| Perc B (8) | 7 | ppcm(7, 16) = 112 pas = 7 mesures | motif qui ne se répète presque jamais |
+| Hat fermé (6) | 12 | ppcm(12, 16) = 48 pas = 3 mesures | balancement ternaire sur un kick droit |
+| Perc (4) | 6 | ppcm(6, 16) = 48 pas = 3 mesures | tresillo qui tourne |
+| Id1, seconde perc (5) | 7 | ppcm(7, 16) = 112 pas = 7 mesures | motif qui ne se répète presque jamais |
 | Id1 (12) | 14 | ppcm(14, 16) = 112 pas = 7 mesures | mélodie qui se décale lentement (doctrine §12) |
 | Trio 3-5-7 (7, 8, 12) | 3, 5, 7 | ppcm(3, 5, 7) = 105 pas | texture « vivante » à petite dose |
 
@@ -41,7 +41,7 @@ de ppcm(N, 16) pas :
 
 1. Copie du pattern modèle, `[FUNC] + [PAGE]`, PER TRACK.
 2. Kick (1), clap (3), basse (9) : 16 pas, ce sont les repères.
-3. Track 7 : 6 pas, deux toms `x..x.x`. Track 4 : 12 pas, hats sur les
+3. Track 4 : 6 pas, deux toms `x..x.x`. Track 6 : 12 pas, hats sur les
    pas 1, 4, 7, 10.
 4. `RESET` du pattern à 64 pas (4 mesures) : tout repart ensemble au début
    de chaque phrase de 4 mesures, malgré les 48 pas de cycle.
@@ -68,16 +68,18 @@ de ppcm(N, 16) pas :
 
 ## À essayer (5 min)
 
-Même boucle tribe, track 7 successivement en 6, 7 puis 12 pas, 8 mesures
+Même boucle tribe, track 4 successivement en 6, 7 puis 12 pas, 8 mesures
 chaque fois ; noter la longueur qui pousse le plus à danser.
 
 Source : manuel DT2 OS 1.17, §10.7, §10.3.
 
 ## Vidéos
 
-Ajoutées depuis [[../veille-live]] (2026-10-07), non visionnées.
+Ajoutées depuis [[../veille-live]] (2026-10-07). La première est
+analysée dans [[theorie/kt-polymetrie-polyrythmie]] (motif 3 / 5 / 7) ;
+les autres ne sont pas visionnées.
 
-- [3-5-7 polymeter — Digitakt](https://www.youtube.com/watch?v=qQF71MdaQ-Y) (vidéo entière) · DT1
+- [3-5-7 polymeter — Digitakt](https://www.youtube.com/watch?v=qQF71MdaQ-Y) (vidéo entière) · DT1 · basse 3, médium 5, aigu 7 pas, démo jouée au mixer et aux mutes
 - [Digitakt polyphonic and polymetric demo](https://www.youtube.com/watch?v=cBjD0ReQ72Q) (vidéo entière) · DT1
 - [Get the max out of 1 pattern (Digitakt tutorial #8)](https://www.youtube.com/watch?v=bynEIvTpydA) (vidéo entière) · DT1
 - [How to keep your boring loop endlessly spicy with polymeters](https://www.youtube.com/watch?v=0SPaGLLlBsM) (vidéo entière) · machine non précisée

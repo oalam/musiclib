@@ -29,7 +29,7 @@ statut: draft
 
 ## Pas à pas : accentuer un hat
 
-1. `[RECORD]`, track 4 (hat fermé), trigs en contretemps posés.
+1. `[RECORD]`, track 6 (hat fermé), trigs en contretemps posés.
 2. Maintenir le trig du pas 15 : tourner `DEC` (page AMP) plus long, et
    `FREQ` (FLTR) plus ouvert. Le trig clignote rouge : il est locké.
 3. Pour le kick alternatif : ajouter le preset au pool (`[PRESET/KIT]` >

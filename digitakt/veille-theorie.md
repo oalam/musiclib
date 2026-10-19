@@ -93,7 +93,7 @@ Notation : 16 pas = 1 mesure 4/4 en doubles croches, `x` trig, `.` vide,
 
 **Sur la DT2**
 
-1. Kick (1) en 16, hat fermé (5) en 12, perc A (7) en 5 : écouter 4 min
+1. Kick (1) en 16, hat fermé (6) en 12, perc (4) en 5 : écouter 4 min
    sans toucher, repérer à l'oreille le point de réalignement (ppcm 240 pas
    = 15 mesures) et le `RESET` à 64 qui le force.
 2. Banque de claves : E(3,8), E(5,8), E(7,16) sur 7, 8 et 6 ; rotation d'un

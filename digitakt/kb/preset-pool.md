@@ -88,9 +88,9 @@ suivants = variantes et Id (cas 1 et 2).
 
 ## En live techno
 
-- **Socle (tracks 1, 3-8) : pas de pool.** Chaque son a sa track et ses
+- **Socle (tracks 1, 3-4, 6-8) : pas de pool.** Chaque son a sa track et ses
   réglages ; le kick ne change pas dans un acte (doctrine §3).
-- Pool : tracks Id (12-13), FX (15), one-shots (14), variantes de rumble
+- Pool : tracks Id (5, 13-14), FX (15), vocal / one-shots (12), variantes de rumble
   (2) et de basse (9).
 - `OCTAVE` (réglages de la track, `[FUNC] + [FLTR]`, manuel §9.8.2) aligne les octaves de
   plusieurs presets pour qu'ils jouent ensemble sans transposer les trigs.

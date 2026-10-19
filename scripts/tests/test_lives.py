@@ -76,9 +76,9 @@ def test_kit_tracks(tmp_path: Path, lib: tuple[Manifest, Path]):
     live = _live(tmp_path)
     lv.add(live, m, ["k/kick.wav", "k/hat.wav", "d/drone C.wav"], lv.KIT, root)
     by = {it.source: it for it in live.items}
-    # track proposee par code : BD 1, HH 5, PD 11
-    assert [(it.bank, it.track) for it in live.items] == [(lv.KIT, 1), (lv.KIT, 5), (lv.KIT, 11)]
-    assert sorted(lv.plan(live)) == ["0-KIT/01 BD F Hard 01 k.wav", "0-KIT/05 HH Tick k.wav",
+    # track proposee par code : BD 1, HH 6, PD 11
+    assert [(it.bank, it.track) for it in live.items] == [(lv.KIT, 1), (lv.KIT, 6), (lv.KIT, 11)]
+    assert sorted(lv.plan(live)) == ["0-KIT/01 BD F Hard 01 k.wav", "0-KIT/06 HH Tick k.wav",
                                      "0-KIT/11 PD C Drone drn.wav"]
     # un second kick prend la premiere track libre du kit (la 1 est prise)
     lv.rename(live, "k/hat.wav", "BD Second k")

@@ -14,6 +14,9 @@ Un live de 1h15 à 1h30 qui reste entre 160 et 175 BPM : l'énergie monte par la
 | Respiration mental | 170 | 5-10 min | On retire de l'énergie, tension sans kick |
 | Tribe saturé | 170-175 | 15-20 min | Finish massif |
 
+l'intro peut durer longtemps avec que de la bass et des voies lancinantes. Puis le coeur battant .
+on peut ensuite amener des kick lourds et distordus. Une simple ligne de basse avec des harmoniques accélérés et c'est pas mal. un delay profond qui larcene les voies
+
 - **Half-time → DnB** : même tempo, on change seulement la rythmique de batterie (kick sur 1, snare sur 3 → breakbeat full-time).
 - **DnB → tribe** : bascule breakbeat → 4x4 sur un break. On mute la batterie DnB, puis on rentre la kick tribe seule.
 - **Tempo** : on le monte à la main par petites touches pendant les breaks, +1 à 2 BPM à la fois. À l'intérieur d'une section, on y touche le moins possible.
@@ -78,7 +81,7 @@ Le kit par défaut `0-KIT` tient 16 samples, un par track de la grille de [[doct
 
 ```
 00-live/solaris/
-├── 0-KIT/      01 BD F Hard 01 slr · 02 RM F Roll 01 slr · 03 SD Tribe 01 slr · 04 CY Ride slr · 05 HH… · 06 OH… · 07 PC… · 08 PC… · 09 BS F Sine slr · 10 ST… · 11 PD F Drone slr · 12 VX… · 13 BR 170 Think slr · 14 BL 168 AcidF1 slr · 15 FX Rise 01 slr · 16 FX Impact 01 slr
+├── 0-KIT/      01 BD F Hard 01 slr · 02 RM F Roll 01 slr · 03 SD Tribe 01 slr · 04 PC… · 05 BR 170 Think slr · 06 HH… · 07 OH… · 08 CY Ride slr · 09 BS F Sine slr · 10 ST… · 11 PD F Drone slr · 12 VX… · 13 BL 168 AcidF1 slr · 14 ML… · 15 FX Rise 01 slr · 16 FX Impact 01 slr
 ├── A-HALF/     BD F Kick 03 rth · BS F Wrap 01 bas · CP… HH… PC… SD… · DL 140 Dubs 02 rth · FX… VX…
 ├── B-DNB/      BD F Kicks rth · BR 160 Amen 01 slr · BR 170 Think 01 slr · BS F Reese 01 slr · HH… PC… SD… · FX…
 ├── C-TRIBE/    BD G Box 01 rth · RM G Box 01 rth · BS G 303 Acc slr · BL 168 AcidG1 slr · CY… HH… OH… PC… SD… · VX…

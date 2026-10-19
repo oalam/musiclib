@@ -133,7 +133,7 @@ la note sonne au moment où on la pose (pattern arrêté).
 
 ## Tuto 3 : jouer une perc en LIVE puis la caler
 
-But : un rim tribe sur la track 7 qui garde un peu de groove.
+But : un rim tribe sur la track 4 qui garde un peu de groove.
 
 1. `[TRK] + [TRIG 7]`, puis `[RECORD] + [PLAY]` : LIVE, le séquenceur
    tourne. Si l'écran affiche la quantize auto active, `[RECORD]` + double
@@ -172,7 +172,7 @@ But : un rim tribe sur la track 7 qui garde un peu de groove.
 ## À essayer (5 min)
 
 Recopier en GRID la page 1 du kick et des hats d'un pattern de bank, puis
-passer en LIVE avec quantize auto coupée, jouer un rim sur la track 7, et
+passer en LIVE avec quantize auto coupée, jouer un rim sur la track 4, et
 monter la quantize TRACK jusqu'à entendre le calage.
 
 Source : manuel DT2 OS 1.17, §10.2, §10.6, §17.

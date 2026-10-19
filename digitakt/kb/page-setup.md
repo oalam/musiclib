@@ -60,7 +60,7 @@ sa vitesse, et, en mode par track, quand le pattern suivant prend la main.
 
 ## À essayer (5 min)
 
-Passer en PER TRACK, mettre la track 4 (hats) sur 12 pas et le kick sur 16 :
+Passer en PER TRACK, mettre la track 6 (hats) sur 12 pas et le kick sur 16 :
 écouter le décalage, puis `RESET` sur 48 et entendre la remise en phase.
 
 Source : manuel DT2 OS 1.17, §10.7, §17.

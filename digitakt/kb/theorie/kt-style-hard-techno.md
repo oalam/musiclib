@@ -118,8 +118,8 @@ confirment les boucles roulantes (sub `XXxxX.X.Xxx.X.X.`, `sync` 0,58-0,69).
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, hat fermé 5, hat
-ouvert 6, perc B 8 (shaker), basse 9, lead 10, FX 15. Gestes :
+Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, hat fermé 6, hat
+ouvert 7, perc 4 (shaker), basse 9, lead 10, FX 15. Gestes :
 [[../rumble-grave]], [[../send-fx-compresseur]] (sidechain),
 [[../microtiming-retrigs]], [[../page-setup]] (48 pas), [[../fill-conditions]].
 
@@ -128,7 +128,7 @@ ouvert 6, perc B 8 (shaker), basse 9, lead 10, FX 15. Gestes :
    [[../send-fx-compresseur]]), puis rumble en `.xxx` passe-bas. Comparer
    les deux : même pas que le kick = respiration, `.xxx` = pression. Puis
    sans ducking : entendre la bouillie.
-2. **Groove qui suit (5 min).** Hat ouvert 6 sur les pas 3, 7, 11, 15 ;
+2. **Groove qui suit (5 min).** Hat ouvert 7 sur les pas 3, 7, 11, 15 ;
    shaker 8 en 16 pas, vélocités 100 / 40 / 70 / 40 par temps, micro
    timing 0 puis +3 ticks sur les pas pairs (fiche
    [[../microtiming-retrigs]]), `PRE` / `NEI` pour des variations. Le

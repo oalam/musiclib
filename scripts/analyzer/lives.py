@@ -68,9 +68,10 @@ LIVE_CAP = 127                   # fichiers par banque : une banque RAM de la DT
 LIVE_BRANCHES = ("DRUMS", "TONAL", "LOOPS", "FX", "VX")
 # tracks du kit proposees par code (grille de digitakt/doctrine §1, analyzer.digitakt.TRACKS)
 KIT_TRACK_FOR: dict[str, tuple[int, ...]] = {
-    "BD": (1,), "RM": (2,), "SD": (3,), "CP": (3,), "CY": (4,), "HH": (5,), "OH": (6,),
-    "PC": (7, 8), "TM": (7, 8), "BS": (9,), "ST": (10,), "PD": (11,), "VX": (12,),
-    "BR": (13, 14), "DL": (13, 14), "PL": (13, 14), "ML": (13, 14), "BL": (13, 14), "FX": (15,),
+    "BD": (1,), "RM": (2,), "SD": (3,), "CP": (3,), "TM": (4, 5), "PC": (4, 5),
+    "BR": (5,), "DL": (5,), "PL": (5,), "HH": (6,), "OH": (7,), "CY": (8,),
+    "BS": (9,), "BL": (9, 13), "ST": (10,), "PD": (11,), "VX": (12,),
+    "ML": (14, 13), "FX": (15,),
 }
 DT2_RATE = 48_000
 DT2_SAMPLE_BYTES = 2             # 16 bits

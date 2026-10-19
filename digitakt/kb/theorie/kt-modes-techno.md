@@ -104,7 +104,7 @@ puis **choisir** la note qui colore.
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : basse 9, lead 10, drone 11, Id1 13.
+Grille de la [[../../doctrine]] §1 : basse 9, lead 10, drone 11, Id2 13.
 Geste : fiche [[../keyboard-gammes]] (KEYBOARD SETUP, `KB SCALE`,
 `ROOT NOTE`, `KB FOLD`, `NOTE PARAM` = SCALE).
 

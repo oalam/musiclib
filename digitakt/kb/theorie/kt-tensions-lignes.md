@@ -124,7 +124,7 @@ accordé : les Id bruitées, les samples métalliques pitchés hors gamme
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : basse 9, lead 10, drone 11, Id1 13.
+Grille de la [[../../doctrine]] §1 : basse 9, lead 10, drone 11, Id2 13.
 Gestes : [[../keyboard-gammes]], [[../parameter-preset-locks]] (p-locks
 de `NOTE`).
 

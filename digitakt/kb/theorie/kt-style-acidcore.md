@@ -114,7 +114,7 @@ staging entre étages est ce qui distingue un mental propre d'une bouillie.
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : kickbass 1, lead 10, Id1 13.
+Grille de la [[../../doctrine]] §1 : kickbass 1, lead 10, Id2 13.
 Gestes : [[../kick-mental-vst]], [[../keyboard-gammes]],
 [[../parameter-preset-locks]], [[../lfo]], [[../page-setup]] (15 pas).
 Tirages : générateur 9.A (vue « Acid · MIDI »).

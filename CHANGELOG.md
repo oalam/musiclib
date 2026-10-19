@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB : nouvelle rubrique **tutos** (`digitakt/kb/tutos/`, hub
+  `_index.md`, lot 1 « Sessions complètes ») pour les sessions vidéo
+  décortiquées trick par trick (track, instrument, pas, lien vers le
+  chapitre, mise en regard de la grille doctrine §1). Première fiche :
+  Synthackers, techno one-box sur DT2 (18 tricks). Onglet « Tutos » dans le
+  panneau KB du front ; `kb.py toc` la reprend sans changement.
+
 - [7.L5] Lives : **une seule banque par sample** (`bank`, l'ajouter ailleurs
   le déplace), **dossiers à plat** `<live>/<BANQUE>/<nom>.wav` (une banque de
   patterns = une banque RAM de la DT2 = un dossier chargé d'un coup) et **kit
@@ -22,6 +29,18 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   SPEC « Décisions 7.L5 », doctrine solaris et README à jour.
 
 ### Modifié
+
+- [7.L] **Grille des 16 tracks révisée le 2026-10-19** (doctrine §1, §4, §9,
+  §12 ; SPEC « Décisions 7.L ») : 4 perc one-shots, 5 Id1 rythmique (BR /
+  DL / PL ou seconde perc), 6 hat fermé, 7 hat ouvert, 8 ride (ordre de la
+  sérigraphie DT1, aigu à droite), 9 basse BS ou BL (possède le grave),
+  13 Id2 bas-médium, 14 Id3 médium-aigu. Reportée dans `TrackSpec` et la
+  famille hats de `analyzer/digitakt.py` (`classify_hats` rangeait encore
+  fermé / ouvert / ride sur 4 / 5 / 6, grille d'avant le 13 octobre),
+  `KIT_TRACK_FOR` de `analyzer/lives.py`, les tracks du 0-KIT de solaris,
+  les libellés de la vue Samples, la doctrine solaris, la fiche Maschine
+  (pads 1-8, qui décrivait aussi l'ancienne grille), une quinzaine de fiches
+  KB / KT et la fiche tuto Synthackers. Export du live solaris à relancer.
 
 - [7.L5] `0-COMMON` disparaît : un live existant est migré au chargement
   (première banque gardée pour un sample de plusieurs banques, samples de

@@ -919,9 +919,16 @@ révisés par 7.J8) :
 
 **Décisions 7.L — lives (arbitrées le 2026-10-13, 7.L1 et 7.L2 faites)** :
 - La grille 16 tracks de [[digitakt/doctrine]] §1 **fait foi**, révisée le
-  2026-10-13 : 1 kick, 2 rumble / sub, 3 clap / snare, 4 ride, 5 hat fermé,
-  6 hat ouvert, 7-8 percs, 9 basse, 10 lead, 11 atmo, 12 vocal, 13-14
-  Id1 / Id2, 15 FX, 16 réserve. [[digitakt/doctrine-dt2-solaris]] s'y
+  2026-10-19 : 1 kick, 2 rumble / sub, 3 clap / snare, 4 perc one-shots,
+  5 Id1 rythmique (boucle BR / DL / PL ou seconde perc), 6 hat fermé, 7 hat
+  ouvert, 8 ride (ordre de la sérigraphie DT1, aigu à droite), 9 basse (BS
+  ou BL, possède le grave), 10 lead, 11 atmo, 12 vocal, 13 Id2 bas-médium,
+  14 Id3 médium-aigu, 15 FX, 16 réserve. Motifs : spectre croissant de
+  gauche à droite sur la rangée haute (couper 6-7-8 = couper l'aigu), ride
+  en dernière entrée de la montée, tutos transposables sans table, et les
+  codes BR / DL / PL déjà classés rythmiques (tracks 1-8) par
+  `samples.RHYTHM`. Révision précédente du 2026-10-13 : 4 ride, 5-6 hats,
+  7-8 percs, 13-14 Id1 / Id2. [[digitakt/doctrine-dt2-solaris]] s'y
   aligne. Reportée dans les `TrackSpec` de `analyzer/digitakt.py`, l'ordre
   des codes (`samples.CODES`) et la grille Samples du front ; les banks
   déjà générées gardent l'ancienne grille jusqu'à leur régénération.

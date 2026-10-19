@@ -130,7 +130,7 @@ pattern pont (doctrine §11, §13).
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : lead 10, drone 11, Id1 13, Id2 14,
+Grille de la [[../../doctrine]] §1 : lead 10, drone 11, Id2 13, Id3 14,
 MIDI 16. Gestes : [[../keyboard-gammes]], [[../parameter-preset-locks]],
 [[../sampling-resampling]] (figer un stab), [[../send-fx-compresseur]]
 (delay du stab).

@@ -98,8 +98,8 @@ Une gamme de 7 notes sur 16 pads = deux octaves (14 pads) + 2 notes.
 
 **Groupe A, la page rythmique** : les notes 0 à 15 déclenchent les
 tracks 1 à 16 quelle que soit la track active (manuel §8.4), sur l'AUTO
-CHANNEL (vérifié le 2026-10-12). Pads 1-8 = kick, rumble, clap, hat
-fermé, hat ouvert, ride, perc A, perc B (grille doctrine §1) ; pads 9-16
+CHANNEL (vérifié le 2026-10-12). Pads 1-8 = kick, rumble, clap, perc,
+Id1 rythmique, hat fermé, hat ouvert, ride (grille doctrine §1) ; pads 9-16
 rejouent les mêmes tracks, pour les rolls à deux mains.
 
 **Importer** : USB branché, Controller Editor, ouvrir le fichier `.ncm2`
@@ -129,7 +129,7 @@ doctrine §11).
 
 ## Pas à pas 2 : enregistrer une perc en LIVE depuis les pads
 
-1. Track 7 active, `[RECORD] + [PLAY]` (LIVE), quantize auto au choix
+1. Track 4 active, `[RECORD] + [PLAY]` (LIVE), quantize auto au choix
    (cf. [[enregistrement-quantize]], tuto 3).
 2. Jouer sur les pads : la vélocité des pads est enregistrée, en lock de
    `VEL` sur chaque trig (manuel §10.2.4) ; c'est l'intérêt face aux
@@ -149,7 +149,7 @@ doctrine §11).
 
 ## En live techno
 
-- Pads sensibles : hats et percs tribe (tracks 4, 7, 8) avec une dynamique
+- Pads sensibles : hats et percs tribe (tracks 4, 5, 6) avec une dynamique
   que les touches de la DT2 ne donnent pas.
 - Une track à la fois : c'est la voie documentée et vérifiée (AUTO
   CHANNEL, cf. [[midi-config]]), cohérente avec la grille §1.
@@ -177,7 +177,7 @@ doctrine §11).
 
 ## À essayer (5 min)
 
-Pads 1-4 en notes 60, 62, 63, 65 sur l'AUTO CHANNEL ; track 7 en LIVE,
+Pads 1-4 en notes 60, 62, 63, 65 sur l'AUTO CHANNEL ; track 4 en LIVE,
 deux tours de boucle en variant la force de frappe, puis regarder les locks
 `VEL` en GRID.
 

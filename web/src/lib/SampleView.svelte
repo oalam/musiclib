@@ -43,21 +43,21 @@
   // ordre des tracks de la doctrine (digitakt/doctrine.md § 1) : rythmique
   // (tracks 1 a 8, boucles rythmiques en fin), puis melodique (9 a 16)
   const LOOPS = ['BR', 'DL', 'PL', 'ML', 'BL']
-  const RHYTHM = ['BD', 'RM', 'SD', 'CP', 'CY', 'HH', 'OH', 'TM', 'PC', 'BR', 'DL', 'PL']
+  const RHYTHM = ['BD', 'RM', 'SD', 'CP', 'TM', 'PC', 'BR', 'DL', 'PL', 'HH', 'OH', 'CY']
   const MELODIC = ['BS', 'BL', 'ST', 'ML', 'PD', 'VX', 'FX', 'RS']
   const CODE_ORDER = [...RHYTHM, ...MELODIC]
   const CODE_HELP: Record<string, string> = {
     BD: 'Kick (bass drum) · track 1', RM: 'Rumble, sub (rendu du sound design) · track 2', SD: 'Snare (caisse claire) · track 3', CP: 'Clap · track 3',
-    CY: 'Cymbale, ride, crash · track 4', HH: 'Hat fermé · track 5', OH: 'Hat ouvert · track 6',
-    TM: 'Tom · track 7 (perc A)', PC: 'Percussion (conga, shaker, cowbell…) · tracks 7-8',
-    BR: 'Boucle break (amen…) · rythmique', DL: 'Boucle drums · rythmique', PL: 'Boucle percussions, hats, tops · rythmique',
-    BS: 'Basse one-shot · track 9', BL: 'Boucle de basse · track 9', ST: 'Stab, accord, synthé, instrument · track 10',
-    ML: 'Boucle mélodique (lead, séquence, accords) · track 10', PD: 'Nappe, pad, drone · track 11',
+    TM: 'Tom · track 4 (perc, ou Id1 en seconde voix)', PC: 'Percussion (conga, shaker, cowbell…) · tracks 4-5',
+    BR: 'Boucle break (amen…) · track 5 (Id1 rythmique)', DL: 'Boucle drums · track 5 (Id1 rythmique)', PL: 'Boucle percussions, hats, tops · track 5 (Id1 rythmique)',
+    HH: 'Hat fermé · track 6', OH: 'Hat ouvert · track 7', CY: 'Cymbale, ride, crash · track 8',
+    BS: 'Basse one-shot · track 9', BL: 'Boucle de basse · track 9 (ou Id2 13, passe-haut)', ST: 'Stab, accord, synthé, instrument · track 10',
+    ML: 'Boucle mélodique (lead, séquence, accords) · track 14 (Id3, ou Id2 13 si grave)', PD: 'Nappe, pad, drone · track 11',
     VX: 'Voix, samples parlés · track 12', FX: 'FX de transition (riser, impact, noise…) · track 15',
     RS: 'Resample, enregistrement maison · track 16 (joker)',
   }
   // libelle court d'un code pour l'arbre : « Kick (bass drum) · track 1 » -> « Kick, bass drum »
-  // track(s) de la doctrine sur deux chiffres : « track 1 » -> « 01 », « tracks 7-8 » -> « 07-08 »
+  // track(s) de la doctrine sur deux chiffres : « track 1 » -> « 01 », « tracks 4-5 » -> « 04-05 »
   const codeTrack = (c: string) => {
     const m = /tracks? (\d+)(?:-(\d+))?/.exec(CODE_HELP[c] ?? '')
     return m ? [m[1], m[2]].filter(Boolean).map(n => n!.padStart(2, '0')).join('-') : ''

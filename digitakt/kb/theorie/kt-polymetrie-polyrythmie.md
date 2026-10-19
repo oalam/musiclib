@@ -5,7 +5,7 @@ lot: 1
 ordre: 2
 styles: [tribe, acidcore, hypnotique, hard techno]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-16
 ---
 
 # KT2 — Polymétrie, polyrythmie, dissonance métrique
@@ -81,6 +81,39 @@ Lecture : une longueur **paire** (6, 10, 12, 14) partage un facteur 2 avec
 line en 15 pas de [[../../veille-theorie]] §B2 (KT11) exploite exactement
 cela.
 
+**Le motif 3 / 5 / 7 (Bonas Buden, « 3-5-7 Polymeter », Digitakt, 2021).**
+Vidéo sans voix, analysée image par image et par autocorrélation des
+attaques par bande (2026-10-16) ; la page SCALE n'apparaît jamais à
+l'écran, les longueurs viennent de l'écoute et de la mesure.
+
+- **Trois tracks à longueurs premières entre elles**, une par registre :
+  basse en 3 pas, médium en 5 pas, aigu en 7 pas, master à 16 (ou `INF`),
+  un ou deux trigs par track. C'est le cas « 3, 5, 7 ensemble » de la
+  table, mais sans repère droit : rien n'est en 16, c'est la version
+  pure du motif.
+- **Il ne touche plus au séquenceur.** Toute la démo se joue sur la page
+  mixer (niveaux de track), en mute mode (pads, 2:30 à 3:10) et sur une
+  page de timbre (4:05) : une boucle qui vit seule, lui dose ce qu'on en
+  entend. Sa description le dit : la polymétrie est triviale sur Digitakt,
+  la polyrythmie vraie ne s'obtient que par retrigs et micro-timing.
+- **Mesuré** : pas de 16e de 0,1224 s, soit 60 / (4 × 0,1224) = 122,5
+  BPM. Bande 150-600 Hz : période de 3 pas (la basse). Bande 600-2500 Hz :
+  périodes de 3,5, 7, 14, 21 et 35 pas (l'élément en 7, deux coups
+  dedans). Bande grave : période la plus nette à 21 pas = 3 × 7, le
+  croisement des deux. Le 5 n'est pas isolé par les bandes, il est tenu
+  par l'écoute seule.
+- **Arithmétique** : les trois tracks se réalignent au ppcm(3, 5, 7) = 105
+  pas = 105 / 16 = 6,56 mesures ; avec le master à 16, tout retombe au
+  ppcm(16, 105) = 1680 pas = 105 mesures, soit 1680 × 0,1224 = 205,6 s à
+  122,5 BPM, presque la durée de la vidéo. La corrélation à 105 pas ne
+  vaut que 0,06 : le réalignement complet est inaudible, il n'y a pas de
+  « résolution » au sens de Butler, seulement une texture.
+- **Transposition au terrain** : à 190 BPM, 105 pas = 105 × 0,0789 = 8,3 s
+  et 1680 pas = 132,6 s. La basse en 3 flotte, recevable à 122 mais elle
+  retire le grave du kick en free party (Pièges) ; garder kick, rumble et
+  basse en 16 et réserver 3 / 5 / 7 à deux tracks d'ornement, c'est la
+  règle de dose ci-dessous.
+
 **Polyrythmie sur la grille.** La grille de 16 pas ne contient pas 3
 coups égaux par mesure (16 / 3 = 5,33 pas). Trois voies sur la DT2 :
 
@@ -121,22 +154,29 @@ phrase : réservé aux textures (track 11) ou à Id2 à faible niveau.
 Grille de la [[../../doctrine]] §1 ; geste : fiche [[../polymetrie]]
 (PER TRACK, longueur, `RESET`).
 
-1. **Entendre le ppcm (5 min).** Kick 1 en 16, perc A 7 en 12 pas avec
+1. **Entendre le ppcm (5 min).** Kick 1 en 16, perc 4 en 12 pas avec
    `x..x.x......`, `RESET` à `INF`. Compter les mesures jusqu'au retour des
-   toms sur le temps : 3. Passer la track 7 à 7 pas avec `x.x.x.x` : 7
+   toms sur le temps : 3. Passer la track 4 à 7 pas avec `x.x.x.x` : 7
    mesures. Passer à 15 pas : chaque mesure, les toms reculent d'un pas ;
    noter la mesure où ça « bascule » à l'oreille.
-2. **Groupement contre déplacement (10 min).** Kick 1 en 16. Track 8 :
+2. **Groupement contre déplacement (10 min).** Kick 1 en 16. Track 5 (Id1) :
    copier le pattern du kick (fiche [[../copier-coller]]) et le reposer
    décalé d'un pas (D+1), écouter 8 mesures ; puis reposer le même motif
    en 3 pas `x..` (G3/4), 8 mesures. Le premier donne un flam qui
    « traîne », le second une perc qui tourne. Muter l'un puis l'autre sur
    le 1 d'une phrase : le soulagement est le même.
-3. **Polyrythmie 3 contre 4 (5 min).** Hat fermé 5 en 16 pas
-   `x...x...x...x...`. Passer la track 5 à `SPEED` 3/4X : trois hats par
+3. **Polyrythmie 3 contre 4 (5 min).** Hat fermé 6 en 16 pas
+   `x...x...x...x...`. Passer la track 6 à `SPEED` 3/4X : trois hats par
    mesure contre quatre kicks, puis revenir à 1X avec un E(3, 8) sur le
    même hat (fiche [[../euclidien]]). Comparer la polyrythmie exacte et la
    quasi-polyrythmie ; garder celle qui tient à 190.
+4. **Le motif 3 / 5 / 7 (10 min).** Kick 1 en 16 avec le rumble. Track 4
+   (perc grave) en 3 pas `x..`, track 5 (perc médium, Id1) en 5 pas `x....`,
+   track 7 (hat ouvert ou métal) en 7 pas `x..x...`, `RESET` à `INF`. Jouer la
+   boucle à la page mixer uniquement : monter une track, en couper une
+   autre au mute, sans toucher aux trigs, 2 minutes. Puis couper le kick
+   8 mesures et le ramener sur le 1 d'une phrase : c'est la résolution que
+   Bonas Buden ne fait jamais, et la différence entre texture et groove.
 
 ## Pièges
 
@@ -166,6 +206,9 @@ Grille de la [[../../doctrine]] §1 ; geste : fiche [[../polymetrie]]
 - Ableton, *New Horizons in Music: Polyrhythms* (Loop 2017) :
   <https://www.ableton.com/en/blog/new-horizons-music-polyrhythms> `[V]`
 - Wikipedia, *Hemiola* : <https://en.wikipedia.org/wiki/Hemiola> `[V]`
+- Bonas Buden, *3-5-7 Polymeter - Digitakt* (2021, 4:50, sans voix) :
+  <https://www.youtube.com/watch?v=qQF71MdaQ-Y> `[V]` ; analysé par images
+  et autocorrélation, voir le motif 3 / 5 / 7 ci-dessus.
 - Production Music Live, *hypnotic polymetric lead* :
   <https://productionmusiclive.com/blogs/news/hypnotic-polymetric-lead-in-analog-melodic-techno-ableton-tutorial> `[V]`
 

@@ -7,9 +7,11 @@ status: living document
 
 # Doctrine Digitakt II — live techno
 
-> **Grille révisée le 2026-10-13** : 4 ride, 5-6 hats, 12 vocal, 13-14
-> Id1 / Id2. Cette grille fait foi pour tous les lives, y compris
-> [[doctrine-dt2-solaris]] (cf. SPEC « Décisions 7.L »).
+> **Grille révisée le 2026-10-19** : 1-2-3 kick, rumble, clap / snare ;
+> 4 perc ; 5 Id1 rythmique ; 6-7-8 hat fermé, hat ouvert, ride (ordre de
+> la sérigraphie DT1) ; 13-14 Id2 bas-médium et Id3 médium-aigu. Cette
+> grille fait foi pour tous les lives, y compris [[doctrine-dt2-solaris]]
+> (cf. SPEC « Décisions 7.L »). Révision précédente : 2026-10-13.
 
 Règles **arbitrées** pour préparer et jouer un live sur Digitakt II. Elles
 servent aussi de contrat à l'analyzer [[../scripts/README|digitakt.py]]
@@ -35,33 +37,36 @@ coupe la basse. Les mutes et les réflexes en dépendent.
 | 1     | **Kick**         | 40-120 Hz + click 2-5 kHz | Même sample, même réglage dans tout le set (cf. §3)                                       |
 | 2     | **Rumble / sub** | 30-80 Hz                  | Kick resamplé + reverb + saturation + passe-bas ; même pas que le kick + ducking (cf. §9) |
 | 3     | **Clap / snare** | 200 Hz-2 kHz              | Temps 2 et 4 en four-on-floor, plus libre en tribe                                        |
-| 4     | **Ride**         | 4-10 kHz                  | Couleur de « plein régime », sort en peak                                                 |
-| 5     | **Hat fermé**    | 6-12 kHz                  | Contretemps, doubles croches                                                              |
-| 6     | **Hat ouvert**   | 5-10 kHz                  | Un seul bien placé vaut mieux qu'un empilement                                            |
-| 7     | **Perc A**       | variable                  | Toms, rims…                                                                               |
-| 8     | **Perc B**       | variable                  | Shakers, claves, métalliques…                                                             |
+| 4     | **Perc**         | variable                  | One-shots : toms, rims, shakers, claves, métalliques… (TM, PC)                            |
+| 5     | **Id1 rythmique** | toute bande, transitoires | Identité rythmique du pattern : boucle (BR, DL, PL) ou seconde voix de perc en one-shots (cf. §12) |
+| 6     | **Hat fermé**    | 6-12 kHz                  | Contretemps, doubles croches                                                              |
+| 7     | **Hat ouvert**   | 5-10 kHz                  | Un seul bien placé vaut mieux qu'un empilement                                            |
+| 8     | **Ride**         | 4-10 kHz                  | Couleur de « plein régime », sort en peak ; dernière entrée de la montée                  |
 
 ### Mélodique et textures — tracks 9 à 16 (seconde rangée)
 
 | Track | Rôle | Bande dominante | Notes |
 |-------|---|---|---|
-| 9     | **Basse** | 80-250 Hz + harmoniques | Sacrée avec le kick ; contretemps, attaque franche, decay court (cf. §9) |
+| 9     | **Basse** | 40-250 Hz + harmoniques | One-shot (BS) ou boucle (BL), au choix ; possède le grave avec le kick et le rumble ; contretemps, attaque franche, decay court (cf. §9) |
 | 10    | **Séquence / lead** | 300 Hz-4 kHz | Acid line, stabs, arpèges |
 | 11    | **Atmo / drone** | large, faible niveau | Nappe, drone, room tone ; souvent sample Stretch |
 | 12    | **Vocal / one-shots** | 300 Hz-4 kHz | Voix, samples parlés, cris, hooks |
-| 13    | **Id1** | variable | Identité du pattern : rythmique, ambiance ou mélodie |
-| 14    | **Id2** | variable | Seconde identité, en dialogue ou en remplacement de Id1 |
+| 13    | **Id2 bas-médium** | 100-800 Hz, passe-haut au-dessus du sub | Identité tonale grave : boucle de basse (BL) ou mélodie grave, jamais dans le grave de la 9 (cf. §12) |
+| 14    | **Id3 médium-aigu** | 800 Hz-8 kHz | Identité tonale aiguë : boucle mélodique (ML), stabs, chops ; en dialogue avec Id2 |
 | 15    | **FX de transition** | large | Risers, noise, impacts, downlifters, reverses (cf. §5) |
 | 16    | **Réserve / MIDI** | — | Track MIDI vers une machine externe, ou joker |
 
 **Règles dérivées** :
 
 - Une track vide reste vide, **jamais réaffectée à un autre rôle** pour « gagner
-  une place ». Un pattern qui n'a pas besoin de ride laisse la 4 vide.
-- Id1 / Id2 (13-14) sont les seules tracks dont le *contenu* change franchement
+  une place ». Un pattern qui n'a pas besoin de ride laisse la 8 vide.
+- Id1 / Id2 / Id3 (5, 13-14) sont les seules tracks dont le *contenu* change franchement
   d'un pattern à l'autre. C'est là qu'on reconnaît « le morceau ».
 - Les 8 premières touches = le corps, les 8 suivantes = la tête. Muter toute la
-  seconde rangée = break percussif ; muter la première = break mélodique.
+  seconde rangée = break percussif ; muter la première (Id1 compris, elle est
+  rythmique) = break mélodique.
+- Sur la rangée haute, le spectre monte de gauche à droite : grave (1-2),
+  médium (3-5), aigu (6-8). Couper 6-7-8 d'une main retire tout l'aigu.
 
 ## 2. Pattern modèle, banks et rangement
 
@@ -113,8 +118,9 @@ Un pattern plein + un ordre de mutes = un morceau. Ordre type pour une montée
 (une entrée à la fois, toutes les 8 / 16 / 32 mesures) :
 
 ```
-kick seul (1) → +rumble (2) → +hat fermé (5) → +basse (9) → +clap (3)
-→ +percs (7-8) → +Id1 (13) → +lead (10) → +hat ouvert (6) → +ride (4) = peak
+kick seul (1) → +rumble (2) → +hat fermé (6) → +basse (9) → +clap (3)
+→ +perc (4) → +Id1 (5) → +lead (10) → +Id2 (13) → +Id3 (14)
+→ +hat ouvert (7) → +ride (8) = peak
 ```
 
 Et pour un break : muter 1 + 2 + 9 (kick, rumble, basse) en début de phrase,
@@ -252,6 +258,9 @@ La Digitakt II peut sauvegarder l'ensemble des sons des 16 tracks en **kit**, vi
 - **Overdrive** pour le mordant, enveloppe de filtre rapide pour le claquement.
 - La rondeur est une **variation**, pas la base : filtre plus fermé en intro qui
   s'ouvre avec un LFO lent ou des p-locks.
+- **La 9 possède le grave**, en one-shot (BS) ou en boucle (BL), au choix mais
+  jamais les deux à la fois. Tout ce qui est tonal ailleurs (Id2 en 13, lead en
+  10) est passe-haut au-dessus du sub (cf. §12).
 
 ### Partage des fréquences
 
@@ -358,11 +367,20 @@ avant le master si on finit dans le DAW (multipiste Overbridge).
   p-locks de notes + trig chance / conditions + longueur polymétrique. Éviter
   un LFO random sur le pitch (non quantifié sur la gamme).
 
-## 12. Tracks identité (Id1 / Id2)
+## 12. Tracks identité (Id1 / Id2 / Id3)
 
 Le socle (grille §1) garantit la **stabilité**, les Id portent le
 **caractère** : c'est par elles qu'on reconnaît un pattern et qu'on tient les
-arcs du set.
+arcs du set. Trois Id, qui ne se battent jamais sur le même terrain :
+
+| Track | Id | Terrain | Contenu type |
+|---|---|---|---|
+| 5 | **Id1** | le temps (rythmique, rangée haute) | break (BR), boucle de drums (DL) ou de percs (PL), ou seconde voix de perc en one-shots (TM, PC) pour un call and response avec la 4 |
+| 13 | **Id2** | le bas-médium (100-800 Hz) | boucle de basse (BL) passe-haut, stabs graves, chops graves ; jamais dans le sub, qui appartient à la 9 |
+| 14 | **Id3** | le médium-aigu (800 Hz-8 kHz) | boucle mélodique (ML), stabs, chops, textures |
+
+Le code propose la track d'après le code du sample (BR / DL / PL → 5, BL → 9
+puis 13, ML → 14 puis 13) ; la bande décide en dernier.
 
 - **Écrire les Id d'abord** (deux ou trois par partie), le socle vient ensuite
   les servir.

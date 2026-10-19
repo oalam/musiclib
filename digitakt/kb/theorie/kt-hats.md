@@ -40,13 +40,13 @@ pour sentir la vitesse (16es = vite, croches = posé) et le style.
 
 ## Vocabulaire
 
-- **Hat fermé** (closed hat, track 5) : court, 6-12 kHz, tient la grille
+- **Hat fermé** (closed hat, track 6) : court, 6-12 kHz, tient la grille
   en croches ou en doubles croches.
-- **Hat ouvert** (open hat, track 6) : long, 5-10 kHz, marque le
+- **Hat ouvert** (open hat, track 7) : long, 5-10 kHz, marque le
   contretemps ; **choke** : coupé net par le hat fermé suivant.
-- **Ride** (track 4) : cymbale continue, 4-10 kHz, couleur de plein
+- **Ride** (track 8) : cymbale continue, 4-10 kHz, couleur de plein
   régime, sort en breakdown (doctrine §1).
-- **Shaker** (track 8) : doubles croches continues à vélocités
+- **Shaker** (track 4, ou Id1 5 en seconde voix) : doubles croches continues à vélocités
   variables ; le hat fermé du hard techno.
 - **Grille** : subdivision rendue audible (croches ou 16es) ; sans grille
   les syncopes des autres tracks ne sont pas lisibles.
@@ -62,11 +62,11 @@ pour sentir la vitesse (16es = vite, croches = posé) et le style.
 ## Pourquoi ça marche
 
 **Concret d'abord : trois boucles, même kick.** Kick 1 en
-`X...X...X...X...` à 170 BPM. Boucle A : hat fermé 5 en croches, hat
-ouvert 6 sur les pas 3, 7, 11, 15 : techno, balancement. Boucle B : hat
+`X...X...X...X...` à 170 BPM. Boucle A : hat fermé 6 en croches, hat
+ouvert 7 sur les pas 3, 7, 11, 15 : techno, balancement. Boucle B : hat
 fermé en 16es, vélocités 100 / 30 / 30 / 70, pas d'ouvert : tribe, ça
 pousse. Boucle C : shaker 8 en 16es 100 / 40 / 70 / 40, hat ouvert sur
-le « et », ride 4 en croches : hard techno, pression. Rien n'a changé
+le « et », ride 8 en croches : hard techno, pression. Rien n'a changé
 sous 2 kHz. C'est l'exercice 1.
 
 **Pourquoi la syncope habite le haut.** Un four-on-floor à 160-200 BPM
@@ -119,7 +119,7 @@ naturellement le son précédent. À vérifier sur la machine : le
 comportement exact de la coupure en preset lock.
 
 **Polymétrie et euclidien sur les hats.** Le hat est le meilleur
-candidat à la polymétrie (KT2) : track 5 en 12 pas sur un kick en 16
+candidat à la polymétrie (KT2) : track 6 en 12 pas sur un kick en 16
 donne un balancement ternaire qui se recale toutes les 3 mesures ; E(5,
 12) `x..x.x..x.x.` (KT1) sur 12 pas est le hat « cassé » ; E(7, 16) sur
 16 fait un hat samba. Le kick ne bouge pas, les repères restent (règle de
@@ -133,7 +133,7 @@ pairs « tire » sans toucher au kick. Les morceaux de référence n'en
 font presque pas : leur groove est dans le placement sur le « a » et
 dans la vélocité, pas dans le retard.
 
-**Ride et densité spectrale.** La ride (4) ajoute une nappe continue
+**Ride et densité spectrale.** La ride (8) ajoute une nappe continue
 dans 4-10 kHz : c'est le « plein régime » du plateau le plus fort. La
 retirer sur le 1 d'une phrase baisse l'énergie perçue sans changer un
 seul coup ; la remettre fait monter. Avec le hat ouvert, c'est le
@@ -149,8 +149,8 @@ que le lead monte, et les ramener en 16es quand il redescend.
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1 : ride 4, hat fermé 5, hat ouvert 6,
-shaker sur perc B 8. Gestes : [[../parameter-preset-locks]] (vélocités,
+Grille de la [[../../doctrine]] §1 : ride 8, hat fermé 6, hat ouvert 7,
+shaker sur la perc 4. Gestes : [[../parameter-preset-locks]] (vélocités,
 preset lock), [[../microtiming-retrigs]], [[../polymetrie]],
 [[../euclidien]], [[../fill-conditions]], [[../oneshots-synthe]] (AMP).
 
@@ -158,14 +158,14 @@ preset lock), [[../microtiming-retrigs]], [[../polymetrie]],
    paragraphe « concret d'abord », dans trois patterns copiés du même
    kick (fiche [[../copier-coller]]). Chaîner, 8 mesures chacune, nommer
    le style à voix haute. Puis mélanger : hats de B sous l'ouvert de A.
-2. **Profils de vélocité (5 min).** Hat fermé 5 en 16es, `VEL` lockée
+2. **Profils de vélocité (5 min).** Hat fermé 6 en 16es, `VEL` lockée
    selon les cinq profils du tableau, 4 mesures chacun. Garder les deux
    qu'on sait reconnaître les yeux fermés.
-3. **Un ouvert, coupé (5 min).** Hat ouvert 6 sur 3, 7, 11, 15, AMP decay
+3. **Un ouvert, coupé (5 min).** Hat ouvert 7 sur 3, 7, 11, 15, AMP decay
    long : bouché. Decay réduit jusqu'à ce que chaque ouvert meure avant
    le fermé suivant. Puis un seul ouvert sur le pas 15 : turnaround.
-   Variante : ouvert en preset lock sur la track 5, comparer la coupure.
-4. **Hat polymétrique (5 min).** Track 5 à 12 pas, E(5, 12), `RESET` à
+   Variante : ouvert en preset lock sur la track 6, comparer la coupure.
+4. **Hat polymétrique (5 min).** Track 6 à 12 pas, E(5, 12), `RESET` à
    64. Trois mesures pour le recalage ; `1:4` sur le hat ouvert pour
    marquer la phrase malgré le cycle de 3.
 

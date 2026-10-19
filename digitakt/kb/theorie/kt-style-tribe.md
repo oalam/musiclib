@@ -61,8 +61,8 @@ Floxytek, Kodaman, Area 23, Apre, Liberté Naturel, Tekotak).
 
 **Concret d'abord : une boucle tribe en six tracks.** À 165 BPM, kick 1
 `X...X...X...X...`, rumble 2 sur les mêmes pas, basse 9 `..x...x...x...x.`
-sur la tonique, hat fermé 5 en croches, toms 7 `...x..x.....x.x.`, perc
-B 8 en E(5, 16) `x..x..x..x..x...` tournée de 2 pas. C'est tout : les
+sur la tonique, hat fermé 6 en croches, toms 4 `...x..x.....x.x.`, perc
+Id1 5 en E(5, 16) `x..x..x..x..x...` tournée de 2 pas. C'est tout : les
 morceaux de référence n'ont pas plus de matière rythmique. Ce qui fait
 tribe est dans le détail de chaque couche.
 
@@ -181,9 +181,9 @@ de la doctrine §1, rôles actuels) :
 | 1 Kick | X | | | | X | | | | X | | | | X | | | |
 | 2 Rumble | | x | | | | x | | | | x | | | | x | | |
 | 3 Clap | | | | | | | | | | | | | | | x | |
-| 5 Hat fermé | | | | | | | | | | | | | x | | | |
-| 6 Hat ouvert | | | | | | | | | x | | x | | | | x | |
-| 8 Perc B | | | | | x | | | | x | | | | | | | |
+| 5 Perc (Id1) | | | | | x | | | | x | | | | | | | |
+| 6 Hat fermé | | | | | | | | | | | | | x | | | |
+| 7 Hat ouvert | | | | | | | | | x | | x | | | | x | |
 | 9 Basse | | | x | | | | x | | | | x | | | | x | |
 
 Lecture : le **rumble** est détecté sur le pas qui suit chaque kick (il
@@ -305,9 +305,9 @@ Patch Tidal équivalent : [[../../../technique/patches/tribe]].
 
 1. **La boucle de référence (10 min).** 165 BPM, les six tracks du
    paragraphe « concret d'abord ». Vélocités des hats : 100 / 65 / 65 /
-   80 par temps (pas 1, 2, 3, 4), swing à 50. Toms 7 en tresillo sur 8 pas
+   80 par temps (pas 1, 2, 3, 4), swing à 50. Toms 4 en tresillo sur 8 pas
    (`PL1` = 3, `LEN` = 8), `RO1` à l'oreille pour placer un coup sur le
-   « a » du temps 2. Perc 8 en E(5, 16) tournée de 2. Écouter 16 mesures
+   « a » du temps 2. Perc 5 (Id1) en E(5, 16) tournée de 2. Écouter 16 mesures
    sans toucher : c'est la signature mesurée.
 2. **Pitch envelope (5 min).** Kick 1 : LFO sur `TUNE`, forme
    exponentielle descendante, `TRIG` relancé, vitesse rapide, profondeur
@@ -320,7 +320,7 @@ Patch Tidal équivalent : [[../../../technique/patches/tribe]].
    « roulé », moins martial. Garder `3:3` sur le pas 15.
 4. **Plateaux et point d'orgue (10 min).** Pattern complet, vocal sur
    12 en `1:8`. Jouer 6 phrases de 8 mesures aux mutes : phrase 1 kick,
-   rumble, hats ; 2 + basse ; 3 + toms ; 4 + perc B ; 5 drop-out du kick
+   rumble, hats ; 2 + basse ; 3 + toms ; 4 + perc Id1 ; 5 drop-out du kick
    sur la dernière mesure (mute et démute à la main) ; 6 tout. Compter.
    C'est un live tribe de 50 s à l'échelle 1/20.
 

@@ -34,7 +34,7 @@ SLICE / GRID pour découper une boucle, MIDI pour piloter un synthé.
 
 ## Pas à pas : caler une boucle de percs à 190 BPM
 
-1. Track 8, `[FUNC] + [SRC]`, choisir STRETCH (garde la hauteur) ou
+1. Track 5 (Id1), `[FUNC] + [SRC]`, choisir STRETCH (garde la hauteur) ou
    REPITCH (garde le grain, change la hauteur).
 2. `SAMP` : choisir la boucle ; `BARS` = sa longueur réelle en mesures.
 3. Un seul trig au pas 1, `LEN` de trig long : la boucle suit le tempo.
