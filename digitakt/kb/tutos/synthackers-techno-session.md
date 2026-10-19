@@ -315,12 +315,17 @@ basse.
 
 ## À essayer (5 min)
 
+Le pattern de la session est le preset « Synthackers » du séquenceur de la
+grille interactive (`digitakt/grille.html`, bouton Grille du panneau KB du
+front, doctrine §1) : kick, clap, hat, ride, basse et percs posés sur la
+grille révisée, à écouter et modifier avant de passer sur la machine.
+
 1. Sur un pattern de la bank techno : ride sur 3, 7, 11, 15, puis trigs sur
    1, 5, 9, 13 avec AMP VOLUME au plus bas. Comparer avec le sidechain du
    compresseur, puis cumuler.
 2. Basse en contretemps : release au minimum sur 1, 5, 9, 13 seulement,
    écouter si le compresseur devient inutile.
-3. Perc B : LFO1 lent sur le filtre, copie sur LFO2 vers le pan ; un retrig
+3. Perc (4) ou Id1 (5) : LFO1 lent sur le filtre, copie sur LFO2 vers le pan ; un retrig
    avec fade descendant, track à 32 pas, retrig sur la seconde mesure.
 4. Swing 53 puis 57 sur le même pattern, noter lequel tient à 180 BPM et
    plus (le tuto est à un tempo techno plus bas).

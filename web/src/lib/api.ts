@@ -501,6 +501,7 @@ export interface SdTarget {
 
 /** URL du manuel PDF ouvert a une page (visionneuse du navigateur). */
 export const manualUrl = (page = 1) => `/api/manual#page=${page}`
+export const grilleUrl = '/api/kb/grille'
 
 async function json<T>(res: Response): Promise<T> {
   if (!res.ok) {

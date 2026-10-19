@@ -12,6 +12,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   SVG avec mutes, coupures grave / aigu, breaks et montée pas à pas du §4 ;
   séquenceur 16 pas avec presets techno, tribe, hard techno, half-time tirés
   des KT, édition au clic, lecture WebAudio). Liée depuis la doctrine §1.
+  Servie par `GET /api/kb/grille` et affichée dans le panneau KB du front
+  (bouton « Grille », iframe comme le manuel) ; preset « Synthackers » et
+  ride (8) ajoutés au séquenceur, lien depuis la fiche tuto.
 
 - [7.M] KB : nouvelle rubrique **tutos** (`digitakt/kb/tutos/`, hub
   `_index.md`, lot 1 « Sessions complètes ») pour les sessions vidéo

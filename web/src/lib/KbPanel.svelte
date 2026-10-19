@@ -1,14 +1,14 @@
 <script lang="ts">
   import { tick } from 'svelte'
   import { createMarked, replaceWikilinks } from './markdown'
-  import { api, manualUrl, normalize, type KbHit, type KbLot, type KbNote } from './api'
+  import { api, grilleUrl, manualUrl, normalize, type KbHit, type KbLot, type KbNote } from './api'
 
   // page : vue Knowledge du panneau lateral, toujours ouverte ; sinon overlay
   // contextuel (aide de la facade DT2)
   let { page = false }: { page?: boolean } = $props()
   let open = $state(false)
   // sommaire par lot, fiche, ou manuel PDF (7.F)
-  let view = $state<'toc' | 'note' | 'manual'>('toc')
+  let view = $state<'toc' | 'note' | 'manual' | 'grille'>('toc')
   let toc = $state<KbLot[]>([])
   let manualPage = $state(1)
   let q = $state('')
@@ -242,12 +242,13 @@
 <svelte:window onkeydown={onkey} />
 
 {#if open}
-  <svelte:element this={page ? 'section' : 'aside'} class="kb" class:page class:wide={view === 'manual'} aria-label="Base de connaissance">
+  <svelte:element this={page ? 'section' : 'aside'} class="kb" class:page class:wide={view === 'manual' || view === 'grille'} aria-label="Base de connaissance">
     <header>
       <input bind:this={input} bind:value={q} oninput={onInput} type="search"
         placeholder="Chercher dans la KB et la doctrine…" aria-label="Recherche" />
       <button class="small" class:on={view === 'toc'} onclick={() => { view = 'toc'; loadToc() }}>Sommaire</button>
       <button class="small" class:on={view === 'manual'} onclick={() => openManual(view === 'manual' ? manualPage : 1)}>Manuel</button>
+      <button class="small" class:on={view === 'grille'} onclick={() => (view = 'grille')} title="Grille des 16 tracks (doctrine §1)">Grille</button>
       {#if !page}<button class="small" onclick={() => (open = false)} title="Fermer (Échap)">×</button>{/if}
     </header>
     {#if error}<p class="err">{error}</p>{/if}
@@ -329,6 +330,15 @@
           <iframe title="Manuel Digitakt II" src={manualUrl(manualPage)}></iframe>
         {/key}
       </div>
+    {:else if view === 'grille'}
+      <div class="manual">
+        <div class="mbar small">
+          {#if note}<button class="small" onclick={() => (view = 'note')}>← {note.title}</button>{/if}
+          <span class="muted">Grille des 16 tracks · doctrine §1, §4 · séquenceur 16 pas</span>
+          <a class="small" href={grilleUrl} target="_blank" rel="noopener">Nouvel onglet ↗</a>
+        </div>
+        <iframe class="grille" title="Grille des 16 tracks" src={grilleUrl}></iframe>
+      </div>
     {/if}
   </svelte:element>
 {/if}
@@ -381,6 +391,7 @@
   .mbar { display: flex; gap: 10px; align-items: center; padding: 6px 10px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .mbar a { margin-left: auto; color: var(--accent); }
   iframe { flex: 1; width: 100%; border: 0; background: #525659; }
+  iframe.grille { background: transparent; }
   .small { font-size: 12px; }
   .err { color: #dc2626; padding: 0 10px; font-size: 12px; }
 </style>

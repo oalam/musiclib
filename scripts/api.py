@@ -735,6 +735,14 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(404, "manuel PDF absent de refs/")
         return FileResponse(kb.MANUAL_PDF, media_type="application/pdf")
 
+    @app.get("/api/kb/grille")
+    def kb_grille() -> FileResponse:
+        """Grille des 16 tracks interactive (`digitakt/grille.html`, doctrine §1), pour l'iframe du panneau KB."""
+        path = VAULT_ROOT / "digitakt" / "grille.html"
+        if not path.exists():
+            raise HTTPException(404, "digitakt/grille.html absent du vault")
+        return FileResponse(path, media_type="text/html")
+
     def overrides() -> dict[str, Override]:
         return samples.load_overrides(samples_overrides)
 

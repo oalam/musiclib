@@ -193,6 +193,7 @@
       <button class="preset" data-p="tribe" aria-pressed="false">Tribe poussée</button>
       <button class="preset" data-p="hard" aria-pressed="false">Hard techno</button>
       <button class="preset" data-p="halftime" aria-pressed="false">Half-time</button>
+      <button class="preset" data-p="synth" aria-pressed="false">Synthackers</button>
       <button class="preset" data-p="vide" aria-pressed="false">Vide</button>
       <button id="b-play" aria-pressed="false">Jouer</button>
       <label class="bpm">BPM <input type="number" id="bpm" min="60" max="220" step="1" value="170"></label>
@@ -333,17 +334,19 @@
   document.getElementById("b-reset").addEventListener("click", () => { exitUp(); muted.clear(); render(); });
 
   /* ---------- séquenceur 16 pas ---------- */
-  const SEQ_TRACKS = [1, 2, 3, 4, 5, 6, 7, 9];
+  const SEQ_TRACKS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const PRESETS = {
-    techno:   { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "....x.......x...", 4: "................", 5: "................", 6: "x.x.x.x.x.x.x.x.", 7: "..x...x...x...x.", 9: "..x...x...x...x.",
+    techno:   { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "....x.......x...", 4: "................", 5: "................", 6: "x.x.x.x.x.x.x.x.", 7: "..x...x...x...x.", 8: "................", 9: "..x...x...x...x.",
       note: "KT swing et micro-timing : hat fermé en croches, hat ouvert sur le « et », clap sur 2 et 4, basse en contretemps. Le balancement vient de l'ouvert." },
-    tribe:    { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "..............x.", 4: "...x..x.....x.x.", 5: "..x..x..x..x..x.", 6: "x.x.x.x.x.x.x.x.", 7: "...x...x...x...x", 9: "..x...x...x...x.",
+    tribe:    { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "..............x.", 4: "...x..x.....x.x.", 5: "..x..x..x..x..x.", 6: "x.x.x.x.x.x.x.x.", 7: "...x...x...x...x", 8: "................", 9: "..x...x...x...x.",
       note: "KT style tribe, boucle de référence à 165 BPM : toms sur la 4, E(5,16) tournée de 2 sur Id1, hat ouvert sur le « a », clap seul en fin de mesure. Vélocités des hats 100 / 65 / 65 / 80 par temps sur la machine." },
-    hard:     { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "....x.......x...", 4: "xxxxxxxxxxxxxxxx", 5: "................", 6: "x.x.x.x.x.x.x.x.", 7: "..x...x...x...x.", 9: ".xxx.xxx.xxx.xxx",
+    hard:     { 1: "x...x...x...x...", 2: "x...x...x...x...", 3: "....x.......x...", 4: "xxxxxxxxxxxxxxxx", 5: "................", 6: "x.x.x.x.x.x.x.x.", 7: "..x...x...x...x.", 8: "................", 9: ".xxx.xxx.xxx.xxx",
       note: "KT hard techno : shaker en doubles croches sur la 4, basse rolling qui remplit tout sauf le kick, hats offbeat. La pression vient de la densité, le kick reste droit." },
-    halftime: { 1: "x.........x.....", 2: "x.........x.....", 3: "........x.......", 4: "................", 5: "x..x..x.x..x..x.", 6: "x.x.x.x.x.x.x.x.", 7: "................", 9: "..x.....x...x...",
+    halftime: { 1: "x.........x.....", 2: "x.........x.....", 3: "........x.......", 4: "................", 5: "x..x..x.x..x..x.", 6: "x.x.x.x.x.x.x.x.", 7: "................", 8: "................", 9: "..x.....x...x...",
       note: "KT half-time et passerelles : kicks sur 1 et 11, clap sur 9 (le 2-step), break en tresillo sur Id1. Même tempo, ressenti divisé par deux : la passerelle tribe vers DnB." },
-    vide:     { 1: "................", 2: "................", 3: "................", 4: "................", 5: "................", 6: "................", 7: "................", 9: "................",
+    synth:    { 1: "x...x...x...x...", 2: "................", 3: "....x.......x...", 4: ".......x.......x", 5: ".........x......", 6: "x.x.x.x.x.x.x.x.", 7: "................", 8: "..x...x...x...x.", 9: ".x.x.x.....x.x..",
+      note: "Fiche tuto Synthackers, techno one-box : kick droit, hat fermé en contretemps avec des ghost notes sur les temps (ici tous les pas impairs), clap sur 2 et 4, ride en contretemps étouffée par des trigs à volume bas sur les temps, basse en fa entre les kicks, percs en call and response sur les pas restés libres. Pas de rumble chez lui ; swing 53 %. Positions des percs indicatives." },
+    vide:     { 1: "................", 2: "................", 3: "................", 4: "................", 5: "................", 6: "................", 7: "................", 8: "................", 9: "................",
       note: "Partir de rien : poser le kick sur 1, 5, 9, 13, puis le hat fermé, puis la basse entre les kicks." },
   };
   const pattern = {};
@@ -413,6 +416,7 @@
     5: t => tone("triangle", 420, 300, 0.1, 0.3, t),
     6: t => noise(0.04, 7000, 0.35, t),
     7: t => noise(0.22, 5000, 0.25, t),
+    8: t => noise(0.4, 3500, 0.18, t),
     9: t => tone("square", 87, 87, 0.16, 0.22, t),
   };
   function schedule() {
