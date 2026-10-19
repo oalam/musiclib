@@ -25,6 +25,9 @@ et harmonique, style par style, vivent dans [[theorie/_index]] (SPEC
 § 7.M). Elles donnent le *pourquoi* et le vocabulaire ; les fiches ci-dessous
 gardent le *comment* sur la machine.
 
+**Tutos** : les sessions vidéo complètes décortiquées trick par trick
+(track, instrument, pas, chapitre horodaté) vivent dans [[tutos/_index]].
+
 ## Parcours dans l'ordre (Dataview)
 
 Fiches rédigées, triées par lot puis par `ordre` (le numéro des tableaux

@@ -24,24 +24,27 @@
   const DOCTRINE = 'digitakt/doctrine.md'
   const known = $derived(new Set([DOCTRINE, ...toc.flatMap(l => [l.hub, ...l.notes.map(n => n.path)])].filter(Boolean)))
 
-  // groupes du sommaire (7.M2), un onglet chacun (7.M3) : fiches machine, doctrine, théorie
-  type Group = 'fiches' | 'doctrine' | 'theorie'
+  // groupes du sommaire (7.M2), un onglet chacun (7.M3) : fiches machine, doctrine, théorie, tutos
+  type Group = 'fiches' | 'doctrine' | 'theorie' | 'tutos'
   const TABS: { key: Group; label: string }[] = [
     { key: 'fiches', label: 'Fiches machine' },
     { key: 'doctrine', label: 'Doctrine' },
     { key: 'theorie', label: 'Théorie' },
+    { key: 'tutos', label: 'Tutos' },
   ]
-  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', doctrine: 'Doctrine', theorie: 'Théorie (notes de KT)' }
+  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', doctrine: 'Doctrine', theorie: 'Théorie (notes de KT)', tutos: 'Tutos (sessions vidéo)' }
   const GROUP_HINTS: Record<string, string> = {
     fiches: "Le geste sur la machine, dans l'ordre de préparation d'un set.",
     doctrine: 'Les règles arbitrées : grille des 16 tracks, banks, mutes, grave, tonalité ; puis une doctrine par live.',
     theorie: 'Le pourquoi et le vocabulaire, style par style ; les fiches donnent le geste.',
+    tutos: 'Des sessions vidéo complètes décortiquées : chaque trick avec sa track, ses pas et le chapitre.',
   }
   let tab = $state<Group>('fiches')
   /** Onglet d'une note du corpus, d'après son chemin. */
   function groupOf(path: string): Group {
     if (path.startsWith('digitakt/doctrine')) return 'doctrine'
     if (path.startsWith('digitakt/kb/theorie/')) return 'theorie'
+    if (path.startsWith('digitakt/kb/tutos/')) return 'tutos'
     return 'fiches'
   }
   const groups = $derived.by(() => {
