@@ -32,29 +32,32 @@ coupe la basse. Les mutes et les réflexes en dépendent.
 
 ### Rythmique — tracks 1 à 8 (première rangée de touches)
 
-| Track | Rôle             | Bande dominante           | Notes                                                                                     |
-|-------| ---------------- | ------------------------- | ----------------------------------------------------------------------------------------- |
-| 1     | **Kick**         | 40-120 Hz + click 2-5 kHz | Même sample, même réglage dans tout le set (cf. §3)                                       |
-| 2     | **Rumble / sub** | 30-80 Hz                  | Kick resamplé + reverb + saturation + passe-bas ; même pas que le kick + ducking (cf. §9) |
-| 3     | **Clap / snare** | 200 Hz-2 kHz              | Temps 2 et 4 en four-on-floor, plus libre en tribe                                        |
-| 4     | **Perc**         | variable                  | One-shots : toms, rims, shakers, claves, métalliques… (TM, PC)                            |
-| 5     | **Id1 rythmique** | toute bande, transitoires | Identité rythmique du pattern : boucle (BR, DL, PL) ou seconde voix de perc en one-shots (cf. §12) |
-| 6     | **Hat fermé**    | 6-12 kHz                  | Contretemps, doubles croches                                                              |
-| 7     | **Hat ouvert**   | 5-10 kHz                  | Un seul bien placé vaut mieux qu'un empilement                                            |
-| 8     | **Ride**         | 4-10 kHz                  | Couleur de « plein régime », sort en peak ; dernière entrée de la montée                  |
+Les codes sont ceux des samples de la lib (`analyzer/samples.py`, SPEC 7.J) ;
+ils pilotent la track proposée au 0-KIT (`KIT_TRACK_FOR`).
+
+| Track | Rôle | Codes | Bande dominante | Notes |
+|---|---|---|---|---|
+| 1 | **Kick** | BD | 40-120 Hz + click 2-5 kHz | Même sample, même réglage dans tout le set (cf. §3) |
+| 2 | **Rumble / sub** | RM | 30-80 Hz | Kick resamplé + reverb + saturation + passe-bas ; même pas que le kick + ducking (cf. §9) |
+| 3 | **Clap / snare** | SD, CP | 200 Hz-2 kHz | Temps 2 et 4 en four-on-floor, plus libre en tribe |
+| 4 | **Perc** | TM, PC | variable | One-shots : toms, rims, shakers, claves, métalliques… |
+| 5 | **Id1 rythmique** | BR, DL, PL (ou TM, PC) | toute bande, transitoires | Identité rythmique du pattern : boucle, ou seconde voix de perc en one-shots (cf. §12) |
+| 6 | **Hat fermé** | HH | 6-12 kHz | Contretemps, doubles croches |
+| 7 | **Hat ouvert** | OH | 5-10 kHz | Un seul bien placé vaut mieux qu'un empilement |
+| 8 | **Ride** | CY | 4-10 kHz | Couleur de « plein régime », sort en peak ; dernière entrée de la montée |
 
 ### Mélodique et textures — tracks 9 à 16 (seconde rangée)
 
-| Track | Rôle | Bande dominante | Notes |
-|-------|---|---|---|
-| 9     | **Basse** | 40-250 Hz + harmoniques | One-shot (BS) ou boucle (BL), au choix ; possède le grave avec le kick et le rumble ; contretemps, attaque franche, decay court (cf. §9) |
-| 10    | **Séquence / lead** | 300 Hz-4 kHz | Acid line, stabs, arpèges |
-| 11    | **Atmo / drone** | large, faible niveau | Nappe, drone, room tone ; souvent sample Stretch |
-| 12    | **Vocal / one-shots** | 300 Hz-4 kHz | Voix, samples parlés, cris, hooks |
-| 13    | **Id2 bas-médium** | 100-800 Hz, passe-haut au-dessus du sub | Identité tonale grave : boucle de basse (BL) ou mélodie grave, jamais dans le grave de la 9 (cf. §12) |
-| 14    | **Id3 médium-aigu** | 800 Hz-8 kHz | Identité tonale aiguë : boucle mélodique (ML), stabs, chops ; en dialogue avec Id2 |
-| 15    | **FX de transition** | large | Risers, noise, impacts, downlifters, reverses (cf. §5) |
-| 16    | **Réserve / MIDI** | — | Track MIDI vers une machine externe, ou joker |
+| Track | Rôle | Codes | Bande dominante | Notes |
+|---|---|---|---|---|
+| 9 | **Basse** | BS, BL | 40-250 Hz + harmoniques | One-shot ou boucle, au choix ; possède le grave avec le kick et le rumble ; contretemps, attaque franche, decay court (cf. §9) |
+| 10 | **Séquence / lead** | ST | 300 Hz-4 kHz | Acid line, stabs, arpèges |
+| 11 | **Atmo / drone** | PD | large, faible niveau | Nappe, drone, room tone ; souvent sample Stretch |
+| 12 | **Vocal / one-shots** | VX | 300 Hz-4 kHz | Voix, samples parlés, cris, hooks |
+| 13 | **Id2 bas-médium** | BL, ML graves | 100-800 Hz, passe-haut au-dessus du sub | Identité tonale grave : boucle de basse ou mélodie grave, jamais dans le grave de la 9 (cf. §12) |
+| 14 | **Id3 médium-aigu** | ML, BL aiguës | 800 Hz-8 kHz | Identité tonale aiguë : boucle mélodique, stabs, chops ; en dialogue avec Id2 |
+| 15 | **FX de transition** | FX | large | Risers, noise, impacts, downlifters, reverses (cf. §5) |
+| 16 | **Réserve / MIDI** | RS | — | Track MIDI vers une machine externe, ou joker ; resamples maison |
 
 **Règles dérivées** :
 
