@@ -364,6 +364,27 @@ def test_tune_measures_missing_note(tmp_path: Path, lib: tuple[Manifest, Path],
     assert (kick.shift, kick.name) == (0, "BD Hard 01 k")
 
 
+def test_add_tunes_into_tuned_bank(tmp_path: Path, lib: tuple[Manifest, Path],
+                                   monkeypatch: pytest.MonkeyPatch):
+    """Un sample ajoute a une banque deja accordee arrive accorde (mesure
+    comprise) ; un deplacement vers une banque sans tonalite rend la hauteur."""
+    m, root = lib
+    m.entries[0].name = "BD Hard 01 k"           # note ni au manifeste ni dans le nom
+    monkeypatch.setattr(lv, "measure_note", lambda path, code: ("G#", 51.9))
+    live = _live(tmp_path)
+    lv.set_key(live, "A-HALF", "Sol m")
+    lv.add(live, m, ["k/kick.wav", "k/hat.wav"], "A-HALF", root)
+    kick = next(it for it in live.items if it.source == "k/kick.wav")
+    hat = next(it for it in live.items if it.source == "k/hat.wav")
+    assert (kick.note, kick.shift, kick.name) == ("G#", -1, "BD G Hard 01 k")
+    assert (hat.note, hat.shift, hat.name) == (None, 0, "HH Tick k")
+    lv.add(live, m, ["k/kick.wav"], "B-DNB", root)      # B-DNB sans tonalite : hauteur d'origine
+    assert (kick.bank, kick.shift, kick.name) == ("B-DNB", 0, "BD Hard 01 k")
+    lv.set_key(live, "A-HALF", "??")                    # illisible : l'ajout n'accorde pas, sans erreur
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", root)
+    assert (kick.bank, kick.shift, kick.name) == ("A-HALF", 0, "BD Hard 01 k")
+
+
 def test_tune_live_all_banks(tmp_path: Path, lib: tuple[Manifest, Path]):
     m, root = lib
     m.entries[0].note = "F"

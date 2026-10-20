@@ -390,7 +390,13 @@ def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
         if target is None:
             raise LiveError(f"tonalite illisible pour {bank} : {key!r} (ex. Fa m, F#m, sol)")
     touched = [it for it in live.items if it.bank == bank and it.code in TUNABLE]
-    for it in touched:
+    _tune_items(touched, manifest, target, root)
+    return touched
+
+
+def _tune_items(items: list[LiveItem], manifest: Manifest, target: str | None, root: Path) -> None:
+    """Ramene `items` (TUNABLE) sur la tonique `target` ; None : hauteur d'origine."""
+    for it in items:
         it.note = source_note(manifest, it, root)
         shift = semitones(it.note, target) if it.note and target else 0
         if shift == it.shift:
@@ -402,7 +408,13 @@ def tune_bank(live: Live, manifest: Manifest, bank: str, root: Path,
             it.name = _renote(it.name, transpose(it.note, it.shift), new)
         it.shift = shift
         it.ram = ram_bytes(root / it.source, shift)
-    return touched
+
+
+def bank_target(live: Live, bank: str) -> str | None:
+    """Tonique de la banque si sa tonalite est saisie et lisible, sinon None
+    (l'accordage explicite, lui, signale une tonalite illisible)."""
+    key = live.keys.get(bank, "")
+    return key_root(key) if key else None
 
 
 def tune_live(live: Live, manifest: Manifest, root: Path, reset: bool = False) -> list[LiveItem]:
@@ -493,7 +505,10 @@ def _new_item(live: Live, manifest: Manifest, source: str, root: Path) -> LiveIt
 
 def add(live: Live, manifest: Manifest, sources: list[str], bank: str, root: Path) -> None:
     """Ajoute des samples a une banque (ou au kit) ; un sample deja dans le live
-    y est deplace. Tout ou rien (catalogue, place dans le kit)."""
+    y est deplace. Tout ou rien (catalogue, place dans le kit). Si la banque a
+    une tonalite lisible, les TUNABLE ajoutes ou deplaces y sont accordes
+    aussitot (comme `tune_bank`, sans attendre un reaccordage de la banque) ;
+    sinon ils reprennent leur hauteur d'origine."""
     if bank != KIT and bank not in live.banks:
         raise LiveError(f"banque absente du live : {bank}")
     by_source = {it.source: it for it in live.items}
@@ -509,6 +524,11 @@ def add(live: Live, manifest: Manifest, sources: list[str], bank: str, root: Pat
         by_source[it.source] = it
     for s in wanted:
         _place(live, by_source[s], bank)
+    # accordes sur la banque ; sans tonalite, un sample deplace reprend sa
+    # hauteur d'origine (comme `tune_live`), un sample neuf n'est pas mesure
+    target = bank_target(live, bank)
+    tunable = [by_source[s] for s in wanted if by_source[s].code in TUNABLE and (target or by_source[s].shift)]
+    _tune_items(tunable, manifest, target, root)
 
 
 def render_item(source: str, code: str, name: str, root: Path, parent: str | None,

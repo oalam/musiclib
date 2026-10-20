@@ -6,6 +6,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+### Corrigé
+
+- [7.L] Un sample ajouté ou déplacé dans une banque déjà accordée restait
+  à sa hauteur d'origine (`note` nulle, `shift` 0) jusqu'au réaccordage
+  manuel de la banque. `lives.add` accorde désormais les TUNABLE ajoutés
+  ou déplacés sur la tonique de la banque (mesure de la note comprise) ;
+  vers une banque sans tonalité, ils reprennent leur hauteur d'origine.
+
 ### Ajouté
 
 - [7.M] Fiche KB [[presets-substance]] (lot 3, ordre 37) : pack Substance de

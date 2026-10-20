@@ -1019,6 +1019,10 @@ varispeed (`samples.write_varispeed` : durée divisée par 2^(shift/12), comme
 le pitch de la DT2), sans toucher la lib ; l'index d'export garde `shift`
 pour réécrire le fichier quand il change. Une banque sans tonalité garde
 (ou reprend) la hauteur d'origine ; une tonalité illisible arrête tout.
+Un sample ajouté ou déplacé dans une banque déjà accordée (`lives.add`,
+`POST .../add`) y est accordé aussitôt, mesure comprise, sans réaccorder la
+banque ; déplacé vers une banque sans tonalité, il reprend sa hauteur
+d'origine (tonalité illisible : rien n'est accordé, sans erreur).
 
 Front (7.L2, `web/src/lib/LivePanel.svelte`) : bouton « Live » de la vue
 Samples, panneau en troisième colonne. Sélecteur de live (ou création :
