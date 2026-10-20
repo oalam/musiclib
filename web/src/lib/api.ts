@@ -348,7 +348,8 @@ export interface LiveItem {
   code: string
   branch: string
   name: string
-  /** banque du live, ou 0-KIT (kit par defaut) : une seule par sample (7.L5) */
+  /** banque du live, ou 0-KIT (kit par defaut) ; un sample peut etre dans plusieurs banques,
+   *  un item par banque (7.L6) : nom, accordage et track propres a la banque */
   bank: string
   /** track 1-16 dans le kit (0-KIT seulement) */
   track: number | null
@@ -637,14 +638,15 @@ export const api = {
   liveRumblesRun: (name: string, bank: string, dryRun = false) =>
     fetch(`/api/lives/${enc(name)}/rumbles`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ bank, dry_run: dryRun }) })
       .then(r => json<BankRumbleReport>(r)),
-  liveRename: (name: string, source: string, newName: string) => livePost(`/${enc(name)}/rename`, { source, name: newName }),
+  liveRename: (name: string, source: string, newName: string, bank: string) =>
+    livePost(`/${enc(name)}/rename`, { source, name: newName, bank }),
   liveExport: (name: string, dryRun: boolean) =>
     fetch(`/api/lives/${enc(name)}/export`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dry_run: dryRun }) })
       .then(r => json<LiveExportReport>(r)),
   sampleAudioUrl: (source: string) => `/api/samples/audio?source=${enc(source)}`,
-  /** Sample du live tel qu'exporte (transpose par l'accordage) ; shift : cle de cache du navigateur. */
-  liveAudioUrl: (name: string, source: string, shift: number) =>
-    `/api/lives/${enc(name)}/audio?source=${enc(source)}&shift=${shift}`,
+  /** Sample du live tel qu'exporte (transpose par l'accordage de sa banque) ; shift : cle de cache du navigateur. */
+  liveAudioUrl: (name: string, source: string, bank: string, shift: number) =>
+    `/api/lives/${enc(name)}/audio?source=${enc(source)}&bank=${enc(bank)}&shift=${shift}`,
   manualOutline: () => fetch('/api/manual/outline').then(r => json<Record<string, ManualRef>>(r)),
   sdTreatments: () => fetch('/api/sounddesign/treatments').then(r => json<TreatmentSpec[]>(r)),
   sdDevices: () => fetch('/api/sounddesign/devices').then(r => json<DeviceSpec[]>(r)),

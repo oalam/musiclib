@@ -6,13 +6,23 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+### Modifié
+
+- [7.L6] Un sample peut figurer dans **plusieurs banques** d'un live, un
+  item par banque (identité `(source, bank)`) avec son nom, sa track et son
+  accordage sur la tonique de sa banque. L'ajout à une autre banque **copie**
+  au lieu de déplacer (révise 7.L5 « une seule banque par sample ») ; le
+  retrait reste par banque ; `POST .../rename` et `GET .../audio` prennent
+  `bank`. Migration d'un live d'avant 7.L5 : un item par banque d'origine.
+  Front : badges de banques cumulés par sample, écoute et renommage par
+  banque.
+
 ### Corrigé
 
-- [7.L] Un sample ajouté ou déplacé dans une banque déjà accordée restait
-  à sa hauteur d'origine (`note` nulle, `shift` 0) jusqu'au réaccordage
-  manuel de la banque. `lives.add` accorde désormais les TUNABLE ajoutés
-  ou déplacés sur la tonique de la banque (mesure de la note comprise) ;
-  vers une banque sans tonalité, ils reprennent leur hauteur d'origine.
+- [7.L] Un sample ajouté dans une banque déjà accordée restait à sa hauteur
+  d'origine (`note` nulle, `shift` 0) jusqu'au réaccordage manuel de la
+  banque. `lives.add` accorde désormais les TUNABLE ajoutés sur la tonique
+  de la banque (mesure de la note comprise).
 
 ### Ajouté
 

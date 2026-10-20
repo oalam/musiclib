@@ -772,9 +772,17 @@ def test_lives_flow(tmp_path: Path):
 
     r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "A-HALF"})
     r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "B-DNB"})
-    body = r.json()      # une seule banque par sample : deplace
-    assert body["folders"] == [{"path": "B-DNB", "files": 1, "ram": 96_000, "over_cap": False, "branches": {"DRUMS": 1}}]
-    assert (body["live"]["items"][0]["bank"], body["live"]["items"][0]["track"]) == ("B-DNB", None)
+    body = r.json()      # un item par banque (7.L6) : copie
+    assert body["folders"] == [{"path": "A-HALF", "files": 1, "ram": 96_000, "over_cap": False, "branches": {"DRUMS": 1}},
+                               {"path": "B-DNB", "files": 1, "ram": 96_000, "over_cap": False, "branches": {"DRUMS": 1}}]
+    assert [(i["bank"], i["track"]) for i in body["live"]["items"]] == [("A-HALF", None), ("B-DNB", None)]
+    assert client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD x"}).status_code == 422   # 2 banques
+    r = client.post("/api/lives/solaris/rename", json={"source": "k/kick.wav", "name": "BD F B slr", "bank": "B-DNB"})
+    assert [i["name"] for i in r.json()["live"]["items"]] == ["BD F Hard 01 k", "BD F B slr"]
+    assert client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav", "bank": "B-DNB"}).status_code == 200
+    assert client.get("/api/lives/solaris/audio", params={"source": "k/kick.wav", "bank": "0-KIT"}).status_code == 404
+    client.post("/api/lives/solaris/remove", json={"sources": ["k/kick.wav"], "bank": "A-HALF"})
+    client.post("/api/lives/solaris/remove", json={"sources": ["k/kick.wav"], "bank": "B-DNB"})
     r = client.post("/api/lives/solaris/add", json={"sources": ["k/kick.wav"], "bank": "0-KIT"})
     assert (r.json()["live"]["items"][0]["bank"], r.json()["live"]["items"][0]["track"]) == ("0-KIT", 1)
     r = client.post("/api/lives/solaris/track", json={"source": "k/kick.wav", "track": 16})

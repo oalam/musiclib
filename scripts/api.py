@@ -383,6 +383,7 @@ class LiveTempo(BaseModel):
 class LiveRename(BaseModel):
     source: str
     name: str
+    bank: str | None = None     # obligatoire si le sample est dans plusieurs banques (7.L6)
 
 
 class LiveTune(BaseModel):
@@ -1035,7 +1036,7 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
 
     @app.post("/api/lives/{name}/rename", response_model=lv.LiveSummary)
     def live_rename(name: str, req: LiveRename) -> lv.LiveSummary:
-        return live_edit(name, lambda live: lv.rename(live, req.source, req.name))
+        return live_edit(name, lambda live: lv.rename(live, req.source, req.name, req.bank))
 
     @app.post("/api/lives/{name}/track", response_model=lv.LiveSummary)
     def live_track(name: str, req: LiveTrack) -> lv.LiveSummary:
@@ -1105,11 +1106,14 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
         return report
 
     @app.get("/api/lives/{name}/audio")
-    def live_audio(name: str, source: str) -> Response:
+    def live_audio(name: str, source: str, bank: str | None = None) -> Response:
         """Ecoute d'un sample du live tel qu'exporte : transpose en varispeed
-        par l'accordage de sa banque (meme rendu que l'export), sinon tel quel."""
+        par l'accordage de sa banque (meme rendu que l'export), sinon tel quel.
+        `bank` : la banque ecoutee (un sample de plusieurs banques, 7.L6) ;
+        absent : son premier item du live."""
         media_or_503()
-        it = next((i for i in live_or_error(name).items if i.source == source), None)
+        items = live_or_error(name).items
+        it = next((i for i in items if i.source == source and (bank is None or i.bank == bank)), None)
         if it is None:
             raise HTTPException(404, f"sample absent du live : {source}")
         path = samples_src / source

@@ -944,10 +944,14 @@ Transfer envoie tel quel sur le +Drive. Exemple :
 
 - Source : tout le catalogue classé (candidats et réserve), pas seulement
   les retenus ; un non classé, un fichier en corbeille ou un RS est refusé.
-- **Une seule banque par sample** (`bank`) : l'ajouter à une autre banque
-  le déplace. Banque de patterns = banque RAM de la DT2 (127 slots, manuel
-  §13.6.1 : `[FUNC] + [YES]` au chargement choisit la banque RAM) = dossier
-  du +Drive, chargé d'un coup.
+- **Un item par banque** (`bank`, 7.L6) : un sample peut être dans plusieurs
+  banques, l'ajouter à une autre banque le **copie** (nom du live repris,
+  track et accordage propres à la banque d'arrivée) ; `remove` retire par
+  banque, `rename` et `GET .../audio` prennent la banque (obligatoire au
+  renommage si le sample est dans plusieurs banques). Banque de patterns =
+  banque RAM de la DT2 (127 slots, manuel §13.6.1 : `[FUNC] + [YES]` au
+  chargement choisit la banque RAM) = dossier du +Drive, chargé d'un coup ;
+  le fichier dupliqué sur le +Drive diffère par le varispeed de sa banque.
 - **Kit par défaut `0-KIT`** : banque implicite, 16 samples au plus, un par
   track de la doctrine (`track`, proposée d'après le code : BD 1, RM 2,
   SD / CP 3, CY 4, HH 5, OH 6, PC / TM 7-8, BS 9, ST 10, PD 11, VX 12,
@@ -965,7 +969,7 @@ Transfer envoie tel quel sur le +Drive. Exemple :
   l'ancien arbre (`0-COMMON/`, sous-dossiers de branche) est retiré au
   premier export après 7.L5.
 - Migration : un live d'avant 7.L5 (`banks` par item) est converti au
-  chargement (première banque gardée, `0-COMMON` fusionné dans la dernière
+  chargement (un item par banque, `0-COMMON` fusionné dans la dernière
   banque du live) et réécrit à la première sauvegarde.
 
 API : `GET/POST /api/lives`, `GET /api/lives/{live}` (bilan par dossier et
@@ -974,8 +978,9 @@ RAM), `PUT .../banks`, `POST .../add` (`sources`, `bank`), `POST .../remove`
 track d'un sample du kit), `POST .../key` (`bank`, `key` : tonalité
 saisie de la banque, vide pour la retirer), `POST .../tempo` (`bank`, `bpm`
 de 30 à 300, `null` pour le retirer), `POST .../tune` (`reset` : accorde ou
-désaccorde tout le live), `GET .../audio?source=` (écoute telle
-qu'exportée : rendu varispeed si le sample est accordé), `POST .../rename`, `POST .../export`
+désaccorde tout le live), `GET .../audio?source=&bank=` (écoute telle
+qu'exportée : rendu varispeed si le sample est accordé dans cette banque),
+`POST .../rename` (`source`, `name`, `bank`), `POST .../export`
 (`dry_run`, vrai par défaut), `PUT .../rumbles` (`bank`, `presets` : presets
 de rumble associés à la banque, 5 au plus, vide pour n'en générer aucun ;
 422 pour un preset inconnu), `POST .../rumbles` (`bank`, `dry_run`) →
@@ -1019,10 +1024,11 @@ varispeed (`samples.write_varispeed` : durée divisée par 2^(shift/12), comme
 le pitch de la DT2), sans toucher la lib ; l'index d'export garde `shift`
 pour réécrire le fichier quand il change. Une banque sans tonalité garde
 (ou reprend) la hauteur d'origine ; une tonalité illisible arrête tout.
-Un sample ajouté ou déplacé dans une banque déjà accordée (`lives.add`,
-`POST .../add`) y est accordé aussitôt, mesure comprise, sans réaccorder la
-banque ; déplacé vers une banque sans tonalité, il reprend sa hauteur
-d'origine (tonalité illisible : rien n'est accordé, sans erreur).
+Un sample ajouté à une banque déjà accordée (`lives.add`, `POST .../add`)
+y est accordé aussitôt, mesure comprise, sans réaccorder la banque ; une
+copie dans une banque sans tonalité (ou illisible) part à sa hauteur
+d'origine, sans erreur. Le même sample dans deux banques de toniques
+différentes sort donc avec deux décalages.
 
 Front (7.L2, `web/src/lib/LivePanel.svelte`) : bouton « Live » de la vue
 Samples, panneau en troisième colonne. Sélecteur de live (ou création :

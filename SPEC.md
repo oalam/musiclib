@@ -415,7 +415,7 @@ mutes, FX de transition, principes d'arc).
 | 7.I | Ajout d'un morceau depuis le front : recherche → choix du candidat → job d'acquisition + analyse | fait |
 | 7.J | Bibliothèque de samples DT2 : classement famille / code des packs de `<MEDIA>/Samples` (7.J1, `samples.py`), pré-filtre qualité et écoute garder / écarter dans le front (7.J2), export renommé vers `<MEDIA>/Live/samples/` pour Transfer (7.J3), vue par kit (7.J5), recherche multi-facettes et tags inférés (7.J6), tonalité des one-shots tonals (7.J7), arbre du +Drive par type / code / sous-catégorie et plafond par dossier (7.J8) | fait (7.J1 à 7.J8) ; reste l'écoute elle-même, l'export se rejoue après |
 | 7.K | Coquille du front : barre générale avec télécommande (morceau ou sample : précédent, lecture / pause, boucle, suivant), panneau latéral minimisable à icônes (Morceaux, Samples, Knowledge), filtre des morceaux par tags multiples, tri date / alpha, historique et recherche en ligne dans les propositions | fait (à valider à l'usage) |
-| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), une banque par sample, dossiers à plat, kit par défaut `0-KIT` (slots A01-A16), noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 fait (front : `LivePanel.svelte`, 3e colonne de la vue Samples) ; 7.L4 fait (accordage des BD / RM / BS / PD / ST d'une banque sur sa tonalité, varispeed à l'export, écoute accordée) ; 7.L5 fait (banques à plat, une banque par sample, kit par défaut, plafond 127) |
+| 7.L | Lives : sélection de samples de la lib rangée par banque pour un live (`00-live/<live>/`), un item par banque (un sample peut être dans plusieurs banques, 7.L6), dossiers à plat, kit par défaut `0-KIT` (slots A01-A16), noms propres au live, jauge de RAM du projet, export rejouable vers le +Drive via Transfer ; grille révisée de [[digitakt/doctrine]] §1 reportée dans `analyzer/digitakt.py` et le front | 7.L1 fait (back : `analyzer/lives.py`, `/api/lives`, grille de la doctrine) ; 7.L2 fait (front : `LivePanel.svelte`, 3e colonne de la vue Samples) ; 7.L4 fait (accordage des BD / RM / BS / PD / ST d'une banque sur sa tonalité, varispeed à l'export, écoute accordée) ; 7.L5 fait (banques à plat, kit par défaut, plafond 127) ; 7.L6 fait (un sample dans plusieurs banques, copie accordée par banque, accordage à l'ajout) |
 | 7.M | KB théorie : 19 notes de KT (transmission) sur la construction rythmique et harmonique, style par style, dans `digitakt/kb/theorie/` (hub `_index.md`) ; veille [[digitakt/veille-theorie]] ; chaque KT ancrée sur une passe `rhythm_signature` de morceaux de référence de la library | en cours : veille et hub faits le 2026-10-15 ; KT à rédiger par lots (socle KT1-KT9 d'abord) |
 | 7.M2 | KB théorie dans le front : corpus `kb.py` récursif (`digitakt/kb/**/*.md`), sommaire en groupes (`fiches`, `theorie`) avec lots nommés par le hub de chaque dossier, lots déclarés mais vides affichés, en-tête de groupe qui ouvre le hub ; wikilinks résolus depuis le dossier de la note ouverte (`[[../euclidien]]`, `[[theorie/_index]]`) ou par nom court | fait le 2026-10-15 (`kb.py`, `KbPanel.svelte`, tests `test_kb.py`) |
 
@@ -946,7 +946,8 @@ révisés par 7.J8) :
   branches), ajout par glisser-déposer ou au clavier.
 - Dédoublonnage : un sample choisi dans deux banques ou plus va dans
   `0-COMMON` (jamais dupliqué sur le +Drive). Révisé par 7.L5 : une seule
-  banque par sample, plus de `0-COMMON`.
+  banque par sample, plus de `0-COMMON`. Révisé par 7.L6 : un sample peut
+  être dans plusieurs banques, dupliqué sur le +Drive (un item par banque).
 - Nom : nomenclature 7.J8 (`<CODE> [BPM|note] <desc> <pack>`, 18
   caractères) proposée, description modifiable par live. Pack `slr` (ou
   celui du live) pour les enregistrements et resamplings du set ; les
@@ -1017,7 +1018,18 @@ révisés par 7.J8) :
   plusieurs banques garde la première, un sample de `0-COMMON` rejoint la
   **dernière banque du live** (F-JOKER pour solaris) ; tonalité, tempo et
   presets de `0-COMMON` sont oubliés. Révise « dédoublonnage dans 0-COMMON »
-  de 7.L.
+  de 7.L. **Révisé par 7.L6 (2026-10-20)** : un sample peut figurer dans
+  **plusieurs banques**, un item par banque (identité `(source, bank)`),
+  chacun avec son nom, sa track et son accordage sur la tonique de sa banque
+  (un kick en G# sort en sol dans C-TRIBE et en la dans E-SATURE). L'ajouter
+  à une autre banque le **copie** (nom du live repris, hauteur d'origine puis
+  accordage de la banque d'arrivée) ; le retrait reste par banque. La
+  duplication sur le +Drive est acceptée : chaque banque se charge d'un
+  coup et le fichier exporté diffère par le varispeed. À la migration d'un
+  live d'avant 7.L5, un sample de plusieurs banques donne un item par
+  banque. `rename` et l'écoute prennent la banque (obligatoire au renommage
+  si le sample est dans plusieurs banques). Un sample ajouté à une banque
+  qui a déjà une tonalité est accordé à l'ajout, sans réaccorder la banque.
 - **Dossiers à plat** : `<live>/<BANQUE>/<nom>.wav`, sans niveau BRANCHE, pour
   tout sélectionner d'un coup dans le navigateur de la DT2 et charger la
   banque entière dans sa banque RAM. La branche reste une donnée de l'item

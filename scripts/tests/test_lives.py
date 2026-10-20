@@ -55,19 +55,26 @@ def test_create_validates_names(tmp_path: Path):
         lv.create_live(tmp_path, "solaris", ["A", "A"])
 
 
-def test_add_moves_between_banks(tmp_path: Path, lib: tuple[Manifest, Path]):
+def test_add_copies_between_banks(tmp_path: Path, lib: tuple[Manifest, Path]):
     m, root = lib
     live = _live(tmp_path)
     lv.add(live, m, ["k/kick.wav", "k/hat.wav"], "A-HALF", root)
     assert {it.bank for it in live.items} == {"A-HALF"}
-    # une seule banque par sample : l'ajouter ailleurs le deplace
+    # un item par banque (7.L6) : l'ajouter ailleurs le copie, le nom du live suit
+    lv.rename(live, "k/kick.wav", "BD F Mien k")
     lv.add(live, m, ["k/kick.wav"], "B-DNB", root)
-    kick = next(it for it in live.items if it.source == "k/kick.wav")
-    assert kick.bank == "B-DNB" and kick.branch == "DRUMS" and len(live.items) == 2
-    lv.remove(live, ["k/kick.wav"], "A-HALF")      # pas dans cette banque : rien
-    assert kick in live.items
-    lv.remove(live, ["k/kick.wav"], "B-DNB")
-    lv.remove(live, ["k/hat.wav"])
+    kicks = [it for it in live.items if it.source == "k/kick.wav"]
+    assert [(k.bank, k.name, k.branch) for k in kicks] == [("A-HALF", "BD F Mien k", "DRUMS"), ("B-DNB", "BD F Mien k", "DRUMS")]
+    assert len(live.items) == 3
+    lv.add(live, m, ["k/kick.wav"], "B-DNB", root)             # deja dans la banque : rien
+    assert len(live.items) == 3
+    with pytest.raises(lv.LiveError, match="preciser"):        # deux banques : nommer la banque
+        lv.rename(live, "k/kick.wav", "BD F Autre k")
+    lv.rename(live, "k/kick.wav", "BD F Autre k", "B-DNB")
+    assert [k.name for k in kicks] == ["BD F Mien k", "BD F Autre k"]
+    lv.remove(live, ["k/kick.wav"], "A-HALF")                  # retire de cette banque seulement
+    assert [it.bank for it in live.items if it.source == "k/kick.wav"] == ["B-DNB"]
+    lv.remove(live, ["k/kick.wav", "k/hat.wav"])               # du live entier
     assert live.items == []
 
 
@@ -80,12 +87,16 @@ def test_kit_tracks(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert [(it.bank, it.track) for it in live.items] == [(lv.KIT, 1), (lv.KIT, 6), (lv.KIT, 11)]
     assert sorted(lv.plan(live)) == ["0-KIT/01 BD F Hard 01 k.wav", "0-KIT/06 HH Tick k.wav",
                                      "0-KIT/11 PD C Drone drn.wav"]
-    # un second kick prend la premiere track libre du kit (la 1 est prise)
+    # un second kick prend la premiere track libre du kit (la 1 est prise) ;
+    # la copie en B-DNB garde le nom et le code du live, pas de track
     lv.rename(live, "k/hat.wav", "BD Second k")
     by["k/hat.wav"].code = "BD"
     lv.add(live, m, ["k/hat.wav"], "B-DNB", root)
-    assert (by["k/hat.wav"].bank, by["k/hat.wav"].track) == ("B-DNB", None)
+    copy = next(it for it in live.items if it.source == "k/hat.wav" and it.bank == "B-DNB")
+    assert (copy.name, copy.code, copy.track, by["k/hat.wav"].track) == ("BD Second k", "BD", None, 6)
+    lv.remove(live, ["k/hat.wav"], lv.KIT)
     lv.add(live, m, ["k/hat.wav"], lv.KIT, root)
+    by["k/hat.wav"] = next(it for it in live.items if it.source == "k/hat.wav" and it.bank == lv.KIT)
     assert by["k/hat.wav"].track == 2
     # changement de track : echange avec l'occupant
     lv.set_track(live, "k/hat.wav", 1)
@@ -119,7 +130,7 @@ def test_migrates_legacy_common(tmp_path: Path):
     }
     live = lv.Live.model_validate(legacy)
     assert [(it.source, it.bank, it.track) for it in live.items] == [
-        ("a.wav", "F-JOKER", None), ("b.wav", "A-HALF", None), ("c.wav", "A-HALF", None)]
+        ("a.wav", "F-JOKER", None), ("b.wav", "A-HALF", None), ("b.wav", "F-JOKER", None), ("c.wav", "A-HALF", None)]
     assert live.keys == {"A-HALF": "Fa m"} and live.tempos == {} and live.rumbles == {}
 
 
@@ -146,8 +157,10 @@ def test_render_item_and_add_item(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert (item.branch, item.parent, item.rumble, item.ram) == ("DRUMS", "k/kick.wav", "deep", 192_000)
     assert lv.add_item(live, item, "A-HALF") == (item, True) and live.items == [item] and item.bank == "A-HALF"
     assert lv.add_item(live, item.model_copy(), "A-HALF") == (item, False)   # deja dans la banque
-    assert lv.add_item(live, item.model_copy(), "B-DNB") == (item, True) and item.bank == "B-DNB"
-    assert lv.add_item(live, item.model_copy(), lv.KIT) == (item, True) and item.track == 2   # RM : track 2
+    twin = item.model_copy()
+    assert lv.add_item(live, twin, "B-DNB") == (twin, True) and (item.bank, twin.bank) == ("A-HALF", "B-DNB")
+    kit = item.model_copy()
+    assert lv.add_item(live, kit, lv.KIT) == (kit, True) and kit.track == 2   # RM : track 2
     # accordage herite du kick : note affichee, decalage, RAM au varispeed
     kick = lv.LiveItem(source="k/kick.wav", code="BD", branch="DRUMS", name="BD G Hard 01 k",
                        bank="A-HALF", note="F", shift=2)
@@ -196,7 +209,7 @@ def test_set_banks_drops_removed(tmp_path: Path, lib: tuple[Manifest, Path]):
     lv.add(live, m, ["k/kick.wav"], "A-HALF", root)
     lv.add(live, m, ["k/kick.wav", "k/hat.wav"], "B-DNB", root)
     lv.set_banks(live, ["A-HALF"])
-    assert [(it.source, it.bank) for it in live.items] == []          # le kick avait ete deplace en B-DNB
+    assert [(it.source, it.bank) for it in live.items] == [("k/kick.wav", "A-HALF")]   # la copie en B-DNB tombe
     lv.add(live, m, ["k/kick.wav"], lv.KIT, root)
     lv.set_banks(live, [])
     assert [(it.source, it.bank) for it in live.items] == [("k/kick.wav", lv.KIT)]
@@ -274,10 +287,13 @@ def test_save_load_and_export(tmp_path: Path, lib: tuple[Manifest, Path]):
     assert (dest / "solaris" / "A-HALF" / "BD F Hard 01 k.wav").is_file()
     assert lv.list_lives(meta) == ["solaris"]          # l'index d'export n'est pas un live
     # rejouable : le kick passe dans le kit, l'ancien fichier est retire
-    lv.add(live, m, ["k/kick.wav"], lv.KIT, root)
+    lv.add(live, m, ["k/kick.wav"], lv.KIT, root)       # copie dans le kit : A-HALF garde la sienne (7.L6)
     r = lv.export_live(live, root, dest, meta)
-    assert r.copied == ["0-KIT/01 BD F Hard 01 k.wav"] and r.unchanged == 1
-    assert r.removed == ["A-HALF/BD F Hard 01 k.wav"]
+    assert r.copied == ["0-KIT/01 BD F Hard 01 k.wav"] and r.unchanged == 2 and r.removed == []
+    assert (dest / "solaris" / "A-HALF" / "BD F Hard 01 k.wav").is_file()
+    lv.remove(live, ["k/kick.wav"], "A-HALF")
+    r = lv.export_live(live, root, dest, meta)
+    assert r.removed == ["A-HALF/BD F Hard 01 k.wav"] and r.unchanged == 2
     assert not (dest / "solaris" / "A-HALF" / "BD F Hard 01 k.wav").exists()
     with pytest.raises(lv.LiveError):
         lv.load_live(meta, "inconnu")
@@ -367,7 +383,7 @@ def test_tune_measures_missing_note(tmp_path: Path, lib: tuple[Manifest, Path],
 def test_add_tunes_into_tuned_bank(tmp_path: Path, lib: tuple[Manifest, Path],
                                    monkeypatch: pytest.MonkeyPatch):
     """Un sample ajoute a une banque deja accordee arrive accorde (mesure
-    comprise) ; un deplacement vers une banque sans tonalite rend la hauteur."""
+    comprise) ; sa copie dans une autre banque s'accorde sur la tonique de celle-ci."""
     m, root = lib
     m.entries[0].name = "BD Hard 01 k"           # note ni au manifeste ni dans le nom
     monkeypatch.setattr(lv, "measure_note", lambda path, code: ("G#", 51.9))
@@ -378,11 +394,17 @@ def test_add_tunes_into_tuned_bank(tmp_path: Path, lib: tuple[Manifest, Path],
     hat = next(it for it in live.items if it.source == "k/hat.wav")
     assert (kick.note, kick.shift, kick.name) == ("G#", -1, "BD G Hard 01 k")
     assert (hat.note, hat.shift, hat.name) == (None, 0, "HH Tick k")
-    lv.add(live, m, ["k/kick.wav"], "B-DNB", root)      # B-DNB sans tonalite : hauteur d'origine
-    assert (kick.bank, kick.shift, kick.name) == ("B-DNB", 0, "BD Hard 01 k")
-    lv.set_key(live, "A-HALF", "??")                    # illisible : l'ajout n'accorde pas, sans erreur
-    lv.add(live, m, ["k/kick.wav"], "A-HALF", root)
-    assert (kick.bank, kick.shift, kick.name) == ("A-HALF", 0, "BD Hard 01 k")
+    lv.add(live, m, ["k/kick.wav"], "B-DNB", root)      # copie en B-DNB, sans tonalite : hauteur d'origine
+    copy = next(it for it in live.items if it.source == "k/kick.wav" and it.bank == "B-DNB")
+    assert (copy.shift, copy.name, kick.shift) == (0, "BD Hard 01 k", -1)
+    lv.set_key(live, "B-DNB", "La")                     # autre tonique : la copie s'accorde a part
+    lv.tune_bank(live, m, "B-DNB", root)
+    assert (copy.shift, copy.name, kick.shift, kick.name) == (1, "BD A Hard 01 k", -1, "BD G Hard 01 k")
+    lv.set_key(live, "B-DNB", "??")                     # illisible : l'ajout n'accorde pas, sans erreur
+    lv.remove(live, ["k/kick.wav"], "B-DNB")
+    lv.add(live, m, ["k/kick.wav"], "B-DNB", root)
+    copy = next(it for it in live.items if it.source == "k/kick.wav" and it.bank == "B-DNB")
+    assert (copy.shift, copy.name) == (0, "BD Hard 01 k")
 
 
 def test_tune_live_all_banks(tmp_path: Path, lib: tuple[Manifest, Path]):

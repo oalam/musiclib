@@ -318,7 +318,7 @@ def test_rumble_live_covers_banks_with_presets_and_follows_preset_edits(tmp_path
                     name="BD C Punch 01 k", duration=0.3, rank=1)])
     sd.save_preset(_preset(), presets)
     live = lv.create_live(tmp_path / "lives", "solaris", ["A-HALF", "B-DNB"])
-    lv.add(live, m, ["k/kick.wav"], "A-HALF", samples_root)     # une seule banque par sample (7.L5)
+    lv.add(live, m, ["k/kick.wav"], "A-HALF", samples_root)     # B-DNB sans kick : pas de bilan
     lv.set_tempo(live, "A-HALF", 165)
     overrides: dict = {}
     run = lambda **kw: sd.rumble_live(live, presets, m, out, samples_root, overrides, **kw)  # noqa: E731

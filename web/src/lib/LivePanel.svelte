@@ -95,7 +95,8 @@
 
   function apply(s: LiveSummary) {
     sum = s
-    inLive = new Map(s.live.items.map(i => [i.source, [i.bank]]))
+    inLive = new Map()
+    for (const i of s.live.items) inLive.set(i.source, [...(inLive.get(i.source) ?? []), i.bank])
     if (!rows.includes(bank)) { bank = s.live.banks[0] ?? KIT; branch = '' }
     error = ''
   }
@@ -245,7 +246,7 @@
     cur = it.source
     // source du sound design (8.E) : le sample ecoute ici, meme hors de la liste de la lib
     focus.set({ source: it.source, name: it.name, code: it.code, folder: `${current}/${it.bank}` })
-    play(it.source, it.shift ? api.liveAudioUrl(current, it.source, it.shift) : undefined)
+    play(it.source, it.shift ? api.liveAudioUrl(current, it.source, it.bank, it.shift) : undefined)
     queueMicrotask(() => document.getElementById(`live-${it.source}`)?.scrollIntoView({ block: 'nearest' }))
   }
 
@@ -275,7 +276,7 @@
   async function saveRename() {
     const source = renaming
     if (!source) return
-    if (await run(() => api.liveRename(current, source, renameText))) renaming = null
+    if (await run(() => api.liveRename(current, source, renameText, bank))) renaming = null
   }
 
   function onRenameKey(e: KeyboardEvent) {
