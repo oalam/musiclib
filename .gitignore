@@ -33,3 +33,6 @@ refs/*.pdf
 
 # IDE JetBrains
 .idea/
+
+# Packs de presets achetés (contenu sous licence, non redistribuable)
+digitakt/presets/

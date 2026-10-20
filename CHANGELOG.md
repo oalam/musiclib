@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] Fiche KB [[presets-substance]] (lot 3, ordre 37) : pack Substance de
+  Synthackers (64 presets `.dt2pst`, 32 BASS / 32 SYNTH, ondes d'usine, zéro
+  RAM), installation par Transfer, macros, place dans la grille et catalogue
+  à remplir à l'écoute. `digitakt/presets/` ajouté au `.gitignore` (licence).
+
 - [7.L] `digitakt/grille.html` : grille des 16 tracks interactive (face avant
   SVG avec mutes, coupures grave / aigu, breaks et montée pas à pas du §4 ;
   séquenceur 16 pas avec presets techno, tribe, hard techno, half-time tirés
