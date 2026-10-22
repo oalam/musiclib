@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, kb, theorie, kt, index]
-updated: 2026-10-15
+updated: 2026-10-22
 spec: "7.M"
 ---
 
@@ -8,7 +8,8 @@ spec: "7.M"
 
 Notes de transmission (KT) sur la **construction rythmique et harmonique**
 d'un morceau (19 arbitrées le 2026-10-15, plus KT20 hats et KT21 basses
-ajoutées le soir même au lot 1), style par style, pour enrichir le vocabulaire de musicien par
+ajoutées le soir même au lot 1, et KT22 tips & tricks Elektronauts en lot 5 le
+2026-10-22), style par style, pour enrichir le vocabulaire de musicien par
 la pratique. Source : [[../../veille-theorie]] (veille du 2026-10-15) ;
 décisions : [[../../../SPEC]] « Décisions 7.M ». Les fiches de [[../_index]]
 disent *comment* faire le geste sur la machine ; une KT dit *pourquoi* et
@@ -35,7 +36,7 @@ exercices joués). Sections, dans cet ordre :
 Convention : 16 pas = 1 mesure 4/4 en doubles croches ; `x` trig, `.` vide,
 `X` accent.
 
-## Les 21 KT (Dataview)
+## Les 22 KT (Dataview)
 
 ```dataview
 TABLE WITHOUT ID ordre AS "#", file.link AS "KT", lot AS "Lot", styles AS "Styles", statut AS "Statut"
@@ -84,6 +85,16 @@ SORT lot ASC, ordre ASC
 | 17 | Electro / breakbeat | `kt-style-electro` | tresillo au kick, electro bounce, clave | [[../euclidien]] | à rédiger |
 | 18 | Dubstep / DnB / jungle | `kt-style-dubstep-dnb` | halftime, 2-step, Amen, chopping, sub / mid split | [[../slice-breaks]], patches dnb / dubstep | à rédiger |
 | 19 | Trance / psy | `kt-style-trance-psy` | rolling bass, gated arp, phrygien dominant, passerelle vers le mental | | à rédiger |
+
+### Lot 5 — Pratique machine (sources communautaires)
+
+Notes tirées de fils de forum plutôt que de la veille théorique : pas de
+tableau de signature, le « Signature » est remplacé par un panorama du fil
+(familles d'astuces, posts les plus votés, fiche KB du geste).
+
+| # | KT | Fichier | Apporte | Renvoie à | Statut |
+|---|---|---|---|---|---|
+| 22 | Tips & tricks Elektronauts (fil Digitakt II) | [[kt-tips-tricks-elektronauts]] | seconde séquence cachée par pattern (euclidien éteint, retrig, page loop, perform kit), CTRL-ALL ciblé, preset pool en rack de fills, resample stéréo en fader LFO3, vélocité et key tracking en macros, projet modèle | [[../euclidien]], [[../preset-pool]], [[../sampling-resampling]], [[../send-fx-compresseur]], [[../parameter-preset-locks]] | draft |
 
 ## Passe `rhythm_signature` — morceaux de référence par style
 

@@ -26,6 +26,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KT22 [[kt-tips-tricks-elektronauts]] (lot 5 « Pratique machine »,
+  nouveau dans le hub théorie) : le fil Elektronauts *Digitakt II Tips &
+  Tricks* (564 posts, lu par l'API du forum, trié par likes) ramené à onze
+  familles d'astuces avec renvoi au post d'origine et à la fiche KB du
+  geste ; quatre exercices sur la grille, pièges contre-doctrine (alt
+  tracks, kits non partagés, CTRL-ALL sans config). Statut `draft`, gestes
+  à rejouer sur la machine.
+
 - [7.M] Fiche KB [[presets-substance]] (lot 3, ordre 37) : pack Substance de
   Synthackers (64 presets `.dt2pst`, 32 BASS / 32 SYNTH, ondes d'usine, zéro
   RAM), installation par Transfer, macros, place dans la grille et catalogue
