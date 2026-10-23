@@ -6,7 +6,7 @@ ordre: 37
 manuel: "§9 (presets, pool), §14.4 (MIDI, macros)"
 os: "1.17"
 statut: draft
-updated: 2026-10-20
+updated: 2026-10-23
 ---
 
 # Presets Substance (Synthackers)
@@ -21,7 +21,8 @@ Achat du 2026-10-20 (James Orvis, Synthackers, 17 £). Fichiers dans
 `digitakt/presets/` (hors git : contenu sous licence, non redistribuable),
 zip d'origine dans les téléchargements. Démo d'usage : la fiche tuto
 [[tutos/synthackers-techno-session]] (basse « moogy » en fa à 3:26, macros à
-30:00 et 36:00).
+30:00 et 36:00) et [[tutos/synthackers-techno-acid]] (preset acid square,
+bit reduction et key tracking à 2:58, LFO du preset à 17:41, macros à 28:55).
 
 ## Ce que contient un fichier
 

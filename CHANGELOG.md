@@ -26,6 +26,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] Fiche tuto [[synthackers-techno-acid]] (lot 1 des tutos, ordre 2) :
+  seconde session one-box de Synthackers (*Let's Grill a Techno Banger*,
+  2025-10-14, 49 min) ramenée à vingt tricks horodatés : kick puis ligne
+  acid depuis un preset Substance, sidechain du kick sur la basse et sur
+  les effets, swing réglé au shaker, une seule perc tordue en texture,
+  builds au breath controller, choix du clap. Statut draft, non rejouée.
 - [7.M] KT22 [[kt-tips-tricks-elektronauts]] (lot 5 « Pratique machine »,
   nouveau dans le hub théorie) : le fil Elektronauts *Digitakt II Tips &
   Tricks* (564 posts, lu par l'API du forum, trié par likes) ramené à onze

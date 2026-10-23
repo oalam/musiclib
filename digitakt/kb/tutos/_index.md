@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-19
+updated: 2026-10-23
 ---
 
 # KB tutos — sessions vidéo décortiquées
@@ -37,3 +37,4 @@ Sections, dans cet ordre :
 | # | Fiche | Auteur | Modèle | Statut |
 |---|---|---|---|---|
 | 1 | [[synthackers-techno-session]] | Synthackers (James Orvis) | DT2 | draft |
+| 2 | [[synthackers-techno-acid]] | Synthackers (James Orvis) | DT2 | draft |
