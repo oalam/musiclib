@@ -32,13 +32,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   acid depuis un preset Substance, sidechain du kick sur la basse et sur
   les effets, swing réglé au shaker, une seule perc tordue en texture,
   builds au breath controller, choix du clap. Statut draft, non rejouée.
-- [7.M] KT22 [[kt-tips-tricks-elektronauts]] (lot 5 « Pratique machine »,
-  nouveau dans le hub théorie) : le fil Elektronauts *Digitakt II Tips &
-  Tricks* (564 posts, lu par l'API du forum, trié par likes) ramené à onze
-  familles d'astuces avec renvoi au post d'origine et à la fiche KB du
-  geste ; quatre exercices sur la grille, pièges contre-doctrine (alt
-  tracks, kits non partagés, CTRL-ALL sans config). Statut `draft`, gestes
-  à rejouer sur la machine.
+- [7.M] Astuces Elektronauts dans la KB tutos, **lot 2** : le fil *Digitakt II
+  Tips & Tricks* (564 posts) ramené à onze fiches, une par famille
+  ([[elektronauts-presets-pool]] … [[elektronauts-raccourcis]]), chaque
+  astuce déroulée pas à pas avec son post d'origine, plus un
+  [[elektronauts-panorama]] (vocabulaire, pièges, exercices d'ensemble).
+  Remplace la KT22 d'abord rangée dans le hub théorie (lot 5 retiré).
+  Statut draft, non rejouées.
 
 - [7.M] Fiche KB [[presets-substance]] (lot 3, ordre 37) : pack Substance de
   Synthackers (64 presets `.dt2pst`, 32 BASS / 32 SYNTH, ondes d'usine, zéro
