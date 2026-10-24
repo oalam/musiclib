@@ -8,7 +8,7 @@ auteur: communauté Elektronauts
 modele: DT2
 os: "1.17"
 statut: draft
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # Elektronauts 4 — Resampling stéréo et fondu
@@ -48,14 +48,27 @@ grave stable, ou les inclut pour un vrai break.
 
 - **Source** : [#88](https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556/88), variante filtre [#208](https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556/208).
 - **Résultat** : un seul encodeur fond entre le pattern et son resample.
-- **Pas à pas (volume)** :
-  1. Sur la 16 (resample) : LFO3 → **AMP VOL**, profondeur **-0.01**, LFO
-     arrêté (mode qui ne court pas, vitesse nulle).
-  2. Sur toutes les autres tracks à fondre : LFO3 → AMP VOL, profondeur
-     **+0.01**, arrêté.
-  3. CONTROL ALL CONFIG : cocher ces tracks et la 16.
-  4. `[TRK]` tenu + encodeur de profondeur de LFO3 : vers le négatif le
-     pattern s'efface et le resample monte, vers le positif l'inverse.
+- **Pas à pas (volume)**, corrigé à la machine le 2026-10-24 :
+  1. Un LFO immobile sort une valeur constante : sur chaque track, LFO3 →
+     **AMP VOL**, vitesse nulle, onde carrée, phase de départ sur le haut
+     de l'onde (sortie +1). La profondeur devient un décalage de volume.
+  2. Sur la 16 (resample) : même LFO3 mais **phase décalée d'une
+     demi-période** (`SPH` 64 sur une échelle 0-127), sortie -1. Contrôle :
+     profondeur +20 provisoire, la 16 doit **baisser** ; remettre près de
+     zéro. AMP VOL de la 16 assez bas pour qu'elle soit muette au repos.
+  3. Profondeur de repos **0.01** sur toutes les tracks concernées (une
+     track à zéro ne suit pas le geste ; le signe n'a aucun rôle).
+  4. CONTROL ALL CONFIG : cocher 1 à 14 et la 16 (décocher 1 et 2 pour
+     garder le grave).
+  5. `[TRK]` tenu + profondeur de LFO3 vers le **négatif** : les 1 à 14
+     descendent, la 16 monte. Repos = zéro. L'autre sens ne fait rien
+     d'utile (les 1 à 14 sont au plafond, la 16 déjà muette).
+- **Attention** : le post [#88](https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556/88)
+  propose des profondeurs de signes opposés (-0.01 sur la 16, +0.01
+  ailleurs) avec la même onde. À la machine (OS 1.17) le CTRL-ALL est
+  additif et pousse toutes les profondeurs dans le même sens : d'un côté
+  les deux sons, de l'autre aucun. L'inversion doit venir de la **phase**
+  du LFO de la 16, pas du signe de sa profondeur.
 - **Pas à pas (filtre)** :
   1. Resample en passe-haut fermé (fréquence basse), les autres tracks en
      passe-bas ouvert.

@@ -8,7 +8,7 @@ auteur: communauté Elektronauts (fil tenu par LyingDalai)
 modele: DT2
 os: "1.17"
 statut: draft
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # Elektronauts — Tips & tricks Digitakt II, panorama
@@ -141,10 +141,12 @@ Grille de la [[../../doctrine]] §1.
    ON pour 2 temps, `[NO]` pour revenir. Noter ce qui sert de fill et ce
    qui sert de break ([[elektronauts-seconde-sequence]]).
 2. **Fader de resample (10 min).** Resample MAIN L/R d'une mesure, posé sur
-   la 16 en Grid 16 avec 16 trigs. LFO3 → AMP VOL -0.01 sur la 16, +0.01
-   sur 1 à 14, LFO arrêté. CTRL-ALL sur la profondeur de LFO3 : fondre vers
-   le resample, filtrer le resample, revenir. Puis la variante filtre
-   (passe-haut contre passe-bas) ([[elektronauts-resampling]]).
+   la 16 en Grid 16 avec 16 trigs. LFO3 immobile → AMP VOL sur 1 à 14 et
+   sur la 16, **phase inversée sur la 16** (demi-période), profondeur de
+   repos 0.01 partout, AMP VOL de la 16 bas. CTRL-ALL sur la profondeur de
+   LFO3 vers le négatif : fondre vers le resample, filtrer le resample,
+   revenir à zéro. Puis la variante filtre (passe-haut contre passe-bas)
+   ([[elektronauts-resampling]] astuce 2, corrigée à la machine).
 3. **Pool de fills (10 min).** Pattern réservé : track 15 riser, 12 un cri,
    4 un impact, 5 une boucle de break en Repitch (1 mesure). Kit sauvé,
    « Add to preset pool ». Retour au pattern tribe, mode PRESET, `RETRIG
