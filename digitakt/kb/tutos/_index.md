@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # KB tutos — sessions vidéo décortiquées
@@ -63,7 +63,7 @@ Source : <https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556>
 | 1 | [[elektronauts-presets-pool]] | presets et preset pool | 5 | draft |
 | 2 | [[elektronauts-seconde-sequence]] | seconde séquence cachée dans chaque pattern | 6 | draft |
 | 3 | [[elektronauts-ctrl-all]] | CTRL-ALL comme geste de fill | 3 | draft |
-| 4 | [[elektronauts-resampling]] | resampling stéréo et fondu | 4 | draft |
+| 4 | [[elektronauts-resampling]] | resampling stéréo et fondu | 4 | draft (astuce 2 vérifiée 2026-10-24) |
 | 5 | [[elektronauts-velocite-macros]] | vélocité, sound macros, key tracking | 4 | draft |
 | 6 | [[elektronauts-compresseur]] | compresseur, sidechain, saturation | 5 | draft |
 | 7 | [[elektronauts-projet-modele]] | projet modèle, kits, banques | 6 | draft |

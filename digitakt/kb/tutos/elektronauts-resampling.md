@@ -48,7 +48,8 @@ grave stable, ou les inclut pour un vrai break.
 
 - **Source** : [#88](https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556/88), variante filtre [#208](https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556/208).
 - **Résultat** : un seul encodeur fond entre le pattern et son resample.
-- **Pas à pas (volume)**, corrigé à la machine le 2026-10-24 :
+- **Pas à pas (volume)**, corrigé et **vérifié à la machine le 2026-10-24**
+  (OS 1.17, la 16 monte pendant que les 1 à 14 descendent) :
   1. Un LFO immobile sort une valeur constante : sur chaque track, LFO3 →
      **AMP VOL**, vitesse nulle, onde carrée, phase de départ sur le haut
      de l'onde (sortie +1). La profondeur devient un décalage de volume.
@@ -68,7 +69,8 @@ grave stable, ou les inclut pour un vrai break.
   ailleurs) avec la même onde. À la machine (OS 1.17) le CTRL-ALL est
   additif et pousse toutes les profondeurs dans le même sens : d'un côté
   les deux sons, de l'autre aucun. L'inversion doit venir de la **phase**
-  du LFO de la 16, pas du signe de sa profondeur.
+  du LFO de la 16, pas du signe de sa profondeur. Vérifié : avec la phase
+  décalée, la 16 monte bien pendant que les autres descendent.
 - **Pas à pas (filtre)** :
   1. Resample en passe-haut fermé (fréquence basse), les autres tracks en
      passe-bas ouvert.

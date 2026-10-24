@@ -22,7 +22,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 - [7.M] Fader de resample ([[elektronauts-resampling]] astuce 2, exercice 2
   du panorama) : la recette du fil (profondeurs de LFO3 de signes opposés)
   ne tient pas, le CTRL-ALL est additif ; l'inversion vient de la phase du
-  LFO de la track resample. Constaté à la machine le 2026-10-24.
+  LFO de la track resample. Constaté puis vérifié à la machine le
+  2026-10-24 : première astuce du lot 2 rejouée.
 - [7.L] Un sample ajouté dans une banque déjà accordée restait à sa hauteur
   d'origine (`note` nulle, `shift` 0) jusqu'au réaccordage manuel de la
   banque. `lives.add` accorde désormais les TUNABLE ajoutés sur la tonique
