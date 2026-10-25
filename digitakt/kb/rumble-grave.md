@@ -19,7 +19,7 @@ les autres fiches, dans l'ordre où on les fait.
 | Étape | Où | Fiche |
 |---|---|---|
 | Kick très réverbéré, AMP courte | page FX `REV`, reverb `DEC` long, `HPF` bas | [[send-fx-compresseur]] |
-| Saturer | page AMP, `OVER` | [[amp-overdrive-bitreduction]] |
+| Saturer | page FX, `OVER` (`OD.RT` = PRE pour saturer avant le filtre) | [[amp-overdrive-bitreduction]] |
 | Figer en sample | `[SAMPLING]`, `SRC` = MAIN, `R.LEN` = 16 | [[sampling-resampling]] |
 | Sculpter | machine LOWPASS 4, `FREQ` bas, un peu de `RESO` ; `WIDTH` borne le haut | [[filtres]] |
 | Accorder sur la tonique | `TUNE` (appuyer en tournant = demi-tons) | [[machines-src]], [[keyboard-gammes]] |
@@ -48,6 +48,9 @@ les autres fiches, dans l'ordre où on les fait.
   bureau, on le pousse toujours trop.
 - Ouvrir le `FREQ` de la 2 en perform kit sur une montée, le refermer au
   drop (cf. [[perform-kit-temp-save]]).
+- Variante **sans track 2** : rumble fabriqué dans la queue sèche du kick
+  (lock trigs, LFO one-shot ou delay en contretemps), plus sec et plus
+  tribe ; recette dans [[tutos/maison-rumble-dans-le-kick]].
 
 ## Pièges
 

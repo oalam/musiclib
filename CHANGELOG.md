@@ -6,6 +6,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ## [Non publié]
 
+### Ajouté
+
+- [7.M] KB tutos, lot 3 « Recettes maison » : fiche
+  [[maison-rumble-dans-le-kick]], rumble fabriqué dans la queue sèche du
+  kick (track 1) par lock trigs, LFO one-shot ou delay en contretemps, puis
+  figé en sample ; le piège de l'envoi reverb (le send dose l'entrée, pas la
+  queue) est expliqué avant les recettes. Draft, à rejouer à la machine.
+
 ### Modifié
 
 - [7.L6] Un sample peut figurer dans **plusieurs banques** d'un live, un
@@ -19,6 +27,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.M] [[rumble-grave]] plaçait `OVER` sur la page AMP ; l'overdrive est
+  sur la page FX (manuel §11.8), avec `OD.RT` pour le passer avant ou après
+  le filtre.
 - [7.M] Fader de resample ([[elektronauts-resampling]] astuce 2, exercice 2
   du panorama) : la recette du fil (profondeurs de LFO3 de signes opposés)
   ne tient pas, le CTRL-ALL est additif ; l'inversion vient de la phase du

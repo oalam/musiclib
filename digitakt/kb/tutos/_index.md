@@ -1,15 +1,18 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-24
+updated: 2026-10-25
 ---
 
 # KB tutos — sessions vidéo décortiquées
 
-Deux sortes de fiches. Le lot 1 tire ses fiches de **tutos vidéo complets**
+Trois sortes de fiches. Le lot 1 tire ses fiches de **tutos vidéo complets**
 (une session de production ou de live, du pattern vide au pattern plein),
 rédigées à partir de la transcription et des chapitres YouTube. Le lot 2
 tire les siennes d'un **fil de forum** (Elektronauts, *Digitakt II Tips &
-Tricks*), une fiche par famille d'astuces, chaque astuce déroulée pas à pas. Chaque *trick* est noté avec la track, l'instrument,
+Tricks*), une fiche par famille d'astuces, chaque astuce déroulée pas à pas.
+Le lot 3 consigne des **recettes maison** : une idée venue en travaillant,
+raisonnée contre le manuel et la doctrine, écrite au format du lot 2 et à
+vérifier à la machine. Chaque *trick* est noté avec la track, l'instrument,
 les pas et un lien vers le chapitre où il est montré, puis mis en regard de la
 grille de [[../../doctrine]] (§1) et des fiches machine de [[../_index]].
 
@@ -44,6 +47,14 @@ les posts `#n` liés, *Résultat*, *Pas à pas* numéroté, *Attention* si
 besoin, *Chez nous*), **Liens**. Le panorama du fil, le vocabulaire, les
 pièges et les exercices d'ensemble sont dans [[elektronauts-panorama]].
 
+### Fiche recette maison (lot 3)
+
+Même frontmatter et mêmes sections que le lot 2, avec `source` = la date de
+l'échange et `auteur` = qui a eu l'idée. Une section **Le piège physique,
+avant de câbler** peut précéder les recettes quand l'idée de départ bute sur
+le fonctionnement de la machine (envoi partagé, lock trig qui ne déclenche
+rien). Statut `draft` tant que la recette n'a pas été rejouée.
+
 ## Lot 1 — Sessions complètes
 
 | # | Fiche | Auteur | Modèle | Statut |
@@ -71,3 +82,9 @@ Source : <https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556>
 | 9 | [[elektronauts-comb-delay]] | comb filter et delay accordé | 3 | draft |
 | 10 | [[elektronauts-transitions]] | transitions entre patterns | 4 | draft |
 | 11 | [[elektronauts-raccourcis]] | raccourcis d'écran et réglages | 12 | draft |
+
+## Lot 3 — Recettes maison
+
+| # | Fiche | Idée | Recettes | Statut |
+|---|---|---|---|---|
+| 1 | [[maison-rumble-dans-le-kick]] | rumble dans la queue sèche du kick (track 1), sans resample | 4 | draft |

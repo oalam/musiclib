@@ -26,7 +26,8 @@ et harmonique, style par style, vivent dans [[theorie/_index]] (SPEC
 gardent le *comment* sur la machine.
 
 **Tutos** : les sessions vidéo complètes décortiquées trick par trick
-(track, instrument, pas, chapitre horodaté) vivent dans [[tutos/_index]].
+(track, instrument, pas, chapitre horodaté), les astuces Elektronauts par
+famille et les recettes maison à vérifier vivent dans [[tutos/_index]].
 
 ## Parcours dans l'ordre (Dataview)
 
