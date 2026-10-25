@@ -5,7 +5,7 @@ lot: 2
 ordre: 9
 styles: [tribe, acidcore, hypnotique, dnb]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-25
 ---
 
 # KT9 — Phrasage et tension
@@ -109,6 +109,75 @@ build 16, breakdown 16, drop et plateau 64, respiration 16, plateau final
 même arc à l'échelle de l'heure : montées avec respirations, un ou deux
 sommets, une fin marquante.
 
+## Compter sans compter : les repères
+
+Compter dans la tête est le dernier recours. La techno pose des repères
+audibles à chaque étage de la hiérarchie, et la DT2 a trois compteurs :
+la LED `[PAGE]` (la mesure, en GRID REC), les conditions `A:B` (le tour,
+jusqu'à 8), `CHANGE` et le song mode (la phrase). Le but est qu'on
+*entende* dans quelle phrase on est, et que la salle l'entende aussi.
+
+### Dans la musique : les conventions
+
+| Étage | Repère techno | Mesuré sur les références (hub, passe drums) |
+|---|---|---|
+| 1 mesure | le kick | — |
+| 2 mesures | hat ouvert ou clap qui alterne un tour sur deux (`1:2` / `2:2`) ; l'unité de 2 de l'oreille | Tekotak *L'okapi* : kick doublé sur le « et » du 1 **toutes les 2 mesures** |
+| 4 mesures | turnaround sur la 4e mesure ; en tribe, le **kick lui-même compte** : halte de 2 temps en tête de phrase, rebond autour du 1 | Kodaman *Smash*, *Béton* : halte `..X.X.X.` à chaque phrase de 4 ; Tekotak : kick accentué toutes les 4 |
+| 8 mesures | halte longue, roulement de fin de phrase avec une croche vide avant le 1 | Tekotak : `X....... \| ..X.X.X.` toutes les 8, roulement `.xXXXXX.` |
+| 16 et 32 mesures | crash ou cymbale inversée sur le 1, shout ou stab vocal, note de basse qui change (KT7), sub drop, **kick coupé sur la dernière mesure**, ride qui n'entre qu'à la moitié (phrases 3 et 4), filtre acid qui s'ouvre sur 32 mesures et se referme au 1 (KT11) | sections des sidecars en multiples de 8 et 16 mesures |
+
+Le filtre qui s'ouvre sur 32 mesures est une **horloge analogique** : la
+brillance dit où on est dans la phrase, sans rien compter.
+
+### Sur la DT2 : faire compter la machine
+
+1. **Une note toutes les 4 phrases.** Track marqueur de 128 pas (8
+   mesures, PER TRACK, car `A:B` compte les tours de la *track*), un trig
+   au pas 1 en `1:4` : il joue une fois toutes les 32 mesures. Sur la 15 :
+   crash, shout, sub drop. Si le pattern fait 4 mesures (64 pas), `1:8`
+   donne aussi 32 mesures (B va jusqu'à 8). Une cymbale inversée doit
+   *précéder* le 1 : la poser en fin de page 8 en `4:4`, pas au pas 1 en
+   `1:4`.
+2. **Le trou qui annonce le 1.** Condition inversée `NOT 4:4` (le trig
+   joue sauf au tour 4, fiche [[../fill-conditions]]) sur les kicks de la
+   dernière mesure (page 8) : le kick se coupe une mesure toutes les 32,
+   le kick cut de la techno sans toucher aux mutes. Même chose en `NOT
+   4:4` sur la basse pour une respiration.
+3. **Un étage par tour.** Rien de plus au tour 1, ride en `2:4`, hat
+   ouvert en `3:4`, roulement sur la dernière page en `4:4` : le numéro
+   du tour s'entend. Le drop remet le tour 1 nu, et le cycle repart.
+4. **Un LFO comme horloge.** Sur la track porteuse (la 10 pour un filtre
+   acid, la 8 pour le volume du ride) : LFO `WAVE` RAMP ou EXP, `MODE`
+   TRG, `SPD` 1 × `MULT` 4 = un cycle de 512 pas, soit 32 mesures (règle
+   de [[../lfo]] : `SPD` 8 × 16 = 16 pas). `LFO.T` (page TRIG 1) locké à
+   OFF sur tous les trigs, sauf un trig au pas 1 en `1:4` avec `LFO.T`
+   ON : la rampe repart au 1 de chaque phrase de 32 et nulle part
+   ailleurs. Variante sans condition : `MODE` FRE, la rampe part au
+   `[PLAY]` et reste calée tant qu'on ne stoppe pas. *Durée du cycle et
+   relance par un lock trig à vérifier à la machine*
+   ([[../tutos/maison-rumble-dans-le-kick]] pose la même question).
+5. **Atterrir sans viser.** `CHANGE` = 128 (PER TRACK, fiche
+   [[../page-setup]]) : un pattern mis en file part sur le 1 d'une phrase
+   de 8 quel que soit le moment du geste ; 512 pour une phrase de 32 si la
+   plage le permet *(maximum à vérifier à la machine)*. En song mode
+   ([[../song-mode]]), une ligne = un pattern × 4 tours : le song compte
+   les 32 mesures et change tout seul.
+6. **Préparer, puis lâcher.** Mutes préparés avec `[FUNC]` maintenu
+   pendant la mesure 8, relâchés quand le 1 arrive : on n'a plus à viser
+   l'instant, seulement à savoir qu'on est dans la dernière mesure, ce que
+   le turnaround dit.
+
+### Dans la tête, quand il faut
+
+Compter les mesures, pas les temps : le numéro de la mesure remplace le
+« 1 » (« 1 2 3 4, 2 2 3 4 … 8 2 3 4 »), un doigt levé par phrase de 8 ;
+quatre doigts = 32. Deux mains pour deux étages : la droite compte les
+mesures de 1 à 8 à voix haute, la gauche garde la phrase de 1 à 4 en
+silence. Exercice : compter ainsi sur une référence de la library et
+vérifier avec les frontières `structure` et `cues` du sidecar
+(`analyze.py`) que les changements tombent sur des multiples de 32.
+
 ## Sur la DT2
 
 Grille de la [[../../doctrine]] §1. Gestes : [[../mutes]] (préparer
@@ -131,12 +200,24 @@ plusieurs mutes, lâcher sur le 1), [[../fill-conditions]] (`A:B`, `FILL`,
    Control All sur le filtre (`[TRK]` maintenu + `FREQ`) ouvert sur 8
    mesures, drop au changement de pattern. Un seul geste, une seule
    ligne.
+4. **Marqueurs de phrase (10 min).** Pattern de 8 mesures, track 15 en
+   128 pas : crash en `1:4` au pas 1, cymbale inversée en `4:4` en fin de
+   page 8. Kicks de la page 8 en `NOT 4:4`. Ride de la 8 en `2:4`, hat
+   ouvert de la 7 en `3:4`. Laisser tourner 3 phrases de 32 sans toucher,
+   fermer les yeux, et dire le numéro du tour quand le ride entre ; poser
+   le mute de la 9 sur le 1 annoncé par le trou de kick.
 
 ## Pièges
 
 - `A:B` compte les tours de la **track** : avec une 13 en 12 pas, `1:2`
   ne vaut plus « une mesure sur deux » (fiche [[../fill-conditions]],
   KT2).
+- Un marqueur de phrase en `1:4` sur une track de 16 pas joue toutes les 4
+  **mesures**, pas toutes les 4 phrases : la track marqueur doit faire la
+  longueur du pattern (128 pas).
+- Trop de marqueurs tuent le repère : un seul élément par étage (le crash
+  pour le 32, le turnaround pour le 4), sinon tout est un signal et plus
+  rien ne l'est.
 - Un pattern de 8 mesures mis en file d'attente démarre à la fin du tour
   en cours : choisir le suivant tôt, ou régler `CHANGE` sur 16 ou 32 pas
   (fiche [[../patterns-chaines]]).
@@ -164,6 +245,8 @@ plusieurs mutes, lâcher sur le 1), [[../fill-conditions]] (`A:B`, `FILL`,
 
 [[_index]] · [[../mutes]] · [[../fill-conditions]] ·
 [[../patterns-chaines]] · [[../microtiming-retrigs]] ·
-[[../perform-kit-temp-save]] · [[../../doctrine]] §2, §4, §5, §6 · KT2
+[[../perform-kit-temp-save]] · [[../lfo]] · [[../page-setup]] ·
+[[../song-mode]] · [[../tutos/maison-rumble-dans-le-kick]] ·
+[[../../doctrine]] §2, §4, §5, §6 · KT2
 [[kt-polymetrie-polyrythmie]] · KT3 [[kt-swing-microtiming]] · KT7
 [[kt-tensions-lignes]] · KT10 (tribe), KT15 (hypnotique), à rédiger

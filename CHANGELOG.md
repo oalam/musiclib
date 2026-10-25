@@ -16,6 +16,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.M] KT9 [[kt-phrasage-tension]] : section « Compter sans compter »,
+  les repères de phrase (conventions techno par étage, en regard des
+  haltes et roulements mesurés sur Kodaman et Tekotak) et six façons de
+  faire compter la DT2 (`1:4` sur une track de 128 pas, `NOT 4:4` pour le
+  kick cut, un étage par tour, LFO de 32 mesures relancé par `LFO.T`,
+  `CHANGE`, song mode), un exercice et deux pièges ; le comptage mental
+  en dernier recours.
 - [7.L6] Un sample peut figurer dans **plusieurs banques** d'un live, un
   item par banque (identité `(source, bank)`) avec son nom, sa track et son
   accordage sur la tonique de sa banque. L'ajout à une autre banque **copie**
