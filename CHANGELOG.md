@@ -33,6 +33,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.M] Veille §F distillée dans les KT : KT5 (bandes kick / rumble /
+  basse des sources, mono sous 120 Hz, cloche dans le kick, désaccord sur
+  le passe-haut du rumble), KT9 (règles de bloc 16 / 32 / 8, recettes de
+  fin de bloc, un seul pattern en six sections aux mutes, `1:2` / `2:2`
+  qui allongent la période), KT11 (plan hypnotique de 64 mesures,
+  breakdowns de 2-4 mesures, filtre en EXP), KT13 (kick conçu en premier,
+  rumble en send), KT21 (double-croche du kick vide, basse en trois
+  couches, release = 60 000 / BPM) ; fiche [[rumble-grave]] : table des
+  repères chiffrés recalés à 180-200 BPM et sources écrites.
 - [7.M] KT21 [[kt-basses]] : entrées et sorties de la 9 à l'étage de la
   décision, en miroir de la table des hats (entrée sur le 1 d'une phrase
   de 16 ou 32 pour toute la section, pas d'annonce, trou de tension d'un

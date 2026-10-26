@@ -5,7 +5,7 @@ lot: 2
 ordre: 5
 styles: [tribe, acidcore, hard techno, frenchcore]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-26
 ---
 
 # KT5 — Tonalité du grave
@@ -87,6 +87,16 @@ mineur, vit une ou deux octaves plus haut, sur la track 10 ou 13 (KT6).
 | Basse | 80-250 Hz + harmoniques | contretemps | 9 |
 | Kickbass | 40-250 Hz | tout le temps | 1 (la 9 vide) |
 
+Les sources de production ([[../../veille-theorie]] §F) découpent plus
+fin et convergent : **sub 20-60 Hz = le kick seul**, 60-150 Hz = le corps
+du rumble, la basse au-dessus ou duckée, 150-300 Hz = texture ; tout
+accordé sur la tonique, sa quinte ou son octave ; **mono sous 120 Hz**.
+Deux gestes chiffrés qui en découlent : une cloche de -4,5 dB dans le kick
+à la fondamentale de la basse (Attack, *Rolling Techno Bass*) pour que les
+deux coexistent, et le passe-bas du rumble entre 130-170 Hz (hypnotique)
+et 200-250 Hz (peak), ce qui fait du rumble un élément de la bande 60-150
+et non du sub. Les valeurs sont données pour 125-140 BPM.
+
 Le chevauchement est normal, le conflit est la **même bande au même
 moment**. La basse en contretemps n'est pas qu'un choix rythmique (KT1,
 KT2) : c'est le partage du temps qui évite le partage impossible de la
@@ -145,6 +155,12 @@ Gestes : [[../rumble-grave]] (recette du rumble), [[../kick-mental-vst]]
   une fois avec un analyseur (doctrine §9, fiche [[../filtres]]).
 - Le rumble se juge au casque ou sur un sub ; sur des enceintes de bureau
   on le pousse toujours trop.
+- Les sources ne s'accordent pas sur le passe-haut du rumble (30 Hz chez
+  Futureproof, 100-150 Hz avant la reverb chez Myloops) : deux points de
+  départ à trancher à l'oreille, détail dans [[../rumble-grave]].
+- Personne n'écrit sur le **kickbass** ni ne chiffre l'accordage kick /
+  basse / rumble en intervalles (tonique, quinte, octave n'est cité qu'en
+  passant) : sur ces deux points, les références de la library font foi.
 
 ## Ressources
 
@@ -158,6 +174,17 @@ Gestes : [[../rumble-grave]] (recette du rumble), [[../kick-mental-vst]]
   (kick construit en premier, distorsion multi-étages).
 - Elektronauts, *psytrance kick bass parameters* :
   <https://www.elektronauts.com/t/psytrance-kick-bass-parameters/253875> `[R]`
+- Myloops, *How To Build a Techno Kick Rumble That Actually Mixes* :
+  <https://www.myloops.net/creating-techno-kick-rumbles> `[V]` (bandes
+  kick / rumble / basse, accordage tonique / quinte / octave, chaîne
+  chiffrée).
+- Attack Magazine, *Sculpting Warehouse-Style Rolling Techno Basslines* :
+  <https://www.attackmagazine.com/technique/tutorials/warehouse-rolling-techno-bass/> `[V]`
+  (cloche dans le kick à la fondamentale de la basse, basse en trois
+  couches).
+- Futureproof, *How to Make Hard Techno: Kick Design, Rumble, and Club Mixing* :
+  <https://futureproofmusicschool.com/blog/making-hard-techno-a-path-to-unique-sound-design> `[V]`
+  (kick accordé sur la tonalité, enveloppe de pitch sur 10-20 ms).
 - Manuel DT2 OS 1.17, §11.5-11.8 (filtre, amp), §12.3 (sampling), §13
   (machines SRC, `TUNE`).
 

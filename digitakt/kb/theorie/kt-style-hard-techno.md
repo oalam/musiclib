@@ -5,7 +5,7 @@ lot: 3
 ordre: 13
 styles: [hard techno, schranz, hard groove]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-26
 ---
 
 # KT13 — Hard techno et schranz
@@ -111,7 +111,13 @@ atonale ou mineure sur une tonique ; Beauz joue des `dim` (triton, KT7)
 entre des quintes nues : tension industrielle sur un grave fixe.
 
 **Forme.** Intro 16-32, plateaux de 16 ou 32, break de 8 à 16 avec le
-kick coupé mais le rumble ou la pression maintenus, retour (KT9). Le
+kick coupé mais le rumble ou la pression maintenus, retour (KT9). Les
+sources ([[../../veille-theorie]] §F) ajoutent : le kick est **conçu en
+premier** et accordé sur la tonalité (A ou C courants), enveloppe de pitch
+sur les 10-20 premières ms, saturation forte sans perdre l'attaque
+(Futureproof, Sara Landry) ; le rumble est un **send** et non un insert,
+avec la distorsion après la reverb, retour en mono et sidechainé ; la
+chaîne chiffrée est dans [[../rumble-grave]]. Le
 reverse kick sur la 15 (doctrine §5) juste avant le 1 du drop. Schranz et
 hard groove ne sont pas sourcés par écrit ; les deux schranz grabés
 confirment les boucles roulantes (sub `XXxxX.X.Xxx.X.X.`, `sync` 0,58-0,69).
@@ -169,6 +175,8 @@ ouvert 7, perc 4 (shaker), basse 9, lead 10, FX 15. Gestes :
   <https://productionmusiclive.com/blogs/news/6-steps-to-create-that-rumbling-techno-kick-you-love-with-johannes-menzel> `[R]`
 - Sinee, *Next generation hard techno* :
   <https://sinee.de/en/next-generation-hard-techno-how-to-make-a-track/HTMAT-007/> `[R]` (payant).
+- Futureproof, *How to Make Hard Techno: Kick Design, Rumble, and Club Mixing* :
+  <https://futureproofmusicschool.com/blog/making-hard-techno-a-path-to-unique-sound-design> `[V]`
 - Schranz et hard groove : non sourcés par écrit.
 
 ## Liens

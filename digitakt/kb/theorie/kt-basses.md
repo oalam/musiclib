@@ -100,6 +100,21 @@ baissant la basse pendant le kick. Le tribe en contretemps strict est une
 **écriture**, choisie pour sa lisibilité en free party ; les rythmes 2, 3,
 6 et 9 du tableau restent du tribe et ouvrent le groove.
 
+**Ce que disent les sources de production.** La règle qui revient
+([[../../veille-theorie]] §F) : **la basse laisse vide la double-croche du
+kick** ; c'est un placement de trigs, pas un compresseur, et le sidechain
+ne vient qu'après pour les notes qui chevauchent. Attack (*Rolling Techno
+Bass*) écrit la basse en trois couches : un **sub** qui est la queue du
+kick passe-bas à 80 Hz, une **basse synthé** entre 65 et 350 Hz, une couche
+**percussive** qui est le kick copié avec un delay à la double-croche ;
+sur la DT2, c'est rumble 2, basse 9, et un send delay sur la 1 (fiche
+[[../rumble-grave]], [[../tutos/maison-rumble-dans-le-kick]]). Pour le
+ducking, Gearnews donne la règle « release maximale = 60 000 / BPM » :
+60 000 / 190 = 316 ms à 190 BPM, et on vise plutôt la moitié, 120 à
+200 ms, pour 6 à 12 dB de réduction ; sur la DT2 ce n'est pas un réglage
+de compresseur par track mais le `DEC` de l'AMP de la 9 ou un LFO one-shot
+sur son volume (fiche [[../lfo]]).
+
 **Ce que disent les morceaux.** La moyenne tekno `X.x.X.x.X.x.X.x.` est le
 contretemps pur ; l'acid core est à moitié contretemps, à moitié vide
 (kickbass) ; le tribe montre un sub plein sur les pas 2-3 (`Xxx.`), où se
@@ -224,6 +239,12 @@ sources ([[../../veille-theorie]] §F), à régler à l'oreille.
   <https://forum.ableton.com/viewtopic.php?p=1083205> `[R]`
 - Attack Magazine, Beat Dissected *Mystik dubstep* (sub et wobble) :
   <https://www.attackmagazine.com/technique/beat-dissected/mystik-dubstep/> `[V]`
+- Attack Magazine, *Sculpting Warehouse-Style Rolling Techno Basslines* :
+  <https://www.attackmagazine.com/technique/tutorials/warehouse-rolling-techno-bass/> `[V]`
+  (trois couches, double-croche du kick vide).
+- Gearnews, *Sidechain Compression in Techno* :
+  <https://www.gearnews.com/sidechain-compression-in-techno-workshop/> `[V]`
+  (release = 60 000 / BPM, multibande, ghost kick).
 - Manuel DT2 OS 1.17, §11.6 (AMP, decay), §12.6 (compresseur,
   sidechain), §11.2 (conditions, `PROB`).
 

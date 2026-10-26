@@ -5,7 +5,7 @@ lot: 3
 ordre: 11
 styles: [acidcore, mental, hardtek]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-26
 ---
 
 # KT11 — Acid core / mental
@@ -100,6 +100,21 @@ kickbass. Sur la DT2 : LFO lent sur `FREQ` (fiche [[../lfo]]), ou le
 knob en perform kit (fiche [[../perform-kit-temp-save]]) ; Control All
 sur `FREQ` pendant le break.
 
+**Ce que disent les sources hypnotiques.** The Acid Mind
+([[../../veille-theorie]] §F) donne un plan de 64 mesures qui est la
+narration au filtre mise en forme : 16 mesures kick, basse et une phrase
+de perc ; 16 avec une seconde voix et un petit changement tonal ; 16 où
+un élément grave est retiré et la texture s'élargit ; 16 de retour de
+l'élément manquant, accentué ou avec un jet de delay. Les breakdowns y
+font **2 ou 4 mesures seulement**, le centre retiré et le rythme sec
+exposé, graves rétablis à la fin du cycle. Les modulations durent 4 ou 8
+mesures et **pas toutes sur la même division** ; on coupe un coup attendu
+juste avant le retour de boucle ; des boucles de 3 ou 5 pas font le
+déphasage (KT2, fiche [[../page-setup]]). Myloops ajoute que l'ouverture
+du filtre se concentre sur les 3 ou 4 dernières mesures du bloc, pas en
+rampe linéaire : sur la DT2, un LFO `WAVE` EXP plutôt que RAMP (fiche
+[[../lfo]]).
+
 **Anticipation maximale.** Le `swing` mesuré (énergie sur le « a »,
 KT3) est le plus haut de tous les styles : 0,76 à 0,95 sur 6 morceaux
 sur 8. L'acid line place ses accents sur les pas 4, 8, 12, 16, le pas qui
@@ -162,6 +177,10 @@ Tirages : générateur 9.A (vue « Acid · MIDI »).
 - Wikipedia, *Acid techno* : <https://en.wikipedia.org/wiki/Acid_techno> `[V]`
 - Attack Magazine, Beat Dissected *Armando acid house* :
   <https://www.attackmagazine.com/technique/beat-dissected/armando-acid-house/> `[R]`
+- The Acid Mind, *Hypnotic Techno: How Repetition, Space and Subtle Motion Build the Groove* :
+  <https://www.theacidmind.com/2026/08/hypnotic-techno-repetition-space-production/> `[V]`
+- Myloops, *Techno Automation: 11 Moves* :
+  <https://www.myloops.net/using-automation-to-keep-techno-interesting> `[V]`
 - SPEC Phase 9.A, règles de tirage (`scripts/analyzer/acid.py`).
 - Rien d'écrit sur Teksa, Crystal Distortion, 69db : à l'oreille, sur les
   références du hub.

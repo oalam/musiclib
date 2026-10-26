@@ -5,7 +5,7 @@ lot: 2
 ordre: 9
 styles: [tribe, acidcore, hypnotique, dnb]
 statut: draft
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # KT9 — Phrasage et tension
@@ -108,6 +108,33 @@ build 16, breakdown 16, drop et plateau 64, respiration 16, plateau final
 64, sortie 32 = 272 mesures. Le set (doctrine §6, principe 1) est le
 même arc à l'échelle de l'heure : montées avec respirations, un ou deux
 sommets, une fin marquante.
+
+**Ce que disent les sources de production.** Les blogs d'arrangement et
+les fils Elektronauts ([[../../veille-theorie]] §F) convergent : **16
+mesures est l'unité de décision, 32 la section, 8 le fill, jamais 24** ;
+un seul changement perceptible par frontière ; et la rupture est
+**annoncée** sur la fin du bloc. Les recettes de fin de bloc, données pour
+125-140 BPM : ouverture de filtre concentrée sur les mesures 13 à 16 d'un
+bloc de 16, résonance à l'inverse du cutoff ; send de reverb de rien à
+-6 dB sur les mesures 15 et 16, puis retour sec sur le 1 ; kick baissé de
+2 demi-tons sur les deux derniers temps de la mesure 16 ; hats retirés sur
+les 4 dernières mesures ; kick coupé 8 mesures avant le pic ; clap coupé
+une mesure sur 8 ; profondeur d'un LFO de 10 à 80 % sur 32 mesures
+(Myloops, TrackSensei). Règles de terrain : « quelque chose change toutes
+les 15 secondes », soit 15 / 1,263 = 12 mesures à 190 BPM ; +1 élément
+et -2 toutes les 16 ; construire la boucle principale et le climax
+d'abord, puis le reste à rebours ; sortir par soustraction dans l'ordre
+inverse de l'entrée ; chasser les **zones mortes** au milieu des blocs de
+32 et 64 (Elektronauts 2021, Attack 2020). Côté machine, Wolkenhauer joue
+un morceau entier sur **un seul pattern** Digitakt en six sections aux
+mutes (intro, transition, break percussif sans kick, core loop, break
+mélodique, outro) avec `FILL` pour les breaks courts, `NOT FILL` pour le
+motif normal, `3:3` pour un élément un cycle sur trois, `1ST` pour
+l'impact d'entrée ; et le fil sur les conditions montre que `1:2` en début
+de pattern et `2:2` en fin **allongent la période perçue** : sur un
+pattern de 4 mesures, `2:2` fait 8 mesures, `2:3` 12, `2:4` 16. C'est la
+version DT1 de ce que la doctrine §2 arbitre pour la DT2 (pattern main
+écrit pour 4 tours).
 
 ## Compter sans compter : les repères
 
@@ -241,6 +268,18 @@ plusieurs mutes, lâcher sur le 1), [[../fill-conditions]] (`A:B`, `FILL`,
   *raw hypnotic techno like Silent Servant* `[R]`.
 - Attack Magazine, *The Secrets of Techno Production* (livre) :
   <https://store.attackmagazine.com/products/the-secrets-of-techno-production> `[R]`
+- TrackSensei, *How to Arrange a Techno Track (Bar-by-Bar)* :
+  <https://tracksensei.com/blog/how-to-arrange-a-techno-track> `[V]`
+- Myloops, *Techno Automation: 11 Moves That Keep an 8-Minute Track Alive* :
+  <https://www.myloops.net/using-automation-to-keep-techno-interesting> `[V]`
+- Attack Magazine, *4 Ways To Break Out Of The Loop* :
+  <https://www.attackmagazine.com/technique/tutorials/4-ways-to-break-out-of-the-loop/> `[V]`
+- Elektronauts, *Simple Tips in Techno Structure* :
+  <https://www.elektronauts.com/t/simple-tips-in-techno-structure/151609> `[V]`
+- Elektronauts, Wolkenhauer, *Turning a DAW track into a Digitakt live performance* :
+  <https://www.elektronauts.com/t/turning-a-daw-track-into-a-digitakt-live-performance-tutorial-how-to/42056> `[V]`
+- Elektronauts, *How do you use conditional triggers?* :
+  <https://www.elektronauts.com/t/how-do-you-use-conditional-triggers/42272> `[V]`
 - Manuel DT2 OS 1.17, §8.5.3 (mutes), §10.7 (`CHANGE`, `RESET`), §10.8.4
   (FILL), §11.2 (conditions).
 
