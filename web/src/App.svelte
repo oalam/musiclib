@@ -28,6 +28,8 @@
   let grabPanel: GrabPanel | undefined = $state()
   let trackList: TrackList | undefined = $state()
   let looping = $state(false)
+  // bornes de la boucle du lecteur : la chaine de la vue bank y repere sa section bouclee
+  let loopRange = $state<{ start: number; end: number } | null>(null)
   let autoplay = $state(false)
 
   // morceau ajoute (7.I) : liste rechargee, puis ouverture du morceau
@@ -237,15 +239,16 @@
       {#snippet playerView()}
         {#key detail?.slug}
           {#if detail}
-            <Player bind:this={player} track={detail} bind:currentTime bind:playing bind:looping {autoplay}
+            <Player bind:this={player} track={detail} bind:currentTime bind:playing bind:looping bind:loopRange {autoplay}
               bars={bank?.bar_times_s?.length ? bank.bar_times_s : detail.bar_times}
-              sections={bank?.sections?.length ? bank.sections : undefined} />
+              sections={bank?.sections?.length ? bank.sections : undefined} {bank} />
           {/if}
         {/key}
       {/snippet}
       {#if bank}
-        <BankView {bank} harmony={detail.harmony} {currentTime} {playing} player={playerView} onseek={t => player?.seek(t)}
-          onloop={(start, end) => player?.setLoop(start, end)} onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
+        <BankView {bank} harmony={detail.harmony} {currentTime} {playing} loop={loopRange} player={playerView} onseek={t => player?.seek(t)}
+          onloop={(start, end) => player?.setLoop(start, end)} onloopclear={() => player?.clearLoop()}
+          onplay={() => player?.playPause()} onstop={t => player?.stop(t)}
           onhelp={(path, page) => (path ? kbPanel?.openPath(path) : page && kbPanel?.openManual(page))} />
         <div class="bankbar">
           <span class="muted small">Bank générée le {new Date(bank.generated_at).toLocaleString('fr-FR')}</span>

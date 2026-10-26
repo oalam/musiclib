@@ -8,6 +8,18 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.K2] Lecture par phrases dans le front : sous la forme d'onde, deux
+  bandes tirées de la bank, les **phrases** (`phrase_bars` mesures, qui
+  repartent à chaque section comme la partition de mutes) et les **tours de
+  pattern** (un tour = `bars` du pattern, positions sur la grille de mesures
+  recalée sur le kick, repli sur le tempo moyen), avec le tour courant
+  surligné et une ligne live « pattern 03 · tour 2/4 · phrase 1/2 · mesure
+  6/8 » ; double-clic sur un tour = boucle sur ce tour. Dans la chaîne de la
+  vue bank, un **clic sur un maillon** place la tête de lecture au début de
+  la section et boucle sur tous ses tours (second clic ou bouton « Retirer la
+  boucle » = fin de boucle, Maj + clic = saut seul) ; le maillon bouclé est
+  marqué. Liste des morceaux : **plage de BPM** min / max (inclusive, vide =
+  pas de borne), persistée avec le reste du filtre.
 - [7.M] KB tutos, lot 3 « Recettes maison » : fiche
   [[maison-rumble-dans-le-kick]], rumble fabriqué dans la queue sèche du
   kick (track 1) par lock trigs, LFO one-shot ou delay en contretemps, puis

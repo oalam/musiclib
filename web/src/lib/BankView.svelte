@@ -4,17 +4,21 @@
   import { CONTROLS, KNOBS, midiLabel, PARAM_PAGES, pagesOf, SILK, type Func, type Param } from './dt2'
   import Dt2SendPanel from './Dt2SendPanel.svelte'
 
-  let { bank, harmony = null, currentTime, playing, player, onseek, onloop, onplay, onstop, onhelp }: {
+  let { bank, harmony = null, currentTime, playing, loop = null, player, onseek, onloop, onloopclear, onplay, onstop, onhelp }: {
     bank: Bank
     /** Gamme et accords du morceau (7.H), affiches en mode KEYBOARD. */
     harmony?: Harmony | null
     currentTime: number
     playing: boolean
+    /** Bornes de la boucle active du lecteur : la chaine marque la section bouclee. */
+    loop?: { start: number; end: number } | null
     /** Lecteur rendu sous la facade, dans le meme bloc que la vue d'ensemble. */
     player?: Snippet
     onseek: (t: number) => void
-    /** Boucle du lecteur sur une section (double-clic dans la chaine). */
+    /** Boucle du lecteur sur une section (clic dans la chaine : tous ses tours). */
     onloop: (start: number, end: number) => void
+    /** Retire la boucle du lecteur (second clic sur la section bouclee). */
+    onloopclear: () => void
     onplay: () => void
     /** Arret et retour au debut du pattern en cours. */
     onstop: (t: number) => void
@@ -47,6 +51,19 @@
   $effect(() => {
     if (follow && playingPattern) selectedSlot = playingPattern.slot
   })
+
+  // 7.K2 : section dont la boucle du lecteur epouse les bornes (calage sur les
+  // mesures compris : demi-mesure de tolerance)
+  const loopedSection = $derived(loop
+    ? sections.find(s => Math.abs(s.start_s - loop.start) < 0.5 && Math.abs(s.end_s - loop.end) < 0.5) ?? null
+    : null)
+  /** Clic sur un maillon : saut au debut de la section et boucle sur tous ses tours ; second clic = retire. */
+  function pressLink(s: { index: number; pattern_slot: number; start_s: number; end_s: number }, e: MouseEvent) {
+    selectedSlot = s.pattern_slot
+    if (e.shiftKey) { onseek(s.start_s); return }  // saut seul, sans boucle
+    if (loopedSection?.index === s.index) onloopclear()
+    else onloop(s.start_s, s.end_s)
+  }
 
   const pattern = $derived<Pattern>(
     bank.patterns.find(p => p.slot === selectedSlot) ?? bank.patterns[0])
@@ -558,16 +575,19 @@
   {@render player?.()}
   {#if sections.length}
     <div class="chain" aria-label="Ordre de jeu">
-      <span class="muted small" title="Clic = saut, double-clic = boucle sur la section">Chaîne</span>
+      <span class="muted small" title="Clic = saut au début de la section et boucle sur tous ses tours ; second clic = retirer ; Maj + clic = saut seul">Chaîne</span>
       {#each sections as s (s.index)}
-        <button class="link mono" class:cur={playingSection?.index === s.index}
+        {@const tours = Math.max(1, Math.ceil(s.bars / (bank.patterns.find(p => p.slot === s.pattern_slot)?.bars ?? s.bars)))}
+        <button class="link mono" class:cur={playingSection?.index === s.index} class:loop={loopedSection?.index === s.index}
           style="--c: {SEGMENT_COLORS[s.label] ?? '#888888'}"
-          title="{s.label} · {mmss(s.start_s)} · {s.bars} mes. · tracks {s.active.join(' ')} · double-clic = boucle"
-          onclick={() => { selectedSlot = s.pattern_slot; onseek(s.start_s) }}
-          ondblclick={() => onloop(s.start_s, s.end_s)}>
+          title="{s.label} · {mmss(s.start_s)} · {s.bars} mes. = {tours} tour{tours > 1 ? 's' : ''} · tracks {s.active.join(' ')} · clic = boucle sur la section"
+          onclick={e => pressLink(s, e)}>
           {patName(s.pattern_slot)}
         </button>
       {/each}
+      {#if loopedSection}
+        <button class="small" onclick={onloopclear} title="Retirer la boucle du lecteur">Retirer la boucle</button>
+      {/if}
     </div>
   {/if}
 
@@ -659,6 +679,7 @@
   .chain { display: flex; gap: 3px; flex-wrap: wrap; align-items: center; margin: 10px 0 6px; }
   .chain .link { font-size: 11px; padding: 2px 5px; border-bottom: 3px solid var(--c); }
   .chain .link.cur { outline: 1px solid var(--accent); }
+  .chain .link.loop { background: color-mix(in srgb, var(--accent) 25%, transparent); color: var(--text); }
   .small { font-size: 12px; }
   .tabs { display: flex; gap: 4px; margin: 14px 0 6px; border-bottom: 1px solid var(--border); overflow-x: auto; }
   .tabs button {

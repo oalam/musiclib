@@ -1,20 +1,24 @@
 <script lang="ts">
   import WaveSurfer from 'wavesurfer.js'
   import RegionsPlugin, { type Region } from 'wavesurfer.js/plugins/regions'
-  import { api, chordAt, mmss, SEGMENT_COLORS, type TrackDetail } from './api'
+  import { api, chordAt, mmss, SEGMENT_COLORS, type Bank, type Section, type TrackDetail } from './api'
 
-  let { track, bars = [], sections, currentTime = $bindable(0), playing = $bindable(false),
-    looping = $bindable(false), autoplay = false }: {
+  let { track, bars = [], sections, bank = null, currentTime = $bindable(0), playing = $bindable(false),
+    looping = $bindable(false), loopRange = $bindable(null), autoplay = false }: {
     track: TrackDetail
     /** Debuts de mesure (s) : la boucle se cale dessus. Vide = pas de calage. */
     bars?: number[]
     /** Structure a afficher (celle de la bank) ; defaut = segments du sidecar. */
     sections?: { start_s: number; end_s: number; label: string }[]
+    /** Bank du morceau (7.K2) : tours de pattern et phrases sous la forme d'onde. */
+    bank?: Bank | null
     currentTime?: number
     /** Etat de lecture, lu par le transport de la facade (7.G). */
     playing?: boolean
     /** Boucle active (region calee, sinon morceau entier), lue par la telecommande. */
     looping?: boolean
+    /** Bornes de la boucle active (null sans region ou boucle coupee), lues par la vue bank. */
+    loopRange?: { start: number; end: number } | null
     /** Lecture des le chargement (prev / next de la telecommande en cours de lecture). */
     autoplay?: boolean
   } = $props()
@@ -33,6 +37,7 @@
   // sans region : boucle sur le morceau entier (bouton boucle de la telecommande)
   let wholeLoop = $state(false)
   $effect(() => { looping = loop ? loopOn : wholeLoop })
+  $effect(() => { loopRange = loop && loopOn ? { start: loop.start, end: loop.end } : null })
 
   /** Boucle de la telecommande : region si elle existe, sinon morceau entier. */
   export function toggleLoop() {
@@ -177,6 +182,77 @@
       `\nDT2 : [FUNC] + [KEYBOARD] > ${track.keyboard_setup}` +
       `\nAlternatives : ${harmony.scale.candidates.slice(0, 3).map(c => `${c.label} (${c.score})`).join(', ')}`
     : '')
+
+  // 7.K2 : tours de pattern et phrases de la bank. Un tour = `pattern.bars`
+  // mesures, une phrase = `phrase_bars` mesures ; les deux repartent au debut
+  // de chaque section (comme la partition de mutes). Positions prises sur la
+  // grille de mesures recalee sur le kick, repli sur le tempo moyen si la
+  // grille ne couvre pas (bank anterieure).
+  type Tour = { start: number; end: number; section: number; slot: number; k: number; n: number }
+  type PhraseMark = { start: number; end: number; section: number; j: number; n: number }
+  const barDur = $derived(bank && bank.bpm > 0 ? 240 / bank.bpm : 0)
+
+  /** Index de la mesure contenant t (dichotomie), -1 hors grille. */
+  function barIndex(t: number): number {
+    if (bars.length < 2 || t < bars[0] || t >= bars[bars.length - 1]) return -1
+    let lo = 0
+    let hi = bars.length - 1
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1
+      if (bars[mid] <= t) lo = mid
+      else hi = mid
+    }
+    return lo
+  }
+
+  /** Debut de la mesure `k` apres `start` : grille reelle si elle couvre, sinon tempo moyen. */
+  function barAfter(start: number, k: number): number {
+    const b0 = barIndex(start + 0.01)
+    if (b0 >= 0 && b0 + k < bars.length) return bars[b0 + k]
+    return start + k * barDur
+  }
+
+  /** Decoupe chaque section en tranches de `size(section)` mesures, la derniere tronquee a la section. */
+  function slices<T>(size: (s: Section) => number,
+    make: (start: number, end: number, section: number, i: number, n: number) => T): T[] {
+    if (!bank?.sections?.length || !(barDur > 0 || bars.length > 1)) return []
+    const out: T[] = []
+    for (const s of bank.sections) {
+      const size_ = Math.max(1, size(s))
+      const n = Math.max(1, Math.ceil(s.bars / size_))
+      for (let i = 0; i < n; i++) {
+        const start = barAfter(s.start_s, i * size_)
+        const end = i === n - 1 ? s.end_s : Math.min(s.end_s, barAfter(s.start_s, (i + 1) * size_))
+        if (end > start) out.push(make(start, end, s.index, i, n))
+      }
+    }
+    return out
+  }
+  const tours = $derived(slices(
+    s => bank!.patterns.find(p => p.slot === s.pattern_slot)?.bars ?? s.bars,
+    (start, end, section, k, n): Tour => ({ start, end, section, k, n,
+      slot: bank!.sections!.find(s => s.index === section)!.pattern_slot })))
+  const phrases = $derived(slices(
+    () => bank!.phrase_bars,
+    (start, end, section, j, n): PhraseMark => ({ start, end, section, j, n })))
+
+  const curTour = $derived(tours.find(t => currentTime >= t.start && currentTime < t.end) ?? null)
+  const curPhrase = $derived(phrases.find(p => currentTime >= p.start && currentTime < p.end) ?? null)
+  const curPatternBars = $derived(curTour ? bank?.patterns.find(p => p.slot === curTour.slot)?.bars ?? 0 : 0)
+  /** Mesure en cours dans le tour (1 = premiere). */
+  const curBar = $derived.by(() => {
+    if (!curTour) return 0
+    const b = barIndex(currentTime)
+    const b0 = barIndex(curTour.start + 0.01)
+    if (b >= 0 && b0 >= 0) return b - b0 + 1
+    return barDur > 0 ? Math.floor((currentTime - curTour.start) / barDur) + 1 : 0
+  })
+  const pad2 = (n: number) => String(n).padStart(2, '0')
+
+  /** Position et largeur (en % de la vue) d'un intervalle [a, b], borne a la partie visible. */
+  const span = (a: number, b: number) =>
+    `left: ${((Math.max(a, viewStart) - viewStart) / (viewEnd - viewStart)) * 100}%; ` +
+    `width: ${((Math.min(b, viewEnd) - Math.max(a, viewStart)) / (viewEnd - viewStart)) * 100}%`
 
   function cssVar(name: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
@@ -357,6 +433,33 @@
     </div>
   {/if}
 
+  {#if duration > 0 && tours.length}
+    <div class="phrases" aria-label="Phrases">
+      {#each phrases.filter(p => p.end > viewStart && p.start < viewEnd) as p (`${p.section}-${p.j}`)}
+        <button class="phrase mono" class:cur={p === curPhrase} class:first={p.j === 0} style={span(p.start, p.end)}
+          title="phrase {p.j + 1}/{p.n} de la section · {bank?.phrase_bars} mes. · {mmss(p.start)}"
+          onclick={() => seek(p.start)}>P{p.j + 1}</button>
+      {/each}
+    </div>
+    <div class="tours" aria-label="Tours de pattern">
+      {#each tours.filter(t => t.end > viewStart && t.start < viewEnd) as t (`${t.section}-${t.k}`)}
+        <button class="tour mono" class:cur={t === curTour} class:first={t.k === 0} style={span(t.start, t.end)}
+          title="pattern {pad2(t.slot)} · tour {t.k + 1}/{t.n} · {mmss(t.start)} · double-clic = boucle sur ce tour"
+          onclick={() => seek(t.start)} ondblclick={() => setLoop(t.start, t.end)}>
+          {#if t.k === 0}<b>{pad2(t.slot)}</b>{/if} {t.k + 1}/{t.n}</button>
+      {/each}
+    </div>
+    <p class="live mono small" aria-live="off">
+      {#if curTour}
+        pattern <b>{pad2(curTour.slot)}</b> · tour <b>{curTour.k + 1}</b>/{curTour.n}
+        · phrase <b>{curPhrase ? curPhrase.j + 1 : '-'}</b>{curPhrase ? `/${curPhrase.n}` : ''}
+        · mesure <b>{curBar}</b>/{curPatternBars}
+      {:else}
+        <span class="muted">hors structure</span>
+      {/if}
+    </p>
+  {/if}
+
   {#if duration > 0 && harmony}
     <div class="chords" aria-label="Accords par mesure">
       {#each harmony.chords.filter(c => c.end_s > viewStart && c.start_s < viewEnd) as c (c.bar)}
@@ -415,6 +518,19 @@
   .scale { color: var(--text); }
   .scale.uncertain { text-decoration: underline dotted; }
   .chord { color: var(--accent); font-weight: 600; }
+  .phrases, .tours { position: relative; height: 16px; margin-top: 2px; overflow: hidden; }
+  .phrase, .tour {
+    position: absolute; top: 0; height: 16px; padding: 0 3px; border: 0; border-radius: 0;
+    border-left: 1px solid var(--border); background: transparent;
+    font-size: 10px; text-align: left; overflow: hidden; white-space: nowrap; color: var(--muted);
+  }
+  .phrase { background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--border) 35%, transparent) 0 1px, transparent 1px 100%); }
+  .phrase.first, .tour.first { border-left: 2px solid var(--text); }
+  .tour b { color: var(--text); }
+  .phrase.cur, .tour.cur { background: color-mix(in srgb, var(--accent) 25%, transparent); color: var(--text); font-weight: 600; }
+  .phrase:hover, .tour:hover { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+  .live { margin: 4px 0 0; color: var(--muted); }
+  .live b { color: var(--text); }
   .chords { position: relative; height: 16px; margin-top: 2px; overflow: hidden; }
   .chordcell {
     position: absolute; top: 0; height: 16px; padding: 0 3px; border: 0; border-radius: 0;

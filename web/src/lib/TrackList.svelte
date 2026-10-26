@@ -16,7 +16,8 @@
   } = $props()
 
   type Sort = 'alpha' | 'date' | 'bpm' | 'key' | 'energy'
-  interface Filter { q: string; tags: string[]; sort: Sort; bank: boolean; stems: boolean }
+  /** `bpmMin` / `bpmMax` : plage de BPM inclusive, null = pas de borne (7.K2). */
+  interface Filter { q: string; tags: string[]; sort: Sort; bank: boolean; stems: boolean; bpmMin: number | null; bpmMax: number | null }
   type Recall = { q: string; tags: string[] }
   type Sug = { kind: 'tag'; value: string; count: number } | { kind: 'history'; value: Recall } | { kind: 'online'; value: string }
 
@@ -26,7 +27,7 @@
 
   let saved: Partial<Filter> = {}
   try { saved = JSON.parse(localStorage.getItem(FILTER_KEY) ?? '{}') } catch { /* stockage indisponible */ }
-  let f = $state<Filter>({ q: '', tags: [], sort: 'alpha', bank: false, stems: false, ...saved })
+  let f = $state<Filter>({ q: '', tags: [], sort: 'alpha', bank: false, stems: false, bpmMin: null, bpmMax: null, ...saved })
   $effect(() => {
     const snap = JSON.stringify(f)
     try { localStorage.setItem(FILTER_KEY, snap) } catch { /* stockage indisponible */ }
@@ -58,10 +59,13 @@
     const q = f.q.trim().toLowerCase()
     const list = tracks.filter(t => {
       const ts = tagMap.get(t.slug) ?? []
+      const bpm = parseFloat(t.bpm)  // NaN sans BPM : exclu des qu'une borne est posee
       return (!q || `${t.artist} ${t.title} ${t.key} ${ts.join(' ')}`.toLowerCase().includes(q))
         && f.tags.every(x => ts.includes(x))
         && (!f.bank || t.has_bank)
         && (!f.stems || t.has_stems)
+        && (f.bpmMin === null || bpm >= f.bpmMin)
+        && (f.bpmMax === null || bpm <= f.bpmMax)
     })
     const alpha = (a: TrackSummary, b: TrackSummary) => a.artist.localeCompare(b.artist) || a.title.localeCompare(b.title)
     const by: Record<Sort, (a: TrackSummary, b: TrackSummary) => number> = {
@@ -107,6 +111,13 @@
 
   function dropTag(t: string) {
     f.tags = f.tags.filter(x => x !== t)
+  }
+
+  const bpmActive = $derived(f.bpmMin !== null || f.bpmMax !== null)
+  /** Borne de BPM depuis un champ : vide ou non numerique = pas de borne. */
+  function setBpm(which: 'bpmMin' | 'bpmMax', raw: string) {
+    const v = parseFloat(raw)
+    f[which] = Number.isFinite(v) ? v : null
   }
 
   function onkey(e: KeyboardEvent) {
@@ -183,7 +194,16 @@
       </select>
       <label class="small"><input type="checkbox" bind:checked={f.stems} /> stems</label>
       <label class="small"><input type="checkbox" bind:checked={f.bank} /> bank</label>
-      <span class="muted count">{filtered.length}/{tracks.length}</span>
+      <span class="bpm small" class:on={bpmActive} title="Plage de BPM inclusive ; vide = pas de borne">
+        BPM
+        <input type="number" inputmode="decimal" min="0" step="1" placeholder="min" aria-label="BPM minimum"
+          value={f.bpmMin ?? ''} onchange={ev => setBpm('bpmMin', ev.currentTarget.value)} />
+        –
+        <input type="number" inputmode="decimal" min="0" step="1" placeholder="max" aria-label="BPM maximum"
+          value={f.bpmMax ?? ''} onchange={ev => setBpm('bpmMax', ev.currentTarget.value)} />
+        {#if bpmActive}<button class="untag" title="Retirer la plage de BPM" onclick={() => { f.bpmMin = null; f.bpmMax = null }}>×</button>{/if}
+      </span>
+      <span class="muted count" title={bpmActive ? `BPM ${f.bpmMin ?? '…'}–${f.bpmMax ?? '…'}` : ''}>{filtered.length}/{tracks.length}</span>
     </div>
   </div>
   <ul class="tracks">
@@ -228,6 +248,10 @@
   .seg button:first-child { border-radius: 4px 0 0 4px; }
   .seg button:last-child { border-radius: 0 4px 4px 0; margin-left: -1px; }
   .seg button[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); position: relative; }
+  .bpm { display: inline-flex; align-items: center; gap: 3px; color: var(--muted); }
+  .bpm.on { color: var(--accent); }
+  .bpm input { width: 46px; padding: 1px 3px; font-size: 12px; -moz-appearance: textfield; appearance: textfield; }
+  .bpm input::-webkit-outer-spin-button, .bpm input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   .count { margin-left: auto; font-size: 12px; }
   .tracks { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
   .tracks li button {
