@@ -33,6 +33,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.A] Doctrine, révision « phrases » du 2026-10-26 : §2 un pattern main
+  fait 8 mesures et est écrit pour 4 tours (cycle en conditions et
+  p-locks, lignes fixes), patterns de 2-4 mesures réservés aux
+  transitions, slots 1-8 nommés par rôle (intro, mains A et B, variantes,
+  break, drop, sortie) ; §4 la partition de mutes est le scénario par
+  défaut, un mute par phrase de 8, une décision par 16 ou 32, ajouter un
+  instrument = démuter ; §6 principe 3, un étage par changement (tour :
+  conditions, phrase : mutes, section : pattern). KT9 renvoie dessus.
+  Idée hors doctrine notée en SPEC 7.B3 (variations par tour dans la
+  bank), à venir.
 - [7.M] KT9 [[kt-phrasage-tension]] : section « Compter sans compter »,
   les repères de phrase (conventions techno par étage, en regard des
   haltes et roulements mesurés sur Kodaman et Tekotak) et six façons de

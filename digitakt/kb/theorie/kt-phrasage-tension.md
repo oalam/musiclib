@@ -180,7 +180,10 @@ vérifier avec les frontières `structure` et `cues` du sidecar
 
 ## Sur la DT2
 
-Grille de la [[../../doctrine]] §1. Gestes : [[../mutes]] (préparer
+Arbitré dans la [[../../doctrine]] le 2026-10-26 : un pattern main fait 8
+mesures et est écrit pour 4 tours (§2), slots 1-8 par rôle (§2), un mute
+par phrase de 8 et une décision par 16 ou 32 (§4), un étage par changement
+(§6, principe 3). Grille de la doctrine §1. Gestes : [[../mutes]] (préparer
 plusieurs mutes, lâcher sur le 1), [[../fill-conditions]] (`A:B`, `FILL`,
 `LST`), [[../patterns-chaines]] (file d'attente, `CHANGE`),
 [[../microtiming-retrigs]] (retrigs).

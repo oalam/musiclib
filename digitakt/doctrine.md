@@ -1,7 +1,7 @@
 ---
 tags: [digitakt, doctrine, live, set, elektron]
 source: "https://youtu.be/y_YijodbZYI"
-updated: 2026-10-13
+updated: 2026-10-26
 status: living document
 ---
 
@@ -12,6 +12,12 @@ status: living document
 > la sérigraphie DT1) ; 13-14 Id2 bas-médium et Id3 médium-aigu. Cette
 > grille fait foi pour tous les lives, y compris [[doctrine-dt2-solaris]]
 > (cf. SPEC « Décisions 7.L »). Révision précédente : 2026-10-13.
+>
+> **Phrases, révision du 2026-10-26** : un pattern main fait 8 mesures et
+> est écrit pour 4 tours (§2) ; chaque changement a son étage, conditions
+> pour le tour, mutes pour la phrase, pattern pour la section (§4, §6
+> principe 3) ; slots 1-8 nommés par rôle (§2). Le *pourquoi* est dans la
+> KT9 [[kb/theorie/kt-phrasage-tension]].
 
 Règles **arbitrées** pour préparer et jouer un live sur Digitakt II. Elles
 servent aussi de contrat à l'analyzer [[../scripts/README|digitakt.py]]
@@ -91,7 +97,12 @@ Convention de slots proposée (16 patterns par bank) :
 
 | Slots | Usage |
 |---|---|
-| 1-8 | Progression du morceau dans l'ordre de jeu (intro → peak → sortie) |
+| 1 | Intro : peu de tracks, pose le kick et la tonalité |
+| 2-3 | Main A et main B : B diffère d'A par **une seule chose** (note de basse, mélodie, figure de hats) ; chacun écrit pour 4 tours (ci-dessous) |
+| 4-5 | Variantes A' et B' si le morceau en a (transposition, seconde ligne), sinon libres |
+| 6 | Break : kick, rumble et basse absents, atmo et Id1 tournent |
+| 7 | Drop et peak : souvent A ou B rejoué tout démuté, un impact sur le 1 |
+| 8 | Sortie : soustraction en ordre inverse de l'entrée |
 | 9-12 | Variations pour les grosses bascules (drop, break total, double-time) |
 | 13-15 | Patterns **réservoir** : à sortir si l'énergie retombe ou si la salle en redemande |
 | 16 | Copie du pattern modèle (point de départ propre, jamais joué tel quel) |
@@ -100,6 +111,18 @@ Convention de slots proposée (16 patterns par bank) :
 doubles croches. À 190 BPM : 1 mesure = 4 × 60 / 190 = 1,263 s, donc 8 mesures
 = 10,1 s et une phrase de 32 mesures = 4 tours de pattern = 40,4 s. Caler les
 longueurs sur les phrases de 8 / 16 / 32 mesures (cf. §6, principe 6).
+
+**Un pattern main est une phrase de 32 mesures, pas une boucle de 8.** Il
+fait 8 mesures (128 pas, mode PER TRACK pour que `A:B` compte les tours du
+pattern) et il est **écrit pour 4 tours** : son cycle de variations est posé
+en conditions (`1:4` à `4:4`, `NOT 4:4`, `FILL`) et en p-locks, et joue tout
+seul : turnaround sur la dernière mesure en `4:4`, ride en `2:4`, kick coupé
+sur la dernière mesure du tour 4 en `NOT 4:4`, note tendue ou b2 de la
+ligne en `4:4`. Ce qui vit à l'intérieur du pattern est la **variation** ;
+les lignes de basse et de mélodie y restent fixes. Les patterns courts de
+2 ou 4 mesures sont réservés aux transitions et aux FX (track 15), jamais
+aux mains. Repères pour entendre le tour et l'arrivée du 1 : KT9
+[[kb/theorie/kt-phrasage-tension]], section « Compter sans compter ».
 
 ## 3. Conseils qui changent tout en live
 
@@ -140,6 +163,15 @@ C'est exactement ce que l'analyzer extrait d'un morceau de référence : pour ch
 section, quelles tracks sont actives. On lit la « partition de mutes » d'un
 morceau qu'on aime pour s'en inspirer.
 
+**La partition de mutes est le scénario par défaut, pas une consigne.** La
+bank générée (phrases de 8 mesures, cf. SPEC « Décisions 7.B ») donne l'ordre
+d'entrée et de sortie du morceau de référence ; en live on le suit ou on
+s'en écarte, mais à son rythme : **un mute par phrase de 8** (une
+variation), **une décision par 16 ou 32** (entrée ou retour d'une track
+structurante, kick, basse, lead). Ajouter un instrument, c'est démuter une
+track déjà écrite dans le pattern, pas changer de pattern : le pattern main
+est plein, la progression est dans l'ordre des mutes.
+
 ## 5. Fabriquer les FX de transition (track 15)
 
 ### Riser
@@ -177,6 +209,13 @@ le kick disparaît et le riser monte. On relâche : le kick retombe sur le temps
    apparaît, note qui change). Erreur classique : trop changer, trop vite.
 3. **Un changement à la fois**, idéalement toutes les 8, 16 ou 32 mesures.
    Plusieurs changements simultanés = moments forts seulement (drop, bascule).
+   Chaque changement a son **étage** et son outil : le **tour** (8 mesures,
+   variation écrite dans le pattern en conditions et p-locks, joue seul), la
+   **phrase** (32 à 128 mesures, entrée ou sortie d'une track, aux mutes, en
+   live), la **section** (intro, main A ou B, break, drop, sortie : la matière
+   change, ligne de basse ou mélodie, par changement de pattern avec `CHANGE`
+   à 128 pour atterrir sur un tour). Moduler une ligne à chaque tour à la
+   main est l'erreur type : la vraie modulation attend la section.
 4. **Le kick et la basse sont sacrés.** Couper le kick est l'outil le plus
    puissant, à utiliser rarement et au bon moment : un break sans kick marche
    d'autant mieux que le kick a tourné longtemps. Kick et basse doivent
