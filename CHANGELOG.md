@@ -33,6 +33,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.M] KT21 [[kt-basses]] : entrées et sorties de la 9 à l'étage de la
+  décision, en miroir de la table des hats (entrée sur le 1 d'une phrase
+  de 16 ou 32 pour toute la section, pas d'annonce, trou de tension d'un
+  tour, break avec kick et rumble, note changée à la section), cas du
+  kickbass sans basse, exercice 4.
 - [7.M] KT20 [[kt-hats]] : entrées et sorties des tracks 6, 7, 8 à l'étage
   du tour (statut de chaque track, table des durées : entrée 2 tours
   minimum, annonce sur 4 mesures, respiration d'un tour, sortie sur le 1

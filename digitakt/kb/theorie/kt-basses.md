@@ -5,7 +5,7 @@ lot: 1
 ordre: 21
 styles: [tribe, acidcore, frenchcore, hard techno, dnb, dubstep]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-26
 ---
 
 # KT21 — Basses : rythmes et rôles
@@ -141,6 +141,44 @@ Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, basse 9. Gestes :
 [[../fill-conditions]], [[../parameter-preset-locks]], [[../lfo]]
 (wobble).
 
+### Entrées et sorties de la 9 : à l'étage de la décision
+
+Miroir de la table des hats (KT20 [[kt-hats]]) : la basse ne se joue pas au
+tour mais à la **décision** (16 ou 32 mesures). La doctrine §6 principe 4
+la range avec le kick parmi les sacrés ; un outil aussi fort s'use vite,
+donc il se joue rarement et sur des durées longues. Ce qui change par
+rapport aux 6, 7, 8 :
+
+- elle entre sur le 1 d'une phrase de 16 ou 32, tôt (quatrième entrée de
+  la montée, doctrine §4), et fait partie de la normale pour toute la
+  section ;
+- elle ne fait **pas d'annonce** : les 4 dernières mesures avant une
+  frontière appartiennent aux hats et à la 15, retirer la basse à cet
+  endroit vide le grave au moment où il doit frapper ;
+- son retrait est un **événement**, pas une variation ; un tour sans basse
+  avec le kick qui tourne crée une attente que seul son retour sur le 1
+  résout, deux tours au maximum ;
+- pour un break elle sort **avec** le kick et le rumble, les trois en début
+  de phrase, les trois de retour ensemble sur le 1 : le seul cas où trois
+  tracks bougent d'un coup ;
+- sa vraie variation est **harmonique** : la note change à la section, par
+  changement de pattern (doctrine §2, §6 principe 3) ; au tour, une b2 ou
+  une quinte en `4:4` comme turnaround harmonique, pas plus.
+
+| Geste | Durée | Moment |
+|---|---|---|
+| Entrée | toute la section, au moins un cycle de 32 | sur le 1 d'une phrase de 16 ou 32, quatrième entrée de la montée |
+| Trou de tension, kick gardé | 1 tour, 2 au maximum | sur le 1 d'un tour, une ou deux fois par morceau |
+| Break | 8 à 16 mesures | avec le kick et le rumble, ensemble ; retour ensemble sur le 1 |
+| Changement de note | à la section | changement de pattern, une seule chose change à la bascule |
+| Micro-variation | automatique, dans le pattern | `1:2` appel-réponse, `NOT 4:4` sur la dernière mesure du cycle, b2 en `4:4` |
+
+Cas à part en tribe et acid core : quand la 9 est vide et que le kickbass
+tient le grave (grille §1, KT11), il n'y a rien à muter. La tension du
+grave se fait au filtre et à la distorsion du kickbass, et le trou de
+basse devient un trou de kick, donc un break. Point non documenté par les
+sources ([[../../veille-theorie]] §F), à régler à l'oreille.
+
 1. **Dix rythmes, une note (15 min).** Les dix patterns du tableau, dans
    dix patterns copiés du même kick (fiche [[../copier-coller]]), basse
    9 sur la tonique, decay 120 ms. Chaîner, 8 mesures chacun. Noter les
@@ -155,6 +193,11 @@ Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, basse 9. Gestes :
    `PROB` 70 % sur les « a », `2:2` sur un coup supplémentaire au pas 16.
    Laisser tourner 32 mesures sans toucher aux percs : le groove vit sur
    la 9.
+4. **Le trou de basse (10 min).** Pattern main plein, 8 mesures, basse 9
+   sur la tonique. Laisser tourner un cycle de 32. Au 1 du tour suivant,
+   muter la 9 un tour, kick et hats gardés, la remettre sur le 1 ;
+   comparer avec deux tours, puis avec un retrait sur les 4 dernières
+   mesures d'un cycle : entendre pourquoi l'annonce revient aux hats.
 
 ## Pièges
 
@@ -186,7 +229,7 @@ Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, basse 9. Gestes :
 
 ## Liens
 
-[[_index]] · [[../../doctrine]] §6, §9, §11, §12 · [[../rumble-grave]] ·
+[[_index]] · [[../../doctrine]] §2, §4, §6, §9, §11, §12 · [[../../veille-theorie]] §F · [[../rumble-grave]] ·
 [[../send-fx-compresseur]] · [[../keyboard-gammes]] ·
 [[../fill-conditions]] · [[../parameter-preset-locks]] · [[../lfo]] ·
 [[../copier-coller]] · KT1 [[kt-cellules-rythmiques]] · KT3
