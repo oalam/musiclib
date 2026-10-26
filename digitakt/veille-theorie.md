@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, veille, theorie, rythme, harmonie, curation]
-updated: 2026-10-15
+updated: 2026-10-26
 status: arbitré le 2026-10-15 (SPEC « Décisions 7.M »)
 ---
 
@@ -505,3 +505,74 @@ Format et emplacement à arbitrer (voir questions en fin de note).
 Liens : [[veille-live]] · [[doctrine]] · [[kb/_index]] ·
 [[../refs/free-tek-sources]] · [[../inspirations/sets]] ·
 [[../technique/patches/_index]]
+
+---
+
+## F. Veille du 2026-10-26 : phrases, tension, kick / basse
+
+Recherche web ciblée (14 requêtes, 20 pages ouvertes) pour creuser KT9
+[[kb/theorie/kt-phrasage-tension]] (progression par phrases d'un morceau
+qui tourne sur une boucle) et le couple kick / basse (KT5
+[[kb/theorie/kt-tonalite-du-grave]], [[kb/rumble-grave]]). Limites : aucun
+résultat YouTube exploitable (pas de chapitres vérifiables), toutes les
+valeurs chiffrées sont données pour 125-140 BPM et **aucune n'est recalée
+pour 170-200 BPM**. Statut `[V]` partout sauf mention.
+
+### Arrangement et phrases (thème KT9)
+
+| Source | Ce qu'elle apporte de concret |
+|---|---|
+| TrackSensei, *How to Arrange a Techno Track (Bar-by-Bar)*, 2026-07, <https://tracksensei.com/blog/how-to-arrange-a-techno-track> | plan de 192 mesures en blocs de 32 (batterie, +basse, +stab, réduction sans kick 16-32 max, pic, outro) ; jamais 24 ; un seul paramètre par bloc de 16-32 qui revient sec à la frontière ; hats retirés sur les 4 dernières mesures d'un bloc, kick coupé 8 mesures avant le pic ; un seul crash par frontière ; le drop techno = retour du kick |
+| Myloops, *Techno Automation: 11 Moves*, 2026, <https://www.myloops.net/using-automation-to-keep-techno-interesting> | 16 mesures = unité de base ; transformer plutôt qu'ajouter ; ouverture de filtre concentrée sur les mesures 13-16, send reverb de rien à -6 dB sur 15-16 puis retour, clap coupé une mesure sur 8, kick -2 demi-tons sur les deux derniers temps de la mesure 16, profondeur de LFO de 10 à 80 % sur 32 mesures ; audit des « zones mortes » au milieu des blocs de 32 et 64 |
+| The Acid Mind, *Hypnotic Techno: Repetition, Space and Subtle Motion*, 2026-08, <https://www.theacidmind.com/2026/08/hypnotic-techno-repetition-space-production/> | plan de 64 mesures (16 kick-basse-perc, 16 seconde voix, 16 retrait d'un grave, 16 retour accentué) ; breakdowns de 2 ou 4 mesures seulement ; modulations de 4 ou 8 mesures sur des divisions différentes ; couper un coup attendu juste avant le retour de boucle ; boucles de 3 ou 5 pas pour le déphasage |
+| Attack Magazine, *4 Ways To Break Out Of The Loop*, Adam Douglas, 2020-07, <https://www.attackmagazine.com/technique/tutorials/4-ways-to-break-out-of-the-loop/> | copier la structure d'une référence en notant chaque entrée et sortie ; blocs de 8 ou 16 ; sortie par soustraction en ordre inverse de l'entrée ; notion de turnaround |
+| Elektronauts, *Simple Tips in Techno Structure*, 2021, <https://www.elektronauts.com/t/simple-tips-in-techno-structure/151609> | « quelque chose change toutes les 15 s » (soit 12 mesures à 190) ; +1 élément et -2 toutes les 16 mesures avec un FX avant la frontière ; construire la boucle principale et le climax d'abord, puis à rebours ; stratégie (forme) contre tactiques (passage) |
+| Attack Magazine, *What is the recipe for an effective breakdown?*, 2023-03, <https://www.attackmagazine.com/technique/the-breakdown/what-is-the-recipe-for-an-effective-breakdown/> | breakdowns de 24 (3 × 8) et 32 mesures analysés à la minute ; un seul accord répété comme tension ; tout coupé deux temps avant le retour ; exemples house, à transposer |
+
+### Arrangement sur Elektron, mutes et conditions (thème machine)
+
+| Source | Ce qu'elle apporte |
+|---|---|
+| Elektronauts, Olaf Wolkenhauer, *Turning a DAW track into a Digitakt live performance*, 2017-07, <https://www.elektronauts.com/t/turning-a-daw-track-into-a-digitakt-live-performance-tutorial-how-to/42056> | six sections par mutes sur un seul pattern (intro, transition, break percussif sans kick, core loop, break mélodique, outro) ; `FILL` pour les breaks courts, `NOT FILL` pour le motif normal, `3:3` pour un élément un cycle sur trois, `1ST` pour l'impact d'entrée ; ride en `FILL` sur 3-7-11-15 contre ride + OH en `NOT FILL` sur 1-5-9-13 ; limite signalée sur DT1 : `1ST` ne se réinitialise pas à la resélection du pattern, à vérifier sur DT2 |
+| Elektronauts, *How do you use conditional triggers?*, 2017, <https://www.elektronauts.com/t/how-do-you-use-conditional-triggers/42272> | `2:2` sur un pattern de 4 mesures = fill au second passage ; `1:2` / `1:4` en début de pattern et `2:2` / `4:4` en fin pour allonger la période perçue (`2:2` = 8 mesures, `2:3` = 12, `2:4` = 16 sur un pattern de 4) ; deux trigs voisins en `1:2` et `2:2` avec micro-timing = deux phrases dans un pattern ; lock trigs en `FILL` ; trop de conditions = aléatoire non musical |
+| Elektronauts, *Playing the sequencer*, 2023-06, <https://www.elektronauts.com/t/playing-the-sequencer/195806> | fill verrouillé au début d'un pattern pour libérer une main ; conditions longues (`7:8`) pour séquencer des effets et macros |
+| Elektronauts, *Help on my journey to my first techno track*, 2016 (Octatrack), <https://www.elektronauts.com/t/help-on-my-journey-to-my-first-techno-track/27776> | « partir du milieu » : boucle complète en A9, copies simplifiées vers A1, enrichies vers A16, puis jouer A1 à A16 en variant les durées |
+
+### Kick, rumble, basse (thème KT5 et rumble-grave)
+
+| Source | Ce qu'elle apporte |
+|---|---|
+| Myloops, *How To Build a Techno Kick Rumble That Actually Mixes*, <https://www.myloops.net/creating-techno-kick-rumbles> | la chaîne la plus chiffrée : kick 150-300 ms, fondamentale 50-65 Hz accordée tonique / quinte / octave ; HPF 100-150 Hz avant reverb ; reverb 100 % wet, pre-delay 0, decay 1,5 s (au-dessus de 135 BPM) à 3 s ; LPF 24 dB/oct après reverb à 200-250 Hz (peak) ou 130-170 Hz (hypnotique) ; sidechain du retour 4:1 à 8:1, release 100-200 ms (une croche) ; mono sous 120 Hz ; sub 20-60 Hz = kick seul, 60-150 Hz = rumble, la basse au-dessus ; LPF résonant automatisé sur 16-32 mesures ; version resamplée : 2 mesures, mixée 3-6 dB sous le kick. À 180-200 BPM la croche vaut 150-167 ms, viser un decay de 1 à 1,5 s |
+| Attack Magazine, *Sculpting Warehouse-Style Rolling Techno Basslines*, Aykan Esen, 2020-07, <https://www.attackmagazine.com/technique/tutorials/warehouse-rolling-techno-bass/> | basse en trois couches (sub = queue de kick LPF 80 Hz, synthé HPF 65 / LPF 350 Hz, percussive = kick + delay 1/16) ; la tonalité du kick fixe celle de la basse, cloche de -4,5 dB dans le kick à la fondamentale de la basse ; **la basse laisse la double-croche du kick vide** : un placement de trigs avant tout compresseur |
+| Futureproof, *How to Make Hard Techno: Kick Design, Rumble, and Club Mixing*, 2026-08, <https://futureproofmusicschool.com/blog/making-hard-techno-a-path-to-unique-sound-design> | rumble en send : reverb 3-5 s, distorsion **après** la reverb, HPF 30 Hz, shelf au-dessus de 150-200 Hz, retour en mono et sidechainé ; désaccord avec Myloops sur le HPF (30 Hz contre 100-150 avant reverb) et le decay |
+| Gearnews, *Sidechain Compression in Techno*, Marcus Schmahl, 2026-06, <https://www.gearnews.com/sidechain-compression-in-techno-workshop/> | règle « release max = 60 000 / BPM » (300-333 ms à 180-200, viser 120-200 ms) ; attaque 1-10 ms, 6-12 dB de réduction ; multibande sur la basse (8-12 dB sous 200 Hz, 2-4 dB jusqu'à 2 kHz) ; ghost kick ; ducking déclenché sur le contretemps, non détaillé |
+| Elektronauts, *Elektron Syntakt techno rumble*, 2022-08, <https://www.elektronauts.com/t/elektron-syntakt-techno-rumble/178253> | recettes sans DAW : kick dupliqué décalé de 2 pas, HPF, reverb + delay ; **LFO one-shot sur le send** pour n'envoyer que le corps du kick ; rumble par résonance de filtre et p-locks sans reverb. Même famille que [[kb/tutos/maison-rumble-dans-le-kick]] |
+| Bonedo, *Bass Drum Rumble & Rattle for Techno*, 2022-04, <https://www.bonedo.de/?p=932209> (allemand) | rumble par delay + reverb + LPF 250 Hz ; variante multibande (croches sous 200 Hz, triolets 200-1000, doubles-croches au-dessus) ; automation de 1-2 dB du send |
+| Audiofanzine, *[TUTO] Faire un kick tribe / hardcore / acid core*, 2019-04, <https://fr.audiofanzine.com/groove-machine/korg/electribe-2014/forums/t.689392,tuto-faire-un-kick-tribe-hardcore-acid-core.html> (FR) ; *kick / bass pour acidcore ?*, 2016, <https://fr.audiofanzine.com/groove-machine/korg/electribe-emx-1/forums/t.616849,kick-bass-pour-acidcore.html> (FR) | seules sources trouvées sur le couple kick / basse en acid core, et en une phrase : « pour une basse en contretemps, decay court », kick « souffle » seul quand la basse domine ; aucun Hz, aucun accordage |
+
+### Ce qui converge, ce qui manque
+
+- **Convergence sur le phrasage** : 16 mesures = unité de décision, 32 =
+  section, 8 = fill, jamais 24 ; un seul changement perceptible par
+  frontière ; la rupture est **annoncée** quelques mesures avant (hats
+  retirés sur les 4 dernières, send de reverb qui monte sur 15-16, fill en
+  `2:2`). Cohérent avec KT9 et la doctrine §6 ; les recettes « fin de
+  bloc » nourrissent la section « Compter sans compter » de la KT9.
+- **Convergence sur la tension hypnotique** : soustraction, kick retiré,
+  drop = retour du kick, narration au filtre avec l'ouverture concentrée
+  sur la fin du bloc.
+- **Convergence sur le grave** : le kick possède seul le sub (20-60 Hz),
+  le rumble vit en 60-150 Hz, la basse au-dessus ou duckée, tout accordé,
+  mono sous 120 Hz, la basse évite la double-croche du kick par placement.
+- **Désaccords** : HPF du rumble (30 contre 100-150 Hz), decay de reverb
+  (1,5-3 contre 3-5 s), release du sidechain (une croche contre 200-350
+  ms), ordre reverb / distorsion. Deux points de départ, à trancher à
+  l'oreille sur nos BPM.
+- **Trous, candidats pour une KT maison** : le **kickbass** (kick tenant
+  lieu de basse) contre kick + basse en contretemps en tribe et acid core,
+  à peine effleuré ; l'accordage kick / basse / rumble en intervalles
+  (tonique, quinte, octave) jamais chiffré ; la conduite d'une progression
+  par phrases **avec les seules conditions et mutes de la DT2** (les fils
+  Elektronauts datent de la DT1, les blogs supposent une DAW). Les
+  références de la library et les passes `rhythm_signature` restent la
+  seule source pour ces trois sujets.

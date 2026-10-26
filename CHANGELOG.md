@@ -8,6 +8,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] [[veille-theorie]] §F : veille web du 2026-10-26 sur les phrases, la
+  tension et le couple kick / basse (17 sources ouvertes, trois tableaux par
+  thème, convergences, désaccords chiffrés et trous à combler par des KT
+  maison : kickbass contre kick + basse, accordage du grave en intervalles,
+  progression par phrases aux seules conditions et mutes de la DT2).
 - [7.K2] Lecture par phrases dans le front : sous la forme d'onde, deux
   bandes tirées de la bank, les **phrases** (`phrase_bars` mesures, qui
   repartent à chaque section comme la partition de mutes) et les **tours de
