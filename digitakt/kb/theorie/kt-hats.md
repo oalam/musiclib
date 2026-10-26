@@ -183,8 +183,12 @@ moitié, un élément par frontière ([[../../veille-theorie]] §F).
 
 Sur la DT2, les gestes au tour se **préparent dans le pattern** (doctrine
 §2, pattern main écrit pour 4 tours) : hats de la dernière page en `NOT
-4:4` pour l'annonce automatique, ride en `3:4` et `4:4` pour l'entrée à la
-moitié du cycle (fiche [[../fill-conditions]]). Les mutes gardent les
+4:4` pour l'annonce automatique ; pour une ride qui n'entre qu'à la moitié
+du cycle, une condition par trig ne suffit pas (`3:4` et `4:4` ne tiennent
+pas sur le même pas) : `NOT 1:4` (tours 2 à 4), ou deux trigs voisins
+micro-timés en `3:4` et `4:4`, ou plus simplement les mutes, puisqu'une
+entrée de deux tours est une décision (fiche [[../fill-conditions]],
+[[../tutos/maison-progression-par-phrases]]). Les mutes gardent les
 entrées et sorties à l'étage de la phrase, et la main reste libre pour la
 décision qui compte.
 
@@ -203,7 +207,7 @@ décision qui compte.
    64. Trois mesures pour le recalage ; `1:4` sur le hat ouvert pour
    marquer la phrase malgré le cycle de 3.
 5. **Entrées et sorties (10 min).** Pattern main plein, 8 mesures. Hats
-   de la page 8 en `NOT 4:4`, ride en `3:4` + `4:4`. Laisser tourner deux
+   de la page 8 en `NOT 4:4`, ride en `NOT 1:4`. Laisser tourner deux
    cycles sans toucher : l'annonce et l'entrée de la ride se font seules.
    Puis aux mutes : couper la 8 un tour au milieu du troisième cycle,
    la remettre sur le 1 ; comparer avec un retrait de deux tours.

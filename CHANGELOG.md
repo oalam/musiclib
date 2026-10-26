@@ -8,6 +8,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB tutos : session 3 [[elektronauts-un-pattern-six-sections]]
+  (Wolkenhauer 2017, un morceau entier sur un seul pattern Digitakt, six
+  sections aux mutes, `FILL` / `NOT FILL` pour deux sons par track, `3:3`,
+  `1ST`, one-shots aux touches de track, transposé sur notre grille) et
+  recette maison 2 [[maison-progression-par-phrases]] (pattern main écrit
+  pour 4 tours en conditions, partition de mutes sur trois cycles de 32,
+  changement de pattern à une seule différence ; piège d'une condition par
+  trig et pas voisin micro-timé). Le lot 1 accepte les sessions écrites.
 - [7.M] [[veille-theorie]] §F : veille web du 2026-10-26 sur les phrases, la
   tension et le couple kick / basse (17 sources ouvertes, trois tableaux par
   thème, convergences, désaccords chiffrés et trous à combler par des KT
@@ -80,6 +88,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.M] KT20 [[kt-hats]] proposait une ride en `3:4` et `4:4` sur les mêmes
+  trigs : une condition par trig, donc `NOT 1:4`, deux trigs voisins
+  micro-timés, ou les mutes.
 - [7.M] [[rumble-grave]] plaçait `OVER` sur la page AMP ; l'overdrive est
   sur la page FX (manuel §11.8), avec `OD.RT` pour le passer avant ou après
   le filtre.

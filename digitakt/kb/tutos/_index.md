@@ -1,13 +1,14 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-25
+updated: 2026-10-26
 ---
 
 # KB tutos — sessions vidéo décortiquées
 
-Trois sortes de fiches. Le lot 1 tire ses fiches de **tutos vidéo complets**
-(une session de production ou de live, du pattern vide au pattern plein),
-rédigées à partir de la transcription et des chapitres YouTube. Le lot 2
+Trois sortes de fiches. Le lot 1 tire ses fiches de **sessions complètes**
+(une production ou un live, du pattern vide au pattern plein), vidéo
+rédigée depuis la transcription et les chapitres YouTube, ou fil écrit
+quand l'auteur y déroule toute sa session. Le lot 2
 tire les siennes d'un **fil de forum** (Elektronauts, *Digitakt II Tips &
 Tricks*), une fiche par famille d'astuces, chaque astuce déroulée pas à pas.
 Le lot 3 consigne des **recettes maison** : une idée venue en travaillant,
@@ -61,6 +62,7 @@ rien). Statut `draft` tant que la recette n'a pas été rejouée.
 |---|---|---|---|---|
 | 1 | [[synthackers-techno-session]] | Synthackers (James Orvis) | DT2 | draft |
 | 2 | [[synthackers-techno-acid]] | Synthackers (James Orvis) | DT2 | draft |
+| 3 | [[elektronauts-un-pattern-six-sections]] | Olaf Wolkenhauer (Elektronauts, fil écrit) | DT1 | draft |
 
 ## Lot 2 — Astuces Elektronauts (fil Digitakt II)
 
@@ -88,3 +90,4 @@ Source : <https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556>
 | # | Fiche | Idée | Recettes | Statut |
 |---|---|---|---|---|
 | 1 | [[maison-rumble-dans-le-kick]] | rumble dans la queue sèche du kick (track 1), sans resample | 4 | draft |
+| 2 | [[maison-progression-par-phrases]] | pattern main écrit pour 4 tours, partition de mutes sur 3 cycles, changement de pattern à une seule différence | 3 | draft |
