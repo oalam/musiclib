@@ -160,7 +160,9 @@ Gestes : [[../rumble-grave]] (recette du rumble), [[../kick-mental-vst]]
   départ à trancher à l'oreille, détail dans [[../rumble-grave]].
 - Personne n'écrit sur le **kickbass** ni ne chiffre l'accordage kick /
   basse / rumble en intervalles (tonique, quinte, octave n'est cité qu'en
-  passant) : sur ces deux points, les références de la library font foi.
+  passant) : sur ces deux points, les références de la library font foi ;
+  le choix d'architecture du grave est traité dans KT23
+  [[kt-kickbass-contre-kick-basse]].
 
 ## Ressources
 

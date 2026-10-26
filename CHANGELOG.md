@@ -8,6 +8,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KT23 [[kt-kickbass-contre-kick-basse]] : qui tient le sub, trois
+  architectures du grave (kickbass, kick + rumble, kick + basse) ancrées
+  sur `kt_kick_profile` : Neurotribe *Le côté obscur* et Six ou Sept *Acid
+  Pirate* (banks générées, sub entre les kicks dans le stem drums à +5,5 et
+  +3,2 dB, stem bass à -2,7 et -17 dB) et les cinq kicks tribe de KT10 ;
+  une architecture à la fois, ce que chacune permet, contrainte de tempo
+  du kickbass saturé, changement par le break ; quatre exercices.
 - [7.M] KB tutos : session 3 [[elektronauts-un-pattern-six-sections]]
   (Wolkenhauer 2017, un morceau entier sur un seul pattern Digitakt, six
   sections aux mutes, `FILL` / `NOT FILL` pour deux sons par track, `3:3`,

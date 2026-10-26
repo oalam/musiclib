@@ -83,6 +83,10 @@ toucher au sub. C'est la **séparation en fréquences** de KT5 poussée à
 l'extrême : une track pour tout le grave, une track pour tout le
 médium. L'autre moitié (Six ou Sept, Captain 303) garde une basse offbeat
 `X.x.X.x.` : c'est l'acid tribe, à la frontière.
+Mesuré le 2026-10-26 au profil du kick (KT23
+[[kt-kickbass-contre-kick-basse]]) : sur Neurotribe et Six ou Sept, le sub
+entre les kicks est dans le stem drums (+5,5 et +3,2 dB), le stem bass ne
+porte rien (-2,7 et -17 dB), l'un saturé, l'autre sinus.
 
 **Phrygien et b2.** Neurotribe fait bouger sa fondamentale de E à F : un
 demi-ton, la b2 phrygienne (KT6) en mouvement de basse, le geste

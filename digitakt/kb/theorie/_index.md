@@ -64,6 +64,7 @@ SORT lot ASC, ordre ASC
 | 7 | Tensions et lignes | [[kt-tensions-lignes]] | pentatonique, blue note, b2, triton, chromatisme, atonalité contrôlée | générateur acid 9.A | draft |
 | 8 | Accords, voicings, rythme harmonique | [[kt-accords-voicings]] | min7 / min9 / sus / quintes nues, voicing ouvert, accords monophoniques, Camelot | doctrine §11 | draft |
 | 9 | Phrasage et tension | [[kt-phrasage-tension]] | 4 / 8 / 16 / 32, build / breakdown / drop, soustraction, call and response, turnaround | doctrine §6, [[../mutes]], [[../patterns-chaines]] | draft |
+| 23 | Kickbass contre kick + basse | [[kt-kickbass-contre-kick-basse]] | qui tient le sub : kickbass (Neurotribe, Six ou Sept), kick-sub (Floxytek), kick + rumble (Kodaman), kick + basse (Tekotak) mesurés par `kt_kick_profile` ; une architecture à la fois, ce que chacune permet, changement par le break | KT5, KT10, KT11, KT21, [[../kick-mental-vst]], [[../rumble-grave]] | draft |
 
 ### Lot 3 — Styles cœur du live
 
