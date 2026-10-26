@@ -5,7 +5,7 @@ lot: 1
 ordre: 20
 styles: [tribe, acidcore, tekno, hard techno, dnb]
 statut: draft
-updated: 2026-10-15
+updated: 2026-10-26
 ---
 
 # KT20 — Hats, ride et haut du spectre
@@ -154,6 +154,40 @@ shaker sur la perc 4. Gestes : [[../parameter-preset-locks]] (vélocités,
 preset lock), [[../microtiming-retrigs]], [[../polymetrie]],
 [[../euclidien]], [[../fill-conditions]], [[../oneshots-synthe]] (AMP).
 
+### Entrées et sorties des 6, 7, 8 : à l'étage du tour
+
+Les trois tracks se jouent au **tour** (8 mesures), pas à la phrase : c'est
+la couche de densité spectrale, la moins chère à bouger, donc celle qui
+bouge le plus souvent et le plus brièvement. Kick et basse ne bougent qu'à
+la décision (16 ou 32), doctrine §6 principe 3 et KT9. Les trois n'ont pas
+le même statut : la **6** (hat fermé) fait partie du moteur avec le kick,
+elle entre à la deuxième phrase et reste, la couper est un geste de break ;
+la **7** et la **8** sont les faders d'énergie, elles entrent tard, sortent
+tôt, et portent les annonces et les respirations. Un seul élément entre ou
+sort par frontière de 8 ; les deux ensemble seulement au drop.
+
+| Geste | Durée | Moment |
+|---|---|---|
+| Entrée de la 7 ou de la 8 | 2 tours minimum, souvent jusqu'au peak | sur le 1 d'un tour, de préférence le tour 3 du cycle (la ride entre à la moitié) |
+| Retrait d'annonce | 4 mesures, un demi-tour | les 4 dernières mesures avant une frontière de 32 |
+| Respiration au milieu d'un plateau | 1 tour | au milieu d'un cycle long, là où le morceau meurt sinon |
+| Sortie définitive | sur le 1 d'une phrase de 16 | la 8 d'abord, la 7 une phrase plus tard, ordre inverse de l'entrée |
+
+La règle derrière la table : un élément doit avoir tourné assez longtemps
+pour devenir la normale avant que son retrait fasse effet. Une ride qui
+entre pour un seul tour est entendue comme un fill, pas comme une entrée ;
+un retrait d'un tour ou d'un demi-tour est entendu comme une annonce ;
+deux tours ou plus, c'est un nouvel état. Sources : hats retirés sur les 4
+dernières mesures d'un bloc (TrackSensei, Myloops), ride sur la seconde
+moitié, un élément par frontière ([[../../veille-theorie]] §F).
+
+Sur la DT2, les gestes au tour se **préparent dans le pattern** (doctrine
+§2, pattern main écrit pour 4 tours) : hats de la dernière page en `NOT
+4:4` pour l'annonce automatique, ride en `3:4` et `4:4` pour l'entrée à la
+moitié du cycle (fiche [[../fill-conditions]]). Les mutes gardent les
+entrées et sorties à l'étage de la phrase, et la main reste libre pour la
+décision qui compte.
+
 1. **Trois boucles, même kick (10 min).** Les boucles A, B, C du
    paragraphe « concret d'abord », dans trois patterns copiés du même
    kick (fiche [[../copier-coller]]). Chaîner, 8 mesures chacune, nommer
@@ -168,6 +202,11 @@ preset lock), [[../microtiming-retrigs]], [[../polymetrie]],
 4. **Hat polymétrique (5 min).** Track 6 à 12 pas, E(5, 12), `RESET` à
    64. Trois mesures pour le recalage ; `1:4` sur le hat ouvert pour
    marquer la phrase malgré le cycle de 3.
+5. **Entrées et sorties (10 min).** Pattern main plein, 8 mesures. Hats
+   de la page 8 en `NOT 4:4`, ride en `3:4` + `4:4`. Laisser tourner deux
+   cycles sans toucher : l'annonce et l'entrée de la ride se font seules.
+   Puis aux mutes : couper la 8 un tour au milieu du troisième cycle,
+   la remettre sur le 1 ; comparer avec un retrait de deux tours.
 
 ## Pièges
 
@@ -197,7 +236,7 @@ preset lock), [[../microtiming-retrigs]], [[../polymetrie]],
 
 ## Liens
 
-[[_index]] · [[../../doctrine]] §1, §6 · [[../parameter-preset-locks]]
+[[_index]] · [[../../doctrine]] §1, §2, §6 · [[kt-phrasage-tension]] · [[../../veille-theorie]] §F · [[../fill-conditions]] · [[../parameter-preset-locks]]
 · [[../microtiming-retrigs]] · [[../polymetrie]] · [[../euclidien]] ·
 [[../fill-conditions]] · [[../oneshots-synthe]] · [[../copier-coller]] ·
 KT1 [[kt-cellules-rythmiques]] · KT2 [[kt-polymetrie-polyrythmie]] · KT3

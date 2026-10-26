@@ -33,6 +33,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.M] KT20 [[kt-hats]] : entrées et sorties des tracks 6, 7, 8 à l'étage
+  du tour (statut de chaque track, table des durées : entrée 2 tours
+  minimum, annonce sur 4 mesures, respiration d'un tour, sortie sur le 1
+  d'une phrase de 16 en ordre inverse), préparation dans le pattern en
+  `NOT 4:4` et `3:4`, exercice 5.
 - [7.A] Doctrine, révision « phrases » du 2026-10-26 : §2 un pattern main
   fait 8 mesures et est écrit pour 4 tours (cycle en conditions et
   p-locks, lignes fixes), patterns de 2-4 mesures réservés aux
