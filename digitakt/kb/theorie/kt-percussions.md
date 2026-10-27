@@ -20,7 +20,8 @@ presque toujours un pattern où ces trois rôles ne sont pas distribués.
 ## Signature
 
 Bande mid (200-2000 Hz) de la passe `rhythm_signature` du hub
-([[_index]]), moyennes par style ; convention `1 e et a` par temps. Le
+([[_index]]), moyennes par style ; convention `1 e et a` par temps (pas 1 = temps,
+2 = « e », 3 = « et », 4 = « a »). Le
 kick, replié dans le mid par son corps, donne le `X` des pas 1, 5, 9, 13 :
 lire ce qui reste autour.
 
@@ -47,8 +48,10 @@ percs ») se lit dans la table : le mid se vide.
   kick ni la basse ; clap, snare, rim, toms, congas, blocs, cloches.
 - **Backbeat** : clap ou snare sur les temps 2 et 4 (`....x.......x...`),
   la réponse au kick de la techno droite (KT4).
-- **Clap anticipé** : le clap sur le pas 15, une anticipation du 1 plutôt
-  qu'un backbeat ; mesuré sur Tekotak (KT10).
+- **Clap sur le « et » du 4** : le clap sur le pas 15, le contretemps du
+  dernier temps, une croche avant le 1 ; ce n'est pas un « a » (le pas
+  16) mais il tire vers le 1 comme le rebond du kick (KT10) ; mesuré sur
+  Tekotak.
 - **Tom** (track 4, code TM) : percussion à hauteur ; sa note se règle,
   elle appartient à la tonalité du kick (KT5).
 - **Rim** (rimshot, code SD/RIM) : coup court et sec de 500 Hz-2 kHz, sans
@@ -172,7 +175,7 @@ par famille au 2026-10-27, 48 disponibles chacune.
 
 | Code / sous-catégorie | Exemples retenus | Track | Rôle |
 |---|---|---|---|
-| CP, SD | `CP Clean 01 909`, `SD Snares 04 909` | 3 | backbeat ou clap anticipé |
+| CP, SD | `CP Clean 01 909`, `SD Snares 04 909` | 3 | backbeat ou clap sur le pas 15 |
 | SD / RIM | `SD Rim 01 909`, `SD Rim Avo ni` | 3 en techno hypnotique, 5 sinon | coup sec sans queue |
 | TM | `TM Toms 01 909`, `TM Ht 01 909`, `TM Floor Dir 01 ni` | 4 | la voix accordée ; `TUNE` sur la tonique ou la quinte du kick |
 | PC / SKIN | `PC Conga Anarc gre`, `PC Fill 01 mrd` | 4 | la voix accordée, matière peau |

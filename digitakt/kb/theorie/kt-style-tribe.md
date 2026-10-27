@@ -189,7 +189,8 @@ de la doctrine §1, rôles actuels) :
 Lecture : le **rumble** est détecté sur le pas qui suit chaque kick (il
 gonfle après l'attaque, ducké pendant, doctrine §9) ; la **basse** est en
 contretemps strict (pas 3, 7, 11, 15, KT21) ; le clap tombe sur le pas 15,
-une **anticipation** du 1 plutôt qu'un backbeat ; le hat ouvert vit sur la
+le « et » du temps 4, un contretemps une croche avant le 1 plutôt qu'un
+backbeat ; le hat ouvert vit sur la
 seconde moitié de mesure (pas 9, 11, 15) ; la perc B double les temps 2 et
 3. Au peak (pattern 07) : clap sur 3 et 15, hat ouvert en `..x.......x.x.x.`,
 perc B en `....x...x.x.x...`, basse qui ajoute le pas 16 ; la dernière
