@@ -257,4 +257,4 @@ sources ([[../../veille-theorie]] §F), à régler à l'oreille.
 [[kt-swing-microtiming]] · KT5 [[kt-tonalite-du-grave]] · KT8
 [[kt-accords-voicings]] · KT9 [[kt-phrasage-tension]] · KT10
 [[kt-style-tribe]] · KT11 [[kt-style-acidcore]] · KT12
-[[kt-style-frenchcore]] · KT20 [[kt-hats]]
+[[kt-style-frenchcore]] · KT20 [[kt-hats]] · KT24 [[kt-percussions]]

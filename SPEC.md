@@ -431,7 +431,10 @@ mutes, FX de transition, principes d'arc).
    § E (9 socle, 4 styles cœur, 6 connexes), pas de regroupement.
    Complément du 2026-10-15 (soir) : KT20 hats et KT21 basses ajoutées au
    lot 1 (socle rythmique), 21 KT au total ; le rebond du kick (doublé
-   martial) est rangé dans KT10 tribe.
+   martial) est rangé dans KT10 tribe. KT22 (astuces Elektronauts)
+   déplacée en kb/tutos le 2026-10-23 ; KT23 kickbass contre kick + basse
+   (lot 2) ajoutée le 2026-10-26, KT24 percussions (lot 1, tracks 3-4-5,
+   miroir de KT20 et KT21) le 2026-10-27 : 23 KT au total.
 3. Ordre de rédaction : socle KT1-KT9 d'abord, puis styles cœur, puis
    connexes. Un lot par session.
 4. Ancrage : avant chaque KT, passe `rhythm_signature` (sidecars

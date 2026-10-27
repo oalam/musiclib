@@ -246,4 +246,4 @@ décision qui compte.
 KT1 [[kt-cellules-rythmiques]] · KT2 [[kt-polymetrie-polyrythmie]] · KT3
 [[kt-swing-microtiming]] · KT9 [[kt-phrasage-tension]] · KT10
 [[kt-style-tribe]] · KT13 [[kt-style-hard-techno]] · KT21
-[[kt-basses]]
+[[kt-basses]] · KT24 [[kt-percussions]]

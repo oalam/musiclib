@@ -361,4 +361,4 @@ Patch Tidal équivalent : [[../../../technique/patches/tribe]].
 [[../../../library/digitakt/kodaman_-_beton]] · KT1
 [[kt-cellules-rythmiques]] · KT3 [[kt-swing-microtiming]] · KT5
 [[kt-tonalite-du-grave]] · KT9 [[kt-phrasage-tension]] · KT11
-[[kt-style-acidcore]]
+[[kt-style-acidcore]] · KT24 [[kt-percussions]]

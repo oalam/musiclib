@@ -8,6 +8,16 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
+  mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
+  `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois
+  sons (répond au kick, parle, répond ou boucle), cellules de 8 pas et
+  rotation, tom accordé sur tonique / quinte / octave avec passe-haut,
+  delay 3/16 comme polymétrie gratuite, table d'entrées et sorties à
+  l'étage de la phrase (miroir de KT20 et KT21), break percussif, et qui
+  va sur quelle track dans la banque de samples (TM et SKIN en 4, WOOD et
+  METAL en 5, SHAKER en 4 seulement en hard techno ; constat sur le kit
+  Solaris : peau, peau, peau, aucun TM en bank C-TRIBE) ; cinq exercices.
 - [7.M] KT23 [[kt-kickbass-contre-kick-basse]] : qui tient le sub, trois
   architectures du grave (kickbass, kick + rumble, kick + basse) ancrées
   sur `kt_kick_profile` : Neurotribe *Le côté obscur* et Six ou Sept *Acid

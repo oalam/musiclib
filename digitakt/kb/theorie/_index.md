@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, kb, theorie, kt, index]
-updated: 2026-10-23
+updated: 2026-10-27
 spec: "7.M"
 ---
 
@@ -8,7 +8,8 @@ spec: "7.M"
 
 Notes de transmission (KT) sur la **construction rythmique et harmonique**
 d'un morceau (19 arbitrées le 2026-10-15, plus KT20 hats et KT21 basses
-ajoutées le soir même au lot 1), style par style, pour enrichir le vocabulaire de musicien par
+ajoutées le soir même au lot 1, KT23 kickbass le 2026-10-26 et KT24
+percussions le 2026-10-27), style par style, pour enrichir le vocabulaire de musicien par
 la pratique. Source : [[../../veille-theorie]] (veille du 2026-10-15) ;
 décisions : [[../../../SPEC]] « Décisions 7.M ». Les fiches de [[../_index]]
 disent *comment* faire le geste sur la machine ; une KT dit *pourquoi* et
@@ -35,7 +36,7 @@ exercices joués). Sections, dans cet ordre :
 Convention : 16 pas = 1 mesure 4/4 en doubles croches ; `x` trig, `.` vide,
 `X` accent.
 
-## Les 22 KT (Dataview)
+## Les 23 KT (Dataview)
 
 ```dataview
 TABLE WITHOUT ID ordre AS "#", file.link AS "KT", lot AS "Lot", styles AS "Styles", statut AS "Statut"
@@ -54,6 +55,7 @@ SORT lot ASC, ordre ASC
 | 4 | Backbeat, half-time, passerelles de tempo | [[kt-halftime-passerelles]] | 90 / 180, 140 / 186, 175 ; ouvrir un live à 190 vers DnB et dubstep | [[../slice-breaks]] | draft |
 | 20 | Hats, ride et haut du spectre | [[kt-hats]] | fermé = grille, ouvert = contretemps, « a » = anticipation, vélocités de grille, choke, bande high par style, polymétrie des hats, masquage | [[../parameter-preset-locks]], [[../microtiming-retrigs]], [[../polymetrie]] | draft |
 | 21 | Basses : rythmes et rôles | [[kt-basses]] | dix rythmes de basse sur une note (contretemps, rolling, galop, tenue, absente), ducking contre contretemps, basse-Id, basse comme voix harmonique | [[../rumble-grave]], [[../send-fx-compresseur]] | draft |
+| 24 | Percussions : toms, rims et la voix du milieu | [[kt-percussions]] | bande mid par style, trois rôles des 3-4-5 (répond, parle, répond ou boucle), cellules de 8 pas, tom accordé (tonique / quinte / octave), delay 3/16, étage de la phrase, break percussif, qui va sur quelle track dans la banque | [[../euclidien]], [[../parameter-preset-locks]], [[../send-fx-compresseur]], [[../../kt-banque-samples]] | draft |
 
 ### Lot 2 — Socle harmonique et forme
 
