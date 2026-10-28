@@ -58,6 +58,15 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.M] [[rumble-grave]] : lecture complète de Myloops *Techno Kick
+  Rumble*, sept repères ajoutés (pas de modulation de reverb, resample à
+  -6 dBFS et second traitement, pitch du rumble -5 à -12 demi-tons,
+  couche sinus une octave sous, lookahead, sidechain automatisé intro vers
+  drop, break en reverb 6 s), sous-section « Rumble par sample et couche
+  de poids » (drone ou bruit sur la 2, combinaison reverb + sample, mono,
+  basse sidechainée comme le rumble), table de dépannage en neuf symptômes
+  et deux pièges (kick trop long, fizz). Ligne de veille corrigée : les
+  3-6 dB concernent la couche sample, pas l'écart au kick.
 - [7] Doctrine §7.4 et §7.5 : ordre de construction d'une bank, le grave
   d'abord (tracks 1, 2, 9) fini et validé seul avant toute track mélodique
   ou Id, puis règle d'arrêt « une passe, puis on fige » (poser en une
