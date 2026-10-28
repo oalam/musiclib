@@ -58,6 +58,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7] Doctrine §7.4 et §7.5 : ordre de construction d'une bank, le grave
+  d'abord (tracks 1, 2, 9) fini et validé seul avant toute track mélodique
+  ou Id, puis règle d'arrêt « une passe, puis on fige » (poser en une
+  séance, réécouter à froid, une seule passe de corrections). §3 : pourquoi
+  un kick par bank et non par morceau, à l'inverse de la pratique DJ
+  (phases additionnées en overlap). Source : entretien Sara Landry, Ableton.
 - [7.M] Veille §F distillée dans les KT : KT5 (bandes kick / rumble /
   basse des sources, mono sous 120 Hz, cloche dans le kick, désaccord sur
   le passe-haut du rumble), KT9 (règles de bloc 16 / 32 / 8, recettes de

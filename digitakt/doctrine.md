@@ -127,7 +127,12 @@ aux mains. Repères pour entendre le tour et l'arrivée du 1 : KT9
 ## 3. Conseils qui changent tout en live
 
 - **Le kick ne bouge jamais** d'un pattern à l'autre : même sample, même réglage.
-  Le groove reste stable pendant que le reste change.
+  Le groove reste stable pendant que le reste change. La pratique DJ dit
+  l'inverse (Sara Landry, Ableton : un kick neuf par morceau, pour que deux
+  morceaux dans la même tonalité enchaînés en overlap n'additionnent pas leurs
+  phases dans le grave) ; en live sur la machine les patterns ne se
+  superposent pas, le kick change avec le kit, donc avec la bank (§13) : un
+  kick par bank, pas par morceau.
 - **Une track dédiée aux transitions** (la 15), sinon rien pour faire monter la
   tension entre deux patterns. Avec les conditions FILL, les roulements partent
   avec le bouton fill sans changer de pattern.
@@ -249,7 +254,17 @@ le kick disparaît et le riser monte. On relâche : le kick retombe sur le temps
    pattern (16 canaux = 16 tracks) à enregistrer en live recording.
 3. Lire la partition de mutes, repérer les Id1 / Id2 du morceau.
 4. Reconstruire sur la DT2 à partir du **pattern modèle** : les grilles sont un
-   point de départ, pas une transcription.
+   point de départ, pas une transcription. **Le grave d'abord, fini et validé
+   seul** : tracks 1, 2 et 9 depuis le modèle, qui tournent seules jusqu'à ce
+   que le grave soit juste (note du kick §11, ducking et partage des
+   fréquences §9), puis seulement les tracks 3 à 8 et 10 à 16. Tant que le
+   grave n'est pas arrêté, pas d'Id (Sara Landry, Ableton : le low end est
+   terminé avant tout élément mélodique ou texturel).
+5. **Une passe, puis on fige** (« touch it once ») : poser la bank en une
+   séance depuis le draft, réécouter le lendemain à froid (§6.12), une seule
+   passe de corrections, puis la figer et passer à la suivante. Les idées des
+   premières minutes sont les meilleures ; les retravailler fatigue l'oreille
+   et les abîme.
 
 
 ## 8. Pattern "Modèle"
