@@ -20,7 +20,13 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   kick-sub, basse en contretemps (one-shot par note) et ligne Acid V,
   rendu 48 kHz mono nommé avec la note, pièges de la stack, cinq
   exercices ; liens retour depuis [[kick-mental-vst]], [[rumble-grave]]
-  et KT23.
+  et KT23. Couche pédagogique Reaper : dix notions (track, item, FX
+  chain, sélection temporelle, sends et canaux, dossiers, render,
+  modèles), glossaire Reaper → Digitakt, construction du projet modèle
+  clic par clic, principe du sidechain par canaux 3/4 expliqué avant les
+  gestes, dossier SUB / BODY pas à pas, fenêtre de rendu champ par champ,
+  Glue et Apply track FX, exercice d'échauffement Reaper, ressources
+  (User Guide, REAPER Mania).
 - [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
   mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
   `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois

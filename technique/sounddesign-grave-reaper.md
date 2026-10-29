@@ -50,11 +50,90 @@ utilisé ci-dessous.
 | **ReaEQ, ReaVerbate, ReaTune, JS** | filtres passe-haut / passe-bas, reverb du rumble, accordeur, saturations d'appoint (JS Saturation, JS Soft Clipper) | tous inclus dans Reaper |
 | **Acid V** (Arturia) | ligne acid (track 10 sur la DT2) et basse acid en contretemps | filtre diode, accent et slide ; passe-haut au-dessus du sub quand un kickbass tient le grave |
 
+### 1.1 Reaper, les notions dont ce projet a besoin
+
+Reaper ne fait rien d'exotique : il a juste des noms à lui. Les dix notions
+ci-dessous couvrent tout ce que la fiche demande ; chacune est reprise au
+moment où on s'en sert. Raccourcis macOS (Cmd remplace Ctrl, Opt remplace
+Alt).
+
+| Notion | Ce que c'est | Où / comment |
+|---|---|---|
+| **Track** (piste) | une tranche qui porte des items, une chaîne d'effets, un fader et un routing ; audio ou MIDI, Reaper ne fait pas la différence : une piste avec un synthé VST **est** une piste d'instrument | Cmd+T, ou double-clic dans la zone vide sous les pistes ; nom par double-clic sur le nom |
+| **TCP et MCP** | les deux vues de la même piste : le *Track Control Panel* à gauche de l'arrangement (nom, M, S, FX, Route, fader) et le *Mixer* (Cmd+M) où les sends apparaissent en potards | tout ce qui se règle dans l'un se voit dans l'autre |
+| **Item** | un bloc posé sur une piste : un fichier audio (WAV glissé depuis le Finder ou le Media Explorer) ou un **item MIDI** (des notes). C'est l'équivalent d'un pattern de la DT2 pour une seule track | item MIDI : faire une sélection temporelle, Insert > New MIDI item ; double-clic pour ouvrir l'éditeur MIDI |
+| **Éditeur MIDI** | la grille où l'on dessine les notes ; grille à 1/16 = les 16 pas d'une mesure DT2 ; clic-glisser pose une note, la barre du bas règle la vélocité | la note jouée est celle de la ligne du piano à gauche ; F#1 est la note 30, A1 la note 33 |
+| **FX chain** | la chaîne d'effets de la piste, dans l'ordre haut → bas = ordre du signal ; un VST d'instrument se met en premier, les filtres et compresseurs après. Même logique que les pages SRC → FLTR → AMP → FX de la DT2, mais l'ordre est libre | bouton **FX** du TCP ; « Add » ouvre le navigateur, taper le nom (ReaEQ, Vital…) ; glisser pour réordonner ; la case à cocher devant chaque effet le bypass |
+| **Sélection temporelle** et **boucle** | la zone en surbrillance dans la règle : Reaper boucle dessus quand **R** (repeat) est actif, et le rendu peut s'y limiter. Cliquer-glisser dans la règle la crée ; **Esc** l'efface ; Opt+S active l'aimantation à la grille pour qu'elle tombe pile sur une mesure | Espace = lecture / stop ; Cmd+R = enregistrer (rien à enregistrer ici) |
+| **Send** et **canaux** | un send copie le signal d'une piste vers une autre, avec son propre volume ; chaque piste a par défaut 2 canaux (gauche, droite) mais peut en avoir 4, 6… ; un send peut viser les canaux **3/4** d'une piste, qui n'arrivent pas dans ses haut-parleurs mais restent lisibles par un plug-in (c'est le principe du sidechain) | bouton **Route** du TCP (ou l'icône I/O) : « Track channels », « Add new send », et sur chaque send le mode pré / post-fader et les canaux source → destination |
+| **Dossier** (folder) | une piste parent dont les enfants sont sommés dedans ; les effets du parent s'appliquent au mélange, le fader du parent dose le tout ; les enfants gardent leur fader et leurs effets | icône de dossier en bas du TCP de la piste parent ; les pistes qui suivent deviennent enfants (indentées) jusqu'à la dernière, marquée par un clic sur la même icône |
+| **Render** (rendu) | écrire un WAV sur disque : tout le master, ou une piste seule (« stem »), sur la sélection temporelle. C'est le resampling de la DT2, en mieux : on choisit la fréquence, le format, le nombre de canaux, et le projet garde tout | Cmd+Opt+R ; détail champ par champ au §7 |
+| **Modèles** | un *track template* sauvegarde une piste avec sa chaîne, son routing et son item ; un *project template* sauvegarde tout le projet comme point de départ. C'est le preset et le kit de la DT2 (doctrine §8) | clic droit sur une piste > « Save tracks as track template » ; File > Project templates > « Save project as template » |
+
+Deux réflexes à prendre tout de suite : **Cmd+Z annule tout, y compris un
+réglage de plug-in**, donc essayer sans peur ; et le bouton **Mono** du
+master dans le mixer (en bas de la tranche master) est le juge de paix du
+grave, à activer à chaque écoute.
+
+### 1.2 Glossaire Reaper → Digitakt
+
+| Reaper | Digitakt II | Différence utile |
+|---|---|---|
+| track | track | une piste Reaper est polyphonique et sans limite de nombre ; on en met une par **rôle** (KICK, RUMBLE, BASS), pas par son |
+| item MIDI d'une mesure, grille 1/16 | pattern, 16 pas | pas de conditions ni de p-locks : les variations se font en dupliquant l'item |
+| FX chain | pages FLTR, AMP, FX + machine SRC | l'ordre est libre et un effet peut apparaître deux fois (deux ReaEQ autour d'une distorsion) |
+| send vers la piste RUMBLE | envoi reverb (FX send) | un send Reaper peut aller vers **n'importe quelle piste**, et la reverb n'est plus partagée : chaque piste peut avoir la sienne |
+| send vers les canaux 3/4 + ReaComp | COMPRESSOR ROUTING + `SCS` = TRK1 | sur la DT2 un seul compresseur pour tout ; dans Reaper, un ReaComp par piste duckée, chacun avec ses réglages |
+| dossier SUB + BODY | (aucun équivalent, une track = une voix) | c'est précisément ce que la DT2 ne sait pas faire et qui justifie de fabriquer le kick sur le Mac |
+| render de la sélection temporelle | `[SAMPLING]` `SRC` = MAIN, `R.LEN` = 16 | le rendu est reproductible ; on peut refaire le même sample après avoir changé un réglage |
+| track template, project template | preset, kit, pattern modèle | mêmes rôles |
+| bouton Mono du master | (écoute sur un sub mono) | la DT2 n'a pas de bouton mono : le contrôle se fait ici |
+
 ## 2. Le projet Reaper modèle
 
 Un projet `grave_<tonique>_<bpm>.rpp`, à copier pour chaque bank. Il est
 au tempo du set, en 48 kHz (la fréquence native de la DT2), avec un item
 MIDI d'une mesure et quatre kicks sur la piste KICK.
+
+### 2.0 Construire le projet, clic par clic (20 min, une fois)
+
+1. **Projet neuf et réglages.** Cmd+N. Opt+Enter ouvre Project Settings :
+   onglet Project Settings, case « Project sample rate » cochée, 48000 ;
+   le tempo se tape
+   directement dans le champ BPM de la barre de transport (185,00). Cmd+S,
+   nom `grave_F#_185.rpp`, dans un dossier à lui (Reaper y met les rendus
+   et les enregistrements).
+2. **Grille.** Opt+L ouvre les réglages de grille : 1/16 ; Opt+S active
+   l'aimantation. Dans la règle, la mesure 1 est maintenant découpée en
+   16 cases, comme la DT2.
+3. **Pistes.** Cmd+T six fois, nommer KICK, RUMBLE, KICKBASS, BASS, ACID et
+   laisser MASTER tel quel (il existe toujours). L'ordre compte peu, sauf
+   pour les dossiers (§2.4).
+4. **Instruments.** Sur KICK, bouton FX > Add > taper le nom (Kick 3, Vital,
+   ou Maschine 2 pour le Drumsynth) ; Reaper demande si la piste doit
+   recevoir le MIDI : oui. Même chose sur KICKBASS et BASS (Vital) et ACID
+   (Acid V).
+5. **Item MIDI du kick.** Cliquer-glisser dans la règle de la mesure 1 à la
+   mesure 2 (la sélection s'aimante aux mesures), sélectionner la piste
+   KICK, Insert > New MIDI item. Double-clic sur l'item : dans l'éditeur,
+   grille 1/16 (menu Grid en bas), poser quatre notes sur la ligne F#1
+   (note 30) aux pas 1, 5, 9, 13, longueur un pas. Fermer l'éditeur.
+   Copier l'item sur KICKBASS (Cmd+C, sélectionner la piste, Cmd+V au même
+   endroit) ; sur KICKBASS, rallonger chaque note dans l'éditeur jusqu'au
+   pas suivant moins un rien (§5).
+6. **Item de la basse.** Même geste sur BASS, notes aux pas 3, 7, 11, 15
+   (le contretemps), longueur deux ou trois pas.
+7. **Lire en boucle.** La sélection temporelle couvre la mesure 1 ; touche
+   R pour activer la répétition ; Espace. Le projet tourne comme un pattern.
+   Muter KICKBASS, BASS et ACID (bouton M) : on entend le kick seul.
+8. **Effets de base.** Sur chaque piste, FX > Add : les chaînes du §2.1,
+   dans l'ordre du tableau. Les réglages viennent aux §3 à §6.
+9. **Sends et sidechain.** §2.3, pour RUMBLE et BASS.
+10. **SPAN sur le master.** Cliquer sur le bouton FX du master, Add > SPAN,
+    en dernière position.
+11. **Sauver comme modèle.** File > Project templates > Save project as
+    template, `grave_modele`. Chaque bank repart de là : File > New project
+    from template.
 
 ### 2.1 Pistes
 
@@ -88,14 +167,32 @@ croche), longueur d'un rendu « un coup » (un temps).
 
 ### 2.3 Sidechain dans Reaper, pas à pas
 
-1. Sur la piste duckée (RUMBLE ou BASS) : bouton **Route**, « Track
-   channels » = 4.
-2. Sur la piste KICK : bouton **Route**, « Add new send » vers RUMBLE,
-   destination **channels 3/4**, send **pré-fader** (pour que le kick muté
-   en fin de chaîne continue de déclencher, l'équivalent du kick fantôme de
-   la doctrine §10). Volume du send à 0 dB.
-3. ReaComp sur RUMBLE : « Detector input » = **Auxiliary input L+R**,
-   « Pre-comp » = 0 ms, « Auto make-up » décoché.
+**Le principe d'abord.** Un compresseur baisse le volume quand *ce qu'il
+écoute* dépasse un seuil. Par défaut il écoute le signal qu'il traite. En
+sidechain, on lui fait écouter **autre chose** : le kick. Reaper n'a pas de
+bouton « sidechain » ; il a quelque chose de plus général, les canaux. Une
+piste a deux canaux audibles (1 et 2, gauche et droite). On lui en donne
+quatre : les canaux 3 et 4 ne sortent nulle part, mais un plug-in posé sur
+la piste peut les lire. On envoie le kick dans ces canaux 3/4, et on dit à
+ReaComp d'écouter son « entrée auxiliaire », c'est-à-dire 3/4. Le rumble
+passe par 1/2, le kick par 3/4, ReaComp traite 1/2 en écoutant 3/4.
+
+1. Sur la piste duckée (RUMBLE ou BASS) : bouton **Route** du TCP. En haut
+   de la fenêtre, « Track channels » : passer de 2 à **4**. Rien ne change
+   à l'écoute, la piste a juste deux canaux muets en plus.
+2. Sur la piste KICK : bouton **Route**, section Sends, « Add new send »,
+   choisir RUMBLE. Sur la ligne du send qui apparaît : le menu de mode sur
+   **Pre-Fader (Post-FX)** (pour que le kick baissé ou muté au fader
+   continue de déclencher, l'équivalent du kick fantôme de la doctrine
+   §10) ; le petit menu des canaux « 1/2 => 1/2 » passé à **1/2 => 3/4**.
+   Volume du send à 0 dB. Dans le mixer, le send apparaît sous la piste
+   KICK ; la fenêtre View > Routing Matrix (Opt+R) montre toute la toile
+   d'un coup, utile pour vérifier qu'on n'a pas visé la mauvaise piste.
+3. ReaComp sur RUMBLE, en dernier dans la chaîne (après Trash) : le menu
+   « Detector input » sur **Auxiliary input L+R** (c'est 3/4), « Pre-comp »
+   à **0 ms**, « Auto make-up » **décoché**. Lecture : le vumètre vertical
+   de ReaComp doit plonger à chaque kick ; s'il ne bouge pas, le send vise
+   1/2 ou le détecteur écoute « Main input ».
 4. Réglages de départ (repères de [[../digitakt/kb/rumble-grave]] recalés
    au tempo) : ratio 4:1 à 8:1, attaque 0,1 à 1 ms, release = une croche
    (160 ms à 185 BPM), seuil descendu jusqu'à 6-12 dB de réduction à chaque
@@ -113,14 +210,26 @@ Trash Lite est monobande : saturé en une pièce, un kick perd son sub (les
 harmoniques créées mangent la fondamentale et le passe-bas qui suit ne
 rend rien). Le découpage se fait dans Reaper, en parallèle :
 
-1. KICK devient un dossier avec deux pistes enfants : **SUB** (ReaEQ
-   passe-bas 24 dB/oct à 90-100 Hz, aucune distorsion) et **BODY** (ReaEQ
-   passe-haut 90-100 Hz, puis Trash).
-2. L'item MIDI reste sur KICK, les enfants reçoivent le même synthé ; plus
-   simple : rendre le kick sec une fois (§6), poser le WAV sur les deux
-   enfants.
-3. Régler Trash sur BODY seul (style, drive, mix), puis doser SUB / BODY au
-   fader. Le sub reste sinus et plein, le corps porte le grain.
+1. Rendre d'abord le kick **sec** (§7, une seule note), pour avoir un WAV :
+   c'est plus simple que de dupliquer le synthé.
+2. Cmd+T deux fois juste sous KICK : **SUB** et **BODY**. Sur KICK, cliquer
+   l'icône de dossier en bas du TCP : SUB et BODY s'indentent, ce sont ses
+   enfants ; sur BODY, cliquer la même icône pour marquer la fin du dossier.
+   Désormais KICK ne joue plus rien lui-même : il **somme** SUB et BODY, et
+   son fader dose les deux (retirer le synthé de sa chaîne, ou le laisser
+   bypassé).
+3. Glisser le WAV du kick sec sur SUB, puis Cmd+C / Cmd+V au même endroit
+   sur BODY (ou Opt+glisser pour dupliquer).
+4. SUB : FX > ReaEQ, une bande de type **Low Pass** à 90-100 Hz ; une
+   bande fait 12 dB/oct, en ajouter une seconde identique pour 24 dB/oct
+   (même recette pour tous les passe-bas « 24 dB/oct » de la fiche).
+   Aucune distorsion.
+5. BODY : FX > ReaEQ en **High Pass** 90-100 Hz, puis Trash. Mettre BODY en
+   solo (bouton S) pour régler Trash seul : style, drive, mix.
+6. Désoloer, doser SUB / BODY aux faders, écouter en mono. Le sub reste
+   sinus et plein, le corps porte le grain. Les effets communs (passe-haut
+   25-30 Hz, soft clipper) vont dans la chaîne de KICK, le parent, et
+   s'appliquent au mélange.
 
 Même découpage pour la basse mid, et pour le rumble si le drive de Trash
 dépasse 20 dB. C'est le « multi-étages » de Sara Landry (doctrine §3) avec
@@ -267,7 +376,7 @@ se rendent et se comparent.
 | 6. Second passe-bas | ReaEQ, low-pass 24 dB/oct, résonance légère | 150-200 Hz | retire les harmoniques aiguës créées en 5 ; avec de la résonance, le rumble « parle » |
 | 7. Passe-haut | ReaEQ, high-pass | 30-40 Hz (50-60 si le kick a déjà beaucoup de sub) | l'infra-grave consomme de la puissance sans être entendu |
 | 8. Ducking | ReaComp, sidechain (§2.3) | 24-30 dB de creux pour que le kick sorte seul (10-12 dB si le rumble reste présent sous le kick), attaque 1-2 ms, release une croche | la pompe qui fait « rouler » |
-| 9. Mono | ReaVerbate width 0 suffit ; sinon JS Stereo Width à 0 | | mono sous 120 Hz |
+| 9. Mono | ReaVerbate « Stereo width » à 0 ; pour un item audio, clic droit > Item properties > Channel mode = Mono (downmix) ; pour un instrument, unisson 1 à la source | | mono sous 120 Hz |
 | 10. Niveau | fader | le rumble **sous** le kick ; sur la DT2 la 2 se règle sous la 1 après coup | une prise normalisée ment sur le niveau |
 
 Le preset `deep` de la chaîne Python (dampening 0,6, drive 14 dB, retour
@@ -436,13 +545,38 @@ ou un kickbass y est déjà.
 
 ## 7. Rendu et transfert vers la DT2
 
+### 7.1 La fenêtre de rendu, champ par champ
+
+Cmd+Opt+R (File > Render). La fenêtre fait peur la première fois ; cinq
+champs comptent, le reste garde sa valeur par défaut.
+
+| Champ | Valeur ici | Pourquoi |
+|---|---|---|
+| **Source** | « Master mix » quand les autres pistes sont mutées ; « Stems (selected tracks) » pour rendre la piste sélectionnée seule, avec ses effets mais **sans** les effets du master (SPAN n'y change rien) | un stem ignore les mutes des autres pistes : pas besoin de muter |
+| **Bounds** | « Time selection » | le fichier fait exactement la longueur de la sélection : une note, un temps ou deux mesures (§2.2) |
+| **Output > Directory, File name** | le dossier `rendus/` du projet ; nom tapé à la main (`kick_tribe_F#_185`) ; les jokers `$track` et `$project` existent pour les séries | le nom porte la note mesurée (§3.5), pas la note MIDI |
+| **Sample rate, Channels** | **48000**, **Mono** | fréquence native de la DT2 ; le grave est mono (si la source est stéréo, Reaper somme gauche + droite) |
+| **Format** | WAV, **24 bit PCM** ; « Normalize/limit » **décoché** pour le kick et le kickbass (garder la marge, la DT2 sature encore à l'overdrive) ; sur le rumble, normalisation de crête à -1 dB acceptée, à condition de baisser la 2 après coup | Transfer convertit en 16 bits à l'envoi |
+| **Tail** | « Add tail » **décoché** (ou 0 ms) | sinon le fichier dépasse la sélection et la boucle ne tombe plus juste |
+| Bouton | « Render 1 file » ; « Add to render queue » pour empiler plusieurs rendus (trois longueurs de kick) et les lancer d'un coup | |
+
+Deux raccourcis pour les cas simples : sélectionner un item, clic droit >
+**Glue items** le rend sur place avec ses fondus (sans les effets de la
+piste) ; clic droit > **Apply track FX to items as new take** rend l'item
+**avec** la chaîne d'effets de la piste, en gardant l'original comme prise
+précédente (Cmd+Z ou le menu des prises pour y revenir). Le second est
+pratique pour figer un kick traité avant de le poser sur SUB et BODY.
+
+### 7.2 Du rendu à la machine
+
 1. **Sélection temporelle** exacte (une note, un temps, une ou deux
-   mesures), « Tail » décoché.
-2. Fichier > Render : source « Selected tracks (stems) » ou master avec les
-   autres pistes mutées ; **48 000 Hz**, **mono**, WAV 24 bits ; pas de
-   normalisation automatique sur le kick et le kickbass (garder la marge,
-   la DT2 sature encore à l'overdrive) ; normalisation de crête à -1 dB
-   acceptée sur le rumble, à condition de baisser la 2 après coup.
+   mesures) : glisser dans la règle avec l'aimantation active (Opt+S) ; pour
+   une note seule, sélectionner l'item puis la sélection temporelle se cale
+   dessus par double-clic dans la règle au-dessus de l'item (ou Time
+   selection > Set time selection to items).
+2. Rendu selon le tableau §7.1. Écouter le fichier rendu dans le Media
+   Explorer (View > Media Explorer) : il lit au tempo du projet, ce qui
+   permet de vérifier une boucle de rumble avant de l'envoyer.
 3. Nommer avec le style, la note et le tempo : `kick_tribe_F#_185.wav`,
    `rumble_gritty_F#_185.wav`, `kickbass_sat_F#_160.wav`, `bass_sub_F#.wav`.
    La note vient de la mesure sur la queue, pas de la note MIDI.
@@ -489,6 +623,12 @@ ou un kickbass y est déjà.
 
 ## 9. Exercices
 
+0. **Échauffement Reaper (15 min).** Construire le projet modèle du §2.0
+   avec un seul kick (Vital, sinus, recette C) et une seule piste RUMBLE :
+   send vers 1/2, send vers 3/4, ReaComp qui plonge à chaque kick. Puis
+   rendre une mesure en mono 48 kHz et la rouvrir dans le Media Explorer.
+   Tant que le vumètre de ReaComp ne bouge pas ou que le fichier n'a pas
+   la bonne longueur, le reste de la fiche attendra.
 1. **Trois longueurs, un kick (10 min).** Recette B ou C, tonique F#,
    185 BPM : queue 70, 180 et 300 ms. Avec la basse Vital en contretemps
    démutée : garder celle qui la laisse respirer ; noter la tenue du sub
@@ -530,8 +670,13 @@ ou un kickbass y est déjà.
   Dusty, Rasper) :
   <https://www.elephorm.com/formation/apprendre-maschine-2x-tutoriel-video-en-ligne/guide-complet-sur-le-drumsynth-kick>
   ; manuel Maschine, section Drum Synths > Kick, pour les paramètres exacts.
-- Reaper : manuel utilisateur, chapitres Routing (sends, canaux 3/4) et
-  ReaComp (Detector input) ; Voxengo SPAN, manuel (block size, slope).
+- Reaper, pour monter en compétence dans l'ordre de cette fiche : le
+  *REAPER User Guide* de Geoffrey Francis (PDF gratuit sur reaper.fm,
+  chapitres Routing et Sidechaining, Rendering, Track templates) ; les
+  vidéos courtes de Kenny Gioia, *REAPER Mania* (YouTube, une notion par
+  vidéo : sends, folders, sidechain avec ReaComp, render) ; The REAPER Blog
+  (articles sur ReaComp, ReaEQ, le Media Explorer). Voxengo SPAN : manuel
+  (block size, slope).
 - Tutos vidéo DAW non visionnés (kick mental en Serum 2 / Ableton) listés
   dans [[../digitakt/kb/kick-mental-vst]].
 
