@@ -27,7 +27,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   clic par clic, principe du sidechain par canaux 3/4 expliqué avant les
   gestes, dossier SUB / BODY pas à pas, fenêtre de rendu champ par champ,
   Glue et Apply track FX, exercice d'échauffement Reaper, ressources
-  (User Guide, REAPER Mania).
+  (User Guide, REAPER Mania). Multibande avec Trash Lite : JS 3-Band
+  Splitter, Trash branché sur 3/4 par le pin connector, JS 3-Band Joiner,
+  conteneur FX ; le dossier SUB / BODY devient la variante.
 - [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
   mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
   `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois

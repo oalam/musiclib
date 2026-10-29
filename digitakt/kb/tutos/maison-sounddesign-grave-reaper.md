@@ -72,6 +72,7 @@ Alt).
 | **FX chain** | la chaîne d'effets de la piste, dans l'ordre haut → bas = ordre du signal ; un VST d'instrument se met en premier, les filtres et compresseurs après. Même logique que les pages SRC → FLTR → AMP → FX de la DT2, mais l'ordre est libre | bouton **FX** du TCP ; « Add » ouvre le navigateur, taper le nom (ReaEQ, Vital…) ; glisser pour réordonner ; la case à cocher devant chaque effet le bypass |
 | **Sélection temporelle** et **boucle** | la zone en surbrillance dans la règle : Reaper boucle dessus quand **R** (repeat) est actif, et le rendu peut s'y limiter. Cliquer-glisser dans la règle la crée ; **Esc** l'efface ; Opt+S active l'aimantation à la grille pour qu'elle tombe pile sur une mesure | Espace = lecture / stop ; Cmd+R = enregistrer (rien à enregistrer ici) |
 | **Send** et **canaux** | un send copie le signal d'une piste vers une autre, avec son propre volume ; chaque piste a par défaut 2 canaux (gauche, droite) mais peut en avoir 4, 6… ; un send peut viser les canaux **3/4** d'une piste, qui n'arrivent pas dans ses haut-parleurs mais restent lisibles par un plug-in (c'est le principe du sidechain) | bouton **Route** du TCP (ou l'icône I/O) : « Track channels », « Add new send », et sur chaque send le mode pré / post-fader et les canaux source → destination |
+| **Pin connector** | la matrice « 2 in 2 out » en haut de chaque effet : quels canaux de la piste entrent dans le plug-in et où ses sorties reviennent. Par défaut 1/2 → 1/2 ; brancher un effet sur 3/4 le fait travailler sur une autre « voie » de la même piste, c'est la base du multibande du §2.4 | bouton « 2 in 2 out » dans la fenêtre FX ; les JS 3-Band Splitter et Joiner créent et résorbent ces voies |
 | **Dossier** (folder) | une piste parent dont les enfants sont sommés dedans ; les effets du parent s'appliquent au mélange, le fader du parent dose le tout ; les enfants gardent leur fader et leurs effets | icône de dossier en bas du TCP de la piste parent ; les pistes qui suivent deviennent enfants (indentées) jusqu'à la dernière, marquée par un clic sur la même icône |
 | **Render** (rendu) | écrire un WAV sur disque : tout le master, ou une piste seule (« stem »), sur la sélection temporelle. C'est le resampling de la DT2, en mieux : on choisit la fréquence, le format, le nombre de canaux, et le projet garde tout | Cmd+Opt+R ; détail champ par champ au §7 |
 | **Modèles** | un *track template* sauvegarde une piste avec sa chaîne, son routing et son item ; un *project template* sauvegarde tout le projet comme point de départ. C'est le preset et le kit de la DT2 (doctrine §8) | clic droit sur une piste > « Save tracks as track template » ; File > Project templates > « Save project as template » |
@@ -90,7 +91,7 @@ grave, à activer à chaque écoute.
 | FX chain | pages FLTR, AMP, FX + machine SRC | l'ordre est libre et un effet peut apparaître deux fois (deux ReaEQ autour d'une distorsion) |
 | send vers la piste RUMBLE | envoi reverb (FX send) | un send Reaper peut aller vers **n'importe quelle piste**, et la reverb n'est plus partagée : chaque piste peut avoir la sienne |
 | send vers les canaux 3/4 + ReaComp | COMPRESSOR ROUTING + `SCS` = TRK1 | sur la DT2 un seul compresseur pour tout ; dans Reaper, un ReaComp par piste duckée, chacun avec ses réglages |
-| dossier SUB + BODY | (aucun équivalent, une track = une voix) | c'est précisément ce que la DT2 ne sait pas faire et qui justifie de fabriquer le kick sur le Mac |
+| splitter de bandes + pin connector (ou dossier SUB + BODY) | (aucun équivalent, une track = une voix, un overdrive large bande) | c'est précisément ce que la DT2 ne sait pas faire et qui justifie de fabriquer le kick sur le Mac |
 | render de la sélection temporelle | `[SAMPLING]` `SRC` = MAIN, `R.LEN` = 16 | le rendu est reproductible ; on peut refaire le même sample après avoir changé un réglage |
 | track template, project template | preset, kit, pattern modèle | mêmes rôles |
 | bouton Mono du master | (écoute sur un sub mono) | la DT2 n'a pas de bouton mono : le contrôle se fait ici |
@@ -114,7 +115,7 @@ MIDI d'une mesure et quatre kicks sur la piste KICK.
    16 cases, comme la DT2.
 3. **Pistes.** Cmd+T six fois, nommer KICK, RUMBLE, KICKBASS, BASS, ACID et
    laisser MASTER tel quel (il existe toujours). L'ordre compte peu, sauf
-   pour les dossiers (§2.4).
+   pour la variante en dossier (§2.4).
 4. **Instruments.** Sur KICK, bouton FX > Add > taper le nom (Kick 3, Vital,
    ou Maschine 2 pour le Drumsynth) ; Reaper demande si la piste doit
    recevoir le MIDI : oui. Même chose sur KICKBASS et BASS (Vital) et ACID
@@ -145,7 +146,7 @@ MIDI d'une mesure et quatre kicks sur la piste KICK.
 
 | Piste | Contenu | Chaîne de départ | Sortie |
 |---|---|---|---|
-| KICK | Drumsynth, Kick 3 ou Vital ; item MIDI `X...X...X...X...` | (saturation parallèle §2.4) → ReaEQ (passe-haut 25-30 Hz) | master **et** send vers canaux 3-4 des pistes duckées |
+| KICK | Drumsynth, Kick 3 ou Vital ; item MIDI `X...X...X...X...` ; 6 canaux | JS 3-Band Splitter → Trash sur 3/4 → JS 3-Band Joiner (§2.4) → ReaEQ (passe-haut 25-30 Hz) | master **et** send vers canaux 3-4 des pistes duckées |
 | RUMBLE | reçoit KICK en send pré-fader | ReaEQ (passe-haut avant reverb) → ReaVerbate 100 % wet → ReaEQ (passe-bas 24 dB/oct) → Trash → ReaComp (sidechain) → largeur 0 | master |
 | KICKBASS | Vital ou Kick 3, même item MIDI que KICK, piste **mutée** quand KICK joue | Vital (distorsion interne) → Trash → ReaEQ (passe-bas 300 Hz) | master |
 | BASS | Vital, item MIDI en contretemps `..x...x...x...x.` | Vital → ReaEQ (passe-haut 60-80 Hz) → JS Saturation → ReaComp (sidechain) | master |
@@ -210,36 +211,73 @@ Pour le rumble, le send KICK → RUMBLE qui nourrit la reverb est un second
 send, vers les canaux **1/2** cette fois. Deux sends de la même piste :
 l'un alimente la reverb, l'autre le détecteur.
 
-### 2.4 Saturation lourde sans multibande
+### 2.4 Saturation lourde sans multibande : séparer les bandes dans Reaper
 
 Trash Lite est monobande : saturé en une pièce, un kick perd son sub (les
 harmoniques créées mangent la fondamentale et le passe-bas qui suit ne
-rend rien). Le découpage se fait dans Reaper, en parallèle :
+rend rien). Le découpage se fait dans Reaper, avec deux effets JS livrés
+avec lui et le **pin connector**, sur une seule piste.
 
-1. Rendre d'abord le kick **sec** (§7, une seule note), pour avoir un WAV :
-   c'est plus simple que de dupliquer le synthé.
-2. Cmd+T deux fois juste sous KICK : **SUB** et **BODY**. Sur KICK, cliquer
-   l'icône de dossier en bas du TCP : SUB et BODY s'indentent, ce sont ses
-   enfants ; sur BODY, cliquer la même icône pour marquer la fin du dossier.
-   Désormais KICK ne joue plus rien lui-même : il **somme** SUB et BODY, et
-   son fader dose les deux (retirer le synthé de sa chaîne, ou le laisser
-   bypassé).
-3. Glisser le WAV du kick sec sur SUB, puis Cmd+C / Cmd+V au même endroit
-   sur BODY (ou Opt+glisser pour dupliquer).
-4. SUB : FX > ReaEQ, une bande de type **Low Pass** à 90-100 Hz ; une
-   bande fait 12 dB/oct, en ajouter une seconde identique pour 24 dB/oct
-   (même recette pour tous les passe-bas « 24 dB/oct » de la fiche).
-   Aucune distorsion.
-5. BODY : FX > ReaEQ en **High Pass** 90-100 Hz, puis Trash. Mettre BODY en
-   solo (bouton S) pour régler Trash seul : style, drive, mix.
-6. Désoloer, doser SUB / BODY aux faders, écouter en mono. Le sub reste
-   sinus et plein, le corps porte le grain. Les effets communs (passe-haut
-   25-30 Hz, soft clipper) vont dans la chaîne de KICK, le parent, et
-   s'appliquent au mélange.
+**Le principe.** « JS: 3-Band Splitter » découpe le signal en trois
+bandes et les pose sur trois paires de canaux de la piste : graves sur
+1/2, médiums sur 3/4, aigus sur 5/6. Chaque effet de la chaîne a, en haut
+de sa fenêtre, un bouton « 2 in 2 out » : c'est le pin connector, une
+matrice qui dit quels canaux de la piste entrent dans le plug-in et où
+ressortent ses sorties. Brancher Trash sur 3/4 seulement, c'est le faire
+travailler sur le corps du kick sans qu'il voie le sub ni le click.
+« JS: 3-Band Joiner » resomme ensuite les six canaux en stéréo. Les
+filtres de croisement du splitter sont faits pour se resommer à plat, ce
+que deux ReaEQ indépendants ne garantissent pas à la fréquence de coupure.
+
+1. Piste KICK, bouton **Route**, « Track channels » = **6**. Rien ne change
+   à l'écoute : quatre canaux muets de plus.
+2. FX > Add > **JS: 3-Band Splitter**, placé juste après l'instrument.
+   Coupures : basse à **90-100 Hz** (sub / corps), haute à **2-3 kHz**
+   (corps / click). Pour l'instant tout ressort tel quel : le joiner n'est
+   pas encore là et seuls 1/2 sont audibles, donc on n'entend que le sub ;
+   c'est normal.
+3. FX > Add > **Trash** après le splitter. Cliquer son bouton « 2 in 2 out » :
+   dans la matrice, **décocher** les entrées 1 et 2 et cocher les canaux
+   **3 et 4** sur les entrées 1 et 2 du plug-in ; même chose côté sorties
+   (sorties 1 et 2 du plug-in vers les canaux 3 et 4). Le bouton affiche
+   maintenant quelque chose comme « 2 in 2 out » avec 3/4 dans la matrice :
+   Trash ne voit que le corps.
+4. FX > Add > **JS: 3-Band Joiner** en dernier (avant le passe-haut 25-30 Hz
+   et le soft clipper de la chaîne de sortie, §3.4). Le son revient entier.
+5. Régler Trash : bypasser le joiner un instant pour écouter 1/2 seuls (le
+   sub, qui doit rester un sinus propre), puis remettre le joiner et doser
+   style, drive et mix sur le corps. Les potards du joiner servent de
+   faders de bandes : baisser 5/6 si le click ressort trop après la
+   saturation.
+6. Un second Trash, ou JS Saturation, branché sur **5/6** traite le click à
+   part (léger) ; un troisième étage sur 1/2 reste interdit : le sub ne se
+   sature pas, il se garde.
+7. Sauvegarder la chaîne en **preset de chaîne** (menu FX > Save chain) ou,
+   depuis Reaper 7, mettre splitter, Trash et joiner dans un **conteneur
+   FX** (FX > Add > Container, puis glisser les trois dedans) : un seul
+   bloc « Trash 3 bandes » réutilisable sur BASS et RUMBLE.
 
 Même découpage pour la basse mid, et pour le rumble si le drive de Trash
 dépasse 20 dB. C'est le « multi-étages » de Sara Landry (doctrine §3) avec
 des outils gratuits.
+
+**Variante en dossier, SUB / BODY.** Avant de connaître le splitter, ou
+quand on veut deux chaînes vraiment différentes sur le sub et le corps :
+rendre le kick sec (§7), créer deux pistes enfants d'un dossier KICK (icône
+de dossier en bas du TCP du parent, puis sur le dernier enfant pour fermer
+le dossier ; le parent somme ses enfants et son fader dose le tout), poser
+le WAV sur les deux, ReaEQ **Low Pass** 90-100 Hz sur SUB (une bande fait
+12 dB/oct, deux bandes identiques pour 24), ReaEQ **High Pass** 90-100 Hz
+puis Trash sur BODY, solo de BODY pour régler Trash, puis doser aux faders
+en mono. Plus lourd (trois pistes, un WAV à rendre d'abord) et pas de
+garantie de resommation plate au croisement : le splitter est le défaut.
+
+**Hors Reaper.** Des hôtes multibandes qui chargent un VST tiers par bande
+existent (Blue Cat's MB-7 Mixer, DDMF Metaplugin), tous payants et
+inutiles ici ; Kilohearts Multipass n'accepte que ses propres snapins. La
+version payante de Trash est elle-même multibande (trois bandes, un
+réglage par bande) : c'est l'argument d'achat si Trash Lite ne suffit
+plus un jour.
 
 ### 2.5 Mesurer
 
@@ -341,8 +379,8 @@ l'architecture :
    qui reste sous le passe-bas.
 6. Effet **Distortion** de Vital (Soft Clip, puis Hard Clip pour le mental)
    en second étage, mix 30-50 % ; refermer avec l'EQ de Vital si le haut
-   devient criard. Le troisième étage, Trash, se fait dans Reaper sur BODY
-   (§2.4).
+   devient criard. Le troisième étage, Trash, se fait dans Reaper sur la
+   bande 3/4 du splitter (§2.4).
 7. Enregistrer le preset Vital avec la note dans le nom, puis rendu (§6).
 
 ### 3.4 Chaîne de sortie commune
@@ -449,8 +487,8 @@ sinus pur 57 → 50 Hz, harmoniques à -17 dB. Deux kickbass, deux chaînes.
 3. ENV 2 sur Transpose, +24 à +30 demi-tons, decay 100-130 ms (Neurotribe)
    ou 20-40 ms puis sinus pur (Six ou Sept).
 4. **Version saturée** (free party) : filtre ladder, drive haut, puis
-   distorsion Vital Soft Clip, puis Trash sur BODY (§2.4, coupure SUB /
-   BODY à 90 Hz pour que le sinus reste intact), passe-bas final 300 Hz
+   distorsion Vital Soft Clip, puis Trash sur la bande 3/4 (§2.4, coupure
+   basse du splitter à 90 Hz pour que le sinus reste intact), passe-bas final 300 Hz
    (LOWPASS 4 sur la DT2). Cible : harmoniques 120-300 Hz à -5 ou -6 dB du
    fondamental sur SPAN.
 5. **Version sinus** (club) : pas de Trash, un seul étage de Soft Clip très
@@ -464,7 +502,7 @@ sinus pur 57 → 50 Hz, harmoniques à -17 dB. Deux kickbass, deux chaînes.
 Même chose en dessinant : enveloppe de volume de la couche sub avec un
 plateau qui dure jusqu'au temps suivant (lire les ms), enveloppe de pitch
 courte, note d'arrivée = tonique, harmoniques du sub poussées pour la
-version saturée ; Trash en aval sur BODY. L'option de suivre la hauteur de
+version saturée ; Trash en aval sur la bande 3/4 (§2.4). L'option de suivre la hauteur de
 la seule queue (pitch tracking des sub tails) sert ici : la queue suit la
 note MIDI, le click reste fixe.
 
@@ -571,7 +609,7 @@ Deux raccourcis pour les cas simples : sélectionner un item, clic droit >
 piste) ; clic droit > **Apply track FX to items as new take** rend l'item
 **avec** la chaîne d'effets de la piste, en gardant l'original comme prise
 précédente (Cmd+Z ou le menu des prises pour y revenir). Le second est
-pratique pour figer un kick traité avant de le poser sur SUB et BODY.
+pratique pour figer un kick traité, ou pour la variante en dossier du §2.4.
 
 ### 7.2 Du rendu à la machine
 
@@ -601,8 +639,12 @@ pratique pour figer un kick traité avant de le poser sur SUB et BODY.
 ## 8. Pièges propres à la stack
 
 - **Trash Lite est monobande** : saturer un kick entier mange le sub ;
-  toujours SUB / BODY en parallèle (§2.4). Convolve et le multibande sont
-  dans la version payante, non nécessaire ici.
+  toujours derrière un JS 3-Band Splitter, branché sur 3/4 par le pin
+  connector (§2.4). Convolve et le multibande sont dans la version
+  payante, non nécessaire ici.
+- **Pin connector oublié** : Trash posé après le splitter sans toucher au
+  « 2 in 2 out » ne traite que 1/2, donc le sub, l'inverse du but ; un
+  joiner oublié ne laisse entendre que les graves.
 - **Vital** : randomisation de phase à 0 sur chaque oscillateur, voices 1,
   unisson 1 sur tout ce qui descend sous 120 Hz ; une basse en unisson
   stéréo disparaît en mono.
@@ -631,7 +673,9 @@ pratique pour figer un kick traité avant de le poser sur SUB et BODY.
 
 0. **Échauffement Reaper (15 min).** Construire le projet modèle du §2.0
    avec un seul kick (Vital, sinus, recette C) et une seule piste RUMBLE :
-   send vers 1/2, send vers 3/4, ReaComp qui plonge à chaque kick. Puis
+   send vers 1/2, send vers 3/4, ReaComp qui plonge à chaque kick ; puis
+   sur KICK, splitter, Trash sur 3/4, joiner, et vérifier au bypass du
+   joiner que 1/2 est un sinus propre. Puis
    rendre une mesure en mono 48 kHz et la rouvrir dans le Media Explorer.
    Tant que le vumètre de ReaComp ne bouge pas ou que le fichier n'a pas
    la bonne longueur, le reste de la fiche attendra.
@@ -676,6 +720,14 @@ pratique pour figer un kick traité avant de le poser sur SUB et BODY.
   Dusty, Rasper) :
   <https://www.elephorm.com/formation/apprendre-maschine-2x-tutoriel-video-en-ligne/guide-complet-sur-le-drumsynth-kick>
   ; manuel Maschine, section Drum Synths > Kick, pour les paramètres exacts.
+- Reaper, multibande avec n'importe quel plug-in : Cockos, *How to set
+  up multi-band effects* :
+  <https://www.cockos.com/wiki/index.php/How_to_set_up_multi-band_effects>
+  `[V]` ; Sound On Sound, *Reaper: creating multi-band processors* :
+  <https://www.soundonsound.com/techniques/reaper-creating-multi-band-processors>
+  `[V]` ; The REAPER Blog, splitter
+  <https://reaper.blog/2016/04/js-band-splitter-fx/> et joiner
+  <https://reaper.blog/2016/05/js-band-joiner-fx-multi-band-processing-with-any-plugin/>.
 - Reaper, pour monter en compétence dans l'ordre de cette fiche : le
   *REAPER User Guide* de Geoffrey Francis (PDF gratuit sur reaper.fm,
   chapitres Routing et Sidechaining, Rendering, Track templates) ; les
