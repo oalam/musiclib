@@ -70,7 +70,7 @@ de point de départ pour les réglages.
 | Resample | bounce de 2 mesures, crête vers -6 dBFS sans écrêter, puis couper l'envoi d'origine ; un second traitement (saturation, filtre) est possible sans boucle de retour | prise normalisée : baisser `VOL` de la 2 après coup ; `OVER` et LOWPASS 4 sur le sample figé |
 | Pitch du rumble | **-5 à -12 demi-tons** en vari-speed (pas de correction de formants, pas de granulaire) ; un shifter qui fait « bouger » la hauteur est un piège | `TUNE` de la 2 (appuyer en tournant = demi-tons), machine ONESHOT ou REPITCH ; vérifier la note contre le kick (KT5) |
 | Couche sinus | sinus **une octave sous** la fondamentale du kick, attaque lente 200 ms, mixée 10-12 dB sous le rumble | second preset de la 2 ou la 9 en variante sans basse, `ATK` 200 ms, sample sinus accordé |
-| Ducking, piège | lookahead désactivé, sinon le creux arrive après l'attaque du kick | sans objet sur la DT2 ; à retenir si le rumble est fabriqué sur le Mac |
+| Ducking, piège | lookahead désactivé, sinon le creux arrive après l'attaque du kick | sans objet sur la DT2 ; sur le Mac, « Pre-comp » de ReaComp à 0 ([[../../technique/sounddesign-grave-reaper]] §2.3) |
 | Ducking qui vit | sidechain **automatisé** : moins de ducking en intro, à fond à partir du drop | `THR` du compresseur en perform kit (fiche [[perform-kit-temp-save]]), ou `ATK` de l'AMP de la 2 par pattern |
 | Niveau | rumble resamplé mixé **sous le kick**, mono sous 120 Hz ; réduction de gain 6-12 dB à chaque kick ; si le rumble noie le kick sur moniteurs, passe-bas vers 170 Hz | la 2 sous la 1, pan centré |
 | Vie du rumble | passe-bas résonant (20-30 %) 140-280 Hz automatisé sur 16-32 mesures, en courbe plutôt qu'en rampe ; send qui bouge de 1-2 dB (Bonedo) | LFO lent sur `FREQ` de la 2 (KT9, KT11) |
@@ -140,6 +140,8 @@ la 2 au même niveau, garder celui qui laisse respirer la basse en
 contretemps.
 
 Source : manuel DT2 OS 1.17, §11.5-11.8, §12.3, §12.5, §13 ; doctrine §9.
+La même recette sur le Mac, plug-in par plug-in (ReaVerbate, Trash Lite,
+ReaComp en sidechain) : [[../../technique/sounddesign-grave-reaper]] §4.
 
 ## Vidéos
 

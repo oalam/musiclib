@@ -8,6 +8,19 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- `technique/` : [[sounddesign-grave-reaper]], tuto complet du grave sur
+  Mac avec la stack gratuite (Reaper, Vital, Maschine Drumsynth Kick,
+  Kick 3, iZotope Trash Lite, SPAN, ReaComp, Acid V) : projet modèle au
+  tempo du set (pistes, sends vers canaux 1/2 et 3/4, ReaComp en sidechain
+  avec pre-comp à 0, saturation SUB / BODY en parallèle parce que Trash
+  Lite est monobande), table des durées par BPM, trois recettes de kick
+  (Drumsynth, Kick 3 par couches, Vital de A à Z), rumble plug-in par
+  plug-in avec les deux départs de passe-haut et les cibles `deep` /
+  `gritty`, kickbass saturé contre sinus et limite de tempo vers le
+  kick-sub, basse en contretemps (one-shot par note) et ligne Acid V,
+  rendu 48 kHz mono nommé avec la note, pièges de la stack, cinq
+  exercices ; liens retour depuis [[kick-mental-vst]], [[rumble-grave]]
+  et KT23.
 - [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
   mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
   `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois

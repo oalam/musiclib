@@ -177,4 +177,6 @@ Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, basse 9. Gestes :
 [[kt-style-acidcore]] · KT13 [[kt-style-hard-techno]] · KT21 [[kt-basses]]
 · [[../kick-mental-vst]] · [[../rumble-grave]] · [[../filtres]] ·
 [[../audio-routing-overbridge]] · [[../../doctrine]] §1, §9, §11, §13 ·
-notebook [[../../../sounddesign/rumble]] · [[../../veille-theorie]] §F
+notebook [[../../../sounddesign/rumble]] · [[../../veille-theorie]] §F ·
+fabrication des trois architectures sur le Mac
+[[../../../technique/sounddesign-grave-reaper]] §3 à §6

@@ -63,7 +63,9 @@ invariant de la track 1 (doctrine §3, §11).
   `USB AUDIO/MIDI` (cf. [[overbridge-live-vst]]) ; *à vérifier* : niveau
   d'entrée côté DAW avant la prise (normalisée ensuite).
 - Les tutos utilisent des plugins payants (Serum 2, Kick 2) : la même
-  chaîne se fait avec un synthé et une distorsion gratuits, à choisir.
+  chaîne se fait avec un synthé et une distorsion gratuits ; la stack
+  retenue (Reaper, Vital, Kick 3, Trash Lite, ReaComp) est déroulée dans
+  [[../../technique/sounddesign-grave-reaper]].
 
 ## À essayer (5 min)
 
@@ -72,6 +74,8 @@ sur la track 1 avec la même basse en contretemps sur la 9 ; garder celui qui
 laisse la basse respirer à 190 BPM.
 
 Source : manuel DT2 OS 1.17, §13.1.1, §13.6.7, A.2.1 ; doctrine §3, §11.
+Recettes concrètes par plug-in (Drumsynth, Kick 3, Vital, kickbass) :
+[[../../technique/sounddesign-grave-reaper]] §3 et §5.
 
 ## Vidéos
 

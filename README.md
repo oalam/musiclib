@@ -19,6 +19,7 @@ Vault Obsidian d'apprentissage et de documentation.
 
 - [ ] Installer TidalCycles → [[technique/installation-macos]]
 - [x] Anatomie du kick (vidéo Koçer) → [[technique/anatomie-kick]] + [[philo/kick-comme-loi]]
+- [ ] Sound design du grave sur Mac (kick, rumble, kickbass, basse ; Reaper, Vital, Kick 3, Trash Lite) → [[technique/sounddesign-grave-reaper]], à rejouer dans Reaper
 - [x] **Ressources rassemblées** → [[inspirations/bahadirhan-kocer]], [[inspirations/penseurs-praticiens]], [[inspirations/sets]], [[refs/free-tek-sources]], [[refs/live-coding-ressources]]
 - [x] **Patches Tidal par genre** → [[technique/patches/_index]] (DnB, tribe, dubstep)
 - [ ] Lire **The Ontology of The Kick** (Medium, Koçer) → enrichir [[philo/kick-comme-loi]]
