@@ -8,8 +8,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
-- `technique/` : [[sounddesign-grave-reaper]], tuto complet du grave sur
-  Mac avec la stack gratuite (Reaper, Vital, Maschine Drumsynth Kick,
+- [7.M] KB tutos, recette maison 3 [[maison-sounddesign-grave-reaper]]
+  (d'abord écrite dans `technique/`, déplacée dans la KB pour être dans le
+  hub) : tuto complet du grave sur Mac avec la stack gratuite (Reaper, Vital, Maschine Drumsynth Kick,
   Kick 3, iZotope Trash Lite, SPAN, ReaComp, Acid V) : projet modèle au
   tempo du set (pistes, sends vers canaux 1/2 et 3/4, ReaComp en sidechain
   avec pre-comp à 0, saturation SUB / BODY en parallèle parce que Trash

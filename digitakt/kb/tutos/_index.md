@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-26
+updated: 2026-10-29
 ---
 
 # KB tutos — sessions vidéo décortiquées
@@ -91,3 +91,4 @@ Source : <https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556>
 |---|---|---|---|---|
 | 1 | [[maison-rumble-dans-le-kick]] | rumble dans la queue sèche du kick (track 1), sans resample | 4 | draft |
 | 2 | [[maison-progression-par-phrases]] | pattern main écrit pour 4 tours, partition de mutes sur 3 cycles, changement de pattern à une seule différence | 3 | draft |
+| 3 | [[maison-sounddesign-grave-reaper]] | le grave fabriqué sur le Mac (Reaper, Vital, Drumsynth, Kick 3, Trash Lite, ReaComp, Acid V) et exporté pour les tracks 1, 2 et 9 ; notions Reaper et glossaire Reaper → Digitakt | 4 tutos (kick, rumble, kickbass, basse) | draft |

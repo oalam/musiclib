@@ -179,4 +179,4 @@ Grille de la [[../../doctrine]] §1 : kick 1, rumble 2, basse 9. Gestes :
 [[../audio-routing-overbridge]] · [[../../doctrine]] §1, §9, §11, §13 ·
 notebook [[../../../sounddesign/rumble]] · [[../../veille-theorie]] §F ·
 fabrication des trois architectures sur le Mac
-[[../../../technique/sounddesign-grave-reaper]] §3 à §6
+[[../tutos/maison-sounddesign-grave-reaper]] §3 à §6

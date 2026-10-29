@@ -1,12 +1,18 @@
 ---
-tags: [technique, sounddesign, kick, rumble, kickbass, basse, reaper, vital]
-theme: Sound design du grave sur Mac, de la stack gratuite au sample DT2
+tags: [digitakt, kb, tutos]
+theme: Sound design du grave sur Mac (kick, rumble, kickbass, basse) avec Reaper, Vital, Drumsynth, Kick 3, Trash Lite, SPAN, ReaComp, Acid V
+lot: 3
+ordre: 3
+source: "échange de travail du 2026-10-29 (stack retenue) ; vérifications web Kick 3, Trash Lite, Drumsynth"
+auteur: Tom (stack), rédaction à vérifier dans Reaper
+modele: DT2
+os: "1.17"
 stack: [Reaper, Vital, Maschine Drumsynth Kick, Kick 3, iZotope Trash Lite, SPAN, ReaComp, Acid V]
 statut: draft
 updated: 2026-10-29
 ---
 
-# Sound design du grave sur Mac : kick, rumble, kickbass, basse
+# Maison 3 — Sound design du grave sur Mac : kick, rumble, kickbass, basse
 
 **En une phrase** : les quatre sons du grave se fabriquent dans un seul
 projet Reaper au tempo du set, chacun sur sa piste avec sa chaîne, se
@@ -15,25 +21,25 @@ en WAV mono 48 kHz nommés avec leur note pour devenir, sur la DT2, le kick
 de la track 1, le rumble de la 2 et la basse de la 9.
 
 Cette fiche est la version « stack concrète » de deux fiches KB qui restent
-la référence des gestes machine : [[../digitakt/kb/kick-mental-vst]] (kick
-fabriqué en VST, joué sur la 1) et [[../digitakt/kb/rumble-grave]] (gestes
+la référence des gestes machine : [[../kick-mental-vst]] (kick
+fabriqué en VST, joué sur la 1) et [[../rumble-grave]] (gestes
 DT2 du §9, repères chiffrés des sources, dépannage). Les décisions sur le
-grave sont prises dans la [[../digitakt/doctrine]] et dans les KT, elles ne
-sont pas rediscutées ici.
+grave sont prises dans la [[../../doctrine]] et dans les KT, elles ne
+sont pas rediscutées ici. Format : recette maison du lot 3 ([[_index]]).
 
 ## 0. Ce qui est arbitré avant d'ouvrir Reaper
 
 | Décision | Où | Conséquence dans le projet |
 |---|---|---|
-| Une seule architecture du grave à la fois : kickbass, kick + rumble, ou kick + basse | KT23 [[../digitakt/kb/theorie/kt-kickbass-contre-kick-basse]] | choisir l'architecture **avant** de dessiner le kick : elle fixe sa longueur et ce qu'on exporte (rumble ou basse, jamais les deux sous un kickbass) |
-| Une seule note sous 120 Hz, mesurée sur la queue du kick ; rumble et basse sur la tonique ou la quinte | KT5 [[../digitakt/kb/theorie/kt-tonalite-du-grave]], doctrine §11 | le projet Reaper a une tonique ; tout s'accorde dessus ; la note va dans le nom du fichier |
-| Le kick possède le sub (20-60 Hz), le rumble vit en 60-150 Hz, la basse au-dessus ou duckée ; mono sous 120 Hz | doctrine §9, [[../digitakt/kb/rumble-grave]] | passe-haut sur le rumble et la basse, pas sur le kick ; master en mono pour juger |
+| Une seule architecture du grave à la fois : kickbass, kick + rumble, ou kick + basse | KT23 [[../theorie/kt-kickbass-contre-kick-basse]] | choisir l'architecture **avant** de dessiner le kick : elle fixe sa longueur et ce qu'on exporte (rumble ou basse, jamais les deux sous un kickbass) |
+| Une seule note sous 120 Hz, mesurée sur la queue du kick ; rumble et basse sur la tonique ou la quinte | KT5 [[../theorie/kt-tonalite-du-grave]], doctrine §11 | le projet Reaper a une tonique ; tout s'accorde dessus ; la note va dans le nom du fichier |
+| Le kick possède le sub (20-60 Hz), le rumble vit en 60-150 Hz, la basse au-dessus ou duckée ; mono sous 120 Hz | doctrine §9, [[../rumble-grave]] | passe-haut sur le rumble et la basse, pas sur le kick ; master en mono pour juger |
 | Le grave d'abord, fini et validé seul, une passe puis on fige | doctrine §7 | une séance = une tonique, une architecture, un tempo ; réécoute à froid le lendemain, une correction, export |
 | Un kick par bank, invariant dans la bank | doctrine §3 | une famille de kicks par tonalité (F#, G, A) plutôt qu'un kick repitché |
-| Kick de 150-300 ms pour un rumble, kickbass qui tient jusqu'au kick suivant | [[../digitakt/kb/rumble-grave]], KT23 | la longueur se règle en ms au tempo du set, pas à l'oreille sur le clavier |
+| Kick de 150-300 ms pour un rumble, kickbass qui tient jusqu'au kick suivant | [[../rumble-grave]], KT23 | la longueur se règle en ms au tempo du set, pas à l'oreille sur le clavier |
 
 Les trois couches du kick (sub 30-60 Hz, thump 100-200 Hz, click au-dessus
-de 2 kHz) sont décrites dans [[anatomie-kick]] ; c'est le vocabulaire
+de 2 kHz) sont décrites dans [[../../../technique/anatomie-kick]] ; c'est le vocabulaire
 utilisé ci-dessous.
 
 ## 1. La stack et le rôle de chacun
@@ -42,7 +48,7 @@ utilisé ci-dessous.
 |---|---|---|
 | **Reaper** | hôte, routing, sidechain, mesure, rendu | tout se fait dans un projet modèle ; les plug-ins Rea* et JS sont inclus |
 | **Vital** | kickbass, basse sub et mid, kick synthétisé de A à Z, lignes | gratuit ; 3 oscillateurs, 2 filtres (dont ladder et diode), 6 enveloppes, distorsion intégrée ; monophonique à régler |
-| **Maschine Drumsynth Kick** | kicks rapides, surtout tribe (moteurs Sub, Tronic, Dusty…) | pas un VST à part : se charge dans le plug-in **Maschine 2** inséré dans Reaper, sur un pad d'un groupe (voir [[../digitakt/kb/controleur-maschine]]) |
+| **Maschine Drumsynth Kick** | kicks rapides, surtout tribe (moteurs Sub, Tronic, Dusty…) | pas un VST à part : se charge dans le plug-in **Maschine 2** inséré dans Reaper, sur un pad d'un groupe (voir [[../controleur-maschine]]) |
 | **Kick 3** (Sonic Academy, démo puis achat) | le kick de référence par bank : enveloppes de pitch et de volume dessinées, click, note lue | cinq couches, chacune sub synthétisé ou sample, avec sa propre enveloppe de pitch et de volume ; 500 clicks ; EQ avec analyseur ; import d'un kick depuis un morceau entier (à vérifier sur la démo : limites d'export) |
 | **Trash** (iZotope) | distorsion lourde : kick saturé, rumble, basse | la version gratuite est **Trash Lite** : module Trash (plus de 60 styles, pad XY entre quatre algorithmes), Randomize, Autogain / limiteur ; **sans Convolve ni multibande**. Le multibande se fait dans Reaper (§2.4) |
 | **SPAN** (Voxengo) | analyseur : note de la queue, tenue du sub, bandes, corrélation | sur le master et sur chaque piste pendant la mesure |
@@ -193,7 +199,7 @@ passe par 1/2, le kick par 3/4, ReaComp traite 1/2 en écoutant 3/4.
    à **0 ms**, « Auto make-up » **décoché**. Lecture : le vumètre vertical
    de ReaComp doit plonger à chaque kick ; s'il ne bouge pas, le send vise
    1/2 ou le détecteur écoute « Main input ».
-4. Réglages de départ (repères de [[../digitakt/kb/rumble-grave]] recalés
+4. Réglages de départ (repères de [[../rumble-grave]] recalés
    au tempo) : ratio 4:1 à 8:1, attaque 0,1 à 1 ms, release = une croche
    (160 ms à 185 BPM), seuil descendu jusqu'à 6-12 dB de réduction à chaque
    kick (lire le vumètre de ReaComp).
@@ -291,14 +297,14 @@ l'architecture :
 1. Piste KICK, Kick 3, preset init. Première couche en **sub synthétisé** :
    dessiner l'enveloppe de pitch avec deux ou trois points : départ une à
    deux octaves au-dessus (+24 à +36 demi-tons, la recette Koçer dans
-   [[anatomie-kick]]), chute en 10-20 ms pour un click intégré, 40-60 ms
+   [[../../../technique/anatomie-kick]]), chute en 10-20 ms pour un click intégré, 40-60 ms
    pour un thump, point d'arrivée **sur la tonique**, affichée par le
    plug-in sur le dernier point.
 2. Enveloppe de volume de la même couche : plateau court puis descente ;
    lire la longueur en ms et la caler sur la table du §3 (à 185 BPM,
    130-200 ms pour un kick à rumble).
 3. Deuxième couche, un **click** parmi les 500 (ou un sample de la banque
-   `/Volumes/xtreme/Samples`, branche DRUMS, [[../digitakt/kt-banque-samples]]) :
+   `/Volumes/xtreme/Samples`, branche DRUMS, [[../../kt-banque-samples]]) :
    enveloppe raccourcie « assez » pour qu'il se fonde au sub, pas de queue.
    Une troisième couche optionnelle en bruit filtré pour l'air (tribe).
 4. Harmoniques du sub (le sub « étendu ») : un peu, pour que le kick passe
@@ -358,10 +364,10 @@ compresseur sur le kick seul ; la colle se fait sur la DT2 (doctrine §10).
 
 ## 4. Tuto rumble : la reverb saturée, duckée par le kick
 
-Même recette que la chaîne `Rumble` de [[../sounddesign/rumble]] (Freeverb,
+Même recette que la chaîne `Rumble` de [[../../../sounddesign/rumble]] (Freeverb,
 passe-bas, tanh, passe-bas, passe-haut, duck) et que la doctrine §9, avec
 les plug-ins de Reaper. Deux départs possibles pour le passe-haut avant la
-reverb (désaccord des sources, [[../digitakt/kb/rumble-grave]]) : les deux
+reverb (désaccord des sources, [[../rumble-grave]]) : les deux
 se rendent et se comparent.
 
 ### 4.1 Chaîne sur la piste RUMBLE
@@ -399,11 +405,11 @@ Vital sur une piste SUB-R : sinus **une octave sous** la fondamentale du
 kick (F#0 = 23,1 Hz pour un kick en F#1 ; à 46,2 / 2), attaque 200 ms,
 mixé 10-12 dB sous le rumble, ducké pareil. Uniquement sur un vrai sub ;
 à retirer si le système ne descend pas (passe-haut du rig à 35-40 Hz,
-[[sound-system-free-party]]).
+[[../../../technique/sound-system-free-party]]).
 
 ### 4.4 Rendu du rumble pour la DT2
 
-Deux formats, comme dans [[../sounddesign/rumble]] :
+Deux formats, comme dans [[../../../sounddesign/rumble]] :
 
 - **Boucle** : sélection temporelle d'exactement 1 ou 2 mesures (à 185 BPM,
   2 mesures = 2 × 4 × 60 / 185 = 2,595 s), kick muté dans le master,
@@ -416,7 +422,7 @@ Deux formats, comme dans [[../sounddesign/rumble]] :
 Nom `rumble_<preset>_<note>_<bpm>.wav` ; rendre une version par tempo,
 jamais de time-stretch sur la machine. Après versement dans la library, le
 rendu prend un nom DT2 en miroir du kick (`RM 185 ... `, circuit 8.L2 dans
-[[../sounddesign/rumble]]).
+[[../../../sounddesign/rumble]]).
 
 ### 4.5 Valider un rumble
 
@@ -424,7 +430,7 @@ Sous le kick, au casque : le kick garde son attaque (sinon ducking plus
 profond ou plus rapide, rumble baissé de 2-3 dB) ; entre deux kicks, le
 30-100 Hz remonte sans dépasser l'attaque ; en mono, rien ne disparaît ;
 au téléphone, le grondement s'entend encore par ses harmoniques. La table
-de dépannage est dans [[../digitakt/kb/rumble-grave]].
+de dépannage est dans [[../rumble-grave]].
 
 ## 5. Tuto kickbass : le kick qui est la basse
 
@@ -515,14 +521,14 @@ Quand une seule basse ne tient pas : **sub** = la queue du kick elle-même,
 passe-bas 80 Hz (c'est le kickbass en version douce) ; **synthé** Vital
 HPF 65 / LPF 350 ; **percussive** = le kick envoyé dans un delay à la
 double-croche (ReaDelay, 1/16, feedback bas, passe-bas 200 Hz), le « rumble
-en contretemps » de [[../digitakt/kb/tutos/maison-rumble-dans-le-kick]].
+en contretemps » de [[maison-rumble-dans-le-kick]].
 Sur la DT2 ces trois couches ne tiennent pas sur une track : choisir
 laquelle est la 9, figer les autres dans le kick ou le rumble.
 
 ### 6.3 Ligne acid, Acid V (track 10, et basse acid)
 
 1. Piste ACID, Acid V ; séquence interne ou item MIDI de 16 pas sur le mode
-   de la bank (phrygien sur la tonique, [[../digitakt/kb/keyboard-gammes]]).
+   de la bank (phrygien sur la tonique, [[../keyboard-gammes]]).
    Dent de scie pour l'acid tribe, carré pour un son plus rond.
 2. Cutoff bas, résonance haute, env mod fort, decay court ; accents sur
    deux ou trois pas, un slide par mesure au plus. Le drive interne d'Acid V
@@ -534,7 +540,7 @@ laquelle est la 9, figer les autres dans le kick ou le rumble.
    200 Hz, KT5) : alors passe-haut à 40-60 Hz et ReaComp sidechainé.
 4. Pour la DT2, deux voies : rendre des one-shots par note (track 10 en
    audio, un sample par degré), ou garder Acid V live sur le Mac séquencé
-   par une track MIDI ([[../digitakt/kb/midi-vst]]).
+   par une track MIDI ([[../midi-vst]]).
 
 ### 6.4 Valider une basse
 
@@ -581,7 +587,7 @@ pratique pour figer un kick traité avant de le poser sur SUB et BODY.
    `rumble_gritty_F#_185.wav`, `kickbass_sat_F#_160.wav`, `bass_sub_F#.wav`.
    La note vient de la mesure sur la queue, pas de la note MIDI.
 4. Ranger les WAV dans la banque de samples (`/Volumes/xtreme/Samples`,
-   [[../digitakt/kt-banque-samples]]) dans un pack `SoundDesign/` à côté de
+   [[../../kt-banque-samples]]) dans un pack `SoundDesign/` à côté de
    `SoundDesign/rumble/` (sous-dossier par rôle, `kick/`, `kickbass/`,
    `bass/` ; nom du pack à arbitrer avant le premier versement), puis
    réanalyse : le circuit habituel, écoute garder / écarter, export
@@ -647,14 +653,14 @@ pratique pour figer un kick traité avant de le poser sur SUB et BODY.
 5. **A/B avec la chaîne Python (5 min).** Même kick dans `sounddesign.py`
    preset `gritty` et dans Reaper avec les valeurs du §4.1 ; au même niveau,
    écouter ce que Trash et ReaVerbate font de différent du tanh et de
-   Freeverb, et noter dans [[../sounddesign/rumble]] ce qui vaut d'être
+   Freeverb, et noter dans [[../../../sounddesign/rumble]] ce qui vaut d'être
    porté dans un preset.
 
 ## Ressources
 
 - Recettes et repères chiffrés des sources (Myloops, Futureproof, Attack
   Magazine, Gearnews, Bonedo, Elektronauts) : rassemblés dans
-  [[../digitakt/kb/rumble-grave]] et [[../digitakt/veille-theorie]] §F ;
+  [[../rumble-grave]] et [[../../veille-theorie]] §F ;
   valeurs données pour 125-140 BPM, recalées ici avec la table du §2.2.
 - MusicTech, *Sonic Academy Kick 3 review* :
   <https://musictech.com/reviews/plug-ins/sonic-academy-kick-3-review/>
@@ -678,17 +684,17 @@ pratique pour figer un kick traité avant de le poser sur SUB et BODY.
   (articles sur ReaComp, ReaEQ, le Media Explorer). Voxengo SPAN : manuel
   (block size, slope).
 - Tutos vidéo DAW non visionnés (kick mental en Serum 2 / Ableton) listés
-  dans [[../digitakt/kb/kick-mental-vst]].
+  dans [[../kick-mental-vst]].
 
 ## Liens
 
-[[anatomie-kick]] · [[sound-system-free-party]] ·
-[[../sounddesign/rumble]] · [[../digitakt/kb/kick-mental-vst]] ·
-[[../digitakt/kb/rumble-grave]] · [[../digitakt/kb/tutos/maison-rumble-dans-le-kick]]
-· [[../digitakt/kb/midi-vst]] · [[../digitakt/kb/controleur-maschine]] ·
-KT5 [[../digitakt/kb/theorie/kt-tonalite-du-grave]] · KT21
-[[../digitakt/kb/theorie/kt-basses]] · KT23
-[[../digitakt/kb/theorie/kt-kickbass-contre-kick-basse]] ·
-[[../digitakt/doctrine]] §3, §7, §9, §10, §11
+[[../../../technique/anatomie-kick]] · [[../../../technique/sound-system-free-party]] ·
+[[../../../sounddesign/rumble]] · [[../kick-mental-vst]] ·
+[[../rumble-grave]] · [[maison-rumble-dans-le-kick]]
+· [[../midi-vst]] · [[../controleur-maschine]] ·
+KT5 [[../theorie/kt-tonalite-du-grave]] · KT21
+[[../theorie/kt-basses]] · KT23
+[[../theorie/kt-kickbass-contre-kick-basse]] ·
+[[../../doctrine]] §3, §7, §9, §10, §11
 
-#technique #sounddesign #kick #rumble #kickbass #basse
+#digitakt #kb #tutos #sounddesign #kick #rumble #kickbass #basse

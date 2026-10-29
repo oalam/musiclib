@@ -65,7 +65,7 @@ invariant de la track 1 (doctrine §3, §11).
 - Les tutos utilisent des plugins payants (Serum 2, Kick 2) : la même
   chaîne se fait avec un synthé et une distorsion gratuits ; la stack
   retenue (Reaper, Vital, Kick 3, Trash Lite, ReaComp) est déroulée dans
-  [[../../technique/sounddesign-grave-reaper]].
+  [[tutos/maison-sounddesign-grave-reaper]].
 
 ## À essayer (5 min)
 
@@ -75,7 +75,7 @@ laisse la basse respirer à 190 BPM.
 
 Source : manuel DT2 OS 1.17, §13.1.1, §13.6.7, A.2.1 ; doctrine §3, §11.
 Recettes concrètes par plug-in (Drumsynth, Kick 3, Vital, kickbass) :
-[[../../technique/sounddesign-grave-reaper]] §3 et §5.
+[[tutos/maison-sounddesign-grave-reaper]] §3 et §5.
 
 ## Vidéos
 
