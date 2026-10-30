@@ -33,6 +33,8 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   rumble : les deux sends du kick (1/2 pour la reverb, 3/4 pour le
   détecteur) dans les étapes numérotées, pourquoi un seul send vers 3/4
   fait taire la piste, variante à un send par pin connector sur ReaVerbate.
+  Tempo de travail recalé sur 160-170 BPM (exemples à 165), kickbass
+  saturé à sa limite haute à 170 plutôt que bascule vers le kick-sub.
 - [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
   mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
   `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois

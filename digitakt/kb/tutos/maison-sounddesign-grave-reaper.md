@@ -107,8 +107,8 @@ MIDI d'une mesure et quatre kicks sur la piste KICK.
 1. **Projet neuf et réglages.** Cmd+N. Opt+Enter ouvre Project Settings :
    onglet Project Settings, case « Project sample rate » cochée, 48000 ;
    le tempo se tape
-   directement dans le champ BPM de la barre de transport (185,00). Cmd+S,
-   nom `grave_F#_185.rpp`, dans un dossier à lui (Reaper y met les rendus
+   directement dans le champ BPM de la barre de transport (165,00). Cmd+S,
+   nom `grave_F#_165.rpp`, dans un dossier à lui (Reaper y met les rendus
    et les enregistrements).
 2. **Grille.** Opt+L ouvre les réglages de grille : 1/16 ; Opt+S active
    l'aimantation. Dans la règle, la mesure 1 est maintenant découpée en
@@ -163,13 +163,18 @@ Un temps vaut 60 / BPM, la croche la moitié, la double-croche le quart.
 | BPM | temps | croche | double-croche | usage |
 |---|---|---|---|---|
 | 150 | 60 / 150 = 0,400 s | 200 ms | 100 ms | hard techno, preset `deep` |
-| 160 | 0,375 s | 187 ms | 94 ms | tribe lente, kickbass saturé (Neurotribe 161,5) |
-| 185 | 0,324 s | 162 ms | 81 ms | tribe, preset `gritty` |
-| 190 | 0,316 s | 158 ms | 79 ms | mental, acid core |
-| 200 | 0,300 s | 150 ms | 75 ms | limite haute du set |
+| 160 | 60 / 160 = 0,375 s | 187 ms | 94 ms | bas du set ; kickbass saturé (Neurotribe 161,5) |
+| 165 | 60 / 165 = 0,364 s | 182 ms | 91 ms | **tempo de travail de la fiche** |
+| 170 | 60 / 170 = 0,353 s | 176 ms | 88 ms | haut du set |
+
+Le set vit entre 160 et 170 BPM, jamais au-delà : les repères des sources
+(donnés pour 125-140) se recalent ici sur 165, et la différence entre 160
+et 170 (22 ms par temps) se règle à l'oreille, pas en refaisant le rendu.
+Le preset `gritty` de la chaîne Python est écrit pour 185 : le relancer au
+tempo de la bank (`sounddesign.py` prend le tempo de la banque).
 
 Ces durées servent partout : longueur du kick (une fraction du temps),
-decay de la reverb (1 à 1,5 s à 185-200 BPM), release du ducking (une
+decay de la reverb (1,5 à 2 s à 160-170 BPM), release du ducking (une
 croche), longueur d'un rendu « un coup » (un temps).
 
 ### 2.3 Sidechain dans Reaper, pas à pas
@@ -210,7 +215,7 @@ passe par 1/2, le kick par 3/4, ReaComp traite 1/2 en écoutant 3/4.
    send vise 1/2 ou le détecteur écoute « Main input ».
 5. Réglages de départ (repères de [[../rumble-grave]] recalés
    au tempo) : ratio 4:1 à 8:1, attaque 0,1 à 1 ms, release = une croche
-   (160 ms à 185 BPM), seuil descendu jusqu'à 6-12 dB de réduction à chaque
+   (180 ms à 165 BPM), seuil descendu jusqu'à 6-12 dB de réduction à chaque
    kick (lire le vumètre de ReaComp).
 6. Mêmes réglages sur BASS : la basse est duckée **avec la même forme** que
    le rumble (Myloops, via rumble-grave).
@@ -325,7 +330,7 @@ Objectif commun : un kick **accordé** (note lue sur la queue), de
 -6 dBFS, la DT2 a son propre overdrive). Trois longueurs selon
 l'architecture :
 
-| Architecture | Longueur de la queue (à -24 dB) | Exemple à 185 BPM |
+| Architecture | Longueur de la queue (à -24 dB) | Exemple à 165 BPM (temps = 364 ms) |
 |---|---|---|
 | kick + basse (tribe, le « tok ») | moins d'un quart du temps | 60-80 ms, sub à -13 dB, médiums 300 Hz-3 kHz (Tekotak, KT23) |
 | kick + rumble | 150-300 ms, sub de la queue coupé avant la reverb | 130-200 ms (40-60 % du temps) |
@@ -359,8 +364,8 @@ l'architecture :
    pour un thump, point d'arrivée **sur la tonique**, affichée par le
    plug-in sur le dernier point.
 2. Enveloppe de volume de la même couche : plateau court puis descente ;
-   lire la longueur en ms et la caler sur la table du §3 (à 185 BPM,
-   130-200 ms pour un kick à rumble).
+   lire la longueur en ms et la caler sur la table du §3 (à 165 BPM,
+   150-250 ms pour un kick à rumble).
 3. Deuxième couche, un **click** parmi les 500 (ou un sample de la banque
    `/Volumes/xtreme/Samples`, branche DRUMS, [[../../kt-banque-samples]]) :
    enveloppe raccourcie « assez » pour qu'il se fonde au sub, pas de queue.
@@ -418,7 +423,7 @@ compresseur sur le kick seul ; la colle se fait sur la DT2 (doctrine §10).
 - En mono, puis au téléphone : le kick doit rester reconnaissable au
   téléphone par ses harmoniques, et ne pas gagner ni perdre en mono.
 - Export avec de la marge, nom `kick_<style>_<note>_<bpm>.wav` (ex.
-  `kick_tribe_F#_185.wav`).
+  `kick_tribe_F#_165.wav`).
 
 ## 4. Tuto rumble : la reverb saturée, duckée par le kick
 
@@ -433,8 +438,8 @@ se rendent et se comparent.
 | Étape | Plug-in | Réglage de départ | Pourquoi |
 |---|---|---|---|
 | 1. Entrée | send KICK → RUMBLE, pré-fader, canaux 1/2 | 0 dB | le kick sec reste sur KICK, la reverb n'entend que lui |
-| 2. Passe-haut avant reverb | ReaEQ, une bande « High Pass » (12 dB/oct), posé sur le kick qui arrive par le send, **avant** qu'il n'entre dans la reverb ; la piste KICK n'est pas touchée | **départ A** 30 Hz ; **départ B** 100-150 Hz | ce filtre décide de ce que la reverb étale. A ne retire que l'infra : le sub du kick entre dans la queue, le rumble tient lui-même le 40-60 Hz entre les coups (Futureproof, hard techno 140-150). B retient le sub : la queue ne contient que le corps, le rumble vit en 100-250 Hz avec le passe-bas de l'étape 4, le 20-60 Hz reste au kick seul (Myloops, doctrine §9, KT5). Les sources se contredisent et aucune n'est écrite pour 180-200 BPM : rendre les deux (exercice 2) ; à nos tempos B est le défaut, A demande plus de ducking et accumule du sub entre les coups sur un gros système |
-| 3. Reverb | ReaVerbate | wet 100 %, dry 0, room size grand, **dampening** 0,5-0,6 (sombre), pre-delay 0, **width 0** | queue de 1 à 1,5 s à 185-200 BPM (la croche vaut 150-165 ms, les queues doivent se chevaucher sans s'accumuler) ; jamais au-delà de 3-4 s ; aucune modulation dans la queue (ReaVerbate n'en a pas) |
+| 2. Passe-haut avant reverb | ReaEQ, une bande « High Pass » (12 dB/oct), posé sur le kick qui arrive par le send, **avant** qu'il n'entre dans la reverb ; la piste KICK n'est pas touchée | **départ A** 30 Hz ; **départ B** 100-150 Hz | ce filtre décide de ce que la reverb étale. A ne retire que l'infra : le sub du kick entre dans la queue, le rumble tient lui-même le 40-60 Hz entre les coups (Futureproof, hard techno 140-150). B retient le sub : la queue ne contient que le corps, le rumble vit en 100-250 Hz avec le passe-bas de l'étape 4, le 20-60 Hz reste au kick seul (Myloops, doctrine §9, KT5). Les sources se contredisent et aucune n'est écrite pour 160-170 BPM : rendre les deux (exercice 2) ; à nos tempos B est le défaut, A demande plus de ducking et accumule du sub entre les coups sur un gros système |
+| 3. Reverb | ReaVerbate | wet 100 %, dry 0, room size grand, **dampening** 0,5-0,6 (sombre), pre-delay 0, **width 0** | queue de 1,5 à 2 s à 160-170 BPM (la croche vaut 176-187 ms, le temps 353-375 ms : les queues doivent se chevaucher d'un temps à l'autre sans s'accumuler sur la mesure) ; jamais au-delà de 3-4 s ; aucune modulation dans la queue (ReaVerbate n'en a pas) |
 | 4. Passe-bas après reverb | ReaEQ, low-pass 24 dB/oct | 200-250 Hz (rumble qui pousse, `gritty`) ou 130-170 Hz (rond, `deep`) | ce qui distingue un rumble d'une reverb de kick |
 | 5. Saturation | Trash Lite | style doux (tube, tape), drive 10-16 dB (`deep`) à 20-26 dB (`gritty`), **mix 30-50 %** | harmoniques 80-160 Hz audibles sur petit système ; après la reverb (Futureproof), le fizz se juge au téléphone |
 | 6. Second passe-bas | ReaEQ, low-pass 24 dB/oct, résonance légère | 150-200 Hz | retire les harmoniques aiguës créées en 5 ; avec de la résonance, le rumble « parle » |
@@ -445,7 +450,8 @@ se rendent et se comparent.
 
 Le preset `deep` de la chaîne Python (dampening 0,6, drive 14 dB, retour
 220 ms, 150 BPM) et `gritty` (dampening 0,3, drive 26 dB, bande +4 dB à
-120 Hz, retour 140 ms, 185 BPM) donnent deux cibles A/B : rendre le même
+120 Hz, retour 140 ms, écrit pour 185 BPM) donnent deux cibles A/B, à
+relancer au tempo de la bank : rendre le même
 kick avec les deux (`sounddesign.py`) et avec Reaper, comparer au même
 niveau.
 
@@ -469,17 +475,17 @@ mixé 10-12 dB sous le rumble, ducké pareil. Uniquement sur un vrai sub ;
 
 Deux formats, comme dans [[../../../sounddesign/rumble]] :
 
-- **Boucle** : sélection temporelle d'exactement 1 ou 2 mesures (à 185 BPM,
-  2 mesures = 2 × 4 × 60 / 185 = 2,595 s), kick muté dans le master,
+- **Boucle** : sélection temporelle d'exactement 1 ou 2 mesures (à 165 BPM,
+  2 mesures = 2 × 4 × 60 / 165 = 2,909 s), kick muté dans le master,
   rendu de la piste RUMBLE ; la boucle part et finit dans le creux du
   ducking. Sur la DT2 : track 2 en lecture loop, un trig par mesure.
-- **Un coup** : un seul kick, rendu d'un temps (0,324 s à 185) plus un
+- **Un coup** : un seul kick, rendu d'un temps (0,364 s à 165) plus un
   fondu de 20 ms. Sur la DT2 : un trig sur chaque pas du kick, fills
   compris (doctrine §9).
 
 Nom `rumble_<preset>_<note>_<bpm>.wav` ; rendre une version par tempo,
 jamais de time-stretch sur la machine. Après versement dans la library, le
-rendu prend un nom DT2 en miroir du kick (`RM 185 ... `, circuit 8.L2 dans
+rendu prend un nom DT2 en miroir du kick (`RM 165 ... `, circuit 8.L2 dans
 [[../../../sounddesign/rumble]]).
 
 ### 4.5 Valider un rumble
@@ -501,7 +507,7 @@ sinus pur 57 → 50 Hz, harmoniques à -17 dB. Deux kickbass, deux chaînes.
 
 1. Piste KICKBASS, Vital : OSC 1 sinus, voices 1, phase fixe (§3.3).
 2. ENV 1 (ampli) : decay long, **release 5-10 ms**, et la **longueur de la
-   note MIDI** égale au temps moins 10-20 ms (à 160 BPM, 375 - 15 = 360 ms) :
+   note MIDI** égale au temps moins 10-20 ms (à 165 BPM, 364 - 15 = 349 ms) :
    la note s'arrête juste avant le kick suivant, la queue ne mange pas
    l'attaque suivante. Sur la DT2 ce sera l'AMP de la track 1 qui coupe.
 3. ENV 2 sur Transpose, +24 à +30 demi-tons, decay 100-130 ms (Neurotribe)
@@ -528,11 +534,15 @@ note MIDI, le click reste fixe.
 
 ### 5.3 Tempo et limite
 
-À 190 BPM le temps fait 316 ms : une queue saturée qui tient 250 ms déborde
-ou s'écrase. Au-delà de 165 BPM, préférer le **kick-sub** (sinus écrêté
-court, sans note tenue, Floxytek, KT23) au kickbass saturé : Vital, sinus,
-decay 150-200 ms, Hard Clip fort, pas de Trash. Rendre les deux et comparer
-au tempo du set.
+Entre 160 et 170 BPM le temps fait 353 à 375 ms : c'est exactement la
+zone du kickbass saturé de référence (Neurotribe, 161,5), et c'est aussi
+sa limite haute. À 170, une queue qui tient encore -8 dB à 300 ms laisse
+53 ms avant le kick suivant : assez si la note MIDI s'arrête à 340 ms,
+trop peu si la saturation allonge la queue. L'autre option à ce tempo est
+le **kick-sub** (sinus écrêté court, sans note tenue, Floxytek, KT23) :
+Vital, sinus, decay 150-200 ms, Hard Clip fort, pas de Trash. Rendre les
+deux à 170 et comparer ; en dessous de 165 le kickbass saturé gagne
+presque toujours.
 
 ### 5.4 Valider un kickbass
 
@@ -555,7 +565,7 @@ trigs, pas un compresseur).
 1. Piste BASS, Vital, **voices 1**, legato, portamento 0 (ou court pour un
    slide ponctuel), OSC 1 sinus ou triangle, OSC 2 en dent de scie à -12 dB
    pour les harmoniques, phase fixe, unisson 1.
-2. ENV 1 : attaque 2-5 ms (franche, sans clic), decay 120-200 ms à 185 BPM
+2. ENV 1 : attaque 2-5 ms (franche, sans clic), decay 120-200 ms à 165 BPM (le temps fait 364 ms)
    (moins qu'un temps : 324 ms), sustain 0 ; **pas de release** longue.
 3. Filtre ladder ou diode, cutoff 150-400 Hz, enveloppe de filtre (ENV 3)
    rapide pour le claquement, résonance modérée ; drive du filtre pour le
@@ -618,7 +628,7 @@ champs comptent, le reste garde sa valeur par défaut.
 |---|---|---|
 | **Source** | « Master mix » quand les autres pistes sont mutées ; « Stems (selected tracks) » pour rendre la piste sélectionnée seule, avec ses effets mais **sans** les effets du master (SPAN n'y change rien) | un stem ignore les mutes des autres pistes : pas besoin de muter |
 | **Bounds** | « Time selection » | le fichier fait exactement la longueur de la sélection : une note, un temps ou deux mesures (§2.2) |
-| **Output > Directory, File name** | le dossier `rendus/` du projet ; nom tapé à la main (`kick_tribe_F#_185`) ; les jokers `$track` et `$project` existent pour les séries | le nom porte la note mesurée (§3.5), pas la note MIDI |
+| **Output > Directory, File name** | le dossier `rendus/` du projet ; nom tapé à la main (`kick_tribe_F#_165`) ; les jokers `$track` et `$project` existent pour les séries | le nom porte la note mesurée (§3.5), pas la note MIDI |
 | **Sample rate, Channels** | **48000**, **Mono** | fréquence native de la DT2 ; le grave est mono (si la source est stéréo, Reaper somme gauche + droite) |
 | **Format** | WAV, **24 bit PCM** ; « Normalize/limit » **décoché** pour le kick et le kickbass (garder la marge, la DT2 sature encore à l'overdrive) ; sur le rumble, normalisation de crête à -1 dB acceptée, à condition de baisser la 2 après coup | Transfer convertit en 16 bits à l'envoi |
 | **Tail** | « Add tail » **décoché** (ou 0 ms) | sinon le fichier dépasse la sélection et la boucle ne tombe plus juste |
@@ -641,8 +651,8 @@ pratique pour figer un kick traité, ou pour la variante en dossier du §2.4.
 2. Rendu selon le tableau §7.1. Écouter le fichier rendu dans le Media
    Explorer (View > Media Explorer) : il lit au tempo du projet, ce qui
    permet de vérifier une boucle de rumble avant de l'envoyer.
-3. Nommer avec le style, la note et le tempo : `kick_tribe_F#_185.wav`,
-   `rumble_gritty_F#_185.wav`, `kickbass_sat_F#_160.wav`, `bass_sub_F#.wav`.
+3. Nommer avec le style, la note et le tempo : `kick_tribe_F#_165.wav`,
+   `rumble_gritty_F#_165.wav`, `kickbass_sat_F#_160.wav`, `bass_sub_F#.wav`.
    La note vient de la mesure sur la queue, pas de la note MIDI.
 4. Ranger les WAV dans la banque de samples (`/Volumes/xtreme/Samples`,
    [[../../kt-banque-samples]]) dans un pack `SoundDesign/` à côté de
@@ -703,7 +713,7 @@ pratique pour figer un kick traité, ou pour la variante en dossier du §2.4.
    Tant que le vumètre de ReaComp ne bouge pas ou que le fichier n'a pas
    la bonne longueur, le reste de la fiche attendra.
 1. **Trois longueurs, un kick (10 min).** Recette B ou C, tonique F#,
-   185 BPM : queue 70, 180 et 300 ms. Avec la basse Vital en contretemps
+   165 BPM : queue 70, 180 et 300 ms. Avec la basse Vital en contretemps
    démutée : garder celle qui la laisse respirer ; noter la tenue du sub
    des trois sur SPAN.
 2. **Deux départs de rumble (10 min).** Même kick, passe-haut avant reverb
@@ -711,8 +721,9 @@ pratique pour figer un kick traité, ou pour la variante en dossier du §2.4.
    boucles, comparer au même niveau sous le kick, au casque puis en mono.
    Garder celle qui laisse le sub au kick.
 3. **Kickbass saturé contre kick-sub (10 min).** Vital, F#, à 160 puis à
-   190 BPM : à 160 le kickbass saturé tient ; à 190 raccourcir le decay
-   jusqu'à ce que le sub soit propre, puis passer en kick-sub. Mesurer la
+   170 BPM : à 160 le kickbass saturé tient ; à 170 raccourcir la note et
+   le decay jusqu'à ce que le kick suivant sorte propre, puis essayer le
+   kick-sub. Mesurer la
    tenue du sub des deux à chaque tempo.
 4. **Tonique, quinte, tierce (5 min).** Basse Vital en contretemps sur F#,
    C# puis A sous le kick F# : entendre le battement sur la tierce, la
