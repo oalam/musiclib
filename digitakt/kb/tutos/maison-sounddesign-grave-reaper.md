@@ -319,6 +319,18 @@ plus un jour.
   du 30-100 Hz par rapport à l'attaque, donne la **tenue du sub** (KT23 :
   au-dessus de -10 dB le kick tient le sub, en dessous de -20 dB il le
   laisse).
+- **SPAN, trois lectures qui servent à chaque séance.** La note : curseur
+  sur le sommet de la bosse grave, SPAN affiche fréquence et note. Un
+  creux dans le spectre à la fréquence du crossover (100 Hz) peut être le
+  kick lui-même ou une annulation de phase entre le sub sur 1/2 et le
+  corps saturé sur 3/4 : bouton **Underlay** pour garder le spectre
+  courant en fond, bypasser Trash, rejouer ; si le creux disparaît, c'est
+  Trash qui décale la phase du corps, descendre le crossover à 70-80 Hz ou
+  baisser le mix. Les statistiques (Peak, Clippings) s'accumulent depuis
+  l'ouverture : bouton **Reset** avant chaque lecture, puis Peak entre -6
+  et -3 dBFS et Clippings à 0 sur un kick à exporter. Le **Correlation
+  Meter** doit se tenir à +1,0 sur un kick en lecture (il affiche 0,0 à
+  l'arrêt) ; en dessous de 0,9, quelque chose est stéréo dans la chaîne.
 - **ReaTune** sur la piste KICK, boucle réduite à la queue (20-90 ms après
   l'attaque, pas l'attaque elle-même) : la note s'affiche. Sur un sinus
   presque pur la détection peut sauter à l'octave ou à 200 Hz, croiser avec
