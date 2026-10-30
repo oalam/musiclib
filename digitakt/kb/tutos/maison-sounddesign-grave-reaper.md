@@ -325,8 +325,13 @@ plus un jour.
   kick lui-même ou une annulation de phase entre le sub sur 1/2 et le
   corps saturé sur 3/4 : bouton **Underlay** pour garder le spectre
   courant en fond, bypasser Trash, rejouer ; si le creux disparaît, c'est
-  Trash qui décale la phase du corps, descendre le crossover à 70-80 Hz ou
-  baisser le mix. Les statistiques (Peak, Clippings) s'accumulent depuis
+  Trash qui creuse le corps (style « scoopé », filtres du module, ou
+  mélange dry / wet déphasé ; constaté le 2026-10-30 sur un kick Kick 3).
+  Deux leviers : changer de style ou baisser le mix vers 30-40 % ; ou
+  monter le crossover 1 du splitter de 100 à 140-150 Hz, pour que le thump
+  (100-150 Hz) reste dans la bande propre avec le sub, Trash ne travaillant
+  que le haut du corps. Le second est le plus simple quand le thump compte,
+  ce qui est le cas d'un kick tribe. Les statistiques (Peak, Clippings) s'accumulent depuis
   l'ouverture : bouton **Reset** avant chaque lecture, puis Peak entre -6
   et -3 dBFS et Clippings à 0 sur un kick à exporter. Le **Correlation
   Meter** doit se tenir à +1,0 sur un kick en lecture (il affiche 0,0 à
@@ -376,17 +381,18 @@ l'architecture :
 
 ### 3.2 Recette B, Kick 3 (le kick de référence de la bank)
 
-0. **Partir d'un preset neutre, ou neutraliser un preset d'usine.** Les
-   presets livrés arrivent avec leur EQ (entailles étroites dans le corps,
-   par exemple 179 Hz à -6 dB avec Q 4 sur `tom1`, qui retirent le thump
-   et creusent un trou visible dans SPAN), leur section Effects (trois
-   drives empilés) et leur **limiteur actif** qui écrase le kick à 0 dBFS
-   avant le splitter et Trash. Avant de construire : EQ à plat ou
-   désactivée, Effects coupés, Limiter désactivé, sortie baissée jusqu'à
-   une crête de -6 dBFS dans SPAN. Les saturations de Kick 3 se
-   réintroduisent après, une à la fois, quand l'étage Trash du §2.4 est
-   réglé. Le champ KEY du panneau Export est une transposition, pas la
-   note de la queue : la note juste reste celle lue dans SPAN.
+0. **Savoir ce qu'un preset d'usine apporte.** Les presets livrés
+   arrivent avec leur EQ (entailles étroites dans le corps, par exemple
+   179 Hz à -6 dB avec Q 4 sur `tom1`), leur section Effects (trois drives
+   empilés) et leur **limiteur actif**, qui plafonne à 0 dBFS en interne.
+   Le limiteur est une couleur comme une autre, à garder si elle plaît
+   (c'est le cas sur `tom1`, 2026-10-30) ; la seule règle est la marge :
+   le fader OUT de Kick 3 est **après** le limiteur, le baisser jusqu'à une
+   crête de -6 dBFS dans SPAN garde la couleur et laisse la place à
+   l'overdrive de la DT2. Pour régler l'étage Trash du §2.4, couper Effects
+   le temps du réglage, afin de juger une saturation à la fois, puis les
+   réintroduire. Le champ KEY du panneau Export est une transposition, pas
+   la note de la queue : la note juste reste celle lue dans SPAN.
 1. Piste KICK, Kick 3, preset init. Première couche en **sub synthétisé** :
    dessiner l'enveloppe de pitch avec deux ou trois points : départ une à
    deux octaves au-dessus (+24 à +36 demi-tons, la recette Koçer dans
