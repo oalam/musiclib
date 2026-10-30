@@ -258,15 +258,22 @@ que deux ReaEQ indépendants ne garantissent pas à la fréquence de coupure.
    à l'écoute : quatre canaux muets de plus.
 2. FX > Add > **JS: 3-Band Splitter**, placé juste après l'instrument.
    Coupures : basse à **90-100 Hz** (sub / corps), haute à **2-3 kHz**
-   (corps / click). Pour l'instant tout ressort tel quel : le joiner n'est
-   pas encore là et seuls 1/2 sont audibles, donc on n'entend que le sub ;
-   c'est normal.
+   (corps / click). Son entrée est mono (« left input », canal 1) : sans
+   conséquence sur un kick, qui est mono. Ouvrir son pin connector et
+   cliquer **Reset** une fois la piste à 6 canaux : la matrice doit
+   montrer six lignes et une diagonale low → 1/2, mid → 3/4, high → 5/6 ;
+   si les lignes 5 et 6 manquent, le click part dans le vide. Pour
+   l'instant tout ressort tel quel : le joiner n'est pas encore là et
+   seuls 1/2 sont audibles, donc on n'entend que le sub ; c'est normal.
 3. FX > Add > **Trash** après le splitter. Cliquer son bouton « 2 in 2 out » :
    dans la matrice, **décocher** les entrées 1 et 2 et cocher les canaux
    **3 et 4** sur les entrées 1 et 2 du plug-in ; même chose côté sorties
-   (sorties 1 et 2 du plug-in vers les canaux 3 et 4). Le bouton affiche
-   maintenant quelque chose comme « 2 in 2 out » avec 3/4 dans la matrice :
-   Trash ne voit que le corps.
+   (sorties 1 et 2 du plug-in vers les canaux 3 et 4). La matrice doit
+   montrer deux diagonales sur les lignes 3 et 4, côté entrées **et** côté
+   sorties, rien d'autre. Des sorties laissées sur 1/2 écrasent le sub
+   avec le corps saturé pendant que 3/4 garde le corps sec : plus de sub,
+   corps en double, l'inverse du but (erreur faite et corrigée le
+   2026-10-30).
 4. FX > Add > **JS: 3-Band Joiner** en dernier (avant le passe-haut 25-30 Hz
    et le soft clipper de la chaîne de sortie, §3.4). Le son revient entier.
 5. Régler Trash : bypasser le joiner un instant pour écouter 1/2 seuls (le
@@ -694,9 +701,12 @@ pratique pour figer un kick traité, ou pour la variante en dossier du §2.4.
 - **Send du kick déplacé de 1/2 vers 3/4** : le rumble se tait, parce que
   la reverb ne reçoit plus rien ; il faut les deux sends (§2.3), ou la
   variante à un send avec ReaVerbate repiqué sur 3/4.
-- **Pin connector oublié** : Trash posé après le splitter sans toucher au
-  « 2 in 2 out » ne traite que 1/2, donc le sub, l'inverse du but ; un
-  joiner oublié ne laisse entendre que les graves.
+- **Pin connector oublié ou à moitié fait** : Trash posé après le splitter
+  sans toucher au « 2 in 2 out » ne traite que 1/2, donc le sub ; entrées
+  sur 3/4 mais sorties laissées sur 1/2, le sub est écrasé par le corps
+  saturé et le corps sec reste sur 3/4 (corps en double). Contrôle : au
+  bypass du joiner, on ne doit entendre que le sub, propre. Un joiner
+  oublié ne laisse entendre que les graves.
 - **Vital** : randomisation de phase à 0 sur chaque oscillateur, voices 1,
   unisson 1 sur tout ce qui descend sous 120 Hz ; une basse en unisson
   stéréo disparaît en mono.
