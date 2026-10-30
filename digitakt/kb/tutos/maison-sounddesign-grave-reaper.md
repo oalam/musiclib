@@ -429,9 +429,25 @@ l'architecture :
 
 ### 3.4 Chaîne de sortie commune
 
-KICK (ou SUB + BODY) → ReaEQ passe-haut 25-30 Hz → JS Soft Clipper à
--1 dB pour rattraper une crête, jamais pour « grossir » → rendu. Pas de
-compresseur sur le kick seul ; la colle se fait sur la DT2 (doctrine §10).
+Après le joiner (ou le dossier SUB + BODY) : ReaEQ passe-haut, puis JS
+Soft Clipper à -1 dB pour rattraper une crête, jamais pour « grossir »,
+puis rendu. Pas de compresseur sur le kick seul ; la colle se fait sur la
+DT2 (doctrine §10).
+
+**La ReaEQ de sortie, réglage.** Une seule bande : Type High Pass,
+Frequency 28 Hz, Bandwidth 1,7 (courbe sans bosse) ; les autres bandes
+retirées ; preset `kick HPF 28`, le même pour toutes les banks. Elle reste
+branchée en 1/2, ce qui est juste : après le joiner seuls 1/2 vont au
+master. Rien d'autre : l'équilibre sub / corps se règle sur le mix de
+Trash et les potards de bande du joiner, et un creux du spectre (souvent
+vers 100 Hz sur un kick à sub sinus, entre la fondamentale et le départ de
+l'enveloppe de pitch) ne se rebouche pas à l'EQ, on remonterait du bruit.
+Seule exception, en architecture kick + basse : une cloche de -4,5 dB à
+la fondamentale de la basse (92 Hz pour une basse en F#2), bandwidth 1 oct
+(Attack Magazine, via KT5). Pas de cloche en kick + rumble ni en kickbass.
+Ensuite, Reset des statistiques de SPAN et lecture du Peak : entre -6 et
+-3 dBFS, prêt à rendre ; au-dessus, baisser le fader de KICK plutôt que
+d'ajouter un limiteur.
 
 ### 3.5 Valider un kick
 
