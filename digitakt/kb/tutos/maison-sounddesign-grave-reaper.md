@@ -376,6 +376,17 @@ l'architecture :
 
 ### 3.2 Recette B, Kick 3 (le kick de référence de la bank)
 
+0. **Partir d'un preset neutre, ou neutraliser un preset d'usine.** Les
+   presets livrés arrivent avec leur EQ (entailles étroites dans le corps,
+   par exemple 179 Hz à -6 dB avec Q 4 sur `tom1`, qui retirent le thump
+   et creusent un trou visible dans SPAN), leur section Effects (trois
+   drives empilés) et leur **limiteur actif** qui écrase le kick à 0 dBFS
+   avant le splitter et Trash. Avant de construire : EQ à plat ou
+   désactivée, Effects coupés, Limiter désactivé, sortie baissée jusqu'à
+   une crête de -6 dBFS dans SPAN. Les saturations de Kick 3 se
+   réintroduisent après, une à la fois, quand l'étage Trash du §2.4 est
+   réglé. Le champ KEY du panneau Export est une transposition, pas la
+   note de la queue : la note juste reste celle lue dans SPAN.
 1. Piste KICK, Kick 3, preset init. Première couche en **sub synthétisé** :
    dessiner l'enveloppe de pitch avec deux ou trois points : départ une à
    deux octaves au-dessus (+24 à +36 demi-tons, la recette Koçer dans
