@@ -438,7 +438,7 @@ se rendent et se comparent.
 | Étape | Plug-in | Réglage de départ | Pourquoi |
 |---|---|---|---|
 | 1. Entrée | send KICK → RUMBLE, pré-fader, canaux 1/2 | 0 dB | le kick sec reste sur KICK, la reverb n'entend que lui |
-| 2. Passe-haut avant reverb | ReaEQ, une bande « High Pass » (12 dB/oct), posé sur le kick qui arrive par le send, **avant** qu'il n'entre dans la reverb ; la piste KICK n'est pas touchée | **départ A** 30 Hz ; **départ B** 100-150 Hz | ce filtre décide de ce que la reverb étale. A ne retire que l'infra : le sub du kick entre dans la queue, le rumble tient lui-même le 40-60 Hz entre les coups (Futureproof, hard techno 140-150). B retient le sub : la queue ne contient que le corps, le rumble vit en 100-250 Hz avec le passe-bas de l'étape 4, le 20-60 Hz reste au kick seul (Myloops, doctrine §9, KT5). Les sources se contredisent et aucune n'est écrite pour 160-170 BPM : rendre les deux (exercice 2) ; à nos tempos B est le défaut, A demande plus de ducking et accumule du sub entre les coups sur un gros système |
+| 2. Passe-haut avant reverb | ReaEQ, **une seule bande** de type High Pass, posée sur le kick qui arrive par le send, **avant** qu'il n'entre dans la reverb ; la piste KICK n'est pas touchée | **départ A** : fréquence 30 Hz ; **départ B** : fréquence 120 Hz. Même bande, deux valeurs, jamais les deux à la fois ; détail sous le tableau | ce filtre décide de ce que la reverb étale. A ne retire que l'infra : le sub du kick entre dans la queue, le rumble tient lui-même le 40-60 Hz entre les coups (Futureproof, hard techno 140-150). B retient le sub : la queue ne contient que le corps, le rumble vit en 100-250 Hz avec le passe-bas de l'étape 4, le 20-60 Hz reste au kick seul (Myloops, doctrine §9, KT5). Les sources se contredisent et aucune n'est écrite pour 160-170 BPM : rendre les deux (exercice 2) ; à nos tempos B est le défaut, A demande plus de ducking et accumule du sub entre les coups sur un gros système |
 | 3. Reverb | ReaVerbate | wet 100 %, dry 0, room size grand, **dampening** 0,5-0,6 (sombre), pre-delay 0, **width 0** | queue de 1,5 à 2 s à 160-170 BPM (la croche vaut 176-187 ms, le temps 353-375 ms : les queues doivent se chevaucher d'un temps à l'autre sans s'accumuler sur la mesure) ; jamais au-delà de 3-4 s ; aucune modulation dans la queue (ReaVerbate n'en a pas) |
 | 4. Passe-bas après reverb | ReaEQ, low-pass 24 dB/oct | 200-250 Hz (rumble qui pousse, `gritty`) ou 130-170 Hz (rond, `deep`) | ce qui distingue un rumble d'une reverb de kick |
 | 5. Saturation | Trash Lite | style doux (tube, tape), drive 10-16 dB (`deep`) à 20-26 dB (`gritty`), **mix 30-50 %** | harmoniques 80-160 Hz audibles sur petit système ; après la reverb (Futureproof), le fizz se juge au téléphone |
@@ -447,6 +447,25 @@ se rendent et se comparent.
 | 8. Ducking | ReaComp, sidechain (§2.3) | 24-30 dB de creux pour que le kick sorte seul (10-12 dB si le rumble reste présent sous le kick), attaque 1-2 ms, release une croche | la pompe qui fait « rouler » |
 | 9. Mono | ReaVerbate « Stereo width » à 0 ; pour un item audio, clic droit > Item properties > Channel mode = Mono (downmix) ; pour un instrument, unisson 1 à la source | | mono sous 120 Hz |
 | 10. Niveau | fader | le rumble **sous** le kick ; sur la DT2 la 2 se règle sous la 1 après coup | une prise normalisée ment sur le niveau |
+
+**Régler le passe-haut dans ReaEQ (étape 2), à l'écran.** ReaEQ s'ouvre
+avec plusieurs bandes par défaut ; il n'en faut qu'une.
+
+1. Onglet **1** : Type = **High Pass** ; Frequency = **30** (départ A) ou
+   **120** (départ B). Le champ Gain ne compte pas pour un passe-haut.
+2. Toujours sur la bande 1, baisser **Bandwidth** jusqu'à ce que la courbe
+   descende sans remonter au-dessus de 0 dB (autour de 1,0 oct) : une
+   valeur plus grande fait résonner le filtre, avec une bosse de plusieurs
+   dB juste au-dessus de la coupure, qui gonfle le sub du kick avant la
+   reverb, l'inverse du but.
+3. Onglets **2**, 3, 4 s'il y en a : **Remove band**. Une cloche à 0 dB ne
+   fait rien, et un shelf par défaut fausse la comparaison.
+4. Bouton **+** à côté de « No preset » : enregistrer `rumble HPF A 30`,
+   passer la fréquence à 120, enregistrer `rumble HPF B 120`. Les deux se
+   rappellent dans le menu déroulant ; rendre la boucle avec chacun
+   (exercice 2) et écouter au même niveau sous le kick.
+5. Le passe-bas de l'étape 4 va dans la **seconde** ReaEQ, après
+   ReaVerbate, pas dans celle-ci.
 
 Le preset `deep` de la chaîne Python (dampening 0,6, drive 14 dB, retour
 220 ms, 150 BPM) et `gritty` (dampening 0,3, drive 26 dB, bande +4 dB à

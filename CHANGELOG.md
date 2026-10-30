@@ -35,6 +35,9 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   fait taire la piste, variante à un send par pin connector sur ReaVerbate.
   Tempo de travail recalé sur 160-170 BPM (exemples à 165), kickbass
   saturé à sa limite haute à 170 plutôt que bascule vers le kick-sub.
+  Passe-haut avant reverb : une seule bande High Pass, A = 30 Hz ou
+  B = 120 Hz, réglage à l'écran dans ReaEQ (résonance de Bandwidth, bandes
+  par défaut à retirer, deux presets pour comparer).
 - [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
   mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
   `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois
