@@ -191,25 +191,45 @@ passe par 1/2, le kick par 3/4, ReaComp traite 1/2 en écoutant 3/4.
    choisir RUMBLE. Sur la ligne du send qui apparaît : le menu de mode sur
    **Pre-Fader (Post-FX)** (pour que le kick baissé ou muté au fader
    continue de déclencher, l'équivalent du kick fantôme de la doctrine
-   §10) ; le petit menu des canaux « 1/2 => 1/2 » passé à **1/2 => 3/4**.
-   Volume du send à 0 dB. Dans le mixer, le send apparaît sous la piste
-   KICK ; la fenêtre View > Routing Matrix (Opt+R) montre toute la toile
-   d'un coup, utile pour vérifier qu'on n'a pas visé la mauvaise piste.
-3. ReaComp sur RUMBLE, en dernier dans la chaîne (après Trash) : le menu
+   §10) ; canaux laissés en **1/2 => 1/2** ; volume à 0 dB. Ce send-là
+   **nourrit la reverb** : c'est lui qui fabrique le rumble. Pour la piste
+   BASS, qui a son propre instrument, ce premier send n'existe pas.
+3. Sur KICK encore, « Add new send » **une seconde fois** vers RUMBLE
+   (Reaper accepte plusieurs sends vers la même piste). Même mode
+   pré-fader, mais le petit menu des canaux passé à **1/2 => 3/4**. Ce
+   send-là **pilote le ducking** et n'est jamais entendu : le send parent
+   de RUMBLE n'envoie que 1/2 au master. Pour BASS, c'est le seul send.
+   Dans le mixer, les deux sends apparaissent sous la piste KICK ; la
+   fenêtre View > Routing Matrix (Opt+R) montre toute la toile d'un coup,
+   utile pour vérifier qu'on n'a pas visé la mauvaise piste ou le mauvais
+   couple de canaux.
+4. ReaComp sur RUMBLE, en dernier dans la chaîne (après Trash) : le menu
    « Detector input » sur **Auxiliary input L+R** (c'est 3/4), « Pre-comp »
    à **0 ms**, « Auto make-up » **décoché**. Lecture : le vumètre vertical
-   de ReaComp doit plonger à chaque kick ; s'il ne bouge pas, le send vise
-   1/2 ou le détecteur écoute « Main input ».
-4. Réglages de départ (repères de [[../rumble-grave]] recalés
+   de ReaComp doit plonger à chaque kick ; s'il ne bouge pas, le second
+   send vise 1/2 ou le détecteur écoute « Main input ».
+5. Réglages de départ (repères de [[../rumble-grave]] recalés
    au tempo) : ratio 4:1 à 8:1, attaque 0,1 à 1 ms, release = une croche
    (160 ms à 185 BPM), seuil descendu jusqu'à 6-12 dB de réduction à chaque
    kick (lire le vumètre de ReaComp).
-5. Mêmes réglages sur BASS : la basse est duckée **avec la même forme** que
+6. Mêmes réglages sur BASS : la basse est duckée **avec la même forme** que
    le rumble (Myloops, via rumble-grave).
 
-Pour le rumble, le send KICK → RUMBLE qui nourrit la reverb est un second
-send, vers les canaux **1/2** cette fois. Deux sends de la même piste :
-l'un alimente la reverb, l'autre le détecteur.
+**Pourquoi deux sends.** Le rumble n'est pas un son à lui : c'est le kick
+qui traverse la reverb. ReaVerbate, comme tout effet, lit 1/2. Un seul send
+vers 3/4 et la reverb ne reçoit plus rien : la piste se tait, alors que le
+kick est bien là sur 3/4, écouté par le seul détecteur. Un seul send vers
+1/2 et le rumble sonne, mais ReaComp n'entend rien sur son entrée
+auxiliaire : plus de ducking.
+
+**Variante à un seul send, par le pin connector.** Send unique 1/2 => 3/4.
+Sur RUMBLE, le ReaEQ passe-haut et ReaVerbate sont rebranchés par leur
+bouton « 2 in 2 out » : entrées sur 3/4 pour les deux, et pour ReaVerbate
+sorties sur 1/2. La reverb lit le kick sec sur 3/4 et écrit la queue sur
+1/2 ; 3/4 garde le kick sec pour ReaComp, puisqu'un plug-in ne vide pas les
+canaux où il n'écrit pas. Le reste de la chaîne reste en 1/2. Même idée
+qu'au §2.4 ; à adopter quand le pin connector est devenu un réflexe, les
+deux sends restant plus lisibles dans la Routing Matrix.
 
 ### 2.4 Saturation lourde sans multibande : séparer les bandes dans Reaper
 
@@ -642,6 +662,9 @@ pratique pour figer un kick traité, ou pour la variante en dossier du §2.4.
   toujours derrière un JS 3-Band Splitter, branché sur 3/4 par le pin
   connector (§2.4). Convolve et le multibande sont dans la version
   payante, non nécessaire ici.
+- **Send du kick déplacé de 1/2 vers 3/4** : le rumble se tait, parce que
+  la reverb ne reçoit plus rien ; il faut les deux sends (§2.3), ou la
+  variante à un send avec ReaVerbate repiqué sur 3/4.
 - **Pin connector oublié** : Trash posé après le splitter sans toucher au
   « 2 in 2 out » ne traite que 1/2, donc le sub, l'inverse du but ; un
   joiner oublié ne laisse entendre que les graves.
