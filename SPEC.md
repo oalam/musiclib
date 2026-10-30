@@ -15,7 +15,7 @@ futures cataloguées.
 Outils Python pour construire et préparer la **library musicale** qui
 alimente deux usages :
 
-1. **Sets free party** sur sound system — tribe / acid core 180-200 BPM,
+1. **Sets free party** sur sound system — tribe / acid core 160-170 BPM,
    ouvertures DnB / dubstep / break / ralentis
 2. **Patches TidalCycles** en live coding — stems et samples extraits
    des tracks

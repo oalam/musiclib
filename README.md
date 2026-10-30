@@ -2,7 +2,7 @@
 
 Vault Obsidian d'apprentissage et de documentation.
 
-**Intention** : apprendre le live coding avec [[technique/tidalcycles-bases|TidalCycles]] pour produire un set de 1 à 2h adapté à un sound system de free party. Terrain sonore : tribe / acid core hybride (180–200 BPM), avec ouvertures vers d'autres tempi et textures.
+**Intention** : apprendre le live coding avec [[technique/tidalcycles-bases|TidalCycles]] pour produire un set de 1 à 2h adapté à un sound system de free party. Terrain sonore : tribe / acid core hybride (160–170 BPM, jamais plus), avec ouvertures vers d'autres tempi et textures.
 
 ## Structure du vault
 
@@ -30,7 +30,7 @@ Vault Obsidian d'apprentissage et de documentation.
 ## Décisions posées
 
 - **Outil** : [[technique/tidalcycles-bases|TidalCycles]] (Haskell + SuperDirt + SuperCollider)
-- **Terrain** : tribe / acid core (180–200 BPM) hybride — laisser de la place au break, au dubstep, aux ralentis
+- **Terrain** : tribe / acid core (160–170 BPM) hybride — laisser de la place au break, au dubstep, aux ralentis ; le 180–200 des débuts (2026-05) n'est plus le terrain, corrigé le 2026-10-30
 - **Cible** : sound system free party — voir [[technique/sound-system-free-party]]
 - **Documentation** : carnet hybride en mode Obsidian (journal + thématiques)
 

@@ -1,7 +1,7 @@
 ---
 tags: [digitakt, doctrine, live, set, elektron]
 source: "https://youtu.be/y_YijodbZYI"
-updated: 2026-10-26
+updated: 2026-10-30
 status: living document
 ---
 
@@ -25,7 +25,7 @@ servent aussi de contrat à l'analyzer [[../scripts/README|digitakt.py]]
 Les points marqués *(à vérifier)* sont des manipulations machine à confirmer dans
 le manuel, ils alimenteront la base de connaissance `digitakt/kb/`.
 
-Terrain : voir [[../README]] — tribe / acid core 180-200 BPM, ouvertures DnB,
+Terrain : voir [[../README]] — tribe / acid core 160-170 BPM, ouvertures DnB,
 dubstep, ralentis.
 
 ---
@@ -308,7 +308,8 @@ La Digitakt II peut sauvegarder l'ensemble des sons des 16 tracks en **kit**, vi
 
 - **Défaut** : rumble **sur le même pas que le kick**, avec ducking (il gonfle
   derrière l'attaque) et release courte. Basse en **contretemps**.
-- À 180-200 BPM, une double-croche ≈ 80 ms : un rumble sur le pas suivant crée
+- À 160-170 BPM, une double-croche fait 88-94 ms (60 / 165 / 4 = 91 ms) : un
+  rumble sur le pas suivant crée
   un galop qui empiète sur la basse en contretemps. À éviter, sauf variante
   **sans basse** : le rumble roule sur les doubles-croches entre les kicks et
   joue lui-même le rôle de basse.

@@ -85,6 +85,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- Terrain de tempo corrigé dans les sources of truth ([[README]], [[SPEC]],
+  [[doctrine]] §9) : tribe / acid core **160-170 BPM, jamais plus**, au lieu
+  du 180-200 des débuts ; la double-croche de la doctrine §9 passe de
+  « ≈ 80 ms » à 88-94 ms (60 / 165 / 4 = 91 ms). Les repères chiffrés des
+  fiches KB, des KT et de `sounddesign/` (une soixantaine de mentions à
+  185-200 BPM) restent à recaler dans une passe dédiée.
 - [7.M] [[rumble-grave]] : lecture complète de Myloops *Techno Kick
   Rumble*, sept repères ajoutés (pas de modulation de reverb, resample à
   -6 dBFS et second traitement, pitch du rumble -5 à -12 demi-tons,
