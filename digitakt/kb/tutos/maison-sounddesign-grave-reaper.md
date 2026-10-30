@@ -453,11 +453,11 @@ avec plusieurs bandes par défaut ; il n'en faut qu'une.
 
 1. Onglet **1** : Type = **High Pass** ; Frequency = **30** (départ A) ou
    **120** (départ B). Le champ Gain ne compte pas pour un passe-haut.
-2. Toujours sur la bande 1, baisser **Bandwidth** jusqu'à ce que la courbe
-   descende sans remonter au-dessus de 0 dB (autour de 1,0 oct) : une
-   valeur plus grande fait résonner le filtre, avec une bosse de plusieurs
-   dB juste au-dessus de la coupure, qui gonfle le sub du kick avant la
-   reverb, l'inverse du but.
+2. Toujours sur la bande 1, régler **Bandwidth** pour que la courbe
+   descende sans remonter au-dessus de 0 dB (1,7 oct convient, vérifié à
+   l'écran le 2026-10-30) : une valeur plus grande fait résonner le
+   filtre, avec une bosse de plusieurs dB juste au-dessus de la coupure,
+   qui gonfle le sub du kick avant la reverb, l'inverse du but.
 3. Onglets **2**, 3, 4 s'il y en a : **Remove band**. Une cloche à 0 dB ne
    fait rien, et un shelf par défaut fausse la comparaison.
 4. Bouton **+** à côté de « No preset » : enregistrer `rumble HPF A 30`,
