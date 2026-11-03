@@ -75,7 +75,8 @@ laisse la basse respirer à 190 BPM.
 
 Source : manuel DT2 OS 1.17, §13.1.1, §13.6.7, A.2.1 ; doctrine §3, §11.
 Recettes concrètes par plug-in (Drumsynth, Kick 3, Vital, kickbass) :
-[[tutos/maison-sounddesign-grave-reaper]] §3 et §5.
+[[tutos/maison-grave-kick]] et [[tutos/maison-grave-kickbass]] (hub
+[[tutos/maison-sounddesign-grave-reaper]]).
 
 ## Vidéos
 

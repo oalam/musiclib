@@ -42,7 +42,8 @@ tracks tonales 9 à 14, pilotées par la 16 en MIDI ou un contrôleur
      filtre +, decay d'AMP +, send delay +, profondeur de LFO -.
   3. Jouer en mode VELOCITY, ou locker `VEL` par pas au bouton.
   4. Variante multi-sample : chaîne de 16 hats classés par force, VEL MOD →
-     slice ; la vélocité choisit la frappe.
+     slice ; la vélocité choisit la frappe. Même recette pour le kick,
+     rendu depuis Reaper : [[maison-grave-rendu-dt2]] §7.3.
 - **Chez nous** : exercice 4 du panorama ; profils de [[../theorie/kt-hats]].
 
 ### 2. Overdrive comme volume

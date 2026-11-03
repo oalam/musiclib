@@ -1,11 +1,11 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-29
+updated: 2026-10-31
 ---
 
 # KB tutos — sessions vidéo décortiquées
 
-Trois sortes de fiches. Le lot 1 tire ses fiches de **sessions complètes**
+Quatre sortes de fiches. Le lot 1 tire ses fiches de **sessions complètes**
 (une production ou un live, du pattern vide au pattern plein), vidéo
 rédigée depuis la transcription et les chapitres YouTube, ou fil écrit
 quand l'auteur y déroule toute sa session. Le lot 2
@@ -13,7 +13,10 @@ tire les siennes d'un **fil de forum** (Elektronauts, *Digitakt II Tips &
 Tricks*), une fiche par famille d'astuces, chaque astuce déroulée pas à pas.
 Le lot 3 consigne des **recettes maison** : une idée venue en travaillant,
 raisonnée contre le manuel et la doctrine, écrite au format du lot 2 et à
-vérifier à la machine. Chaque *trick* est noté avec la track, l'instrument,
+vérifier à la machine. Le lot 4 rassemble le **sound design
+préparatoire** : ce qui se fabrique sur le Mac avant la machine (Reaper,
+Vital, Kick 3, Trash Lite), un hub et six chapitres au format du lot 3.
+Chaque *trick* est noté avec la track, l'instrument,
 les pas et un lien vers le chapitre où il est montré, puis mis en regard de la
 grille de [[../../doctrine]] (§1) et des fiches machine de [[../_index]].
 
@@ -56,6 +59,13 @@ avant de câbler** peut précéder les recettes quand l'idée de départ bute su
 le fonctionnement de la machine (envoi partagé, lock trig qui ne déclenche
 rien). Statut `draft` tant que la recette n'a pas été rejouée.
 
+### Fiche sound design préparatoire (lot 4)
+
+Même frontmatter que le lot 3, `lot: 4`, `ordre` = numéro de chapitre (0
+pour le hub) et `parent` = le hub. Les chapitres gardent la numérotation
+de section du tuto entier ; un renvoi « §n » vers un autre chapitre est
+précédé du lien de sa fiche.
+
 ## Lot 1 — Sessions complètes
 
 | # | Fiche | Auteur | Modèle | Statut |
@@ -91,4 +101,22 @@ Source : <https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556>
 |---|---|---|---|---|
 | 1 | [[maison-rumble-dans-le-kick]] | rumble dans la queue sèche du kick (track 1), sans resample | 4 | draft |
 | 2 | [[maison-progression-par-phrases]] | pattern main écrit pour 4 tours, partition de mutes sur 3 cycles, changement de pattern à une seule différence | 3 | draft |
-| 3 | [[maison-sounddesign-grave-reaper]] | le grave fabriqué sur le Mac (Reaper, Vital, Drumsynth, Kick 3, Trash Lite, ReaComp, Acid V) et exporté pour les tracks 1, 2 et 9 ; notions Reaper et glossaire Reaper → Digitakt | 4 tutos (kick, rumble, kickbass, basse) | draft |
+
+L'ex-recette maison 3 (le grave fabriqué sur le Mac) est devenue le lot 4.
+
+## Lot 4 — Sound design préparatoire
+
+Le grave fabriqué sur le Mac avant la machine (Reaper, Vital, Drumsynth,
+Kick 3, Trash Lite, SPAN, ReaComp, Acid V) et exporté pour les tracks 1, 2
+et 9. Ex-recette maison 3, découpée le 2026-10-31 en un hub et six
+chapitres parce que la fiche unique dépassait 800 lignes.
+
+| Ch. | Fiche | Contenu | Statut |
+|---|---|---|---|
+| 0-1, 8-9 | [[maison-sounddesign-grave-reaper]] | hub : arbitrages, stack, notions Reaper, glossaire Reaper → Digitakt, pièges, exercices, ressources | draft |
+| 2 | [[maison-grave-projet-reaper]] | projet Reaper modèle : construction clic par clic, pistes, durées au tempo, sidechain par canaux 3/4, saturation par bandes, mesure SPAN | draft |
+| 3 | [[maison-grave-kick]] | kick : Drumsynth, Kick 3 par couches, Vital de A à Z, chaîne de sortie commune | draft |
+| 4 | [[maison-grave-rumble]] | rumble : reverb saturée duckée par le kick, deux départs de passe-haut, rendu boucle ou un coup | draft |
+| 5 | [[maison-grave-kickbass]] | kickbass : Vital saturé ou sinus, Kick 3, limite de tempo vers le kick-sub | draft |
+| 6 | [[maison-grave-basse]] | basse en contretemps (one-shot par note), trois couches, ligne Acid V | draft |
+| 7 | [[maison-grave-rendu-dt2]] | rendu 48 kHz mono et transfert ; chaîne de seize kicks choisis à la vélocité (Grid 16, essayée à la machine le 2026-10-31) | draft |

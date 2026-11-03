@@ -8,6 +8,23 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB tutos, lot 4 « Sound design préparatoire » : l'ex-recette
+  maison 3 [[maison-sounddesign-grave-reaper]], devenue trop longue
+  (860 lignes), est découpée en un hub (arbitrages, stack, notions
+  Reaper, pièges, exercices, ressources) et six chapitres
+  [[maison-grave-projet-reaper]], [[maison-grave-kick]],
+  [[maison-grave-rumble]], [[maison-grave-kickbass]],
+  [[maison-grave-basse]], [[maison-grave-rendu-dt2]] ; numérotation des
+  sections conservée, renvois croisés préfixés du lien de la fiche,
+  liens entrants ([[kick-mental-vst]], [[rumble-grave]], KT23, README)
+  mis à jour, `kb.py toc` montre le lot. Nouveau §7.3 dans le chapitre
+  rendu : chaîne de seize kicks ordonnés par intensité rendue en un seul
+  WAV de 4 mesures (une tranche par temps, enveloppe de paramètre dans
+  Reaper, table des longueurs de tranche par format), lue sur la track 1
+  en machine GRID 16 avec VEL → VOL off et VEL MOD → SRC:SLICE, essayée
+  à la machine le 2026-10-31 ; exception à la règle « kick en ONESHOT »
+  documentée dans [[machines-src]], renvoi depuis
+  [[elektronauts-velocite-macros]] §1.
 - [7.M] KB tutos, recette maison 3 [[maison-sounddesign-grave-reaper]]
   (d'abord écrite dans `technique/`, déplacée dans la KB pour être dans le
   hub) : tuto complet du grave sur Mac avec la stack gratuite (Reaper, Vital, Maschine Drumsynth Kick,

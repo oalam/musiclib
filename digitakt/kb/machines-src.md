@@ -44,7 +44,9 @@ SLICE / GRID pour découper une boucle, MIDI pour piloter un synthé.
 ## En live techno
 
 - Kick, rumble, clap, hats : **ONESHOT**, toujours ; le reste se décide au
-  son.
+  son. Une exception : le kick en **GRID 16** quand il vient d'une chaîne
+  de seize variantes choisies à la vélocité
+  ([[tutos/maison-grave-rendu-dt2]] §7.3).
 - Une boucle de breakbeat ou de percs tribe d'un autre tempo : STRETCH pour
   rester naturel, REPITCH pour l'effet « vinyle accéléré ».
 - `PLAY` en REVERSE sur un crash ou une reverb resamplée = montée avant un
