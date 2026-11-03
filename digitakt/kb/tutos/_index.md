@@ -1,6 +1,6 @@
 ---
 tags: [digitakt, kb, tutos, index]
-updated: 2026-10-31
+updated: 2026-11-02
 ---
 
 # KB tutos — sessions vidéo décortiquées
@@ -101,8 +101,11 @@ Source : <https://www.elektronauts.com/t/digitakt-ii-tips-tricks/212556>
 |---|---|---|---|---|
 | 1 | [[maison-rumble-dans-le-kick]] | rumble dans la queue sèche du kick (track 1), sans resample | 4 | draft |
 | 2 | [[maison-progression-par-phrases]] | pattern main écrit pour 4 tours, partition de mutes sur 3 cycles, changement de pattern à une seule différence | 3 | draft |
+| 3 | [[maison-groove-tribe-battement]] | groove tribe à 143 démonté : kick glissant qui tient le sub (kick-sub), stab à la tierce mineure en contretemps, charley accentué, battement à ~12 Hz entre les deux queues ; sons isolés et vérification Reaper | 6 | draft |
 
-L'ex-recette maison 3 (le grave fabriqué sur le Mac) est devenue le lot 4.
+L'ex-recette maison 3 (le grave fabriqué sur le Mac) est devenue le lot 4 ;
+le numéro 3 est repris le 2026-11-02 par le groove tribe à 143 BPM, tiré
+d'une analyse rangée dans [[../../../refs/Groove tribe 143 BPM — analyse et recette Reaper DT2]].
 
 ## Lot 4 — Sound design préparatoire
 

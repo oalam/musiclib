@@ -8,6 +8,18 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M] KB tutos, recette maison 3 [[maison-groove-tribe-battement]] :
+  un extrait de live tribe à 143,25 BPM démonté (analyse rangée dans
+  `refs/`, sons isolés dans `~/Downloads/sons_isoles_live/`, destination
+  à arbitrer) et traduit en six recettes DT2 / Reaper : kick glissant qui
+  tient le sub sur A#1 (architecture kick-sub de KT23), stab à la tierce
+  mineure (C#2) sur chaque contretemps ~15 ms en avance, charley fermé en
+  croches accentué au contretemps, arrangement sur 12 mesures par mutes,
+  ghosts et niveau, variante kick court + note tenue, vérification dans
+  Reaper. Le roulement du sub est un battement à ~12 Hz entre la queue du
+  kick et le stab, pas un LFO ; l'intervalle kick / stab est documenté
+  comme réglage de groove, en écart assumé avec KT5 et la doctrine §11.
+  Index des tutos et de `refs/` mis à jour.
 - [7.M] KB tutos, lot 4 « Sound design préparatoire » : l'ex-recette
   maison 3 [[maison-sounddesign-grave-reaper]], devenue trop longue
   (860 lignes), est découpée en un hub (arbitrages, stack, notions
