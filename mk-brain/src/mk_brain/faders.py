@@ -14,7 +14,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 DEFAULT_VALUE = 64  # valeur de départ d'un paramètre jamais vu
-MUTED, OPEN = 0, 1  # valeurs du CC de mute, dans les deux sens (constaté le 2026-11-09)
+# CC de mute : 0 = ouvert, autre valeur = muté. La DT2 envoie 1 pour muté, le Pi
+# envoie 127 (vérifié en 5.A) ; constaté le 2026-11-09 à l'essai.
+MUTED, OPEN = 127, 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -63,7 +65,7 @@ class Faders:
     def toggle_mute(self, track: int) -> tuple[int, int]:
         """MUTE + pad → (CC, valeur). Un mute jamais vu est supposé ouvert.
 
-        Même sens que la DT2 (constaté le 2026-11-09) : 0 = muté, 1 = ouvert.
+        127 = muter, 0 = ouvrir (vérifié sur la DT2).
         """
         muted = not self.muted.get(track, False)
         self.muted[track] = muted
@@ -71,8 +73,8 @@ class Faders:
 
     def received(self, track: int, cc: int, value: int) -> None:
         """CC venu de la DT2 sur le canal d'une track : bouton ou mute joué sur la machine."""
-        if cc == self.mute_cc:  # constaté le 2026-11-09 : la DT2 envoie 0 = muté, 1 = ouvert
-            self.muted[track] = value == MUTED
+        if cc == self.mute_cc:  # la DT2 envoie 1 = muté, 0 = ouvert (constaté le 2026-11-09)
+            self.muted[track] = value != OPEN
             return
         if any(c == cc for page in self.pages for _, c in page):
             self._values[(track, cc)] = value

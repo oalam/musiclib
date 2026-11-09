@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.15.3] - 2026-11-09
+
+### Corrigé
+
+- [6] Sens des mutes rétabli après l'essai : la DT2 envoie 1 = muté et
+  0 = ouvert ; MUTE + pad renvoie 127 pour muter, 0 pour ouvrir (comme
+  avant la 0.15.2). Réception : toute valeur non nulle = muté. Les 0.15.1
+  et 0.15.2 reposaient sur une lecture inversée de l'essai.
+
 ## [0.15.2] - 2026-11-09
 
 ### Corrigé
