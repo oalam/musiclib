@@ -387,7 +387,7 @@ E·TRIBE  A# phrg        162.0 ▶  Q16 SW54
   27 / 64              PAT E04  2/4       <- chiffres doubles
                                           
 [████████|████████|████████|██▒░░░░░░░░░] <- 8 blocs de 8 mesures
- ● ○ ○ ○                     cap 32 : -5  <- temps, mesures avant le cap
+ ● ○ ○ ○                     cap 32 : -6  <- temps, mesures avant le cap
 ```
 - 4 dernières mesures d'une phrase : la barre passe en vidéo inverse.
 - BPM lu sur la clock, arrondi à 0,1 ; `■` à l'arrêt, `▶` en lecture.
@@ -517,6 +517,19 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
   phrase de 16 mesures après le premier PC de la banque.
 - Patterns de longueur non puissance de 2 : le compteur dérive, c'est
   assumé ; le bouton manuel corrige.
+- **Précisé le 2026-11-09 (slice 4)** :
+  - toute remise à zéro (SHIFT + PLAY, SHIFT + GROUP n, PC) s'applique à
+    la barre suivante ; SHIFT + GROUP n donne à cette barre le numéro
+    (n − 1) × 8 + 1, ignoré au-delà de la longueur de phrase ;
+  - mesures avant le cap comptées avec la mesure en cours : `-1` pendant la
+    dernière, donc `cap 32 : -6` à la mesure 27 (32 − 27 + 1 = 6) ;
+  - PC reçu transport arrêté : ignoré (le Start remet à 1) ; Stop reçu
+    avant la barre : la remise en attente est oubliée ;
+  - le 1 de chaque mesure pulse sur la LED PLAY (première croche) ;
+  - en attendant les modes (slice 5) : transport lancé, les LED GROUP
+    montrent le compteur ; arrêté, la disposition. GROUP seul choisit
+    toujours la disposition. Longueur de phrase dans `config/default.yaml`
+    (`play.phrase`), par banque avec les projets (slice 6), comme `intro`.
 
 ## Réglages DT2 requis
 
@@ -543,7 +556,7 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 à 3 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 à 3 faites le 2026-11-09, slice 4 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
@@ -552,7 +565,7 @@ conditionne tout le reste.
 | 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | fait 2026-11-09 : tracks 1-16 en A, gamme du groupe C jouée sur la track active (9) |
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
-| 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
+| 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | en cours : code et tests faits 2026-11-09, essai sur la DT2 à faire |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | à venir |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |

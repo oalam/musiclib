@@ -17,10 +17,12 @@ play:
   quantize: "1/16"         # off, 1/16, 1/8 ; GRID fait défiler
   swing: 50                  # 50-75 %, SWING + encodeur maître
   repeat: "1/16"            # division de départ du note repeat
+  phrase: 32                 # 32 ou 64 mesures ; par banque une fois les projets là (slice 6)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
 
 leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine
+  phrase: [0, 255, 0]        # LED GROUP du compteur de phrases (transport lancé)
 
 # Couleurs des rôles de note (dispositions B-H)
 roles:

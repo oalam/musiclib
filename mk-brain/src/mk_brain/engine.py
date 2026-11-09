@@ -6,6 +6,10 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
 - Slice 3 : quantize « nearest » (GRID), swing (SWING + encodeur maître),
   note repeat (NOTE REPEAT tenu, SHIFT + NOTE REPEAT verrouille, boutons
   d'écran 1-8 = division). Sans transport lancé : envoi immédiat, sans repeat.
+- Slice 4 : compteur de phrases (`phrase.py`) ; Start, Stop et Program Change
+  reçus de la DT2 ; SHIFT + PLAY = mesure 1 à la barre suivante, SHIFT +
+  GROUP n = début du bloc n ; transport lancé, les LED GROUP montrent le
+  compteur et PLAY pulse sur le 1.
 """
 
 from __future__ import annotations
@@ -25,6 +29,7 @@ from mk_brain.hid_mk2 import (
     pad_label,
 )
 from mk_brain.layouts import N_PADS, pad_color, pad_note, scale, velocity
+from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseState, pattern_label
 from mk_brain.quantize import (
     GRID_TICKS,
     QUANTIZE_CYCLE,
@@ -86,6 +91,10 @@ class Engine:
         self.leds_dirty = True
         self.last_played: tuple[int, int, int] | None = None  # (pad, note, vélocité)
         self.last_decision = ""  # diagnostic quantize : position de la frappe et décision
+        self.phrase = PhraseCounter(cfg.play.phrase)
+        self.phrase_state: PhraseState | None = None
+        self._phrase_leds: tuple[object, ...] = ()
+        self.log: list[str] = []  # évènements du compteur, lus et vidés par la CLI
 
     @property
     def repeat_active(self) -> bool:
@@ -103,6 +112,31 @@ class Engine:
             return []
         return self._pad(pad_label(ev.index), ev, now)
 
+    def on_start(self) -> None:
+        self.phrase.start()
+
+    def on_stop(self) -> None:
+        self.phrase.stop()
+        self.phrase_state = None
+        self.leds_dirty = True
+
+    def on_program_change(self, program: int) -> None:
+        """PC reçu : transport lancé, mesure 1 à la barre suivante ; arrêté, ignoré."""
+        ticks = self.clock.ticks_since_start
+        if ticks is None:
+            return
+        label = pattern_label(program)
+        at = self.phrase.reset_next_bar(ticks, pattern=label)
+        self.log.append(f"PC {label} -> mesure 1 à la barre {at + 1}")
+
+    def _recalibrate(self, first_bar: int) -> bool:
+        ticks = self.clock.ticks_since_start
+        if ticks is None or first_bar > self.phrase.length:
+            return False
+        at = self.phrase.reset_next_bar(ticks, first_bar=first_bar)
+        self.log.append(f"recalage -> mesure {first_bar} à la barre {at + 1}")
+        return True
+
     def _button(self, ev: ButtonEvent) -> None:
         name = ev.name
         if not ev.pressed:
@@ -114,13 +148,20 @@ class Engine:
                 self.leds_dirty = True
             return
         self._held_buttons.add(name)
+        shift = "SHIFT" in self._held_buttons
+        if shift and name == "PLAY":
+            self._recalibrate(1)
+            return
+        if shift and name.startswith("GROUP_"):
+            self._recalibrate(GROUPS.index(name[-1]) * BLOCK_BARS + 1)
+            return
         if name.startswith("GROUP_"):
             self.group = GROUPS.index(name[-1])
         elif name == "GRID":
             i = QUANTIZE_CYCLE.index(self.quantize)
             self.quantize = QUANTIZE_CYCLE[(i + 1) % len(QUANTIZE_CYCLE)]
         elif name == "NOTE_REPEAT":
-            if "SHIFT" in self._held_buttons:
+            if shift:
                 self.repeat_locked = not self.repeat_locked
                 if not self.repeat_locked:
                     self._repeats.clear()
@@ -160,6 +201,7 @@ class Engine:
 
     def tick(self, now: int) -> list[Timed]:
         """Attaques dont la fenêtre de vélocité est écoulée, coups de repeat à venir."""
+        self._update_phrase()
         window = int(self.cfg.velocity.window_ms * 1e6)
         out: list[Timed] = []
         for pad in [p for p, a in self._attacks.items() if now - a.start >= window]:
@@ -175,6 +217,17 @@ class Engine:
                 self.last_played = (pad, rep.note, vel)
                 rep.next_pos += div
         return out
+
+    def _update_phrase(self) -> None:
+        ticks = self.clock.ticks_since_start
+        st = None if ticks is None else self.phrase.update(ticks)
+        self.phrase_state = st
+        sig: tuple[object, ...] = (
+            () if st is None else (st.blocks_lit, st.blinking and st.half_beat_on, st.pulse)
+        )
+        if sig != self._phrase_leds:
+            self._phrase_leds = sig
+            self.leds_dirty = True
 
     def _time_of(self, position: float) -> int | None:
         t = self.clock.position_time(position + swing_offset(position, self.swing))
@@ -222,15 +275,23 @@ class Engine:
             pad = pad_label(index)
             full = pad_color(self.cfg, layout, pad)
             pads[index] = full if pad in lit else scale(full, dim)
-        groups = [
-            scale(self.cfg.families[lay.family], 1.0 if g == self.group else dim)
-            for g, lay in enumerate(self.cfg.layouts)
-        ]
+        st = self.phrase_state
+        if st is None:  # transport arrêté : les GROUP montrent la disposition
+            groups = [
+                scale(self.cfg.families[lay.family], 1.0 if g == self.group else dim)
+                for g, lay in enumerate(self.cfg.layouts)
+            ]
+        else:  # un bouton de plus toutes les 8 mesures ; le bloc en cours clignote avant un cap
+            color = self.cfg.leds.phrase
+            groups = [color if g < st.blocks_lit else (0, 0, 0) for g in range(len(GROUPS))]
+            if st.blinking and not st.half_beat_on:
+                groups[st.blocks_lit - 1] = (0, 0, 0)
         low = round(LED_MAX * dim)
         buttons = {
             "GRID": LED_MAX if self.quantize != "off" else 0,
             "NOTE_REPEAT": LED_MAX if self.repeat_active else 0,
             "SWING": LED_MAX if self.swing > 50 else 0,
+            "PLAY": LED_MAX if st is not None and st.pulse else 0,
         }
         if self.repeat_active:
             for i, (name, _) in enumerate(DIVISIONS):

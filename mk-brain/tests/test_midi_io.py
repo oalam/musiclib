@@ -3,7 +3,8 @@ from __future__ import annotations
 import pytest
 
 from mk_brain import midi_io
-from mk_brain.engine import NoteOff, NoteOn
+from mk_brain.config import Config
+from mk_brain.engine import Engine, NoteOff, NoteOn
 
 
 def test_find_port(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -45,3 +46,14 @@ def test_feed_clock_dispatch() -> None:
     assert c.transfer_suspected(10)
     midi_io.feed_clock(c, midi_io.MidiIn("stop", 10))
     assert not c.running
+
+
+def test_feed_engine_dispatch(cfg: Config) -> None:
+    eng = Engine(cfg)
+    midi_io.feed_engine(eng, midi_io.MidiIn("start", 0))
+    for k in range(100):
+        midi_io.feed_engine(eng, midi_io.MidiIn("clock", k * 17_000_000))
+    midi_io.feed_engine(eng, midi_io.MidiIn("program_change", 0, (0, 2)))
+    assert eng.phrase.pending
+    midi_io.feed_engine(eng, midi_io.MidiIn("stop", 0))
+    assert not eng.phrase.pending and not eng.clock.running

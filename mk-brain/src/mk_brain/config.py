@@ -42,6 +42,7 @@ class VelocityConfig(BaseModel):
 
 class LedConfig(BaseModel):
     dim: float = Field(0.15, ge=0, le=1)
+    phrase: RGB = (0, 255, 0)  # LED GROUP du compteur de phrases
 
 
 class PlayConfig(BaseModel):
@@ -50,6 +51,7 @@ class PlayConfig(BaseModel):
     quantize: Literal["off", "1/16", "1/8"] = "1/16"
     swing: int = Field(50, ge=50, le=75)
     repeat: Literal["1/4", "1/8", "1/8T", "1/16", "1/16T", "1/32", "1/32T", "1/64"] = "1/16"
+    phrase: Literal[32, 64] = 32  # longueur de phrase ; par banque avec les projets (slice 6)
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
 
 

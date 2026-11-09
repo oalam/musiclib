@@ -1,10 +1,11 @@
-"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-3, pads → DT2), `clock` (slice 2)."""
+"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-4, pads → DT2), `clock` (slice 2)."""
 
 from __future__ import annotations
 
 import argparse
 import sys
 import time
+from typing import TYPE_CHECKING
 
 from mk_brain import display
 from mk_brain.clock import ClockTracker
@@ -29,6 +30,9 @@ from mk_brain.hid_mk2 import (
     pad_label,
 )
 from mk_brain.midi_io import MidiError
+
+if TYPE_CHECKING:
+    from mk_brain.engine import Engine
 
 RAINBOW: list[tuple[int, int, int]] = [
     (255, 0, 0), (255, 128, 0), (255, 255, 0), (0, 255, 0),
@@ -166,11 +170,23 @@ def _clock_line(clock: ClockTracker) -> str:
     return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
 
 
+def _phrase_screen(engine: Engine) -> tuple[str, int]:
+    """Écran droit de `play` : mesure / longueur, ou -2 / -1 avant un cap."""
+    st = engine.phrase_state
+    if st is None:
+        return ("-", 44)
+    if st.countdown is not None:
+        return (str(st.countdown), 60)
+    pat = engine.phrase.pattern
+    mark = "*" if st.tail else ""
+    return (f"{st.bar}/{st.length}{mark} {pat}" if pat else f"{st.bar}/{st.length}{mark}", 32)
+
+
 def cmd_play(dry_run: bool) -> int:
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
-    from mk_brain.midi_io import Dt2In, Dt2Out, feed_clock
+    from mk_brain.midi_io import Dt2In, Dt2Out, feed_engine
     from mk_brain.scheduler import Scheduler
 
     cfg = load_config()
@@ -183,6 +199,7 @@ def cmd_play(dry_run: bool) -> int:
     dev = Mk2Device.open()
     last = "-"
     shown: tuple[object, ...] = ()
+    shown_right: tuple[object, ...] = ()
     last_draw = 0
 
     def emit(msgs: list[Timed]) -> None:
@@ -198,7 +215,10 @@ def cmd_play(dry_run: bool) -> int:
                 print(f"{last}   {engine.last_decision}")
                 engine.last_decision = ""
 
-    print(f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; Ctrl-C")
+    print(
+        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; "
+        "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
+    )
     try:
         if sched is not None:
             sched.start()
@@ -208,10 +228,15 @@ def cmd_play(dry_run: bool) -> int:
             now = time.perf_counter_ns()
             if inp is not None:
                 for ev in inp.drain():
-                    feed_clock(clock, ev)
+                    feed_engine(engine, ev)
+                    if ev.kind in ("start", "stop"):
+                        print(f"{ev.kind} {_clock_line(clock)}")
             for hid_ev in decoder.feed(report):
                 emit(engine.handle(hid_ev, now))
             emit(engine.tick(now))
+            for line in engine.log:
+                print(f"{line}   ({_clock_line(clock)})")
+            engine.log.clear()
             if engine.leds_dirty:
                 dev.send_leds(engine.leds())
             lay = cfg.layouts[engine.group]
@@ -227,6 +252,10 @@ def cmd_play(dry_run: bool) -> int:
                     lines = [f"{lay.group}  {lay.name}", _clock_line(clock), engine.status(), last]
                     _show(dev, 0, display.text_image([*lines, warn]))
                 shown, last_draw = state, now
+            right = _phrase_screen(engine)
+            if right != shown_right:
+                _show(dev, 1, display.big_text_image(right[0], size=right[1]))
+                shown_right = right
     except KeyboardInterrupt:
         pass
     finally:

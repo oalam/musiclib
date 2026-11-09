@@ -3,6 +3,26 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.5.0] - 2026-11-09
+
+### Ajouté
+
+- [4] `phrase.py` : compteur de phrases pur (mesure 1-32/64, numéro de
+  phrase, temps, cap 16/32/64, 4 dernières mesures, compte à rebours
+  `-2` / `-1`, blocs de 8 mesures), remise à zéro différée à la barre
+  suivante, nom de pattern depuis le Program Change (`36` → `C05`).
+- [4] Moteur : Start, Stop et Program Change reçus de la DT2
+  (`midi_io.feed_engine`) ; PC transport lancé = mesure 1 à la barre
+  suivante, ignoré à l'arrêt, oublié si un Stop suit ; SHIFT + PLAY =
+  mesure 1, SHIFT + GROUP n = début du bloc n, à la barre suivante.
+- [4] LED : transport lancé, GROUP A-H = un bloc de 8 mesures allumé de
+  plus toutes les 8 mesures, le bloc clignote au temps pendant la dernière
+  mesure avant un cap ; PLAY pulse sur le 1.
+- [4] `play` : écran droit `mesure/longueur` et pattern en gros, `*` dans
+  les 4 dernières mesures, `-2` / `-1` avant un cap ; recalages, Start et
+  Stop journalisés avec la position.
+- [4] Config : `play.phrase` (32 ou 64), `leds.phrase` (couleur).
+
 ## [0.4.0] - 2026-11-09
 
 ### Ajouté

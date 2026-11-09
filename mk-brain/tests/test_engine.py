@@ -146,3 +146,64 @@ def test_repeat_needs_running_transport(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "NOTE_REPEAT")
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 0, 127))]
+
+
+# --- slice 4 : compteur de phrases -------------------------------------------
+
+
+def advance(eng: Engine, start: int, end: int) -> None:
+    """Fait avancer l'horloge du moteur de `start` à `end` (exclu) et lit l'état."""
+    for k in range(start, end):
+        eng.clock.tick(k * TICK)
+    eng.tick((end - 1) * TICK)
+
+
+def test_phrase_leds_follow_transport(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(1))
+    eng.on_start()
+    advance(eng, 1, 9 * 96 + 1)  # mesure 10, temps 1 : blocs A et B
+    st = eng.phrase_state
+    assert st is not None and st.bar == 10
+    leds = eng.leds()
+    assert leds.groups[:3] == [cfg.leds.phrase, cfg.leds.phrase, (0, 0, 0)]
+    assert leds.buttons["PLAY"] > 0  # pulse sur le 1
+    eng.on_stop()
+    eng.clock.stop(0)
+    eng.tick(0)
+    leds = eng.leds()
+    assert leds.groups[0] == cfg.families["rythmique"]  # retour aux dispositions
+    assert leds.buttons["PLAY"] == 0
+
+
+def test_program_change_resets_at_next_bar(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(1))
+    eng.on_start()
+    advance(eng, 1, 3 * 96 + 86 + 1)  # 10 clocks avant la 5ᵉ mesure
+    eng.on_program_change(16 * 4 + 3)
+    assert eng.log == ["PC E04 -> mesure 1 à la barre 5"]
+    assert eng.phrase_state is not None and eng.phrase_state.bar == 4
+    advance(eng, 3 * 96 + 87, 4 * 96 + 1)
+    assert eng.phrase_state is not None and eng.phrase_state.bar == 1
+    assert eng.phrase.pattern == "E04"
+
+
+def test_program_change_ignored_when_stopped(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.on_program_change(5)
+    assert eng.log == [] and not eng.phrase.pending
+
+
+def test_shift_play_and_shift_group_recalibrate(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(1))
+    eng.on_start()
+    advance(eng, 1, 2 * 96 + 41)  # mesure 3
+    btn(eng, "SHIFT")
+    btn(eng, "GROUP_C")
+    assert eng.group == 0  # SHIFT + GROUP ne change pas la disposition
+    advance(eng, 2 * 96 + 41, 3 * 96 + 1)
+    assert eng.phrase_state is not None and eng.phrase_state.bar == 17
+    btn(eng, "PLAY")
+    advance(eng, 3 * 96 + 1, 4 * 96 + 1)
+    assert eng.phrase_state is not None and eng.phrase_state.bar == 1
+    btn(eng, "GROUP_H")  # bloc 8 = mesure 57, au-delà d'une phrase de 32 : ignoré
+    assert not eng.phrase.pending

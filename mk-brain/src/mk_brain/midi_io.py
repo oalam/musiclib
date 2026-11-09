@@ -10,7 +10,7 @@ from typing import Any, Literal
 import mido
 
 from mk_brain.clock import ClockTracker
-from mk_brain.engine import MidiOut, NoteOff, NoteOn
+from mk_brain.engine import Engine, MidiOut, NoteOff, NoteOn
 
 InKind = Literal["clock", "start", "continue", "stop", "sysex", "program_change"]
 
@@ -126,3 +126,14 @@ def feed_clock(clock: ClockTracker, ev: MidiIn) -> None:
         clock.stop(ev.t_ns)
     elif ev.kind == "sysex":
         clock.sysex(ev.data, ev.t_ns)
+
+
+def feed_engine(engine: Engine, ev: MidiIn) -> None:
+    """Horloge d'abord, puis transport et Program Change vers le moteur."""
+    feed_clock(engine.clock, ev)
+    if ev.kind == "start":
+        engine.on_start()
+    elif ev.kind == "stop":
+        engine.on_stop()
+    elif ev.kind == "program_change":
+        engine.on_program_change(ev.data[1])
