@@ -187,7 +187,7 @@ def cmd_play(dry_run: bool) -> int:
     sched: Scheduler[MidiOut] | None = Scheduler(out.send) if out is not None else None
     dev = Mk2Device.open()
     last = "-"
-    message: tuple[str, int] | None = None  # dernier geste de contrôle, en tête de l'écran droit
+    message: tuple[str, int] | None = None  # dernier geste de contrôle, 2e ligne du bandeau gauche
     shown: list[bytes] = [b"", b""]  # dernière image envoyée par écran
     last_draw = 0
 
@@ -240,13 +240,8 @@ def cmd_play(dry_run: bool) -> int:
             warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
                 warn = warn or "pas de clock"
-            if engine.design:  # bandeau et cadre permanents : jamais confondu avec live (5.D)
-                lay = engine.layout
-                lines = [f"DESIGN  {lay.group}  {lay.name}", _clock_line(clock), engine.status()]
-                left = display.text_image([*lines, last, warn], bold=frozenset({0, 4}), framed=True)
-            else:
-                left = render.live_left(engine, warn)
-            for screen, img in enumerate((left, render.right(engine, now, message))):
+            left = render.left(engine, now, message, warn)  # cadre et bandeau DESIGN en design
+            for screen, img in enumerate((left, render.right(engine, now))):
                 frame = display.image_to_frame(img)
                 if frame != shown[screen]:
                     for report in display.frame_reports(screen, frame):

@@ -3,6 +3,17 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.8.1] - 2026-11-09
+
+### Modifié
+
+- [5] 5.C Écrans revus à l'essai : chaque valeur au-dessus de son
+  encodeur (faders 1-4 à gauche, 5-8 à droite, valeurs en gros), tiers
+  supérieur des deux écrans en bandeau (contexte et track à gauche,
+  phrase et progression à droite, compte à rebours en bandeau inversé) ;
+  divisions du repeat sous leurs boutons d'écran ; même structure en
+  design, écran gauche bordé.
+
 ## [0.8.0] - 2026-11-09
 
 ### Ajouté

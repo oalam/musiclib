@@ -442,25 +442,41 @@ mode et le nom devient la vraie note (tonique + degré).
    viennent du projet (samples par banque et track du JSON), la DT2 ne les
    renvoie pas.
 
-**Fait le 2026-11-09 (slice 5.C, `render.py`), écarts aux maquettes** :
+**Fait le 2026-11-09 (slice 5.C, `render.py`), revu à l'essai le même
+jour** : chaque valeur s'affiche juste au-dessus de son encodeur. Les deux
+écrans ont la même structure, qui remplace les maquettes live ci-dessus :
 
-- écran gauche live : pattern, BPM, lecture / arrêt dessinés, quantize,
-  swing ; `mesure / longueur` en gros, `phrase n` et `cap 32 : -6` à
-  droite ; barre d'une case par mesure, séparée tous les 8, cadre et
-  barre en vidéo inverse dans les 4 dernières mesures ; 4 ronds pour les
-  temps ; alerte (`pas de clock`, `TRANSFER OUVERT ?`) en gras en bas. La
-  banque, sa tonique et son mode s'ajouteront avec les projets (slice 6) ;
-- écran droit : en-tête `T07  ch7` (`MUTE` si mutée ; en design
-  `-> AUTO ch16`), remplacé 1,5 s par le dernier geste de contrôle ;
-  8 colonnes nom / valeur (`~` hors prise) / jauge, le pan depuis le
-  centre (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
-- superpositions, par priorité : proposition de bascule de mode, division
-  du repeat (NOTE REPEAT tenu ou pad qui répète), compte à rebours,
-  frappe d'un pad 1 s (`T07 96` : track et vélocité ; nom du sample avec
-  les projets) ;
+```
+écran gauche                              écran droit
+E04  143.0 ▶  Q16 SW50                    25 / 32   phrase 1   cap 32 : -8
+T07  ch7                                  [████████|████████|████████|██░░]
+----------------------------------------  ---------------------------------
+CUT      RES      ENV      DEC            LVL      PAN      DLY      REV
+74       64       64       64             64       59       64       64
+[███░]   [██░░]   [██░░]   [██░░]         [██░░]   [─|─]    [██░░]   [██░░]
+```
+
+- tiers supérieur (21 px) = bandeau ; dessous, 4 colonnes de 64 px par
+  écran, encodeurs 1-4 à gauche, 5-8 à droite : nom, valeur en gros
+  (`~` hors prise), jauge (le pan depuis le centre, `bipolar` dans la
+  page d'encodeurs) ; colonne touchée inversée 1 s ;
+- bandeau gauche : pattern, BPM, lecture / arrêt dessinés, quantize,
+  swing ; 2e ligne : track sélectionnée (`MUTE` si mutée ; en design
+  `-> AUTO ch16`), remplacée par le geste ou la frappe le plus récent
+  (1,5 s / 1 s ; frappe = track et vélocité, nom du sample avec les
+  projets) ou par une alerte (`pas de clock`, `TRANSFER OUVERT ?`) ;
+- bandeau droit : `mesure / longueur`, phrase, cap ; barre d'une case par
+  mesure, séparée tous les 8, inversée dans les 4 dernières mesures ;
+  dans les 2 dernières avant un cap, bandeau inversé avec `-2` / `-1` ;
+- NOTE REPEAT (tenu, ou pad qui répète) : les 8 divisions remplacent les
+  bandeaux, chacune sous son bouton d'écran, la choisie inversée ;
+- bascule de mode proposée : écran droit entier ;
+- design : même structure, bandeau `DESIGN` + disposition, cadre autour
+  de l'écran gauche (les menus viendront en 5.D) ;
+- banque, tonique et mode s'ajouteront avec les projets (slice 6) ;
 - rafraîchi au plus toutes les 50 ms dans la boucle principale, envoyé
-  seulement si l'image change ; 0,7 ms la paire d'écrans sur le Mac. Si
-  le Pi est trop lent, passer au fil de rendu dédié (slice 7).
+  seulement si l'image change ; moins d'1 ms la paire d'écrans sur le
+  Mac. Si le Pi est trop lent, passer au fil de rendu dédié (slice 7).
 
 **Design, écran gauche : ce qui part vers la DT2**
 ```
