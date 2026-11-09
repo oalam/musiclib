@@ -497,12 +497,22 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     from mk_brain.engine import ControlChange, PitchBend
 
     eng = Engine(cfg)
+    assert eng.handle(EncoderEvent(4, 8, 0), 0) == []  # PB sans SHIFT : rien
+    assert eng.last_control == "PB: hold SHIFT"
+    btn(eng, "SHIFT")
     assert eng.handle(EncoderEvent(4, 8, 0), 0) == [(0, PitchBend(0, 256))]  # PB : 64 → 66
+    assert eng.faders.view(1)[3].value == 66
+    assert eng.handle(ButtonEvent("SHIFT", False), MS) == [(MS, PitchBend(0, 0))]  # au centre
+    assert eng.faders.view(1)[3].value == 64
+    assert eng.handle(ButtonEvent("SHIFT", False), MS) == []  # une seule remise
+    btn(eng, "SHIFT")
+    eng.handle(EncoderEvent(4, 8, 0), 0)
+    btn(eng, "SHIFT", False)
     btn(eng, "BROWSE_RIGHT")
     assert eng.last_control == "page 2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
     assert eng.handle(EncoderEvent(1, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
     btn(eng, "BROWSE_LEFT")
-    assert eng.faders.view(1)[3].value == 66  # PB gardé
+    assert eng.faders.view(1)[3].value == 64  # PB revenu au centre
 
 
 def test_pattern_has_no_effect_in_design(cfg: Config, project: Project) -> None:

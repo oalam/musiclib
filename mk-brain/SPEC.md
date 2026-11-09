@@ -610,7 +610,10 @@ DT2 (`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`, B.1-B.7) :
 - MW, BC et PB n'agissent que si le preset leur assigne jusqu'à 4
   paramètres (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset,
   manuel p. 39). PB part en message pitch bend (0-127 → -8192..8191,
-  64 = centre) ; l'encodeur ne revient pas au centre tout seul.
+  64 = centre). **PB seulement avec SHIFT tenu** (décidé le 2026-11-09) :
+  sans SHIFT, l'encodeur ne fait rien (`PB: hold SHIFT`) ; au relâché de
+  SHIFT, pitch bend remis au centre sur le canal où il est parti, comme
+  une molette à ressort.
 - Jauge depuis le centre : PB, ENV, PAN, TUNE (`bipolar`). Valeurs gardées
   par track et par paramètre, quelle que soit la page ; un CC reçu de la
   DT2 est appris même si sa page n'est pas affichée.

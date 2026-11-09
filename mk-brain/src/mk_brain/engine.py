@@ -169,6 +169,7 @@ class Engine:
         self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
         self.last_hit: tuple[int, int, int, int] | None = None  # (pad, note, vélocité, instant)
         self._requested: str | None = None  # pattern demandé par PATTERN + pad, pas encore confirmé
+        self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
 
     @property
     def design(self) -> bool:
@@ -229,6 +230,8 @@ class Engine:
     def handle(self, ev: Event, now: int) -> list[Timed]:
         if isinstance(ev, ButtonEvent):
             self._button(ev, now)
+            if ev.name == "SHIFT" and not ev.pressed:
+                return self._release_bend(now)
             return []
         if isinstance(ev, EncoderEvent):
             if ev.index == 0:
@@ -252,6 +255,9 @@ class Engine:
         active de la DT2 (p-locks en LIVE REC) ; valeurs tenues sous la track sélectionnée."""
         if not self.design and not self._reachable(self.track):
             return []
+        if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
+            self.last_control = "PB: hold SHIFT"  # pitch bend tenu par SHIFT seulement
+            return []
         self.last_touch = (index, now)
         sent = self.faders.turn(self.track, index, delta)
         if sent is None:
@@ -264,6 +270,7 @@ class Engine:
             self.last_control += "  DT2 in LIVE REC?"
         channel = self.channel if self.design else self.track - 1
         if param == PITCH_BEND:  # 0-127 → -8192..8191, 64 = centre
+            self._bent = (self.track, channel)
             return [(now, PitchBend(channel, max(-8192, min(8191, (value - 64) * 128))))]
         return [(now, ControlChange(channel, param, value))]
 
@@ -422,6 +429,16 @@ class Engine:
         labels, _, apply = self._menu_items(entry)
         apply(self.menu_choice)
         self.last_control = labels[self.menu_choice]
+
+    def _release_bend(self, now: int) -> list[Timed]:
+        """SHIFT relâché : pitch bend remis au centre sur le canal où il est parti."""
+        if self._bent is None:
+            return []
+        track, channel = self._bent
+        self._bent = None
+        self.faders.received(track, PITCH_BEND, 64)
+        self.leds_dirty = True
+        return [(now, PitchBend(channel, 0))]
 
     def _switch_mode(self, name: str, now: int) -> bool:
         """Bascule de mode : SHIFT + CONTROL tenus, appui maître = confirmer. True si consommé."""

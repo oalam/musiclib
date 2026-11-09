@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.10.1] - 2026-11-09
+
+### Modifié
+
+- [5] Pitch bend (encodeur 4, page 1) seulement avec SHIFT tenu ; au
+  relâché de SHIFT, remis au centre sur le canal où il est parti.
+
 ## [0.10.0] - 2026-11-09
 
 ### Ajouté
