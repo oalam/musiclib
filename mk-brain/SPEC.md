@@ -233,7 +233,7 @@ la slice 7**.
     `Project` / `Bank` au schéma du front matter, `ProjectError`) et
     `projects/solaris.yaml` écrit à la main, marqué provisoire, jusqu'à
     `convert` (slice 6) ; `tests/test_project.py` le recoupe avec les
-    `keys` et `tempos` de `solaris.json`. Banques A-F ; **G-JOKER absent**
+    `keys` et `tempos` de `solaris.json`. Banques A-F ; **G-JOKER absent** (ajouté à la 6.A, cf. Projets)
     (ni tonalité ni tempo dans le JSON : kick + sub en fa, la# et do), à
     trancher avec le front matter. Phrase de 32 partout (`defaults`), la
     doctrine ne fixe pas de longueur par banque ;
@@ -268,9 +268,9 @@ la slice 7**.
 | Samples par banque et track | `library/lives/<set>.json` | `items[].bank`, `items[].track`, `items[].name` |
 | Fiche de chaque banque : titre, description, tempo, tonique, mode ; et ce que mk-brain ajoute pour jouer : longueur de phrase, paliers de tempo, longueur des patterns | front matter `mkbrain:` de la doctrine du set (`digitakt/doctrine-dt2-<set>.md`) | `E-TRIBE: {title: Tribe, tempo: 162, tonique: A#, mode: phrygien, phrase: 64}` |
 | Matériel, dispositions de pads, page d'encodeurs (CC) | `mk-brain/config/default.yaml` | `encodeurs: [{nom: CUT, cc: 74}, …]` |
-| Projet résolu, prêt à jouer | `mk-brain/projects/<set>.yaml` (généré, jamais édité à la main ; `solaris.yaml` écrit à la main en attendant `convert`, 5.D) | tout ce qui précède, aplati par banque |
+| Projet résolu, prêt à jouer | `mk-brain/projects/<set>.yaml` (généré par `convert` depuis la slice 6.A, jamais édité à la main) | tout ce qui précède, aplati par banque |
 
-### Formalisme du front matter (proposition, à valider)
+### Formalisme du front matter (validé ; posé dans la doctrine solaris à la 6.A)
 
 ```yaml
 ---
@@ -325,6 +325,37 @@ mkbrain:
   et le JSON, valide (banque inconnue, tonalité illisible, clé inconnue →
   exception typée `ProjectError` avec la ligne fautive), écrit
   `projects/solaris.yaml`. Le commit est fait à la main, avec le reste.
+
+**Découpage de la slice 6 (décidé le 2026-11-09)** :
+- **6.A** front matter `mkbrain:` dans la doctrine solaris, `convert`,
+  `projects/solaris.yaml` généré ;
+- **6.B** contexte live suivi par Program Change : banque du projet, donc
+  gamme, tonique et phrase ; titre et description 2 s ; tonique et vraie
+  note sur l'écran play ;
+- **6.C** écran de sélection de projet (encodeur maître, dernier joué
+  présélectionné, SHIFT + BROWSE), noms de samples à la frappe depuis le
+  JSON.
+
+**Fait le 2026-11-09 (slice 6.A, `convert.py`)** :
+- front matter posé en tête de `digitakt/doctrine-dt2-solaris.md`, banques
+  A-G ; seules les clés que mk-brain emploie déjà y figurent (`live`,
+  `defaults.phrase`, fiche de banque, `phrase` par banque) ; `auto_channel`,
+  `quantize`, `swing`, `intro`, `paliers` et `patterns` viendront avec
+  leur usage (pas de pré-construction), une clé inconnue est refusée ;
+- **G-JOKER** (tranché le 2026-11-09) : `chromatique` sur A#, 165 BPM
+  (milieu de la plage 160-168, celui du `0-KIT`). Le JSON n'a ni tonalité
+  ni tempo pour G : rien à recouper ;
+- `live` est relatif à la racine du vault (parent de `digitakt/`) ; le nom
+  du projet est le `name` du JSON ;
+- recoupement : chaque banque du front matter existe dans `banks` du JSON ;
+  chaque `keys` du JSON a sa fiche, même tonique (bémols normalisés,
+  `Bb` = `A#`) et même mode (`m` = `eolien`, `phrg` = `phrygien`, une
+  autre abréviation est refusée) ; chaque `tempos` d'une banque du projet
+  est égal (le `0-KIT` est ignoré). Erreur = `ProjectError` avec
+  `doctrine:ligne` de la banque ;
+- sortie rejouable (même texte à source égale), en-tête « GÉNÉRÉ » ;
+  `tests/test_convert.py` échoue si `projects/solaris.yaml` est périmé
+  (sauté sans le vault, sur le Pi).
 
 ## Comportements
 
@@ -746,7 +777,7 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 à 4 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 à 4 faites le 2026-11-09, 5 et 6 en cours, 7 à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
@@ -757,7 +788,7 @@ conditionne tout le reste.
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
-| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
+| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | en cours, découpée le 2026-11-09 : 6.A front matter et `convert`, faite le 2026-11-09 ; 6.B contexte suivi par PC et 6.C sélection de projet à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et

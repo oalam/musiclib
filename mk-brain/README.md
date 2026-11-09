@@ -17,8 +17,12 @@ python3.12 -m venv .venv
 couleurs, dispositions A-H.
 
 `projects/<set>.yaml` : fiche de chaque banque (titre, tempo, tonique, mode,
-phrase). `projects/solaris.yaml` est écrit à la main jusqu'à la slice 6, où
-`mk-brain convert` le générera depuis la doctrine du set.
+phrase), **généré** par `mk-brain convert` depuis le front matter `mkbrain:` de
+la doctrine du set (`digitakt/doctrine-dt2-<set>.md`), recoupé avec le
+`library/lives/<set>.json` qu'il référence (banques, tonalités, tempos : une
+divergence est une erreur qui donne la ligne fautive). Ne pas l'éditer à la
+main : modifier la doctrine, reconvertir, commiter les deux.
+`tests/test_convert.py` échoue si le projet commité est périmé.
 
 ## Commandes
 
@@ -35,6 +39,7 @@ phrase). `projects/solaris.yaml` est écrit à la main jusqu'à la slice 6, où
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 .venv/bin/mk-brain play --project projects/solaris.yaml   # projet (défaut : solaris)
+.venv/bin/mk-brain convert ../digitakt/doctrine-dt2-solaris.md   # → projects/solaris.yaml
 .venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks
 .venv/bin/mk-brain clock --bench-note 3   # + note 3 (track 4) envoyée à chaque noire, gigue d'envoi
 ```

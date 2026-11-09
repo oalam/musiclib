@@ -3,6 +3,27 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.12.0] - 2026-11-09
+
+### Ajouté
+
+- [6] 6.A : `mk-brain convert <doctrine>` (`convert.py`) lit le front matter
+  `mkbrain:` de la doctrine du set et le lives JSON qu'il référence, recoupe
+  banques, tonalités (`Bb` = `A#`, `m` / `phrg`) et tempos, et écrit
+  `projects/<set>.yaml` (rejouable, en-tête « GÉNÉRÉ »). Divergence, clé
+  inconnue ou front matter absent : `ProjectError` avec `doctrine:ligne`.
+- [6] Front matter `mkbrain:` en tête de `digitakt/doctrine-dt2-solaris.md`,
+  banques A-G ; **G-JOKER** en chromatique sur A#, 165 BPM.
+- [6] `project.note_name` (normalisation des toniques, partagée par le
+  modèle et `convert`).
+
+### Modifié
+
+- [6] `projects/solaris.yaml` est généré, plus écrit à la main ; le test
+  provisoire de recoupement (5.D) devient `tests/test_convert.py`, qui
+  échoue aussi si le projet commité est périmé. GROUP G en design choisit
+  désormais G-JOKER.
+
 ## [0.11.0] - 2026-11-09
 
 ### Ajouté

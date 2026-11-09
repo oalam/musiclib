@@ -1,46 +1,48 @@
-# PROVISOIRE (slice 5.D, 2026-11-09) : écrit à la main en attendant la slice 6,
-# où `mk-brain convert digitakt/doctrine-dt2-solaris.md` le générera depuis le
-# front matter `mkbrain:` de la doctrine. Doublon assumé avec la doctrine et
-# library/lives/solaris.json (keys, tempos) ; tests/test_project.py vérifie
-# que les deux ne divergent pas.
-# G-JOKER absent : ni tonalité ni tempo dans solaris.json (kick + sub en fa,
-# la# et do), à trancher avec le front matter.
+# GÉNÉRÉ par `mk-brain convert digitakt/doctrine-dt2-solaris.md` : ne pas éditer à la main.
+# Source : front matter `mkbrain:` de la doctrine, recoupé avec library/lives/solaris.json.
 name: solaris
-defaults: {phrase: 32}
+defaults:
+  phrase: 32
 banks:
   A-HALF:
     title: Half-time
     desc: Ouverture lourde et lente, basse lente, peu de notes
-    tempo: 160
+    tempo: 160.0
     tonique: F
     mode: eolien
   B-DNB:
     title: Drum and bass
     desc: Ça s'ouvre, vers la jungle et les rollers, reese fa / sol bémol
-    tempo: 165
+    tempo: 165.0
     tonique: F
     mode: phrygien
   C-GROOVE:
     title: Groove tribe
     desc: Kick glissant la#, stab à la tierce, charley ; paliers vers 152
-    tempo: 143
+    tempo: 143.0
     tonique: A#
     mode: eolien
   D-ACID:
     title: Acid
     desc: L'acid entre en la#, percs, kick-sub ; paliers vers 162
-    tempo: 152
+    tempo: 152.0
     tonique: A#
     mode: eolien
   E-TRIBE:
     title: Tribe
     desc: Cœur du set, rumble, couleur phrygienne ; fin en respiration
-    tempo: 162
+    tempo: 162.0
     tonique: A#
     mode: phrygien
   F-MENTAL:
     title: Mental
     desc: Tension hypnotique en do, drone et acid, kick sèche
-    tempo: 168
+    tempo: 168.0
     tonique: C
     mode: eolien
+  G-JOKER:
+    title: Jokers
+    desc: Breaks et secours, kick + sub seuls en fa, la# et do
+    tempo: 165.0
+    tonique: A#
+    mode: chromatique

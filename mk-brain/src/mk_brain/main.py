@@ -349,6 +349,8 @@ def main(argv: list[str] | None = None) -> int:
     pp.add_argument(
         "--project", type=Path, default=DEFAULT_PROJECT, help="projet du set (banques du design)"
     )
+    vp = sub.add_parser("convert", help="slice 6 : doctrine du set → projects/<set>.yaml")
+    vp.add_argument("doctrine", type=Path, help="doctrine du set (front matter mkbrain:)")
     cp = sub.add_parser("clock", help="slice 2 : horloge DT2, BPM, gigue ; banc d'envoi")
     cp.add_argument("--bench-note", type=int, help="note envoyée sur la grille (ex. 3 = track 4)")
     cp.add_argument(
@@ -360,6 +362,11 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_list()
         if args.cmd == "play":
             return cmd_play(dry_run=args.dry_run, project_path=args.project)
+        if args.cmd == "convert":
+            from mk_brain.convert import write_project
+
+            print(f"écrit : {write_project(args.doctrine)}")
+            return 0
         if args.cmd == "clock":
             return cmd_clock(bench_note=args.bench_note, every=args.every)
         return cmd_spike(chase=not args.no_chase, raw=args.raw, step_s=args.step)

@@ -1,8 +1,8 @@
 """Projet de set (`projects/<set>.yaml`) : fiche de chaque banque, validée par Pydantic.
 
-Schéma de la SPEC (Projets). Avancé à la slice 5.D pour le mode design : le
-fichier est encore écrit à la main ; à la slice 6, `mk-brain convert` le
-générera depuis le front matter `mkbrain:` de la doctrine du set.
+Schéma de la SPEC (Projets). Avancé à la slice 5.D pour le mode design ;
+depuis la slice 6.A, le fichier est généré par `mk-brain convert`
+(`convert.py`) depuis le front matter `mkbrain:` de la doctrine du set.
 """
 
 from __future__ import annotations
@@ -28,6 +28,14 @@ class ProjectError(Exception):
     """Projet illisible ou invalide."""
 
 
+def note_name(v: str) -> str:
+    """Nom de note canonique (`Bb` → `A#`) ; ValueError si illisible."""
+    name = FLATS.get(v, v)
+    if name not in NOTE_NAMES:
+        raise ValueError(f"tonique illisible : {v!r} (C, C#, Db… B)")
+    return name
+
+
 class Bank(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -41,10 +49,7 @@ class Bank(BaseModel):
     @field_validator("tonique")
     @classmethod
     def _note(cls, v: str) -> str:
-        name = FLATS.get(v, v)
-        if name not in NOTE_NAMES:
-            raise ValueError(f"tonique illisible : {v!r} (C, C#, Db… B)")
-        return name
+        return note_name(v)
 
     @property
     def tonic(self) -> int:

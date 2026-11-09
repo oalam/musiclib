@@ -422,6 +422,11 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     btn(eng, "GROUP_H")
     assert (eng.design_bank, eng.last_control) == (4, "no bank H")
     assert eng.layout.group == "B"  # GROUP ne change plus la disposition
+    btn(eng, "GROUP_G")  # G-JOKER : chromatique sur la# (slice 6.A)
+    assert eng.last_control == "G-JOKER  Bb Chroma"
+    assert eng.leds().groups[6] == cfg.families["chromatique"]  # choisie : pleine
+    eng.handle(PadEvent(PAD1, False, 0), 10 * MS)
+    assert press(eng, 20 * MS)[0][1] == NoteOn(15, 70, 127)  # chromatique depuis A#
 
 
 def test_design_without_project(cfg: Config) -> None:

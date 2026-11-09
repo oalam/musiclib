@@ -5,29 +5,16 @@ from pathlib import Path
 
 import pytest
 
-from mk_brain.project import Project, ProjectError, load_project
-
-SOLARIS_JSON = Path(__file__).resolve().parents[2] / "library" / "lives" / "solaris.json"
-JSON_MODES = {"m": "eolien", "phrg": "phrygien"}
+from mk_brain.project import Project, ProjectError, load_project, note_name
 
 
 def test_solaris_banks(project: Project) -> None:
-    assert [k[0] for k in project.banks] == list("ABCDEF")
+    assert [k[0] for k in project.banks] == list("ABCDEFG")
     key, bank = project.bank(4) or ("", None)
     assert key == "E-TRIBE" and bank is not None
     assert (bank.tonique, bank.tonic, bank.mode) == ("A#", 10, "phrygien")
     assert project.phrase(bank) == 32  # defaults
-    assert project.bank(6) is None  # G-JOKER pas encore dans le projet
-
-
-@pytest.mark.skipif(not SOLARIS_JSON.exists(), reason="library/lives/solaris.json absent")
-def test_solaris_matches_live_json(project: Project) -> None:
-    """Doublon assumé jusqu'à `convert` (slice 6) : tonalités et tempos identiques au JSON."""
-    live = json.loads(SOLARIS_JSON.read_text(encoding="utf-8"))
-    for key, bank in project.banks.items():
-        tonic, mode = live["keys"][key].split()
-        assert (bank.tonique, bank.mode) == (tonic, JSON_MODES[mode]), key
-        assert bank.tempo == live["tempos"][key], key
+    assert project.bank(7) is None  # H libre
 
 
 BANK = {"title": "T", "desc": "D", "tempo": 160, "tonique": "F", "mode": "eolien"}
@@ -64,3 +51,9 @@ def test_invalid_project_raises(tmp_path: Path, banks: dict[str, object]) -> Non
 def test_missing_file_raises(tmp_path: Path) -> None:
     with pytest.raises(ProjectError):
         load_project(tmp_path / "absent.yaml")
+
+
+def test_note_name() -> None:
+    assert (note_name("Bb"), note_name("C")) == ("A#", "C")
+    with pytest.raises(ValueError):
+        note_name("H")
