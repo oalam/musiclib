@@ -293,7 +293,10 @@ mkbrain:
 - Swing : décalage des 16ᵉ impairs d'un pourcentage réglable (50-75 %),
   à caler à la main sur celui de la DT2, qui ne le transmet pas.
 - En LIVE REC sur la DT2 : couper la quantize du Pi (bouton), pour ne pas
-  quantizer deux fois. Indicateur visible à l'écran.
+  quantizer deux fois. Indicateur visible à l'écran. **Décidé le
+  2026-11-09** : l'enregistrement se quantize par la DT2 ; la quantize du
+  Pi sert au jeu live. Pas de mode « strict » (toute frappe au pas
+  suivant) : jusqu'à 105 ms de retard au jeu.
 
 ### Note repeat
 
@@ -540,7 +543,7 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 à 2 faites le 2026-11-09, slice 3 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 à 3 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
@@ -548,7 +551,7 @@ conditionne tout le reste.
 | 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
 | 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | fait 2026-11-09 : tracks 1-16 en A, gamme du groupe C jouée sur la track active (9) |
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
-| 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | en cours : code prêt (`mk-brain play`), essai sur la DT2 à faire |
+| 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | à venir |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
@@ -654,6 +657,18 @@ noire sur la droite de régression, DT2 à 151 BPM, 2 minutes.
   MIDI horodate en retard et la gigue d'arrivée triple (0,63 ms rms).
 - Cible SPEC (0,3 ms) tenue en rms, pas au p99 (0,72 ms) : sans effet
   audible ; à remesurer sur le Pi (slice 7).
+
+## Constats quantize (slice 3, 2026-11-09)
+
+`mk-brain play` affiche pour chaque frappe sa position et la décision
+(`frappe 287.2 -> pas 288 (-15 ms) retardé`).
+
+- Frappes avant le pas (−15 à −44 ms) : retardées, enregistrées sur la
+  grille par la DT2.
+- Frappes visées « juste avant le temps », écoute au casque de la DT2 :
+  mesurées de +12 à +38 ms après le pas, et enregistrées après le temps
+  par la DT2 aussi. Le Pi et la DT2 concordent ; le retard est celui du
+  jeu, pas de la chaîne.
 
 ## Références
 

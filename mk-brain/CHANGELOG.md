@@ -3,7 +3,7 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
-## [Non publié]
+## [0.4.0] - 2026-11-09
 
 ### Ajouté
 
@@ -19,6 +19,10 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
   gros pendant NOTE REPEAT ; section `play:` de la config (réglages de
   départ).
 - [3] `ClockTracker.ticks_at` : position fractionnaire d'un instant.
+- [3] Diagnostic par frappe dans `play` : position, pas visé, écart en
+  ms, décision (immédiat ou retardé).
+- [3] Essai sur la DT2 : frappes avant le pas posées sur la grille ; la
+  quantize de l'enregistrement reste à la DT2 (décidé, cf. `SPEC.md`).
 
 ## [0.3.1] - 2026-11-09
 
