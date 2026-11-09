@@ -102,7 +102,7 @@ Le portage sur le Pi vient en fin de MVP.
 | MIDI | `mido` + `python-rtmidi` (CoreMIDI sur Mac, ALSA sur Pi) | déjà éprouvé en 7.E |
 | HID | `hidapi` (bindings Python `hid`) | le même code sur Mac et sur Linux (hidraw) |
 | Rendu écrans | Pillow, image 1 bit, thread dédié | la boucle MIDI ne doit jamais attendre le rendu |
-| Configuration | `config/default.yaml` (matériel, dispositions, pages d'encodeurs) + un `projects/<set>.yaml` par set, validés par Pydantic | modifiable sans toucher au code |
+| Configuration | `config/default.yaml` (matériel, dispositions, page d'encodeurs) + un `projects/<set>.yaml` par set, validés par Pydantic | modifiable sans toucher au code |
 | Canal de jeu | AUTO CHANNEL de la DT2 (canal 10 par défaut, comme en 7.D) | voie vérifiée le 2026-10-12 |
 | Source d'un projet | la doctrine du set (front matter `mkbrain:`) + le `library/lives/<set>.json` qu'elle référence ; convertis sur le Mac | un seul hub par donnée, pas de recopie des tonalités et tempos à la main |
 | Transport des projets | git : le Pi clone `oalam/musiclib` en partiel (`--filter=blob:none --sparse`, dossier `mk-brain/` seul), `git pull` au démarrage si le réseau répond, sinon dernière copie locale | le dépôt fait 677 Mo, le Pi n'en prend que `mk-brain/` ; le même mécanisme met à jour le code |
@@ -130,7 +130,7 @@ messages datés. On le teste avec une horloge simulée, sans matériel.
 ```
 mk-brain/
 ├── SPEC.md, CHANGELOG.md, pyproject.toml, README.md
-├── config/default.yaml           # matériel, dispositions, pages d'encodeurs
+├── config/default.yaml           # matériel, dispositions, page d'encodeurs
 ├── projects/solaris.yaml         # généré par convert, commité, lu par le Pi
 ├── src/mk_brain/
 │   ├── convert.py                # doctrine (front matter) + lives JSON → projet (Mac)
@@ -178,10 +178,10 @@ la slice 7**.
 | | **Live** | **Design** |
 |---|---|---|
 | Objectif | jouer le set, lire d'un coup d'œil, zéro fausse manœuvre | préparer les patterns sur la DT2 : enregistrer des mélodies et des mouvements de paramètres en LIVE REC |
-| Contexte (banque, gamme, encodeurs, phrase) | suit la DT2 : Program Change reçu → banque et pattern → réglages de la banque dans le projet | choisi à la main dans le menu ; Program Change reçu affiché mais sans effet |
+| Contexte (banque, gamme, phrase) | suit la DT2 : Program Change reçu → banque et pattern → réglages de la banque dans le projet | choisi à la main dans le menu ; Program Change reçu affiché mais sans effet |
 | Quantize du Pi | active, au réglage par défaut du projet | coupée par défaut (la DT2 quantize déjà en LIVE REC), activable |
-| Pads | disposition de la banque (gamme déduite de la tonalité) | toute disposition, au choix par le menu ; sélection de track et de canal |
-| Encodeurs | macros de jeu fixes par banque, soft-takeover | pages de paramètres de la track ; les mouvements partent en CC sur l'AUTO CHANNEL et s'enregistrent comme p-locks de la track active si la DT2 est en LIVE REC (vérifié le 2026-11-09) |
+| Pads | rythmique : pad n = track n ; SELECT / MUTE / PATTERN + pad | toute disposition, au choix par le menu ; sélection de track et de canal |
+| Encodeurs | les 8 faders de la track sélectionnée (SELECT + pad), sur son canal, soft-takeover | pages de paramètres de la track ; les mouvements partent en CC sur l'AUTO CHANNEL et s'enregistrent comme p-locks de la track active si la DT2 est en LIVE REC (vérifié le 2026-11-09) |
 | Compteur de phrases | affiché en grand | affiché en petit (repère pour enregistrer sur 1, 2, 4 mesures) |
 | Écrans | grosses polices, peu d'infos | détail : messages MIDI envoyés, valeurs, notes jouées |
 | Menus | inaccessibles | navigués par les 8 boutons au-dessus des écrans et l'encodeur maître |
@@ -204,8 +204,8 @@ la slice 7**.
 | Donnée | Hub | Exemple |
 |---|---|---|
 | Samples par banque et track | `library/lives/<set>.json` | `items[].bank`, `items[].track`, `items[].name` |
-| Fiche de chaque banque : titre, description, tempo, tonique, mode ; et ce que mk-brain ajoute pour jouer : longueur de phrase, paliers de tempo, pages d'encodeurs, longueur des patterns | front matter `mkbrain:` de la doctrine du set (`digitakt/doctrine-dt2-<set>.md`) | `E-TRIBE: {title: Tribe, tempo: 162, tonique: A#, mode: phrygien, phrase: 64}` |
-| Matériel, dispositions de pads, définitions des pages d'encodeurs (CC) | `mk-brain/config/default.yaml` | `perf-tribe: [cutoff, reso, …]` |
+| Fiche de chaque banque : titre, description, tempo, tonique, mode ; et ce que mk-brain ajoute pour jouer : longueur de phrase, paliers de tempo, longueur des patterns | front matter `mkbrain:` de la doctrine du set (`digitakt/doctrine-dt2-<set>.md`) | `E-TRIBE: {title: Tribe, tempo: 162, tonique: A#, mode: phrygien, phrase: 64}` |
+| Matériel, dispositions de pads, page d'encodeurs (CC) | `mk-brain/config/default.yaml` | `encodeurs: [{nom: CUT, cc: 74}, …]` |
 | Projet résolu, prêt à jouer | `mk-brain/projects/<set>.yaml` (généré, jamais édité à la main) | tout ce qui précède, aplati par banque |
 
 ### Formalisme du front matter (proposition, à valider)
@@ -215,7 +215,7 @@ la slice 7**.
 mkbrain:
   live: library/lives/solaris.json   # samples par banque et track
   auto_channel: 10
-  defaults: {phrase: 32, quantize: "1/16", swing: 50, encodeurs: perf-base}
+  defaults: {phrase: 32, quantize: "1/16", swing: 50}
   banks:
     A-HALF:
       title: Half-time
@@ -239,7 +239,6 @@ mkbrain:
       tonique: A#
       mode: phrygien
       phrase: 64
-      encodeurs: perf-tribe
     # … B-DNB, D-ACID, F-MENTAL, G-JOKER sur le même modèle
   patterns:                          # facultatif, longueur si ≠ 64 pas
     E-TRIBE: {13: 32, 14: 16}
@@ -261,8 +260,8 @@ mkbrain:
 - **Paliers de tempo** (groove et acid) : rappel à l'écran
   `palier 147 dans 3 mes`. Le Pi ne change pas le tempo, la DT2 mène.
 - `mk-brain convert digitakt/doctrine-dt2-solaris.md` lit le front matter
-  et le JSON, valide (banque inconnue, tonalité illisible, page d'encodeurs
-  absente → exception typée `ProjectError` avec la ligne fautive), écrit
+  et le JSON, valide (banque inconnue, tonalité illisible, clé inconnue →
+  exception typée `ProjectError` avec la ligne fautive), écrit
   `projects/solaris.yaml`. Le commit est fait à la main, avec le reste.
 
 ## Comportements
@@ -311,6 +310,24 @@ mkbrain:
   par le Pi, plus besoin de retour MIDI.
 - Vélocité : courbe réglable dans la config. Les frappes légères donnaient
   5 à 26 en 7.D.
+
+**Pads en live** (décidé le 2026-11-09) :
+
+- **Pad seul = jouer**, disposition rythmique : pad n = note n − 1 sur
+  l'AUTO CHANNEL = track n, à sa hauteur d'origine, quelle que soit la
+  track active (16 pads = 16 tracks). Quantize et note repeat s'appliquent.
+- **SELECT + pad = sélectionner la track n** pour les 8 encodeurs (cf.
+  Encodeurs). Rien ne sonne. La track sélectionnée est celle du Pi, pas la
+  track active de la DT2, que le MIDI ne peut ni lire ni changer.
+- **MUTE + pad = mute / démute de la track n** (CC 94 sur son canal).
+- **PATTERN + pad = pattern n de la banque courante** : Program Change
+  `banque × 16 + (n − 1)` envoyé à la DT2, qui le met en file comme ses
+  propres changements.
+- LED : pad de la track sélectionnée allumé en permanence, tracks mutées
+  éteintes, couleurs par rôle de la grille (doctrine §1).
+- **Track 16 et Preset Pool** : le pool se joue depuis les touches `[TRIG]`
+  de la DT2, en trig mode Preset Pool. La MK2 ne peut pas choisir un preset
+  du pool (vérifié le 2026-11-09, fiche `digitakt/kb/preset-pool.md`).
 
 **Couleurs des pads en mode design** (décidé le 2026-11-09), calculées
 depuis la tonique et le mode de la banque :
@@ -363,12 +380,12 @@ E·TRIBE  A# phrg        162.0 ▶  Q16 SW54
 - 4 dernières mesures d'une phrase : la barre passe en vidéo inverse.
 - BPM lu sur la clock, arrondi à 0,1 ; `■` à l'arrêt, `▶` en lecture.
 
-**Live, écran droit : 8 encodeurs de la banque**
+**Live, écran droit : les 8 faders de la track sélectionnée**
 ```
- CUT   RES   DRV   DLY   REV   LFO   VOL  ·
-  87    40    12     0    20    —   100
- ▮▮▮▯  ▮▯▯▯  ▯▯▯▯  ▯▯▯▯  ▮▯▯▯       ▮▮▮▮
-T10 ACID ch11              palier 147 -3
+T07 PERC A  ch7            palier 147 -3
+ CUT   RES   ENV   DEC   LVL   PAN   DLY  REV
+  87    40    12    64   100    0     0   20
+ ▮▮▮▯  ▮▯▯▯  ▯▯▯▯  ▮▮▯▯  ▮▮▮▮  ·▮·   ▯▯▯▯ ▮▯▯▯
 ```
 - Colonne touchée en vidéo inverse ; `~` devant la valeur tant que le
   soft-takeover n'a pas rattrapé la DT2.
@@ -409,14 +426,58 @@ T10 ACID ch11              palier 147 -3
 
 ### Encodeurs → DT2
 
-- Pages définies dans `config/default.yaml`, choisies par banque dans le
-  projet (live) ou dans le menu (design).
-- Page de base : filtre (fréquence, résonance), overdrive, envoi delay,
-  envoi reverb de la track jouée, en CC sur le canal de la track. Numéros
-  de CC : **à relever dans l'annexe MIDI du manuel DT2 (OS 1.17)**.
-- Soft-takeover : la valeur du Pi n'est envoyée qu'une fois rattrapée
-  depuis la dernière valeur connue, puisque la DT2 ne renvoie rien si on
-  tourne son bouton. Indicateur « hors prise » dans la colonne.
+**Une seule page, la même pour toutes les tracks** (décidé le 2026-11-09),
+définie dans `config/default.yaml`. Proposition, à ajuster à l'usage ;
+numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
+
+| Encodeur | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|---|
+| Paramètre | fréquence du filtre | résonance | profondeur d'env. filtre | decay d'amp | niveau de track | pan | envoi delay | envoi reverb |
+| Abrégé | CUT | RES | ENV | DEC | LVL | PAN | DLY | REV |
+| CC | 74 | 75 | 77 | 81 | 95 | 90 | 84 | 85 |
+
+- **Live** : CC sur le canal de la track sélectionnée (SELECT + pad),
+  `TRACK n CHANNEL` = n. Une track répond sur son canal (vérifié le
+  2026-11-09).
+- **Design** : CC sur l'AUTO CHANNEL, donc vers la track active de la DT2 ;
+  enregistrés en p-locks en LIVE REC (vérifié le 2026-11-09).
+- **Soft-takeover**, par track et par paramètre : la valeur du Pi n'est
+  envoyée qu'une fois rattrapée depuis la dernière valeur connue, puisque
+  la DT2 ne renvoie rien si on tourne son bouton. `~` devant la valeur tant
+  que ce n'est pas rattrapé. Au chargement du projet, aucune valeur n'est
+  connue : la première rotation envoie, sans rattrapage.
+- Un changement de pattern recharge les réglages de la DT2 : les valeurs
+  connues du Pi sont alors marquées « hors prise » pour toutes les tracks.
+
+### Affectation des contrôles
+
+Noms de la face avant MK2, à confirmer au décodage HID (slice 0).
+
+| Contrôle | Live | Design |
+|---|---|---|
+| Pad | joue la track n (rythmique) | joue la disposition choisie (chromatique par défaut) |
+| SELECT + pad | sélectionne la track n pour les encodeurs | sélectionne la track n (canal) |
+| MUTE + pad | mute / démute la track n | idem |
+| PATTERN + pad | pattern n de la banque courante (PC) | idem |
+| 8 encodeurs | les 8 faders de la track sélectionnée | les 8 faders de la track active (p-locks en LIVE REC) |
+| NOTE REPEAT tenu + pad | répétition ; les 8 boutons au-dessus des écrans choisissent la division (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64) | idem |
+| SHIFT + NOTE REPEAT | verrouillage du repeat | idem |
+| GRID | quantize off → 1/16 → 1/8 | idem (off par défaut) |
+| SWING + encodeur maître | swing 50-75 % | idem |
+| SHIFT + PLAY | phrase remise à 1 à la prochaine mesure | idem |
+| SHIFT + GROUP n | recale le compteur au début du bloc n | **à trancher** (GROUP en design : banque ou disposition) |
+| GROUP A-H | LED du compteur 8 × 8 mesures | **à trancher** |
+| PAD MODE | — | cycle des dispositions |
+| 8 boutons au-dessus des écrans | divisions du repeat (pendant NOTE REPEAT) | entrées du menu |
+| Encodeur maître | sans effet (sauf avec SWING) | valeur de l'entrée de menu ; appui = valider |
+| SHIFT + CONTROL (1 s) | changer de mode (refusé transport lancé) | changer de mode |
+| SHIFT + BROWSE | sélection de projet (refusé transport lancé) | idem |
+| Autres (PLAY, REC, ERASE, RESTART, STEP, SAMPLING, ALL, AUTO WRITE, SCENE, NAVIGATE, DUPLICATE, SOLO, TEMPO, VOLUME, flèches) | non affectés, LED éteintes | idem |
+
+- **La DT2 reste maître du transport** : PLAY et REC de la MK2 n'envoient
+  ni Start ni Stop.
+- **En live, tout geste à risque passe par SHIFT.**
+- **Un bouton non affecté a sa LED éteinte.**
 
 ### Compteur de phrases
 
@@ -447,9 +508,11 @@ Repris de `digitakt/kb/midi-config.md` :
   audio USB (constaté le 2026-11-09, cf.
   `digitakt/kb/audio-routing-overbridge.md`) ;
 - `INPUT FROM` et `OUTPUT TO` = USB ;
-- `RECEIVE NOTES` = on ;
+- `RECEIVE NOTES` et `RECEIVE CC/NRPN` = on ;
 - `CLOCK SEND` et `TRANSPORT SEND` = on ;
-- `PRG CH SEND` = on (pour le reset automatique) ;
+- `PRG CH SEND` = on (suivi de contexte, reset du compteur) et
+  `PRG CH RECEIVE` = on (PATTERN + pad) ;
+- `TRACK n CHANNEL` = n pour les 16 tracks (faders et mutes par track) ;
 - `AUTO CHANNEL` noté dans la config ;
 - Transfer fermé.
 
@@ -470,7 +533,7 @@ conditionne tout le reste.
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | à venir |
-| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change gamme, encodeurs et phrase sur la MK2 | à venir |
+| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et
@@ -483,10 +546,10 @@ la slice 0.
    et empêche-t-il hidapi de l'ouvrir ? Faut-il l'arrêter pendant le
    prototypage, et l'autorisation « Surveillance de l'entrée » de macOS
    est-elle requise ? À trancher en phase 0.
-2. **« CC slot + note »** du chat de cadrage : désigne-t-il un CC de choix
-   de slot de sample avant la note ? La DT2 l'accepte-t-elle par MIDI, et
-   sous quel numéro ? À vérifier dans l'annexe MIDI du manuel avant la
-   phase 1. Sinon, on reste sur les tracks et les notes de 7.D.
+2. ~~« CC slot + note »~~ : **tranché le 2026-11-09**. L'annexe B donne
+   CC 19 (slot) et CC 24 (banque de samples), mais le Preset Pool ne se
+   pilote pas en MIDI (vérifié) et la track 16 garde son pool joué depuis
+   la DT2. Pas de changement de sample par la MK2 dans le MVP.
 3. **Quantize par pad** ou seulement globale ?
 4. **Pression en note repeat** : vélocité seule, ou aussi un CC (filtre) ?
 5. **Modèle de Pi** : Pi 4 ou Pi 5. Le Pi Zero 2 W, avec un seul port OTG
@@ -510,6 +573,16 @@ la slice 0.
    combinaison au Pi, ou la garde-t-elle pour sa propre bascule en mode
    MIDI (7.D) ? Sinon, choisir une autre combinaison. À voir en phase 0.
 10. **Polyphonie d'une track audio DT2** : conditionne le mode accords.
+11. **AUTO CHANNEL et canaux de track** : avec `TRACK n CHANNEL` = n pour
+    les 16 tracks, l'AUTO CHANNEL (10) tombe sur le canal de la track 10.
+    Une note ou un CC reçu sur le canal 10 vise-t-il la track active, la
+    track 10, ou les deux ? À tester avant la slice 1. Sinon, régler l'AUTO
+    CHANNEL sur un canal libre, en retirant une track de la règle n = n
+    (la 16, jouée depuis la DT2, par exemple).
+12. **Lors du test du pool**, une seule série de 4 hauteurs a été entendue
+    sur les deux envois attendus (notes 60-63 sur le canal 10 et sur le
+    canal 16) : le canal 16 n'a peut-être rien joué. À recouper avec la
+    question 11.
 
 ## Références
 
