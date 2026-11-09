@@ -663,6 +663,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | PATTERN + GROUP n | banque n pour PATTERN + pad (sans envoi) ; GROUP tenus = banque | sans effet (GROUP seul = banque du design) |
 | 8 encodeurs | les 8 faders de la track sélectionnée | les 8 faders de la track active (p-locks en LIVE REC) |
 | Flèches à côté des écrans (BROWSE ◀ ▶) | page d'encodeurs 1 / 2 | idem |
+| Flèches de transport (◀ ▶, à côté de RESTART) | sans effet, LED éteintes | octave des pads −1 / +1, ±4 au plus, notes bornées à 0-127, remise à 0 par GROUP ; sans effet en rythmique ; LED pleine du côté décalé, `oct +1` sur l'écran droit (décidé le 2026-11-09) |
 | NOTE REPEAT tenu + pad | répétition ; les 8 boutons au-dessus des écrans choisissent la division (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64) | idem |
 | SHIFT + NOTE REPEAT | verrouillage du repeat | idem |
 | GRID | quantize off → 1/16 → 1/8 | idem (off par défaut) |
@@ -675,7 +676,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | Encodeur maître | sans effet (sauf avec SWING) | valeur de l'entrée de menu ; appui = valider |
 | SHIFT + CONTROL (1 s) | changer de mode (refusé transport lancé) | changer de mode |
 | SHIFT + BROWSE | sélection de projet (refusé transport lancé) | idem |
-| Autres (PLAY, REC, ERASE, RESTART, STEP, SAMPLING, ALL, AUTO WRITE, SCENE, NAVIGATE, DUPLICATE, SOLO, TEMPO, VOLUME, flèches) | non affectés, LED éteintes | idem |
+| Autres (PLAY, REC, ERASE, RESTART, STEP, SAMPLING, ALL, AUTO WRITE, SCENE, NAVIGATE, DUPLICATE, SOLO, TEMPO, VOLUME, flèches du maître) | non affectés, LED éteintes | idem |
 
 - **La DT2 reste maître du transport** : PLAY et REC de la MK2 n'envoient
   ni Start ni Stop.
@@ -755,7 +756,7 @@ conditionne tout le reste.
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
-| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite le 2026-11-09, à essayer sur la MK2 |
+| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 

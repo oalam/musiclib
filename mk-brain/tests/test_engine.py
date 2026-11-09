@@ -522,3 +522,37 @@ def test_pattern_has_no_effect_in_design(cfg: Config, project: Project) -> None:
     btn(eng, "GROUP_E")  # GROUP choisit la banque, comme sans PATTERN
     assert eng.design_bank == 4 and eng.bank is None
     assert eng.leds().buttons["PATTERN"] == 0
+
+
+def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "GROUP_E")  # la#, chromatique depuis A#5 (70)
+    btn(eng, "TRANSPORT_RIGHT")
+    assert (eng.octave, eng.last_control) == (1, "octave +1")
+    assert press(eng, 0) == [(3 * MS, NoteOn(15, 82, 127))]
+    buttons = eng.leds().buttons
+    assert buttons["TRANSPORT_RIGHT"] > buttons["TRANSPORT_LEFT"] > 0
+    btn(eng, "TRANSPORT_RIGHT")  # 70 + 24 + 15 = 109 : passe
+    btn(eng, "TRANSPORT_RIGHT")  # 70 + 36 + 15 = 121 : passe
+    btn(eng, "TRANSPORT_RIGHT")  # 70 + 48 + 15 = 133 > 127 : refusé
+    assert (eng.octave, eng.last_control) == (3, "octave limit +3")
+    btn(eng, "GROUP_A")  # fa : 65 + 48 + 15 = 128 > 127, mais vers le bas ±4
+    for _ in range(5):
+        btn(eng, "TRANSPORT_LEFT")
+    assert (eng.octave, eng.last_control) == (-4, "octave limit -4")
+    btn(eng, "GROUP_C")  # nouvelle banque : retour sur sa tonique
+    assert eng.octave == 0
+
+
+def test_octave_bounded_by_midi_range(cfg: Config) -> None:
+    from mk_brain.layouts import fits, shift_octave
+
+    lay = cfg.layouts[1]  # chromatique depuis la base de la config
+    assert fits(lay) and not fits(shift_octave(lay, 6)) and not fits(shift_octave(lay, -6))
+
+
+def test_transport_arrows_ignored_in_live(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "TRANSPORT_LEFT")
+    assert eng.octave == 0
+    assert eng.leds().buttons.get("TRANSPORT_LEFT", 0) == 0

@@ -191,11 +191,12 @@ def _design_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
     """Fiche de la banque (clé, tempo, tonique, mode, titre) ; phrase en petit dessous."""
     small, mid = _font(SMALL), _font(16)
     sheet = engine.sheet
+    octave = f"  oct {engine.octave:+d}" if engine.octave else ""
     if sheet is None:
-        d.text((3, 2), "no project", font=mid, fill=1)
+        d.text((3, 2), "no project" + octave, font=mid, fill=1)
     else:
         key, bank = sheet
-        _bold(d, (3, -3), f"{key}  {bank.tempo:g}", mid, 1)
+        _bold(d, (3, -3), f"{key}  {bank.tempo:g}{octave}", mid, 1)
         tonic, mode = FLAT_NAMES[bank.tonic], engine.cfg.scale(bank.mode).name
         d.text((3, 12), f"{tonic} {mode} - {bank.title}", font=small, fill=1)
     st = engine.phrase_state

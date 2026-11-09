@@ -49,11 +49,13 @@ from mk_brain.hid_mk2 import (
 from mk_brain.layouts import (
     FLAT_NAMES,
     N_PADS,
+    fits,
     for_bank,
     in_scale,
     pad_color,
     pad_note,
     scale,
+    shift_octave,
     velocity,
 )
 from mk_brain.modes import ModeSwitch
@@ -109,6 +111,7 @@ MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
 LIVE_GROUP = 0  # disposition rythmique, imposée en live
 DESIGN_GROUP = 1  # chromatique, disposition de départ en design
 MODE_KEYS = ("SHIFT", "CONTROL", "MASTER_PUSH")  # n'annulent pas une bascule proposée
+MAX_OCTAVE = 4  # design : décalage d'octave borné à ±4 (flèches de transport)
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # design : boutons d'écran 1-4 (banque : GROUP)
 PHRASES: tuple[PhraseLength, ...] = (32, 64)
 Timed = tuple[int, MidiOut]
@@ -170,6 +173,7 @@ class Engine:
         self.last_hit: tuple[int, int, int, int] | None = None  # (pad, note, vélocité, instant)
         self._requested: str | None = None  # pattern demandé par PATTERN + pad, pas encore confirmé
         self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
+        self.octave = 0  # décalage d'octave du design (flèches de transport), remis à 0 par GROUP
 
     @property
     def design(self) -> bool:
@@ -188,10 +192,10 @@ class Engine:
             return self.cfg.layouts[LIVE_GROUP]
         lay = self.cfg.layouts[self.group]
         sheet = self.sheet
-        if sheet is None:
-            return lay
-        bank = sheet[1]
-        return for_bank(lay, self.cfg.scale(bank.mode), bank.tonic)
+        if sheet is not None:
+            bank = sheet[1]
+            lay = for_bank(lay, self.cfg.scale(bank.mode), bank.tonic)
+        return shift_octave(lay, self.octave)
 
     @property
     def quantize(self) -> QuantizeMode:
@@ -379,10 +383,23 @@ class Engine:
         if found is None:
             self.last_control = f"no bank {GROUPS[index]}"
             return
-        self.design_bank, self._design_phrase = index, None
+        self.design_bank, self._design_phrase, self.octave = index, None, 0
         self._apply_phrase()
         key, bank = found
         self.last_control = f"{key}  {FLAT_NAMES[bank.tonic]} {self.cfg.scale(bank.mode).name}"
+
+    def _shift_octave(self, step: int) -> None:
+        """Flèches de transport en design : ±1 octave, ±3 au plus, notes dans 0-127."""
+        if self.layout.kind == "rythmique":
+            self.last_control = "octave: not in Drums"
+            return
+        new = self.octave + step
+        if abs(new) > MAX_OCTAVE or not fits(shift_octave(self.layout, step)):
+            self.last_control = f"octave limit {self.octave:+d}"
+            return
+        self.octave = new
+        self.last_control = f"octave {new:+d}"
+        self.leds_dirty = True
 
     def _menu_items(self, entry: int) -> tuple[list[str], int, Callable[[int], None]]:
         """Valeurs d'une entrée du menu, index de la valeur en cours, application."""
@@ -496,6 +513,10 @@ class Engine:
                 self.faders.page_index = page
                 self.last_control = f"page {page + 1}"
             self.leds_dirty = True
+            return
+        if name in ("TRANSPORT_LEFT", "TRANSPORT_RIGHT"):  # octave du design
+            if self.design:
+                self._shift_octave(-1 if name == "TRANSPORT_LEFT" else 1)
             return
         if "PATTERN" in self._held_buttons and name.startswith("GROUP_") and not self.design:
             self.bank = GROUPS.index(name[-1])
@@ -684,6 +705,9 @@ class Engine:
             buttons[name] = (LED_MAX if name in held else low) if name in self._modifiers else 0
         for i, name in enumerate(("BROWSE_LEFT", "BROWSE_RIGHT")):
             buttons[name] = LED_MAX if i == min(self.faders.page_index, 1) else low
+        if self.design and layout.kind != "rythmique":  # pleine du côté où l'on est décalé
+            buttons["TRANSPORT_LEFT"] = LED_MAX if self.octave < 0 else low
+            buttons["TRANSPORT_RIGHT"] = LED_MAX if self.octave > 0 else low
         if self.repeat_active:
             for i, (name, _) in enumerate(DIVISIONS):
                 buttons[f"DISPLAY_{i + 1}"] = LED_MAX if name == self.division else low

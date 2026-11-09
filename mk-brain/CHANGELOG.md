@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.11.0] - 2026-11-09
+
+### Ajouté
+
+- [5] Octave des pads en design aux flèches de transport (◀ ▶ à côté de
+  RESTART) : ±1 octave par appui, ±4 au plus (essayé), refusé si une note sortait
+  de 0-127 (`octave limit`), sans effet en rythmique ni en live ; remise
+  à 0 au changement de banque (GROUP) ; LED pleine du côté décalé,
+  `oct +1` sur l'écran droit. `layouts.shift_octave` et `layouts.fits`.
+- [5] 5.D essayée sur la MK2 : banques, menu, pages d'encodeurs et pitch
+  bend validés.
+
 ## [0.10.1] - 2026-11-09
 
 ### Modifié

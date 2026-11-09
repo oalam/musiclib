@@ -47,6 +47,24 @@ def for_bank(layout: Layout, scale: Layout, tonic: int) -> Layout:
     return layout.model_copy(update=update)
 
 
+def shift_octave(layout: Layout, octaves: int) -> Layout:
+    """Disposition décalée de `octaves` octaves ; la rythmique ne bouge pas."""
+    if octaves == 0 or layout.kind == "rythmique":
+        return layout
+    return layout.model_copy(update={"base": layout.base + 12 * octaves})
+
+
+def fits(layout: Layout) -> bool:
+    """Toutes les notes des pads dans 0-127."""
+    if layout.base < 0:
+        return False
+    try:
+        pad_note(layout, N_PADS)
+    except LayoutError:
+        return False
+    return True
+
+
 def in_scale(layout: Layout, pad: int) -> bool:
     """Note du pad dans la gamme : toujours vrai hors chromatique, et sans gamme connue."""
     if layout.kind != "chromatique" or not layout.intervals:
