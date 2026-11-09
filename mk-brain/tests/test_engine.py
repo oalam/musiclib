@@ -300,7 +300,8 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
 def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     from mk_brain.engine import ControlChange
 
-    eng = Engine(cfg)
+    midi = cfg.midi.model_copy(update={"knobs_on_track_channel": False})  # DT2 OUTPUT CH = AUTO
+    eng = Engine(cfg.model_copy(update={"midi": midi}))
     eng.track = 7
     eng.on_control_change(15, 74, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
     eng.on_control_change(15, 94, 1)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
@@ -746,3 +747,17 @@ def test_arrows_cycle_both_ways(cfg: Config) -> None:
     assert eng.faders.page_index == 1 and eng.last_control == "page 2/2"
     btn(eng, "BROWSE_RIGHT")  # de la dernière vers la page 1
     assert eng.faders.page_index == 0
+
+
+def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
+    eng = Engine(cfg)  # DT2 OUTPUT CH = TRACK CH
+    eng.on_control_change(3, 74, 112)  # CUTOFF tourné sur la track 4 active
+    assert eng.track == 4 and eng.last_control == "T04 selected (DT2)"
+    assert eng.faders.view(4)[1].value == 112
+    eng.on_control_change(6, 94, 1)  # mute de la track 7 : pas de sélection
+    assert eng.track == 4 and eng.faders.muted[7]
+    eng.on_control_change(15, 74, 90)  # track 16 (AUTO CHANNEL) : pas joignable en live
+    assert eng.track == 4 and eng.faders.view(16)[1].value == 90
+    d = design(cfg)
+    d.on_control_change(15, 74, 90)  # en design, suivie
+    assert d.track == 16

@@ -1,6 +1,6 @@
 [project]
 name = "mk-brain"
-version = "0.19.0"
+version = "0.20.0"
 description = "Maschine MK2 en HID brut devant la Digitakt II (Raspberry Pi, prototype Mac)"
 requires-python = ">=3.12"
 dependencies = [

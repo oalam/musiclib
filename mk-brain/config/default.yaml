@@ -5,6 +5,8 @@ midi:
   port_hint: Digitakt        # sous-chaîne du nom de port de sortie
   auto_channel: 16           # AUTO CHANNEL de la DT2 (SPEC, décidé le 2026-11-09)
   program_channel: 10        # canal des Program Change (PRG CH SEND / RECEIVE, fiche midi-config)
+  knobs_on_track_channel: true   # DT2 PORT CONFIG > OUTPUT CH = TRACK CH : la MK2 suit la track
+                                 # active au premier bouton tourné sur la DT2 (2026-11-09)
 
 velocity:
   window_ms: 2.0             # la vélocité = pression maximale sur cette fenêtre après l'attaque

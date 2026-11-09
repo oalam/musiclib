@@ -22,6 +22,9 @@ class MidiConfig(BaseModel):
     port_hint: str = "Digitakt"
     auto_channel: int = Field(16, ge=1, le=16)
     program_channel: int = Field(10, ge=1, le=16)  # canal des Program Change de la DT2
+    # DT2 OUTPUT CH = TRACK CH : ses boutons sortent sur le canal de la track active, le Pi
+    # suit la track (vérifié le 2026-11-09) ; False = AUTO CH, valeur à la track de la MK2
+    knobs_on_track_channel: bool = True
 
 
 class VelocityConfig(BaseModel):

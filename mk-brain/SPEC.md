@@ -748,6 +748,16 @@ revu le 2026-11-09** (demande utilisateur), TYPE retiré :
   est active. Un CC reçu sur l'AUTO CHANNEL met donc à jour la track
   sélectionnée sur la MK2 (décidé : on tourne sur la DT2 la track
   sélectionnée sur la MK2). Un mute reçu sur ce canal est ignoré.
+  **Remplacé le 2026-11-09** : c'était le réglage `OUTPUT CH` = AUTO CH
+  de la DT2 (PORT CONFIG, manuel §14.4.2). Avec `OUTPUT CH` = TRACK CH,
+  ses boutons sortent sur le canal de la track active (vérifié à l'écoute
+  MIDI brute : tracks 4, 5, 6 sur leurs canaux, la 16 sur le canal 16) ;
+  le Pi **sélectionne cette track sur la MK2** au premier bouton tourné
+  (`T04 selected (DT2)`). [TRK] + trig seul n'envoie rien : la synchro
+  attend un bouton. Un CC sur l'AUTO CHANNEL vient alors de la track 16 :
+  suivie en design, valeur seulement apprise en live (la track 16 n'y est
+  pas joignable). Les mutes ne changent pas la sélection.
+  `midi.knobs_on_track_channel: false` rend l'ancien comportement.
 - Mutes : la DT2 ne donne pas leur état, elle n'envoie que leurs
   changements. Au lancement, toutes les tracks sont supposées ouvertes
   jusqu'au premier mute joué (limite assumée, 2026-11-09).
@@ -852,6 +862,7 @@ Repris de `digitakt/kb/midi-config.md` :
   `PROGRAM CHG IN CH` = `midi.program_channel` de `config/default.yaml`
   (10). Le canal d'entrée est réglé à part : resté sur `AUTO` (16), la DT2
   ignorait les PC du Pi (constaté le 2026-11-09) ;
+- `OUTPUT CH` = TRACK CH : la MK2 suit la track active de la DT2 (2026-11-09) ;
 - `ENCODER DEST` et `MUTE DEST` = `INT + EXT` : le Pi apprend les valeurs
   des boutons et les mutes joués sur la DT2 (décidé le 2026-11-09) ;
 - `TRACK n CHANNEL` = n pour les 16 tracks (faders et mutes par track) ;

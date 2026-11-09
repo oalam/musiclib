@@ -340,15 +340,26 @@ class Engine:
     def on_control_change(self, channel: int, control: int, value: int) -> None:
         """CC reçu de la DT2 (canal 0-15) : bouton ou mute joué sur la machine.
 
-        La DT2 envoie ses boutons sur l'AUTO CHANNEL, sans dire quelle track est
-        active (constaté le 2026-11-09) : la valeur va à la track sélectionnée sur
-        la MK2. Un mute sur ce canal n'a pas de track sûre : ignoré.
+        Mutes : sur le canal de la track ; sur l'AUTO CHANNEL, pas de track sûre,
+        ignorés. Boutons, selon `OUTPUT CH` de la DT2 (`midi.knobs_on_track_channel`) :
+        - TRACK CH (vérifié le 2026-11-09) : canal de la track active, la MK2 la
+          sélectionne (sur l'AUTO CHANNEL, c'est la track 16 : suivie en design
+          seulement, le live ne la joint pas) ;
+        - AUTO CH : sans dire quelle track est active, la valeur va à la track
+          sélectionnée sur la MK2.
         """
         track = channel + 1
-        if track == self.cfg.midi.auto_channel:
-            if control == self.faders.mute_cc:
-                return
+        auto = track == self.cfg.midi.auto_channel
+        if control == self.faders.mute_cc:
+            if not auto:
+                self.faders.received(track, control, value)
+                self.leds_dirty = True
+            return
+        if auto and not self.cfg.midi.knobs_on_track_channel:
             track = self.track
+        elif track != self.track and (self.design or not auto):
+            self.track = track  # suit la track active de la DT2
+            self.last_control = f"T{track:02d} selected (DT2)"
         self.faders.received(track, control, value)
         self.leds_dirty = True
 

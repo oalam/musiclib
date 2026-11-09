@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.20.0] - 2026-11-09
+
+### Ajouté
+
+- [6] La MK2 suit la track active de la DT2 : avec `OUTPUT CH` = TRACK CH
+  sur la DT2 (vérifié à l'écoute MIDI brute), un bouton tourné sur la
+  machine arrive sur le canal de sa track et la sélectionne sur la MK2
+  (`midi.knobs_on_track_channel`, vrai par défaut). Mutes exclus ; track
+  16 (AUTO CHANNEL) suivie en design seulement.
+
 ## [0.19.0] - 2026-11-09
 
 ### Retiré
