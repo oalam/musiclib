@@ -103,7 +103,7 @@ Le portage sur le Pi vient en fin de MVP.
 | HID | `hidapi` (bindings Python `hid`) | le même code sur Mac et sur Linux (hidraw) |
 | Rendu écrans | Pillow, image 1 bit, thread dédié | la boucle MIDI ne doit jamais attendre le rendu |
 | Configuration | `config/default.yaml` (matériel, dispositions, page d'encodeurs) + un `projects/<set>.yaml` par set, validés par Pydantic | modifiable sans toucher au code |
-| Canal de jeu | AUTO CHANNEL de la DT2 (canal 10 par défaut, comme en 7.D) | voie vérifiée le 2026-10-12 |
+| Canal de jeu | AUTO CHANNEL de la DT2 sur le **canal 16** (décidé le 2026-11-09 ; c'était 10 en 7.D) | sur un canal partagé l'AUTO CHANNEL l'emporte : seule la track 16, jouée depuis la DT2, perd son canal propre |
 | Source d'un projet | la doctrine du set (front matter `mkbrain:`) + le `library/lives/<set>.json` qu'elle référence ; convertis sur le Mac | un seul hub par donnée, pas de recopie des tonalités et tempos à la main |
 | Transport des projets | git : le Pi clone `oalam/musiclib` en partiel (`--filter=blob:none --sparse`, dossier `mk-brain/` seul), `git pull` au démarrage si le réseau répond, sinon dernière copie locale | le dépôt fait 677 Mo, le Pi n'en prend que `mk-brain/` ; le même mécanisme met à jour le code |
 | Accès GitHub du Pi | clé de déploiement en lecture seule | moindre privilège, le Pi ne pousse jamais |
@@ -214,7 +214,7 @@ la slice 7**.
 ---
 mkbrain:
   live: library/lives/solaris.json   # samples par banque et track
-  auto_channel: 10
+  auto_channel: 16
   defaults: {phrase: 32, quantize: "1/16", swing: 50}
   banks:
     A-HALF:
@@ -513,7 +513,9 @@ Repris de `digitakt/kb/midi-config.md` :
 - `PRG CH SEND` = on (suivi de contexte, reset du compteur) et
   `PRG CH RECEIVE` = on (PATTERN + pad) ;
 - `TRACK n CHANNEL` = n pour les 16 tracks (faders et mutes par track) ;
-- `AUTO CHANNEL` noté dans la config ;
+- `AUTO CHANNEL` = 16 (valeur `auto_channel` du projet). La track 16 n'est
+  plus joignable par son canal : SELECT + pad 16 et MUTE + pad 16 sont
+  désactivés (LED éteinte) ; le pad 16 la joue toujours (note 15) ;
 - Transfer fermé.
 
 ## Phases
@@ -573,16 +575,13 @@ la slice 0.
    combinaison au Pi, ou la garde-t-elle pour sa propre bascule en mode
    MIDI (7.D) ? Sinon, choisir une autre combinaison. À voir en phase 0.
 10. **Polyphonie d'une track audio DT2** : conditionne le mode accords.
-11. **AUTO CHANNEL et canaux de track** : avec `TRACK n CHANNEL` = n pour
-    les 16 tracks, l'AUTO CHANNEL (10) tombe sur le canal de la track 10.
-    Une note ou un CC reçu sur le canal 10 vise-t-il la track active, la
-    track 10, ou les deux ? À tester avant la slice 1. Sinon, régler l'AUTO
-    CHANNEL sur un canal libre, en retirant une track de la règle n = n
-    (la 16, jouée depuis la DT2, par exemple).
-12. **Lors du test du pool**, une seule série de 4 hauteurs a été entendue
-    sur les deux envois attendus (notes 60-63 sur le canal 10 et sur le
-    canal 16) : le canal 16 n'a peut-être rien joué. À recouper avec la
-    question 11.
+11. ~~AUTO CHANNEL et canaux de track~~ : **vérifié le 2026-11-09** (fiche
+    `digitakt/kb/midi-config.md`). Sur un canal partagé, l'AUTO CHANNEL
+    l'emporte : notes et CC vont à la track active, la track de ce canal
+    n'est plus joignable. AUTO CHANNEL = 16 (décidé le 2026-11-09) : seule
+    la track 16, jouée depuis la DT2, perd ses faders et son mute en live.
+12. ~~Canal 16 au test du pool~~ : la track 16 répond bien sur le canal 16
+    (vérifié le 2026-11-09).
 
 ## Références
 
