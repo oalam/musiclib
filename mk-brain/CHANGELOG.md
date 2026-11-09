@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.3.1] - 2026-11-09
+
+### Modifié
+
+- [1] Courbe de vélocité : `gamma` 0,6 → 0,4 et `full_scale` 2500 → 2000,
+  les frappes légères sortaient à 2-14.
+
 ## [0.3.0] - 2026-11-09
 
 ### Ajouté
