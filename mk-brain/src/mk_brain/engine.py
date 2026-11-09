@@ -10,6 +10,11 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   reçus de la DT2 ; SHIFT + PLAY = mesure 1 à la barre suivante, SHIFT +
   GROUP n = début du bloc n ; transport lancé, les LED GROUP montrent le
   compteur et PLAY pulse sur le 1.
+- Slice 5.A : SELECT + pad = track des encodeurs, MUTE + pad = mute (CC 94),
+  PATTERN + pad = Program Change dans la banque courante (refusé tant
+  qu'elle est inconnue) ; 8 encodeurs → CC sur le canal de la track, valeurs
+  apprises de la DT2 (`faders.py`). La track de l'AUTO CHANNEL n'est pas
+  joignable par son canal : refusée.
 """
 
 from __future__ import annotations
@@ -18,6 +23,7 @@ from dataclasses import dataclass
 
 from mk_brain.clock import ClockTracker
 from mk_brain.config import RGB, Config
+from mk_brain.faders import Faders
 from mk_brain.hid_mk2 import (
     GROUPS,
     LED_MAX,
@@ -56,7 +62,21 @@ class NoteOff:
     note: int
 
 
-MidiOut = NoteOn | NoteOff
+@dataclass(frozen=True, slots=True)
+class ControlChange:
+    channel: int
+    control: int
+    value: int
+
+
+@dataclass(frozen=True, slots=True)
+class ProgramChange:
+    channel: int
+    program: int
+
+
+MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange
+MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
 Timed = tuple[int, MidiOut]
 
 
@@ -95,6 +115,12 @@ class Engine:
         self.phrase_state: PhraseState | None = None
         self._phrase_leds: tuple[object, ...] = ()
         self.log: list[str] = []  # évènements du compteur, lus et vidés par la CLI
+        enc = cfg.encoders
+        self.faders = Faders([(e.name, e.cc) for e in enc.page], enc.mute_cc, enc.raw_per_step)
+        self.track = 1  # track des encodeurs (SELECT + pad)
+        self.last_program: int | None = None  # dernier PC reçu : banque courante
+        self.last_control = ""  # dernier geste de contrôle, pour l'écran
+        self._consumed: set[int] = set()  # pads frappés avec un modificateur
 
     @property
     def repeat_active(self) -> bool:
@@ -107,10 +133,56 @@ class Engine:
             self._button(ev)
             return []
         if isinstance(ev, EncoderEvent):
-            if ev.index == 0 and "SWING" in self._held_buttons:
-                self.swing = clamp_swing(self.swing + ev.delta)
-            return []
+            if ev.index == 0:
+                if "SWING" in self._held_buttons:
+                    self.swing = clamp_swing(self.swing + ev.delta)
+                return []
+            return self._encoder(ev.index, ev.delta, now)
         return self._pad(pad_label(ev.index), ev, now)
+
+    def _reachable(self, track: int) -> bool:
+        if track == self.cfg.midi.auto_channel:
+            self.last_control = f"T{track:02d} = AUTO CHANNEL : pas de canal propre"
+            return False
+        return True
+
+    def _encoder(self, index: int, delta: int, now: int) -> list[Timed]:
+        if not self._reachable(self.track):
+            return []
+        sent = self.faders.turn(self.track, index, delta)
+        if sent is None:
+            return []
+        cc, value = sent
+        name = self.faders.page[index - 1][0]
+        self.last_control = f"T{self.track:02d} {name} {value}"
+        return [(now, ControlChange(self.track - 1, cc, value))]
+
+    def _command(self, pad: int, now: int) -> list[Timed]:
+        held = self._held_buttons
+        if "SELECT" in held:
+            if self._reachable(pad):
+                self.track = pad
+                self.last_control = f"T{pad:02d} sélectionnée"
+            return []
+        if "MUTE" in held:
+            if not self._reachable(pad):
+                return []
+            cc, value = self.faders.toggle_mute(pad)
+            self.last_control = f"T{pad:02d} {'mute' if value else 'démute'}"
+            return [(now, ControlChange(pad - 1, cc, value))]
+        if self.last_program is None:
+            self.last_control = "banque ? (changer de pattern sur la DT2)"
+            return []
+        program = self.last_program // 16 * 16 + pad - 1
+        self.last_control = f"-> {pattern_label(program)}"
+        return [(now, ProgramChange(self.cfg.midi.program_channel - 1, program))]
+
+    def on_control_change(self, channel: int, control: int, value: int) -> None:
+        """CC reçu de la DT2 (canal 0-15) : bouton ou mute joué sur la machine."""
+        track = channel + 1
+        if track != self.cfg.midi.auto_channel:
+            self.faders.received(track, control, value)
+            self.leds_dirty = True
 
     def on_start(self) -> None:
         self.phrase.start()
@@ -121,7 +193,11 @@ class Engine:
         self.leds_dirty = True
 
     def on_program_change(self, program: int) -> None:
-        """PC reçu : transport lancé, mesure 1 à la barre suivante ; arrêté, ignoré."""
+        """PC reçu : banque courante, faders hors prise ; transport lancé, mesure 1 à la barre
+        suivante (arrêté : compteur inchangé)."""
+        if program != self.last_program:
+            self.faders.pattern_changed()
+        self.last_program = program
         ticks = self.clock.ticks_since_start
         if ticks is None:
             return
@@ -141,6 +217,8 @@ class Engine:
         name = ev.name
         if not ev.pressed:
             self._held_buttons.discard(name)
+            if name in MODIFIERS:
+                self.leds_dirty = True
             if name == "NOTE_REPEAT":
                 self.repeat_held = False
                 if not self.repeat_locked:
@@ -169,11 +247,21 @@ class Engine:
                 self.repeat_held = True
         elif name.startswith("DISPLAY_") and self.repeat_active:
             self.division = DIVISIONS[int(name[-1]) - 1][0]
+        elif name in MODIFIERS:
+            pass
         else:
             return
         self.leds_dirty = True
 
     def _pad(self, pad: int, ev: PadEvent, now: int) -> list[Timed]:
+        if pad in self._consumed:  # frappé avec un modificateur : pas de note jusqu'au relâché
+            if not ev.pressed:
+                self._consumed.discard(pad)
+            return []
+        if ev.pressed and pad not in self._pressure and self._held_buttons & set(MODIFIERS):
+            self._consumed.add(pad)
+            self.leds_dirty = True
+            return self._command(pad, now)
         if ev.pressed:
             was_held = pad in self._pressure
             self._pressure[pad] = ev.pressure
@@ -264,17 +352,25 @@ class Engine:
     def status(self) -> str:
         q = "Qoff" if self.quantize == "off" else f"Q{self.quantize[2:]}"
         rep = f"  R{self.division}{'*' if self.repeat_locked else ''}" if self.repeat_active else ""
-        return f"{q}  SW{self.swing}{rep}"
+        return f"T{self.track:02d}  {q}  SW{self.swing}{rep}"
 
     def leds(self) -> LedState:
         layout = self.cfg.layouts[self.group]
         dim = self.cfg.leds.dim
         lit = set(self._attacks) | set(self._sounding) | set(self._repeats)
+        held = self._held_buttons
         pads: list[RGB] = [(0, 0, 0)] * N_PADS
         for index in range(N_PADS):
             pad = pad_label(index)
             full = pad_color(self.cfg, layout, pad)
-            pads[index] = full if pad in lit else scale(full, dim)
+            if held & {"MUTE", "SELECT"} and pad == self.cfg.midi.auto_channel:
+                pads[index] = (0, 0, 0)  # track de l'AUTO CHANNEL : pas joignable
+            elif "MUTE" in held:  # tracks ouvertes pleines, mutées éteintes
+                pads[index] = (0, 0, 0) if self.faders.muted.get(pad) else full
+            elif "SELECT" in held:
+                pads[index] = full if pad == self.track else scale(full, dim)
+            else:
+                pads[index] = full if pad in lit else scale(full, dim)
         st = self.phrase_state
         if st is None:  # transport arrêté : les GROUP montrent la disposition
             groups = [
@@ -293,6 +389,8 @@ class Engine:
             "SWING": LED_MAX if self.swing > 50 else 0,
             "PLAY": LED_MAX if st is not None and st.pulse else 0,
         }
+        for name in MODIFIERS:
+            buttons[name] = LED_MAX if name in held else low
         if self.repeat_active:
             for i, (name, _) in enumerate(DIVISIONS):
                 buttons[f"DISPLAY_{i + 1}"] = LED_MAX if name == self.division else low

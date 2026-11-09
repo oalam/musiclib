@@ -21,6 +21,7 @@ class ConfigError(Exception):
 class MidiConfig(BaseModel):
     port_hint: str = "Digitakt"
     auto_channel: int = Field(16, ge=1, le=16)
+    program_channel: int = Field(10, ge=1, le=16)  # canal des Program Change de la DT2
 
 
 class VelocityConfig(BaseModel):
@@ -55,6 +56,26 @@ class PlayConfig(BaseModel):
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
 
 
+class Encoder(BaseModel):
+    name: str = Field(max_length=4)
+    cc: int = Field(ge=0, le=127)
+
+
+class EncodersConfig(BaseModel):
+    """Page unique des 8 encodeurs, la même pour toutes les tracks (SPEC, Encodeurs)."""
+
+    page: list[Encoder]
+    mute_cc: int = Field(94, ge=0, le=127)
+    raw_per_step: int = Field(4, ge=1)  # unités brutes de la MK2 par cran de CC
+
+    @field_validator("page")
+    @classmethod
+    def _eight(cls, v: list[Encoder]) -> list[Encoder]:
+        if len(v) != 8:
+            raise ValueError("encoders.page : exactement 8 encodeurs")
+        return v
+
+
 class Roles(BaseModel):
     tonique: RGB
     tierce: RGB
@@ -87,6 +108,7 @@ class Config(BaseModel):
     velocity: VelocityConfig = VelocityConfig()
     leds: LedConfig = LedConfig()
     play: PlayConfig = PlayConfig()
+    encoders: EncodersConfig
     roles: Roles
     families: dict[Family, RGB]
     track_colors: dict[int, RGB]

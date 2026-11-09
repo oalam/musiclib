@@ -207,3 +207,65 @@ def test_shift_play_and_shift_group_recalibrate(cfg: Config) -> None:
     assert eng.phrase_state is not None and eng.phrase_state.bar == 1
     btn(eng, "GROUP_H")  # bloc 8 = mesure 57, au-delà d'une phrase de 32 : ignoré
     assert not eng.phrase.pending
+
+
+# --- slice 5.A : SELECT / MUTE / PATTERN + pad, encodeurs ---------------------
+
+PAD7 = 10  # index HID du pad 7 (rangée 2 depuis le bas : index 8-11 = pads 5-8)
+
+
+def test_select_then_encoder_sends_cc_on_track_channel(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "SELECT")
+    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []  # pas de note
+    assert eng.handle(PadEvent(PAD7, False, 0), MS) == []
+    btn(eng, "SELECT", False)
+    assert eng.track == 7
+    from mk_brain.engine import ControlChange
+
+    assert eng.handle(EncoderEvent(1, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
+
+
+def test_auto_channel_track_refused(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "MUTE")
+    assert eng.handle(PadEvent(3, True, 2500), 0) == []  # index 3 = pad 16
+    eng.handle(PadEvent(3, False, 0), MS)
+    btn(eng, "MUTE", False)
+    btn(eng, "SELECT")
+    eng.handle(PadEvent(3, True, 2500), 2 * MS)
+    assert eng.track == 1 and "AUTO CHANNEL" in eng.last_control
+    assert eng.leds().pads[3] == (0, 0, 0)
+
+
+def test_mute_pad_sends_cc94(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    btn(eng, "MUTE")
+    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ControlChange(0, 94, 127))]
+    assert eng.leds().pads[PAD1] == (0, 0, 0)  # muté : éteint pendant MUTE
+
+
+def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
+    from mk_brain.engine import ProgramChange
+
+    eng = Engine(cfg)
+    btn(eng, "PATTERN")
+    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []
+    assert eng.last_control.startswith("banque ?")
+    eng.handle(PadEvent(PAD7, False, 0), MS)
+    eng.on_program_change(16 * 4 + 3)  # E04 reçu, transport arrêté
+    assert eng.handle(PadEvent(PAD7, True, 2500), 2 * MS) == [
+        (2 * MS, ProgramChange(9, 16 * 4 + 6))
+    ]  # E07, canal 10
+
+
+def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.on_control_change(0, 74, 30)
+    eng.on_program_change(3)
+    assert eng.faders.view(1)[0].stale
+    eng.handle(EncoderEvent(1, 4, 0), 0)
+    eng.on_program_change(3)  # même pattern (PC du Stop) : rien ne change
+    assert not eng.faders.view(1)[0].stale

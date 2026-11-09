@@ -4,6 +4,7 @@
 midi:
   port_hint: Digitakt        # sous-chaîne du nom de port de sortie
   auto_channel: 16           # AUTO CHANNEL de la DT2 (SPEC, décidé le 2026-11-09)
+  program_channel: 10        # canal des Program Change (PRG CH SEND / RECEIVE, fiche midi-config)
 
 velocity:
   window_ms: 2.0             # la vélocité = pression maximale sur cette fenêtre après l'attaque
@@ -19,6 +20,21 @@ play:
   repeat: "1/16"            # division de départ du note repeat
   phrase: 32                 # 32 ou 64 mesures ; par banque une fois les projets là (slice 6)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
+
+# 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B, fiche cc-nrpn)
+# DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine
+encoders:
+  mute_cc: 94
+  raw_per_step: 4            # pas minimal remonté par la MK2 (constat slice 0)
+  page:
+    - {name: CUT, cc: 74}    # fréquence du filtre
+    - {name: RES, cc: 75}    # résonance
+    - {name: ENV, cc: 77}    # profondeur d'enveloppe du filtre
+    - {name: DEC, cc: 81}    # decay d'amp
+    - {name: LVL, cc: 95}    # niveau de track
+    - {name: PAN, cc: 90}
+    - {name: DLY, cc: 84}    # envoi delay
+    - {name: REV, cc: 85}    # envoi reverb
 
 leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine

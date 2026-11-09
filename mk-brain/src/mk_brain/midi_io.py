@@ -10,9 +10,9 @@ from typing import Any, Literal
 import mido
 
 from mk_brain.clock import ClockTracker
-from mk_brain.engine import Engine, MidiOut, NoteOff, NoteOn
+from mk_brain.engine import ControlChange, Engine, MidiOut, NoteOff, NoteOn, ProgramChange
 
-InKind = Literal["clock", "start", "continue", "stop", "sysex", "program_change"]
+InKind = Literal["clock", "start", "continue", "stop", "sysex", "program_change", "control_change"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +50,19 @@ def find_port(hint: str, names: list[str] | None = None) -> str:
     raise MidiError(f"aucun port contenant {hint!r} ; vus : {names or 'aucun'}")
 
 
+def to_mido(msg: MidiOut) -> Any:
+    if isinstance(msg, NoteOn):
+        return mido.Message("note_on", channel=msg.channel, note=msg.note, velocity=msg.velocity)
+    if isinstance(msg, NoteOff):
+        return mido.Message("note_off", channel=msg.channel, note=msg.note, velocity=0)
+    if isinstance(msg, ControlChange):
+        return mido.Message(
+            "control_change", channel=msg.channel, control=msg.control, value=msg.value
+        )
+    assert isinstance(msg, ProgramChange)
+    return mido.Message("program_change", channel=msg.channel, program=msg.program)
+
+
 class Dt2Out:
     def __init__(self, port: Any) -> None:
         self._port = port
@@ -63,12 +76,7 @@ class Dt2Out:
             raise MidiError(f"ouverture de {name!r} impossible : {exc}") from exc
 
     def send(self, msg: MidiOut) -> None:
-        if isinstance(msg, NoteOn):
-            m = mido.Message("note_on", channel=msg.channel, note=msg.note, velocity=msg.velocity)
-        else:
-            assert isinstance(msg, NoteOff)
-            m = mido.Message("note_off", channel=msg.channel, note=msg.note, velocity=0)
-        self._port.send(m)
+        self._port.send(to_mido(msg))
 
     def close(self) -> None:
         self._port.close()
@@ -96,6 +104,8 @@ class Dt2In:
                     data = tuple(msg.data)
                 elif msg.type == "program_change":
                     data = (msg.channel, msg.program)
+                elif msg.type == "control_change":
+                    data = (msg.channel, msg.control, msg.value)
                 inbox.put(MidiIn(msg.type, t, data))
 
         try:
@@ -137,3 +147,5 @@ def feed_engine(engine: Engine, ev: MidiIn) -> None:
         engine.on_stop()
     elif ev.kind == "program_change":
         engine.on_program_change(ev.data[1])
+    elif ev.kind == "control_change":
+        engine.on_control_change(*ev.data)

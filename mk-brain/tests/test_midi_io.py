@@ -57,3 +57,16 @@ def test_feed_engine_dispatch(cfg: Config) -> None:
     assert eng.phrase.pending
     midi_io.feed_engine(eng, midi_io.MidiIn("stop", 0))
     assert not eng.phrase.pending and not eng.clock.running
+
+
+def test_send_cc_and_program_change() -> None:
+    from mk_brain.engine import ControlChange, ProgramChange
+
+    port = FakePort()
+    out = midi_io.Dt2Out(port)
+    out.send(ControlChange(6, 74, 66))
+    out.send(ProgramChange(9, 70))
+    assert [str(m) for m in port.sent] == [
+        "control_change channel=6 control=74 value=66 time=0",
+        "program_change channel=9 program=70 time=0",
+    ]

@@ -3,6 +3,25 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.6.0] - 2026-11-09
+
+### Ajouté
+
+- [5] 5.A `faders.py` : valeurs des 8 paramètres par track (64 si jamais
+  vues), apprises des CC reçus de la DT2 (`ENCODER DEST` / `MUTE DEST` =
+  `INT + EXT`), « hors prise » après un changement de pattern, restes de
+  rotation cumulés (4 unités brutes par cran), mutes.
+- [5] 5.A Moteur : 8 encodeurs → CC sur le canal de la track
+  sélectionnée ; SELECT + pad = track des encodeurs, MUTE + pad = CC 94,
+  PATTERN + pad = Program Change dans la banque du dernier PC reçu
+  (refusé, « banque ? », tant qu'aucun n'est arrivé) ; un pad frappé avec
+  un modificateur ne joue pas de note ; track de l'AUTO CHANNEL refusée.
+- [5] 5.A LED : SELECT, MUTE, PATTERN atténués, pleins tenus ; MUTE tenu =
+  tracks ouvertes allumées, mutées éteintes ; SELECT tenu = track choisie.
+- [5] 5.A MIDI : envoi de CC et Program Change, réception des CC ;
+  config `encoders` (page, `mute_cc`, `raw_per_step`) et
+  `midi.program_channel` ; `play` affiche la track et le dernier geste.
+
 ## [0.5.1] - 2026-11-09
 
 ### Corrigé

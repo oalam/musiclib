@@ -234,6 +234,10 @@ def cmd_play(dry_run: bool) -> int:
             for hid_ev in decoder.feed(report):
                 emit(engine.handle(hid_ev, now))
             emit(engine.tick(now))
+            if engine.last_control:
+                last = engine.last_control
+                print(last)
+                engine.last_control = ""
             for line in engine.log:
                 print(f"{line}   ({_clock_line(clock)})")
             engine.log.clear()
