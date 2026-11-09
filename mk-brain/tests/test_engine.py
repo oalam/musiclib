@@ -267,7 +267,7 @@ def test_mute_pad_sends_cc94(cfg: Config) -> None:
 
     eng = Engine(cfg)
     btn(eng, "MUTE")
-    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ControlChange(0, 94, 127))]
+    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ControlChange(0, 94, 0))]  # 0 = muter
     assert eng.leds().pads[PAD1] == (0, 0, 0)  # muté : éteint pendant MUTE
 
 
@@ -297,7 +297,7 @@ def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.track = 7
     eng.on_control_change(15, 74, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
-    eng.on_control_change(15, 94, 127)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
+    eng.on_control_change(15, 94, 0)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
     assert not eng.faders.muted
     assert eng.handle(EncoderEvent(5, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
 

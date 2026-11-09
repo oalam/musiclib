@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.15.2] - 2026-11-09
+
+### Corrigé
+
+- [6] MUTE + pad inversé sur la DT2 : envoi de 0 pour muter et 1 pour
+  ouvrir, le même sens que ce qu'elle envoie (constaté à l'essai).
+
 ## [0.15.1] - 2026-11-09
 
 ### Corrigé

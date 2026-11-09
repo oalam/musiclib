@@ -736,9 +736,10 @@ DT2 (`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`, B.1-B.7) :
 - **Constaté le 2026-11-09** (écoute MIDI brute, mutes joués sur la DT2,
   `MUTE DEST` = `INT + EXT`) : la DT2 envoie un CC 94 **sur le canal de la
   track**, valeur **0 = muté, 1 = ouvert** (pas 0 / 127). Le Pi lisait
-  « muté » à partir de 64 et ne voyait donc aucun mute : corrigé. À
-  vérifier : l'envoi de la MK2 (MUTE + pad, 127 = muter, 0 = ouvrir) suit-il
-  le même sens à la réception de la DT2 ?
+  « muté » à partir de 64 et ne voyait donc aucun mute : corrigé. L'envoi
+  de MUTE + pad (127 = muter, 0 = ouvrir) était inversé à l'essai : la DT2
+  reçoit dans le même sens qu'elle envoie, MUTE + pad envoie donc 0 pour
+  muter et 1 pour ouvrir (corrigé le 2026-11-09).
 - PATTERN + pad : banque choisie par PATTERN + GROUP A-H (sans envoi,
   décidé le 2026-11-09) ou apprise du dernier PC reçu ; avant, `banque ?`.
   Le PC au Stop relevé en 7.E ne s'est pas reproduit : sur une quinzaine

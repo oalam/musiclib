@@ -33,13 +33,13 @@ def test_learns_from_dt2_and_marks_stale_on_pattern_change() -> None:
 
 def test_mute_toggle_and_learn() -> None:
     f = make()
-    assert f.toggle_mute(3) == (94, 127)
-    assert f.toggle_mute(3) == (94, 0)
+    assert f.toggle_mute(3) == (94, 0)  # muter
+    assert f.toggle_mute(3) == (94, 1)  # rouvrir
     f.received(3, 94, 0)  # muté sur la DT2 (elle envoie 0 = muté, 1 = ouvert)
     assert f.muted[3]
     f.received(3, 94, 1)  # rouvert
     assert not f.muted[3]
-    assert f.toggle_mute(3) == (94, 127)
+    assert f.toggle_mute(3) == (94, 0)
 
 
 def test_pages_keep_values_and_learn_any_page() -> None:
