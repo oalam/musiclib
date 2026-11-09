@@ -216,6 +216,18 @@ la slice 7**.
   - bandeau `DESIGN` et cadre de l'écran gauche dès 5.B ; couleurs des pads
     hors gamme et pages complètes : 5.C et 5.D ; `demarrage: design` avec
     les projets (slice 6).
+- **Cadrage de la 5.D (décidé le 2026-11-09)** :
+  - en design, **GROUP A-H seul = banque** : la tonique, le mode et la
+    phrase de la banque colorent les pads par degré et calent la
+    chromatique sur la tonique ; PAD MODE seul fait défiler les
+    dispositions ; LED GROUP = banque choisie ;
+  - **banques initialisées avec solaris** sans attendre la slice 6 (tonique,
+    mode, tempo, phrase des banques A-G depuis la doctrine solaris et
+    `library/lives/solaris.json`) ; à trancher en début de 5.D : fichier
+    provisoire tenu à la main (doublon assumé jusqu'à `convert`) ou avance
+    du modèle de projet et de `projects/solaris.yaml` ;
+  - menu design : entrées de la maquette, BANK et GAMME alimentées par
+    solaris.
 
 ## Projets : de la doctrine au fichier projet
 
@@ -570,8 +582,8 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | GRID | quantize off → 1/16 → 1/8 | idem (off par défaut) |
 | SWING + encodeur maître | swing 50-75 % | idem |
 | SHIFT + PLAY | phrase remise à 1 à la prochaine mesure | idem |
-| SHIFT + GROUP n | recale le compteur au début du bloc n | **à trancher** (GROUP en design : banque ou disposition) |
-| GROUP A-H | LED du compteur 8 × 8 mesures | **à trancher** |
+| SHIFT + GROUP n | recale le compteur au début du bloc n | idem |
+| GROUP A-H | LED du compteur 8 × 8 mesures | banque n : sa tonique, son mode et sa phrase colorent et calent les pads (décidé le 2026-11-09) |
 | PAD MODE | — | cycle des dispositions |
 | 8 boutons au-dessus des écrans | divisions du repeat (pendant NOTE REPEAT) | entrées du menu |
 | Encodeur maître | sans effet (sauf avec SWING) | valeur de l'entrée de menu ; appui = valider |
@@ -657,7 +669,7 @@ conditionne tout le reste.
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
-| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite le 2026-11-09, à essayer sur la MK2 ; 5.C écrans live et superpositions, faite le 2026-11-09, à essayer sur la MK2 ; 5.D design (menus ; GROUP en design à trancher) |
+| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design, cadrée le 2026-11-09 (cf. Modes), à faire en nouvelle session |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 
