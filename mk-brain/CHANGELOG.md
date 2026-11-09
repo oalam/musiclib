@@ -3,6 +3,25 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.13.0] - 2026-11-09
+
+### Ajouté
+
+- [6] 6.B : en live, la banque du dernier Program Change reçu règle le
+  contexte (`Engine.context`, `live_sheet`) : sa longueur de phrase
+  s'applique avec la remise à 1 (`PhraseCounter.reset_next_bar(length=)`,
+  tout de suite transport arrêté), sa tonique et son mode s'affichent en
+  haut à droite du bandeau droit. Le design garde sa banque et ignore le PC.
+- [6] Annonce d'une nouvelle banque : clé, titre et description 2 s sur
+  l'écran droit en live (le compte à rebours garde la priorité), accents
+  retirés (`render.ascii_text`).
+- [6] Console de `mk-brain play` : banque, tonique et mode devant chaque note.
+
+### Modifié
+
+- [6] La phrase du live n'est plus seulement celle de la config :
+  `play.phrase` ne sert que sans banque du projet.
+
 ## [0.12.0] - 2026-11-09
 
 ### Ajouté

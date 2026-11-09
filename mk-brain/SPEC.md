@@ -357,6 +357,25 @@ mkbrain:
   `tests/test_convert.py` échoue si `projects/solaris.yaml` est périmé
   (sauté sans le vault, sur le Pi).
 
+**Fait le 2026-11-09 (slice 6.B)**, provisoire jusqu'à l'essai sur la MK2 :
+- en live, la banque du **dernier PC reçu** règle le contexte (`Engine.context`) ;
+  PATTERN + GROUP choisit seulement la banque de PATTERN + pad. Banque
+  absente du projet (H) : phrase de la config, pas de tonique ;
+- sa longueur de phrase s'applique **avec la remise à 1**, à la barre
+  suivante (transport arrêté : tout de suite) ; le mode design garde la
+  sienne (banque choisie par GROUP, menu PHRASE) et ignore le PC ;
+- **annonce** au changement de banque (premier PC d'une autre banque, pas
+  d'un autre pattern de la même) : clé et titre en gras, description sur
+  deux lignes, 2 s à la place du bandeau droit ; le compte à rebours
+  garde la priorité. Accents retirés (`Cœur` → `Coeur`, police sans
+  accents) ;
+- **tonique et mode** en haut à droite du bandeau droit live
+  (`Bb Phrygian`), phrase et cap dessous (`ph 2  -6 to 32`) ;
+- console de `mk-brain play` : banque, tonique et mode devant chaque note
+  (`E-TRIBE A# Phrygian : pad 3 -> b2 (B5, 71)`) ; en design, la
+  disposition part de la tonique (5.D), le nom MIDI est donc la vraie
+  note ; en live (rythmique), la track.
+
 ## Comportements
 
 ### Horloge et PLL
@@ -511,7 +530,7 @@ mode, la note jouée avec son degré et son nom (`pad 3 -> b3 (D#5, 63)`,
 convention Elektron 60 = C5). Fait à la slice 2, sur l'écran gauche de
 `mk-brain play`. Tant qu'aucun projet n'est chargé, le nom suppose la DT2
 sans `TUNE` ; avec le projet (slice 6), la tonique s'affiche à côté du
-mode et le nom devient la vraie note (tonique + degré).
+mode et le nom devient la vraie note (tonique + degré) : fait à la 6.B.
 
 **Superpositions temporaires sur l'écran droit**, par ordre de priorité :
 1. Note repeat : la division en très gros (`1/16T`) tant que le pad est
@@ -559,7 +578,8 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
 - bascule de mode proposée : écran droit entier ;
 - design : cadre autour de l'écran gauche, menu dans les bandeaux depuis
   la 5.D (cf. ci-dessous) ;
-- banque, tonique et mode s'ajouteront avec les projets (slice 6) ;
+- tonique et mode de la banque en live, titre et description 2 s au
+  changement de banque : slice 6.B (cf. Projets) ;
 - rafraîchi au plus toutes les 50 ms dans la boucle principale, envoyé
   seulement si l'image change ; moins d'1 ms la paire d'écrans sur le
   Mac. Si le Pi est trop lent, passer au fil de rendu dédié (slice 7).
@@ -788,7 +808,7 @@ conditionne tout le reste.
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
-| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | en cours, découpée le 2026-11-09 : 6.A front matter et `convert`, faite le 2026-11-09 ; 6.B contexte suivi par PC et 6.C sélection de projet à venir |
+| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | en cours, découpée le 2026-11-09 : 6.A front matter et `convert`, faite le 2026-11-09 ; 6.B contexte suivi par PC, faite le 2026-11-09, à essayer ; 6.C sélection de projet à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et

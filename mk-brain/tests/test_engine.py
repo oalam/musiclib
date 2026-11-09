@@ -561,3 +561,54 @@ def test_transport_arrows_ignored_in_live(cfg: Config) -> None:
     btn(eng, "TRANSPORT_LEFT")
     assert eng.octave == 0
     assert eng.leds().buttons.get("TRANSPORT_LEFT", 0) == 0
+
+
+# --- slice 6.B : contexte live suivi par Program Change -----------------------
+
+
+def test_live_program_change_sets_bank_context_and_phrase_at_bar(
+    cfg: Config, project: Project
+) -> None:
+    long_bank = project.model_copy(deep=True)
+    long_bank.banks["E-TRIBE"].phrase = 64
+    eng = Engine(cfg, running_clock(1), long_bank)
+    eng.on_start()
+    advance(eng, 1, 3 * 96 + 86 + 1)
+    eng.on_program_change(16 * 4 + 3)  # E04
+    assert eng.context is not None and eng.context[0] == "E-TRIBE"
+    assert eng.phrase.length == 32  # pas avant la barre
+    assert eng.announce is not None and eng.announce[2] is None
+    eng.tick(5 * MS)
+    assert eng.announce[2] == 5 * MS  # instant posé au tick
+    advance(eng, 3 * 96 + 87, 4 * 96 + 1)
+    assert eng.phrase.length == 64 and eng.phrase_state is not None
+    assert eng.phrase_state.bar == 1
+
+
+def test_live_program_change_stopped_applies_phrase_now(cfg: Config, project: Project) -> None:
+    long_bank = project.model_copy(deep=True)
+    long_bank.banks["C-GROOVE"].phrase = 64
+    eng = Engine(cfg, project=long_bank)
+    eng.on_program_change(2 * 16)  # C01
+    assert eng.phrase.length == 64
+    eng.on_program_change(7 * 16)  # H01 : banque absente du projet, phrase de la config
+    assert eng.context is None and eng.phrase.length == cfg.play.phrase
+
+
+def test_announce_only_on_bank_change(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, project=project)
+    eng.on_program_change(4 * 16 + 2)  # E03
+    eng.announce = None
+    eng.on_program_change(4 * 16 + 3)  # E04 : même banque
+    assert eng.announce is None
+    eng.on_program_change(5 * 16)  # F01
+    assert eng.announce is not None and eng.announce[0] == "F-MENTAL"
+
+
+def test_design_ignores_program_change_for_context(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "GROUP_A")
+    eng.on_program_change(4 * 16)  # E01 reçu en design
+    assert eng.context is not None and eng.context[0] == "A-HALF"
+    assert eng.announce is None
+    assert eng.live_sheet is not None and eng.live_sheet[0] == "E-TRIBE"

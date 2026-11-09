@@ -18,7 +18,7 @@ play:
   quantize: "1/16"         # off, 1/16, 1/8 ; GRID fait défiler
   swing: 50                  # 50-75 %, SWING + encodeur maître
   repeat: "1/16"            # division de départ du note repeat
-  phrase: 32                 # 32 ou 64 mesures ; par banque une fois les projets là (slice 6)
+  phrase: 32                 # 32 ou 64 mesures ; sans banque du projet (sinon celle de la banque, 6.B)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,

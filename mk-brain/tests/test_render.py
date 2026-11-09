@@ -130,3 +130,20 @@ def test_design_right_shows_bank_sheet(cfg: Config, project: Project) -> None:
     btn(eng, "GROUP_E")
     assert render.right(eng, 0).tobytes() != a  # fiche E-TRIBE au lieu de A-HALF
     assert render.right(design(cfg), 0).tobytes() != a  # sans projet : « pas de projet »
+
+
+def test_ascii_text_strips_accents() -> None:
+    assert render.ascii_text("Cœur du set, ça s'ouvre, bémol") == "Coeur du set, ca s'ouvre, bemol"
+
+
+def test_live_right_shows_tonic_then_announce_for_two_seconds(
+    cfg: Config, project: Project
+) -> None:
+    eng = Engine(cfg, project=project)
+    plain = render.right(eng, 0).tobytes()
+    eng.on_program_change(4 * 16)  # E01 : E-TRIBE annoncée
+    eng.tick(0)
+    announced = render.right(eng, 10 * MS).tobytes()
+    assert announced != plain
+    after = render.right(eng, 3 * SECOND).tobytes()
+    assert after not in (plain, announced)  # tonique et mode en haut à droite

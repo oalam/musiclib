@@ -145,8 +145,9 @@ def note_name(note: int) -> str:
 def describe_note(layout: Layout, pad: int, note: int) -> str:
     """Texte d'écran : track en rythmique, degré + nom MIDI sinon.
 
-    Le nom suppose la DT2 sans TUNE ; la vraie note (tonique + degré) viendra
-    avec le projet (slice 6).
+    Le nom suppose la DT2 sans TUNE. Avec un projet, la disposition part de la
+    tonique de la banque (`for_bank`) : le nom est la vraie note, et la CLI
+    affiche banque, tonique et mode devant (slice 6.B).
     """
     if layout.kind == "rythmique":
         return f"pad {pad} -> track {note + 1}"

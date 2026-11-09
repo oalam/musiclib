@@ -68,6 +68,7 @@ class _Reset:
     at_bar: int  # mesure absolue (0 = première après le Start)
     first_bar: int  # numéro donné à cette mesure dans la phrase
     pattern: str | None
+    length: int | None = None  # longueur de phrase de la nouvelle banque (slice 6.B)
 
 
 class PhraseCounter:
@@ -87,10 +88,17 @@ class PhraseCounter:
         """Le PC qui accompagne un Stop ne change rien : on oublie la remise en attente."""
         self._pending = None
 
-    def reset_next_bar(self, ticks: int, first_bar: int = 1, pattern: str | None = None) -> int:
-        """Recale le compteur : la barre suivante devient `first_bar`. Rend sa mesure absolue."""
+    def reset_next_bar(
+        self,
+        ticks: int,
+        first_bar: int = 1,
+        pattern: str | None = None,
+        length: int | None = None,
+    ) -> int:
+        """Recale le compteur : la barre suivante devient `first_bar`, avec la longueur
+        `length` si donnée (changement de banque). Rend sa mesure absolue."""
         at = ticks // TICKS_PER_BAR + 1
-        self._pending = _Reset(at, first_bar, pattern)
+        self._pending = _Reset(at, first_bar, pattern, length)
         return at
 
     @property
@@ -112,6 +120,8 @@ class PhraseCounter:
             self._origin, self._offset = p.at_bar, p.first_bar - 1
             if p.pattern is not None:
                 self.pattern = p.pattern
+            if p.length is not None:
+                self.length = p.length
             self._pending = None
         elapsed = abs_bar - self._origin + self._offset
         in_bar = ticks % TICKS_PER_BAR

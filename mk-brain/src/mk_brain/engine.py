@@ -26,6 +26,11 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   de la chromatique, sa phrase règle le compteur ; PAD MODE fait défiler les
   dispositions. Menu : boutons d'écran 1-4 = GAMME, TRACK, QUANT, PHRASE ;
   l'encodeur maître choisit, son appui valide, le même bouton ferme.
+- Slice 6.B : en live, la banque du dernier PC reçu règle le contexte
+  (`context`) : sa phrase s'applique avec la remise à 1 (tout de suite
+  transport arrêté), sa tonique et son mode s'affichent, son titre et sa
+  description s'annoncent 2 s au changement de banque (`announce`). En
+  design, le PC reste sans effet sur la banque choisie.
 """
 
 from __future__ import annotations
@@ -174,6 +179,8 @@ class Engine:
         self._requested: str | None = None  # pattern demandé par PATTERN + pad, pas encore confirmé
         self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
         self.octave = 0  # décalage d'octave du design (flèches de transport), remis à 0 par GROUP
+        # annonce d'une nouvelle banque en live : (clé, fiche, instant) ; instant posé au tick
+        self.announce: tuple[str, Bank, int | None] | None = None
 
     @property
     def design(self) -> bool:
@@ -185,6 +192,18 @@ class Engine:
         if not self.design or self.project is None or self.design_bank is None:
             return None
         return self.project.bank(self.design_bank)
+
+    @property
+    def live_sheet(self) -> tuple[str, Bank] | None:
+        """Fiche de la banque du dernier PC reçu (live), None sans PC ou hors projet."""
+        if self.project is None or self.last_program is None:
+            return None
+        return self.project.bank(self.last_program // 16)
+
+    @property
+    def context(self) -> tuple[str, Bank] | None:
+        """Banque qui règle le jeu : choisie en design, suivie par PC en live."""
+        return self.sheet if self.design else self.live_sheet
 
     @property
     def layout(self) -> Layout:
@@ -324,20 +343,34 @@ class Engine:
 
     def on_program_change(self, program: int) -> None:
         """PC reçu : banque courante, faders hors prise ; transport lancé, mesure 1 à la barre
-        suivante (arrêté : compteur inchangé)."""
+        suivante (arrêté : compteur inchangé).
+
+        En live, la banque du projet suit le PC (slice 6.B) : sa phrase s'applique avec la
+        remise (arrêté : tout de suite), son titre s'annonce si la banque change.
+        """
         if program != self.last_program:
             self.faders.pattern_changed()
         if program // 16 != self.bank:
             self.log.append(f"banque {pattern_label(program)[0]} (PC reçu)")
+        new_bank = self.last_program is None or program // 16 != self.last_program // 16
         self.last_program = program
         self.bank = program // 16
         self._requested = None  # la DT2 a répondu
+        length: int | None = None
+        if not self.design:
+            sheet = self.live_sheet
+            length = self._live_phrase()
+            if new_bank and sheet is not None:
+                self.announce = (*sheet, None)
+                self.log.append(f"{sheet[0]} : {sheet[1].title}, phrase {length}")
         label = pattern_label(program)
         ticks = self.clock.ticks_since_start
-        if ticks is None:  # arrêté : pattern changé tout de suite, compteur inchangé
+        if ticks is None:  # arrêté : pattern et phrase changés tout de suite, compteur inchangé
             self.phrase.pattern = label
+            if length is not None:
+                self.phrase.length = length
             return
-        at = self.phrase.reset_next_bar(ticks, pattern=label)
+        at = self.phrase.reset_next_bar(ticks, pattern=label, length=length)
         self.log.append(f"PC {label} -> mesure 1 à la barre {at + 1}")
 
     def _recalibrate(self, first_bar: int) -> bool:
@@ -365,11 +398,21 @@ class Engine:
             self.design_bank = self.bank if self.bank in banks else banks[0]
         self._apply_phrase()
 
+    def _live_phrase(self) -> PhraseLength:
+        """Phrase du live : celle de la banque du dernier PC, sinon la config."""
+        sheet = self.live_sheet
+        if sheet is None or self.project is None:
+            return self.cfg.play.phrase
+        return self.project.phrase(sheet[1])
+
     def _apply_phrase(self) -> None:
-        """Longueur de phrase : celle de la banque (ou du menu) en design, la config en live."""
+        """Longueur de phrase : celle de la banque (ou du menu) en design, du dernier PC en live."""
+        if not self.design:
+            self.phrase.length = self._live_phrase()
+            return
         length: PhraseLength = self.cfg.play.phrase
         sheet = self.sheet
-        if self.design and self._design_phrase is not None:
+        if self._design_phrase is not None:
             length = self._design_phrase
         elif sheet is not None and self.project is not None:
             length = self.project.phrase(sheet[1])
@@ -588,6 +631,8 @@ class Engine:
     def tick(self, now: int) -> list[Timed]:
         """Attaques dont la fenêtre de vélocité est écoulée, coups de repeat à venir."""
         self._note(self.modes.update(now, self.running))
+        if self.announce is not None and self.announce[2] is None:
+            self.announce = (self.announce[0], self.announce[1], now)
         self._update_phrase()
         window = int(self.cfg.velocity.window_ms * 1e6)
         out: list[Timed] = []

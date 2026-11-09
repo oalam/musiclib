@@ -203,6 +203,10 @@ def cmd_play(dry_run: bool, project_path: Path) -> int:
         if msgs and engine.last_played is not None:
             pad, note, vel = engine.last_played
             text = f"{describe_note(engine.layout, pad, note)} vel {vel}"
+            sheet = engine.context  # tonique et mode de la banque (slice 6.B)
+            if sheet is not None:
+                key, bank = sheet
+                text = f"{key} {bank.tonique} {cfg.scale(bank.mode).name} : {text}"
             if text != last or engine.last_decision:
                 last = text
                 print(f"{last}   {engine.last_decision}")

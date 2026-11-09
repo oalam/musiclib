@@ -22,6 +22,8 @@ la doctrine du set (`digitakt/doctrine-dt2-<set>.md`), recoupé avec le
 `library/lives/<set>.json` qu'il référence (banques, tonalités, tempos : une
 divergence est une erreur qui donne la ligne fautive). Ne pas l'éditer à la
 main : modifier la doctrine, reconvertir, commiter les deux.
+En live, la banque du dernier Program Change reçu de la DT2 donne la phrase,
+la tonique et le mode affichés ; en design, celle choisie par GROUP.
 `tests/test_convert.py` échoue si le projet commité est périmé.
 
 ## Commandes

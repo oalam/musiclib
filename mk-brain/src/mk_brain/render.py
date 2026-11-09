@@ -20,10 +20,15 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
   frappe (`Bb4 tierce mineure` sur une barre de vélocité), une alerte, le
   dernier geste ou les mutes ; à droite la fiche de la banque et la
   phrase en petit.
+- Live avec un projet (slice 6.B, provisoire jusqu'à l'essai) : tonique et
+  mode de la banque du dernier PC en haut à droite du bandeau droit ; à un
+  changement de banque, titre et description 2 s à la place du bandeau
+  (le compte à rebours garde la priorité).
 """
 
 from __future__ import annotations
 
+import unicodedata
 from typing import TYPE_CHECKING
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
@@ -38,6 +43,7 @@ if TYPE_CHECKING:
 
 OVERLAY_NS = 1_000_000_000  # frappe d'un pad, colonne touchée : 1 s
 MESSAGE_NS = 1_500_000_000  # dernier geste de contrôle dans le bandeau gauche
+ANNOUNCE_NS = 2_000_000_000  # titre et description d'une nouvelle banque (live)
 BAND = 40  # hauteur du bandeau (deux tiers supérieurs) ; faders dessous
 COLS = 4  # colonnes de fader par écran
 COL = WIDTH // COLS
@@ -73,6 +79,42 @@ def _fit(d: ImageDraw.ImageDraw, text: str, width: int, sizes: tuple[int, ...] =
         if d.textlength(text, font=font) <= width:
             return font
     return _font(sizes[-1])
+
+
+def ascii_text(text: str) -> str:
+    """Sans accents : la police de Pillow ne les a pas (`Cœur, ça` → `Coeur, ca`)."""
+    text = text.replace("œ", "oe").replace("Œ", "OE").replace("æ", "ae").replace("Æ", "AE")
+    decomposed = unicodedata.normalize("NFKD", text)
+    return "".join(c for c in decomposed if not unicodedata.combining(c))
+
+
+def _wrap(d: ImageDraw.ImageDraw, text: str, font: Font, width: int, lines: int) -> list[str]:
+    """Coupe aux mots en `lines` lignes au plus ; le reste est perdu (`...`)."""
+    out: list[str] = []
+    words = text.split()
+    while words and len(out) < lines:
+        line = words.pop(0)
+        while words and d.textlength(f"{line} {words[0]}", font=font) <= width:
+            line = f"{line} {words.pop(0)}"
+        out.append(line)
+    if words:
+        out[-1] += " ..."
+    return out
+
+
+def _announcing(engine: Engine, now: int) -> bool:
+    a = engine.announce
+    return a is not None and a[2] is not None and now - a[2] < ANNOUNCE_NS
+
+
+def _announce_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+    """Nouvelle banque : clé et titre en gras, description sur deux lignes."""
+    assert engine.announce is not None
+    key, bank, _ = engine.announce
+    _bold(d, (3, -3), ascii_text(f"{key}  {bank.title}"), _font(16), 1)
+    small = _font(SMALL)
+    for i, line in enumerate(_wrap(d, ascii_text(bank.desc), small, WIDTH - 6, 2)):
+        d.text((3, 14 + 12 * i), line, font=small, fill=1)
 
 
 def _showing_repeat(engine: Engine) -> bool:
@@ -198,7 +240,7 @@ def _design_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
         key, bank = sheet
         _bold(d, (3, -3), f"{key}  {bank.tempo:g}{octave}", mid, 1)
         tonic, mode = FLAT_NAMES[bank.tonic], engine.cfg.scale(bank.mode).name
-        d.text((3, 12), f"{tonic} {mode} - {bank.title}", font=small, fill=1)
+        d.text((3, 12), ascii_text(f"{tonic} {mode} - {bank.title}"), font=small, fill=1)
     st = engine.phrase_state
     length = engine.phrase.length
     bar = "--" if st is None else str(st.bar)
@@ -239,7 +281,7 @@ def _left_band(
         _mute_strip(d, engine)
 
 
-def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
     small = _font(SMALL)
     st = engine.phrase_state
     if st is not None and st.countdown is not None:  # bandeau inversé, compte à rebours
@@ -250,9 +292,19 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
         d.text((WIDTH // 2 + 8, 4), f"to {st.cap}", font=_font(16), fill=0)
         d.text((WIDTH // 2 + 8, 22), f"{st.bar} / {st.length}", font=_font(16), fill=0)
         return
+    if _announcing(engine, now):
+        _announce_band(d, engine)
+        return
     bar = "--" if st is None else str(st.bar)
     _bold(d, (3, -4), f"{bar} / {engine.phrase.length}", _font(BAR), 1)
-    if st is not None:
+    sheet = engine.context
+    if sheet is not None:  # tonique et mode de la banque en haut, phrase et cap dessous
+        bank = sheet[1]
+        tonic = f"{FLAT_NAMES[bank.tonic]} {engine.cfg.scale(bank.mode).name}"
+        _bold(d, (150, -3), tonic, small, 1)
+        if st is not None:
+            d.text((150, 9), f"ph {st.phrase}  -{st.to_cap} to {st.cap}", font=small, fill=1)
+    elif st is not None:
         d.text((150, -3), f"phrase {st.phrase}", font=small, fill=1)
         d.text((150, 9), f"-{st.to_cap} to {st.cap}", font=small, fill=1)
     # barre : une case par mesure, séparateurs tous les 8 ; 4 dernières en vidéo inverse
@@ -341,7 +393,7 @@ def right(engine: Engine, now: int) -> Image.Image:
     elif engine.design:
         _design_right(d, engine)
     else:
-        _right_band(d, engine)
+        _right_band(d, engine, now)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
     _faders(d, engine, now, 1)
     return img
