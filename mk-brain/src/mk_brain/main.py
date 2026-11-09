@@ -1,4 +1,4 @@
-"""CLI mk-brain. Slice 0 : `mk-brain spike`, banc d'essai HID de la MK2."""
+"""CLI mk-brain : `spike` (slice 0, banc d'essai HID), `play` (slice 1, relais pads → DT2)."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import sys
 import time
 
 from mk_brain import display
+from mk_brain.config import ConfigError
 from mk_brain.hid_mk2 import (
     BUTTON_LEDS,
     BUTTONS,
@@ -26,6 +27,7 @@ from mk_brain.hid_mk2 import (
     enumerate_mk2,
     pad_label,
 )
+from mk_brain.midi_io import MidiError
 
 RAINBOW: list[tuple[int, int, int]] = [
     (255, 0, 0), (255, 128, 0), (255, 255, 0), (0, 255, 0),
@@ -157,6 +159,67 @@ def cmd_spike(chase: bool, raw: bool, step_s: float) -> int:
     return 0
 
 
+def cmd_play(dry_run: bool) -> int:
+    from mk_brain.config import load_config
+    from mk_brain.engine import Engine, MidiOut, NoteOn
+    from mk_brain.midi_io import Dt2Out
+
+    cfg = load_config()
+    engine = Engine(cfg)
+    decoder = InputDecoder(pad_threshold=cfg.velocity.threshold)
+    out = None if dry_run else Dt2Out.open(cfg.midi.port_hint)
+    dev = Mk2Device.open()
+    last = "-"
+    screen_dirty, last_draw = True, 0.0
+
+    def emit(msgs: list[MidiOut]) -> None:
+        nonlocal last, screen_dirty
+        for m in msgs:
+            if out is not None:
+                out.send(m)
+            if isinstance(m, NoteOn):
+                last = f"note {m.note} vel {m.velocity} ch {m.channel + 1}"
+                print(last)
+                screen_dirty = True
+
+    print(f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; Ctrl-C")
+    try:
+        _show(dev, 1, display.new_image())
+        while True:
+            report = dev.read(timeout_ms=1)
+            now = time.perf_counter()
+            group = engine.group
+            for ev in decoder.feed(report):
+                emit(engine.handle(ev, now))
+            emit(engine.tick(now))
+            if engine.group != group:
+                screen_dirty = True
+            if engine.leds_dirty:
+                dev.send_leds(engine.leds())
+            if screen_dirty and now - last_draw > 0.05:
+                lay = cfg.layouts[engine.group]
+                lines = [
+                    f"mk-brain  slice 1  {'ESSAI' if dry_run else 'DT2'}",
+                    f"groupe {lay.group}  {lay.name}",
+                    f"canal {cfg.midi.auto_channel}",
+                    last,
+                ]
+                _show(dev, 0, display.text_image(lines))
+                screen_dirty, last_draw = False, now
+    except KeyboardInterrupt:
+        pass
+    finally:
+        try:
+            dev.send_leds(LedState.off())
+            for s in range(display.N_DISPLAYS):
+                _show(dev, s, display.new_image())
+        finally:
+            dev.close()
+            if out is not None:
+                out.close()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="mk-brain")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -165,12 +228,16 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--no-chase", action="store_true", help="sauter le balayage des LED")
     sp.add_argument("--raw", action="store_true", help="afficher les rapports bruts en hexa")
     sp.add_argument("--step", type=float, default=0.15, help="pas du balayage LED (s)")
+    pp = sub.add_parser("play", help="slice 1 : pads → notes DT2 sur l'AUTO CHANNEL")
+    pp.add_argument("--dry-run", action="store_true", help="sans DT2 : notes affichées seulement")
     args = parser.parse_args(argv)
     try:
         if args.cmd == "list":
             return cmd_list()
+        if args.cmd == "play":
+            return cmd_play(dry_run=args.dry_run)
         return cmd_spike(chase=not args.no_chase, raw=args.raw, step_s=args.step)
-    except Mk2Error as exc:
+    except (Mk2Error, ConfigError, MidiError) as exc:
         print(f"erreur : {exc}", file=sys.stderr)
         return 2
 

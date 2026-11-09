@@ -11,12 +11,18 @@ python3.12 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 ```
 
+## Configuration
+
+`config/default.yaml` : canal, courbe de vélocité, couleurs, dispositions A-H.
+
 ## Commandes
 
 ```bash
 .venv/bin/mk-brain list               # interfaces HID de la MK2
 .venv/bin/mk-brain spike              # mire, balayage LED, écho des contrôles, bilan à Ctrl-C
 .venv/bin/mk-brain spike --raw --no-chase   # + rapports bruts en hexa
+.venv/bin/mk-brain play               # pads → DT2 (AUTO CHANNEL), GROUP A-H = disposition
+.venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 ```
 
 ## Tests

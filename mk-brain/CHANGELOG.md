@@ -3,6 +3,27 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [Non publié]
+
+### Ajouté
+
+- [1] `config/default.yaml` et `config.py` (Pydantic, `ConfigError`) :
+  AUTO CHANNEL, courbe de vélocité, couleurs des rôles, des familles et
+  des 16 tracks, dispositions A-H du template DT2 Pads.
+- [1] `layouts.py` : note et couleur de chaque pad (rythmique pad n =
+  track n, chromatique, gammes), courbe pression → vélocité.
+- [1] `engine.py` : moteur pur, vélocité = pression maximale sur une
+  fenêtre de 2 ms après l'attaque, note off sur la note réellement jouée,
+  LED vives à la frappe et atténuées au repos ; GROUP A-H choisit la
+  disposition (provisoire, à revoir à la slice 5).
+- [1] `midi_io.py` (mido + python-rtmidi, `MidiError`) et
+  `mk-brain play [--dry-run]`.
+
+### Modifié
+
+- [1] Disposition A : pad n = track n sur les 16 pads (décision « Pads en
+  live »), au lieu des tracks 1-8 doublées du template 7.D.
+
 ## [0.1.0] - 2026-11-09
 
 ### Ajouté

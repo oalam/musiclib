@@ -302,7 +302,8 @@ mkbrain:
 
 - Reprise des groupes A-H de `DT2 Pads.ncm2` (table dans
   `digitakt/kb/controleur-maschine.md`) en données YAML :
-  - A : notes 0-15 sur l'AUTO CHANNEL = tracks 1-16, pads 9-16 en doublon ;
+  - A : notes 0-15 sur l'AUTO CHANNEL = tracks 1-16, pad n = track n (les
+    doublons 9-16 du template 7.D sont abandonnés, cf. Pads en live) ;
   - B : chromatique ;
   - C-H : modes à partir de 60.
 - Couleurs reprises : tonique rouge, tierce jaune, quinte verte, groupe A
@@ -524,13 +525,13 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slice 0 faite le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slice 0 faite le 2026-11-09, slice 1 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
 |---|---|---|---|
 | 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
-| 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-8, les groupes changent de gamme, LED justes | à venir |
+| 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | en cours : code prêt (`mk-brain play`), essai sur la DT2 à faire |
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | à venir |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
