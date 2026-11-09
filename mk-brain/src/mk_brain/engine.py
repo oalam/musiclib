@@ -85,6 +85,7 @@ class Engine:
         self._pressure: dict[int, int] = {}
         self.leds_dirty = True
         self.last_played: tuple[int, int, int] | None = None  # (pad, note, vélocité)
+        self.last_decision = ""  # diagnostic quantize : position de la frappe et décision
 
     @property
     def repeat_active(self) -> bool:
@@ -193,11 +194,15 @@ class Engine:
             self._repeats[pad] = _Repeat(note, pos)
             return self.tick(now)
         target = now
+        self.last_decision = f"frappe {ticks:.1f} ticks, Qoff"
         if self.quantize != "off":
             pos, immediate = nearest(ticks, GRID_TICKS[self.quantize])
             t = self._time_of(pos)
             if not immediate and t is not None:
                 target = max(now, t)
+            ms = (ticks - pos) * (self.clock.period_ns or 0) / 1e6
+            verdict = "immédiat" if immediate else "retardé"
+            self.last_decision = f"frappe {ticks:.1f} -> pas {pos:.0f} ({ms:+.0f} ms) {verdict}"
         self._sounding[pad] = (note, target)
         return [(target, NoteOn(self.channel, note, vel))]
 

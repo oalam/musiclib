@@ -193,9 +193,10 @@ def cmd_play(dry_run: bool) -> int:
         if msgs and engine.last_played is not None:
             pad, note, vel = engine.last_played
             text = f"{describe_note(cfg.layouts[engine.group], pad, note)} vel {vel}"
-            if text != last:
+            if text != last or engine.last_decision:
                 last = text
-                print(last)
+                print(f"{last}   {engine.last_decision}")
+                engine.last_decision = ""
 
     print(f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; Ctrl-C")
     try:
