@@ -20,6 +20,7 @@ play:
   repeat: "1/16"            # division de départ du note repeat
   phrase: 32                 # 32 ou 64 mesures ; sans banque du projet (sinon celle de la banque, 6.B)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
+  mode: design               # mode au démarrage : live (scène) ou design (préparation)
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09).

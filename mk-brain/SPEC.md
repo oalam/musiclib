@@ -191,9 +191,11 @@ la slice 7**.
 - **Changer de mode** : SHIFT + CONTROL maintenu 1 s. L'écran droit affiche
   une confirmation (`→ DESIGN ? encodeur maître`). Désactivé en live tant
   que le transport tourne.
-- **Mode au chargement** : live. Un projet peut en imposer un autre
-  (`demarrage: design`, au niveau du projet) pour les séances de
-  préparation. La clé `mode` est réservée au mode musical d'une banque.
+- **Mode au chargement** : `play.mode` de `config/default.yaml`,
+  **design** depuis le 2026-11-09 (période de préparation, demande
+  utilisateur) ; repasser à `live` pour la scène. Remplace l'idée d'un
+  `demarrage: design` par projet. La clé `mode` d'une banque reste le mode
+  musical.
 - Le Pi ne sait pas si la DT2 est en LIVE REC (rien n'est transmis). Le mode
   design le rappelle à l'écran (`DT2 en LIVE REC ?`) au premier mouvement
   d'encodeur.
@@ -398,8 +400,8 @@ l'essai sur la MK2 :
 - **noms de samples à la frappe reportés** (décidé le 2026-11-09) : le
   lives JSON ne dit pas quel sample est sur quelle track hors `0-KIT`, et
   le sample d'une track change d'un pattern à l'autre (cf. Questions
-  ouvertes) ; `demarrage: design` pas encore ajouté au front matter (pas
-  de besoin pour solaris).
+  ouvertes) ; le mode de démarrage est réglé par la config (`play.mode`),
+  pas par projet.
 
 ## Comportements
 

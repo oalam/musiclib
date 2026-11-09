@@ -220,7 +220,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
                 engine.last_decision = ""
 
     print(
-        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; mode live ; "
+        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; mode {engine.modes.mode} ; "
         "SHIFT + CONTROL 1 s puis appui maître = changer de mode ; SHIFT + BROWSE = projet ; "
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )

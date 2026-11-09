@@ -158,7 +158,7 @@ class Engine:
         self.menu_choice = 0  # valeur en cours de choix à l'encodeur maître
         self.clock = clock or ClockTracker()
         self.channel = cfg.midi.auto_channel - 1
-        self.modes = ModeSwitch()
+        self.modes = ModeSwitch(cfg.play.mode)
         self.group = DESIGN_GROUP  # disposition du mode design (en live : rythmique)
         self._quantize: dict[str, QuantizeMode] = {"live": cfg.play.quantize, "design": "off"}
         self._rec_hint = False  # rappel « DT2 en LIVE REC ? » déjà donné dans ce passage en design
@@ -193,6 +193,8 @@ class Engine:
         self.octave = 0  # décalage d'octave du design (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque en live : (clé, fiche, instant) ; instant posé au tick
         self.announce: tuple[str, Bank, int | None] | None = None
+        if self.design:  # démarrage en design (`play.mode`)
+            self._enter_design()
 
     @property
     def design(self) -> bool:

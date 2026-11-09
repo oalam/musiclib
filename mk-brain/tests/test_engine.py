@@ -671,3 +671,11 @@ def test_start_in_live_closes_selection(cfg: Config, project: Project) -> None:
     eng.clock = running_clock()
     eng.tick(0)
     assert eng.selector is None
+
+
+def test_start_mode_from_config(cfg: Config, project: Project) -> None:
+    start = cfg.model_copy(update={"play": cfg.play.model_copy(update={"mode": "design"})})
+    eng = Engine(start, project=project)
+    assert eng.design and eng.quantize == "off"
+    assert eng.sheet is not None and eng.sheet[0] == "A-HALF"  # première banque du projet
+    assert Engine(start).design  # sans projet aussi

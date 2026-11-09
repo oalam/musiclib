@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.14.1] - 2026-11-09
+
+### Modifié
+
+- [6] Mode au démarrage réglable (`play.mode` de `config/default.yaml`),
+  **design** par défaut pendant la préparation ; `live` pour la scène.
+  Remplace le `demarrage: design` par projet prévu par la SPEC.
+
 ## [0.14.0] - 2026-11-09
 
 ### Ajouté
