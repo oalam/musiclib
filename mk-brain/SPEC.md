@@ -406,17 +406,24 @@ mkbrain:
 **Couleurs des pads en mode design** (décidé le 2026-11-09), calculées
 depuis la tonique et le mode de la banque :
 
-| Rôle de la note | Couleur |
-|---|---|
-| Tonique | rouge |
-| Tierce (mineure ou majeure) | jaune |
-| Quinte | vert |
-| Autres degrés de la gamme | couleur de la famille du mode (bleu pour les modes mineurs, violet pour le phrygien dominant) |
-| Hors gamme (« interdite ») | blanc |
+| Rôle de la note | Chromatique (B) | Gamme (C-H) |
+|---|---|---|
+| Tonique | rouge | rouge |
+| Tierce (mineure ou majeure) | blanc | jaune |
+| Quinte | blanc | vert |
+| Autres degrés de la gamme | blanc | bleu (une seule famille `gamme`) |
+| Hors gamme | éteint au repos, blanc à la frappe | — (absent) |
 
+- **Révisé le 2026-11-09 (après la 5.D)** : en chromatique, seule la
+  tonique est en couleur ; la gamme se lit par les pads allumés, le hors
+  gamme éteint reste jouable. Distinction mineur / majeur supprimée : elle
+  ne disait que la tierce du phrygien dominant, la disposition gamme est
+  la même pour tous les modes, seules les notes changent. Piste écartée
+  pour l'instant : marquer la note caractéristique du mode (♭2 phrygien,
+  6 dorien…).
 - Disposition par défaut en design : **chromatique** (16 demi-tons à partir
-  de la tonique), pour que les notes hors gamme restent jouables mais
-  visibles en blanc. Les dispositions « gamme seule » restent dans le menu.
+  de la tonique), pour que les notes hors gamme restent jouables.
+  Les dispositions « gamme seule » restent dans le menu.
 - Pad frappé : couleur vive ; au repos : atténuée.
 
 **Mode accords (design, piste à explorer)** : un pad = un degré de la gamme

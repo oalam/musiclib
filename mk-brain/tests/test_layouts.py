@@ -30,10 +30,11 @@ def test_colors_by_role(cfg: Config) -> None:
     assert pad_color(cfg, c, 1) == cfg.roles.tonique
     assert pad_color(cfg, c, 3) == cfg.roles.tierce  # 63
     assert pad_color(cfg, c, 5) == cfg.roles.quinte  # 67
-    assert pad_color(cfg, c, 2) == cfg.families["mineur"]
-    assert pad_color(cfg, b, 2) == cfg.roles.hors_gamme  # 61 en chromatique
+    assert pad_color(cfg, c, 2) == cfg.families["gamme"]
+    assert pad_color(cfg, b, 1) == cfg.roles.tonique
+    assert pad_color(cfg, b, 4) == cfg.families["chromatique"]  # 63 : pas de tierce en chromatique
     assert pad_color(cfg, g, 3) == cfg.roles.tierce  # tierce majeure 64
-    assert pad_color(cfg, g, 2) == cfg.families["majeur"]
+    assert pad_color(cfg, g, 2) == cfg.families["gamme"]  # plus de famille majeure
     assert pad_color(cfg, cfg.layouts[0], 1) == cfg.track_colors[1]
 
 
@@ -62,13 +63,14 @@ def test_chromatic_follows_bank_scale(cfg: Config) -> None:
     from mk_brain.layouts import for_bank
 
     chroma = for_bank(cfg.layouts[1], cfg.scale("eolien"), 10)  # la# mineur
+    from mk_brain.layouts import in_scale
+
     assert pad_note(chroma, 1) == 70  # A#4 : tonique dans l'octave de C5
     assert pad_color(cfg, chroma, 1) == cfg.roles.tonique
-    assert pad_color(cfg, chroma, 2) == cfg.roles.hors_gamme  # B : seconde mineure
-    assert pad_color(cfg, chroma, 4) == cfg.roles.tierce  # C# : tierce mineure
-    assert pad_color(cfg, chroma, 5) == cfg.roles.hors_gamme  # D : tierce majeure, hors gamme
-    assert pad_color(cfg, chroma, 8) == cfg.roles.quinte  # F
-    assert pad_color(cfg, chroma, 3) == cfg.families["mineur"]  # C : seconde
+    white = cfg.families["chromatique"]
+    assert [pad_color(cfg, chroma, p) for p in (2, 4, 8)] == [white] * 3  # seule la tonique
+    assert [in_scale(chroma, p) for p in (2, 3, 4, 5, 8)] == [False, True, True, False, True]
+    assert in_scale(cfg.layouts[1], 2)  # sans banque : tout dans la gamme
 
 
 def test_scale_layout_moves_to_tonic_rhythm_untouched(cfg: Config) -> None:

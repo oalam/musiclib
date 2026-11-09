@@ -412,7 +412,12 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     assert eng.last_control == "E-TRIBE  A# phrygien"
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 70, 127))]  # chromatique depuis A#
     leds = eng.leds()
-    assert leds.groups[4] == cfg.families["mineur"]
+    assert leds.groups[4] == cfg.families["gamme"]
+    from mk_brain.hid_mk2 import pad_label
+
+    by_pad = {pad_label(i): rgb for i, rgb in enumerate(leds.pads)}
+    assert by_pad[3] == (0, 0, 0)  # C : seconde majeure, hors la# phrygien, éteinte au repos
+    assert by_pad[2] != (0, 0, 0)  # B : ♭2, dans la gamme
     assert leds.groups[7] == (0, 0, 0)  # pas de banque H
     btn(eng, "GROUP_H")
     assert (eng.design_bank, eng.last_control) == (4, "pas de banque H")

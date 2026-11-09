@@ -46,7 +46,7 @@ from mk_brain.hid_mk2 import (
     PadEvent,
     pad_label,
 )
-from mk_brain.layouts import N_PADS, for_bank, pad_color, pad_note, scale, velocity
+from mk_brain.layouts import N_PADS, for_bank, in_scale, pad_color, pad_note, scale, velocity
 from mk_brain.modes import ModeSwitch
 from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseLength, PhraseState, pattern_label
 from mk_brain.project import Bank, Project
@@ -613,8 +613,8 @@ class Engine:
                 pads[index] = full
             elif pad == self.track and not self.design:  # live : track des encodeurs repérée
                 pads[index] = scale(full, self.cfg.leds.selected)
-            else:
-                pads[index] = scale(full, dim)
+            else:  # repos ; hors gamme de la chromatique éteint
+                pads[index] = scale(full, dim if in_scale(layout, pad) else 0)
         st = self.phrase_state
         if "PATTERN" in held:  # PATTERN tenu : les GROUP montrent la banque
             white = self.cfg.families["chromatique"]

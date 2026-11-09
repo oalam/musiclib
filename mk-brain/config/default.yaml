@@ -41,19 +41,19 @@ leds:
   selected: 0.5              # live : pad de la track sélectionnée (encodeurs), entre repos et frappe
   phrase: [0, 255, 0]        # LED GROUP du compteur de phrases (transport lancé)
 
-# Couleurs des rôles de note (dispositions B-H)
+# Couleurs des rôles de note : tonique partout (B-H), tierce et quinte en gamme (C-H)
 roles:
   tonique: [255, 0, 0]
   tierce: [255, 200, 0]
   quinte: [0, 255, 0]
-  hors_gamme: [255, 255, 255]
 
-# Couleur des autres degrés et du bouton GROUP, par famille
+# Couleur des autres notes et du bouton GROUP, par famille :
+# chromatique = notes de la gamme (hors gamme éteint au repos, blanc à la frappe),
+# gamme = autres degrés des dispositions C-H (une seule famille, 2026-11-09)
 families:
   rythmique: [255, 80, 0]
   chromatique: [255, 255, 255]
-  mineur: [0, 60, 255]
-  majeur: [170, 0, 255]
+  gamme: [0, 60, 255]
 
 # Disposition rythmique : couleur de chaque track (grille doctrine §1, révisée 2026-11-07)
 track_colors:
@@ -100,9 +100,9 @@ track_names:
 layouts:
   - {group: A, name: Rythmique, kind: rythmique, family: rythmique}
   - {group: B, name: Chromatique, kind: chromatique, mode: chromatique, base: 60, family: chromatique}
-  - {group: C, name: Eolien, kind: gamme, mode: eolien, base: 60, intervals: [0, 2, 3, 5, 7, 8, 10], family: mineur}
-  - {group: D, name: Phrygien, kind: gamme, mode: phrygien, base: 60, intervals: [0, 1, 3, 5, 7, 8, 10], family: mineur}
-  - {group: E, name: Dorien, kind: gamme, mode: dorien, base: 60, intervals: [0, 2, 3, 5, 7, 9, 10], family: mineur}
-  - {group: F, name: Mineur harm., kind: gamme, mode: mineur-harmonique, base: 60, intervals: [0, 2, 3, 5, 7, 8, 11], family: mineur}
-  - {group: G, name: Phryg. dom., kind: gamme, mode: phrygien-dominant, base: 60, intervals: [0, 1, 4, 5, 7, 8, 10], family: majeur}
-  - {group: H, name: Penta mineure, kind: gamme, mode: penta-mineure, base: 60, intervals: [0, 3, 5, 7, 10], family: mineur}
+  - {group: C, name: Eolien, kind: gamme, mode: eolien, base: 60, intervals: [0, 2, 3, 5, 7, 8, 10], family: gamme}
+  - {group: D, name: Phrygien, kind: gamme, mode: phrygien, base: 60, intervals: [0, 1, 3, 5, 7, 8, 10], family: gamme}
+  - {group: E, name: Dorien, kind: gamme, mode: dorien, base: 60, intervals: [0, 2, 3, 5, 7, 9, 10], family: gamme}
+  - {group: F, name: Mineur harm., kind: gamme, mode: mineur-harmonique, base: 60, intervals: [0, 2, 3, 5, 7, 8, 11], family: gamme}
+  - {group: G, name: Phryg. dom., kind: gamme, mode: phrygien-dominant, base: 60, intervals: [0, 1, 4, 5, 7, 8, 10], family: gamme}
+  - {group: H, name: Penta mineure, kind: gamme, mode: penta-mineure, base: 60, intervals: [0, 3, 5, 7, 10], family: gamme}

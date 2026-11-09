@@ -82,10 +82,9 @@ class Roles(BaseModel):
     tonique: RGB
     tierce: RGB
     quinte: RGB
-    hors_gamme: RGB
 
 
-Family = Literal["rythmique", "chromatique", "mineur", "majeur"]
+Family = Literal["rythmique", "chromatique", "gamme"]
 Mode = Literal[
     "eolien",
     "phrygien",

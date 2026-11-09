@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.9.1] - 2026-11-09
+
+### Modifié
+
+- [5] 5.D Couleurs du design : en chromatique, seule la tonique est en
+  couleur (rouge), les notes de la gamme en blanc, le hors gamme éteint au
+  repos et blanc à la frappe ; familles `mineur` / `majeur` fusionnées en
+  `gamme` (bleu), rôle `hors_gamme` retiré de la config.
+
 ## [0.9.0] - 2026-11-09
 
 ### Ajouté
