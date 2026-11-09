@@ -87,7 +87,36 @@ def velocity(cfg: VelocityConfig, pressure: int) -> int:
 
 
 DEGREES = ("T", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7")
+DEGREE_NAMES = (
+    "tonique",
+    "seconde mineure",
+    "seconde",
+    "tierce mineure",
+    "tierce majeure",
+    "quarte",
+    "triton",
+    "quinte",
+    "sixte mineure",
+    "sixte",
+    "septième mineure",
+    "septième majeure",
+)
 NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+FLAT_NAMES = ("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B")  # écrans
+
+
+def flat_note(note: int) -> str:
+    """Nom à l'écran, en bémols comme la doctrine (B♭) : 70 → `Bb4` (60 = C5)."""
+    return f"{FLAT_NAMES[note % 12]}{note // 12}"
+
+
+def degree_name(layout: Layout, note: int) -> str:
+    """Place de la note dans la gamme, depuis la tonique (`base`) ; hors gamme signalé."""
+    degree = (note - layout.base) % 12
+    name = DEGREE_NAMES[degree]
+    if layout.kind == "chromatique" and layout.intervals and degree not in layout.intervals:
+        name += ", hors gamme"
+    return name
 
 
 def note_name(note: int) -> str:

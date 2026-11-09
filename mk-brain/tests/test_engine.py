@@ -443,24 +443,25 @@ def test_design_starts_on_dt2_bank(cfg: Config, project: Project) -> None:
 
 def test_menu_choose_and_validate(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "DISPLAY_2")  # GAMME
-    assert eng.leds().buttons["DISPLAY_2"] > eng.leds().buttons["DISPLAY_1"]
+    btn(eng, "DISPLAY_1")  # GAMME
+    assert eng.leds().buttons["DISPLAY_1"] > eng.leds().buttons["DISPLAY_2"]
+    assert "DISPLAY_5" not in eng.leds().buttons  # 4 entrées, plus de BANK
     turn_master(eng, 2)
-    assert eng.menu_view()[1] == ("GAMME", "Phrygien", True)
+    assert eng.menu_view()[0] == ("GAMME", "Phrygien", True)
     assert eng.layout.group == "B"  # rien d'appliqué avant l'appui
     btn(eng, "MASTER_PUSH")
-    assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "GAMME Phrygien")
-    btn(eng, "DISPLAY_1")  # BANK : A → B, borné aux banques du projet
+    assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "Phrygien")
+    btn(eng, "DISPLAY_3")  # QUANT : borné à la dernière valeur
     turn_master(eng, 9)
     btn(eng, "MASTER_PUSH")
-    assert eng.design_bank == 5 and eng.sheet is not None and eng.sheet[0] == "F-MENTAL"
+    assert (eng.quantize, eng.last_control) == ("1/8", "Q 1/8")
 
 
 def test_menu_same_button_closes_without_applying(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "DISPLAY_3")  # TRACK
+    btn(eng, "DISPLAY_2")  # TRACK
     turn_master(eng, 4)
-    btn(eng, "DISPLAY_3")
+    btn(eng, "DISPLAY_2")
     btn(eng, "MASTER_PUSH")
     assert (eng.menu, eng.track) == (None, 1)
     btn(eng, "DISPLAY_7")  # pas d'entrée : rien d'ouvert
@@ -469,13 +470,13 @@ def test_menu_same_button_closes_without_applying(cfg: Config, project: Project)
 
 def test_menu_phrase_design_only(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "DISPLAY_5")
+    btn(eng, "DISPLAY_4")  # PHRASE
     turn_master(eng, 1)
     btn(eng, "MASTER_PUSH")
     assert eng.phrase.length == 64
     btn(eng, "GROUP_C")  # nouvelle banque : sa phrase
     assert eng.phrase.length == project.defaults.phrase
-    btn(eng, "DISPLAY_5")
+    btn(eng, "DISPLAY_4")  # PHRASE
     turn_master(eng, 1)
     btn(eng, "MASTER_PUSH")
     btn(eng, "SHIFT")
@@ -483,3 +484,10 @@ def test_menu_phrase_design_only(cfg: Config, project: Project) -> None:
     eng.tick(3 * SECOND)
     btn(eng, "MASTER_PUSH")  # retour en live : la phrase de la config
     assert not eng.design and eng.phrase.length == cfg.play.phrase
+
+
+def test_hit_kept_with_note_for_screen(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "GROUP_E")
+    press(eng, 0, pressure=2500)
+    assert eng.last_hit is not None and eng.last_hit[1:3] == (70, 127)

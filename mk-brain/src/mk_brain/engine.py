@@ -24,8 +24,8 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
 - Slice 5.D : design avec un projet (`project.py`). GROUP A-H = banque du
   projet : sa tonique cale les dispositions, sa gamme marque le hors gamme
   de la chromatique, sa phrase règle le compteur ; PAD MODE fait défiler les
-  dispositions. Menu : boutons d'écran 1-5 = BANK, GAMME, TRACK, QUANT,
-  PHRASE ; l'encodeur maître choisit, son appui valide, le même bouton ferme.
+  dispositions. Menu : boutons d'écran 1-4 = GAMME, TRACK, QUANT, PHRASE ;
+  l'encodeur maître choisit, son appui valide, le même bouton ferme.
 """
 
 from __future__ import annotations
@@ -94,7 +94,7 @@ MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
 LIVE_GROUP = 0  # disposition rythmique, imposée en live
 DESIGN_GROUP = 1  # chromatique, disposition de départ en design
 MODE_KEYS = ("SHIFT", "CONTROL", "MASTER_PUSH")  # n'annulent pas une bascule proposée
-MENU = ("BANK", "GAMME", "TRACK", "QUANT", "PHRASE")  # design : boutons d'écran 1-5
+MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # design : boutons d'écran 1-4 (banque : GROUP)
 PHRASES: tuple[PhraseLength, ...] = (32, 64)
 Timed = tuple[int, MidiOut]
 
@@ -151,7 +151,7 @@ class Engine:
         self.last_control = ""  # dernier geste de contrôle, pour l'écran
         self._consumed: set[int] = set()  # pads frappés avec un modificateur
         self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
-        self.last_hit: tuple[int, int, int] | None = None  # (pad, vélocité, instant) pour l'écran
+        self.last_hit: tuple[int, int, int, int] | None = None  # (pad, note, vélocité, instant)
         self._requested: str | None = None  # pattern demandé par PATTERN + pad, pas encore confirmé
 
     @property
@@ -357,12 +357,6 @@ class Engine:
     def _menu_items(self, entry: int) -> tuple[list[str], int, Callable[[int], None]]:
         """Valeurs d'une entrée du menu, index de la valeur en cours, application."""
         name = MENU[entry]
-        if name == "BANK":
-            found = self._banks()
-            banks = [i for i, _, _ in found]
-            labels = [key for _, key, _ in found]
-            cur = banks.index(self.design_bank) if self.design_bank in banks else 0
-            return labels, cur, lambda i: self._choose_bank(banks[i])
         if name == "GAMME":
             labels = [lay.name for lay in self.cfg.layouts]
             return labels, self.group, lambda i: setattr(self, "group", i)
@@ -371,7 +365,7 @@ class Engine:
             labels = [f"T{t:02d} {names.get(t, '')}".rstrip() for t in range(1, 17)]
             return labels, self.track - 1, lambda i: setattr(self, "track", i + 1)
         if name == "QUANT":
-            labels = list(QUANTIZE_CYCLE)
+            labels = [f"Q {q}" for q in QUANTIZE_CYCLE]
             cur = QUANTIZE_CYCLE.index(self.quantize)
             return labels, cur, lambda i: setattr(self, "quantize", QUANTIZE_CYCLE[i])
 
@@ -379,7 +373,7 @@ class Engine:
             self._design_phrase = PHRASES[i]
             self._apply_phrase()
 
-        return [str(n) for n in PHRASES], PHRASES.index(self.phrase.length), phrase
+        return [f"{n} mes" for n in PHRASES], PHRASES.index(self.phrase.length), phrase
 
     def menu_view(self) -> list[tuple[str, str, bool]]:
         """Pour l'écran : (entrée, valeur affichée, ouverte) ; ouverte = choix en cours."""
@@ -404,8 +398,7 @@ class Engine:
         entry, self.menu = self.menu, None
         labels, _, apply = self._menu_items(entry)
         apply(self.menu_choice)
-        if MENU[entry] != "BANK":  # la banque a son propre message
-            self.last_control = f"{MENU[entry]} {labels[self.menu_choice]}"
+        self.last_control = labels[self.menu_choice]
 
     def _switch_mode(self, name: str, now: int) -> bool:
         """Bascule de mode : SHIFT + CONTROL tenus, appui maître = confirmer. True si consommé."""
@@ -564,7 +557,7 @@ class Engine:
         note = pad_note(self.layout, pad)
         vel = velocity(self.cfg.velocity, att.peak)
         self.last_played = (pad, note, vel)
-        self.last_hit = (pad, vel, now)
+        self.last_hit = (pad, note, vel, now)
         ticks = self.clock.ticks_at(att.start)  # instant de la frappe, pas de la fin de fenêtre
         if ticks is None:  # transport arrêté : immédiat, pas de repeat
             self._sounding[pad] = (note, now)

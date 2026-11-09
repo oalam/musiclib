@@ -99,10 +99,10 @@ track_names:
 # les dispositions se calent sur la tonique de la banque, la chromatique sur sa gamme
 layouts:
   - {group: A, name: Rythmique, kind: rythmique, family: rythmique}
-  - {group: B, name: Chromatique, kind: chromatique, mode: chromatique, base: 60, family: chromatique}
+  - {group: B, name: Chroma, kind: chromatique, mode: chromatique, base: 60, family: chromatique}
   - {group: C, name: Eolien, kind: gamme, mode: eolien, base: 60, intervals: [0, 2, 3, 5, 7, 8, 10], family: gamme}
   - {group: D, name: Phrygien, kind: gamme, mode: phrygien, base: 60, intervals: [0, 1, 3, 5, 7, 8, 10], family: gamme}
   - {group: E, name: Dorien, kind: gamme, mode: dorien, base: 60, intervals: [0, 2, 3, 5, 7, 9, 10], family: gamme}
-  - {group: F, name: Mineur harm., kind: gamme, mode: mineur-harmonique, base: 60, intervals: [0, 2, 3, 5, 7, 8, 11], family: gamme}
+  - {group: F, name: Min. harm., kind: gamme, mode: mineur-harmonique, base: 60, intervals: [0, 2, 3, 5, 7, 8, 11], family: gamme}
   - {group: G, name: Phryg. dom., kind: gamme, mode: phrygien-dominant, base: 60, intervals: [0, 1, 4, 5, 7, 8, 10], family: gamme}
-  - {group: H, name: Penta mineure, kind: gamme, mode: penta-mineure, base: 60, intervals: [0, 3, 5, 7, 10], family: gamme}
+  - {group: H, name: Penta min., kind: gamme, mode: penta-mineure, base: 60, intervals: [0, 3, 5, 7, 10], family: gamme}

@@ -240,7 +240,7 @@ la slice 7**.
   - le mode d'une banque désigne la disposition qui porte ses intervalles
     (clé `mode` des dispositions B-H, `config/default.yaml`, un seul hub) ;
   - GROUP A-H = banque : départ des dispositions sur la tonique dans
-    l'octave de C5 (la# → A#4, note 70), chromatique avec la gamme de la
+    l'octave de C5 (la# → A#5, note 70), chromatique avec la gamme de la
     banque (hors gamme en blanc, avant les rôles : la tierce majeure d'un
     mode mineur est blanche), phrase de la banque au compteur (en live, la
     config jusqu'à la slice 6) ; GROUP d'une banque absente : `pas de
@@ -249,8 +249,9 @@ la slice 7**.
     le transport (le compteur reste à l'écran) ;
   - premier passage en design : banque du dernier PC reçu si le projet
     l'a, sinon la première ; gardée ensuite d'un passage à l'autre ;
-  - **menu réduit à 5 entrées** (décidé le 2026-11-09) : boutons d'écran
-    1-5 = BANK, GAMME (disposition), TRACK, QUANT, PHRASE ; SLOTS, CANAL
+  - **menu réduit** (décidé le 2026-11-09) : boutons d'écran 1-4 =
+    GAMME (disposition), TRACK, QUANT, PHRASE ; BANK retirée à l'essai
+    des écrans (GROUP la choisit, l'écran droit l'affiche) ; SLOTS, CANAL
     et MON reportés tant que leur rôle n'est pas précisé. L'encodeur
     maître choisit, son appui valide, le même bouton (ou un bouton sans
     entrée) ferme sans appliquer ; NOTE REPEAT garde la priorité sur les
@@ -538,17 +539,26 @@ divisions du repeat ; faders inchangés.
 
 ```
 écran gauche (bordé)                          écran droit
- BANK    GAMME    TRACK      QUANT            PHRASE  E-TRIBE 162 (gras)
- E-TRIBE Chromat. T03 SD/CP  off              32      A# phrygien
-DESIGN ■ ■ □ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ·      6 / 32  cap 16 : -11  [██░░░░]
+[D] Chroma   T03 SD/CP   Q off   32 mes       E-TRIBE 162 (gras)
+[██Db6 tierce mineure██████░░░░░░░░░░░]       Bb phrygien · Tribe
+                                              6 / 32  cap 16 : -11  [██░░░░]
 ```
 
+- revu le 2026-11-09 : valeurs seules, sans libellé (`Q` et `mes` gardés,
+  `off` et `32` seuls seraient muets) ; plus de `DESIGN` écrit, une icône
+  `D` inversée au coin haut gauche (le cadre reste) ;
 - entrée ouverte en vidéo inverse, avec la valeur en cours de choix ;
-- à droite de `DESIGN` : mutes, ou le dernier geste (1,5 s), la frappe
-  (`pad n vel v`, 1 s) ou une alerte ;
-- écran droit : PHRASE sous le bouton 5, fiche de la banque (clé, tempo,
-  tonique, mode) à côté, `pas de projet` sans projet ; phrase en petit,
-  sans compte à rebours en gros.
+- sous le menu, 1 s après une frappe : la note en bémols, comme la
+  doctrine (`Db6`, convention Elektron 60 = C5), et sa place depuis la
+  tonique de la banque (`tierce mineure`, `seconde, hors gamme`), sur une
+  barre de vélocité, texte inversé sur la partie pleine ; en rythmique,
+  la track et son code ; sinon le dernier geste (1,5 s), une alerte ou les
+  mutes ;
+- écran droit : fiche de la banque (clé, tempo, tonique en bémols, mode,
+  titre), `pas de projet` sans projet ; phrase en petit, sans compte à
+  rebours en gros ;
+- noms courts des dispositions pour tenir sous un bouton (Chroma, Min.
+  harm., Penta min.).
 
 **Design, écran gauche : ce qui part vers la DT2** (maquette d'origine)
 ```
@@ -639,7 +649,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | SHIFT + GROUP n | recale le compteur au début du bloc n | idem |
 | GROUP A-H | LED du compteur 8 × 8 mesures | banque n : sa tonique, son mode et sa phrase colorent et calent les pads (décidé le 2026-11-09) |
 | PAD MODE | — | cycle des dispositions |
-| 8 boutons au-dessus des écrans | divisions du repeat (pendant NOTE REPEAT) | 1-5 : BANK, GAMME, TRACK, QUANT, PHRASE (5.D) ; divisions pendant NOTE REPEAT |
+| 8 boutons au-dessus des écrans | divisions du repeat (pendant NOTE REPEAT) | 1-4 : GAMME, TRACK, QUANT, PHRASE (5.D) ; divisions pendant NOTE REPEAT |
 | Encodeur maître | sans effet (sauf avec SWING) | valeur de l'entrée de menu ; appui = valider |
 | SHIFT + CONTROL (1 s) | changer de mode (refusé transport lancé) | changer de mode |
 | SHIFT + BROWSE | sélection de projet (refusé transport lancé) | idem |
@@ -723,7 +733,7 @@ conditionne tout le reste.
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
-| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 5 entrées), faite le 2026-11-09, à essayer sur la MK2 |
+| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite le 2026-11-09, à essayer sur la MK2 |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 

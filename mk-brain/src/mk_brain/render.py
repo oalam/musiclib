@@ -14,21 +14,22 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
 - NOTE REPEAT : les 8 divisions dans les deux bandeaux, chacune sous son
   bouton d'écran, la division choisie inversée.
 - Bascule de mode proposée : l'écran droit entier.
-- Design (slice 5.D) : les entrées du menu sous leurs boutons d'écran
-  (BANK, GAMME, TRACK, QUANT à gauche, PHRASE à droite), l'entrée ouverte
-  inversée avec la valeur en cours de choix ; dessous, `DESIGN` et les
-  mutes (ou le dernier geste) à gauche ; à droite la fiche de la banque
-  (clé, tempo, tonique, mode) et la phrase en petit.
+- Design (slice 5.D, revu le 2026-11-09) : icône `D` au coin haut gauche
+  (le cadre reste), valeurs du menu sous les boutons 1-4 (GAMME, TRACK,
+  QUANT, PHRASE) sans libellé, l'entrée ouverte inversée ; dessous, la
+  frappe (`Bb4 tierce mineure` sur une barre de vélocité), une alerte, le
+  dernier geste ou les mutes ; à droite la fiche de la banque et la
+  phrase en petit.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 from mk_brain.display import HEIGHT, WIDTH, new_image, text_image
-from mk_brain.engine import MENU
+from mk_brain.layouts import FLAT_NAMES, degree_name, flat_note
 from mk_brain.phrase import BLOCK_BARS
 from mk_brain.repeat import DIVISIONS
 
@@ -107,60 +108,96 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = 0) -> None:
             d.rectangle((x0 - 1, bottom + 2, x1 + 1, bottom + 3), fill=1)
 
 
-MENU_TOP = 23  # hauteur des entrées du menu en design
+MENU_TOP = 15  # ligne du menu en design ; frappe ou mutes dessous
+ICON = 11  # icône du design, coin haut gauche
 
 
-def _menu_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
-    """Design : les entrées du menu sous les boutons d'écran de cet écran."""
-    view = engine.menu_view()
-    small = _font(SMALL)
-    for i in range(COLS):
-        k = screen * COLS + i
-        if k >= len(MENU):
-            continue
-        name, value, opened = view[k]
-        box = (i * COL, 0, (i + 1) * COL - 2, MENU_TOP)
+def _menu_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+    """Design : la valeur de chaque entrée du menu sous son bouton d'écran, sans libellé.
+    Entrée ouverte inversée, avec la valeur en cours de choix."""
+    for i, (_, value, opened) in enumerate(engine.menu_view()[:COLS]):
+        x0 = ICON + 2 if i == 0 else i * COL  # la première laisse la place à l'icône
+        box = (x0, 1, (i + 1) * COL - 2, MENU_TOP)
         ink = 1
         if opened:
             d.rectangle(box, fill=1)
             ink = 0
-        _centered(d, (box[0], 2, box[2], 11), name, small, ink)  # sous le cadre du design
-        font = _fit(d, value, COL - 6, (16, 12, 10, 9))
-        _centered(d, (box[0], 12, box[2], MENU_TOP), value, font, ink)
+        font = _fit(d, value, box[2] - box[0] - 4, (16, 12, 10, 9))
+        _centered(d, box, value, font, ink)
+
+
+def _icon(d: ImageDraw.ImageDraw) -> None:
+    """Petit « D » inversé : distingue le design du live au coin haut gauche."""
+    d.rectangle((1, 1, ICON, ICON), fill=1)
+    _centered(d, (1, 1, ICON + 1, ICON + 1), "D", _font(10), 0)
+
+
+def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int]) -> None:
+    """Frappe : note en bémols et sa place dans la gamme, sur une barre de vélocité.
+    Le texte s'inverse là où la barre est pleine (OU exclusif)."""
+    _, note, vel, _ = hit
+    lay = engine.layout
+    if lay.kind == "rythmique":
+        name, role = f"T{note + 1:02d}", engine.cfg.track_names.get(note + 1, "")
+    else:
+        name, role = flat_note(note), degree_name(lay, note)
+    top, bottom, left, right = MENU_TOP + 3, BAND - 3, 3, WIDTH - 4
+    bar = new_image()
+    db = ImageDraw.Draw(bar)
+    db.rectangle((left, top, left + round((right - left) * vel / 127), bottom), fill=1)
+    text = new_image()
+    dt = ImageDraw.Draw(text)
+    big = _font(18)
+    _bold(dt, (left + 4, top - 2), name, big, 1)
+    x = left + 14 + int(dt.textlength(name, font=big))
+    role_font = _fit(dt, role, right - x - 4, (14, 12, 10))
+    _centered(
+        dt, (x, top, x + int(dt.textlength(role, font=role_font)), bottom), role, role_font, 1
+    )
+    box = (0, top, WIDTH, bottom + 1)
+    img.paste(ImageChops.logical_xor(bar, text).crop(box), box[:2])
+    ImageDraw.Draw(img).rectangle((left, top, right, bottom), outline=1)
 
 
 def _design_left(
-    d: ImageDraw.ImageDraw, engine: Engine, now: int, message: tuple[str, int] | None, warn: str
+    img: Image.Image,
+    d: ImageDraw.ImageDraw,
+    engine: Engine,
+    now: int,
+    message: tuple[str, int] | None,
+    warn: str,
 ) -> None:
-    """Menu 1-4 en haut ; dessous `DESIGN`, puis mutes ou dernier geste / frappe."""
-    _menu_band(d, engine, 0)
-    small = _font(SMALL)
-    _bold(d, (3, 25), "DESIGN", small, 1)
-    left = 8 + int(d.textlength("DESIGN", font=small))
-    recent: list[tuple[int, str]] = []
-    if message is not None and now - message[1] < MESSAGE_NS:
-        recent.append((message[1], message[0]))
+    """Icône et menu 1-4 en haut ; dessous la dernière frappe, une alerte, le dernier
+    geste ou les mutes."""
+    _icon(d)
+    _menu_band(d, engine)
     hit = engine.last_hit
-    if hit is not None and now - hit[2] < OVERLAY_NS:
-        recent.append((hit[2], f"pad {hit[0]}  vel {hit[1]}"))
-    text = warn or (max(recent)[1] if recent else "")
+    if hit is not None and now - hit[3] >= OVERLAY_NS:
+        hit = None
+    if message is not None and now - message[1] >= MESSAGE_NS:
+        message = None
+    text = warn
+    if not text and message is not None and (hit is None or message[1] >= hit[3]):
+        text = message[0]  # le plus récent l'emporte
     if text:
-        d.text((left, 25), text, font=_fit(d, text, WIDTH - left - 4, (12,)), fill=1)
+        _bold(d, (3, 23), text, _fit(d, text, WIDTH - 8, (12,)), 1)
+    elif hit is not None:
+        _hit_strip(img, engine, hit)
     else:
-        _mute_strip(d, engine, left)
+        _mute_strip(d, engine)
 
 
 def _design_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
-    """PHRASE sous le bouton 5, fiche de la banque à côté ; phrase en petit dessous."""
-    _menu_band(d, engine, 1)
+    """Fiche de la banque (clé, tempo, tonique, mode, titre) ; phrase en petit dessous."""
     small, mid = _font(SMALL), _font(16)
     sheet = engine.sheet
     if sheet is None:
-        d.text((COL + 6, 4), "pas de projet", font=mid, fill=1)
+        d.text((3, 2), "pas de projet", font=mid, fill=1)
     else:
         key, bank = sheet
-        _bold(d, (COL + 6, -3), f"{key}  {bank.tempo:g}", mid, 1)
-        d.text((COL + 6, 12), f"{bank.tonique} {bank.mode}", font=small, fill=1)
+        _bold(d, (3, -3), f"{key}  {bank.tempo:g}", mid, 1)
+        tonic = FLAT_NAMES[bank.tonic]
+        d.text((3, 12), f"{tonic} {bank.mode} · {bank.title}", font=small, fill=1)
     st = engine.phrase_state
     length = engine.phrase.length
     bar = "--" if st is None else str(st.bar)
@@ -280,7 +317,7 @@ def left(
     if _showing_repeat(engine):
         _repeat_band(d, engine, 0)
     elif engine.design:
-        _design_left(d, engine, now, message, warn)
+        _design_left(img, d, engine, now, message, warn)
     else:
         _left_band(d, engine, now, message, warn)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)

@@ -99,12 +99,27 @@ def test_design_menu_entry_inverted_while_open(cfg: Config, project: Project) ->
     from test_engine import btn
 
     eng = design(cfg, project=project)
-    corner = (render.COL + 2, 3)  # coin de l'entrée GAMME, hors texte
+    corner = (render.COL + 1, 2)  # coin de l'entrée TRACK, hors texte
     assert not render.left(eng, 0).getpixel(corner)
     btn(eng, "DISPLAY_2")
     assert render.left(eng, 0).getpixel(corner)
-    btn(eng, "DISPLAY_5")  # PHRASE : écran droit, colonne 1
-    assert render.right(eng, 0).getpixel((2, 3))
+    assert render.left(eng, 0).getpixel((2, 2))  # icône du design
+    assert not render.left(Engine(cfg), 0).getpixel((2, 2))
+
+
+def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None:
+    from test_engine import btn, press
+
+    from mk_brain.layouts import degree_name, flat_note
+
+    eng = design(cfg, project=project)
+    btn(eng, "GROUP_E")
+    assert (flat_note(70), degree_name(eng.layout, 73)) == ("Bb5", "tierce mineure")
+    assert degree_name(eng.layout, 72) == "seconde, hors gamme"
+    quiet = render.left(eng, 0).tobytes()
+    press(eng, 0, pressure=600)
+    assert render.left(eng, 10 * MS).tobytes() != quiet  # bandeau de frappe
+    assert render.left(eng, 2 * SECOND).tobytes() == quiet  # retombé sur les mutes
 
 
 def test_design_right_shows_bank_sheet(cfg: Config, project: Project) -> None:

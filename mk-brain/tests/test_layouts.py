@@ -65,7 +65,7 @@ def test_chromatic_follows_bank_scale(cfg: Config) -> None:
     chroma = for_bank(cfg.layouts[1], cfg.scale("eolien"), 10)  # la# mineur
     from mk_brain.layouts import in_scale
 
-    assert pad_note(chroma, 1) == 70  # A#4 : tonique dans l'octave de C5
+    assert pad_note(chroma, 1) == 70  # A#5 : tonique dans l'octave de C5 (60 = C5)
     assert pad_color(cfg, chroma, 1) == cfg.roles.tonique
     white = cfg.families["chromatique"]
     assert [pad_color(cfg, chroma, p) for p in (2, 4, 8)] == [white] * 3  # seule la tonique

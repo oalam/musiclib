@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.9.2] - 2026-11-09
+
+### Modifié
+
+- [5] 5.D Écran gauche du design revu : valeurs du menu sans libellé sur
+  une ligne, BANK retirée du menu (GROUP la choisit, l'écran droit
+  l'affiche), menu sur les boutons 1-4 ; `DESIGN` remplacé par une icône
+  `D` au coin haut gauche ; frappe affichée en note bémolisée et degré
+  depuis la tonique (`Db6 tierce mineure`) sur une barre de vélocité.
+  Fiche de la banque avec tonique en bémols et titre. Noms courts des
+  dispositions (Chroma, Min. harm., Penta min.).
+
 ## [0.9.1] - 2026-11-09
 
 ### Modifié
