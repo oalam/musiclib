@@ -3,7 +3,7 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
-## [Non publié]
+## [0.1.0] - 2026-11-09
 
 ### Ajouté
 
@@ -17,3 +17,10 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 - [0] `mk-brain list` et `mk-brain spike` : mire sur les deux écrans,
   balayage des LED, écho des contrôles (LED et écran droit), bilan des
   contrôles jamais vus.
+- [0] Essai sur la MK2 : mire nette sur les deux écrans, LED justes,
+  48 boutons, 16 pads et 9 encodeurs décodés (constats dans `SPEC.md`).
+
+### Modifié
+
+- [0] Bouton `MAIN` de cabl renommé `MASTER_PUSH` (appui sur l'encodeur
+  maître, vérifié).

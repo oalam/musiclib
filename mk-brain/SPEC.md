@@ -451,7 +451,7 @@ numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
 
 ### Affectation des contrôles
 
-Noms de la face avant MK2, à confirmer au décodage HID (slice 0).
+Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Constats HID).
 
 | Contrôle | Live | Design |
 |---|---|---|
@@ -524,12 +524,12 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slice 0 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slice 0 faite le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
 |---|---|---|---|
-| 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | en cours : code prêt (`mk-brain spike`), essai sur la MK2 à faire |
+| 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
 | 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-8, les groupes changent de gamme, LED justes | à venir |
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | à venir |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
@@ -544,10 +544,11 @@ la slice 0.
 
 ## Questions ouvertes
 
-1. **Pilotes NI sur le Mac** : NIHardwareAgent garde-t-il la MK2 ouverte
-   et empêche-t-il hidapi de l'ouvrir ? Faut-il l'arrêter pendant le
-   prototypage, et l'autorisation « Surveillance de l'entrée » de macOS
-   est-elle requise ? À trancher en phase 0.
+1. ~~Pilotes NI sur le Mac~~ : **tranché le 2026-11-09** (slice 0). hidapi
+   ouvre la MK2 alors que NIHardwareAgent et NIHostIntegrationAgent
+   tournent ; aucune autorisation macOS demandée. Seul prérequis constaté :
+   la brancher en direct sur le Mac, pas sur un hub USB 2.0 non alimenté
+   (elle n'y apparaît même pas en USB).
 2. ~~« CC slot + note »~~ : **tranché le 2026-11-09**. L'annexe B donne
    CC 19 (slot) et CC 24 (banque de samples), mais le Preset Pool ne se
    pilote pas en MIDI (vérifié) et la track 16 garde son pool joué depuis
@@ -571,9 +572,9 @@ la slice 0.
    design, les encodeurs envoient donc sur l'AUTO CHANNEL, et la track
    active est visée sans régler de canal. Reste à préciser : un pas sans
    trig reçoit-il un p-lock ?
-9. **SHIFT + CONTROL** : en HID brut, la MK2 remonte-t-elle cette
-   combinaison au Pi, ou la garde-t-elle pour sa propre bascule en mode
-   MIDI (7.D) ? Sinon, choisir une autre combinaison. À voir en phase 0.
+9. ~~SHIFT + CONTROL~~ : **tranché le 2026-11-09** (slice 0). En HID brut,
+   la combinaison remonte au Pi (SHIFT on, CONTROL on/off, SHIFT off) et la
+   MK2 ne bascule pas en mode MIDI : la bascule de mode est conservée.
 10. **Polyphonie d'une track audio DT2** : conditionne le mode accords.
 11. ~~AUTO CHANNEL et canaux de track~~ : **vérifié le 2026-11-09** (fiche
     `digitakt/kb/midi-config.md`). Sur un canal partagé, l'AUTO CHANNEL
@@ -582,6 +583,27 @@ la slice 0.
     la track 16, jouée depuis la DT2, perd ses faders et son mute en live.
 12. ~~Canal 16 au test du pool~~ : la track 16 répond bien sur le canal 16
     (vérifié le 2026-11-09).
+
+## Constats HID (slice 0, 2026-11-09)
+
+Formats de cabl confirmés sur la MK2 (`src/mk_brain/hid_mk2.py` en garde
+le détail) :
+
+- **USB** : `17cc:1140`, interface HID 2, page d'usage vendeur `0xff01`.
+- **Écrans** : 256 × 64, octets horizontaux, bit fort à gauche, 8 tranches
+  `E0|écran` de 256 octets ; pas de séquence d'init, image nette.
+- **LED** : rapports 0x80 (pads RGB), 0x81 (groupes RGB + transport),
+  0x82 (boutons) ; valeur 255 = pleine luminosité, couleurs justes.
+- **Pads** : rapport 0x20 en continu (environ 755 par seconde au repos :
+  2266 en 3 s, 2266 / 3 ≈ 755), 16 pressions sur 12 bits, deux relevés
+  par rapport. Index 0 = pad 13 (en haut à gauche), index 12 = pad 1.
+  Frappe légère vers 240, appuis francs 1000-2500 sur 4095 ; seuil 200.
+- **Boutons** : rapport 0x01 envoyé seulement sur changement, 48 boutons
+  nommés comme dans cabl, sauf `Main` = appui sur l'encodeur maître, renommé
+  `MASTER_PUSH`.
+- **Encodeurs** : 8 compteurs absolus sur 10 bits qui bouclent à 1024,
+  pas minimal remonté de 4 (zone morte du matériel), jusqu'à 70 par rapport
+  en rotation rapide ; maître sur 4 bits, 1 par cran.
 
 ## Références
 

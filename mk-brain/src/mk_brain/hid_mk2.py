@@ -49,7 +49,7 @@ BUTTONS: tuple[str, ...] = (
     "CONTROL", "STEP", "BROWSE", "SAMPLING",
     "BROWSE_LEFT", "BROWSE_RIGHT", "ALL", "AUTO_WRITE",
     "VOLUME", "SWING", "TEMPO", "MASTER_LEFT",
-    "MASTER_RIGHT", "ENTER", "NOTE_REPEAT", "MAIN",
+    "MASTER_RIGHT", "ENTER", "NOTE_REPEAT", "MASTER_PUSH",  # « Main » chez cabl = appui maître
     "GROUP_A", "GROUP_B", "GROUP_C", "GROUP_D",
     "GROUP_E", "GROUP_F", "GROUP_G", "GROUP_H",
     "RESTART", "TRANSPORT_LEFT", "TRANSPORT_RIGHT", "GRID",
@@ -103,7 +103,7 @@ class Mk2ReportError(Mk2Error):
 def pad_label(index: int) -> int:
     """Numéro imprimé du pad (1 en bas à gauche) depuis l'index du rapport.
 
-    Selon cabl, l'index 0 est le pad 13 (en haut à gauche) : à confirmer.
+    L index 0 est le pad 13 (en haut à gauche), vérifié le 2026-11-09.
     """
     if not 0 <= index < N_PADS:
         raise Mk2ReportError(f"index de pad hors bornes : {index}")
@@ -230,7 +230,7 @@ class LedState:
                 buttons[BUTTON_LEDS[name]] = value
             elif name in TRANSPORT_LEDS:
                 groups[TRANSPORT_LEDS[name]] = value
-            # sinon : bouton sans LED (MAIN, GROUP_x géré à part)
+            # sinon : bouton sans LED (MASTER_PUSH, GROUP_x géré à part)
 
         return [
             bytes([REPORT_LED_PADS]) + pads,

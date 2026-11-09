@@ -91,7 +91,7 @@ def test_led_reports_layout() -> None:
     leds = LedState.off()
     leds.pads[1] = (1, 2, 3)
     leds.groups[2] = (9, 8, 7)
-    leds.buttons.update({"CONTROL": 255, "NOTE_REPEAT": 10, "SHIFT": 5, "MAIN": 99})
+    leds.buttons.update({"CONTROL": 255, "NOTE_REPEAT": 10, "SHIFT": 5, "MASTER_PUSH": 99})
     pads, groups, buttons = leds.reports()
     assert (pads[0], len(pads)) == (0x80, 1 + LED_PADS_LEN)
     assert pads[1 + 3 : 1 + 6] == bytes([1, 2, 3])
