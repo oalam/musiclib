@@ -110,6 +110,14 @@ suivants = variantes et Id (cas 1 et 2).
 - **À vérifier sur la machine** : si retoucher un preset dans le pool met à
   jour les preset locks qui le désignent ; si la queue du son précédent
   est coupée par un trig preset locké.
+- **Le pool ne se joue pas en MIDI** (vérifié le 2026-11-09, track 16
+  active en trig mode Preset Pool, transport arrêté) : notes 0-3 reçues sur
+  l'AUTO CHANNEL → tracks 1-4, comme en mode normal ; notes 60-63 → le
+  preset **chargé** sur la track (le dernier joué du pool), transposé. Les
+  touches `[TRIG]` en mode Preset Pool n'émettent rien en MIDI, et l'annexe
+  B n'a aucun CC / NRPN de choix de preset. Un contrôleur externe ne peut
+  donc pas choisir un preset du pool ; seuls le sample (CC 19 slot, CC 24
+  banque) et les paramètres de la track se pilotent.
 
 ## À essayer (5 min)
 
