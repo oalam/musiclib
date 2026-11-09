@@ -44,6 +44,7 @@ class Engine:
         self._attacks: dict[int, _Attack] = {}  # pad 1-16 → attaque en cours de mesure
         self._sounding: dict[int, int] = {}  # pad 1-16 → note envoyée (pour le note off)
         self.leds_dirty = True
+        self.last_played: tuple[int, int, int] | None = None  # (pad, note, vélocité)
 
     @property
     def layout_name(self) -> str:
@@ -88,7 +89,9 @@ class Engine:
         att = self._attacks.pop(pad)
         note = pad_note(self.cfg.layouts[self.group], pad)
         self._sounding[pad] = note
-        return NoteOn(self.channel, note, velocity(self.cfg.velocity, att.peak))
+        vel = velocity(self.cfg.velocity, att.peak)
+        self.last_played = (pad, note, vel)
+        return NoteOn(self.channel, note, vel)
 
     def leds(self) -> LedState:
         layout = self.cfg.layouts[self.group]

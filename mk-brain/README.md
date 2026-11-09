@@ -23,6 +23,8 @@ python3.12 -m venv .venv
 .venv/bin/mk-brain spike --raw --no-chase   # + rapports bruts en hexa
 .venv/bin/mk-brain play               # pads → DT2 (AUTO CHANNEL), GROUP A-H = disposition
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
+.venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks
+.venv/bin/mk-brain clock --bench-note 3   # + note 3 (track 4) envoyée à chaque noire, gigue d'envoi
 ```
 
 ## Tests

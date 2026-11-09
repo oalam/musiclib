@@ -33,3 +33,15 @@ def test_send_converts_to_mido() -> None:
         "note_on channel=15 note=0 velocity=100 time=0",
         "note_off channel=15 note=0 velocity=0 time=0",
     ]
+
+
+def test_feed_clock_dispatch() -> None:
+    from mk_brain.clock import ClockTracker
+
+    c = ClockTracker()
+    midi_io.feed_clock(c, midi_io.MidiIn("start", 0))
+    assert c.running
+    midi_io.feed_clock(c, midi_io.MidiIn("sysex", 5, (0x00, 0x20, 0x3C)))
+    assert c.transfer_suspected(10)
+    midi_io.feed_clock(c, midi_io.MidiIn("stop", 10))
+    assert not c.running

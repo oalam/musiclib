@@ -3,6 +3,23 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [Non publié]
+
+### Ajouté
+
+- [2] `clock.py` : suivi de la clock DT2 par régression linéaire sur 24
+  ticks (période, phase, BPM à 0,1), Start / Continue / Stop, position
+  mesure.temps.pas, détection du sysex Elektron (Transfer ouvert), écart
+  d'arrivée des ticks à la prévision.
+- [2] `scheduler.py` : envoi à l'instant cible (sommeil puis attente active
+  sur 0,5 ms), écart d'envoi mesuré, abandon au-delà de 20 ms de retard.
+- [2] `midi_io.py` : entrée DT2 horodatée dans le callback, `feed_clock`.
+- [2] `mk-brain clock [--bench-note N --every T]` : BPM, transport,
+  bilan de gigue ; banc d'envoi d'une note sur la grille.
+- [2] `mk-brain play` : BPM, transport et position à l'écran gauche, note
+  jouée avec degré et nom (`pad 3 -> b3 (D#5, 63)`), alerte Transfer ou
+  clock absente.
+
 ## [0.2.0] - 2026-11-09
 
 ### Ajouté

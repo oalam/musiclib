@@ -269,11 +269,13 @@ mkbrain:
 ### Horloge et PLL
 
 - 24 ticks par noire, 6 par double-croche, 96 par mesure en 4/4.
-- Durée de tick = moyenne glissante des 24 derniers intervalles. BPM
-  affiché = 60 / (24 × durée de tick), arrondi à 0,1.
-- Un envoi prévu au pas k part à `dernier_tick + n × durée_moyenne` (n =
-  ticks restants), pas au tick reçu : la gigue USB (±1 ms) n'est pas
-  recopiée. Cible : erreur sous 0,3 ms. **À mesurer.**
+- Durée de tick = pente de la régression linéaire sur les 24 derniers
+  ticks (affiné le 2026-11-09 à la slice 2 : la moyenne glissante des
+  intervalles ne dépend que des deux ticks extrêmes, donc de leur gigue).
+  BPM affiché = 60 / (24 × durée de tick), arrondi à 0,1.
+- Un envoi prévu au pas k part à l'instant que la droite de régression
+  donne pour ce tick, pas au tick reçu : la gigue USB (±1 ms) n'est pas
+  recopiée. Cible : erreur sous 0,3 ms. **À mesurer** (`mk-brain clock`).
 - Clocks sans Start (la DT2 en envoie à l'arrêt) : BPM affiché, aucune note
   planifiée, compteur de phrases figé.
 - Trafic sysex Elektron détecté : avertissement à l'écran (Transfer ouvert).
@@ -390,6 +392,13 @@ T07 PERC A  ch7            palier 147 -3
 ```
 - Colonne touchée en vidéo inverse ; `~` devant la valeur tant que le
   soft-takeover n'a pas rattrapé la DT2.
+
+**Note jouée et tonique** (demandé le 2026-11-09) : l'écran affiche le
+mode, la note jouée avec son degré et son nom (`pad 3 -> b3 (D#5, 63)`,
+convention Elektron 60 = C5). Fait à la slice 2, sur l'écran gauche de
+`mk-brain play`. Tant qu'aucun projet n'est chargé, le nom suppose la DT2
+sans `TUNE` ; avec le projet (slice 6), la tonique s'affiche à côté du
+mode et le nom devient la vraie note (tonique + degré).
 
 **Superpositions temporaires sur l'écran droit**, par ordre de priorité :
 1. Note repeat : la division en très gros (`1/16T`) tant que le pad est
@@ -525,14 +534,14 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 et 1 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 et 1 faites le 2026-11-09, slice 2 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
 |---|---|---|---|
 | 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
 | 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | fait 2026-11-09 : tracks 1-16 en A, gamme du groupe C jouée sur la track active (9) |
-| 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | à venir |
+| 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | en cours : code prêt (`mk-brain clock`), à l'arrêt 145,0 BPM lus, écart d'arrivée 0,21 ms rms ; banc transport lancé à faire |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | à venir |

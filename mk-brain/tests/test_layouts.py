@@ -45,3 +45,11 @@ def test_velocity_curve() -> None:
     assert velocity(v, 1350) == 64  # 1 + 126 × (1150 / 2300) = 1 + 63
     soft = VelocityConfig(gamma=0.6)
     assert velocity(soft, 1350) > 64
+
+
+def test_describe_note(cfg: Config) -> None:
+    from mk_brain.layouts import describe_note, note_name
+
+    assert note_name(60) == "C5"  # convention Elektron
+    assert describe_note(cfg.layouts[0], 9, 8) == "pad 9 -> track 9"
+    assert describe_note(cfg.layouts[2], 3, 63) == "pad 3 -> b3 (D#5, 63)"

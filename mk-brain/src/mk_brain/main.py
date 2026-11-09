@@ -1,4 +1,4 @@
-"""CLI mk-brain : `spike` (slice 0, banc d'essai HID), `play` (slice 1, relais pads → DT2)."""
+"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-2, pads → DT2), `clock` (slice 2)."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import sys
 import time
 
 from mk_brain import display
+from mk_brain.clock import ClockTracker
 from mk_brain.config import ConfigError
 from mk_brain.hid_mk2 import (
     BUTTON_LEDS,
@@ -159,28 +160,40 @@ def cmd_spike(chase: bool, raw: bool, step_s: float) -> int:
     return 0
 
 
+def _clock_line(clock: ClockTracker) -> str:
+    bpm = f"{clock.bpm:5.1f}" if clock.bpm else "  -- "
+    pos = clock.position()
+    return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
+
+
 def cmd_play(dry_run: bool) -> int:
     from mk_brain.config import load_config
-    from mk_brain.engine import Engine, MidiOut, NoteOn
-    from mk_brain.midi_io import Dt2Out
+    from mk_brain.engine import Engine, MidiOut
+    from mk_brain.layouts import describe_note
+    from mk_brain.midi_io import Dt2In, Dt2Out, feed_clock
 
     cfg = load_config()
     engine = Engine(cfg)
+    clock = ClockTracker()
     decoder = InputDecoder(pad_threshold=cfg.velocity.threshold)
     out = None if dry_run else Dt2Out.open(cfg.midi.port_hint)
+    inp = None if dry_run else Dt2In.open(cfg.midi.port_hint)
     dev = Mk2Device.open()
     last = "-"
-    screen_dirty, last_draw = True, 0.0
+    shown: tuple[object, ...] = ()
+    last_draw = 0.0
 
     def emit(msgs: list[MidiOut]) -> None:
-        nonlocal last, screen_dirty
+        nonlocal last
         for m in msgs:
             if out is not None:
                 out.send(m)
-            if isinstance(m, NoteOn):
-                last = f"note {m.note} vel {m.velocity} ch {m.channel + 1}"
+        if msgs and engine.last_played is not None:
+            pad, note, vel = engine.last_played
+            text = f"{describe_note(cfg.layouts[engine.group], pad, note)} vel {vel}"
+            if text != last:
+                last = text
                 print(last)
-                screen_dirty = True
 
     print(f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; Ctrl-C")
     try:
@@ -188,24 +201,22 @@ def cmd_play(dry_run: bool) -> int:
         while True:
             report = dev.read(timeout_ms=1)
             now = time.perf_counter()
-            group = engine.group
-            for ev in decoder.feed(report):
-                emit(engine.handle(ev, now))
+            if inp is not None:
+                for ev in inp.drain():
+                    feed_clock(clock, ev)
+            for hid_ev in decoder.feed(report):
+                emit(engine.handle(hid_ev, now))
             emit(engine.tick(now))
-            if engine.group != group:
-                screen_dirty = True
             if engine.leds_dirty:
                 dev.send_leds(engine.leds())
-            if screen_dirty and now - last_draw > 0.05:
-                lay = cfg.layouts[engine.group]
-                lines = [
-                    f"mk-brain  slice 1  {'ESSAI' if dry_run else 'DT2'}",
-                    f"groupe {lay.group}  {lay.name}",
-                    f"canal {cfg.midi.auto_channel}",
-                    last,
-                ]
-                _show(dev, 0, display.text_image(lines))
-                screen_dirty, last_draw = False, now
+            lay = cfg.layouts[engine.group]
+            warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(time.perf_counter_ns()) else ""
+            if clock.bpm is None and not dry_run:
+                warn = warn or "pas de clock : CLOCK SEND ?"
+            state = (lay.group, _clock_line(clock), last, warn)
+            if state != shown and now - last_draw > 0.1:
+                _show(dev, 0, display.text_image([f"{lay.group}  {lay.name}", *state[1:]]))
+                shown, last_draw = state, now
     except KeyboardInterrupt:
         pass
     finally:
@@ -217,6 +228,73 @@ def cmd_play(dry_run: bool) -> int:
             dev.close()
             if out is not None:
                 out.close()
+            if inp is not None:
+                inp.close()
+    print(f"clock, écart d'arrivée des ticks à la prévision : {clock.prediction_error.summary()}")
+    return 0
+
+
+def cmd_clock(bench_note: int | None, every: int) -> int:
+    """Banc d'horloge : BPM, transport, gigue d'arrivée ; option envoi calé sur la grille."""
+    from mk_brain.config import load_config
+    from mk_brain.engine import MidiOut, NoteOff, NoteOn
+    from mk_brain.midi_io import Dt2In, Dt2Out, feed_clock
+    from mk_brain.scheduler import Scheduler
+
+    cfg = load_config()
+    channel = cfg.midi.auto_channel - 1
+    clock = ClockTracker()
+    inp = Dt2In.open(cfg.midi.port_hint)
+    out = Dt2Out.open(cfg.midi.port_hint) if bench_note is not None else None
+    sched: Scheduler[MidiOut] | None = Scheduler(out.send) if out is not None else None
+    if sched is not None:
+        sched.start()
+    next_pos: int | None = None
+    last_print = 0.0
+    print(
+        "clock : Ctrl-C pour le bilan"
+        + (f" ; banc : note {bench_note} tous les {every} ticks" if sched else "")
+    )
+    try:
+        while True:
+            for ev in inp.drain():
+                feed_clock(clock, ev)
+                if ev.kind in ("start", "stop", "continue"):
+                    print(ev.kind)
+                    next_pos = None
+            k = clock.ticks_since_start
+            if sched is not None and bench_note is not None and k is not None:
+                if next_pos is None:
+                    next_pos = (k // every + 1) * every
+                # planifié 5 ms avant la cible, prise sur la droite de régression
+                t = clock.position_time(next_pos)
+                if t is not None and t - time.perf_counter_ns() < 5_000_000:
+                    sched.at(int(t), NoteOn(channel, bench_note, 100))
+                    sched.at(int(t) + 20_000_000, NoteOff(channel, bench_note))
+                    next_pos += every
+            now = time.monotonic()
+            if now - last_print > 1.0:
+                warn = (
+                    "  TRANSFER OUVERT ?"
+                    if clock.transfer_suspected(time.perf_counter_ns())
+                    else ""
+                )
+                print(_clock_line(clock) + warn)
+                last_print = now
+            time.sleep(0.0005)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if sched is not None:
+            sched.close()
+        if out is not None:
+            out.close()
+        inp.close()
+    print("\n--- bilan ---")
+    print(f"BPM final : {clock.bpm}")
+    print(f"arrivée des ticks vs prévision : {clock.prediction_error.summary()}")
+    if sched is not None:
+        print(f"envoi vs cible : {sched.errors.summary()} ; abandonnés : {sched.dropped}")
     return 0
 
 
@@ -230,12 +308,19 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--step", type=float, default=0.15, help="pas du balayage LED (s)")
     pp = sub.add_parser("play", help="slice 1 : pads → notes DT2 sur l'AUTO CHANNEL")
     pp.add_argument("--dry-run", action="store_true", help="sans DT2 : notes affichées seulement")
+    cp = sub.add_parser("clock", help="slice 2 : horloge DT2, BPM, gigue ; banc d'envoi")
+    cp.add_argument("--bench-note", type=int, help="note envoyée sur la grille (ex. 3 = track 4)")
+    cp.add_argument(
+        "--every", type=int, default=24, help="intervalle du banc en ticks (24 = noire)"
+    )
     args = parser.parse_args(argv)
     try:
         if args.cmd == "list":
             return cmd_list()
         if args.cmd == "play":
             return cmd_play(dry_run=args.dry_run)
+        if args.cmd == "clock":
+            return cmd_clock(bench_note=args.bench_note, every=args.every)
         return cmd_spike(chase=not args.no_chase, raw=args.raw, step_s=args.step)
     except (Mk2Error, ConfigError, MidiError) as exc:
         print(f"erreur : {exc}", file=sys.stderr)

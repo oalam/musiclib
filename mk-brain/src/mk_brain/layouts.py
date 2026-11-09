@@ -58,3 +58,24 @@ def velocity(cfg: VelocityConfig, pressure: int) -> int:
     span = cfg.full_scale - cfg.threshold
     x = min(1.0, max(0.0, (pressure - cfg.threshold) / span))
     return max(cfg.min, min(cfg.max, cfg.min + round((cfg.max - cfg.min) * float(x**cfg.gamma))))
+
+
+DEGREES = ("T", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7")
+NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+
+
+def note_name(note: int) -> str:
+    """Nom Elektron : 60 = C5 (manuel §8.4, fiche midi-config)."""
+    return f"{NOTE_NAMES[note % 12]}{note // 12}"
+
+
+def describe_note(layout: Layout, pad: int, note: int) -> str:
+    """Texte d'écran : track en rythmique, degré + nom MIDI sinon.
+
+    Le nom suppose la DT2 sans TUNE ; la vraie note (tonique + degré) viendra
+    avec le projet (slice 6).
+    """
+    if layout.kind == "rythmique":
+        return f"pad {pad} -> track {note + 1}"
+    degree = DEGREES[(note - layout.base) % 12]
+    return f"pad {pad} -> {degree} ({note_name(note)}, {note})"
