@@ -23,7 +23,8 @@ play:
   mode: design               # mode au démarrage : live (scène) ou design (préparation)
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
-# refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09).
+# refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le
+# même jour ; une 3e page affiche le LVL des 16 tracks (affichage seul), les flèches cyclent.
 # DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine.
 # MW, BC et PB n'agissent que si le preset leur assigne des paramètres
 # (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset).
@@ -31,22 +32,22 @@ encoders:
   mute_cc: 94
   raw_per_step: 4            # pas minimal remonté par la MK2 (constat slice 0)
   pages:
-    - - {name: LVL, cc: 95}                    # niveau de track
+    - - {name: LVL, cc: 95}                    # niveau de track (aussi la page des niveaux)
+      - {name: CUT, cc: 74}                    # fréquence du filtre
+      - {name: RES, cc: 75}                    # résonance (knob F du filtre)
+      - {name: ENV, cc: 77, bipolar: true}     # profondeur d'enveloppe du filtre
+      - {name: OVER, cc: 57}                   # overdrive de track
+      - {name: DEL, cc: 84}                    # envoi delay
+      - {name: REV, cc: 85}                    # envoi reverb
+      - {name: SRR, cc: 55}                    # sample rate reduction
+    - - {name: LVL, cc: 95}
       - {name: MW, cc: 1}                      # mod wheel
       - {name: BC, cc: 2}                      # breath controller
       - {name: PB, pitchbend: true, bipolar: true}   # pitch bend, centré
-      - {name: CUT, cc: 74}                    # fréquence du filtre
-      - {name: RES, cc: 75}                    # résonance (knob F du filtre)
-      - {name: TYPE, cc: 76}                   # type, sur la machine MULTI-MODE (knob G)
-      - {name: ENV, cc: 77, bipolar: true}     # profondeur d'enveloppe du filtre
-    - - {name: BR, cc: 54}                     # bit reduction
-      - {name: OVER, cc: 57}                   # overdrive de track
-      - {name: SRR, cc: 55}                    # sample rate reduction
-      - {name: DEL, cc: 84}                    # envoi delay
-      - {name: REV, cc: 85}                    # envoi reverb
+      - {name: BR, cc: 54}                     # bit reduction
       - {name: CHO, cc: 12}                    # envoi chorus
-      - {name: PAN, cc: 90, bipolar: true}
       - {name: TUNE, cc: 16, bipolar: true}
+      - {name: PAN, cc: 90, bipolar: true}
 
 leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine

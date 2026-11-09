@@ -3,6 +3,20 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.18.0] - 2026-11-09
+
+### Ajouté
+
+- [6] Page 3 des encodeurs : niveau (LVL) des 16 tracks, affichage seul
+  (`Faders.levels_view`, `render._levels`) ; 1-8 à gauche, 9-16 à droite.
+
+### Modifié
+
+- [6] Ordre des pages : p1 LVL CUT RES ENV / OVER DEL REV SRR ; p2 LVL MW
+  BC PB / BR CHO TUNE PAN ; TYPE retiré.
+- [6] Flèches BROWSE : page précédente / suivante en boucle (avant :
+  gauche = p1, droite = p2) ; LED atténuées, pleines pendant l'appui.
+
 ## [0.17.0] - 2026-11-09
 
 ### Modifié

@@ -5,8 +5,10 @@ changement de pattern : le Pi part de la dernière valeur connue. Il apprend
 celles jouées sur la DT2 (`ENCODER DEST` et `MUTE DEST` = `INT + EXT`,
 décidé le 2026-11-09). Après un changement de pattern, toutes les valeurs
 sont marquées « hors prise » (`~`) : la DT2 a rechargé son kit.
-Plusieurs pages de 8 (flèches à côté des écrans) ; un paramètre est un CC
-ou le pitch bend (`PITCH_BEND`), sa valeur est gardée quelle que soit la page.
+Plusieurs pages de 8 (flèches à côté des écrans, qui cyclent dans les deux
+sens) ; un paramètre est un CC ou le pitch bend (`PITCH_BEND`), sa valeur est
+gardée quelle que soit la page. Si un encodeur s'appelle `LVL`, une dernière
+page montre le niveau des 16 tracks, en affichage seul (2026-11-09).
 """
 
 from __future__ import annotations
@@ -28,9 +30,22 @@ class FaderView:
     known: bool
 
 
+LEVEL_NAME = "LVL"  # encodeur dont le CC fait la page des niveaux
+N_TRACKS = 16
+
+
+@dataclass(frozen=True, slots=True)
+class LevelView:
+    track: int
+    value: int
+    stale: bool
+    known: bool  # False : jamais vu ni envoyé
+
+
 class Faders:
     def __init__(self, pages: list[list[tuple[str, int]]], mute_cc: int, raw_per_step: int) -> None:
         self.pages = pages  # pages de 8 × (abrégé, CC ou PITCH_BEND)
+        self.level_cc = next((c for p in pages for n, c in p if n == LEVEL_NAME), None)
         self.page_index = 0
         self.mute_cc = mute_cc
         self.raw_per_step = raw_per_step
@@ -40,13 +55,31 @@ class Faders:
         self.muted: dict[int, bool] = {}
 
     @property
+    def n_pages(self) -> int:
+        """Pages de paramètres, plus celle des niveaux s'il y a un LVL."""
+        return len(self.pages) + (self.level_cc is not None)
+
+    @property
+    def levels(self) -> bool:
+        """Page des niveaux des 16 tracks affichée (sans encodeurs)."""
+        return self.page_index >= len(self.pages)
+
+    @property
     def page(self) -> list[tuple[str, int]]:
-        return self.pages[self.page_index]
+        """Page de paramètres en cours ; sur la page des niveaux, la dernière."""
+        return self.pages[min(self.page_index, len(self.pages) - 1)]
+
+    def cycle(self, step: int) -> int:
+        """Flèches : page suivante (+1) ou précédente (−1), en boucle. Rend la page."""
+        self.page_index = (self.page_index + step) % self.n_pages
+        return self.page_index
 
     # --- entrées ------------------------------------------------------------
 
     def turn(self, track: int, encoder: int, raw_delta: int) -> tuple[int, int] | None:
         """Rotation de l'encodeur 1-8 → (CC ou PITCH_BEND, valeur 0-127), ou None."""
+        if self.levels:
+            return None
         acc = self._residue.get(encoder, 0) + raw_delta
         steps = int(acc / self.raw_per_step)  # vers zéro, dans les deux sens
         self._residue[encoder] = acc - steps * self.raw_per_step
@@ -97,6 +130,17 @@ class Faders:
         self.muted = {t: True for t in muted}
 
     # --- lecture --------------------------------------------------------------
+
+    def levels_view(self) -> list[LevelView]:
+        """Niveau de chaque track (CC du LVL), pour la page des niveaux."""
+        assert self.level_cc is not None
+        out = []
+        for t in range(1, N_TRACKS + 1):
+            key = (t, self.level_cc)
+            known = key in self._values
+            value = self._values.get(key, DEFAULT_VALUE)
+            out.append(LevelView(t, value, key in self._stale, known))
+        return out
 
     def view(self, track: int) -> list[FaderView]:
         out = []

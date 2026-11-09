@@ -702,18 +702,30 @@ divisions du repeat ; faders inchangés.
 
 **Deux pages, les mêmes pour toutes les tracks** (décidé le 2026-11-09,
 remplace la page unique CUT RES ENV DEC LVL PAN DLY REV), définies dans
-`config/default.yaml`, choisies par les flèches à côté des écrans
-(`BROWSE_LEFT` = page 1, `BROWSE_RIGHT` = page 2, LED de la page en
-cours pleine), en live comme en design. Numéros de l'annexe B du manuel
-DT2 (`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`, B.1-B.7) :
+`config/default.yaml`, choisies par les flèches à côté des écrans, en
+live comme en design. Numéros de l'annexe B du manuel DT2
+(`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`, B.1-B.7). **Ordre
+revu le 2026-11-09** (demande utilisateur), TYPE retiré :
 
 | Page | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| p1 | LVL 95 (niveau de track) | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | CUT 74 | RES 75 | TYPE 76 | ENV 77 |
-| p2 | BR 54 (bit reduction) | OVER 57 (overdrive) | SRR 55 | DEL 84 (envoi delay) | REV 85 | CHO 12 (chorus) | PAN 90 | TUNE 16 |
+| p1 | LVL 95 (niveau de track) | CUT 74 | RES 75 | ENV 77 | OVER 57 (overdrive) | DEL 84 (envoi delay) | REV 85 | SRR 55 |
+| p2 | LVL 95 | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | BR 54 (bit reduction) | CHO 12 (chorus) | TUNE 16 | PAN 90 |
+| p3 | niveaux des 16 tracks (LVL), affichage seul | | | | | | | |
 
-- TYPE = knob G du filtre : le type sur la machine MULTI-MODE seulement,
-  un autre paramètre sur les autres machines.
+- **Flèches** (2026-11-09) : `BROWSE_RIGHT` = page suivante,
+  `BROWSE_LEFT` = précédente, **en boucle** (p3 → p1, p1 → p3) ; LED des
+  deux flèches atténuées, pleine pendant l'appui ; `page 2/3` dans le
+  bandeau.
+- **Page des niveaux (p3)** : le LVL des 16 tracks, connu par les CC reçus
+  de la DT2 ou envoyés par la MK2 ; 1-8 sur l'écran gauche, 9-16 sur le
+  droit, 4 par ligne, numéro et jauge ; track sélectionnée inversée, mutée
+  entre crochets (`[5]`), hors prise en pointillé, jamais vue = cadre vide.
+  Encodeurs sans effet (`levels: display only`, décidé le 2026-11-09). La
+  page n'existe que si une page porte un encodeur `LVL`.
+
+- TYPE (CC 76, knob G du filtre) retiré des pages le 2026-11-09 : le type
+  sur la machine MULTI-MODE seulement, un autre paramètre ailleurs.
 - MW, BC et PB n'agissent que si le preset leur assigne jusqu'à 4
   paramètres (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset,
   manuel p. 39). PB part en message pitch bend (0-127 → -8192..8191,
@@ -776,7 +788,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | PATTERN + pad | pattern n de la banque courante (PC) | sans effet, le pad joue (décidé le 2026-11-09) |
 | PATTERN + GROUP n | banque n pour PATTERN + pad (sans envoi) ; GROUP tenus = banque | sans effet (GROUP seul = banque du design) |
 | 8 encodeurs | les 8 faders de la track sélectionnée | les 8 faders de la track active (p-locks en LIVE REC) |
-| Flèches à côté des écrans (BROWSE ◀ ▶) | page d'encodeurs 1 / 2 | idem |
+| Flèches à côté des écrans (BROWSE ◀ ▶) | page d'encodeurs précédente / suivante, en boucle (p3 = niveaux des 16 tracks) | idem |
 | Flèches de transport (◀ ▶, à côté de RESTART) | sans effet, LED éteintes | octave des pads −1 / +1, ±4 au plus, notes bornées à 0-127, remise à 0 par GROUP ; sans effet en rythmique ; LED pleine du côté décalé, `oct +1` sur l'écran droit (décidé le 2026-11-09) |
 | NOTE REPEAT tenu + pad | répétition ; les 8 boutons au-dessus des écrans choisissent la division (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64) | idem |
 | SHIFT + NOTE REPEAT | verrouillage du repeat | idem |

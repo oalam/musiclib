@@ -297,6 +297,9 @@ class Engine:
         active de la DT2 (p-locks en LIVE REC) ; valeurs tenues sous la track sélectionnée."""
         if not self.design and not self._reachable(self.track):
             return []
+        if self.faders.levels:
+            self.last_control = "levels: display only"
+            return []
         if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
             self.last_control = "PB: hold SHIFT"  # pitch bend tenu par SHIFT seulement
             return []
@@ -484,7 +487,7 @@ class Engine:
         if self.bank is None:
             self.bank = session.bank
         self.track = session.track
-        if session.page < len(self.faders.pages):
+        if session.page < self.faders.n_pages:
             self.faders.page_index = session.page
         values = {(f.track, f.param): f.value for f in session.faders}
         self.faders.restore(values, set(session.muted))
@@ -652,7 +655,7 @@ class Engine:
             self._held_buttons.discard(name)
             if name in ("SHIFT", "CONTROL"):
                 self.modes.combo_released()
-            if name in MODIFIERS:
+            if name in MODIFIERS or name.startswith("BROWSE_"):
                 self.leds_dirty = True
             if name == "NOTE_REPEAT":
                 self.repeat_held = False
@@ -681,10 +684,9 @@ class Engine:
             self._load_selected()
             return
         if name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # page d'encodeurs
-            page = 0 if name == "BROWSE_LEFT" else len(self.faders.pages) - 1
-            if page != self.faders.page_index:
-                self.faders.page_index = page
-                self.last_control = f"page {page + 1}"
+            page = self.faders.cycle(-1 if name == "BROWSE_LEFT" else 1)  # en boucle
+            levels = "  levels" if self.faders.levels else ""
+            self.last_control = f"page {page + 1}/{self.faders.n_pages}{levels}"
             self.leds_dirty = True
             return
         if name in ("TRANSPORT_LEFT", "TRANSPORT_RIGHT"):  # octave du design
@@ -883,8 +885,8 @@ class Engine:
         }
         for name in MODIFIERS:
             buttons[name] = (LED_MAX if name in held else low) if name in self._modifiers else 0
-        for i, name in enumerate(("BROWSE_LEFT", "BROWSE_RIGHT")):
-            buttons[name] = LED_MAX if i == min(self.faders.page_index, 1) else low
+        for name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # cyclent : toujours disponibles
+            buttons[name] = LED_MAX if name in held else low
         if self.design and layout.kind != "rythmique":  # pleine du côté où l'on est décalé
             buttons["TRANSPORT_LEFT"] = LED_MAX if self.octave < 0 else low
             buttons["TRANSPORT_RIGHT"] = LED_MAX if self.octave > 0 else low

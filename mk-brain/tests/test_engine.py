@@ -253,7 +253,7 @@ def test_select_then_encoder_sends_cc_on_track_channel(cfg: Config) -> None:
     assert eng.track == 7
     from mk_brain.engine import ControlChange
 
-    assert eng.handle(EncoderEvent(5, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
+    assert eng.handle(EncoderEvent(2, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
 
 
 def test_auto_channel_track_refused(cfg: Config) -> None:
@@ -305,17 +305,17 @@ def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     eng.on_control_change(15, 74, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
     eng.on_control_change(15, 94, 1)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
     assert not eng.faders.muted
-    assert eng.handle(EncoderEvent(5, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
+    assert eng.handle(EncoderEvent(2, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
 
 
 def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_control_change(0, 74, 30)
     eng.on_program_change(3)
-    assert eng.faders.view(1)[4].stale
-    eng.handle(EncoderEvent(5, 4, 0), 0)
+    assert eng.faders.view(1)[1].stale  # CUT, encodeur 2
+    eng.handle(EncoderEvent(2, 4, 0), 0)
     eng.on_program_change(3)  # même pattern (PC du Stop) : rien ne change
-    assert not eng.faders.view(1)[4].stale
+    assert not eng.faders.view(1)[1].stale
 
 
 # --- slice 5.B : modes live / design ---------------------------------------------
@@ -368,9 +368,9 @@ def test_design_encoders_on_auto_channel_with_rec_hint(cfg: Config) -> None:
     eng.handle(PadEvent(3, True, 2500), 0)  # index 3 = pad 16 : joignable en design
     btn(eng, "SELECT", False)
     assert eng.track == 16
-    assert eng.handle(EncoderEvent(5, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
+    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
     assert eng.last_control.endswith("DT2 in LIVE REC?")
-    eng.handle(EncoderEvent(5, 4, 0), 0)
+    eng.handle(EncoderEvent(2, 4, 0), 0)
     assert "LIVE REC" not in eng.last_control  # rappel une fois par passage en design
 
 
@@ -516,6 +516,7 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     from mk_brain.engine import ControlChange, PitchBend
 
     eng = Engine(cfg)
+    btn(eng, "BROWSE_RIGHT")  # page 2 : LVL MW BC PB BR CHO TUNE PAN
     assert eng.handle(EncoderEvent(4, 8, 0), 0) == []  # PB sans SHIFT : rien
     assert eng.last_control == "PB: hold SHIFT"
     btn(eng, "SHIFT")
@@ -527,11 +528,11 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     btn(eng, "SHIFT")
     eng.handle(EncoderEvent(4, 8, 0), 0)
     btn(eng, "SHIFT", False)
-    btn(eng, "BROWSE_RIGHT")
-    assert eng.last_control == "page 2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
-    assert eng.handle(EncoderEvent(1, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
-    btn(eng, "BROWSE_LEFT")
     assert eng.faders.view(1)[3].value == 64  # PB revenu au centre
+    assert eng.handle(EncoderEvent(5, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
+    btn(eng, "BROWSE_LEFT")
+    assert eng.last_control == "page 1/3" and eng.leds().buttons["BROWSE_RIGHT"] > 0
+    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
 
 
 def test_pattern_has_no_effect_in_design(cfg: Config, project: Project) -> None:
@@ -737,3 +738,17 @@ def test_design_layout_follows_bank_mode_until_pad_mode(cfg: Config, project: Pr
     assert group(eng) == "E"
     eng.on_program_change(6 * 16)  # G-JOKER : chromatique
     assert group(eng) == "B"
+
+
+def test_arrows_cycle_both_ways_and_levels_page_is_display_only(cfg: Config) -> None:
+    eng = Engine(cfg)
+    assert eng.faders.n_pages == 3
+    btn(eng, "BROWSE_LEFT")  # de la page 1 vers la dernière, en boucle
+    assert eng.faders.levels and eng.last_control == "page 3/3  levels"
+    eng.on_control_change(2, 95, 100)  # LVL de T03 joué sur la DT2
+    assert eng.handle(EncoderEvent(1, 8, 0), 0) == []  # affichage seul
+    assert eng.last_control == "levels: display only"
+    lv = eng.faders.levels_view()
+    assert (lv[2].value, lv[2].known) == (100, True) and not lv[3].known
+    btn(eng, "BROWSE_RIGHT")  # de la dernière vers la page 1
+    assert eng.faders.page_index == 0
