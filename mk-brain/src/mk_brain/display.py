@@ -74,13 +74,18 @@ TEXT_LINES = 5  # 64 / 5 = 12,8 px par ligne
 TEXT_TOP = -3  # 3 px vides en tête de police : descendantes de la 5e ligne entières
 
 
-def text_image(lines: list[str], bold: frozenset[int] = frozenset()) -> Image.Image:
+def text_image(
+    lines: list[str], bold: frozenset[int] = frozenset(), framed: bool = False
+) -> Image.Image:
     """Les 5 dernières lignes ; `bold` = index (dans `lines`) des libellés graissés d'1 px.
 
     Police vectorielle maigre en 13 : la police bitmap se lisait mal (6 pris pour 8).
+    `framed` : cadre d'1 px sur le bord, marque du mode design (slice 5.B).
     """
     img = new_image()
     d = ImageDraw.Draw(img)
+    if framed:
+        d.rectangle((0, 0, WIDTH - 1, HEIGHT - 1), outline=1)
     font = ImageFont.load_default(size=TEXT_SIZE)
     first = max(0, len(lines) - TEXT_LINES)
     for i, line in enumerate(lines[first:]):

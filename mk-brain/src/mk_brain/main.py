@@ -1,4 +1,4 @@
-"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-4, pads → DT2), `clock` (slice 2)."""
+"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-5, pads → DT2), `clock` (slice 2)."""
 
 from __future__ import annotations
 
@@ -171,7 +171,10 @@ def _clock_line(clock: ClockTracker) -> str:
 
 
 def _phrase_screen(engine: Engine) -> tuple[str, int]:
-    """Écran droit de `play` : mesure / longueur, ou -2 / -1 avant un cap."""
+    """Écran droit de `play` : mesure / longueur, ou -2 / -1 avant un cap ;
+    proposition de bascule de mode en attente (taille 0 = texte courant)."""
+    if engine.modes.pending is not None:
+        return (f"-> {engine.modes.pending.upper()} ?", 0)
     st = engine.phrase_state
     if st is None:
         return ("-", 44)
@@ -209,14 +212,15 @@ def cmd_play(dry_run: bool) -> int:
                 sched.at(t, m)  # un seul fil écrit sur le port, même pour l'immédiat
         if msgs and engine.last_played is not None:
             pad, note, vel = engine.last_played
-            text = f"{describe_note(cfg.layouts[engine.group], pad, note)} vel {vel}"
+            text = f"{describe_note(engine.layout, pad, note)} vel {vel}"
             if text != last or engine.last_decision:
                 last = text
                 print(f"{last}   {engine.last_decision}")
                 engine.last_decision = ""
 
     print(
-        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; "
+        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; mode live ; "
+        "SHIFT + CONTROL 1 s puis appui maître = changer de mode ; "
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )
     try:
@@ -243,22 +247,31 @@ def cmd_play(dry_run: bool) -> int:
             engine.log.clear()
             if engine.leds_dirty:
                 dev.send_leds(engine.leds())
-            lay = cfg.layouts[engine.group]
+            lay = engine.layout
             warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
                 warn = warn or "pas de clock : CLOCK SEND ?"
             big = engine.division if engine.repeat_held else None
-            state = (lay.group, _clock_line(clock), engine.status(), last, warn, big)
+            mode = engine.modes.mode
+            state = (mode, lay.group, _clock_line(clock), engine.status(), last, warn, big)
             if state != shown and now - last_draw > 100_000_000:
                 if big is not None:
                     _show(dev, 0, display.big_text_image(big))
                 else:
-                    lines = [f"{lay.group}  {lay.name}", _clock_line(clock), engine.status(), last]
-                    _show(dev, 0, display.text_image([*lines, warn], bold=frozenset({0, 4})))
+                    head = f"{lay.group}  {lay.name}"
+                    if engine.design:  # bandeau et cadre permanents : jamais confondu avec live
+                        head = f"DESIGN  {head}"
+                    lines = [head, _clock_line(clock), engine.status(), last, warn]
+                    img = display.text_image(lines, bold=frozenset({0, 4}), framed=engine.design)
+                    _show(dev, 0, img)
                 shown, last_draw = state, now
             right = _phrase_screen(engine)
             if right != shown_right:
-                _show(dev, 1, display.big_text_image(right[0], size=right[1]))
+                if right[1] == 0:
+                    lines = ["", right[0], "appui encodeur maître", "autre bouton : annuler"]
+                    _show(dev, 1, display.text_image(lines, bold=frozenset({1})))
+                else:
+                    _show(dev, 1, display.big_text_image(right[0], size=right[1]))
                 shown_right = right
     except KeyboardInterrupt:
         pass

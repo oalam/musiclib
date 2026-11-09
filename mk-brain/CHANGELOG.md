@@ -3,6 +3,23 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.7.0] - 2026-11-09
+
+### Ajouté
+
+- [5] 5.B `modes.py` : modes live / design ; SHIFT + CONTROL tenus 1 s
+  proposent l'autre mode, appui sur l'encodeur maître = confirmer (5 s,
+  tout autre bouton annule) ; refusé en live transport lancé, à la
+  proposition comme à la confirmation.
+- [5] 5.B Moteur : live = pads en rythmique, GROUP seul sans effet ;
+  design = disposition par GROUP ou PAD MODE (B chromatique au départ),
+  encodeurs sur l'AUTO CHANNEL avec rappel `DT2 en LIVE REC ?`, SELECT +
+  pad 16 permis ; quantize propre à chaque mode (off en design).
+- [5] 5.B LED : CONTROL pleine en design ou proposition en attente,
+  atténuée en live ; PAD MODE en design ; GROUP éteints en live arrêté.
+- [5] 5.B `play` : écran gauche bordé avec bandeau `DESIGN`, proposition
+  de bascule sur l'écran droit (`display.text_image(..., framed=)`).
+
 ## [0.6.2] - 2026-11-09
 
 ### Ajouté

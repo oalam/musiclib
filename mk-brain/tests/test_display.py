@@ -49,3 +49,10 @@ def test_text_image_bold_lines_are_thicker() -> None:
     bold = display.text_image(["Q16"], bold=frozenset({0})).getbbox()
     assert thin is not None and bold is not None
     assert bold[2] == thin[2] + 1  # graissé d'1 px vers la droite
+
+
+def test_text_image_framed_draws_border() -> None:
+    img = display.text_image(["DESIGN"], framed=True)
+    w, h = img.size
+    assert all(img.getpixel(xy) for xy in [(0, 0), (w - 1, 0), (0, h - 1), (w - 1, h - 1)])
+    assert not display.text_image(["DESIGN"]).getpixel((0, h - 1))

@@ -16,6 +16,11 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   8 encodeurs → CC sur le canal de la track, valeurs apprises de la DT2
   (`faders.py`). La track de l'AUTO CHANNEL n'est pas joignable par son
   canal : refusée.
+- Slice 5.B : modes live / design (`modes.py`), bascule par SHIFT + CONTROL
+  tenus 1 s puis appui sur l'encodeur maître, refusée en live transport
+  lancé. Live : pads en rythmique, GROUP seul sans effet. Design :
+  disposition au choix (GROUP ou PAD MODE, chromatique par défaut),
+  encodeurs sur l'AUTO CHANNEL. Quantize propre à chaque mode (off en design).
 """
 
 from __future__ import annotations
@@ -23,7 +28,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from mk_brain.clock import ClockTracker
-from mk_brain.config import RGB, Config
+from mk_brain.config import RGB, Config, Layout
 from mk_brain.faders import Faders
 from mk_brain.hid_mk2 import (
     GROUPS,
@@ -36,6 +41,7 @@ from mk_brain.hid_mk2 import (
     pad_label,
 )
 from mk_brain.layouts import N_PADS, pad_color, pad_note, scale, velocity
+from mk_brain.modes import ModeSwitch
 from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseState, pattern_label
 from mk_brain.quantize import (
     GRID_TICKS,
@@ -78,6 +84,9 @@ class ProgramChange:
 
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange
 MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
+LIVE_GROUP = 0  # disposition rythmique, imposée en live
+DESIGN_GROUP = 1  # chromatique, disposition de départ en design
+MODE_KEYS = ("SHIFT", "CONTROL", "MASTER_PUSH")  # n'annulent pas une bascule proposée
 Timed = tuple[int, MidiOut]
 
 
@@ -98,8 +107,10 @@ class Engine:
         self.cfg = cfg
         self.clock = clock or ClockTracker()
         self.channel = cfg.midi.auto_channel - 1
-        self.group = 0
-        self.quantize: QuantizeMode = cfg.play.quantize
+        self.modes = ModeSwitch()
+        self.group = DESIGN_GROUP  # disposition du mode design (en live : rythmique)
+        self._quantize: dict[str, QuantizeMode] = {"live": cfg.play.quantize, "design": "off"}
+        self._rec_hint = False  # rappel « DT2 en LIVE REC ? » déjà donné dans ce passage en design
         self.swing = cfg.play.swing
         self.division: str = cfg.play.repeat
         self.repeat_held = False
@@ -125,6 +136,26 @@ class Engine:
         self._consumed: set[int] = set()  # pads frappés avec un modificateur
 
     @property
+    def design(self) -> bool:
+        return self.modes.mode == "design"
+
+    @property
+    def layout(self) -> Layout:
+        return self.cfg.layouts[self.group if self.design else LIVE_GROUP]
+
+    @property
+    def quantize(self) -> QuantizeMode:
+        return self._quantize[self.modes.mode]
+
+    @quantize.setter
+    def quantize(self, value: QuantizeMode) -> None:
+        self._quantize[self.modes.mode] = value
+
+    @property
+    def running(self) -> bool:
+        return self.clock.ticks_since_start is not None
+
+    @property
     def repeat_active(self) -> bool:
         return self.repeat_held or self.repeat_locked
 
@@ -132,7 +163,7 @@ class Engine:
 
     def handle(self, ev: Event, now: int) -> list[Timed]:
         if isinstance(ev, ButtonEvent):
-            self._button(ev)
+            self._button(ev, now)
             return []
         if isinstance(ev, EncoderEvent):
             if ev.index == 0:
@@ -149,7 +180,9 @@ class Engine:
         return True
 
     def _encoder(self, index: int, delta: int, now: int) -> list[Timed]:
-        if not self._reachable(self.track):
+        """Live : canal de la track sélectionnée. Design : AUTO CHANNEL, donc la track
+        active de la DT2 (p-locks en LIVE REC) ; valeurs tenues sous la track sélectionnée."""
+        if not self.design and not self._reachable(self.track):
             return []
         sent = self.faders.turn(self.track, index, delta)
         if sent is None:
@@ -157,12 +190,16 @@ class Engine:
         cc, value = sent
         name = self.faders.page[index - 1][0]
         self.last_control = f"T{self.track:02d} {name} {value}"
-        return [(now, ControlChange(self.track - 1, cc, value))]
+        if self.design and not self._rec_hint:
+            self._rec_hint = True
+            self.last_control += "  DT2 en LIVE REC ?"
+        channel = self.channel if self.design else self.track - 1
+        return [(now, ControlChange(channel, cc, value))]
 
     def _command(self, pad: int, now: int) -> list[Timed]:
         held = self._held_buttons
         if "SELECT" in held:
-            if self._reachable(pad):
+            if self.design or self._reachable(pad):
                 self.track = pad
                 self.last_control = f"T{pad:02d} sélectionnée"
             return []
@@ -226,10 +263,34 @@ class Engine:
         self.log.append(f"recalage -> mesure {first_bar} à la barre {at + 1}")
         return True
 
-    def _button(self, ev: ButtonEvent) -> None:
+    def _switch_mode(self, name: str, now: int) -> bool:
+        """Bascule de mode : SHIFT + CONTROL tenus, appui maître = confirmer. True si consommé."""
+        if name == "MASTER_PUSH" and self.modes.pending is not None:
+            msg = self.modes.confirm(self.running)
+            if self.design and msg and msg.startswith("mode"):
+                self._rec_hint = False
+            self._note(msg)
+            self.leds_dirty = True
+            return True
+        if name not in MODE_KEYS:
+            self._note(self.modes.cancel())
+        if {"SHIFT", "CONTROL"} <= self._held_buttons and name in ("SHIFT", "CONTROL"):
+            self.modes.combo_pressed(now)
+            return True
+        return False
+
+    def _note(self, msg: str | None) -> None:
+        if msg:
+            self.last_control = msg
+            self.log.append(msg)
+            self.leds_dirty = True
+
+    def _button(self, ev: ButtonEvent, now: int) -> None:
         name = ev.name
         if not ev.pressed:
             self._held_buttons.discard(name)
+            if name in ("SHIFT", "CONTROL"):
+                self.modes.combo_released()
             if name in MODIFIERS:
                 self.leds_dirty = True
             if name == "NOTE_REPEAT":
@@ -239,6 +300,8 @@ class Engine:
                 self.leds_dirty = True
             return
         self._held_buttons.add(name)
+        if self._switch_mode(name, now):
+            return
         shift = "SHIFT" in self._held_buttons
         if shift and name == "PLAY":
             self._recalibrate(1)
@@ -252,7 +315,11 @@ class Engine:
             self.leds_dirty = True
             return
         if name.startswith("GROUP_"):
+            if not self.design:  # live : pads toujours en rythmique
+                return
             self.group = GROUPS.index(name[-1])
+        elif name == "PAD_MODE" and self.design:
+            self.group = (self.group + 1) % len(self.cfg.layouts)
         elif name == "GRID":
             i = QUANTIZE_CYCLE.index(self.quantize)
             self.quantize = QUANTIZE_CYCLE[(i + 1) % len(QUANTIZE_CYCLE)]
@@ -307,6 +374,7 @@ class Engine:
 
     def tick(self, now: int) -> list[Timed]:
         """Attaques dont la fenêtre de vélocité est écoulée, coups de repeat à venir."""
+        self._note(self.modes.update(now, self.running))
         self._update_phrase()
         window = int(self.cfg.velocity.window_ms * 1e6)
         out: list[Timed] = []
@@ -341,7 +409,7 @@ class Engine:
 
     def _fire(self, pad: int, now: int) -> list[Timed]:
         att = self._attacks.pop(pad)
-        note = pad_note(self.cfg.layouts[self.group], pad)
+        note = pad_note(self.layout, pad)
         vel = velocity(self.cfg.velocity, att.peak)
         self.last_played = (pad, note, vel)
         ticks = self.clock.ticks_at(att.start)  # instant de la frappe, pas de la fin de fenêtre
@@ -373,7 +441,7 @@ class Engine:
         return f"T{self.track:02d}  {q}  SW{self.swing}{rep}"
 
     def leds(self) -> LedState:
-        layout = self.cfg.layouts[self.group]
+        layout = self.layout
         dim = self.cfg.leds.dim
         lit = set(self._attacks) | set(self._sounding) | set(self._repeats)
         held = self._held_buttons
@@ -381,7 +449,8 @@ class Engine:
         for index in range(N_PADS):
             pad = pad_label(index)
             full = pad_color(self.cfg, layout, pad)
-            if held & {"MUTE", "SELECT"} and pad == self.cfg.midi.auto_channel:
+            auto = pad == self.cfg.midi.auto_channel
+            if auto and ("MUTE" in held or ("SELECT" in held and not self.design)):
                 pads[index] = (0, 0, 0)  # track de l'AUTO CHANNEL : pas joignable
             elif "MUTE" in held:  # tracks ouvertes pleines, mutées éteintes
                 pads[index] = (0, 0, 0) if self.faders.muted.get(pad) else full
@@ -393,7 +462,9 @@ class Engine:
         if "PATTERN" in held:  # PATTERN tenu : les GROUP montrent la banque
             white = self.cfg.families["chromatique"]
             groups = [scale(white, 1.0 if g == self.bank else dim) for g in range(len(GROUPS))]
-        elif st is None:  # transport arrêté : les GROUP montrent la disposition
+        elif st is None and not self.design:  # live arrêté : GROUP sans rôle, éteints
+            groups = [(0, 0, 0)] * len(GROUPS)
+        elif st is None:  # design arrêté : les GROUP montrent la disposition
             groups = [
                 scale(self.cfg.families[lay.family], 1.0 if g == self.group else dim)
                 for g, lay in enumerate(self.cfg.layouts)
@@ -409,6 +480,8 @@ class Engine:
             "NOTE_REPEAT": LED_MAX if self.repeat_active else 0,
             "SWING": LED_MAX if self.swing > 50 else 0,
             "PLAY": LED_MAX if st is not None and st.pulse else 0,
+            "CONTROL": LED_MAX if self.design or self.modes.pending else low,
+            "PAD_MODE": low if self.design else 0,
         }
         for name in MODIFIERS:
             buttons[name] = LED_MAX if name in held else low

@@ -9,6 +9,7 @@ from mk_brain.hid_mk2 import BUTTONS, ButtonEvent, EncoderEvent, PadEvent
 
 PAD1 = 12  # index HID du pad 1 (constat slice 0)
 MS = 1_000_000
+SECOND = 1_000_000_000
 TICK = round(60e9 / (24 * 143))  # 143 BPM : 17 482 517 ns
 
 
@@ -26,9 +27,23 @@ def press(eng: Engine, t: int, pressure: int = 2500, pad: int = PAD1) -> list[Ti
     return out + eng.tick(t + 3 * MS)
 
 
-def btn(eng: Engine, name: str, pressed: bool = True) -> None:
+def btn(eng: Engine, name: str, pressed: bool = True, t: int = 0) -> None:
     assert name in BUTTONS
-    eng.handle(ButtonEvent(name, pressed), 0)
+    eng.handle(ButtonEvent(name, pressed), t)
+
+
+def design(cfg: Config, clock: ClockTracker | None = None) -> Engine:
+    """Moteur passé en design par le geste : SHIFT + CONTROL 1 s, appui maître."""
+    eng = Engine(cfg, clock)
+    btn(eng, "SHIFT")
+    btn(eng, "CONTROL")
+    eng.tick(SECOND)
+    btn(eng, "SHIFT", False)
+    btn(eng, "CONTROL", False)
+    btn(eng, "MASTER_PUSH")
+    btn(eng, "MASTER_PUSH", False)
+    assert eng.design
+    return eng
 
 
 # --- slice 1, transport arrêté : immédiat -------------------------------------
@@ -51,7 +66,7 @@ def test_short_hit_fires_on_release(cfg: Config) -> None:
 
 
 def test_group_changes_layout_and_note_off_keeps_note(cfg: Config) -> None:
-    eng = Engine(cfg)
+    eng = design(cfg)
     btn(eng, "GROUP_C")
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 60, 127))]
     btn(eng, "GROUP_A")
@@ -64,7 +79,7 @@ def test_leds_lit_pad_and_active_group(cfg: Config) -> None:
     leds = eng.leds()
     assert leds.pads[PAD1] == cfg.track_colors[1]
     assert leds.pads[0] != cfg.track_colors[13]  # pad 13 au repos, atténué
-    assert leds.groups[0] == cfg.families["rythmique"]
+    assert leds.groups == [(0, 0, 0)] * 8  # live arrêté : GROUP sans rôle
     assert leds.buttons["GRID"] > 0  # quantize 1/16 par défaut
     assert not eng.leds_dirty
 
@@ -171,7 +186,7 @@ def test_phrase_leds_follow_transport(cfg: Config) -> None:
     eng.clock.stop(0)
     eng.tick(0)
     leds = eng.leds()
-    assert leds.groups[0] == cfg.families["rythmique"]  # retour aux dispositions
+    assert leds.groups == [(0, 0, 0)] * 8  # live arrêté : éteints
     assert leds.buttons["PLAY"] == 0
 
 
@@ -199,7 +214,7 @@ def test_shift_play_and_shift_group_recalibrate(cfg: Config) -> None:
     advance(eng, 1, 2 * 96 + 41)  # mesure 3
     btn(eng, "SHIFT")
     btn(eng, "GROUP_C")
-    assert eng.group == 0  # SHIFT + GROUP ne change pas la disposition
+    assert eng.group == 1  # SHIFT + GROUP ne change pas la disposition
     advance(eng, 2 * 96 + 41, 3 * 96 + 1)
     assert eng.phrase_state is not None and eng.phrase_state.bar == 17
     btn(eng, "PLAY")
@@ -255,7 +270,7 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
     assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []
     assert eng.last_control.startswith("banque ?")
     btn(eng, "GROUP_B")  # PATTERN tenu : banque B, sans changer de disposition
-    assert eng.group == 0 and eng.bank == 1
+    assert eng.group == 1 and eng.layout.group == "A" and eng.bank == 1
     assert eng.leds().groups[1] == cfg.families["chromatique"]
     assert eng.handle(PadEvent(PAD1, True, 2500), MS) == [(MS, ProgramChange(9, 16))]  # B01
     eng.handle(PadEvent(PAD1, False, 0), MS)
@@ -286,3 +301,59 @@ def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
     eng.handle(EncoderEvent(1, 4, 0), 0)
     eng.on_program_change(3)  # même pattern (PC du Stop) : rien ne change
     assert not eng.faders.view(1)[0].stale
+
+
+# --- slice 5.B : modes live / design ---------------------------------------------
+
+
+def test_live_pads_stay_rhythmic(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "GROUP_C")
+    btn(eng, "PAD_MODE")
+    assert eng.layout.group == "A"
+    assert press(eng, 0) == [(3 * MS, NoteOn(15, 0, 127))]
+
+
+def test_design_starts_chromatic_with_own_quantize(cfg: Config) -> None:
+    eng = design(cfg)
+    assert (eng.layout.group, eng.quantize) == ("B", "off")
+    btn(eng, "PAD_MODE")
+    btn(eng, "GRID")
+    assert (eng.layout.group, eng.quantize) == ("C", "1/16")
+    eng.modes.mode = "live"
+    assert (eng.layout.group, eng.quantize) == ("A", cfg.play.quantize)
+
+
+def test_mode_switch_refused_in_live_while_running(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(1))
+    eng.on_start()
+    btn(eng, "SHIFT")
+    btn(eng, "CONTROL")
+    eng.tick(SECOND)
+    btn(eng, "MASTER_PUSH")
+    assert not eng.design and eng.last_control.startswith("transport lancé")
+
+
+def test_other_button_cancels_proposal(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "SHIFT")
+    btn(eng, "CONTROL")
+    eng.tick(SECOND)
+    assert eng.modes.pending == "design" and eng.leds().buttons["CONTROL"] > 0
+    btn(eng, "GRID")
+    btn(eng, "MASTER_PUSH")
+    assert not eng.design and eng.last_control == "bascule annulée"
+
+
+def test_design_encoders_on_auto_channel_with_rec_hint(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = design(cfg)
+    btn(eng, "SELECT")
+    eng.handle(PadEvent(3, True, 2500), 0)  # index 3 = pad 16 : joignable en design
+    btn(eng, "SELECT", False)
+    assert eng.track == 16
+    assert eng.handle(EncoderEvent(1, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
+    assert eng.last_control.endswith("DT2 en LIVE REC ?")
+    eng.handle(EncoderEvent(1, 4, 0), 0)
+    assert "LIVE REC" not in eng.last_control  # rappel une fois par passage en design

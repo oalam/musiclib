@@ -196,6 +196,26 @@ la slice 7**.
 - Le Pi ne sait pas si la DT2 est en LIVE REC (rien n'est transmis). Le mode
   design le rappelle à l'écran (`DT2 en LIVE REC ?`) au premier mouvement
   d'encodeur.
+- **Précisé le 2026-11-09 (slice 5.B, provisoire jusqu'à l'essai sur la
+  MK2)** :
+  - la proposition (`-> DESIGN ?` sur l'écran droit, LED CONTROL pleine)
+    attend 5 s l'appui sur l'encodeur maître ; tout autre bouton l'annule.
+    En live, un Start pendant l'attente l'annule et la confirmation revérifie
+    le transport ;
+  - quantize propre à chaque mode : on retrouve celle du live en revenant ;
+  - live : GROUP seul sans effet, LED GROUP éteintes transport arrêté
+    (compteur transport lancé) ; PAD MODE éteint ;
+  - design : GROUP seul ou PAD MODE choisit la disposition (B chromatique au
+    départ ; GROUP en design reste à trancher en 5.D), LED CONTROL pleine ;
+    SELECT + pad 16 permis (la track active est visée par l'AUTO CHANNEL),
+    valeurs des encodeurs tenues sous la track sélectionnée ; rappel
+    `DT2 en LIVE REC ?` au premier mouvement de chaque passage en design ;
+  - Program Change reçu en design : banque de PATTERN + pad, faders hors
+    prise et mesure 1 comme en live (faits de la DT2) ; seuls les réglages
+    de banque du projet (slice 6) n'en dépendent pas ;
+  - bandeau `DESIGN` et cadre de l'écran gauche dès 5.B ; couleurs des pads
+    hors gamme et pages complètes : 5.C et 5.D ; `demarrage: design` avec
+    les projets (slice 6).
 
 ## Projets : de la doctrine au fichier projet
 
@@ -548,9 +568,9 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
   - PC reçu transport arrêté : ignoré (le Start remet à 1) ; Stop reçu
     avant la barre : la remise en attente est oubliée ;
   - le 1 de chaque mesure pulse sur la LED PLAY (première croche) ;
-  - en attendant les modes (slice 5) : transport lancé, les LED GROUP
-    montrent le compteur ; arrêté, la disposition. GROUP seul choisit
-    toujours la disposition. Longueur de phrase dans `config/default.yaml`
+  - transport lancé, les LED GROUP montrent le compteur ; arrêté, la
+    disposition en design, rien en live, où GROUP seul est sans effet
+    (slice 5.B, cf. Modes). Longueur de phrase dans `config/default.yaml`
     (`play.phrase`), par banque avec les projets (slice 6), comme `intro`.
 
 ## Réglages DT2 requis
@@ -593,7 +613,7 @@ conditionne tout le reste.
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
-| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule ; 5.C écrans live et superpositions ; 5.D design (menus ; GROUP en design à trancher) |
+| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite le 2026-11-09, à essayer sur la MK2 ; 5.C écrans live et superpositions ; 5.D design (menus ; GROUP en design à trancher) |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 

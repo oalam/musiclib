@@ -22,7 +22,9 @@ couleurs, dispositions A-H.
 .venv/bin/mk-brain list               # interfaces HID de la MK2
 .venv/bin/mk-brain spike              # mire, balayage LED, écho des contrôles, bilan à Ctrl-C
 .venv/bin/mk-brain spike --raw --no-chase   # + rapports bruts en hexa
-.venv/bin/mk-brain play               # pads → DT2 (AUTO CHANNEL), GROUP A-H = disposition,
+.venv/bin/mk-brain play               # pads → DT2 (AUTO CHANNEL), démarre en live (rythmique),
+                                      # SHIFT + CONTROL 1 s + appui maître = live / design,
+                                      # en design GROUP A-H ou PAD MODE = disposition,
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 .venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks
