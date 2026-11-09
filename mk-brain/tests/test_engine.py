@@ -370,3 +370,25 @@ def test_live_selected_track_pad_stays_lit(cfg: Config) -> None:
     pads = eng.leds().pads
     assert pads[PAD7] == scale(cfg.track_colors[7], cfg.leds.selected)
     assert pads[PAD1] == scale(cfg.track_colors[1], cfg.leds.dim)
+
+
+def test_next_pattern_requested_then_announced(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(1))
+    eng.on_start()
+    eng.on_program_change(16 * 4 + 3)  # E04 annoncé
+    advance(eng, 1, 96 + 1)
+    assert (eng.phrase.pattern, eng.next_pattern) == ("E04", None)
+    btn(eng, "PATTERN")
+    eng.handle(PadEvent(PAD7, True, 2500), 96 * TICK)
+    assert eng.next_pattern == "E07"  # demandé, pas encore confirmé
+    eng.on_program_change(16 * 4 + 6)
+    assert eng.next_pattern == "E07"  # annoncé par la DT2, appliqué à la barre
+    advance(eng, 96 + 1, 2 * 96 + 1)
+    after: tuple[str | None, str | None] = (eng.phrase.pattern, eng.next_pattern)
+    assert after == ("E07", None)
+
+
+def test_program_change_when_stopped_sets_current_pattern(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.on_program_change(16 + 1)
+    assert (eng.phrase.pattern, eng.next_pattern) == ("B02", None)

@@ -5,15 +5,15 @@ Disposition (revue le 2026-11-09 à l'essai) : chaque écran a un bandeau
 (deux tiers supérieurs) et, dessous, 4 colonnes de 64 px, une au-dessus de
 chaque encodeur (1-4 sous l'écran gauche, 5-8 sous le droit) : nom et jauge
 sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
-- Bandeau gauche : pattern, BPM, transport, quantize, swing ; puis track
-  sélectionnée, ou dernier geste / frappe, ou alerte.
+- Bandeau gauche : pattern en cours (et prochain) et track sélectionnée en
+  gros ; dessous, les 16 mutes, remplacés un instant par une alerte ou le
+  dernier geste. Pas de tempo, quantize ni swing (décidé à l'essai).
 - Bandeau droit : mesure / longueur, phrase, cap ; barre de progression,
   inversée dans les 4 dernières mesures ; compte à rebours `-2` / `-1` en
   bandeau inversé.
 - NOTE REPEAT : les 8 divisions dans les deux bandeaux, chacune sous son
   bouton d'écran, la division choisie inversée.
 - Bascule de mode proposée : l'écran droit entier.
-Les symboles (lecture, arrêt) sont dessinés : la police intégrée ne les a pas.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ BAND = 40  # hauteur du bandeau (deux tiers supérieurs) ; faders dessous
 COLS = 4  # colonnes de fader par écran
 COL = WIDTH // COLS
 SMALL = 12
-LINE_SIZES = (20, 16, 12)  # 2e ligne du bandeau gauche : la plus grande qui tient
+BIG = 30  # pattern et track sélectionnée
 BAR = 24  # mesure / longueur
 DIVISION = 20
 COUNTDOWN = 40
@@ -60,19 +60,12 @@ def _centered(d: ImageDraw.ImageDraw, box: Box, text: str, font: Font, ink: int)
     d.text((x, y), text, font=font, fill=ink)
 
 
-def _fit(d: ImageDraw.ImageDraw, text: str, width: int) -> Font:
-    for size in LINE_SIZES:
+def _fit(d: ImageDraw.ImageDraw, text: str, width: int, sizes: tuple[int, ...] = (16, 12)) -> Font:
+    for size in sizes:
         font = _font(size)
         if d.textlength(text, font=font) <= width:
             return font
-    return _font(LINE_SIZES[-1])
-
-
-def _transport(d: ImageDraw.ImageDraw, x: int, y: int, running: bool) -> None:
-    if running:
-        d.polygon([(x, y), (x, y + 8), (x + 7, y + 4)], fill=1)
-    else:
-        d.rectangle((x, y + 1, x + 6, y + 7), fill=1)
+    return _font(sizes[-1])
 
 
 def _showing_repeat(engine: Engine) -> bool:
@@ -91,39 +84,55 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
         _centered(d, box, name, font, 0 if chosen else 1)
 
 
+def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+    """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
+    La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point."""
+    cell = WIDTH // 16
+    top, bottom = 29, 35
+    for t in range(1, 17):
+        x0, x1 = (t - 1) * cell + 2, t * cell - 3
+        if t == engine.cfg.midi.auto_channel:
+            d.point(((x0 + x1) // 2, (top + bottom) // 2), fill=1)
+        elif engine.faders.muted.get(t):
+            d.rectangle((x0, top, x1, bottom), outline=1)
+        else:
+            d.rectangle((x0, top, x1, bottom), fill=1)
+        if t == engine.track:
+            d.rectangle((x0 - 1, bottom + 2, x1 + 1, bottom + 3), fill=1)
+
+
 def _left_band(
     d: ImageDraw.ImageDraw, engine: Engine, now: int, message: tuple[str, int] | None, warn: str
 ) -> None:
-    small = _font(SMALL)
-    q = "Qoff" if engine.quantize == "off" else f"Q{engine.quantize[2:]}"
+    """Pattern en cours (et prochain) et track sélectionnée en gros ; mutes dessous.
+    Tempo, quantize et swing ne sont pas affichés (LED GRID et SWING, écran de la DT2)."""
+    big, mid = _font(BIG), _font(16)
+    track = f"T{engine.track:02d}"
+    tw = int(d.textlength(track, font=big))
+    _bold(d, (WIDTH - tw - 4, -6), track, big, 1)
     if engine.design:
         lay = engine.layout
-        _bold(d, (3, -3), f"DESIGN  {lay.group} {lay.name}", small, 1)
-        d.text((190, -3), q, font=small, fill=1)
+        _bold(d, (3, -3), "DESIGN", mid, 1)
+        d.text((3, 12), f"{lay.group} {lay.name}  -> AUTO", font=_font(SMALL), fill=1)
     else:
-        bpm = f"{engine.clock.bpm:5.1f}" if engine.clock.bpm else "--.-"
-        d.text((3, -3), engine.phrase.pattern or "---", font=small, fill=1)
-        d.text((50, -3), bpm, font=small, fill=1)
-        _transport(d, 96, 0, engine.phrase_state is not None)
-        d.text((120, -3), f"{q}  SW{engine.swing}", font=small, fill=1)
-    # 2e ligne : alerte > frappe ou geste le plus récent > track sélectionnée
-    track = engine.track
-    if engine.design:
-        line = f"T{track:02d}  -> AUTO ch{engine.cfg.midi.auto_channel}"
-    else:
-        line = f"T{track:02d}  ch{track}" + ("  MUTE" if engine.faders.muted.get(track) else "")
+        current = engine.phrase.pattern or "---"
+        _bold(d, (3, -6), current, big, 1)
+        nxt = engine.next_pattern
+        if nxt is not None:
+            x = 8 + int(d.textlength(current, font=big))
+            _bold(d, (x, 1), f"> {nxt}", mid, 1)
+    # bande des mutes, ou alerte / geste / frappe en design, le plus récent
     recent: list[tuple[int, str]] = []
     if message is not None and now - message[1] < MESSAGE_NS:
         recent.append((message[1], message[0]))
     hit = engine.last_hit
-    if hit is not None and now - hit[2] < OVERLAY_NS:
-        pad, vel, at = hit
-        label = f"T{pad:02d}" if engine.layout.kind == "rythmique" else f"pad {pad}"
-        recent.append((at, f"{label}  vel {vel}"))
-    if recent:
-        line = max(recent)[1]
-    text = warn or line
-    _bold(d, (3, 15), text, _fit(d, text, WIDTH - 8), 1)
+    if engine.design and hit is not None and now - hit[2] < OVERLAY_NS:
+        recent.append((hit[2], f"pad {hit[0]}  vel {hit[1]}"))
+    text = warn or (max(recent)[1] if recent else "")
+    if text:
+        _bold(d, (3, 23), text, _fit(d, text, WIDTH - 8, (12,)), 1)
+    else:
+        _mute_strip(d, engine)
 
 
 def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:

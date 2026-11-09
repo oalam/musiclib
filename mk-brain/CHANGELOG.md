@@ -17,6 +17,10 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
   track et compte à rebours en gros), faders sur le tiers bas, nom et
   jauge alignés ; plus de valeur numérique, jauge en pointillé tant
   qu'elle est hors prise (remplace le `~`).
+- [5] 5.C Bandeau gauche : pattern en cours et prochain (annoncé par la
+  DT2 ou demandé par PATTERN + pad) et track sélectionnée en gros, bande
+  des 16 mutes ; tempo, quantize et swing retirés. PC reçu transport
+  arrêté = pattern en cours aussitôt.
 
 ## [0.8.0] - 2026-11-09
 

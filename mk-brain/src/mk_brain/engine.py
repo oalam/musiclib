@@ -136,6 +136,7 @@ class Engine:
         self._consumed: set[int] = set()  # pads frappés avec un modificateur
         self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
         self.last_hit: tuple[int, int, int] | None = None  # (pad, vélocité, instant) pour l'écran
+        self._requested: str | None = None  # pattern demandé par PATTERN + pad, pas encore confirmé
 
     @property
     def design(self) -> bool:
@@ -156,6 +157,12 @@ class Engine:
     @property
     def running(self) -> bool:
         return self.clock.ticks_since_start is not None
+
+    @property
+    def next_pattern(self) -> str | None:
+        """Prochain pattern : annoncé par la DT2 (PC reçu), sinon demandé par PATTERN + pad."""
+        nxt = self.phrase.next_pattern or self._requested
+        return None if nxt == self.phrase.pattern else nxt
 
     @property
     def repeating(self) -> bool:
@@ -221,7 +228,8 @@ class Engine:
             self.last_control = "banque ? (PATTERN + GROUP)"
             return []
         program = self.bank * 16 + pad - 1
-        self.last_control = f"-> {pattern_label(program)}"
+        self._requested = pattern_label(program)
+        self.last_control = f"-> {self._requested}"
         return [(now, ProgramChange(self.cfg.midi.program_channel - 1, program))]
 
     def on_control_change(self, channel: int, control: int, value: int) -> None:
@@ -256,10 +264,12 @@ class Engine:
             self.log.append(f"banque {pattern_label(program)[0]} (PC reçu)")
         self.last_program = program
         self.bank = program // 16
-        ticks = self.clock.ticks_since_start
-        if ticks is None:
-            return
+        self._requested = None  # la DT2 a répondu
         label = pattern_label(program)
+        ticks = self.clock.ticks_since_start
+        if ticks is None:  # arrêté : pattern changé tout de suite, compteur inchangé
+            self.phrase.pattern = label
+            return
         at = self.phrase.reset_next_bar(ticks, pattern=label)
         self.log.append(f"PC {label} -> mesure 1 à la barre {at + 1}")
 

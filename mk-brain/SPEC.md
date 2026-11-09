@@ -448,9 +448,9 @@ jour** : chaque valeur s'affiche juste au-dessus de son encodeur. Les deux
 
 ```
 écran gauche                              écran droit
-E04  143.0 ▶  Q16 SW50                    25 / 32 (gros)       phrase 1
-T07  ch7 (gros)                                                cap 32 : -8
-                                          [████████|████████|████████|██░░]
+E04 > E06 (gros)            T07 (gros)   25 / 32 (gros)       phrase 1
+                                                               cap 32 : -8
+■ ■ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           [████████|████████|████████|██░░]
 ----------------------------------------  ---------------------------------
 CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [██░] PAN [─|─] DLY [██░] REV [██░]
 ```
@@ -460,18 +460,22 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
   ligne, sans valeur numérique (inutile, décidé à l'essai) ; jauge en
   pointillé tant qu'elle est hors prise (remplace le `~`) ; le pan depuis le centre
   (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
-- bandeau gauche : pattern, BPM, lecture / arrêt dessinés, quantize,
-  swing ; 2e ligne en gros (réduite si le texte est long) : track sélectionnée (`MUTE` si mutée ; en design
-  `-> AUTO ch16`), remplacée par le geste ou la frappe le plus récent
-  (1,5 s / 1 s ; frappe = track et vélocité, nom du sample avec les
-  projets) ou par une alerte (`pas de clock`, `TRANSFER OUVERT ?`) ;
+- bandeau gauche (revu à l'essai) : en gros, le pattern en cours, suivi
+  du prochain (`> E06`) annoncé par la DT2 ou demandé par PATTERN + pad,
+  et la track sélectionnée ; dessous, 16 cases de mutes (pleine =
+  ouverte, vide = mutée, point = track de l'AUTO CHANNEL, track
+  sélectionnée soulignée), remplacées 1,5 s par le dernier geste ou par
+  une alerte (`pas de clock`, `TRANSFER OUVERT ?`). Ni tempo, ni quantize,
+  ni swing : la DT2 affiche le tempo, les LED GRID et SWING disent si
+  quantize et swing du Pi sont actifs. Frappe de pad : rien en live (les
+  LED suffisent), `pad n vel v` en design ;
 - bandeau droit : `mesure / longueur`, phrase, cap ; barre d'une case par
   mesure, séparée tous les 8, inversée dans les 4 dernières mesures ;
   dans les 2 dernières avant un cap, bandeau inversé avec `-2` / `-1` ;
 - NOTE REPEAT (tenu, ou pad qui répète) : les 8 divisions remplacent les
   bandeaux, chacune sous son bouton d'écran, la choisie inversée ;
 - bascule de mode proposée : écran droit entier ;
-- design : même structure, bandeau `DESIGN` + disposition, cadre autour
+- design : même structure, `DESIGN` + disposition à la place du pattern, cadre autour
   de l'écran gauche (les menus viendront en 5.D) ;
 - banque, tonique et mode s'ajouteront avec les projets (slice 6) ;
 - rafraîchi au plus toutes les 50 ms dans la boucle principale, envoyé

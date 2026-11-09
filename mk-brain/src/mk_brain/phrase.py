@@ -97,6 +97,11 @@ class PhraseCounter:
     def pending(self) -> bool:
         return self._pending is not None
 
+    @property
+    def next_pattern(self) -> str | None:
+        """Pattern annoncé par PC, appliqué à la barre suivante."""
+        return None if self._pending is None else self._pending.pattern
+
     # --- lecture --------------------------------------------------------------
 
     def update(self, ticks: int) -> PhraseState:

@@ -47,13 +47,29 @@ def test_touched_column_is_inverted_above_its_encoder(cfg: Config) -> None:
     assert not render.right(eng, SECOND).getpixel(probe)
 
 
-def test_pad_hit_replaces_track_line_for_one_second(cfg: Config) -> None:
-    eng = Engine(cfg)
+def test_pad_hit_shown_in_design_only(cfg: Config) -> None:
+    live = Engine(cfg)
+    before = render.left(live, 0).tobytes()
+    live.handle(PadEvent(PAD1, True, 2500), 0)
+    live.tick(3 * MS)
+    assert render.left(live, 3 * MS).tobytes() == before  # live : les LED suffisent
+    eng = design(cfg)
     before = render.left(eng, 0).tobytes()
     eng.handle(PadEvent(PAD1, True, 2500), 0)
     eng.tick(3 * MS)
     assert render.left(eng, 3 * MS).tobytes() != before
     assert render.left(eng, 3 * MS + SECOND).tobytes() == before
+
+
+def test_mute_strip_open_muted_and_selected(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.faders.muted[3] = True
+    img = render.left(eng, 0)
+    cell = WIDTH // 16
+    assert img.getpixel((cell // 2, 32))  # track 1 ouverte : case pleine
+    assert not img.getpixel((2 * cell + cell // 2, 32))  # track 3 mutée : case vide
+    assert img.getpixel((cell // 2, 37))  # track 1 sélectionnée : soulignée
+    assert not img.getpixel((cell + cell // 2, 37))
 
 
 def test_design_left_is_framed(cfg: Config) -> None:
