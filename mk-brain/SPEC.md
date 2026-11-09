@@ -754,7 +754,9 @@ revu le 2026-11-09** (demande utilisateur), TYPE retiré :
   MIDI brute : tracks 4, 5, 6 sur leurs canaux, la 16 sur le canal 16) ;
   le Pi **sélectionne cette track sur la MK2** au premier bouton tourné
   (`T04 selected (DT2)`). [TRK] + trig seul n'envoie rien : la synchro
-  attend un bouton. Un CC sur l'AUTO CHANNEL vient alors de la track 16 :
+  attend un bouton. Vérifié aussi avec `TRIG KEY DEST` = `INT + EXT` :
+  ni [TRK] + trig ni un trig seul n'envoient de message (écoute MIDI
+  brute, 2026-11-09) ; pas d'autre moyen de connaître la track active. Un CC sur l'AUTO CHANNEL vient alors de la track 16 :
   suivie en design, valeur seulement apprise en live (la track 16 n'y est
   pas joignable). Les mutes ne changent pas la sélection.
   `midi.knobs_on_track_channel: false` rend l'ancien comportement.
