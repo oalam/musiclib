@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.6.1] - 2026-11-09
+
+### Corrigé
+
+- [5] 5.A Saut de valeur après un bouton tourné sur la DT2 : elle envoie
+  ses boutons sur l'AUTO CHANNEL, pas sur le canal de la track ; ces CC
+  vont désormais à la track sélectionnée sur la MK2 (mute ignoré).
+
 ## [0.6.0] - 2026-11-09
 
 ### Ajouté

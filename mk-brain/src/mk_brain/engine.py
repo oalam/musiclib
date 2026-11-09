@@ -178,11 +178,19 @@ class Engine:
         return [(now, ProgramChange(self.cfg.midi.program_channel - 1, program))]
 
     def on_control_change(self, channel: int, control: int, value: int) -> None:
-        """CC reçu de la DT2 (canal 0-15) : bouton ou mute joué sur la machine."""
+        """CC reçu de la DT2 (canal 0-15) : bouton ou mute joué sur la machine.
+
+        La DT2 envoie ses boutons sur l'AUTO CHANNEL, sans dire quelle track est
+        active (constaté le 2026-11-09) : la valeur va à la track sélectionnée sur
+        la MK2. Un mute sur ce canal n'a pas de track sûre : ignoré.
+        """
         track = channel + 1
-        if track != self.cfg.midi.auto_channel:
-            self.faders.received(track, control, value)
-            self.leds_dirty = True
+        if track == self.cfg.midi.auto_channel:
+            if control == self.faders.mute_cc:
+                return
+            track = self.track
+        self.faders.received(track, control, value)
+        self.leds_dirty = True
 
     def on_start(self) -> None:
         self.phrase.start()

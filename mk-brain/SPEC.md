@@ -470,6 +470,11 @@ numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
   jamais vue). Il **écoute la DT2** : `ENCODER DEST` et `MUTE DEST` =
   `INT + EXT`, les boutons et mutes joués sur la machine mettent à jour
   ses valeurs. Une rotation de la MK2 = un CC, sans attente.
+- **Constaté le 2026-11-09** : la DT2 envoie ses boutons sur l'AUTO
+  CHANNEL (16), pas sur le canal de la track, et ne dit pas quelle track
+  est active. Un CC reçu sur l'AUTO CHANNEL met donc à jour la track
+  sélectionnée sur la MK2 (décidé : on tourne sur la DT2 la track
+  sélectionnée sur la MK2). Un mute reçu sur ce canal est ignoré.
 - Un changement de pattern (PC d'un autre pattern) recharge le kit de la
   DT2 : toutes les valeurs passent « hors prise », `~` devant la valeur.
   La première rotation repart de la dernière valeur connue (saut possible,

@@ -261,6 +261,17 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
     ]  # E07, canal 10
 
 
+def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    eng.track = 7
+    eng.on_control_change(15, 74, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
+    eng.on_control_change(15, 94, 127)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
+    assert not eng.faders.muted
+    assert eng.handle(EncoderEvent(1, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
+
+
 def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_control_change(0, 74, 30)
