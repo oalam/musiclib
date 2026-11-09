@@ -87,19 +87,19 @@ def velocity(cfg: VelocityConfig, pressure: int) -> int:
 
 
 DEGREES = ("T", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7")
-DEGREE_NAMES = (
-    "tonique",
-    "seconde mineure",
-    "seconde",
-    "tierce mineure",
-    "tierce majeure",
-    "quarte",
-    "triton",
-    "quinte",
-    "sixte mineure",
-    "sixte",
-    "septième mineure",
-    "septième majeure",
+DEGREE_NAMES = (  # écran : anglais, la police n'a pas les accents
+    "root",
+    "minor 2nd",
+    "2nd",
+    "minor 3rd",
+    "major 3rd",
+    "4th",
+    "tritone",
+    "5th",
+    "minor 6th",
+    "6th",
+    "minor 7th",
+    "major 7th",
 )
 NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
 FLAT_NAMES = ("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B")  # écrans
@@ -115,7 +115,7 @@ def degree_name(layout: Layout, note: int) -> str:
     degree = (note - layout.base) % 12
     name = DEGREE_NAMES[degree]
     if layout.kind == "chromatique" and layout.intervals and degree not in layout.intervals:
-        name += ", hors gamme"
+        name += ", out of scale"
     return name
 
 

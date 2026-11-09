@@ -34,7 +34,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from mk_brain.clock import ClockTracker
-from mk_brain.config import RGB, Config, Layout
+from mk_brain.config import PITCH_BEND, RGB, Config, Layout
 from mk_brain.faders import Faders
 from mk_brain.hid_mk2 import (
     GROUPS,
@@ -46,7 +46,16 @@ from mk_brain.hid_mk2 import (
     PadEvent,
     pad_label,
 )
-from mk_brain.layouts import N_PADS, for_bank, in_scale, pad_color, pad_note, scale, velocity
+from mk_brain.layouts import (
+    FLAT_NAMES,
+    N_PADS,
+    for_bank,
+    in_scale,
+    pad_color,
+    pad_note,
+    scale,
+    velocity,
+)
 from mk_brain.modes import ModeSwitch
 from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseLength, PhraseState, pattern_label
 from mk_brain.project import Bank, Project
@@ -89,7 +98,13 @@ class ProgramChange:
     program: int
 
 
-MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange
+@dataclass(frozen=True, slots=True)
+class PitchBend:
+    channel: int
+    pitch: int  # -8192..8191, 0 = centre (mido)
+
+
+MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend
 MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
 LIVE_GROUP = 0  # disposition rythmique, imposée en live
 DESIGN_GROUP = 1  # chromatique, disposition de départ en design
@@ -144,7 +159,8 @@ class Engine:
         self._phrase_leds: tuple[object, ...] = ()
         self.log: list[str] = []  # évènements du compteur, lus et vidés par la CLI
         enc = cfg.encoders
-        self.faders = Faders([(e.name, e.cc) for e in enc.page], enc.mute_cc, enc.raw_per_step)
+        pages = [[(e.name, e.param) for e in page] for page in enc.pages]
+        self.faders = Faders(pages, enc.mute_cc, enc.raw_per_step)
         self.track = 1  # track des encodeurs (SELECT + pad)
         self.last_program: int | None = None  # dernier PC reçu
         self.bank: int | None = None  # banque de PATTERN + pad : PC reçu ou PATTERN + GROUP
@@ -195,6 +211,11 @@ class Engine:
         return None if nxt == self.phrase.pattern else nxt
 
     @property
+    def _modifiers(self) -> set[str]:
+        """SELECT, MUTE, PATTERN ; PATTERN sans effet en design (décidé le 2026-11-09)."""
+        return set(MODIFIERS) - ({"PATTERN"} if self.design else set())
+
+    @property
     def repeating(self) -> bool:
         """Un pad au moins répète (note repeat en cours)."""
         return bool(self._repeats)
@@ -222,7 +243,7 @@ class Engine:
 
     def _reachable(self, track: int) -> bool:
         if track == self.cfg.midi.auto_channel:
-            self.last_control = f"T{track:02d} = AUTO CHANNEL : pas de canal propre"
+            self.last_control = f"T{track:02d} = AUTO CHANNEL: no own channel"
             return False
         return True
 
@@ -235,30 +256,32 @@ class Engine:
         sent = self.faders.turn(self.track, index, delta)
         if sent is None:
             return []
-        cc, value = sent
+        param, value = sent
         name = self.faders.page[index - 1][0]
         self.last_control = f"T{self.track:02d} {name} {value}"
         if self.design and not self._rec_hint:
             self._rec_hint = True
-            self.last_control += "  DT2 en LIVE REC ?"
+            self.last_control += "  DT2 in LIVE REC?"
         channel = self.channel if self.design else self.track - 1
-        return [(now, ControlChange(channel, cc, value))]
+        if param == PITCH_BEND:  # 0-127 → -8192..8191, 64 = centre
+            return [(now, PitchBend(channel, max(-8192, min(8191, (value - 64) * 128))))]
+        return [(now, ControlChange(channel, param, value))]
 
     def _command(self, pad: int, now: int) -> list[Timed]:
         held = self._held_buttons
         if "SELECT" in held:
             if self.design or self._reachable(pad):
                 self.track = pad
-                self.last_control = f"T{pad:02d} sélectionnée"
+                self.last_control = f"T{pad:02d} selected"
             return []
         if "MUTE" in held:
             if not self._reachable(pad):
                 return []
             cc, value = self.faders.toggle_mute(pad)
-            self.last_control = f"T{pad:02d} {'mute' if value else 'démute'}"
+            self.last_control = f"T{pad:02d} {'muted' if value else 'unmuted'}"
             return [(now, ControlChange(pad - 1, cc, value))]
         if self.bank is None:
-            self.last_control = "banque ? (PATTERN + GROUP)"
+            self.last_control = "bank? (PATTERN + GROUP)"
             return []
         program = self.bank * 16 + pad - 1
         self._requested = pattern_label(program)
@@ -343,16 +366,16 @@ class Engine:
 
     def _choose_bank(self, index: int) -> None:
         if self.project is None:
-            self.last_control = "pas de projet"
+            self.last_control = "no project"
             return
         found = self.project.bank(index)
         if found is None:
-            self.last_control = f"pas de banque {GROUPS[index]}"
+            self.last_control = f"no bank {GROUPS[index]}"
             return
         self.design_bank, self._design_phrase = index, None
         self._apply_phrase()
         key, bank = found
-        self.last_control = f"{key}  {bank.tonique} {bank.mode}"
+        self.last_control = f"{key}  {FLAT_NAMES[bank.tonic]} {self.cfg.scale(bank.mode).name}"
 
     def _menu_items(self, entry: int) -> tuple[list[str], int, Callable[[int], None]]:
         """Valeurs d'une entrée du menu, index de la valeur en cours, application."""
@@ -373,7 +396,7 @@ class Engine:
             self._design_phrase = PHRASES[i]
             self._apply_phrase()
 
-        return [f"{n} mes" for n in PHRASES], PHRASES.index(self.phrase.length), phrase
+        return [f"{n} bars" for n in PHRASES], PHRASES.index(self.phrase.length), phrase
 
     def menu_view(self) -> list[tuple[str, str, bool]]:
         """Pour l'écran : (entrée, valeur affichée, ouverte) ; ouverte = choix en cours."""
@@ -450,9 +473,16 @@ class Engine:
         if shift and name.startswith("GROUP_"):
             self._recalibrate(GROUPS.index(name[-1]) * BLOCK_BARS + 1)
             return
-        if "PATTERN" in self._held_buttons and name.startswith("GROUP_"):
+        if name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # page d'encodeurs
+            page = 0 if name == "BROWSE_LEFT" else len(self.faders.pages) - 1
+            if page != self.faders.page_index:
+                self.faders.page_index = page
+                self.last_control = f"page {page + 1}"
+            self.leds_dirty = True
+            return
+        if "PATTERN" in self._held_buttons and name.startswith("GROUP_") and not self.design:
             self.bank = GROUPS.index(name[-1])
-            self.last_control = f"banque {name[-1]}"
+            self.last_control = f"bank {name[-1]}"
             self.leds_dirty = True
             return
         if name.startswith("GROUP_"):
@@ -488,7 +518,7 @@ class Engine:
             if not ev.pressed:
                 self._consumed.discard(pad)
             return []
-        if ev.pressed and pad not in self._pressure and self._held_buttons & set(MODIFIERS):
+        if ev.pressed and pad not in self._pressure and self._held_buttons & self._modifiers:
             self._consumed.add(pad)
             self.leds_dirty = True
             return self._command(pad, now)
@@ -609,7 +639,7 @@ class Engine:
             else:  # repos ; hors gamme de la chromatique éteint
                 pads[index] = scale(full, dim if in_scale(layout, pad) else 0)
         st = self.phrase_state
-        if "PATTERN" in held:  # PATTERN tenu : les GROUP montrent la banque
+        if "PATTERN" in held and not self.design:  # PATTERN tenu : les GROUP montrent la banque
             white = self.cfg.families["chromatique"]
             groups = [scale(white, 1.0 if g == self.bank else dim) for g in range(len(GROUPS))]
         elif self.design:  # les GROUP montrent les banques du projet, couleur de leur mode
@@ -634,7 +664,9 @@ class Engine:
             "PAD_MODE": low if self.design else 0,
         }
         for name in MODIFIERS:
-            buttons[name] = LED_MAX if name in held else low
+            buttons[name] = (LED_MAX if name in held else low) if name in self._modifiers else 0
+        for i, name in enumerate(("BROWSE_LEFT", "BROWSE_RIGHT")):
+            buttons[name] = LED_MAX if i == min(self.faders.page_index, 1) else low
         if self.repeat_active:
             for i, (name, _) in enumerate(DIVISIONS):
                 buttons[f"DISPLAY_{i + 1}"] = LED_MAX if name == self.division else low

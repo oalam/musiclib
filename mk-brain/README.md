@@ -30,6 +30,7 @@ phrase). `projects/solaris.yaml` est écrit à la main jusqu'à la slice 6, où
                                       # SHIFT + CONTROL 1 s + appui maître = live / design,
                                       # en design GROUP A-H = banque, PAD MODE = disposition,
                                       # boutons d'écran 1-4 = menu (maître : choisir, appui : valider),
+                                      # flèches BROWSE = page d'encodeurs 1 / 2,
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 .venv/bin/mk-brain play --project projects/solaris.yaml   # projet (défaut : solaris)

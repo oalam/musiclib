@@ -5,6 +5,8 @@ changement de pattern : le Pi part de la dernière valeur connue. Il apprend
 celles jouées sur la DT2 (`ENCODER DEST` et `MUTE DEST` = `INT + EXT`,
 décidé le 2026-11-09). Après un changement de pattern, toutes les valeurs
 sont marquées « hors prise » (`~`) : la DT2 a rechargé son kit.
+Plusieurs pages de 8 (flèches à côté des écrans) ; un paramètre est un CC
+ou le pitch bend (`PITCH_BEND`), sa valeur est gardée quelle que soit la page.
 """
 
 from __future__ import annotations
@@ -24,8 +26,9 @@ class FaderView:
 
 
 class Faders:
-    def __init__(self, page: list[tuple[str, int]], mute_cc: int, raw_per_step: int) -> None:
-        self.page = page  # 8 × (abrégé, CC)
+    def __init__(self, pages: list[list[tuple[str, int]]], mute_cc: int, raw_per_step: int) -> None:
+        self.pages = pages  # pages de 8 × (abrégé, CC ou PITCH_BEND)
+        self.page_index = 0
         self.mute_cc = mute_cc
         self.raw_per_step = raw_per_step
         self._values: dict[tuple[int, int], int] = {}  # (track, CC) → valeur connue
@@ -33,10 +36,14 @@ class Faders:
         self._residue: dict[int, int] = {}  # encodeur → reste de rotation brute
         self.muted: dict[int, bool] = {}
 
+    @property
+    def page(self) -> list[tuple[str, int]]:
+        return self.pages[self.page_index]
+
     # --- entrées ------------------------------------------------------------
 
     def turn(self, track: int, encoder: int, raw_delta: int) -> tuple[int, int] | None:
-        """Rotation de l'encodeur 1-8 → (CC, valeur) à envoyer, ou None si rien ne change."""
+        """Rotation de l'encodeur 1-8 → (CC ou PITCH_BEND, valeur 0-127), ou None."""
         acc = self._residue.get(encoder, 0) + raw_delta
         steps = int(acc / self.raw_per_step)  # vers zéro, dans les deux sens
         self._residue[encoder] = acc - steps * self.raw_per_step
@@ -63,7 +70,7 @@ class Faders:
         if cc == self.mute_cc:
             self.muted[track] = value >= 64
             return
-        if any(c == cc for _, c in self.page):
+        if any(c == cc for page in self.pages for _, c in page):
             self._values[(track, cc)] = value
             self._stale.discard((track, cc))
 

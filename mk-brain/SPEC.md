@@ -544,7 +544,13 @@ divisions du repeat ; faders inchangés.
                                               6 / 32  cap 16 : -11  [██░░░░]
 ```
 
-- revu le 2026-11-09 : valeurs seules, sans libellé (`Q` et `mes` gardés,
+- **textes d'écran en anglais, sans accent** (décidé le 2026-11-09 : la
+  police de Pillow n'a pas les accents) : degrés (`minor 3rd`, `2nd, out of
+  scale`), gestes (`T03 selected`, `switch cancelled`), alertes (`no
+  clock`, `TRANSFER OPEN?`), noms des dispositions (Drums, Chroma, Aeolian,
+  Phrygian, Dorian, Harm. min, Phryg. dom, Min. penta), cap noté `-8 to
+  32` ; la console et le code restent en français ;
+- revu le 2026-11-09 : valeurs seules, sans libellé (`Q` et `bars` gardés,
   `off` et `32` seuls seraient muets) ; plus de `DESIGN` écrit, une icône
   `D` inversée au coin haut gauche (le cadre reste) ;
 - entrée ouverte en vidéo inverse, avec la valeur en cours de choix ;
@@ -587,15 +593,27 @@ divisions du repeat ; faders inchangés.
 
 ### Encodeurs → DT2
 
-**Une seule page, la même pour toutes les tracks** (décidé le 2026-11-09),
-définie dans `config/default.yaml`. Proposition, à ajuster à l'usage ;
-numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
+**Deux pages, les mêmes pour toutes les tracks** (décidé le 2026-11-09,
+remplace la page unique CUT RES ENV DEC LVL PAN DLY REV), définies dans
+`config/default.yaml`, choisies par les flèches à côté des écrans
+(`BROWSE_LEFT` = page 1, `BROWSE_RIGHT` = page 2, LED de la page en
+cours pleine), en live comme en design. Numéros de l'annexe B du manuel
+DT2 (`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`, B.1-B.7) :
 
-| Encodeur | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+| Page | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| Paramètre | fréquence du filtre | résonance | profondeur d'env. filtre | decay d'amp | niveau de track | pan | envoi delay | envoi reverb |
-| Abrégé | CUT | RES | ENV | DEC | LVL | PAN | DLY | REV |
-| CC | 74 | 75 | 77 | 81 | 95 | 90 | 84 | 85 |
+| p1 | LVL 95 (niveau de track) | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | CUT 74 | RES 75 | TYPE 76 | ENV 77 |
+| p2 | BR 54 (bit reduction) | OVER 57 (overdrive) | SRR 55 | DEL 84 (envoi delay) | REV 85 | CHO 12 (chorus) | PAN 90 | TUNE 16 |
+
+- TYPE = knob G du filtre : le type sur la machine MULTI-MODE seulement,
+  un autre paramètre sur les autres machines.
+- MW, BC et PB n'agissent que si le preset leur assigne jusqu'à 4
+  paramètres (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset,
+  manuel p. 39). PB part en message pitch bend (0-127 → -8192..8191,
+  64 = centre) ; l'encodeur ne revient pas au centre tout seul.
+- Jauge depuis le centre : PB, ENV, PAN, TUNE (`bipolar`). Valeurs gardées
+  par track et par paramètre, quelle que soit la page ; un CC reçu de la
+  DT2 est appris même si sa page n'est pas affichée.
 
 - **Live** : CC sur le canal de la track sélectionnée (SELECT + pad),
   `TRACK n CHANNEL` = n. Une track répond sur son canal (vérifié le
@@ -638,9 +656,10 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | Pad | joue la track n (rythmique) | joue la disposition choisie (chromatique par défaut) |
 | SELECT + pad | sélectionne la track n pour les encodeurs | sélectionne la track n (canal) |
 | MUTE + pad | mute / démute la track n | idem |
-| PATTERN + pad | pattern n de la banque courante (PC) | idem |
-| PATTERN + GROUP n | banque n pour PATTERN + pad (sans envoi) ; GROUP tenus = banque | idem |
+| PATTERN + pad | pattern n de la banque courante (PC) | sans effet, le pad joue (décidé le 2026-11-09) |
+| PATTERN + GROUP n | banque n pour PATTERN + pad (sans envoi) ; GROUP tenus = banque | sans effet (GROUP seul = banque du design) |
 | 8 encodeurs | les 8 faders de la track sélectionnée | les 8 faders de la track active (p-locks en LIVE REC) |
+| Flèches à côté des écrans (BROWSE ◀ ▶) | page d'encodeurs 1 / 2 | idem |
 | NOTE REPEAT tenu + pad | répétition ; les 8 boutons au-dessus des écrans choisissent la division (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64) | idem |
 | SHIFT + NOTE REPEAT | verrouillage du repeat | idem |
 | GRID | quantize off → 1/16 → 1/8 | idem (off par défaut) |

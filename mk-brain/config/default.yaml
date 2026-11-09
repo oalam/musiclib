@@ -21,20 +21,31 @@ play:
   phrase: 32                 # 32 ou 64 mesures ; par banque une fois les projets là (slice 6)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
 
-# 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B, fiche cc-nrpn)
-# DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine
+# 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
+# refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09).
+# DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine.
+# MW, BC et PB n'agissent que si le preset leur assigne des paramètres
+# (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset).
 encoders:
   mute_cc: 94
   raw_per_step: 4            # pas minimal remonté par la MK2 (constat slice 0)
-  page:
-    - {name: CUT, cc: 74}    # fréquence du filtre
-    - {name: RES, cc: 75}    # résonance
-    - {name: ENV, cc: 77}    # profondeur d'enveloppe du filtre
-    - {name: DEC, cc: 81}    # decay d'amp
-    - {name: LVL, cc: 95}    # niveau de track
-    - {name: PAN, cc: 90, bipolar: true}
-    - {name: DLY, cc: 84}    # envoi delay
-    - {name: REV, cc: 85}    # envoi reverb
+  pages:
+    - - {name: LVL, cc: 95}                    # niveau de track
+      - {name: MW, cc: 1}                      # mod wheel
+      - {name: BC, cc: 2}                      # breath controller
+      - {name: PB, pitchbend: true, bipolar: true}   # pitch bend, centré
+      - {name: CUT, cc: 74}                    # fréquence du filtre
+      - {name: RES, cc: 75}                    # résonance (knob F du filtre)
+      - {name: TYPE, cc: 76}                   # type, sur la machine MULTI-MODE (knob G)
+      - {name: ENV, cc: 77, bipolar: true}     # profondeur d'enveloppe du filtre
+    - - {name: BR, cc: 54}                     # bit reduction
+      - {name: OVER, cc: 57}                   # overdrive de track
+      - {name: SRR, cc: 55}                    # sample rate reduction
+      - {name: DEL, cc: 84}                    # envoi delay
+      - {name: REV, cc: 85}                    # envoi reverb
+      - {name: CHO, cc: 12}                    # envoi chorus
+      - {name: PAN, cc: 90, bipolar: true}
+      - {name: TUNE, cc: 16, bipolar: true}
 
 leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine
@@ -95,14 +106,15 @@ track_names:
   16: RS
 
 # Dispositions des groupes A-H, reprises du template DT2 Pads (fiche controleur-maschine).
+# `name` s'affiche : anglais, court, sans accent (la police de l'écran n'en a pas).
 # `mode` : nom du mode d'une banque de projet (hub des intervalles) ; en design,
 # les dispositions se calent sur la tonique de la banque, la chromatique sur sa gamme
 layouts:
-  - {group: A, name: Rythmique, kind: rythmique, family: rythmique}
+  - {group: A, name: Drums, kind: rythmique, family: rythmique}
   - {group: B, name: Chroma, kind: chromatique, mode: chromatique, base: 60, family: chromatique}
-  - {group: C, name: Eolien, kind: gamme, mode: eolien, base: 60, intervals: [0, 2, 3, 5, 7, 8, 10], family: gamme}
-  - {group: D, name: Phrygien, kind: gamme, mode: phrygien, base: 60, intervals: [0, 1, 3, 5, 7, 8, 10], family: gamme}
-  - {group: E, name: Dorien, kind: gamme, mode: dorien, base: 60, intervals: [0, 2, 3, 5, 7, 9, 10], family: gamme}
-  - {group: F, name: Min. harm., kind: gamme, mode: mineur-harmonique, base: 60, intervals: [0, 2, 3, 5, 7, 8, 11], family: gamme}
-  - {group: G, name: Phryg. dom., kind: gamme, mode: phrygien-dominant, base: 60, intervals: [0, 1, 4, 5, 7, 8, 10], family: gamme}
-  - {group: H, name: Penta min., kind: gamme, mode: penta-mineure, base: 60, intervals: [0, 3, 5, 7, 10], family: gamme}
+  - {group: C, name: Aeolian, kind: gamme, mode: eolien, base: 60, intervals: [0, 2, 3, 5, 7, 8, 10], family: gamme}
+  - {group: D, name: Phrygian, kind: gamme, mode: phrygien, base: 60, intervals: [0, 1, 3, 5, 7, 8, 10], family: gamme}
+  - {group: E, name: Dorian, kind: gamme, mode: dorien, base: 60, intervals: [0, 2, 3, 5, 7, 9, 10], family: gamme}
+  - {group: F, name: Harm. min, kind: gamme, mode: mineur-harmonique, base: 60, intervals: [0, 2, 3, 5, 7, 8, 11], family: gamme}
+  - {group: G, name: Phryg. dom, kind: gamme, mode: phrygien-dominant, base: 60, intervals: [0, 1, 4, 5, 7, 8, 10], family: gamme}
+  - {group: H, name: Min. penta, kind: gamme, mode: penta-mineure, base: 60, intervals: [0, 3, 5, 7, 10], family: gamme}

@@ -6,7 +6,7 @@ PAGE = [("CUT", 74), ("RES", 75), ("ENV", 77), ("DEC", 81)] + [("X", 100 + i) fo
 
 
 def make() -> Faders:
-    return Faders(PAGE, mute_cc=94, raw_per_step=4)
+    return Faders([PAGE], mute_cc=94, raw_per_step=4)
 
 
 def test_turn_accumulates_raw_units_and_clamps() -> None:
@@ -38,3 +38,15 @@ def test_mute_toggle_and_learn() -> None:
     f.received(3, 94, 127)  # muté sur la DT2
     assert f.muted[3]
     assert f.toggle_mute(3) == (94, 0)
+
+
+def test_pages_keep_values_and_learn_any_page() -> None:
+    p2 = [("BR", 54)] + [("Y", 110 + i) for i in range(7)]
+    f = Faders([PAGE, p2], mute_cc=94, raw_per_step=4)
+    f.received(3, 54, 90)  # CC de la page 2, appris page 1 affichée
+    f.turn(3, 1, 8)  # CUT
+    f.page_index = 1
+    assert (f.view(3)[0].name, f.view(3)[0].value) == ("BR", 90)
+    assert f.turn(3, 1, 4) == (54, 91)
+    f.page_index = 0
+    assert f.view(3)[0].value == DEFAULT_VALUE + 2

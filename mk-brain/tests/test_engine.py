@@ -242,7 +242,7 @@ def test_select_then_encoder_sends_cc_on_track_channel(cfg: Config) -> None:
     assert eng.track == 7
     from mk_brain.engine import ControlChange
 
-    assert eng.handle(EncoderEvent(1, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
+    assert eng.handle(EncoderEvent(5, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
 
 
 def test_auto_channel_track_refused(cfg: Config) -> None:
@@ -272,7 +272,7 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "PATTERN")
     assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []
-    assert eng.last_control.startswith("banque ?")
+    assert eng.last_control.startswith("bank?")
     btn(eng, "GROUP_B")  # PATTERN tenu : banque B, sans changer de disposition
     assert eng.group == 1 and eng.layout.group == "A" and eng.bank == 1
     assert eng.leds().groups[1] == cfg.families["chromatique"]
@@ -294,17 +294,17 @@ def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     eng.on_control_change(15, 74, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
     eng.on_control_change(15, 94, 127)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
     assert not eng.faders.muted
-    assert eng.handle(EncoderEvent(1, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
+    assert eng.handle(EncoderEvent(5, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
 
 
 def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_control_change(0, 74, 30)
     eng.on_program_change(3)
-    assert eng.faders.view(1)[0].stale
-    eng.handle(EncoderEvent(1, 4, 0), 0)
+    assert eng.faders.view(1)[4].stale
+    eng.handle(EncoderEvent(5, 4, 0), 0)
     eng.on_program_change(3)  # même pattern (PC du Stop) : rien ne change
-    assert not eng.faders.view(1)[0].stale
+    assert not eng.faders.view(1)[4].stale
 
 
 # --- slice 5.B : modes live / design ---------------------------------------------
@@ -335,7 +335,7 @@ def test_mode_switch_refused_in_live_while_running(cfg: Config) -> None:
     btn(eng, "CONTROL")
     eng.tick(SECOND)
     btn(eng, "MASTER_PUSH")
-    assert not eng.design and eng.last_control.startswith("transport lancé")
+    assert not eng.design and eng.last_control.startswith("transport running")
 
 
 def test_other_button_cancels_proposal(cfg: Config) -> None:
@@ -346,7 +346,7 @@ def test_other_button_cancels_proposal(cfg: Config) -> None:
     assert eng.modes.pending == "design" and eng.leds().buttons["CONTROL"] > 0
     btn(eng, "GRID")
     btn(eng, "MASTER_PUSH")
-    assert not eng.design and eng.last_control == "bascule annulée"
+    assert not eng.design and eng.last_control == "switch cancelled"
 
 
 def test_design_encoders_on_auto_channel_with_rec_hint(cfg: Config) -> None:
@@ -357,9 +357,9 @@ def test_design_encoders_on_auto_channel_with_rec_hint(cfg: Config) -> None:
     eng.handle(PadEvent(3, True, 2500), 0)  # index 3 = pad 16 : joignable en design
     btn(eng, "SELECT", False)
     assert eng.track == 16
-    assert eng.handle(EncoderEvent(1, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
-    assert eng.last_control.endswith("DT2 en LIVE REC ?")
-    eng.handle(EncoderEvent(1, 4, 0), 0)
+    assert eng.handle(EncoderEvent(5, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
+    assert eng.last_control.endswith("DT2 in LIVE REC?")
+    eng.handle(EncoderEvent(5, 4, 0), 0)
     assert "LIVE REC" not in eng.last_control  # rappel une fois par passage en design
 
 
@@ -409,7 +409,7 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
     assert eng.design_bank == 0  # pas de PC reçu : première banque
     btn(eng, "GROUP_E")
-    assert eng.last_control == "E-TRIBE  A# phrygien"
+    assert eng.last_control == "E-TRIBE  Bb Phrygian"
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 70, 127))]  # chromatique depuis A#
     leds = eng.leds()
     assert leds.groups[4] == cfg.families["gamme"]
@@ -420,14 +420,14 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     assert by_pad[2] != (0, 0, 0)  # B : ♭2, dans la gamme
     assert leds.groups[7] == (0, 0, 0)  # pas de banque H
     btn(eng, "GROUP_H")
-    assert (eng.design_bank, eng.last_control) == (4, "pas de banque H")
+    assert (eng.design_bank, eng.last_control) == (4, "no bank H")
     assert eng.layout.group == "B"  # GROUP ne change plus la disposition
 
 
 def test_design_without_project(cfg: Config) -> None:
     eng = design(cfg)
     btn(eng, "GROUP_C")
-    assert (eng.layout.group, eng.last_control) == ("B", "pas de projet")
+    assert (eng.layout.group, eng.last_control) == ("B", "no project")
     assert eng.leds().groups == [(0, 0, 0)] * 8
 
 
@@ -447,10 +447,10 @@ def test_menu_choose_and_validate(cfg: Config, project: Project) -> None:
     assert eng.leds().buttons["DISPLAY_1"] > eng.leds().buttons["DISPLAY_2"]
     assert "DISPLAY_5" not in eng.leds().buttons  # 4 entrées, plus de BANK
     turn_master(eng, 2)
-    assert eng.menu_view()[0] == ("GAMME", "Phrygien", True)
+    assert eng.menu_view()[0] == ("GAMME", "Phrygian", True)
     assert eng.layout.group == "B"  # rien d'appliqué avant l'appui
     btn(eng, "MASTER_PUSH")
-    assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "Phrygien")
+    assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "Phrygian")
     btn(eng, "DISPLAY_3")  # QUANT : borné à la dernière valeur
     turn_master(eng, 9)
     btn(eng, "MASTER_PUSH")
@@ -491,3 +491,24 @@ def test_hit_kept_with_note_for_screen(cfg: Config, project: Project) -> None:
     btn(eng, "GROUP_E")
     press(eng, 0, pressure=2500)
     assert eng.last_hit is not None and eng.last_hit[1:3] == (70, 127)
+
+
+def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange, PitchBend
+
+    eng = Engine(cfg)
+    assert eng.handle(EncoderEvent(4, 8, 0), 0) == [(0, PitchBend(0, 256))]  # PB : 64 → 66
+    btn(eng, "BROWSE_RIGHT")
+    assert eng.last_control == "page 2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
+    assert eng.handle(EncoderEvent(1, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
+    btn(eng, "BROWSE_LEFT")
+    assert eng.faders.view(1)[3].value == 66  # PB gardé
+
+
+def test_pattern_has_no_effect_in_design(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "PATTERN")
+    assert press(eng, 0) == [(3 * MS, NoteOn(15, 65, 127))]  # la note joue (A-HALF, fa)
+    btn(eng, "GROUP_E")  # GROUP choisit la banque, comme sans PATTERN
+    assert eng.design_bank == 4 and eng.bank is None
+    assert eng.leds().buttons["PATTERN"] == 0

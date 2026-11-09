@@ -3,6 +3,24 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.10.0] - 2026-11-09
+
+### Ajouté
+
+- [5] Deux pages d'encodeurs, flèches à côté des écrans (BROWSE ◀ ▶) :
+  p1 LVL, MW (CC 1), BC (CC 2), PB (pitch bend), CUT, RES, TYPE (76),
+  ENV ; p2 BR (54), OVER (57), SRR (55), DEL, REV, CHO (12), PAN, TUNE
+  (16), numéros de l'annexe B du manuel. Message `PitchBend` vers la DT2.
+
+### Modifié
+
+- [5] Textes d'écran en anglais, sans accent (la police n'en a pas) :
+  degrés, gestes, alertes, bascule de mode, noms des dispositions.
+- [5] PATTERN sans effet en design : PATTERN + pad y joue la note,
+  PATTERN + GROUP = GROUP, LED éteinte.
+- [5] Page d'encodeurs : CUT RES ENV DEC LVL PAN DLY REV remplacée par
+  les deux pages (DEC retiré).
+
 ## [0.9.2] - 2026-11-09
 
 ### Modifié

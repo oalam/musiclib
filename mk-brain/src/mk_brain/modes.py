@@ -13,7 +13,7 @@ from typing import Literal
 Mode = Literal["live", "design"]
 HOLD_NS = 1_000_000_000  # SHIFT + CONTROL tenus 1 s
 CONFIRM_NS = 5_000_000_000  # délai pour confirmer à l'encodeur maître
-LOCKED = "transport lancé : live verrouillé"
+LOCKED = "transport running: live locked"  # écran : anglais, sans accent
 
 
 def other(mode: Mode) -> Mode:
@@ -38,7 +38,7 @@ class ModeSwitch:
         if self.pending is None:
             return None
         self.pending = None
-        return "bascule annulée"
+        return "switch cancelled"
 
     def update(self, now: int, running: bool) -> str | None:
         """Message à afficher quand l'état change, sinon None."""
@@ -54,7 +54,7 @@ class ModeSwitch:
                 return LOCKED
             self.pending = other(self.mode)
             self._pending_since = now
-            return f"-> {self.pending.upper()} ? encodeur maître"
+            return f"-> {self.pending.upper()}? push master"
         return None
 
     def confirm(self, running: bool) -> str | None:

@@ -192,16 +192,16 @@ def _design_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
     small, mid = _font(SMALL), _font(16)
     sheet = engine.sheet
     if sheet is None:
-        d.text((3, 2), "pas de projet", font=mid, fill=1)
+        d.text((3, 2), "no project", font=mid, fill=1)
     else:
         key, bank = sheet
         _bold(d, (3, -3), f"{key}  {bank.tempo:g}", mid, 1)
-        tonic = FLAT_NAMES[bank.tonic]
-        d.text((3, 12), f"{tonic} {bank.mode} · {bank.title}", font=small, fill=1)
+        tonic, mode = FLAT_NAMES[bank.tonic], engine.cfg.scale(bank.mode).name
+        d.text((3, 12), f"{tonic} {mode} - {bank.title}", font=small, fill=1)
     st = engine.phrase_state
     length = engine.phrase.length
     bar = "--" if st is None else str(st.bar)
-    text = f"{bar} / {length}" + ("" if st is None else f"  cap {st.cap} : -{st.to_cap}")
+    text = f"{bar} / {length}" + ("" if st is None else f"  -{st.to_cap} to {st.cap}")
     d.text((3, 24), text, font=small, fill=1)
     top, bottom, left, right = 28, 34, 140, WIDTH - 3
     d.rectangle((left, top, right, bottom), outline=1)
@@ -246,14 +246,14 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
         for dx in (0, 1):  # gras, centré dans la moitié gauche
             box = (dx, 0, WIDTH // 2 + dx, BAND - 1)
             _centered(d, box, str(st.countdown), _font(COUNTDOWN), 0)
-        d.text((WIDTH // 2 + 8, 4), f"cap {st.cap}", font=_font(16), fill=0)
+        d.text((WIDTH // 2 + 8, 4), f"to {st.cap}", font=_font(16), fill=0)
         d.text((WIDTH // 2 + 8, 22), f"{st.bar} / {st.length}", font=_font(16), fill=0)
         return
     bar = "--" if st is None else str(st.bar)
     _bold(d, (3, -4), f"{bar} / {engine.phrase.length}", _font(BAR), 1)
     if st is not None:
         d.text((150, -3), f"phrase {st.phrase}", font=small, fill=1)
-        d.text((150, 9), f"cap {st.cap} : -{st.to_cap}", font=small, fill=1)
+        d.text((150, 9), f"-{st.to_cap} to {st.cap}", font=small, fill=1)
     # barre : une case par mesure, séparateurs tous les 8 ; 4 dernières en vidéo inverse
     length = engine.phrase.length
     top, bottom, left, right = 27, 35, 2, WIDTH - 3
@@ -276,7 +276,7 @@ def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> No
     touched = None
     if engine.last_touch is not None and now - engine.last_touch[1] < OVERLAY_NS:
         touched = engine.last_touch[0] - 1
-    page = engine.cfg.encoders.page
+    page = engine.cfg.encoders.pages[engine.faders.page_index]
     views = engine.faders.view(engine.track)
     for i in range(COLS):
         k = screen * COLS + i
@@ -331,7 +331,7 @@ def right(engine: Engine, now: int) -> Image.Image:
     """Écran droit : bandeau de phrase, faders 5-8 ; bascule de mode proposée en plein écran."""
     pending = engine.modes.pending
     if pending is not None:
-        lines = ["", f"-> {pending.upper()} ?", "appui encodeur maître", "autre bouton : annuler"]
+        lines = ["", f"-> {pending.upper()}?", "push master to confirm", "other button: cancel"]
         return text_image(lines, bold=frozenset({1}))
     img = new_image()
     d = ImageDraw.Draw(img)

@@ -57,24 +57,39 @@ class PlayConfig(BaseModel):
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
 
 
+PITCH_BEND = 128  # identifiant du pitch bend parmi les paramètres (hors des CC 0-127)
+
+
 class Encoder(BaseModel):
     name: str = Field(max_length=4)
-    cc: int = Field(ge=0, le=127)
-    bipolar: bool = False  # jauge depuis le centre (pan)
+    cc: int | None = Field(None, ge=0, le=127)
+    pitchbend: bool = False  # message pitch bend au lieu d'un CC
+    bipolar: bool = False  # jauge depuis le centre (pan, tune, pitch bend)
+
+    @model_validator(mode="after")
+    def _target(self) -> Encoder:
+        if (self.cc is None) == (not self.pitchbend):
+            raise ValueError(f"encodeur {self.name} : un CC ou pitchbend, pas les deux")
+        return self
+
+    @property
+    def param(self) -> int:
+        """CC, ou PITCH_BEND."""
+        return PITCH_BEND if self.cc is None else self.cc
 
 
 class EncodersConfig(BaseModel):
-    """Page unique des 8 encodeurs, la même pour toutes les tracks (SPEC, Encodeurs)."""
+    """Pages de 8 encodeurs, les mêmes pour toutes les tracks (SPEC, Encodeurs)."""
 
-    page: list[Encoder]
+    pages: list[list[Encoder]]
     mute_cc: int = Field(94, ge=0, le=127)
     raw_per_step: int = Field(4, ge=1)  # unités brutes de la MK2 par cran de CC
 
-    @field_validator("page")
+    @field_validator("pages")
     @classmethod
-    def _eight(cls, v: list[Encoder]) -> list[Encoder]:
-        if len(v) != 8:
-            raise ValueError("encoders.page : exactement 8 encodeurs")
+    def _eight(cls, v: list[list[Encoder]]) -> list[list[Encoder]]:
+        if not v or any(len(p) != 8 for p in v):
+            raise ValueError("encoders.pages : au moins une page, 8 encodeurs par page")
         return v
 
 

@@ -10,7 +10,15 @@ from typing import Any, Literal
 import mido
 
 from mk_brain.clock import ClockTracker
-from mk_brain.engine import ControlChange, Engine, MidiOut, NoteOff, NoteOn, ProgramChange
+from mk_brain.engine import (
+    ControlChange,
+    Engine,
+    MidiOut,
+    NoteOff,
+    NoteOn,
+    PitchBend,
+    ProgramChange,
+)
 
 InKind = Literal["clock", "start", "continue", "stop", "sysex", "program_change", "control_change"]
 
@@ -59,6 +67,8 @@ def to_mido(msg: MidiOut) -> Any:
         return mido.Message(
             "control_change", channel=msg.channel, control=msg.control, value=msg.value
         )
+    if isinstance(msg, PitchBend):
+        return mido.Message("pitchwheel", channel=msg.channel, pitch=msg.pitch)
     assert isinstance(msg, ProgramChange)
     return mido.Message("program_change", channel=msg.channel, program=msg.program)
 

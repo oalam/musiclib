@@ -241,9 +241,9 @@ def cmd_play(dry_run: bool, project_path: Path) -> int:
             if now - last_draw < FRAME_NS:
                 continue
             last_draw = now
-            warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(now) else ""
+            warn = "TRANSFER OPEN?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
-                warn = warn or "pas de clock"
+                warn = warn or "no clock"
             left = render.left(engine, now, message, warn)  # cadre et bandeau DESIGN en design
             for screen, img in enumerate((left, render.right(engine, now))):
                 frame = display.image_to_frame(img)
