@@ -171,7 +171,7 @@ class Engine:
             self.last_control = f"T{pad:02d} {'mute' if value else 'démute'}"
             return [(now, ControlChange(pad - 1, cc, value))]
         if self.last_program is None:
-            self.last_control = "banque ? (changer de pattern sur la DT2)"
+            self.last_control = "banque ? (Stop ou changement de pattern sur la DT2)"
             return []
         program = self.last_program // 16 * 16 + pad - 1
         self.last_control = f"-> {pattern_label(program)}"
@@ -205,6 +205,8 @@ class Engine:
         suivante (arrêté : compteur inchangé)."""
         if program != self.last_program:
             self.faders.pattern_changed()
+        if self.last_program is None or program // 16 != self.last_program // 16:
+            self.log.append(f"banque {pattern_label(program)[0]} (PC reçu)")
         self.last_program = program
         ticks = self.clock.ticks_since_start
         if ticks is None:

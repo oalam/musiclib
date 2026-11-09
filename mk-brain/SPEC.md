@@ -475,6 +475,11 @@ numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
   est active. Un CC reçu sur l'AUTO CHANNEL met donc à jour la track
   sélectionnée sur la MK2 (décidé : on tourne sur la DT2 la track
   sélectionnée sur la MK2). Un mute reçu sur ce canal est ignoré.
+- Mutes : la DT2 ne donne pas leur état, elle n'envoie que leurs
+  changements. Au lancement, toutes les tracks sont supposées ouvertes
+  jusqu'au premier mute joué (limite assumée, 2026-11-09).
+- PATTERN + pad : la banque s'apprend au premier PC reçu, dont celui que la
+  DT2 envoie à chaque Stop (pattern actif) ; avant, `banque ?`.
 - Un changement de pattern (PC d'un autre pattern) recharge le kit de la
   DT2 : toutes les valeurs passent « hors prise », `~` devant la valeur.
   La première rotation repart de la dernière valeur connue (saut possible,

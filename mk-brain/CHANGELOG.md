@@ -10,6 +10,8 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 - [5] 5.A Saut de valeur après un bouton tourné sur la DT2 : elle envoie
   ses boutons sur l'AUTO CHANNEL, pas sur le canal de la track ; ces CC
   vont désormais à la track sélectionnée sur la MK2 (mute ignoré).
+- [5] 5.A `banque ?` indique qu'un Stop sur la DT2 suffit (elle envoie le
+  pattern actif) ; la banque apprise est journalisée.
 
 ## [0.6.0] - 2026-11-09
 

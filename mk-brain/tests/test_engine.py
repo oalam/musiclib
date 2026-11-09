@@ -180,7 +180,7 @@ def test_program_change_resets_at_next_bar(cfg: Config) -> None:
     eng.on_start()
     advance(eng, 1, 3 * 96 + 86 + 1)  # 10 clocks avant la 5ᵉ mesure
     eng.on_program_change(16 * 4 + 3)
-    assert eng.log == ["PC E04 -> mesure 1 à la barre 5"]
+    assert eng.log == ["banque E (PC reçu)", "PC E04 -> mesure 1 à la barre 5"]
     assert eng.phrase_state is not None and eng.phrase_state.bar == 4
     advance(eng, 3 * 96 + 87, 4 * 96 + 1)
     assert eng.phrase_state is not None and eng.phrase_state.bar == 1
@@ -190,7 +190,7 @@ def test_program_change_resets_at_next_bar(cfg: Config) -> None:
 def test_program_change_ignored_when_stopped(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_program_change(5)
-    assert eng.log == [] and not eng.phrase.pending
+    assert eng.log == ["banque A (PC reçu)"] and not eng.phrase.pending  # compteur inchangé
 
 
 def test_shift_play_and_shift_group_recalibrate(cfg: Config) -> None:
@@ -256,6 +256,7 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
     assert eng.last_control.startswith("banque ?")
     eng.handle(PadEvent(PAD7, False, 0), MS)
     eng.on_program_change(16 * 4 + 3)  # E04 reçu, transport arrêté
+    assert eng.log == ["banque E (PC reçu)"]
     assert eng.handle(PadEvent(PAD7, True, 2500), 2 * MS) == [
         (2 * MS, ProgramChange(9, 16 * 4 + 6))
     ]  # E07, canal 10
