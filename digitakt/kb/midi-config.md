@@ -89,6 +89,18 @@ calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
   Stop s'accompagne aussi d'un PC du pattern actif.
 - Usage : suivi de contexte par [[mk-brain/SPEC|mk-brain]].
 
+## Vérifié sur la machine (2026-11-09) : AUTO CHANNEL partagé avec une track
+
+- `AUTO CHANNEL` = 10 et `TRACK 10 CHANNEL` = 10, track 1 active : les
+  notes et les CC reçus sur le canal 10 vont à la **track active** (kick),
+  jamais à la track 10. L'AUTO CHANNEL l'emporte, et la track qui partage
+  son canal n'est plus joignable par ce canal.
+- `TRACK 16 CHANNEL` = 16 : une note reçue sur le canal 16 joue la
+  track 16, quelle que soit la track active.
+- Pour piloter chaque track par son canal (faders, mutes), l'AUTO CHANNEL
+  doit tomber sur le canal d'une track qu'on accepte de ne plus piloter
+  ainsi.
+
 ## Pièges
 
 - **Fermer Transfer** pendant un envoi depuis le Mac : son dialogue sysex
