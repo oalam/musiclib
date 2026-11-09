@@ -16,6 +16,10 @@ python3.12 -m venv .venv
 `config/default.yaml` : canal, courbe de vélocité, quantize, longueur de phrase,
 couleurs, dispositions A-H.
 
+`projects/<set>.yaml` : fiche de chaque banque (titre, tempo, tonique, mode,
+phrase). `projects/solaris.yaml` est écrit à la main jusqu'à la slice 6, où
+`mk-brain convert` le générera depuis la doctrine du set.
+
 ## Commandes
 
 ```bash
@@ -24,9 +28,11 @@ couleurs, dispositions A-H.
 .venv/bin/mk-brain spike --raw --no-chase   # + rapports bruts en hexa
 .venv/bin/mk-brain play               # pads → DT2 (AUTO CHANNEL), démarre en live (rythmique),
                                       # SHIFT + CONTROL 1 s + appui maître = live / design,
-                                      # en design GROUP A-H ou PAD MODE = disposition,
+                                      # en design GROUP A-H = banque, PAD MODE = disposition,
+                                      # boutons d'écran 1-5 = menu (maître : choisir, appui : valider),
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
+.venv/bin/mk-brain play --project projects/solaris.yaml   # projet (défaut : solaris)
 .venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks
 .venv/bin/mk-brain clock --bench-note 3   # + note 3 (track 4) envoyée à chaque noire, gigue d'envoi
 ```

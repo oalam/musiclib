@@ -14,6 +14,11 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
 - NOTE REPEAT : les 8 divisions dans les deux bandeaux, chacune sous son
   bouton d'écran, la division choisie inversée.
 - Bascule de mode proposée : l'écran droit entier.
+- Design (slice 5.D) : les entrées du menu sous leurs boutons d'écran
+  (BANK, GAMME, TRACK, QUANT à gauche, PHRASE à droite), l'entrée ouverte
+  inversée avec la valeur en cours de choix ; dessous, `DESIGN` et les
+  mutes (ou le dernier geste) à gauche ; à droite la fiche de la banque
+  (clé, tempo, tonique, mode) et la phrase en petit.
 """
 
 from __future__ import annotations
@@ -23,6 +28,7 @@ from typing import TYPE_CHECKING
 from PIL import Image, ImageDraw, ImageFont
 
 from mk_brain.display import HEIGHT, WIDTH, new_image, text_image
+from mk_brain.engine import MENU
 from mk_brain.phrase import BLOCK_BARS
 from mk_brain.repeat import DIVISIONS
 
@@ -84,13 +90,13 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
         _centered(d, box, name, font, 0 if chosen else 1)
 
 
-def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = 0) -> None:
     """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
     La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point."""
-    cell = WIDTH // 16
+    cell = (WIDTH - left) // 16
     top, bottom = 29, 35
     for t in range(1, 17):
-        x0, x1 = (t - 1) * cell + 2, t * cell - 3
+        x0, x1 = left + (t - 1) * cell + 2, left + t * cell - 3
         if t == engine.cfg.midi.auto_channel:
             d.point(((x0 + x1) // 2, (top + bottom) // 2), fill=1)
         elif engine.faders.muted.get(t):
@@ -99,6 +105,71 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine) -> None:
             d.rectangle((x0, top, x1, bottom), fill=1)
         if t == engine.track:
             d.rectangle((x0 - 1, bottom + 2, x1 + 1, bottom + 3), fill=1)
+
+
+MENU_TOP = 23  # hauteur des entrées du menu en design
+
+
+def _menu_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
+    """Design : les entrées du menu sous les boutons d'écran de cet écran."""
+    view = engine.menu_view()
+    small = _font(SMALL)
+    for i in range(COLS):
+        k = screen * COLS + i
+        if k >= len(MENU):
+            continue
+        name, value, opened = view[k]
+        box = (i * COL, 0, (i + 1) * COL - 2, MENU_TOP)
+        ink = 1
+        if opened:
+            d.rectangle(box, fill=1)
+            ink = 0
+        _centered(d, (box[0], 2, box[2], 11), name, small, ink)  # sous le cadre du design
+        font = _fit(d, value, COL - 6, (16, 12, 10, 9))
+        _centered(d, (box[0], 12, box[2], MENU_TOP), value, font, ink)
+
+
+def _design_left(
+    d: ImageDraw.ImageDraw, engine: Engine, now: int, message: tuple[str, int] | None, warn: str
+) -> None:
+    """Menu 1-4 en haut ; dessous `DESIGN`, puis mutes ou dernier geste / frappe."""
+    _menu_band(d, engine, 0)
+    small = _font(SMALL)
+    _bold(d, (3, 25), "DESIGN", small, 1)
+    left = 8 + int(d.textlength("DESIGN", font=small))
+    recent: list[tuple[int, str]] = []
+    if message is not None and now - message[1] < MESSAGE_NS:
+        recent.append((message[1], message[0]))
+    hit = engine.last_hit
+    if hit is not None and now - hit[2] < OVERLAY_NS:
+        recent.append((hit[2], f"pad {hit[0]}  vel {hit[1]}"))
+    text = warn or (max(recent)[1] if recent else "")
+    if text:
+        d.text((left, 25), text, font=_fit(d, text, WIDTH - left - 4, (12,)), fill=1)
+    else:
+        _mute_strip(d, engine, left)
+
+
+def _design_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+    """PHRASE sous le bouton 5, fiche de la banque à côté ; phrase en petit dessous."""
+    _menu_band(d, engine, 1)
+    small, mid = _font(SMALL), _font(16)
+    sheet = engine.sheet
+    if sheet is None:
+        d.text((COL + 6, 4), "pas de projet", font=mid, fill=1)
+    else:
+        key, bank = sheet
+        _bold(d, (COL + 6, -3), f"{key}  {bank.tempo:g}", mid, 1)
+        d.text((COL + 6, 12), f"{bank.tonique} {bank.mode}", font=small, fill=1)
+    st = engine.phrase_state
+    length = engine.phrase.length
+    bar = "--" if st is None else str(st.bar)
+    text = f"{bar} / {length}" + ("" if st is None else f"  cap {st.cap} : -{st.to_cap}")
+    d.text((3, 24), text, font=small, fill=1)
+    top, bottom, left, right = 28, 34, 140, WIDTH - 3
+    d.rectangle((left, top, right, bottom), outline=1)
+    if st is not None:
+        d.rectangle((left, top, left + round((right - left) * st.bar / length), bottom), fill=1)
 
 
 def _left_band(
@@ -114,25 +185,16 @@ def _left_band(
     if name:
         nw = int(d.textlength(name, font=mid))
         _bold(d, (WIDTH - tw - nw - 12, 1), name, mid, 1)
-    if engine.design:
-        lay = engine.layout
-        _bold(d, (3, -3), "DESIGN", mid, 1)
-        d.text((3, 12), f"{lay.group} {lay.name}  -> AUTO", font=_font(SMALL), fill=1)
-    else:
-        current = engine.phrase.pattern or "---"
-        _bold(d, (3, -6), current, big, 1)
-        nxt = engine.next_pattern
-        if nxt is not None:
-            x = 8 + int(d.textlength(current, font=big))
-            _bold(d, (x, 1), f"> {nxt}", mid, 1)
-    # bande des mutes, ou alerte / geste / frappe en design, le plus récent
-    recent: list[tuple[int, str]] = []
-    if message is not None and now - message[1] < MESSAGE_NS:
-        recent.append((message[1], message[0]))
-    hit = engine.last_hit
-    if engine.design and hit is not None and now - hit[2] < OVERLAY_NS:
-        recent.append((hit[2], f"pad {hit[0]}  vel {hit[1]}"))
-    text = warn or (max(recent)[1] if recent else "")
+    current = engine.phrase.pattern or "---"
+    _bold(d, (3, -6), current, big, 1)
+    nxt = engine.next_pattern
+    if nxt is not None:
+        x = 8 + int(d.textlength(current, font=big))
+        _bold(d, (x, 1), f"> {nxt}", mid, 1)
+    # bande des mutes, ou alerte / dernier geste
+    text = warn
+    if not text and message is not None and now - message[1] < MESSAGE_NS:
+        text = message[0]
     if text:
         _bold(d, (3, 23), text, _fit(d, text, WIDTH - 8, (12,)), 1)
     else:
@@ -217,6 +279,8 @@ def left(
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):
         _repeat_band(d, engine, 0)
+    elif engine.design:
+        _design_left(d, engine, now, message, warn)
     else:
         _left_band(d, engine, now, message, warn)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
@@ -236,6 +300,8 @@ def right(engine: Engine, now: int) -> Image.Image:
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):
         _repeat_band(d, engine, 1)
+    elif engine.design:
+        _design_right(d, engine)
     else:
         _right_band(d, engine)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)

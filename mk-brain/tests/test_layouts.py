@@ -53,3 +53,27 @@ def test_describe_note(cfg: Config) -> None:
     assert note_name(60) == "C5"  # convention Elektron
     assert describe_note(cfg.layouts[0], 9, 8) == "pad 9 -> track 9"
     assert describe_note(cfg.layouts[2], 3, 63) == "pad 3 -> b3 (D#5, 63)"
+
+
+# --- slice 5.D : dispositions calées sur une banque ---------------------------
+
+
+def test_chromatic_follows_bank_scale(cfg: Config) -> None:
+    from mk_brain.layouts import for_bank
+
+    chroma = for_bank(cfg.layouts[1], cfg.scale("eolien"), 10)  # la# mineur
+    assert pad_note(chroma, 1) == 70  # A#4 : tonique dans l'octave de C5
+    assert pad_color(cfg, chroma, 1) == cfg.roles.tonique
+    assert pad_color(cfg, chroma, 2) == cfg.roles.hors_gamme  # B : seconde mineure
+    assert pad_color(cfg, chroma, 4) == cfg.roles.tierce  # C# : tierce mineure
+    assert pad_color(cfg, chroma, 5) == cfg.roles.hors_gamme  # D : tierce majeure, hors gamme
+    assert pad_color(cfg, chroma, 8) == cfg.roles.quinte  # F
+    assert pad_color(cfg, chroma, 3) == cfg.families["mineur"]  # C : seconde
+
+
+def test_scale_layout_moves_to_tonic_rhythm_untouched(cfg: Config) -> None:
+    from mk_brain.layouts import for_bank
+
+    phryg = for_bank(cfg.layouts[3], cfg.scale("phrygien"), 5)  # fa phrygien
+    assert [pad_note(phryg, p) for p in (1, 2, 8)] == [65, 66, 77]
+    assert for_bank(cfg.layouts[0], cfg.scale("eolien"), 5) == cfg.layouts[0]

@@ -3,6 +3,32 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.9.0] - 2026-11-09
+
+### Ajouté
+
+- [5] 5.D Modèle de projet (`project.py`, `Project` / `Bank`,
+  `ProjectError`) au schéma de la SPEC, avancé de la slice 6 ;
+  `projects/solaris.yaml` écrit à la main (provisoire jusqu'à `convert`),
+  banques A-F, G-JOKER en attente de sa tonalité ; un test vérifie qu'il
+  reste aligné sur les tonalités et tempos de `library/lives/solaris.json`.
+- [5] 5.D Design : GROUP A-H = banque du projet (LED GROUP = banques, à la
+  couleur de leur mode, la choisie pleine) ; tonique de la banque = départ
+  des dispositions, gamme de la banque = hors gamme en blanc dans la
+  chromatique ; phrase de la banque au compteur. Premier passage en design
+  sur la banque de la DT2 si le projet l'a.
+- [5] 5.D Menu design : boutons d'écran 1-5 = BANK, GAMME, TRACK, QUANT,
+  PHRASE ; encodeur maître = choix, appui = valider, même bouton = fermer.
+  Écrans : entrées sous leurs boutons (ouverte inversée), `DESIGN` et
+  mutes dessous, fiche de la banque et phrase en petit à droite.
+- `mk-brain play --project` (défaut `projects/solaris.yaml`).
+
+### Modifié
+
+- [5] 5.D Clé `mode` sur les dispositions B-H de `config/default.yaml`
+  (hub des intervalles des modes) ; en design, GROUP ne choisit plus la
+  disposition (PAD MODE ou menu GAMME).
+
 ## [0.8.1] - 2026-11-09
 
 ### Modifié

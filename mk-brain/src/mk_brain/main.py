@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 import time
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from mk_brain import display, render
@@ -30,6 +31,7 @@ from mk_brain.hid_mk2 import (
     pad_label,
 )
 from mk_brain.midi_io import MidiError
+from mk_brain.project import DEFAULT_PROJECT, ProjectError
 
 if TYPE_CHECKING:
     pass
@@ -171,16 +173,18 @@ def _clock_line(clock: ClockTracker) -> str:
     return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
 
 
-def cmd_play(dry_run: bool) -> int:
+def cmd_play(dry_run: bool, project_path: Path) -> int:
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
     from mk_brain.midi_io import Dt2In, Dt2Out, feed_engine
+    from mk_brain.project import load_project
     from mk_brain.scheduler import Scheduler
 
     cfg = load_config()
+    project = load_project(project_path)
     clock = ClockTracker()
-    engine = Engine(cfg, clock)
+    engine = Engine(cfg, clock, project)
     decoder = InputDecoder(pad_threshold=cfg.velocity.threshold)
     out = None if dry_run else Dt2Out.open(cfg.midi.port_hint)
     inp = None if dry_run else Dt2In.open(cfg.midi.port_hint)
@@ -342,6 +346,9 @@ def main(argv: list[str] | None = None) -> int:
     sp.add_argument("--step", type=float, default=0.15, help="pas du balayage LED (s)")
     pp = sub.add_parser("play", help="slice 1 : pads → notes DT2 sur l'AUTO CHANNEL")
     pp.add_argument("--dry-run", action="store_true", help="sans DT2 : notes affichées seulement")
+    pp.add_argument(
+        "--project", type=Path, default=DEFAULT_PROJECT, help="projet du set (banques du design)"
+    )
     cp = sub.add_parser("clock", help="slice 2 : horloge DT2, BPM, gigue ; banc d'envoi")
     cp.add_argument("--bench-note", type=int, help="note envoyée sur la grille (ex. 3 = track 4)")
     cp.add_argument(
@@ -352,11 +359,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "list":
             return cmd_list()
         if args.cmd == "play":
-            return cmd_play(dry_run=args.dry_run)
+            return cmd_play(dry_run=args.dry_run, project_path=args.project)
         if args.cmd == "clock":
             return cmd_clock(bench_note=args.bench_note, every=args.every)
         return cmd_spike(chase=not args.no_chase, raw=args.raw, step_s=args.step)
-    except (Mk2Error, ConfigError, MidiError) as exc:
+    except (Mk2Error, ConfigError, MidiError, ProjectError) as exc:
         print(f"erreur : {exc}", file=sys.stderr)
         return 2
 

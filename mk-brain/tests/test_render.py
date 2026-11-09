@@ -7,6 +7,7 @@ from mk_brain.config import Config
 from mk_brain.display import HEIGHT, WIDTH
 from mk_brain.engine import Engine
 from mk_brain.hid_mk2 import ButtonEvent, EncoderEvent, PadEvent
+from mk_brain.project import Project
 
 BAND_PIXEL = (WIDTH - 2, 2)  # coin du bandeau droit, hors texte
 
@@ -89,3 +90,28 @@ def test_track_code_shown_next_to_track(cfg: Config) -> None:
     with_name = render.left(Engine(cfg), 0).tobytes()
     bare = cfg.model_copy(update={"track_names": {}})
     assert render.left(Engine(bare), 0).tobytes() != with_name
+
+
+# --- slice 5.D : menu du design -----------------------------------------------
+
+
+def test_design_menu_entry_inverted_while_open(cfg: Config, project: Project) -> None:
+    from test_engine import btn
+
+    eng = design(cfg, project=project)
+    corner = (render.COL + 2, 3)  # coin de l'entrée GAMME, hors texte
+    assert not render.left(eng, 0).getpixel(corner)
+    btn(eng, "DISPLAY_2")
+    assert render.left(eng, 0).getpixel(corner)
+    btn(eng, "DISPLAY_5")  # PHRASE : écran droit, colonne 1
+    assert render.right(eng, 0).getpixel((2, 3))
+
+
+def test_design_right_shows_bank_sheet(cfg: Config, project: Project) -> None:
+    from test_engine import btn
+
+    eng = design(cfg, project=project)
+    a = render.right(eng, 0).tobytes()
+    btn(eng, "GROUP_E")
+    assert render.right(eng, 0).tobytes() != a  # fiche E-TRIBE au lieu de A-HALF
+    assert render.right(design(cfg), 0).tobytes() != a  # sans projet : « pas de projet »

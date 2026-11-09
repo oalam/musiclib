@@ -206,7 +206,7 @@ la slice 7**.
   - live : GROUP seul sans effet, LED GROUP éteintes transport arrêté
     (compteur transport lancé) ; PAD MODE éteint ;
   - design : GROUP seul ou PAD MODE choisit la disposition (B chromatique au
-    départ ; GROUP en design reste à trancher en 5.D), LED CONTROL pleine ;
+    départ ; GROUP en design = banque depuis la 5.D), LED CONTROL pleine ;
     SELECT + pad 16 permis (la track active est visée par l'AUTO CHANNEL),
     valeurs des encodeurs tenues sous la track sélectionnée ; rappel
     `DT2 en LIVE REC ?` au premier mouvement de chaque passage en design ;
@@ -228,6 +228,35 @@ la slice 7**.
     du modèle de projet et de `projects/solaris.yaml` ;
   - menu design : entrées de la maquette, BANK et GAMME alimentées par
     solaris.
+- **Fait le 2026-11-09 (slice 5.D)** :
+  - tranché en début de 5.D : **modèle de projet avancé** (`project.py`,
+    `Project` / `Bank` au schéma du front matter, `ProjectError`) et
+    `projects/solaris.yaml` écrit à la main, marqué provisoire, jusqu'à
+    `convert` (slice 6) ; `tests/test_project.py` le recoupe avec les
+    `keys` et `tempos` de `solaris.json`. Banques A-F ; **G-JOKER absent**
+    (ni tonalité ni tempo dans le JSON : kick + sub en fa, la# et do), à
+    trancher avec le front matter. Phrase de 32 partout (`defaults`), la
+    doctrine ne fixe pas de longueur par banque ;
+  - le mode d'une banque désigne la disposition qui porte ses intervalles
+    (clé `mode` des dispositions B-H, `config/default.yaml`, un seul hub) ;
+  - GROUP A-H = banque : départ des dispositions sur la tonique dans
+    l'octave de C5 (la# → A#4, note 70), chromatique avec la gamme de la
+    banque (hors gamme en blanc, avant les rôles : la tierce majeure d'un
+    mode mineur est blanche), phrase de la banque au compteur (en live, la
+    config jusqu'à la slice 6) ; GROUP d'une banque absente : `pas de
+    banque G`, sans changement ; LED GROUP en design = banques du projet à
+    la couleur de la famille de leur mode, la choisie pleine, quel que soit
+    le transport (le compteur reste à l'écran) ;
+  - premier passage en design : banque du dernier PC reçu si le projet
+    l'a, sinon la première ; gardée ensuite d'un passage à l'autre ;
+  - **menu réduit à 5 entrées** (décidé le 2026-11-09) : boutons d'écran
+    1-5 = BANK, GAMME (disposition), TRACK, QUANT, PHRASE ; SLOTS, CANAL
+    et MON reportés tant que leur rôle n'est pas précisé. L'encodeur
+    maître choisit, son appui valide, le même bouton (ou un bouton sans
+    entrée) ferme sans appliquer ; NOTE REPEAT garde la priorité sur les
+    boutons d'écran ;
+  - provisoire jusqu'à l'essai sur la MK2 : disposition des écrans (cf.
+    Écrans, design).
 
 ## Projets : de la doctrine au fichier projet
 
@@ -238,7 +267,7 @@ la slice 7**.
 | Samples par banque et track | `library/lives/<set>.json` | `items[].bank`, `items[].track`, `items[].name` |
 | Fiche de chaque banque : titre, description, tempo, tonique, mode ; et ce que mk-brain ajoute pour jouer : longueur de phrase, paliers de tempo, longueur des patterns | front matter `mkbrain:` de la doctrine du set (`digitakt/doctrine-dt2-<set>.md`) | `E-TRIBE: {title: Tribe, tempo: 162, tonique: A#, mode: phrygien, phrase: 64}` |
 | Matériel, dispositions de pads, page d'encodeurs (CC) | `mk-brain/config/default.yaml` | `encodeurs: [{nom: CUT, cc: 74}, …]` |
-| Projet résolu, prêt à jouer | `mk-brain/projects/<set>.yaml` (généré, jamais édité à la main) | tout ce qui précède, aplati par banque |
+| Projet résolu, prêt à jouer | `mk-brain/projects/<set>.yaml` (généré, jamais édité à la main ; `solaris.yaml` écrit à la main en attendant `convert`, 5.D) | tout ce qui précède, aplati par banque |
 
 ### Formalisme du front matter (proposition, à valider)
 
@@ -489,14 +518,32 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
 - NOTE REPEAT (tenu, ou pad qui répète) : les 8 divisions remplacent les
   bandeaux, chacune sous son bouton d'écran, la choisie inversée ;
 - bascule de mode proposée : écran droit entier ;
-- design : même structure, `DESIGN` + disposition à la place du pattern, cadre autour
-  de l'écran gauche (les menus viendront en 5.D) ;
+- design : cadre autour de l'écran gauche, menu dans les bandeaux depuis
+  la 5.D (cf. ci-dessous) ;
 - banque, tonique et mode s'ajouteront avec les projets (slice 6) ;
 - rafraîchi au plus toutes les 50 ms dans la boucle principale, envoyé
   seulement si l'image change ; moins d'1 ms la paire d'écrans sur le
   Mac. Si le Pi est trop lent, passer au fil de rendu dédié (slice 7).
 
-**Design, écran gauche : ce qui part vers la DT2**
+**Fait le 2026-11-09 (slice 5.D), remplace les deux maquettes design
+ci-dessous** : les entrées du menu sous leurs boutons d'écran, comme les
+divisions du repeat ; faders inchangés.
+
+```
+écran gauche (bordé)                          écran droit
+ BANK    GAMME    TRACK      QUANT            PHRASE  E-TRIBE 162 (gras)
+ E-TRIBE Chromat. T03 SD/CP  off              32      A# phrygien
+DESIGN ■ ■ □ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ·      6 / 32  cap 16 : -11  [██░░░░]
+```
+
+- entrée ouverte en vidéo inverse, avec la valeur en cours de choix ;
+- à droite de `DESIGN` : mutes, ou le dernier geste (1,5 s), la frappe
+  (`pad n vel v`, 1 s) ou une alerte ;
+- écran droit : PHRASE sous le bouton 5, fiche de la banque (clé, tempo,
+  tonique, mode) à côté, `pas de projet` sans projet ; phrase en petit,
+  sans compte à rebours en gros.
+
+**Design, écran gauche : ce qui part vers la DT2** (maquette d'origine)
 ```
 ╔DESIGN═ E-TRIBE ═ T10 acid ═ ch11 ═══════╗
 ║ pad 6 -> A#3 (70) vel 96   Grp H penta  ║
@@ -507,7 +554,7 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
 - Le cadre et le bandeau `DESIGN` ne disparaissent jamais : un coup d'œil
   suffit à savoir dans quel mode on est.
 
-**Design, écran droit : menu ou page de paramètres**
+**Design, écran droit : menu ou page de paramètres** (maquette d'origine)
 ```
  BANK  TRACK GAMME SLOTS QUANT PHRASE CANAL MON
   E     10   penta 33-48  off   32    11    ·
@@ -585,7 +632,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | SHIFT + GROUP n | recale le compteur au début du bloc n | idem |
 | GROUP A-H | LED du compteur 8 × 8 mesures | banque n : sa tonique, son mode et sa phrase colorent et calent les pads (décidé le 2026-11-09) |
 | PAD MODE | — | cycle des dispositions |
-| 8 boutons au-dessus des écrans | divisions du repeat (pendant NOTE REPEAT) | entrées du menu |
+| 8 boutons au-dessus des écrans | divisions du repeat (pendant NOTE REPEAT) | 1-5 : BANK, GAMME, TRACK, QUANT, PHRASE (5.D) ; divisions pendant NOTE REPEAT |
 | Encodeur maître | sans effet (sauf avec SWING) | valeur de l'entrée de menu ; appui = valider |
 | SHIFT + CONTROL (1 s) | changer de mode (refusé transport lancé) | changer de mode |
 | SHIFT + BROWSE | sélection de projet (refusé transport lancé) | idem |
@@ -669,7 +716,7 @@ conditionne tout le reste.
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
-| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design, cadrée le 2026-11-09 (cf. Modes), à faire en nouvelle session |
+| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 5 entrées), faite le 2026-11-09, à essayer sur la MK2 |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 

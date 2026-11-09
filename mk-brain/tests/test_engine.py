@@ -6,6 +6,7 @@ from mk_brain.clock import ClockTracker
 from mk_brain.config import Config
 from mk_brain.engine import NOTE_OFF_MIN_NS, Engine, NoteOff, NoteOn, Timed
 from mk_brain.hid_mk2 import BUTTONS, ButtonEvent, EncoderEvent, PadEvent
+from mk_brain.project import Project
 
 PAD1 = 12  # index HID du pad 1 (constat slice 0)
 MS = 1_000_000
@@ -32,9 +33,11 @@ def btn(eng: Engine, name: str, pressed: bool = True, t: int = 0) -> None:
     eng.handle(ButtonEvent(name, pressed), t)
 
 
-def design(cfg: Config, clock: ClockTracker | None = None) -> Engine:
+def design(
+    cfg: Config, clock: ClockTracker | None = None, project: Project | None = None
+) -> Engine:
     """Moteur passé en design par le geste : SHIFT + CONTROL 1 s, appui maître."""
-    eng = Engine(cfg, clock)
+    eng = Engine(cfg, clock, project)
     btn(eng, "SHIFT")
     btn(eng, "CONTROL")
     eng.tick(SECOND)
@@ -65,11 +68,12 @@ def test_short_hit_fires_on_release(cfg: Config) -> None:
     assert out == [(MS // 2, NoteOn(15, 0, 127)), (MS // 2 + NOTE_OFF_MIN_NS, NoteOff(15, 0))]
 
 
-def test_group_changes_layout_and_note_off_keeps_note(cfg: Config) -> None:
+def test_pad_mode_changes_layout_and_note_off_keeps_note(cfg: Config) -> None:
     eng = design(cfg)
-    btn(eng, "GROUP_C")
+    btn(eng, "PAD_MODE")  # B → C
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 60, 127))]
-    btn(eng, "GROUP_A")
+    for _ in range(6):
+        btn(eng, "PAD_MODE")  # … → A
     assert eng.handle(PadEvent(PAD1, False, 0), 30 * MS) == [(30 * MS, NoteOff(15, 60))]
 
 
@@ -392,3 +396,85 @@ def test_program_change_when_stopped_sets_current_pattern(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_program_change(16 + 1)
     assert (eng.phrase.pattern, eng.next_pattern) == ("B02", None)
+
+
+# --- slice 5.D : design, banques et menu ------------------------------------------
+
+
+def turn_master(eng: Engine, delta: int) -> None:
+    eng.handle(EncoderEvent(0, delta, 0), 0)
+
+
+def test_design_group_is_bank(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    assert eng.design_bank == 0  # pas de PC reçu : première banque
+    btn(eng, "GROUP_E")
+    assert eng.last_control == "E-TRIBE  A# phrygien"
+    assert press(eng, 0) == [(3 * MS, NoteOn(15, 70, 127))]  # chromatique depuis A#
+    leds = eng.leds()
+    assert leds.groups[4] == cfg.families["mineur"]
+    assert leds.groups[7] == (0, 0, 0)  # pas de banque H
+    btn(eng, "GROUP_H")
+    assert (eng.design_bank, eng.last_control) == (4, "pas de banque H")
+    assert eng.layout.group == "B"  # GROUP ne change plus la disposition
+
+
+def test_design_without_project(cfg: Config) -> None:
+    eng = design(cfg)
+    btn(eng, "GROUP_C")
+    assert (eng.layout.group, eng.last_control) == ("B", "pas de projet")
+    assert eng.leds().groups == [(0, 0, 0)] * 8
+
+
+def test_design_starts_on_dt2_bank(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, project=project)
+    eng.on_program_change(4 * 16 + 2)  # E03
+    btn(eng, "SHIFT")
+    btn(eng, "CONTROL")
+    eng.tick(SECOND)
+    btn(eng, "MASTER_PUSH")
+    assert eng.design and eng.design_bank == 4
+
+
+def test_menu_choose_and_validate(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "DISPLAY_2")  # GAMME
+    assert eng.leds().buttons["DISPLAY_2"] > eng.leds().buttons["DISPLAY_1"]
+    turn_master(eng, 2)
+    assert eng.menu_view()[1] == ("GAMME", "Phrygien", True)
+    assert eng.layout.group == "B"  # rien d'appliqué avant l'appui
+    btn(eng, "MASTER_PUSH")
+    assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "GAMME Phrygien")
+    btn(eng, "DISPLAY_1")  # BANK : A → B, borné aux banques du projet
+    turn_master(eng, 9)
+    btn(eng, "MASTER_PUSH")
+    assert eng.design_bank == 5 and eng.sheet is not None and eng.sheet[0] == "F-MENTAL"
+
+
+def test_menu_same_button_closes_without_applying(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "DISPLAY_3")  # TRACK
+    turn_master(eng, 4)
+    btn(eng, "DISPLAY_3")
+    btn(eng, "MASTER_PUSH")
+    assert (eng.menu, eng.track) == (None, 1)
+    btn(eng, "DISPLAY_7")  # pas d'entrée : rien d'ouvert
+    assert eng.menu is None
+
+
+def test_menu_phrase_design_only(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "DISPLAY_5")
+    turn_master(eng, 1)
+    btn(eng, "MASTER_PUSH")
+    assert eng.phrase.length == 64
+    btn(eng, "GROUP_C")  # nouvelle banque : sa phrase
+    assert eng.phrase.length == project.defaults.phrase
+    btn(eng, "DISPLAY_5")
+    turn_master(eng, 1)
+    btn(eng, "MASTER_PUSH")
+    btn(eng, "SHIFT")
+    btn(eng, "CONTROL")
+    eng.tick(3 * SECOND)
+    btn(eng, "MASTER_PUSH")  # retour en live : la phrase de la config
+    assert not eng.design and eng.phrase.length == cfg.play.phrase

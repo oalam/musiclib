@@ -21,10 +21,16 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   lancé. Live : pads en rythmique, GROUP seul sans effet. Design :
   disposition au choix (GROUP ou PAD MODE, chromatique par défaut),
   encodeurs sur l'AUTO CHANNEL. Quantize propre à chaque mode (off en design).
+- Slice 5.D : design avec un projet (`project.py`). GROUP A-H = banque du
+  projet : sa tonique cale les dispositions, sa gamme marque le hors gamme
+  de la chromatique, sa phrase règle le compteur ; PAD MODE fait défiler les
+  dispositions. Menu : boutons d'écran 1-5 = BANK, GAMME, TRACK, QUANT,
+  PHRASE ; l'encodeur maître choisit, son appui valide, le même bouton ferme.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from mk_brain.clock import ClockTracker
@@ -40,9 +46,10 @@ from mk_brain.hid_mk2 import (
     PadEvent,
     pad_label,
 )
-from mk_brain.layouts import N_PADS, pad_color, pad_note, scale, velocity
+from mk_brain.layouts import N_PADS, for_bank, pad_color, pad_note, scale, velocity
 from mk_brain.modes import ModeSwitch
-from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseState, pattern_label
+from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseLength, PhraseState, pattern_label
+from mk_brain.project import Bank, Project
 from mk_brain.quantize import (
     GRID_TICKS,
     QUANTIZE_CYCLE,
@@ -87,6 +94,8 @@ MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
 LIVE_GROUP = 0  # disposition rythmique, imposée en live
 DESIGN_GROUP = 1  # chromatique, disposition de départ en design
 MODE_KEYS = ("SHIFT", "CONTROL", "MASTER_PUSH")  # n'annulent pas une bascule proposée
+MENU = ("BANK", "GAMME", "TRACK", "QUANT", "PHRASE")  # design : boutons d'écran 1-5
+PHRASES: tuple[PhraseLength, ...] = (32, 64)
 Timed = tuple[int, MidiOut]
 
 
@@ -103,8 +112,15 @@ class _Repeat:
 
 
 class Engine:
-    def __init__(self, cfg: Config, clock: ClockTracker | None = None) -> None:
+    def __init__(
+        self, cfg: Config, clock: ClockTracker | None = None, project: Project | None = None
+    ) -> None:
         self.cfg = cfg
+        self.project = project
+        self.design_bank: int | None = None  # banque du design (GROUP, menu BANK), 0 = A
+        self._design_phrase: PhraseLength | None = None  # menu PHRASE ; None = celle de la banque
+        self.menu: int | None = None  # entrée de menu ouverte (index dans MENU)
+        self.menu_choice = 0  # valeur en cours de choix à l'encodeur maître
         self.clock = clock or ClockTracker()
         self.channel = cfg.midi.auto_channel - 1
         self.modes = ModeSwitch()
@@ -143,8 +159,22 @@ class Engine:
         return self.modes.mode == "design"
 
     @property
+    def sheet(self) -> tuple[str, Bank] | None:
+        """Fiche de la banque du design (clé, banque), None hors design ou sans projet."""
+        if not self.design or self.project is None or self.design_bank is None:
+            return None
+        return self.project.bank(self.design_bank)
+
+    @property
     def layout(self) -> Layout:
-        return self.cfg.layouts[self.group if self.design else LIVE_GROUP]
+        if not self.design:
+            return self.cfg.layouts[LIVE_GROUP]
+        lay = self.cfg.layouts[self.group]
+        sheet = self.sheet
+        if sheet is None:
+            return lay
+        bank = sheet[1]
+        return for_bank(lay, self.cfg.scale(bank.mode), bank.tonic)
 
     @property
     def quantize(self) -> QuantizeMode:
@@ -183,6 +213,9 @@ class Engine:
             if ev.index == 0:
                 if "SWING" in self._held_buttons:
                     self.swing = clamp_swing(self.swing + ev.delta)
+                elif self.menu is not None:
+                    n = len(self._menu_items(self.menu)[0])
+                    self.menu_choice = max(0, min(n - 1, self.menu_choice + ev.delta))
                 return []
             return self._encoder(ev.index, ev.delta, now)
         return self._pad(pad_label(ev.index), ev, now)
@@ -281,12 +314,109 @@ class Engine:
         self.log.append(f"recalage -> mesure {first_bar} à la barre {at + 1}")
         return True
 
+    # --- design : banque et menu ----------------------------------------------
+
+    def _banks(self) -> list[tuple[int, str, Bank]]:
+        """Banques du projet : (lettre 0-7, clé, fiche)."""
+        if self.project is None:
+            return []
+        found = ((i, self.project.bank(i)) for i in range(len(GROUPS)))
+        return [(i, b[0], b[1]) for i, b in found if b is not None]
+
+    def _enter_design(self) -> None:
+        """Premier passage : la banque de la DT2 si le projet l'a, sinon la première."""
+        self._rec_hint = False
+        banks = [i for i, _, _ in self._banks()]
+        if self.design_bank is None and banks:
+            self.design_bank = self.bank if self.bank in banks else banks[0]
+        self._apply_phrase()
+
+    def _apply_phrase(self) -> None:
+        """Longueur de phrase : celle de la banque (ou du menu) en design, la config en live."""
+        length: PhraseLength = self.cfg.play.phrase
+        sheet = self.sheet
+        if self.design and self._design_phrase is not None:
+            length = self._design_phrase
+        elif sheet is not None and self.project is not None:
+            length = self.project.phrase(sheet[1])
+        self.phrase.length = length
+
+    def _choose_bank(self, index: int) -> None:
+        if self.project is None:
+            self.last_control = "pas de projet"
+            return
+        found = self.project.bank(index)
+        if found is None:
+            self.last_control = f"pas de banque {GROUPS[index]}"
+            return
+        self.design_bank, self._design_phrase = index, None
+        self._apply_phrase()
+        key, bank = found
+        self.last_control = f"{key}  {bank.tonique} {bank.mode}"
+
+    def _menu_items(self, entry: int) -> tuple[list[str], int, Callable[[int], None]]:
+        """Valeurs d'une entrée du menu, index de la valeur en cours, application."""
+        name = MENU[entry]
+        if name == "BANK":
+            found = self._banks()
+            banks = [i for i, _, _ in found]
+            labels = [key for _, key, _ in found]
+            cur = banks.index(self.design_bank) if self.design_bank in banks else 0
+            return labels, cur, lambda i: self._choose_bank(banks[i])
+        if name == "GAMME":
+            labels = [lay.name for lay in self.cfg.layouts]
+            return labels, self.group, lambda i: setattr(self, "group", i)
+        if name == "TRACK":
+            names = self.cfg.track_names
+            labels = [f"T{t:02d} {names.get(t, '')}".rstrip() for t in range(1, 17)]
+            return labels, self.track - 1, lambda i: setattr(self, "track", i + 1)
+        if name == "QUANT":
+            labels = list(QUANTIZE_CYCLE)
+            cur = QUANTIZE_CYCLE.index(self.quantize)
+            return labels, cur, lambda i: setattr(self, "quantize", QUANTIZE_CYCLE[i])
+
+        def phrase(i: int) -> None:
+            self._design_phrase = PHRASES[i]
+            self._apply_phrase()
+
+        return [str(n) for n in PHRASES], PHRASES.index(self.phrase.length), phrase
+
+    def menu_view(self) -> list[tuple[str, str, bool]]:
+        """Pour l'écran : (entrée, valeur affichée, ouverte) ; ouverte = choix en cours."""
+        view = []
+        for entry, name in enumerate(MENU):
+            labels, cur, _ = self._menu_items(entry)
+            opened = entry == self.menu
+            i = self.menu_choice if opened else cur
+            view.append((name, labels[i] if labels else "-", opened))
+        return view
+
+    def _open_menu(self, entry: int) -> None:
+        if entry >= len(MENU) or entry == self.menu:
+            self.menu = None  # même bouton (ou bouton sans entrée) : fermer sans appliquer
+            return
+        labels, cur, _ = self._menu_items(entry)
+        if labels:
+            self.menu, self.menu_choice = entry, cur
+
+    def _validate_menu(self) -> None:
+        assert self.menu is not None
+        entry, self.menu = self.menu, None
+        labels, _, apply = self._menu_items(entry)
+        apply(self.menu_choice)
+        if MENU[entry] != "BANK":  # la banque a son propre message
+            self.last_control = f"{MENU[entry]} {labels[self.menu_choice]}"
+
     def _switch_mode(self, name: str, now: int) -> bool:
         """Bascule de mode : SHIFT + CONTROL tenus, appui maître = confirmer. True si consommé."""
         if name == "MASTER_PUSH" and self.modes.pending is not None:
             msg = self.modes.confirm(self.running)
-            if self.design and msg and msg.startswith("mode"):
-                self._rec_hint = False
+            if msg and msg.startswith("mode"):
+                self.menu = None
+                if self.design:
+                    self._enter_design()
+                else:
+                    self._apply_phrase()
             self._note(msg)
             self.leds_dirty = True
             return True
@@ -335,7 +465,7 @@ class Engine:
         if name.startswith("GROUP_"):
             if not self.design:  # live : pads toujours en rythmique
                 return
-            self.group = GROUPS.index(name[-1])
+            self._choose_bank(GROUPS.index(name[-1]))
         elif name == "PAD_MODE" and self.design:
             self.group = (self.group + 1) % len(self.cfg.layouts)
         elif name == "GRID":
@@ -350,6 +480,10 @@ class Engine:
                 self.repeat_held = True
         elif name.startswith("DISPLAY_") and self.repeat_active:
             self.division = DIVISIONS[int(name[-1]) - 1][0]
+        elif name.startswith("DISPLAY_") and self.design:
+            self._open_menu(int(name[-1]) - 1)
+        elif name == "MASTER_PUSH" and self.menu is not None:
+            self._validate_menu()
         elif name in MODIFIERS:
             pass
         else:
@@ -485,13 +619,13 @@ class Engine:
         if "PATTERN" in held:  # PATTERN tenu : les GROUP montrent la banque
             white = self.cfg.families["chromatique"]
             groups = [scale(white, 1.0 if g == self.bank else dim) for g in range(len(GROUPS))]
-        elif st is None and not self.design:  # live arrêté : GROUP sans rôle, éteints
+        elif self.design:  # les GROUP montrent les banques du projet, couleur de leur mode
             groups = [(0, 0, 0)] * len(GROUPS)
-        elif st is None:  # design arrêté : les GROUP montrent la disposition
-            groups = [
-                scale(self.cfg.families[lay.family], 1.0 if g == self.group else dim)
-                for g, lay in enumerate(self.cfg.layouts)
-            ]
+            for g, _, bank in self._banks():
+                family = self.cfg.scale(bank.mode).family
+                groups[g] = scale(self.cfg.families[family], 1.0 if g == self.design_bank else dim)
+        elif st is None:  # live arrêté : GROUP sans rôle, éteints
+            groups = [(0, 0, 0)] * len(GROUPS)
         else:  # un bouton de plus toutes les 8 mesures ; le bloc en cours clignote avant un cap
             color = self.cfg.leds.phrase
             groups = [color if g < st.blocks_lit else (0, 0, 0) for g in range(len(GROUPS))]
@@ -511,5 +645,8 @@ class Engine:
         if self.repeat_active:
             for i, (name, _) in enumerate(DIVISIONS):
                 buttons[f"DISPLAY_{i + 1}"] = LED_MAX if name == self.division else low
+        elif self.design:
+            for i in range(len(MENU)):
+                buttons[f"DISPLAY_{i + 1}"] = LED_MAX if i == self.menu else low
         self.leds_dirty = False
         return LedState(pads=pads, groups=groups, buttons=buttons)

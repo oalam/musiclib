@@ -32,18 +32,40 @@ def pad_note(layout: Layout, pad: int) -> int:
     return note
 
 
+def for_bank(layout: Layout, scale: Layout, tonic: int) -> Layout:
+    """Disposition calée sur une banque (mode design, slice 5.D).
+
+    `scale` est la disposition du mode de la banque (intervalles, famille),
+    `tonic` sa tonique (0 = C) : départ sur la tonique dans l'octave de C5,
+    la chromatique prend la gamme de la banque pour marquer le hors gamme.
+    """
+    if layout.kind == "rythmique":
+        return layout
+    update: dict[str, object] = {"base": 60 + tonic}
+    if layout.kind == "chromatique":
+        update |= {"intervals": scale.intervals, "family": scale.family}
+    return layout.model_copy(update=update)
+
+
 def pad_color(cfg: Config, layout: Layout, pad: int) -> RGB:
-    """Couleur pleine du pad : track en rythmique, rôle de la note sinon."""
+    """Couleur pleine du pad : track en rythmique, rôle de la note sinon.
+
+    Chromatique : sans gamme (`intervals` vide), seuls tonique, tierces et
+    quinte sont marqués, le reste en blanc ; avec la gamme d'une banque, le
+    hors gamme passe en blanc avant les rôles (tierce majeure d'un mode mineur).
+    """
     if layout.kind == "rythmique":
         return cfg.track_colors[pad]
     degree = (pad_note(layout, pad) - layout.base) % 12
     if degree == 0:
         return cfg.roles.tonique
+    if layout.intervals and degree not in layout.intervals:
+        return cfg.roles.hors_gamme
     if degree in (3, 4):
         return cfg.roles.tierce
     if degree == 7:
         return cfg.roles.quinte
-    if layout.kind == "chromatique" and degree not in layout.intervals:
+    if not layout.intervals:
         return cfg.roles.hors_gamme
     return cfg.families[layout.family]
 

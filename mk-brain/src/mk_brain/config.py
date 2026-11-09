@@ -86,6 +86,15 @@ class Roles(BaseModel):
 
 
 Family = Literal["rythmique", "chromatique", "mineur", "majeur"]
+Mode = Literal[
+    "eolien",
+    "phrygien",
+    "dorien",
+    "mineur-harmonique",
+    "phrygien-dominant",
+    "penta-mineure",
+    "chromatique",
+]  # modes d'une banque de projet (SPEC, Formalisme du front matter)
 
 
 class Layout(BaseModel):
@@ -93,6 +102,7 @@ class Layout(BaseModel):
     name: str
     kind: Literal["rythmique", "chromatique", "gamme"]
     family: Family
+    mode: Mode | None = None  # mode d'une banque de projet que cette disposition joue
     base: int = Field(60, ge=0, le=127)
     intervals: list[int] = []
 
@@ -138,7 +148,17 @@ class Config(BaseModel):
         missing = {lay.family for lay in self.layouts} - set(self.families)
         if missing:
             raise ValueError(f"families : couleur manquante pour {sorted(missing)}")
+        modes = [lay.mode for lay in self.layouts if lay.mode is not None]
+        if len(set(modes)) != len(modes):
+            raise ValueError("layouts : un mode au plus par disposition")
         return self
+
+    def scale(self, mode: Mode) -> Layout:
+        """Disposition qui porte les intervalles et la famille du mode `mode`."""
+        for lay in self.layouts:
+            if lay.mode == mode:
+                return lay
+        raise ConfigError(f"layouts : aucune disposition pour le mode {mode!r}")
 
 
 def load_config(path: Path = DEFAULT_CONFIG) -> Config:
