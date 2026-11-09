@@ -367,7 +367,10 @@ ou passer par une track MIDI. Hors MVP tant que ce point n'est pas tranché.
 ### Écrans (256 × 64, monochromes) — maquettes à valider
 
 Grille de travail : police 6 × 8, soit 42 colonnes × 8 lignes ; police
-double 12 × 16 pour les chiffres clés. Les maquettes ci-dessous sont en
+double 12 × 16 pour les chiffres clés. **Constaté sur la MK2 le
+2026-11-09** : la police bitmap 6 × 8 se lit mal (6 pris pour 8) ; texte
+courant en police vectorielle de Pillow, taille 13, 5 lignes de 12,8 px,
+gras d'1 px pour les libellés. Les maquettes ci-dessous sont en
 caractères, une ligne = 8 pixels.
 
 **Sélection de projet** (au démarrage)

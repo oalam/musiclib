@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.5.1] - 2026-11-09
+
+### Corrigé
+
+- [4] Écrans peu lisibles (6 lu comme 8) : texte en police vectorielle
+  intégrée à Pillow (présente aussi sur le Pi), taille 13, toujours
+  5 lignes, au lieu de la police bitmap fine ; gras (1 px) réservé aux
+  libellés (`text_image(..., bold=)`) : disposition et alerte dans `play`.
+
 ## [0.5.0] - 2026-11-09
 
 ### Ajouté

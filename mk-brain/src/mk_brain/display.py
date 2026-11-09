@@ -69,12 +69,24 @@ def mire(display: int) -> Image.Image:
     return img
 
 
-def text_image(lines: list[str]) -> Image.Image:
+TEXT_SIZE = 13  # police vectorielle intégrée à Pillow (Aileron), présente aussi sur le Pi
+TEXT_LINES = 5  # 64 / 5 = 12,8 px par ligne
+TEXT_TOP = -3  # 3 px vides en tête de police : descendantes de la 5e ligne entières
+
+
+def text_image(lines: list[str], bold: frozenset[int] = frozenset()) -> Image.Image:
+    """Les 5 dernières lignes ; `bold` = index (dans `lines`) des libellés graissés d'1 px.
+
+    Police vectorielle maigre en 13 : la police bitmap se lisait mal (6 pris pour 8).
+    """
     img = new_image()
     d = ImageDraw.Draw(img)
-    font = ImageFont.load_default()
-    for i, line in enumerate(lines[-5:]):
-        d.text((2, 1 + 12 * i), line, font=font, fill=1)
+    font = ImageFont.load_default(size=TEXT_SIZE)
+    first = max(0, len(lines) - TEXT_LINES)
+    for i, line in enumerate(lines[first:]):
+        y = TEXT_TOP + round(HEIGHT * i / TEXT_LINES)
+        for dx in (0, 1) if first + i in bold else (0,):
+            d.text((2 + dx, y), line, font=font, fill=1)
     return img
 
 

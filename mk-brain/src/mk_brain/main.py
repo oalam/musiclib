@@ -250,7 +250,7 @@ def cmd_play(dry_run: bool) -> int:
                     _show(dev, 0, display.big_text_image(big))
                 else:
                     lines = [f"{lay.group}  {lay.name}", _clock_line(clock), engine.status(), last]
-                    _show(dev, 0, display.text_image([*lines, warn]))
+                    _show(dev, 0, display.text_image([*lines, warn], bold=frozenset({0, 4})))
                 shown, last_draw = state, now
             right = _phrase_screen(engine)
             if right != shown_right:

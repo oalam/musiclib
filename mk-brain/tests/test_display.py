@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from mk_brain import display
 from mk_brain.display import (
     FRAME_BYTES,
     DisplayError,
@@ -41,3 +42,10 @@ def test_invalid_inputs() -> None:
 def test_pattern_has_border() -> None:
     frame = image_to_frame(mire(0))
     assert frame[0] == 0xFF and frame[-1] == 0xFF
+
+
+def test_text_image_bold_lines_are_thicker() -> None:
+    thin = display.text_image(["Q16"]).getbbox()
+    bold = display.text_image(["Q16"], bold=frozenset({0})).getbbox()
+    assert thin is not None and bold is not None
+    assert bold[2] == thin[2] + 1  # graissé d'1 px vers la droite
