@@ -68,6 +68,22 @@ Sur `FX CONTROL CH` : overdrive master CC 17 (NRPN 2:37), délai (CC
 - Piste non explorée : le SYSEX DUMP (§14.5) envoie et reçoit des patterns
   entiers, mais le format n'est pas documenté dans le manuel.
 
+## Vérifié sur la machine (2026-11-09) : CC reçus en LIVE REC
+
+- Track 1 active, `[RECORD] + [PLAY]`, CC 74 envoyé depuis le Mac, un par
+  pas, calé sur la clock de la DT2 : pas 1-32 sur l'AUTO CHANNEL (10),
+  balayage montant ; pas 33-64 sur le canal de la track (1), balayage
+  descendant.
+- Les deux balayages s'**entendent** : la track active répond aux CC reçus
+  sur l'AUTO CHANNEL comme sur son propre canal.
+- Ils s'**enregistrent en p-locks** de fréquence du filtre, un par pas, sur
+  toutes les pages enregistrées.
+- *À préciser* : comportement sur un pas sans trig (p-lock sans trig ou
+  rien), et quel balayage l'emporte quand le pattern est plus court que
+  l'envoi.
+- Usage : mode design de [[mk-brain/SPEC|mk-brain]] (encodeurs de la MK2 →
+  p-locks en LIVE REC).
+
 ## En live techno
 
 - `MUTE DEST` = `INT + EXT` : les mutes joués sur la DT2 sortent en MIDI, de

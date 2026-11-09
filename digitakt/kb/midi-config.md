@@ -75,6 +75,20 @@ calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
 - `AUTO CHANNEL` du front = la valeur réglée sur la DT2, pas le numéro de
   track : c'est la track **active** qui reçoit.
 
+## Vérifié sur la machine (2026-11-09, Program Change envoyés)
+
+- `PRG CH SEND` = on : à chaque changement de pattern, la DT2 envoie un
+  Program Change numéroté `banque × 16 + (pattern − 1)`, sur un seul canal
+  (canal 10 ici, mido `channel=9`). Relevé : A01 = 0, A02 = 1, A16 = 15,
+  B01 = 16, C05 = 2 × 16 + 4 = 36 ; les 8 banques tiennent dans 0-127.
+- Transport lancé, le PC part **10 clocks avant** la mesure où le nouveau
+  pattern démarre (5 relevés, écarts de 384 clocks = 4 mesures entre
+  changements en file) : environ 170 ms d'avance à 145 BPM (10 × 60 / 145 /
+  24 = 0,172 s). Le récepteur a le temps de se préparer avant la barre.
+- Transport arrêté : PC envoyé tout de suite au changement de pattern. Un
+  Stop s'accompagne aussi d'un PC du pattern actif.
+- Usage : suivi de contexte par [[mk-brain/SPEC|mk-brain]].
+
 ## Pièges
 
 - **Fermer Transfer** pendant un envoi depuis le Mac : son dialogue sysex
