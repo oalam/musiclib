@@ -114,6 +114,7 @@ def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None
 
     eng = design(cfg, project=project)
     btn(eng, "GROUP_E")
+    eng.group = 1  # chromatique (surcharge de la disposition phrygienne)
     assert (flat_note(70), degree_name(eng.layout, 73)) == ("Bb5", "minor 3rd")
     assert degree_name(eng.layout, 72) == "2nd, out of scale"
     quiet = render.left(eng, 0).tobytes()

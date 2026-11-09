@@ -251,8 +251,16 @@ la slice 7**.
     mode mineur est blanche), phrase de la banque au compteur (en live, la
     config jusqu'à la slice 6) ; GROUP d'une banque absente : `pas de
     banque G`, sans changement ; LED GROUP en design = banques du projet à
-    la couleur de la famille de leur mode, la choisie pleine, quel que soit
-    le transport (le compteur reste à l'écran) ;
+    la couleur de la famille de leur mode × `dim`, la choisie en **blanc
+    plein** (`leds.bank`, revu le 2026-11-09 : la choisie en couleur pleine
+    se distinguait mal), quel que soit le transport (le compteur reste à
+    l'écran) ;
+  - **disposition calée sur le mode de la banque** (demandé le
+    2026-11-09) : chaque changement de banque du design (GROUP, PC d'une
+    autre banque, premier passage) choisit la disposition de son mode
+    (éolien → Aeolian, chromatique → Chroma) ; PAD MODE ou le menu GAMME la
+    surchargent jusqu'au prochain changement de banque ; un PC de la banque
+    déjà choisie garde la surcharge ;
   - premier passage en design : banque du dernier PC reçu si le projet
     l'a, sinon la première ; gardée ensuite d'un passage à l'autre ;
   - **menu réduit** (décidé le 2026-11-09) : boutons d'écran 1-4 =

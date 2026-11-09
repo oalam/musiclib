@@ -380,11 +380,13 @@ class Engine:
         length: int | None = None
         if self.design:
             found = None if self.project is None else self.project.bank(program // 16)
-            if new_bank and found is not None and self.project is not None:
-                self.design_bank, self._design_phrase, self.octave = program // 16, None, 0
+            fresh = (
+                new_bank and program // 16 != self.design_bank
+            )  # déjà choisie : surcharge gardée
+            if fresh and found is not None and self.project is not None:
+                self._set_design_bank(program // 16)
                 length = self.project.phrase(found[1])
                 self.last_control = f"{found[0]} (DT2)"
-                self.leds_dirty = True
         else:
             sheet = self.live_sheet
             length = self._live_phrase()
@@ -503,8 +505,18 @@ class Engine:
         self._rec_hint = False
         banks = [i for i, _, _ in self._banks()]
         if self.design_bank is None and banks:
-            self.design_bank = self.bank if self.bank in banks else banks[0]
+            self._set_design_bank(self.bank if self.bank in banks else banks[0])
         self._apply_phrase()
+
+    def _set_design_bank(self, index: int) -> None:
+        """Banque du design (GROUP, PC d'une autre banque, premier passage) : octave à 0,
+        phrase de la banque, disposition calée sur son mode (PAD MODE la surcharge ensuite,
+        jusqu'au prochain changement de banque ; demandé le 2026-11-09)."""
+        self.design_bank, self._design_phrase, self.octave = index, None, 0
+        found = None if self.project is None else self.project.bank(index)
+        if found is not None:
+            self.group = self.cfg.layouts.index(self.cfg.scale(found[1].mode))
+        self.leds_dirty = True
 
     def _live_phrase(self) -> PhraseLength:
         """Phrase du live : celle de la banque du dernier PC, sinon la config."""
@@ -534,7 +546,7 @@ class Engine:
         if found is None:
             self.last_control = f"no bank {GROUPS[index]}"
             return
-        self.design_bank, self._design_phrase, self.octave = index, None, 0
+        self._set_design_bank(index)
         self._apply_phrase()
         key, bank = found
         self.last_control = f"{key}  {FLAT_NAMES[bank.tonic]} {self.cfg.scale(bank.mode).name}"
@@ -846,11 +858,13 @@ class Engine:
         if "PATTERN" in held and not self.design:  # PATTERN tenu : les GROUP montrent la banque
             white = self.cfg.families["chromatique"]
             groups = [scale(white, 1.0 if g == self.bank else dim) for g in range(len(GROUPS))]
-        elif self.design:  # les GROUP montrent les banques du projet, couleur de leur mode
+        elif self.design:  # banques du projet en couleur de leur mode, la choisie en blanc plein
             groups = [(0, 0, 0)] * len(GROUPS)
             for g, _, bank in self._banks():
                 family = self.cfg.scale(bank.mode).family
-                groups[g] = scale(self.cfg.families[family], 1.0 if g == self.design_bank else dim)
+                groups[g] = scale(self.cfg.families[family], dim)
+            if self.design_bank is not None and self.project is not None:
+                groups[self.design_bank] = self.cfg.leds.bank
         elif st is None:  # live arrêté : GROUP sans rôle, éteints
             groups = [(0, 0, 0)] * len(GROUPS)
         else:  # un bouton de plus toutes les 8 mesures ; le bloc en cours clignote avant un cap

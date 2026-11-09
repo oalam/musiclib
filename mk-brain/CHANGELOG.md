@@ -3,6 +3,17 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.17.0] - 2026-11-09
+
+### Modifié
+
+- [6] Design : chaque changement de banque (GROUP, PC d'une autre banque,
+  premier passage) cale la disposition sur le mode de la banque ; PAD MODE
+  ou le menu GAMME la surchargent jusqu'au prochain changement de banque.
+- [6] Design : LED GROUP de la banque choisie en blanc plein
+  (`leds.bank`), les autres en couleur de leur mode × `dim` ; avant, la
+  choisie en couleur pleine se distinguait mal.
+
 ## [0.16.0] - 2026-11-09
 
 ### Ajouté

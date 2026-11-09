@@ -7,8 +7,9 @@ import pytest
 
 from mk_brain.clock import ClockTracker
 from mk_brain.config import Config
-from mk_brain.engine import NOTE_OFF_MIN_NS, Engine, NoteOff, NoteOn, Timed
+from mk_brain.engine import DESIGN_GROUP, NOTE_OFF_MIN_NS, Engine, NoteOff, NoteOn, Timed
 from mk_brain.hid_mk2 import BUTTONS, ButtonEvent, EncoderEvent, PadEvent
+from mk_brain.layouts import scale
 from mk_brain.project import Project
 from mk_brain.selection import Entry, Selector
 from mk_brain.session import Session
@@ -36,6 +37,11 @@ def press(eng: Engine, t: int, pressure: int = 2500, pad: int = PAD1) -> list[Ti
 def btn(eng: Engine, name: str, pressed: bool = True, t: int = 0) -> None:
     assert name in BUTTONS
     eng.handle(ButtonEvent(name, pressed), t)
+
+
+def group(eng: Engine) -> str:
+    """Disposition en cours (fonction : mypy ne fige pas la valeur entre deux gestes)."""
+    return eng.layout.group
 
 
 def design(
@@ -415,9 +421,12 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     assert eng.design_bank == 0  # pas de PC reçu : première banque
     btn(eng, "GROUP_E")
     assert eng.last_control == "E-TRIBE  Bb Phrygian"
+    assert eng.layout.group == "D"  # disposition calée sur le mode de la banque
+    eng.group = DESIGN_GROUP  # surcharge (PAD MODE, menu GAMME) : chromatique
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 70, 127))]  # chromatique depuis A#
     leds = eng.leds()
-    assert leds.groups[4] == cfg.families["gamme"]
+    assert leds.groups[4] == cfg.leds.bank  # choisie : blanc plein
+    assert leds.groups[0] == scale(cfg.families["gamme"], cfg.leds.dim)  # les autres : mode × dim
     from mk_brain.hid_mk2 import pad_label
 
     by_pad = {pad_label(i): rgb for i, rgb in enumerate(leds.pads)}
@@ -426,10 +435,10 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     assert leds.groups[7] == (0, 0, 0)  # pas de banque H
     btn(eng, "GROUP_H")
     assert (eng.design_bank, eng.last_control) == (4, "no bank H")
-    assert eng.layout.group == "B"  # GROUP ne change plus la disposition
+    assert group(eng) == "B"  # banque absente : la surcharge tient
     btn(eng, "GROUP_G")  # G-JOKER : chromatique sur la# (slice 6.A)
     assert eng.last_control == "G-JOKER  Bb Chroma"
-    assert eng.leds().groups[6] == cfg.families["chromatique"]  # choisie : pleine
+    assert eng.leds().groups[6] == cfg.leds.bank  # choisie : blanc plein
     eng.handle(PadEvent(PAD1, False, 0), 10 * MS)
     assert press(eng, 20 * MS)[0][1] == NoteOn(15, 70, 127)  # chromatique depuis A#
 
@@ -456,9 +465,9 @@ def test_menu_choose_and_validate(cfg: Config, project: Project) -> None:
     btn(eng, "DISPLAY_1")  # GAMME
     assert eng.leds().buttons["DISPLAY_1"] > eng.leds().buttons["DISPLAY_2"]
     assert "DISPLAY_5" not in eng.leds().buttons  # 4 entrées, plus de BANK
-    turn_master(eng, 2)
+    turn_master(eng, 1)  # A-HALF éolien : Aeolian au départ, Phrygian juste après
     assert eng.menu_view()[0] == ("GAMME", "Phrygian", True)
-    assert eng.layout.group == "B"  # rien d'appliqué avant l'appui
+    assert eng.layout.group == "C"  # rien d'appliqué avant l'appui
     btn(eng, "MASTER_PUSH")
     assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "Phrygian")
     btn(eng, "DISPLAY_3")  # QUANT : borné à la dernière valeur
@@ -536,7 +545,8 @@ def test_pattern_has_no_effect_in_design(cfg: Config, project: Project) -> None:
 
 def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_E")  # la#, chromatique depuis A#5 (70)
+    btn(eng, "GROUP_E")  # la#
+    eng.group = DESIGN_GROUP  # chromatique depuis A#5 (70)
     btn(eng, "TRANSPORT_RIGHT")
     assert (eng.octave, eng.last_control) == (1, "octave +1")
     assert press(eng, 0) == [(3 * MS, NoteOn(15, 82, 127))]
@@ -714,3 +724,16 @@ def test_restore_keeps_program_already_received(cfg: Config, project: Project) -
     eng.restore(Session(program=4 * 16 + 3, design_bank=7, group=9 % 8))
     assert eng.last_program == 2 * 16  # la DT2 l'emporte
     assert eng.design_bank is None  # banque H absente du projet : ignorée
+
+
+def test_design_layout_follows_bank_mode_until_pad_mode(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    assert group(eng) == "C"  # A-HALF éolien
+    btn(eng, "GROUP_E")
+    assert group(eng) == "D"  # E-TRIBE phrygien
+    btn(eng, "PAD_MODE")  # surcharge
+    assert group(eng) == "E"
+    eng.on_program_change(4 * 16 + 1)  # même banque : la surcharge tient
+    assert group(eng) == "E"
+    eng.on_program_change(6 * 16)  # G-JOKER : chromatique
+    assert group(eng) == "B"

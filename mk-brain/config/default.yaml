@@ -52,6 +52,7 @@ leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine
   selected: 0.5              # live : pad de la track sélectionnée (encodeurs), entre repos et frappe
   phrase: [0, 255, 0]        # LED GROUP du compteur de phrases (transport lancé)
+  bank: [255, 255, 255]      # design : GROUP de la banque choisie, les autres en couleur de mode × dim
 
 # Couleurs des rôles de note : tonique partout (B-H), tierce et quinte en gamme (C-H)
 roles:
