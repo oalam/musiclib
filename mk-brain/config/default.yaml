@@ -24,7 +24,7 @@ play:
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le
-# même jour ; une 3e page affiche le LVL des 16 tracks (affichage seul), les flèches cyclent.
+# même jour ; les flèches cyclent dans les deux sens.
 # DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine.
 # MW, BC et PB n'agissent que si le preset leur assigne des paramètres
 # (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset).
@@ -32,7 +32,7 @@ encoders:
   mute_cc: 94
   raw_per_step: 4            # pas minimal remonté par la MK2 (constat slice 0)
   pages:
-    - - {name: LVL, cc: 95}                    # niveau de track (aussi la page des niveaux)
+    - - {name: LVL, cc: 95}                    # niveau de track
       - {name: CUT, cc: 74}                    # fréquence du filtre
       - {name: RES, cc: 75}                    # résonance (knob F du filtre)
       - {name: ENV, cc: 77, bipolar: true}     # profondeur d'enveloppe du filtre

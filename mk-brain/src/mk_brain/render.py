@@ -334,45 +334,8 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
         d.line((x, top - 2, x, bottom + 2), fill=ink)
 
 
-def _levels(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
-    """Page des niveaux : 8 tracks par écran (1-8 à gauche, 9-16 à droite), numéro et
-    jauge horizontale ; pointillé hors prise, cadre vide si jamais vu ; mutée : numéro
-    entre crochets. Affichage seul."""
-    tiny = _font(10)
-    views = engine.faders.levels_view()[screen * 8 : screen * 8 + 8]
-    cell = WIDTH // 4  # 4 tracks par ligne, 2 lignes
-    for i, lv in enumerate(views):
-        x, y = (i % 4) * cell, BAND + 2 + (i // 4) * 11
-        label = f"[{lv.track}]" if engine.faders.muted.get(lv.track) else str(lv.track)
-        ink = 1
-        if lv.track == engine.track:  # track sélectionnée : case inversée
-            d.rectangle((x, y - 1, x + cell - 2, y + 9), fill=1)
-            ink = 0
-        d.text((x + 2, y - 1), label, font=tiny, fill=ink)
-        left, right, top, bottom = x + 20, x + cell - 5, y + 1, y + 7
-        d.rectangle((left, top, right, bottom), outline=ink)
-        if not lv.known:
-            continue
-        end = left + round((right - left) * lv.value / 127)
-        if lv.stale:
-            d.point(
-                [
-                    (px, py)
-                    for px in range(left, end + 1)
-                    for py in range(top, bottom + 1)
-                    if (px + py) % 2 == 0
-                ],
-                fill=ink,
-            )
-        else:
-            d.rectangle((left, top, end, bottom), fill=ink)
-
-
 def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> None:
     """Les 4 faders au-dessus des encodeurs de cet écran."""
-    if engine.faders.levels:
-        _levels(d, engine, screen)
-        return
     small = _font(SMALL)
     touched = None
     if engine.last_touch is not None and now - engine.last_touch[1] < OVERLAY_NS:

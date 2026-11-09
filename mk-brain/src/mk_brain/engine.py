@@ -297,9 +297,6 @@ class Engine:
         active de la DT2 (p-locks en LIVE REC) ; valeurs tenues sous la track sélectionnée."""
         if not self.design and not self._reachable(self.track):
             return []
-        if self.faders.levels:
-            self.last_control = "levels: display only"
-            return []
         if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
             self.last_control = "PB: hold SHIFT"  # pitch bend tenu par SHIFT seulement
             return []
@@ -685,8 +682,7 @@ class Engine:
             return
         if name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # page d'encodeurs
             page = self.faders.cycle(-1 if name == "BROWSE_LEFT" else 1)  # en boucle
-            levels = "  levels" if self.faders.levels else ""
-            self.last_control = f"page {page + 1}/{self.faders.n_pages}{levels}"
+            self.last_control = f"page {page + 1}/{self.faders.n_pages}"
             self.leds_dirty = True
             return
         if name in ("TRANSPORT_LEFT", "TRANSPORT_RIGHT"):  # octave du design

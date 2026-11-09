@@ -711,18 +711,12 @@ revu le 2026-11-09** (demande utilisateur), TYPE retiré :
 |---|---|---|---|---|---|---|---|---|
 | p1 | LVL 95 (niveau de track) | CUT 74 | RES 75 | ENV 77 | OVER 57 (overdrive) | DEL 84 (envoi delay) | REV 85 | SRR 55 |
 | p2 | LVL 95 | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | BR 54 (bit reduction) | CHO 12 (chorus) | TUNE 16 | PAN 90 |
-| p3 | niveaux des 16 tracks (LVL), affichage seul | | | | | | | |
 
 - **Flèches** (2026-11-09) : `BROWSE_RIGHT` = page suivante,
-  `BROWSE_LEFT` = précédente, **en boucle** (p3 → p1, p1 → p3) ; LED des
-  deux flèches atténuées, pleine pendant l'appui ; `page 2/3` dans le
+  `BROWSE_LEFT` = précédente, **en boucle** ; LED des
+  deux flèches atténuées, pleine pendant l'appui ; `page 2/2` dans le
   bandeau.
-- **Page des niveaux (p3)** : le LVL des 16 tracks, connu par les CC reçus
-  de la DT2 ou envoyés par la MK2 ; 1-8 sur l'écran gauche, 9-16 sur le
-  droit, 4 par ligne, numéro et jauge ; track sélectionnée inversée, mutée
-  entre crochets (`[5]`), hors prise en pointillé, jamais vue = cadre vide.
-  Encodeurs sans effet (`levels: display only`, décidé le 2026-11-09). La
-  page n'existe que si une page porte un encodeur `LVL`.
+- Page des niveaux des 16 tracks : faite puis retirée le 2026-11-09 (pas retenue).
 
 - TYPE (CC 76, knob G du filtre) retiré des pages le 2026-11-09 : le type
   sur la machine MULTI-MODE seulement, un autre paramètre ailleurs.
@@ -788,7 +782,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | PATTERN + pad | pattern n de la banque courante (PC) | sans effet, le pad joue (décidé le 2026-11-09) |
 | PATTERN + GROUP n | banque n pour PATTERN + pad (sans envoi) ; GROUP tenus = banque | sans effet (GROUP seul = banque du design) |
 | 8 encodeurs | les 8 faders de la track sélectionnée | les 8 faders de la track active (p-locks en LIVE REC) |
-| Flèches à côté des écrans (BROWSE ◀ ▶) | page d'encodeurs précédente / suivante, en boucle (p3 = niveaux des 16 tracks) | idem |
+| Flèches à côté des écrans (BROWSE ◀ ▶) | page d'encodeurs précédente / suivante, en boucle | idem |
 | Flèches de transport (◀ ▶, à côté de RESTART) | sans effet, LED éteintes | octave des pads −1 / +1, ±4 au plus, notes bornées à 0-127, remise à 0 par GROUP ; sans effet en rythmique ; LED pleine du côté décalé, `oct +1` sur l'écran droit (décidé le 2026-11-09) |
 | NOTE REPEAT tenu + pad | répétition ; les 8 boutons au-dessus des écrans choisissent la division (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64) | idem |
 | SHIFT + NOTE REPEAT | verrouillage du repeat | idem |
@@ -883,7 +877,7 @@ conditionne tout le reste.
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
-| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | en cours, découpée le 2026-11-09 : 6.A front matter et `convert`, faite le 2026-11-09 ; 6.B contexte suivi par PC et 6.C sélection de projet, faites le 2026-11-09, à essayer ; noms de samples reportés |
+| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et

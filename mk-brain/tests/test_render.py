@@ -158,11 +158,3 @@ def test_selection_takes_both_screens(cfg: Config, project: Project) -> None:
     eng.open_selection()
     assert render.left(eng, 0).tobytes() != left
     assert render.right(eng, 0).tobytes() != right
-
-
-def test_levels_page_replaces_faders(cfg: Config) -> None:
-    eng = Engine(cfg)
-    before = render.left(eng, 0).tobytes()
-    eng.faders.page_index = 2  # page des niveaux
-    eng.on_control_change(0, 95, 120)
-    assert render.left(eng, 0).tobytes() != before

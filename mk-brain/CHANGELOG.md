@@ -3,6 +3,19 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.19.0] - 2026-11-09
+
+### Retiré
+
+- [6] Page 3 des niveaux des 16 tracks (0.18.0) : pas retenue. Les flèches
+  cyclent sur les deux pages de paramètres.
+
+### Modifié
+
+- [6] Slice 6 close : projets, contexte suivi par Program Change, sélection
+  de projet, session, réglages issus des essais. Noms de samples reportés
+  (SPEC, question 15).
+
 ## [0.18.0] - 2026-11-09
 
 ### Ajouté

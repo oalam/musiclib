@@ -531,7 +531,7 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     assert eng.faders.view(1)[3].value == 64  # PB revenu au centre
     assert eng.handle(EncoderEvent(5, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
     btn(eng, "BROWSE_LEFT")
-    assert eng.last_control == "page 1/3" and eng.leds().buttons["BROWSE_RIGHT"] > 0
+    assert eng.last_control == "page 1/2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
     assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
 
 
@@ -740,15 +740,9 @@ def test_design_layout_follows_bank_mode_until_pad_mode(cfg: Config, project: Pr
     assert group(eng) == "B"
 
 
-def test_arrows_cycle_both_ways_and_levels_page_is_display_only(cfg: Config) -> None:
+def test_arrows_cycle_both_ways(cfg: Config) -> None:
     eng = Engine(cfg)
-    assert eng.faders.n_pages == 3
     btn(eng, "BROWSE_LEFT")  # de la page 1 vers la dernière, en boucle
-    assert eng.faders.levels and eng.last_control == "page 3/3  levels"
-    eng.on_control_change(2, 95, 100)  # LVL de T03 joué sur la DT2
-    assert eng.handle(EncoderEvent(1, 8, 0), 0) == []  # affichage seul
-    assert eng.last_control == "levels: display only"
-    lv = eng.faders.levels_view()
-    assert (lv[2].value, lv[2].known) == (100, True) and not lv[3].known
+    assert eng.faders.page_index == 1 and eng.last_control == "page 2/2"
     btn(eng, "BROWSE_RIGHT")  # de la dernière vers la page 1
     assert eng.faders.page_index == 0

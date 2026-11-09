@@ -38,7 +38,7 @@ la tonique et le mode affichés ; en design, celle choisie par GROUP.
                                       # SHIFT + CONTROL 1 s + appui maître = live / design,
                                       # en design GROUP A-H = banque, PAD MODE = disposition,
                                       # boutons d'écran 1-4 = menu (maître : choisir, appui : valider),
-                                      # flèches BROWSE = page d'encodeurs ◀ ▶ en boucle (p3 = niveaux),
+                                      # flèches BROWSE = page d'encodeurs ◀ ▶ en boucle,
                                       # flèches de transport = octave en design (±4),
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
