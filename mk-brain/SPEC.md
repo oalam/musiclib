@@ -525,13 +525,13 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slice 0 faite le 2026-11-09, slice 1 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 et 1 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
 |---|---|---|---|
 | 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
-| 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | en cours : code prêt (`mk-brain play`), essai sur la DT2 à faire |
+| 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | fait 2026-11-09 : tracks 1-16 en A, gamme du groupe C jouée sur la track active (9) |
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | à venir |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
@@ -582,6 +582,11 @@ la slice 0.
     l'emporte : notes et CC vont à la track active, la track de ce canal
     n'est plus joignable. AUTO CHANNEL = 16 (décidé le 2026-11-09) : seule
     la track 16, jouée depuis la DT2, perd ses faders et son mute en live.
+13. **Notes 0-15 hors AUTO CHANNEL** : à l'essai de la slice 1, AUTO
+    CHANNEL resté à 10, le groupe A (notes 0-15 sur le canal 16) a semblé
+    jouer les tracks 1-16, alors que les notes 60+ allaient à la track 16.
+    Les notes 0-15 déclenchent-elles les tracks sur n'importe quel canal de
+    track ? À réécouter, sans enjeu tant que l'AUTO CHANNEL est à 16.
 12. ~~Canal 16 au test du pool~~ : la track 16 répond bien sur le canal 16
     (vérifié le 2026-11-09).
 
@@ -606,6 +611,13 @@ le détail) :
 - **Encodeurs** : 8 compteurs absolus sur 10 bits qui bouclent à 1024,
   pas minimal remonté de 4 (zone morte du matériel), jusqu'à 70 par rapport
   en rotation rapide ; maître sur 4 bits, 1 par cran.
+
+## Constat DT2 (slice 1, 2026-11-09)
+
+- L'AUTO CHANNEL de la DT2 était resté à 10 (réglage 7.D) : les notes du
+  Pi sur le canal 16 jouaient la track 16 au lieu de la track active.
+  Réglé à 16, la gamme joue sur la track active. Premier point à vérifier
+  si les pads visent la mauvaise track.
 
 ## Références
 

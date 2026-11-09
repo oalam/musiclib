@@ -3,7 +3,7 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
-## [Non publié]
+## [0.2.0] - 2026-11-09
 
 ### Ajouté
 
@@ -18,6 +18,8 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
   disposition (provisoire, à revoir à la slice 5).
 - [1] `midi_io.py` (mido + python-rtmidi, `MidiError`) et
   `mk-brain play [--dry-run]`.
+- [1] Essai sur la DT2 : tracks 1-16 en disposition A, gamme sur la track
+  active une fois l'AUTO CHANNEL de la DT2 passé de 10 à 16.
 
 ### Modifié
 
