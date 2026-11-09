@@ -114,7 +114,15 @@ class Config(BaseModel):
     roles: Roles
     families: dict[Family, RGB]
     track_colors: dict[int, RGB]
+    track_names: dict[int, Annotated[str, Field(max_length=5)]] = {}
     layouts: list[Layout]
+
+    @field_validator("track_names")
+    @classmethod
+    def _names(cls, v: dict[int, str]) -> dict[int, str]:
+        if not set(v) <= set(range(1, 17)):
+            raise ValueError("track_names : tracks de 1 à 16")
+        return v
 
     @field_validator("track_colors")
     @classmethod

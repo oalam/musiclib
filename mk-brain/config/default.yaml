@@ -74,6 +74,26 @@ track_colors:
   15: [255, 255, 255]  # FX de transition
   16: [40, 40, 40]     # réserve, Preset Pool
 
+# Codes de track affichés à côté de T01-T16 : colonne « Codes » de la grille
+# (doctrine §1, digitakt/doctrine.md), les deux premiers au plus
+track_names:
+  1: BD
+  2: RM
+  3: SD/CP
+  4: TM/PC
+  5: HH/OH
+  6: CY
+  7: BR/DL
+  8: BR/DL
+  9: BS/BL
+  10: ST
+  11: PD
+  12: VX
+  13: BL/ML
+  14: ML/BL
+  15: FX
+  16: RS
+
 # Dispositions des groupes A-H, reprises du template DT2 Pads (fiche controleur-maschine)
 layouts:
   - {group: A, name: Rythmique, kind: rythmique, family: rythmique}

@@ -21,6 +21,8 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
   DT2 ou demandé par PATTERN + pad) et track sélectionnée en gros, bande
   des 16 mutes ; tempo, quantize et swing retirés. PC reçu transport
   arrêté = pattern en cours aussitôt.
+- [5] 5.C Code de la track à côté de son numéro (`SD/CP T03`), repris de
+  la grille de la doctrine §1 dans `track_names` de `config/default.yaml`.
 
 ## [0.8.0] - 2026-11-09
 

@@ -448,7 +448,7 @@ jour** : chaque valeur s'affiche juste au-dessus de son encodeur. Les deux
 
 ```
 écran gauche                              écran droit
-E04 > E06 (gros)            T07 (gros)   25 / 32 (gros)       phrase 1
+E04 > E06 (gros)       SD/CP T03 (gros)  25 / 32 (gros)       phrase 1
                                                                cap 32 : -8
 ■ ■ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           [████████|████████|████████|██░░]
 ----------------------------------------  ---------------------------------
@@ -462,7 +462,9 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
   (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
 - bandeau gauche (revu à l'essai) : en gros, le pattern en cours, suivi
   du prochain (`> E06`) annoncé par la DT2 ou demandé par PATTERN + pad,
-  et la track sélectionnée ; dessous, 16 cases de mutes (pleine =
+  et la track sélectionnée avec son code de la grille (doctrine §1,
+  `T03` + `SD/CP` ; `track_names` de `config/default.yaml`, deux codes au
+  plus, à remplacer par le projet à la slice 6) ; dessous, 16 cases de mutes (pleine =
   ouverte, vide = mutée, point = track de l'AUTO CHANNEL, track
   sélectionnée soulignée), remplacées 1,5 s par le dernier geste ou par
   une alerte (`pas de clock`, `TRANSFER OUVERT ?`). Ni tempo, ni quantize,

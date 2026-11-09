@@ -82,3 +82,10 @@ def test_mode_proposal_takes_right_screen(cfg: Config) -> None:
     eng = at_bar(cfg, 15)
     eng.modes.pending = "design"
     assert not render.right(eng, 0).getpixel(BAND_PIXEL)
+
+
+def test_track_code_shown_next_to_track(cfg: Config) -> None:
+    assert cfg.track_names[1] == "BD"  # grille de la doctrine §1
+    with_name = render.left(Engine(cfg), 0).tobytes()
+    bare = cfg.model_copy(update={"track_names": {}})
+    assert render.left(Engine(bare), 0).tobytes() != with_name

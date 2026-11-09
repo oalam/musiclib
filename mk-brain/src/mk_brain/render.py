@@ -110,6 +110,10 @@ def _left_band(
     track = f"T{engine.track:02d}"
     tw = int(d.textlength(track, font=big))
     _bold(d, (WIDTH - tw - 4, -6), track, big, 1)
+    name = engine.cfg.track_names.get(engine.track, "")  # code de la grille (doctrine §1)
+    if name:
+        nw = int(d.textlength(name, font=mid))
+        _bold(d, (WIDTH - tw - nw - 12, 1), name, mid, 1)
     if engine.design:
         lay = engine.layout
         _bold(d, (3, -3), "DESIGN", mid, 1)
