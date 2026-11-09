@@ -24,6 +24,9 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
   mode de la banque du dernier PC en haut à droite du bandeau droit ; à un
   changement de banque, titre et description 2 s à la place du bandeau
   (le compte à rebours garde la priorité).
+- Sélection de projet (slice 6.C) : liste à gauche, la ligne choisie en
+  gros et inversée ; à droite le projet choisi (banques, date) et les gestes.
+  Elle remplace les deux écrans entiers.
 """
 
 from __future__ import annotations
@@ -361,10 +364,64 @@ def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> No
             d.rectangle(fill, fill=ink)
 
 
+SELECT_ROWS = 3  # lignes de projets visibles, autour de la choisie
+
+
+def _selection_left(engine: Engine) -> Image.Image:
+    """Liste des projets : la choisie en gros, inversée ; les voisines en petit."""
+    img = new_image()
+    d = ImageDraw.Draw(img)
+    sel = engine.selector
+    assert sel is not None
+    _bold(d, (3, -2), "PROJECTS", _font(SMALL), 1)
+    if not sel.entries:
+        d.text((3, 24), "no project in projects/", font=_font(SMALL), fill=1)
+        return img
+    first = max(0, min(sel.index - 1, len(sel.entries) - SELECT_ROWS))
+    y = 13
+    for i in range(first, min(first + SELECT_ROWS, len(sel.entries))):
+        e = sel.entries[i]
+        name = e.name.upper() + ("  !" if e.project is None else "")
+        if i == sel.index:
+            d.rectangle((0, y, WIDTH - 1, y + 20), fill=1)
+            _bold(d, (4, y), name, _font(18), 0)
+            y += 22
+        else:
+            d.text((4, y), name, font=_font(SMALL), fill=1)
+            y += 14
+    return img
+
+
+def _selection_right(engine: Engine) -> Image.Image:
+    """Projet choisi : banques et date, ou l'erreur ; les gestes dessous."""
+    sel = engine.selector
+    assert sel is not None
+    e = sel.current
+    if e is None:
+        lines = ["", "", "SHIFT + BROWSE: back"]
+    elif e.project is None:
+        lines = [
+            e.name.upper(),
+            "invalid project",
+            ascii_text(e.error)[-40:],
+            "SHIFT + BROWSE: back",
+        ]
+    else:
+        lines = [
+            e.name.upper(),
+            f"{e.banks} banks   {e.date}",
+            "push: load",
+            "SHIFT + BROWSE: back",
+        ]
+    return text_image(lines, bold=frozenset({0}))
+
+
 def left(
     engine: Engine, now: int, message: tuple[str, int] | None = None, warn: str = ""
 ) -> Image.Image:
     """Écran gauche : bandeau de contexte, faders 1-4. Cadre en design (jamais confondu)."""
+    if engine.selector is not None:
+        return _selection_left(engine)
     img = new_image()
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):
@@ -386,6 +443,8 @@ def right(engine: Engine, now: int) -> Image.Image:
     if pending is not None:
         lines = ["", f"-> {pending.upper()}?", "push master to confirm", "other button: cancel"]
         return text_image(lines, bold=frozenset({1}))
+    if engine.selector is not None:
+        return _selection_right(engine)
     img = new_image()
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):

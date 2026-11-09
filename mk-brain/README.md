@@ -32,7 +32,9 @@ la tonique et le mode affichés ; en design, celle choisie par GROUP.
 .venv/bin/mk-brain list               # interfaces HID de la MK2
 .venv/bin/mk-brain spike              # mire, balayage LED, écho des contrôles, bilan à Ctrl-C
 .venv/bin/mk-brain spike --raw --no-chase   # + rapports bruts en hexa
-.venv/bin/mk-brain play               # pads → DT2 (AUTO CHANNEL), démarre en live (rythmique),
+.venv/bin/mk-brain play               # sélection de projet (maître : choisir, appui : charger ;
+                                      # dernier joué présélectionné, SHIFT + BROWSE = y revenir),
+                                      # pads → DT2 (AUTO CHANNEL), démarre en live (rythmique),
                                       # SHIFT + CONTROL 1 s + appui maître = live / design,
                                       # en design GROUP A-H = banque, PAD MODE = disposition,
                                       # boutons d'écran 1-4 = menu (maître : choisir, appui : valider),
@@ -40,7 +42,7 @@ la tonique et le mode affichés ; en design, celle choisie par GROUP.
                                       # flèches de transport = octave en design (±4),
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
-.venv/bin/mk-brain play --project projects/solaris.yaml   # projet (défaut : solaris)
+.venv/bin/mk-brain play --project projects/solaris.yaml   # projet chargé sans sélection
 .venv/bin/mk-brain convert ../digitakt/doctrine-dt2-solaris.md   # → projects/solaris.yaml
 .venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks
 .venv/bin/mk-brain clock --bench-note 3   # + note 3 (track 4) envoyée à chaque noire, gigue d'envoi

@@ -3,6 +3,25 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.14.0] - 2026-11-09
+
+### Ajouté
+
+- [6] 6.C : sélection de projet (`selection.py`) au démarrage de
+  `mk-brain play` : liste de `projects/*.yaml` (nom, date du dernier
+  commit, nombre de banques, fichier invalide marqué et non chargeable),
+  encodeur maître pour choisir, appui pour charger, dernier projet joué
+  présélectionné (`state/last_project`, ignoré par git). SHIFT + BROWSE
+  l'ouvre ou la referme, refusée en live transport lancé ; un Start en live
+  la referme. `Engine.set_project` change de projet en cours de séance.
+
+### Modifié
+
+- [6] `mk-brain play --project` charge un projet sans sélection ; il n'a
+  plus de défaut (solaris passait d'office).
+- [6] Noms de samples à la frappe reportés : le lives JSON n'associe pas
+  les samples aux tracks hors `0-KIT` (SPEC, question 15).
+
 ## [0.13.0] - 2026-11-09
 
 ### Ajouté

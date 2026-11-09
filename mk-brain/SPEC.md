@@ -134,8 +134,9 @@ mk-brain/
 ├── projects/solaris.yaml         # généré par convert, commité, lu par le Pi
 ├── src/mk_brain/
 │   ├── convert.py                # doctrine (front matter) + lives JSON → projet (Mac)
-│   ├── project.py                # modèle Pydantic du projet, chargement, liste
-│   ├── modes.py                  # live / design / sélection de projet
+│   ├── project.py                # modèle Pydantic du projet, chargement
+│   ├── selection.py              # liste des projets, dernier joué (6.C)
+│   ├── modes.py                  # bascule live / design
 │   ├── hid_mk2.py                # rapports HID MK2 : parse entrée, LED, écrans
 │   ├── display.py                # Pillow 1 bit → octets écran
 │   ├── midi_io.py                # ports DT2, callback clock
@@ -376,6 +377,30 @@ mkbrain:
   disposition part de la tonique (5.D), le nom MIDI est donc la vraie
   note ; en live (rythmique), la track.
 
+**Fait le 2026-11-09 (slice 6.C, `selection.py`)**, provisoire jusqu'à
+l'essai sur la MK2 :
+- `mk-brain play` sans `--project` ouvre la sélection au démarrage ;
+  `--project <fichier>` charge directement (essais) ;
+- liste de `projects/*.yaml` par nom : nom, date du dernier commit (`git
+  log`, sinon date de modification), nombre de banques ; un fichier
+  invalide reste listé, marqué `!`, son erreur à droite, et ne se charge
+  pas ;
+- dernier projet chargé retenu dans `mk-brain/state/last_project` (local,
+  ignoré par git) et présélectionné ;
+- écrans : liste à gauche (choisi en gros, inversé, 3 lignes visibles),
+  projet choisi et gestes à droite ; les deux écrans entiers ;
+- SHIFT + BROWSE (l'une ou l'autre flèche) ouvre ou referme sans charger ;
+  ouverture refusée en live transport lancé, permise en design ; un Start
+  en live referme la sélection sur le projet en cours. Les pads restent
+  jouables pendant la sélection ;
+- chargement : banque du design à rechoisir (la DT2 d'abord, cf. 5.D),
+  contexte live repris du dernier PC reçu, mode inchangé ;
+- **noms de samples à la frappe reportés** (décidé le 2026-11-09) : le
+  lives JSON ne dit pas quel sample est sur quelle track hors `0-KIT`, et
+  le sample d'une track change d'un pattern à l'autre (cf. Questions
+  ouvertes) ; `demarrage: design` pas encore ajouté au front matter (pas
+  de besoin pour solaris).
+
 ## Comportements
 
 ### Horloge et PLL
@@ -539,7 +564,8 @@ mode et le nom devient la vraie note (tonique + degré) : fait à la 6.B.
    avant un cap.
 3. Frappe d'un pad : nom du sample, slot, track, pendant 1 s. Les noms
    viennent du projet (samples par banque et track du JSON), la DT2 ne les
-   renvoie pas.
+   renvoie pas. **Reporté le 2026-11-09** (6.C) : le JSON n'a pas de track
+   par banque.
 
 **Fait le 2026-11-09 (slice 5.C, `render.py`), revu à l'essai le même
 jour** : chaque valeur s'affiche juste au-dessus de son encodeur. Les deux
@@ -808,7 +834,7 @@ conditionne tout le reste.
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
-| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | en cours, découpée le 2026-11-09 : 6.A front matter et `convert`, faite le 2026-11-09 ; 6.B contexte suivi par PC, faite le 2026-11-09, à essayer ; 6.C sélection de projet à venir |
+| 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | en cours, découpée le 2026-11-09 : 6.A front matter et `convert`, faite le 2026-11-09 ; 6.B contexte suivi par PC et 6.C sélection de projet, faites le 2026-11-09, à essayer ; noms de samples reportés |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et
@@ -870,6 +896,11 @@ la slice 0.
     capturer sur un PC Windows (Wireshark + USBPcap) en bougeant le
     curseur Display de Maschine 2. Ne pas sonder au hasard les rapports de
     sortie (`0xd0`-`0xdf` ressemblent à la flash : calibration, série).
+15. **Noms de samples à la frappe** (reporté le 2026-11-09, 6.C) : le
+    lives JSON range les samples par banque sans track (288 sur 304), seuls
+    les 16 du `0-KIT` ont une track, et le sample d'une track change d'un
+    pattern à l'autre. Il faudrait une table banque × pattern × track →
+    sample, tenue dans le JSON ou la doctrine, avant de l'afficher.
 
 ## Constats HID (slice 0, 2026-11-09)
 

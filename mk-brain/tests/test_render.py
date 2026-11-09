@@ -147,3 +147,13 @@ def test_live_right_shows_tonic_then_announce_for_two_seconds(
     assert announced != plain
     after = render.right(eng, 3 * SECOND).tobytes()
     assert after not in (plain, announced)  # tonique et mode en haut à droite
+
+
+def test_selection_takes_both_screens(cfg: Config, project: Project) -> None:
+    from test_engine import _catalog
+
+    eng = Engine(cfg, catalog=_catalog(project))
+    left, right = render.left(eng, 0).tobytes(), render.right(eng, 0).tobytes()
+    eng.open_selection()
+    assert render.left(eng, 0).tobytes() != left
+    assert render.right(eng, 0).tobytes() != right

@@ -40,3 +40,4 @@ digitakt/presets/
 # mk-brain
 mk-brain/.venv/
 mk-brain/src/*.egg-info/
+mk-brain/state/

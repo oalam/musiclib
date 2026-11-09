@@ -31,7 +31,7 @@ from mk_brain.hid_mk2 import (
     pad_label,
 )
 from mk_brain.midi_io import MidiError
-from mk_brain.project import DEFAULT_PROJECT, ProjectError
+from mk_brain.project import ProjectError
 
 if TYPE_CHECKING:
     pass
@@ -173,18 +173,25 @@ def _clock_line(clock: ClockTracker) -> str:
     return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
 
 
-def cmd_play(dry_run: bool, project_path: Path) -> int:
+def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
     from mk_brain.midi_io import Dt2In, Dt2Out, feed_engine
     from mk_brain.project import load_project
     from mk_brain.scheduler import Scheduler
+    from mk_brain.selection import Selector, list_projects, read_last, write_last
 
     cfg = load_config()
-    project = load_project(project_path)
+    project = None if project_path is None else load_project(project_path)
     clock = ClockTracker()
-    engine = Engine(cfg, clock, project)
+
+    def catalog() -> Selector:
+        return Selector(list_projects(), read_last())
+
+    engine = Engine(cfg, clock, project, catalog)
+    if project is None:  # démarrage : sélection, le dernier joué présélectionné
+        engine.open_selection()
     decoder = InputDecoder(pad_threshold=cfg.velocity.threshold)
     out = None if dry_run else Dt2Out.open(cfg.midi.port_hint)
     inp = None if dry_run else Dt2In.open(cfg.midi.port_hint)
@@ -214,7 +221,7 @@ def cmd_play(dry_run: bool, project_path: Path) -> int:
 
     print(
         f"play : {'essai sans DT2' if dry_run else 'DT2'} ; mode live ; "
-        "SHIFT + CONTROL 1 s puis appui maître = changer de mode ; "
+        "SHIFT + CONTROL 1 s puis appui maître = changer de mode ; SHIFT + BROWSE = projet ; "
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )
     try:
@@ -237,6 +244,9 @@ def cmd_play(dry_run: bool, project_path: Path) -> int:
                 message = (last, now)
                 print(last)
                 engine.last_control = ""
+            if engine.loaded is not None:
+                write_last(engine.loaded)
+                engine.loaded = None
             for line in engine.log:
                 print(f"{line}   ({_clock_line(clock)})")
             engine.log.clear()
@@ -351,7 +361,10 @@ def main(argv: list[str] | None = None) -> int:
     pp = sub.add_parser("play", help="slice 1 : pads → notes DT2 sur l'AUTO CHANNEL")
     pp.add_argument("--dry-run", action="store_true", help="sans DT2 : notes affichées seulement")
     pp.add_argument(
-        "--project", type=Path, default=DEFAULT_PROJECT, help="projet du set (banques du design)"
+        "--project",
+        type=Path,
+        default=None,
+        help="projet chargé sans passer par la sélection (ex. projects/solaris.yaml)",
     )
     vp = sub.add_parser("convert", help="slice 6 : doctrine du set → projects/<set>.yaml")
     vp.add_argument("doctrine", type=Path, help="doctrine du set (front matter mkbrain:)")

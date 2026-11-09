@@ -31,6 +31,10 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   transport arrêté), sa tonique et son mode s'affichent, son titre et sa
   description s'annoncent 2 s au changement de banque (`announce`). En
   design, le PC reste sans effet sur la banque choisie.
+- Slice 6.C : sélection de projet (`selection.py`) : SHIFT + BROWSE l'ouvre
+  (refusée en live transport lancé) ou la ferme ; l'encodeur maître fait
+  défiler, son appui charge le projet (`set_project`), `loaded` le nomme
+  pour que la CLI le retienne.
 """
 
 from __future__ import annotations
@@ -75,6 +79,7 @@ from mk_brain.quantize import (
     swing_offset,
 )
 from mk_brain.repeat import DIVISION_TICKS, DIVISIONS, GATE
+from mk_brain.selection import Selector
 
 NOTE_OFF_MIN_NS = 5_000_000  # note off au moins 5 ms après sa note on
 
@@ -136,10 +141,17 @@ class _Repeat:
 
 class Engine:
     def __init__(
-        self, cfg: Config, clock: ClockTracker | None = None, project: Project | None = None
+        self,
+        cfg: Config,
+        clock: ClockTracker | None = None,
+        project: Project | None = None,
+        catalog: Callable[[], Selector] | None = None,
     ) -> None:
         self.cfg = cfg
         self.project = project
+        self.catalog = catalog  # liste des projets pour la sélection (lue à chaque ouverture)
+        self.selector: Selector | None = None  # sélection de projet ouverte
+        self.loaded: str | None = None  # nom du dernier projet chargé par la sélection
         self.design_bank: int | None = None  # banque du design (GROUP, menu BANK), 0 = A
         self._design_phrase: PhraseLength | None = None  # menu PHRASE ; None = celle de la banque
         self.menu: int | None = None  # entrée de menu ouverte (index dans MENU)
@@ -258,7 +270,9 @@ class Engine:
             return []
         if isinstance(ev, EncoderEvent):
             if ev.index == 0:
-                if "SWING" in self._held_buttons:
+                if self.selector is not None:
+                    self.selector.scroll(ev.delta)
+                elif "SWING" in self._held_buttons:
                     self.swing = clamp_swing(self.swing + ev.delta)
                 elif self.menu is not None:
                     n = len(self._menu_items(self.menu)[0])
@@ -380,6 +394,42 @@ class Engine:
         at = self.phrase.reset_next_bar(ticks, first_bar=first_bar)
         self.log.append(f"recalage -> mesure {first_bar} à la barre {at + 1}")
         return True
+
+    # --- projet : sélection et chargement ---------------------------------------
+
+    def open_selection(self) -> None:
+        """Ouvre la liste des projets ; refusée en live transport lancé."""
+        if not self.design and self.running:
+            self._note("transport running: no project change")
+            return
+        if self.catalog is None:
+            self._note("no project list")
+            return
+        self.selector = self.catalog()
+        self.menu = None
+        self.leds_dirty = True
+
+    def _load_selected(self) -> None:
+        assert self.selector is not None
+        entry = self.selector.current
+        if entry is None or entry.project is None:
+            self._note("no project" if entry is None else f"{entry.name}: invalid")
+            return
+        self.selector = None
+        self.set_project(entry.project)
+        self.loaded = entry.name
+        self._note(f"project {entry.name}")
+
+    def set_project(self, project: Project | None) -> None:
+        """Change de projet : banque du design à rechoisir, contexte live repris du dernier PC."""
+        self.project = project
+        self.design_bank, self._design_phrase, self.octave = None, None, 0
+        self.announce = None
+        if self.design:
+            self._enter_design()
+        else:
+            self._apply_phrase()
+        self.leds_dirty = True
 
     # --- design : banque et menu ----------------------------------------------
 
@@ -550,6 +600,16 @@ class Engine:
         if shift and name.startswith("GROUP_"):
             self._recalibrate(GROUPS.index(name[-1]) * BLOCK_BARS + 1)
             return
+        if shift and name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # sélection de projet
+            if self.selector is not None:
+                self.selector = None
+                self.leds_dirty = True
+            else:
+                self.open_selection()
+            return
+        if name == "MASTER_PUSH" and self.selector is not None:
+            self._load_selected()
+            return
         if name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # page d'encodeurs
             page = 0 if name == "BROWSE_LEFT" else len(self.faders.pages) - 1
             if page != self.faders.page_index:
@@ -631,6 +691,9 @@ class Engine:
     def tick(self, now: int) -> list[Timed]:
         """Attaques dont la fenêtre de vélocité est écoulée, coups de repeat à venir."""
         self._note(self.modes.update(now, self.running))
+        if self.selector is not None and not self.design and self.running:
+            self.selector = None  # Start en live : la sélection se ferme sur le projet en cours
+            self._note("transport running: selection closed")
         if self.announce is not None and self.announce[2] is None:
             self.announce = (self.announce[0], self.announce[1], now)
         self._update_phrase()

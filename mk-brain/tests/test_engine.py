@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+from pathlib import Path
+
 import pytest
 
 from mk_brain.clock import ClockTracker
@@ -7,6 +10,7 @@ from mk_brain.config import Config
 from mk_brain.engine import NOTE_OFF_MIN_NS, Engine, NoteOff, NoteOn, Timed
 from mk_brain.hid_mk2 import BUTTONS, ButtonEvent, EncoderEvent, PadEvent
 from mk_brain.project import Project
+from mk_brain.selection import Entry, Selector
 
 PAD1 = 12  # index HID du pad 1 (constat slice 0)
 MS = 1_000_000
@@ -612,3 +616,58 @@ def test_design_ignores_program_change_for_context(cfg: Config, project: Project
     assert eng.context is not None and eng.context[0] == "A-HALF"
     assert eng.announce is None
     assert eng.live_sheet is not None and eng.live_sheet[0] == "E-TRIBE"
+
+
+# --- slice 6.C : sélection de projet --------------------------------------------
+
+
+def _catalog(project: Project) -> Callable[[], Selector]:
+    path = Path("solaris.yaml")
+    entries = [
+        Entry("broken", path, "2026-11-09", None, "illisible"),
+        Entry("solaris", path, "2026-11-09", project),
+    ]
+    return lambda: Selector(entries, "solaris")
+
+
+def test_selection_loads_preselected_project(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, catalog=_catalog(project))
+    eng.on_program_change(4 * 16)  # E01 reçu avant le chargement
+    eng.open_selection()
+    assert eng.selector is not None and eng.selector.index == 1
+    btn(eng, "MASTER_PUSH")
+    assert eng.selector is None and eng.project is project and eng.loaded == "solaris"
+    assert eng.context is not None and eng.context[0] == "E-TRIBE"  # contexte repris du PC
+
+
+def test_selection_scroll_and_invalid_refused(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, catalog=_catalog(project))
+    btn(eng, "SHIFT")
+    btn(eng, "BROWSE_LEFT")
+    assert eng.selector is not None
+    btn(eng, "SHIFT", False)
+    eng.handle(EncoderEvent(0, -1, 0), 0)
+    btn(eng, "MASTER_PUSH")
+    assert eng.selector is not None and eng.project is None  # « broken » ne se charge pas
+    btn(eng, "SHIFT")
+    btn(eng, "BROWSE_RIGHT")  # referme sans charger
+    assert eng.selector is None and eng.faders.page_index == 0
+
+
+def test_selection_refused_in_live_while_running(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, running_clock(), project, _catalog(project))
+    eng.on_start()
+    eng.open_selection()
+    assert eng.selector is None
+    d = design(cfg, project=project)  # bascule faite à l'arrêt, puis Start
+    d.clock, d.catalog = running_clock(), _catalog(project)
+    d.open_selection()  # design : permise transport lancé
+    assert d.selector is not None
+
+
+def test_start_in_live_closes_selection(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, catalog=_catalog(project))
+    eng.open_selection()
+    eng.clock = running_clock()
+    eng.tick(0)
+    assert eng.selector is None
