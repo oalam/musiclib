@@ -67,8 +67,8 @@ class Faders:
 
     def received(self, track: int, cc: int, value: int) -> None:
         """CC venu de la DT2 sur le canal d'une track : bouton ou mute joué sur la machine."""
-        if cc == self.mute_cc:
-            self.muted[track] = value >= 64
+        if cc == self.mute_cc:  # constaté le 2026-11-09 : la DT2 envoie 0 = muté, 1 = ouvert
+            self.muted[track] = value == 0
             return
         if any(c == cc for page in self.pages for _, c in page):
             self._values[(track, cc)] = value

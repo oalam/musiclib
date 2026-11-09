@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.15.1] - 2026-11-09
+
+### Corrigé
+
+- [6] Mutes joués sur la DT2 ignorés : elle envoie le CC 94 avec 0 = muté
+  et 1 = ouvert (constaté à l'écoute MIDI brute), le Pi attendait 127 pour
+  muté (`Faders.received`).
+
 ## [0.15.0] - 2026-11-09
 
 ### Ajouté
