@@ -453,12 +453,12 @@ T07  ch7 (gros)                                                cap 32 : -8
                                           [████████|████████|████████|██░░]
 ----------------------------------------  ---------------------------------
 CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [██░] PAN [─|─] DLY [██░] REV [██░]
-74         64         64         64       64        59        64        64
 ```
 
 - deux tiers supérieurs (40 px) = bandeau ; dessous, 4 colonnes de 64 px
   par écran, encodeurs 1-4 à gauche, 5-8 à droite : nom et jauge sur une
-  ligne, valeur dessous (`~` hors prise) ; le pan depuis le centre
+  ligne, sans valeur numérique (inutile, décidé à l'essai) ; jauge en
+  pointillé tant qu'elle est hors prise (remplace le `~`) ; le pan depuis le centre
   (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
 - bandeau gauche : pattern, BPM, lecture / arrêt dessinés, quantize,
   swing ; 2e ligne en gros (réduite si le texte est long) : track sélectionnée (`MUTE` si mutée ; en design
@@ -540,9 +540,10 @@ numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
   Le PC au Stop relevé en 7.E ne s'est pas reproduit : sur une quinzaine
   de Stop, aucun PC sans changement de pattern (à confirmer).
 - Un changement de pattern (PC d'un autre pattern) recharge le kit de la
-  DT2 : toutes les valeurs passent « hors prise », `~` devant la valeur.
-  La première rotation repart de la dernière valeur connue (saut possible,
-  assumé) et efface le `~`.
+  DT2 : toutes les valeurs passent « hors prise », jauge en pointillé
+  (c'était un `~` devant la valeur avant la 5.C). La première rotation
+  repart de la dernière valeur connue (saut possible, assumé) et rend la
+  jauge pleine.
 - Rotation : 4 unités brutes de la MK2 par cran de CC
   (`encoders.raw_per_step`), restes cumulés.
 

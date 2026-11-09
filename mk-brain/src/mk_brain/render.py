@@ -4,7 +4,7 @@ Pur : le moteur et l'instant sont passés par l'appelant, rien n'est envoyé.
 Disposition (revue le 2026-11-09 à l'essai) : chaque écran a un bandeau
 (deux tiers supérieurs) et, dessous, 4 colonnes de 64 px, une au-dessus de
 chaque encodeur (1-4 sous l'écran gauche, 5-8 sous le droit) : nom et jauge
-sur une ligne, valeur dessous.
+sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
 - Bandeau gauche : pattern, BPM, transport, quantize, swing ; puis track
   sélectionnée, ou dernier geste / frappe, ou alerte.
 - Bandeau droit : mesure / longueur, phrase, cap ; barre de progression,
@@ -174,17 +174,26 @@ def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> No
         if k == touched:
             d.rectangle((x, BAND + 1, x + COL - 2, HEIGHT - 1), fill=1)
             ink = 0
-        d.text((x + 3, BAND), f.name, font=small, fill=ink)
-        d.text((x + 3, BAND + 10), f"{'~' if f.stale else ''}{f.value}", font=small, fill=ink)
-        top, bottom, left, right = BAND + 5, BAND + 11, x + 33, x + COL - 5
+        _centered(d, (x + 2, BAND + 1, x + 30, HEIGHT - 1), f.name, small, ink)
+        top, bottom, left, right = BAND + 7, BAND + 17, x + 33, x + COL - 5
         d.rectangle((left, top, right, bottom), outline=ink)
         end = left + round((right - left) * f.value / 127)
         if page[k].bipolar:  # pan : depuis le centre (64)
             mid = (left + right) // 2
-            d.rectangle((min(mid, end), top, max(mid, end), bottom), fill=ink)
+            fill: Box = (min(mid, end), top, max(mid, end), bottom)
             d.line((mid, top - 2, mid, bottom + 2), fill=ink)
         else:
-            d.rectangle((left, top, end, bottom), fill=ink)
+            fill = (left, top, end, bottom)
+        if f.stale:  # hors prise : remplissage en pointillé
+            pts = [
+                (px, py)
+                for px in range(fill[0], fill[2] + 1)
+                for py in range(top, bottom + 1)
+                if (px + py) % 2 == 0
+            ]
+            d.point(pts, fill=ink)
+        else:
+            d.rectangle(fill, fill=ink)
 
 
 def left(

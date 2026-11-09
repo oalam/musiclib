@@ -15,7 +15,8 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
   design, écran gauche bordé.
 - [5] 5.C Proportions inversées : bandeau sur les deux tiers (mesure,
   track et compte à rebours en gros), faders sur le tiers bas, nom et
-  jauge alignés, valeur en petit dessous.
+  jauge alignés ; plus de valeur numérique, jauge en pointillé tant
+  qu'elle est hors prise (remplace le `~`).
 
 ## [0.8.0] - 2026-11-09
 
