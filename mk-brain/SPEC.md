@@ -810,6 +810,15 @@ la slice 0.
     track ? À réécouter, sans enjeu tant que l'AUTO CHANNEL est à 16.
 12. ~~Canal 16 au test du pool~~ : la track 16 répond bien sur le canal 16
     (vérifié le 2026-11-09).
+14. **Luminosité des écrans** : la commande n'est pas connue (cabl :
+    `//!\todo set backlight`). Écarté le 2026-11-09 : octets libres des
+    rapports LED (`0x82`[31], `0x81`[56]) sans effet ; aucun feature report
+    ne change quand on règle Display dans Maschine 2 ; le réglage n'est pas
+    gardé par la MK2 à la réouverture. Pas de capture USB sur Mac Apple
+    Silicon (SIP), et Maschine ne tourne pas sur le Pi : piste restante,
+    capturer sur un PC Windows (Wireshark + USBPcap) en bougeant le
+    curseur Display de Maschine 2. Ne pas sonder au hasard les rapports de
+    sortie (`0xd0`-`0xdf` ressemblent à la flash : calibration, série).
 
 ## Constats HID (slice 0, 2026-11-09)
 
