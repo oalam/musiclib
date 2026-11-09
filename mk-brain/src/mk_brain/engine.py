@@ -456,8 +456,12 @@ class Engine:
                 pads[index] = (0, 0, 0) if self.faders.muted.get(pad) else full
             elif "SELECT" in held:
                 pads[index] = full if pad == self.track else scale(full, dim)
+            elif pad in lit:
+                pads[index] = full
+            elif pad == self.track and not self.design:  # live : track des encodeurs repérée
+                pads[index] = scale(full, self.cfg.leds.selected)
             else:
-                pads[index] = full if pad in lit else scale(full, dim)
+                pads[index] = scale(full, dim)
         st = self.phrase_state
         if "PATTERN" in held:  # PATTERN tenu : les GROUP montrent la banque
             white = self.cfg.families["chromatique"]

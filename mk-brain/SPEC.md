@@ -355,7 +355,8 @@ mkbrain:
 - **PATTERN + pad = pattern n de la banque courante** : Program Change
   `banque × 16 + (n − 1)` envoyé à la DT2, qui le met en file comme ses
   propres changements.
-- LED : pad de la track sélectionnée allumé en permanence, tracks mutées
+- LED : pad de la track sélectionnée allumé en permanence (à mi-intensité,
+  `leds.selected`, pour que la frappe reste visible en plein), tracks mutées
   éteintes, couleurs par rôle de la grille (doctrine §1).
 - **Track 16 et Preset Pool** : le pool se joue depuis les touches `[TRIG]`
   de la DT2, en trig mode Preset Pool. La MK2 ne peut pas choisir un preset

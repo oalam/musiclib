@@ -357,3 +357,16 @@ def test_design_encoders_on_auto_channel_with_rec_hint(cfg: Config) -> None:
     assert eng.last_control.endswith("DT2 en LIVE REC ?")
     eng.handle(EncoderEvent(1, 4, 0), 0)
     assert "LIVE REC" not in eng.last_control  # rappel une fois par passage en design
+
+
+def test_live_selected_track_pad_stays_lit(cfg: Config) -> None:
+    from mk_brain.layouts import scale
+
+    eng = Engine(cfg)
+    btn(eng, "SELECT")
+    eng.handle(PadEvent(PAD7, True, 2500), 0)
+    eng.handle(PadEvent(PAD7, False, 0), MS)
+    btn(eng, "SELECT", False)
+    pads = eng.leds().pads
+    assert pads[PAD7] == scale(cfg.track_colors[7], cfg.leds.selected)
+    assert pads[PAD1] == scale(cfg.track_colors[1], cfg.leds.dim)

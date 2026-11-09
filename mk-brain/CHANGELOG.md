@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.7.1] - 2026-11-09
+
+### Corrigé
+
+- [5] 5.B En live, la track sélectionnée (SELECT + pad) n'était repérée
+  que SELECT tenu : son pad reste allumé à mi-intensité (`leds.selected`,
+  0.5), plein à la frappe.
+
 ## [0.7.0] - 2026-11-09
 
 ### Ajouté
