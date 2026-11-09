@@ -478,8 +478,10 @@ numéros de l'annexe B (fiche `digitakt/kb/cc-nrpn.md`) :
 - Mutes : la DT2 ne donne pas leur état, elle n'envoie que leurs
   changements. Au lancement, toutes les tracks sont supposées ouvertes
   jusqu'au premier mute joué (limite assumée, 2026-11-09).
-- PATTERN + pad : la banque s'apprend au premier PC reçu, dont celui que la
-  DT2 envoie à chaque Stop (pattern actif) ; avant, `banque ?`.
+- PATTERN + pad : banque choisie par PATTERN + GROUP A-H (sans envoi,
+  décidé le 2026-11-09) ou apprise du dernier PC reçu ; avant, `banque ?`.
+  Le PC au Stop relevé en 7.E ne s'est pas reproduit : sur une quinzaine
+  de Stop, aucun PC sans changement de pattern (à confirmer).
 - Un changement de pattern (PC d'un autre pattern) recharge le kit de la
   DT2 : toutes les valeurs passent « hors prise », `~` devant la valeur.
   La première rotation repart de la dernière valeur connue (saut possible,
@@ -497,6 +499,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | SELECT + pad | sélectionne la track n pour les encodeurs | sélectionne la track n (canal) |
 | MUTE + pad | mute / démute la track n | idem |
 | PATTERN + pad | pattern n de la banque courante (PC) | idem |
+| PATTERN + GROUP n | banque n pour PATTERN + pad (sans envoi) ; GROUP tenus = banque | idem |
 | 8 encodeurs | les 8 faders de la track sélectionnée | les 8 faders de la track active (p-locks en LIVE REC) |
 | NOTE REPEAT tenu + pad | répétition ; les 8 boutons au-dessus des écrans choisissent la division (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64) | idem |
 | SHIFT + NOTE REPEAT | verrouillage du repeat | idem |

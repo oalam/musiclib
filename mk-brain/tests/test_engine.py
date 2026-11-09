@@ -254,6 +254,11 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
     btn(eng, "PATTERN")
     assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []
     assert eng.last_control.startswith("banque ?")
+    btn(eng, "GROUP_B")  # PATTERN tenu : banque B, sans changer de disposition
+    assert eng.group == 0 and eng.bank == 1
+    assert eng.leds().groups[1] == cfg.families["chromatique"]
+    assert eng.handle(PadEvent(PAD1, True, 2500), MS) == [(MS, ProgramChange(9, 16))]  # B01
+    eng.handle(PadEvent(PAD1, False, 0), MS)
     eng.handle(PadEvent(PAD7, False, 0), MS)
     eng.on_program_change(16 * 4 + 3)  # E04 reçu, transport arrêté
     assert eng.log == ["banque E (PC reçu)"]

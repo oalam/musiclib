@@ -11,10 +11,11 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   GROUP n = début du bloc n ; transport lancé, les LED GROUP montrent le
   compteur et PLAY pulse sur le 1.
 - Slice 5.A : SELECT + pad = track des encodeurs, MUTE + pad = mute (CC 94),
-  PATTERN + pad = Program Change dans la banque courante (refusé tant
-  qu'elle est inconnue) ; 8 encodeurs → CC sur le canal de la track, valeurs
-  apprises de la DT2 (`faders.py`). La track de l'AUTO CHANNEL n'est pas
-  joignable par son canal : refusée.
+  PATTERN + GROUP A-H = banque (sans envoi), PATTERN + pad = Program
+  Change dans la banque courante (refusé tant qu'elle est inconnue) ;
+  8 encodeurs → CC sur le canal de la track, valeurs apprises de la DT2
+  (`faders.py`). La track de l'AUTO CHANNEL n'est pas joignable par son
+  canal : refusée.
 """
 
 from __future__ import annotations
@@ -118,7 +119,8 @@ class Engine:
         enc = cfg.encoders
         self.faders = Faders([(e.name, e.cc) for e in enc.page], enc.mute_cc, enc.raw_per_step)
         self.track = 1  # track des encodeurs (SELECT + pad)
-        self.last_program: int | None = None  # dernier PC reçu : banque courante
+        self.last_program: int | None = None  # dernier PC reçu
+        self.bank: int | None = None  # banque de PATTERN + pad : PC reçu ou PATTERN + GROUP
         self.last_control = ""  # dernier geste de contrôle, pour l'écran
         self._consumed: set[int] = set()  # pads frappés avec un modificateur
 
@@ -170,10 +172,10 @@ class Engine:
             cc, value = self.faders.toggle_mute(pad)
             self.last_control = f"T{pad:02d} {'mute' if value else 'démute'}"
             return [(now, ControlChange(pad - 1, cc, value))]
-        if self.last_program is None:
-            self.last_control = "banque ? (Stop ou changement de pattern sur la DT2)"
+        if self.bank is None:
+            self.last_control = "banque ? (PATTERN + GROUP)"
             return []
-        program = self.last_program // 16 * 16 + pad - 1
+        program = self.bank * 16 + pad - 1
         self.last_control = f"-> {pattern_label(program)}"
         return [(now, ProgramChange(self.cfg.midi.program_channel - 1, program))]
 
@@ -205,9 +207,10 @@ class Engine:
         suivante (arrêté : compteur inchangé)."""
         if program != self.last_program:
             self.faders.pattern_changed()
-        if self.last_program is None or program // 16 != self.last_program // 16:
+        if program // 16 != self.bank:
             self.log.append(f"banque {pattern_label(program)[0]} (PC reçu)")
         self.last_program = program
+        self.bank = program // 16
         ticks = self.clock.ticks_since_start
         if ticks is None:
             return
@@ -242,6 +245,11 @@ class Engine:
             return
         if shift and name.startswith("GROUP_"):
             self._recalibrate(GROUPS.index(name[-1]) * BLOCK_BARS + 1)
+            return
+        if "PATTERN" in self._held_buttons and name.startswith("GROUP_"):
+            self.bank = GROUPS.index(name[-1])
+            self.last_control = f"banque {name[-1]}"
+            self.leds_dirty = True
             return
         if name.startswith("GROUP_"):
             self.group = GROUPS.index(name[-1])
@@ -382,7 +390,10 @@ class Engine:
             else:
                 pads[index] = full if pad in lit else scale(full, dim)
         st = self.phrase_state
-        if st is None:  # transport arrêté : les GROUP montrent la disposition
+        if "PATTERN" in held:  # PATTERN tenu : les GROUP montrent la banque
+            white = self.cfg.families["chromatique"]
+            groups = [scale(white, 1.0 if g == self.bank else dim) for g in range(len(GROUPS))]
+        elif st is None:  # transport arrêté : les GROUP montrent la disposition
             groups = [
                 scale(self.cfg.families[lay.family], 1.0 if g == self.group else dim)
                 for g, lay in enumerate(self.cfg.layouts)
