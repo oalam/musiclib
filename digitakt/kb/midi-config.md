@@ -88,6 +88,12 @@ calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
 - Transport arrêté : PC envoyé tout de suite au changement de pattern. Un
   Stop s'accompagne aussi d'un PC du pattern actif.
 - Usage : suivi de contexte par [[mk-brain/SPEC|mk-brain]].
+- Réception : `PROGRAM CHG IN CH` se règle à part de `PROGRAM CHG OUT CH`
+  (manuel §14.4.2). Resté sur `AUTO`, la DT2 ignorait les PC envoyés sur
+  le canal 10 ; réglé à 10, PATTERN + pad de la MK2 change de pattern et
+  de banque (vérifié le 2026-11-09). PC 0-127 = A01-H16 (manuel §8.4).
+- PC au Stop : non reproduit le 2026-11-09 (une quinzaine de Stop sans PC
+  hors changement de pattern), à confirmer.
 
 ## Vérifié sur la machine (2026-11-09) : AUTO CHANNEL partagé avec une track
 
