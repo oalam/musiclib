@@ -266,9 +266,9 @@ def cmd_clock(bench_note: int | None, every: int) -> int:
             if sched is not None and bench_note is not None and k is not None:
                 if next_pos is None:
                     next_pos = (k // every + 1) * every
-                # planifié 5 ms avant la cible, prise sur la droite de régression
+                # confié 20 ms avant la cible, prise sur la droite de régression
                 t = clock.position_time(next_pos)
-                if t is not None and t - time.perf_counter_ns() < 5_000_000:
+                if t is not None and t - time.perf_counter_ns() < 20_000_000:
                     sched.at(int(t), NoteOn(channel, bench_note, 100))
                     sched.at(int(t) + 20_000_000, NoteOff(channel, bench_note))
                     next_pos += every

@@ -3,7 +3,7 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
-## [Non publié]
+## [0.3.0] - 2026-11-09
 
 ### Ajouté
 
@@ -19,6 +19,13 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 - [2] `mk-brain play` : BPM, transport et position à l'écran gauche, note
   jouée avec degré et nom (`pad 3 -> b3 (D#5, 63)`), alerte Transfer ou
   clock absente.
+- [2] Banc sur la DT2 : BPM à 0,1 près, envoi à 0,17 ms rms (p99
+  0,72 ms), sans flam à l'oreille (constats dans `SPEC.md`).
+
+### Corrigé
+
+- [2] Ordonnanceur en retard de 1,3 ms en moyenne : attentes découpées
+  (2 ms), attente active de 2 ms qui cède le GIL, bascule de fil à 0,2 ms.
 
 ## [0.2.0] - 2026-11-09
 

@@ -275,7 +275,8 @@ mkbrain:
   BPM affiché = 60 / (24 × durée de tick), arrondi à 0,1.
 - Un envoi prévu au pas k part à l'instant que la droite de régression
   donne pour ce tick, pas au tick reçu : la gigue USB (±1 ms) n'est pas
-  recopiée. Cible : erreur sous 0,3 ms. **À mesurer** (`mk-brain clock`).
+  recopiée. Cible : erreur sous 0,3 ms. Mesuré sur Mac le 2026-11-09 :
+  0,17 ms rms, p99 0,72 ms (cf. Constats horloge).
 - Clocks sans Start (la DT2 en envoie à l'arrêt) : BPM affiché, aucune note
   planifiée, compteur de phrases figé.
 - Trafic sysex Elektron détecté : avertissement à l'écran (Transfer ouvert).
@@ -534,14 +535,14 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 et 1 faites le 2026-11-09, slice 2 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 à 2 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
 |---|---|---|---|
 | 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
 | 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | fait 2026-11-09 : tracks 1-16 en A, gamme du groupe C jouée sur la track active (9) |
-| 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | en cours : code prêt (`mk-brain clock`), à l'arrêt 145,0 BPM lus, écart d'arrivée 0,21 ms rms ; banc transport lancé à faire |
+| 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | à venir |
@@ -627,6 +628,27 @@ le détail) :
   Pi sur le canal 16 jouaient la track 16 au lieu de la track active.
   Réglé à 16, la gamme joue sur la track active. Premier point à vérifier
   si les pads visent la mauvaise track.
+
+## Constats horloge (slice 2, 2026-11-09, Mac)
+
+`mk-brain clock --bench-note 3` : note de la track 4 envoyée à chaque
+noire sur la droite de régression, DT2 à 151 BPM, 2 minutes.
+
+| Mesure | Résultat |
+|---|---|
+| BPM lu | 145,0 / 145,1 puis 151,0 / 151,1 ; recalé en une seconde après un changement |
+| Arrivée des ticks vs prévision | 0,22 à 0,38 ms rms, p99 0,44 ms ; rares pics isolés (max 12,8 ms, un tick) |
+| Envoi vs cible | moyenne +0,13 ms, 0,17 ms rms, p99 0,72 ms, max 1,47 ms, 464 envois, aucun abandon |
+| Durée de `send()` vers la DT2 | 0,06 ms en moyenne, p99 0,22 ms |
+| Oreille | perc du Pi pile avec le kick de la DT2, pas de flam |
+
+- Premier banc à 1,8 ms rms et +1,3 ms de retard : macOS réveille tard les
+  longues attentes (jusqu'à 3,6 ms). Corrigé par des attentes découpées en
+  tranches de 2 ms et 2 ms d'attente active avant la cible.
+- L'attente active doit céder le GIL (`time.sleep(0)`) : sinon le callback
+  MIDI horodate en retard et la gigue d'arrivée triple (0,63 ms rms).
+- Cible SPEC (0,3 ms) tenue en rms, pas au p99 (0,72 ms) : sans effet
+  audible ; à remesurer sur le Pi (slice 7).
 
 ## Références
 
