@@ -1,0 +1,48 @@
+[project]
+name = "mk-brain"
+version = "0.1.0"
+description = "Maschine MK2 en HID brut devant la Digitakt II (Raspberry Pi, prototype Mac)"
+requires-python = ">=3.12"
+dependencies = [
+    "hidapi>=0.14",
+    "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[project.scripts]
+mk-brain = "mk_brain.main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]  # typographie française (×, ’, «»)
+
+[tool.mypy]
+strict = true
+python_version = "3.12"
+mypy_path = "src"
+
+[[tool.mypy.overrides]]
+module = ["hid"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["hardware: nécessite la MK2 branchée (non lancé par défaut)"]
+addopts = "-m 'not hardware'"

@@ -36,3 +36,7 @@ refs/*.pdf
 
 # Packs de presets achetés (contenu sous licence, non redistribuable)
 digitakt/presets/
+
+# mk-brain
+mk-brain/.venv/
+mk-brain/src/*.egg-info/
