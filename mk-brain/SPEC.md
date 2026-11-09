@@ -448,20 +448,20 @@ jour** : chaque valeur s'affiche juste au-dessus de son encodeur. Les deux
 
 ```
 écran gauche                              écran droit
-E04  143.0 ▶  Q16 SW50                    25 / 32   phrase 1   cap 32 : -8
-T07  ch7                                  [████████|████████|████████|██░░]
+E04  143.0 ▶  Q16 SW50                    25 / 32 (gros)       phrase 1
+T07  ch7 (gros)                                                cap 32 : -8
+                                          [████████|████████|████████|██░░]
 ----------------------------------------  ---------------------------------
-CUT      RES      ENV      DEC            LVL      PAN      DLY      REV
-74       64       64       64             64       59       64       64
-[███░]   [██░░]   [██░░]   [██░░]         [██░░]   [─|─]    [██░░]   [██░░]
+CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [██░] PAN [─|─] DLY [██░] REV [██░]
+74         64         64         64       64        59        64        64
 ```
 
-- tiers supérieur (21 px) = bandeau ; dessous, 4 colonnes de 64 px par
-  écran, encodeurs 1-4 à gauche, 5-8 à droite : nom, valeur en gros
-  (`~` hors prise), jauge (le pan depuis le centre, `bipolar` dans la
-  page d'encodeurs) ; colonne touchée inversée 1 s ;
+- deux tiers supérieurs (40 px) = bandeau ; dessous, 4 colonnes de 64 px
+  par écran, encodeurs 1-4 à gauche, 5-8 à droite : nom et jauge sur une
+  ligne, valeur dessous (`~` hors prise) ; le pan depuis le centre
+  (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
 - bandeau gauche : pattern, BPM, lecture / arrêt dessinés, quantize,
-  swing ; 2e ligne : track sélectionnée (`MUTE` si mutée ; en design
+  swing ; 2e ligne en gros (réduite si le texte est long) : track sélectionnée (`MUTE` si mutée ; en design
   `-> AUTO ch16`), remplacée par le geste ou la frappe le plus récent
   (1,5 s / 1 s ; frappe = track et vélocité, nom du sample avec les
   projets) ou par une alerte (`pas de clock`, `TRANSFER OUVERT ?`) ;

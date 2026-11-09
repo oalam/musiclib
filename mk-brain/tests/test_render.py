@@ -25,7 +25,7 @@ def test_countdown_inverts_right_band(cfg: Config) -> None:
 
 
 def test_tail_inverts_progress_bar(cfg: Config) -> None:
-    probe = (1, 11)  # à gauche de la barre, sous le texte
+    probe = (1, 25)  # à gauche de la barre de progression
     assert not render.right(at_bar(cfg, 20), 0).getpixel(probe)
     assert render.right(at_bar(cfg, 29), 0).getpixel(probe)  # 4 dernières mesures
 

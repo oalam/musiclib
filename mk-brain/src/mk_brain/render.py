@@ -2,8 +2,9 @@
 
 Pur : le moteur et l'instant sont passés par l'appelant, rien n'est envoyé.
 Disposition (revue le 2026-11-09 à l'essai) : chaque écran a un bandeau
-(tiers supérieur) et, dessous, 4 colonnes de 64 px, une au-dessus de chaque
-encodeur (1-4 sous l'écran gauche, 5-8 sous le droit).
+(deux tiers supérieurs) et, dessous, 4 colonnes de 64 px, une au-dessus de
+chaque encodeur (1-4 sous l'écran gauche, 5-8 sous le droit) : nom et jauge
+sur une ligne, valeur dessous.
 - Bandeau gauche : pattern, BPM, transport, quantize, swing ; puis track
   sélectionnée, ou dernier geste / frappe, ou alerte.
 - Bandeau droit : mesure / longueur, phrase, cap ; barre de progression,
@@ -30,13 +31,14 @@ if TYPE_CHECKING:
 
 OVERLAY_NS = 1_000_000_000  # frappe d'un pad, colonne touchée : 1 s
 MESSAGE_NS = 1_500_000_000  # dernier geste de contrôle dans le bandeau gauche
-BAND = 21  # hauteur du bandeau (tiers supérieur)
+BAND = 40  # hauteur du bandeau (deux tiers supérieurs) ; faders dessous
 COLS = 4  # colonnes de fader par écran
 COL = WIDTH // COLS
 SMALL = 12
-VALUE = 18
-DIVISION = 16
-COUNTDOWN = 26
+LINE_SIZES = (20, 16, 12)  # 2e ligne du bandeau gauche : la plus grande qui tient
+BAR = 24  # mesure / longueur
+DIVISION = 20
+COUNTDOWN = 40
 
 Font = ImageFont.FreeTypeFont | ImageFont.ImageFont
 Box = tuple[int, int, int, int]
@@ -56,6 +58,14 @@ def _centered(d: ImageDraw.ImageDraw, box: Box, text: str, font: Font, ink: int)
     x = box[0] + (box[2] - box[0] - (right - left)) // 2 - left
     y = box[1] + (box[3] - box[1] - (bottom - top)) // 2 - top
     d.text((x, y), text, font=font, fill=ink)
+
+
+def _fit(d: ImageDraw.ImageDraw, text: str, width: int) -> Font:
+    for size in LINE_SIZES:
+        font = _font(size)
+        if d.textlength(text, font=font) <= width:
+            return font
+    return _font(LINE_SIZES[-1])
 
 
 def _transport(d: ImageDraw.ImageDraw, x: int, y: int, running: bool) -> None:
@@ -112,10 +122,8 @@ def _left_band(
         recent.append((at, f"{label}  vel {vel}"))
     if recent:
         line = max(recent)[1]
-    if warn:
-        _bold(d, (3, 8), warn, small, 1)
-    else:
-        d.text((3, 8), line, font=small, fill=1)
+    text = warn or line
+    _bold(d, (3, 15), text, _fit(d, text, WIDTH - 8), 1)
 
 
 def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
@@ -123,23 +131,24 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
     st = engine.phrase_state
     if st is not None and st.countdown is not None:  # bandeau inversé, compte à rebours
         d.rectangle((0, 0, WIDTH - 1, BAND - 1), fill=1)
-        for dx in (0, 1):  # gras, centré dans le bandeau
-            _centered(d, (4 + dx, 0, 64 + dx, BAND - 1), str(st.countdown), _font(COUNTDOWN), 0)
-        d.text((70, 1), f"cap {st.cap}     {st.bar} / {st.length}", font=small, fill=0)
+        for dx in (0, 1):  # gras, centré dans la moitié gauche
+            box = (dx, 0, WIDTH // 2 + dx, BAND - 1)
+            _centered(d, box, str(st.countdown), _font(COUNTDOWN), 0)
+        d.text((WIDTH // 2 + 8, 4), f"cap {st.cap}", font=_font(16), fill=0)
+        d.text((WIDTH // 2 + 8, 22), f"{st.bar} / {st.length}", font=_font(16), fill=0)
         return
-    if st is None:
-        _bold(d, (3, -3), f"-- / {engine.phrase.length}", small, 1)
-    else:
-        _bold(d, (3, -3), f"{st.bar} / {st.length}", small, 1)
-        d.text((80, -3), f"phrase {st.phrase}", font=small, fill=1)
-        d.text((165, -3), f"cap {st.cap} : -{st.to_cap}", font=small, fill=1)
+    bar = "--" if st is None else str(st.bar)
+    _bold(d, (3, -4), f"{bar} / {engine.phrase.length}", _font(BAR), 1)
+    if st is not None:
+        d.text((150, -3), f"phrase {st.phrase}", font=small, fill=1)
+        d.text((150, 9), f"cap {st.cap} : -{st.to_cap}", font=small, fill=1)
     # barre : une case par mesure, séparateurs tous les 8 ; 4 dernières en vidéo inverse
     length = engine.phrase.length
-    top, bottom, left, right = 12, 17, 2, WIDTH - 3
+    top, bottom, left, right = 27, 35, 2, WIDTH - 3
     cell = (right - left) / length
     tail = st is not None and st.tail
     if tail:
-        d.rectangle((0, top - 2, WIDTH - 1, bottom + 2), fill=1)
+        d.rectangle((0, top - 3, WIDTH - 1, bottom + 3), fill=1)
     ink = 0 if tail else 1
     d.rectangle((left, top, right, bottom), outline=ink)
     if st is not None:
@@ -151,7 +160,7 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
 
 def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> None:
     """Les 4 faders au-dessus des encodeurs de cet écran."""
-    small, value_font = _font(SMALL), _font(VALUE)
+    small = _font(SMALL)
     touched = None
     if engine.last_touch is not None and now - engine.last_touch[1] < OVERLAY_NS:
         touched = engine.last_touch[0] - 1
@@ -165,9 +174,9 @@ def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> No
         if k == touched:
             d.rectangle((x, BAND + 1, x + COL - 2, HEIGHT - 1), fill=1)
             ink = 0
-        d.text((x + 4, BAND + 1), f.name, font=small, fill=ink)
-        _bold(d, (x + 4, BAND + 9), f"{'~' if f.stale else ''}{f.value}", value_font, ink)
-        top, bottom, left, right = 55, 61, x + 4, x + COL - 7
+        d.text((x + 3, BAND), f.name, font=small, fill=ink)
+        d.text((x + 3, BAND + 10), f"{'~' if f.stale else ''}{f.value}", font=small, fill=ink)
+        top, bottom, left, right = BAND + 5, BAND + 11, x + 33, x + COL - 5
         d.rectangle((left, top, right, bottom), outline=ink)
         end = left + round((right - left) * f.value / 127)
         if page[k].bipolar:  # pan : depuis le centre (64)
