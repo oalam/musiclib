@@ -610,13 +610,16 @@ def test_announce_only_on_bank_change(cfg: Config, project: Project) -> None:
     assert eng.announce is not None and eng.announce[0] == "F-MENTAL"
 
 
-def test_design_ignores_program_change_for_context(cfg: Config, project: Project) -> None:
+def test_design_follows_dt2_bank_change(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_A")
-    eng.on_program_change(4 * 16)  # E01 reçu en design
+    eng.on_program_change(4 * 16)  # E01 reçu en design : banque E, comme GROUP E
+    assert eng.context is not None and eng.context[0] == "E-TRIBE"
+    assert eng.announce is None  # la fiche est déjà à l'écran en design
+    btn(eng, "GROUP_A")  # choix à la main
+    eng.on_program_change(4 * 16 + 1)  # E02 : même banque, le choix tient
     assert eng.context is not None and eng.context[0] == "A-HALF"
-    assert eng.announce is None
-    assert eng.live_sheet is not None and eng.live_sheet[0] == "E-TRIBE"
+    eng.on_program_change(7 * 16)  # H01 : banque absente du projet, rien ne change
+    assert eng.context is not None and eng.context[0] == "A-HALF"
 
 
 # --- slice 6.C : sélection de projet --------------------------------------------

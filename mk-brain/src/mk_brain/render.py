@@ -233,17 +233,25 @@ def _design_left(
 
 
 def _design_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
-    """Fiche de la banque (clé, tempo, tonique, mode, titre) ; phrase en petit dessous."""
+    """Fiche de la banque (clé, tempo, tonique, mode, titre) ; pattern en cours en gros
+    en haut à droite (demandé le 2026-11-09) ; phrase en petit dessous."""
     small, mid = _font(SMALL), _font(16)
+    pattern = engine.phrase.pattern or "---"
+    big = _font(BIG)
+    pw = int(d.textlength(pattern, font=big))
+    _bold(d, (WIDTH - pw - 4, -6), pattern, big, 1)
+    room = WIDTH - pw - 12  # largeur laissée à la fiche, à gauche du pattern
     sheet = engine.sheet
     octave = f"  oct {engine.octave:+d}" if engine.octave else ""
     if sheet is None:
         d.text((3, 2), "no project" + octave, font=mid, fill=1)
     else:
         key, bank = sheet
-        _bold(d, (3, -3), f"{key}  {bank.tempo:g}{octave}", mid, 1)
+        head = f"{key}  {bank.tempo:g}{octave}"
+        _bold(d, (3, -3), head, _fit(d, head, room, (16, 12)), 1)
         tonic, mode = FLAT_NAMES[bank.tonic], engine.cfg.scale(bank.mode).name
-        d.text((3, 12), ascii_text(f"{tonic} {mode} - {bank.title}"), font=small, fill=1)
+        line = ascii_text(f"{tonic} {mode} - {bank.title}")
+        d.text((3, 12), line, font=_fit(d, line, room, (12, 10, 9)), fill=1)
     st = engine.phrase_state
     length = engine.phrase.length
     bar = "--" if st is None else str(st.bar)

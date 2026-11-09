@@ -3,6 +3,19 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.16.0] - 2026-11-09
+
+### Ajouté
+
+- [6] Design : pattern en cours en gros en haut à droite de l'écran droit.
+
+### Modifié
+
+- [6] Design : un Program Change d'une autre banque choisit la banque du
+  design comme GROUP (octave à 0, phrase de la banque à la barre) ; un
+  autre pattern de la même banque garde le choix fait à la main. Avant,
+  le PC était sans effet en design.
+
 ## [0.15.3] - 2026-11-09
 
 ### Corrigé

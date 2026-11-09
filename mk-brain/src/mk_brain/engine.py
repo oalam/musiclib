@@ -365,7 +365,9 @@ class Engine:
         suivante (arrêté : compteur inchangé).
 
         En live, la banque du projet suit le PC (slice 6.B) : sa phrase s'applique avec la
-        remise (arrêté : tout de suite), son titre s'annonce si la banque change.
+        remise (arrêté : tout de suite), son titre s'annonce si la banque change. En design,
+        un PC d'une autre banque la choisit comme GROUP (demandé le 2026-11-09) ; un autre
+        pattern de la même banque laisse le choix fait à la main.
         """
         if program != self.last_program:
             self.faders.pattern_changed()
@@ -376,7 +378,14 @@ class Engine:
         self.bank = program // 16
         self._requested = None  # la DT2 a répondu
         length: int | None = None
-        if not self.design:
+        if self.design:
+            found = None if self.project is None else self.project.bank(program // 16)
+            if new_bank and found is not None and self.project is not None:
+                self.design_bank, self._design_phrase, self.octave = program // 16, None, 0
+                length = self.project.phrase(found[1])
+                self.last_control = f"{found[0]} (DT2)"
+                self.leds_dirty = True
+        else:
             sheet = self.live_sheet
             length = self._live_phrase()
             if new_bank and sheet is not None:

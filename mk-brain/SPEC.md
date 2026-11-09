@@ -180,7 +180,7 @@ la slice 7**.
 | | **Live** | **Design** |
 |---|---|---|
 | Objectif | jouer le set, lire d'un coup d'œil, zéro fausse manœuvre | préparer les patterns sur la DT2 : enregistrer des mélodies et des mouvements de paramètres en LIVE REC |
-| Contexte (banque, gamme, phrase) | suit la DT2 : Program Change reçu → banque et pattern → réglages de la banque dans le projet | choisi à la main dans le menu ; Program Change reçu affiché mais sans effet |
+| Contexte (banque, gamme, phrase) | suit la DT2 : Program Change reçu → banque et pattern → réglages de la banque dans le projet | choisi à la main (GROUP) ; un Program Change d'une autre banque la choisit aussi (2026-11-09) |
 | Quantize du Pi | active, au réglage par défaut du projet | coupée par défaut (la DT2 quantize déjà en LIVE REC), activable |
 | Pads | rythmique : pad n = track n ; SELECT / MUTE / PATTERN + pad | toute disposition, au choix par le menu ; sélection de track et de canal |
 | Encodeurs | les 8 faders de la track sélectionnée (SELECT + pad), sur son canal, soft-takeover | pages de paramètres de la track ; les mouvements partent en CC sur l'AUTO CHANNEL et s'enregistrent comme p-locks de la track active si la DT2 est en LIVE REC (vérifié le 2026-11-09) |
@@ -215,8 +215,10 @@ la slice 7**.
     valeurs des encodeurs tenues sous la track sélectionnée ; rappel
     `DT2 en LIVE REC ?` au premier mouvement de chaque passage en design ;
   - Program Change reçu en design : banque de PATTERN + pad, faders hors
-    prise et mesure 1 comme en live (faits de la DT2) ; seuls les réglages
-    de banque du projet (slice 6) n'en dépendent pas ;
+    prise et mesure 1 comme en live (faits de la DT2) ; depuis le
+    2026-11-09, un PC d'une **autre banque** choisit aussi la banque du
+    design (comme GROUP : octave à 0, phrase de la banque à la barre) ; un
+    autre pattern de la même banque laisse le choix fait à la main ;
   - bandeau `DESIGN` et cadre de l'écran gauche dès 5.B ; couleurs des pads
     hors gamme et pages complètes : 5.C et 5.D ; `demarrage: design` avec
     les projets (slice 6).
@@ -656,8 +658,10 @@ divisions du repeat ; faders inchangés.
   la track et son code ; sinon le dernier geste (1,5 s), une alerte ou les
   mutes ;
 - écran droit : fiche de la banque (clé, tempo, tonique en bémols, mode,
-  titre), `pas de projet` sans projet ; phrase en petit, sans compte à
-  rebours en gros ;
+  titre), `pas de projet` sans projet ; **pattern en cours en gros en haut
+  à droite** (`E04`, demandé le 2026-11-09), la fiche rétrécit sa police
+  pour lui laisser la place ; phrase en petit, sans compte à rebours en
+  gros ;
 - noms courts des dispositions pour tenir sous un bouton (Chroma, Min.
   harm., Penta min.).
 
