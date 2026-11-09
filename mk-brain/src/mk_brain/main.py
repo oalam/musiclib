@@ -1,4 +1,4 @@
-"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-2, pads → DT2), `clock` (slice 2)."""
+"""CLI mk-brain : `spike` (slice 0, HID), `play` (slices 1-3, pads → DT2), `clock` (slice 2)."""
 
 from __future__ import annotations
 
@@ -168,26 +168,28 @@ def _clock_line(clock: ClockTracker) -> str:
 
 def cmd_play(dry_run: bool) -> int:
     from mk_brain.config import load_config
-    from mk_brain.engine import Engine, MidiOut
+    from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
     from mk_brain.midi_io import Dt2In, Dt2Out, feed_clock
+    from mk_brain.scheduler import Scheduler
 
     cfg = load_config()
-    engine = Engine(cfg)
     clock = ClockTracker()
+    engine = Engine(cfg, clock)
     decoder = InputDecoder(pad_threshold=cfg.velocity.threshold)
     out = None if dry_run else Dt2Out.open(cfg.midi.port_hint)
     inp = None if dry_run else Dt2In.open(cfg.midi.port_hint)
+    sched: Scheduler[MidiOut] | None = Scheduler(out.send) if out is not None else None
     dev = Mk2Device.open()
     last = "-"
     shown: tuple[object, ...] = ()
-    last_draw = 0.0
+    last_draw = 0
 
-    def emit(msgs: list[MidiOut]) -> None:
+    def emit(msgs: list[Timed]) -> None:
         nonlocal last
-        for m in msgs:
-            if out is not None:
-                out.send(m)
+        for t, m in msgs:
+            if sched is not None:
+                sched.at(t, m)  # un seul fil écrit sur le port, même pour l'immédiat
         if msgs and engine.last_played is not None:
             pad, note, vel = engine.last_played
             text = f"{describe_note(cfg.layouts[engine.group], pad, note)} vel {vel}"
@@ -197,10 +199,12 @@ def cmd_play(dry_run: bool) -> int:
 
     print(f"play : {'essai sans DT2' if dry_run else 'DT2'} ; GROUP A-H = disposition ; Ctrl-C")
     try:
+        if sched is not None:
+            sched.start()
         _show(dev, 1, display.new_image())
         while True:
             report = dev.read(timeout_ms=1)
-            now = time.perf_counter()
+            now = time.perf_counter_ns()
             if inp is not None:
                 for ev in inp.drain():
                     feed_clock(clock, ev)
@@ -210,12 +214,17 @@ def cmd_play(dry_run: bool) -> int:
             if engine.leds_dirty:
                 dev.send_leds(engine.leds())
             lay = cfg.layouts[engine.group]
-            warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(time.perf_counter_ns()) else ""
+            warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
                 warn = warn or "pas de clock : CLOCK SEND ?"
-            state = (lay.group, _clock_line(clock), last, warn)
-            if state != shown and now - last_draw > 0.1:
-                _show(dev, 0, display.text_image([f"{lay.group}  {lay.name}", *state[1:]]))
+            big = engine.division if engine.repeat_held else None
+            state = (lay.group, _clock_line(clock), engine.status(), last, warn, big)
+            if state != shown and now - last_draw > 100_000_000:
+                if big is not None:
+                    _show(dev, 0, display.big_text_image(big))
+                else:
+                    lines = [f"{lay.group}  {lay.name}", _clock_line(clock), engine.status(), last]
+                    _show(dev, 0, display.text_image([*lines, warn]))
                 shown, last_draw = state, now
     except KeyboardInterrupt:
         pass
@@ -226,11 +235,15 @@ def cmd_play(dry_run: bool) -> int:
                 _show(dev, s, display.new_image())
         finally:
             dev.close()
+            if sched is not None:
+                sched.close()
             if out is not None:
                 out.close()
             if inp is not None:
                 inp.close()
     print(f"clock, écart d'arrivée des ticks à la prévision : {clock.prediction_error.summary()}")
+    if sched is not None:
+        print(f"envoi vs cible : {sched.errors.summary()} ; abandonnés : {sched.dropped}")
     return 0
 
 

@@ -286,7 +286,9 @@ mkbrain:
 - Modes : `off`, `1/16`, `1/8`, globaux, réglables à la volée par un bouton.
   Quantize par pad : **à arbitrer** (question ouverte 3).
 - « Nearest » : pression dans les 3 premiers ticks après un pas → envoi
-  immédiat ; sinon → au pas suivant. Retard maximum d'un 16ᵉ = 105 ms à
+  immédiat ; sinon → au pas suivant. En 1/8 : 6 ticks (la moitié du pas).
+  L'instant pris en compte est celui de la frappe, pas la fin de la fenêtre
+  de vélocité. Retard maximum d'un 16ᵉ = 105 ms à
   143 BPM (60 / 143 / 4 = 0,105 s), d'un demi-16ᵉ en moyenne.
 - Swing : décalage des 16ᵉ impairs d'un pourcentage réglable (50-75 %),
   à caler à la main sur celui de la DT2, qui ne le transmet pas.
@@ -296,7 +298,10 @@ mkbrain:
 ### Note repeat
 
 - Pad maintenu + bouton repeat (NOTE REPEAT de la MK2) : répétition à 1/8,
-  1/16, 1/32, triolets (1/8T, 1/16T), calée sur la grille d'horloge.
+  1/16, 1/32, triolets (1/8T, 1/16T), calée sur la grille d'horloge. Premier
+  coup sur la division la plus proche (règle « nearest »), puis un coup par
+  division ; durée de chaque coup = moitié de la division. Transport
+  arrêté : pas de repeat, le pad joue une fois.
 - Vélocité de chaque coup = pression courante du pad (aftertouch MK2).
   Pression vers un CC (filtre) : **à arbitrer** (question ouverte 4).
 - Division courante en gros caractères sur l'écran gauche pendant le maintien.
@@ -535,7 +540,7 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 à 2 faites le 2026-11-09, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 à 2 faites le 2026-11-09, slice 3 en cours, les suivantes à venir. L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
@@ -543,7 +548,7 @@ conditionne tout le reste.
 | 0 | **Spike HID sur Mac** : ouvrir la MK2 sans NI, lire pads, boutons, encodeurs ; allumer une LED ; afficher une mire sur chaque écran | une mire nette sur les deux écrans, tous les contrôles décodés et listés | fait 2026-11-09 : mire nette, 48 boutons, 16 pads, 9 encodeurs |
 | 1 | **Relais pads → DT2** : dispositions A-H, couleurs, vélocité, sans horloge | la page A joue les tracks 1-16, les groupes changent de gamme, LED justes | fait 2026-11-09 : tracks 1-16 en A, gamme du groupe C jouée sur la track active (9) |
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
-| 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | à venir |
+| 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | en cours : code prêt (`mk-brain play`), essai sur la DT2 à faire |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | à venir |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | à venir |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |

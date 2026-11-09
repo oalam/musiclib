@@ -120,7 +120,7 @@ class ClockTracker:
         p = self.period_ns
         return round(60e9 / (TICKS_PER_BEAT * p), 1) if p else None
 
-    def tick_time(self, index: int) -> float | None:
+    def tick_time(self, index: float) -> float | None:
         """Instant prévu du tick d'index absolu `index`."""
         if self._fit is None:
             return None
@@ -143,7 +143,14 @@ class ClockTracker:
             step=k % TICKS_PER_BEAT // TICKS_PER_STEP + 1,
         )
 
-    def position_time(self, ticks_since_start: int) -> float | None:
+    def ticks_at(self, t_ns: int) -> float | None:
+        """Position fractionnaire (ticks depuis le Start) à l'instant `t_ns`."""
+        if self._fit is None or self._start_index is None or not self.running:
+            return None
+        xm, tm, slope = self._fit
+        return xm + (t_ns - tm) / slope - self._start_index
+
+    def position_time(self, ticks_since_start: float) -> float | None:
         """Instant prévu d'une position (en ticks depuis le Start)."""
         if self._start_index is None:
             return None

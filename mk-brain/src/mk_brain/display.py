@@ -76,3 +76,15 @@ def text_image(lines: list[str]) -> Image.Image:
     for i, line in enumerate(lines[-5:]):
         d.text((2, 1 + 12 * i), line, font=font, fill=1)
     return img
+
+
+def big_text_image(text: str, size: int = 44) -> Image.Image:
+    """Texte en très gros, centré (division du note repeat, compte à rebours)."""
+    img = new_image()
+    d = ImageDraw.Draw(img)
+    font = ImageFont.load_default(size=size)
+    left, top, right, bottom = d.textbbox((0, 0), text, font=font)
+    x = (WIDTH - (right - left)) // 2 - left
+    y = (HEIGHT - (bottom - top)) // 2 - top
+    d.text((x, y), text, font=font, fill=1)
+    return img

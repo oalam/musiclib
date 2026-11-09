@@ -3,6 +3,23 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [Non publié]
+
+### Ajouté
+
+- [3] `quantize.py` : quantize « nearest » 1/16 et 1/8 (moitié du pas =
+  immédiat), swing 50-75 % sur les 16ᵉ impairs.
+- [3] `repeat.py` : 8 divisions du note repeat (1/4 à 1/64, triolets).
+- [3] Moteur : messages datés confiés à l'ordonnanceur ; GRID fait défiler
+  off / 1/16 / 1/8 ; SWING + encodeur maître règle le swing ; NOTE REPEAT
+  tenu + pad = repeat, vélocité = pression courante, boutons d'écran 1-8 =
+  division, SHIFT + NOTE REPEAT verrouille ; note off jamais avant sa note
+  on quantizée ; LED GRID, SWING, NOTE REPEAT et division.
+- [3] `play` : état `Q16 SW50 R1/16` à l'écran gauche, division en très
+  gros pendant NOTE REPEAT ; section `play:` de la config (réglages de
+  départ).
+- [3] `ClockTracker.ticks_at` : position fractionnaire d'un instant.
+
 ## [0.3.1] - 2026-11-09
 
 ### Modifié
