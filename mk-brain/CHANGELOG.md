@@ -3,6 +3,21 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.8.0] - 2026-11-09
+
+### Ajouté
+
+- [5] 5.C `render.py` : écran gauche live (pattern, BPM, transport,
+  quantize, swing, mesure / longueur en gros, phrase, cap, barre de
+  mesures par blocs de 8 inversée dans les 4 dernières, temps, alerte).
+- [5] 5.C Écran droit : 8 faders de la track sélectionnée (nom, valeur,
+  `~` hors prise, jauge, pan depuis le centre), colonne touchée inversée
+  1 s, dernier geste de contrôle en tête 1,5 s ; superpositions par
+  priorité : bascule de mode, division du repeat, compte à rebours,
+  frappe d'un pad (track et vélocité, 1 s).
+- [5] 5.C `play` : écrans redessinés au plus toutes les 50 ms, envoyés
+  seulement s'ils changent ; config `encoders.page[].bipolar`.
+
 ## [0.7.1] - 2026-11-09
 
 ### Corrigé

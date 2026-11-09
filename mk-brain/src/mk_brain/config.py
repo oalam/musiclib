@@ -60,6 +60,7 @@ class PlayConfig(BaseModel):
 class Encoder(BaseModel):
     name: str = Field(max_length=4)
     cc: int = Field(ge=0, le=127)
+    bipolar: bool = False  # jauge depuis le centre (pan)
 
 
 class EncodersConfig(BaseModel):

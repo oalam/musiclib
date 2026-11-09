@@ -442,6 +442,26 @@ mode et le nom devient la vraie note (tonique + degré).
    viennent du projet (samples par banque et track du JSON), la DT2 ne les
    renvoie pas.
 
+**Fait le 2026-11-09 (slice 5.C, `render.py`), écarts aux maquettes** :
+
+- écran gauche live : pattern, BPM, lecture / arrêt dessinés, quantize,
+  swing ; `mesure / longueur` en gros, `phrase n` et `cap 32 : -6` à
+  droite ; barre d'une case par mesure, séparée tous les 8, cadre et
+  barre en vidéo inverse dans les 4 dernières mesures ; 4 ronds pour les
+  temps ; alerte (`pas de clock`, `TRANSFER OUVERT ?`) en gras en bas. La
+  banque, sa tonique et son mode s'ajouteront avec les projets (slice 6) ;
+- écran droit : en-tête `T07  ch7` (`MUTE` si mutée ; en design
+  `-> AUTO ch16`), remplacé 1,5 s par le dernier geste de contrôle ;
+  8 colonnes nom / valeur (`~` hors prise) / jauge, le pan depuis le
+  centre (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
+- superpositions, par priorité : proposition de bascule de mode, division
+  du repeat (NOTE REPEAT tenu ou pad qui répète), compte à rebours,
+  frappe d'un pad 1 s (`T07 96` : track et vélocité ; nom du sample avec
+  les projets) ;
+- rafraîchi au plus toutes les 50 ms dans la boucle principale, envoyé
+  seulement si l'image change ; 0,7 ms la paire d'écrans sur le Mac. Si
+  le Pi est trop lent, passer au fil de rendu dédié (slice 7).
+
 **Design, écran gauche : ce qui part vers la DT2**
 ```
 ╔DESIGN═ E-TRIBE ═ T10 acid ═ ch11 ═══════╗
@@ -614,7 +634,7 @@ conditionne tout le reste.
 | 2 | **Horloge** : suivi, PLL, BPM, transport, détection Transfer ; banc de mesure de gigue | BPM juste à 0,1 près, gigue d'envoi mesurée et notée | fait 2026-11-09 : BPM à 0,1 près (145, 151), envoi 0,17 ms rms, pas de flam à l'oreille |
 | 3 | **Quantize + note repeat + swing** | à 143 BPM, des frappes volontairement décalées tombent sur la grille de la DT2, à l'oreille et à l'enregistrement LIVE | fait 2026-11-09 : frappes avant le pas posées sur la grille ; frappes après le pas envoyées tout de suite (règle « nearest »), donc à quantizer par la DT2 en LIVE REC (critère précisé le 2026-11-09) |
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
-| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite le 2026-11-09, à essayer sur la MK2 ; 5.C écrans live et superpositions ; 5.D design (menus ; GROUP en design à trancher) |
+| 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite le 2026-11-09, à essayer sur la MK2 ; 5.C écrans live et superpositions, faite le 2026-11-09, à essayer sur la MK2 ; 5.D design (menus ; GROUP en design à trancher) |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | à venir |
 | 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
 

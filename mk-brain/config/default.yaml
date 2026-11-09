@@ -32,7 +32,7 @@ encoders:
     - {name: ENV, cc: 77}    # profondeur d'enveloppe du filtre
     - {name: DEC, cc: 81}    # decay d'amp
     - {name: LVL, cc: 95}    # niveau de track
-    - {name: PAN, cc: 90}
+    - {name: PAN, cc: 90, bipolar: true}
     - {name: DLY, cc: 84}    # envoi delay
     - {name: REV, cc: 85}    # envoi reverb
 

@@ -7,7 +7,7 @@ import sys
 import time
 from typing import TYPE_CHECKING
 
-from mk_brain import display
+from mk_brain import display, render
 from mk_brain.clock import ClockTracker
 from mk_brain.config import ConfigError
 from mk_brain.hid_mk2 import (
@@ -32,13 +32,14 @@ from mk_brain.hid_mk2 import (
 from mk_brain.midi_io import MidiError
 
 if TYPE_CHECKING:
-    from mk_brain.engine import Engine
+    pass
 
 RAINBOW: list[tuple[int, int, int]] = [
     (255, 0, 0), (255, 128, 0), (255, 255, 0), (0, 255, 0),
     (0, 255, 255), (0, 0, 255), (128, 0, 255), (255, 0, 255),
 ]  # fmt: skip
 OFF = (0, 0, 0)
+FRAME_NS = 50_000_000  # écrans redessinés au plus toutes les 50 ms, envoyés s'ils changent
 
 
 def cmd_list() -> int:
@@ -170,21 +171,6 @@ def _clock_line(clock: ClockTracker) -> str:
     return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
 
 
-def _phrase_screen(engine: Engine) -> tuple[str, int]:
-    """Écran droit de `play` : mesure / longueur, ou -2 / -1 avant un cap ;
-    proposition de bascule de mode en attente (taille 0 = texte courant)."""
-    if engine.modes.pending is not None:
-        return (f"-> {engine.modes.pending.upper()} ?", 0)
-    st = engine.phrase_state
-    if st is None:
-        return ("-", 44)
-    if st.countdown is not None:
-        return (str(st.countdown), 60)
-    pat = engine.phrase.pattern
-    mark = "*" if st.tail else ""
-    return (f"{st.bar}/{st.length}{mark} {pat}" if pat else f"{st.bar}/{st.length}{mark}", 32)
-
-
 def cmd_play(dry_run: bool) -> int:
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
@@ -201,8 +187,8 @@ def cmd_play(dry_run: bool) -> int:
     sched: Scheduler[MidiOut] | None = Scheduler(out.send) if out is not None else None
     dev = Mk2Device.open()
     last = "-"
-    shown: tuple[object, ...] = ()
-    shown_right: tuple[object, ...] = ()
+    message: tuple[str, int] | None = None  # dernier geste de contrôle, en tête de l'écran droit
+    shown: list[bytes] = [b"", b""]  # dernière image envoyée par écran
     last_draw = 0
 
     def emit(msgs: list[Timed]) -> None:
@@ -240,6 +226,7 @@ def cmd_play(dry_run: bool) -> int:
             emit(engine.tick(now))
             if engine.last_control:
                 last = engine.last_control
+                message = (last, now)
                 print(last)
                 engine.last_control = ""
             for line in engine.log:
@@ -247,32 +234,24 @@ def cmd_play(dry_run: bool) -> int:
             engine.log.clear()
             if engine.leds_dirty:
                 dev.send_leds(engine.leds())
-            lay = engine.layout
+            if now - last_draw < FRAME_NS:
+                continue
+            last_draw = now
             warn = "TRANSFER OUVERT ?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
-                warn = warn or "pas de clock : CLOCK SEND ?"
-            big = engine.division if engine.repeat_held else None
-            mode = engine.modes.mode
-            state = (mode, lay.group, _clock_line(clock), engine.status(), last, warn, big)
-            if state != shown and now - last_draw > 100_000_000:
-                if big is not None:
-                    _show(dev, 0, display.big_text_image(big))
-                else:
-                    head = f"{lay.group}  {lay.name}"
-                    if engine.design:  # bandeau et cadre permanents : jamais confondu avec live
-                        head = f"DESIGN  {head}"
-                    lines = [head, _clock_line(clock), engine.status(), last, warn]
-                    img = display.text_image(lines, bold=frozenset({0, 4}), framed=engine.design)
-                    _show(dev, 0, img)
-                shown, last_draw = state, now
-            right = _phrase_screen(engine)
-            if right != shown_right:
-                if right[1] == 0:
-                    lines = ["", right[0], "appui encodeur maître", "autre bouton : annuler"]
-                    _show(dev, 1, display.text_image(lines, bold=frozenset({1})))
-                else:
-                    _show(dev, 1, display.big_text_image(right[0], size=right[1]))
-                shown_right = right
+                warn = warn or "pas de clock"
+            if engine.design:  # bandeau et cadre permanents : jamais confondu avec live (5.D)
+                lay = engine.layout
+                lines = [f"DESIGN  {lay.group}  {lay.name}", _clock_line(clock), engine.status()]
+                left = display.text_image([*lines, last, warn], bold=frozenset({0, 4}), framed=True)
+            else:
+                left = render.live_left(engine, warn)
+            for screen, img in enumerate((left, render.right(engine, now, message))):
+                frame = display.image_to_frame(img)
+                if frame != shown[screen]:
+                    for report in display.frame_reports(screen, frame):
+                        dev.write(report)
+                    shown[screen] = frame
     except KeyboardInterrupt:
         pass
     finally:

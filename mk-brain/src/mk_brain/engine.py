@@ -134,6 +134,8 @@ class Engine:
         self.bank: int | None = None  # banque de PATTERN + pad : PC reçu ou PATTERN + GROUP
         self.last_control = ""  # dernier geste de contrôle, pour l'écran
         self._consumed: set[int] = set()  # pads frappés avec un modificateur
+        self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
+        self.last_hit: tuple[int, int, int] | None = None  # (pad, vélocité, instant) pour l'écran
 
     @property
     def design(self) -> bool:
@@ -154,6 +156,11 @@ class Engine:
     @property
     def running(self) -> bool:
         return self.clock.ticks_since_start is not None
+
+    @property
+    def repeating(self) -> bool:
+        """Un pad au moins répète (note repeat en cours)."""
+        return bool(self._repeats)
 
     @property
     def repeat_active(self) -> bool:
@@ -184,6 +191,7 @@ class Engine:
         active de la DT2 (p-locks en LIVE REC) ; valeurs tenues sous la track sélectionnée."""
         if not self.design and not self._reachable(self.track):
             return []
+        self.last_touch = (index, now)
         sent = self.faders.turn(self.track, index, delta)
         if sent is None:
             return []
@@ -412,6 +420,7 @@ class Engine:
         note = pad_note(self.layout, pad)
         vel = velocity(self.cfg.velocity, att.peak)
         self.last_played = (pad, note, vel)
+        self.last_hit = (pad, vel, now)
         ticks = self.clock.ticks_at(att.start)  # instant de la frappe, pas de la fin de fenêtre
         if ticks is None:  # transport arrêté : immédiat, pas de repeat
             self._sounding[pad] = (note, now)
