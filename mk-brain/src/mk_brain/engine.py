@@ -35,6 +35,8 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   (refusée en live transport lancé) ou la ferme ; l'encodeur maître fait
   défiler, son appui charge le projet (`set_project`), `loaded` le nomme
   pour que la CLI le retienne.
+- Session (`session.py`) : `snapshot` et `restore` des derniers réglages
+  (banque, pattern, track, faders, mutes), sans rien envoyer à la DT2.
 """
 
 from __future__ import annotations
@@ -80,6 +82,7 @@ from mk_brain.quantize import (
 )
 from mk_brain.repeat import DIVISION_TICKS, DIVISIONS, GATE
 from mk_brain.selection import Selector
+from mk_brain.session import FaderValue, Session
 
 NOTE_OFF_MIN_NS = 5_000_000  # note off au moins 5 ms après sa note on
 
@@ -431,6 +434,50 @@ class Engine:
             self._enter_design()
         else:
             self._apply_phrase()
+        self.leds_dirty = True
+
+    # --- session : derniers réglages -------------------------------------------
+
+    def snapshot(self) -> Session:
+        values = self.faders.values()
+        return Session(
+            design_bank=self.design_bank,
+            group=self.group,
+            octave=self.octave,
+            bank=self.bank,
+            program=self.last_program,
+            track=self.track,
+            page=self.faders.page_index,
+            faders=[
+                FaderValue(track=t, param=p, value=v)
+                for (t, p), v in sorted(values.items())
+                if p != PITCH_BEND  # ressort : toujours au centre au départ
+            ],
+            muted=sorted(t for t, m in self.faders.muted.items() if m),
+        )
+
+    def restore(self, session: Session) -> None:
+        """Reprend une session sauvée ; ce que la DT2 a déjà dit (PC reçu) l'emporte."""
+        banks = [i for i, _, _ in self._banks()]
+        if session.design_bank in banks:
+            self.design_bank = session.design_bank
+        if session.group < len(self.cfg.layouts):
+            self.group = session.group
+        if abs(session.octave) <= MAX_OCTAVE:
+            self.octave = session.octave
+            if not fits(self.layout):
+                self.octave = 0
+        if self.last_program is None and session.program is not None:
+            self.last_program = session.program
+            self.phrase.pattern = pattern_label(session.program)
+        if self.bank is None:
+            self.bank = session.bank
+        self.track = session.track
+        if session.page < len(self.faders.pages):
+            self.faders.page_index = session.page
+        values = {(f.track, f.param): f.value for f in session.faders}
+        self.faders.restore(values, set(session.muted))
+        self._apply_phrase()
         self.leds_dirty = True
 
     # --- design : banque et menu ----------------------------------------------

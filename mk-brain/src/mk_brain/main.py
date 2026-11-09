@@ -181,6 +181,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     from mk_brain.project import load_project
     from mk_brain.scheduler import Scheduler
     from mk_brain.selection import Selector, list_projects, read_last, write_last
+    from mk_brain.session import SAVE_EVERY_NS, Session, load_session, save_session
 
     cfg = load_config()
     project = None if project_path is None else load_project(project_path)
@@ -190,8 +191,14 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
         return Selector(list_projects(), read_last())
 
     engine = Engine(cfg, clock, project, catalog)
+    name = None if project_path is None else project_path.stem  # session de ce projet
+    saved: Session | None = None
+    if name is not None and (saved := load_session(name)) is not None:
+        engine.restore(saved)
+        print(f"session {name} reprise")
     if project is None:  # démarrage : sélection, le dernier joué présélectionné
         engine.open_selection()
+    last_save = 0
     decoder = InputDecoder(pad_threshold=cfg.velocity.threshold)
     out = None if dry_run else Dt2Out.open(cfg.midi.port_hint)
     inp = None if dry_run else Dt2In.open(cfg.midi.port_hint)
@@ -244,9 +251,18 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
                 message = (last, now)
                 print(last)
                 engine.last_control = ""
-            if engine.loaded is not None:
+            if engine.loaded is not None:  # projet choisi : sa session reprise
                 write_last(engine.loaded)
-                engine.loaded = None
+                name, engine.loaded = engine.loaded, None
+                if (saved := load_session(name)) is not None:
+                    engine.restore(saved)
+                    print(f"session {name} reprise")
+            if name is not None and now - last_save >= SAVE_EVERY_NS:
+                last_save = now
+                snap = engine.snapshot()
+                if snap != saved:
+                    save_session(name, snap)
+                    saved = snap
             for line in engine.log:
                 print(f"{line}   ({_clock_line(clock)})")
             engine.log.clear()
@@ -268,6 +284,8 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     except KeyboardInterrupt:
         pass
     finally:
+        if name is not None:  # derniers réglages, même après Ctrl-C
+            save_session(name, engine.snapshot())
         try:
             dev.send_leds(LedState.off())
             for s in range(display.N_DISPLAYS):

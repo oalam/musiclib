@@ -77,6 +77,19 @@ class Faders:
     def pattern_changed(self) -> None:
         self._stale = set(self._values)
 
+    # --- session (sauvée, reprise au démarrage) -----------------------------------
+
+    def values(self) -> dict[tuple[int, int], int]:
+        """Valeurs connues, (track, paramètre) → valeur."""
+        return dict(self._values)
+
+    def restore(self, values: dict[tuple[int, int], int], muted: set[int]) -> None:
+        """Valeurs d'une session passée, toutes hors prise ; mutes pour l'affichage."""
+        known = {c for page in self.pages for _, c in page}
+        self._values = {k: v for k, v in values.items() if k[1] in known}
+        self._stale = set(self._values)
+        self.muted = {t: True for t in muted}
+
     # --- lecture --------------------------------------------------------------
 
     def view(self, track: int) -> list[FaderView]:

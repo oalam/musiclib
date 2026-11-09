@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.15.0] - 2026-11-09
+
+### Ajouté
+
+- [6] Session par projet (`session.py`, `state/session-<projet>.json`) :
+  banque du design, disposition, octave, banque, dernier pattern reçu,
+  track sélectionnée, page et valeurs des faders, mutes. Sauvée au plus
+  toutes les 2 s si elle change et à l'arrêt, reprise au chargement du
+  projet sans rien envoyer à la DT2 (faders hors prise, mutes affichés
+  seulement, un PC déjà reçu l'emporte). `Engine.snapshot` / `restore`,
+  `Faders.values` / `restore`.
+
 ## [0.14.1] - 2026-11-09
 
 ### Modifié

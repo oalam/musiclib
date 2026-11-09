@@ -43,6 +43,7 @@ la tonique et le mode affichés ; en design, celle choisie par GROUP.
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 .venv/bin/mk-brain play --project projects/solaris.yaml   # projet chargé sans sélection
+                                      # derniers réglages repris de state/session-<projet>.json
 .venv/bin/mk-brain convert ../digitakt/doctrine-dt2-solaris.md   # → projects/solaris.yaml
 .venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks
 .venv/bin/mk-brain clock --bench-note 3   # + note 3 (track 4) envoyée à chaque noire, gigue d'envoi

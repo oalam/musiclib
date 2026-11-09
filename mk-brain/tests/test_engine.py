@@ -11,6 +11,7 @@ from mk_brain.engine import NOTE_OFF_MIN_NS, Engine, NoteOff, NoteOn, Timed
 from mk_brain.hid_mk2 import BUTTONS, ButtonEvent, EncoderEvent, PadEvent
 from mk_brain.project import Project
 from mk_brain.selection import Entry, Selector
+from mk_brain.session import Session
 
 PAD1 = 12  # index HID du pad 1 (constat slice 0)
 MS = 1_000_000
@@ -679,3 +680,34 @@ def test_start_mode_from_config(cfg: Config, project: Project) -> None:
     assert eng.design and eng.quantize == "off"
     assert eng.sheet is not None and eng.sheet[0] == "A-HALF"  # première banque du projet
     assert Engine(start).design  # sans projet aussi
+
+
+# --- session : derniers réglages ---------------------------------------------------
+
+
+def test_snapshot_restore_round_trip(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    btn(eng, "GROUP_E")
+    btn(eng, "TRANSPORT_RIGHT")  # octave +1
+    btn(eng, "SELECT")
+    eng.handle(PadEvent(PAD1 - 2, True, 2500), 0)  # pad 3
+    btn(eng, "SELECT", False)
+    eng.handle(EncoderEvent(5, 40, 0), 0)  # CUT de T03
+    eng.on_program_change(4 * 16 + 3)  # E04
+    eng.faders.muted[7] = True
+    snap = eng.snapshot()
+
+    fresh = Engine(cfg, project=project)
+    fresh.restore(snap)
+    assert fresh.snapshot() == snap
+    assert fresh.phrase.pattern == "E04" and fresh.track == snap.track
+    view = fresh.faders.view(snap.track)[4]
+    assert view.stale and view.value == snap.faders[0].value  # hors prise : DT2 à confirmer
+
+
+def test_restore_keeps_program_already_received(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, project=project)
+    eng.on_program_change(2 * 16)  # C01 reçu de la DT2
+    eng.restore(Session(program=4 * 16 + 3, design_bank=7, group=9 % 8))
+    assert eng.last_program == 2 * 16  # la DT2 l'emporte
+    assert eng.design_bank is None  # banque H absente du projet : ignorée

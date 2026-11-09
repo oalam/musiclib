@@ -136,6 +136,7 @@ mk-brain/
 │   ├── convert.py                # doctrine (front matter) + lives JSON → projet (Mac)
 │   ├── project.py                # modèle Pydantic du projet, chargement
 │   ├── selection.py              # liste des projets, dernier joué (6.C)
+│   ├── session.py                # derniers réglages par projet (state/)
 │   ├── modes.py                  # bascule live / design
 │   ├── hid_mk2.py                # rapports HID MK2 : parse entrée, LED, écrans
 │   ├── display.py                # Pillow 1 bit → octets écran
@@ -402,6 +403,21 @@ l'essai sur la MK2 :
   le sample d'une track change d'un pattern à l'autre (cf. Questions
   ouvertes) ; le mode de démarrage est réglé par la config (`play.mode`),
   pas par projet.
+
+**Session : derniers réglages (demandé et fait le 2026-11-09)** :
+- par projet, dans `mk-brain/state/session-<projet>.json` (local, ignoré
+  par git) : banque du design, disposition, octave, banque de PATTERN +
+  pad, dernier PC reçu (pattern et banque live), track sélectionnée, page
+  et valeurs des faders, mutes ;
+- sauvée au plus toutes les 2 s si elle a changé, et à l'arrêt (Ctrl-C) :
+  une coupure du Pi perd au plus 2 s ; écriture atomique ;
+- reprise au chargement du projet (`--project` ou sélection), **sans rien
+  envoyer à la DT2** : faders hors prise (pointillé), mutes à l'affichage
+  seulement (décidé le 2026-11-09 : la DT2 a pu changer entre-temps) ; un
+  PC déjà reçu de la DT2 l'emporte sur le pattern sauvé ; une banque
+  absente du projet ou une octave hors bornes est ignorée ; pitch bend non
+  sauvé (ressort) ;
+- fichier illisible ou hors bornes : session neuve, sans erreur.
 
 ## Comportements
 
