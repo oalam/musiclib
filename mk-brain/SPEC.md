@@ -593,7 +593,8 @@ le détail) :
 - **Écrans** : 256 × 64, octets horizontaux, bit fort à gauche, 8 tranches
   `E0|écran` de 256 octets ; pas de séquence d'init, image nette.
 - **LED** : rapports 0x80 (pads RGB), 0x81 (groupes RGB + transport),
-  0x82 (boutons) ; valeur 255 = pleine luminosité, couleurs justes.
+  0x82 (boutons) ; valeur 255 = pleine luminosité, couleurs justes ;
+  balayage une à une : chaque LED de bouton, de groupe et de pad à sa place.
 - **Pads** : rapport 0x20 en continu (environ 755 par seconde au repos :
   2266 en 3 s, 2266 / 3 ≈ 755), 16 pressions sur 12 bits, deux relevés
   par rapport. Index 0 = pad 13 (en haut à gauche), index 12 = pad 1.
