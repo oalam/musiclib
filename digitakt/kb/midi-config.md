@@ -46,8 +46,11 @@ calée sur l'horloge, un passage. CLI équivalente : `python dt2_midi.py`.
 - Les `.mid` générés mettent la track `n` sur le canal `n` (doctrine §7) et
   les drums sur la note 60. Le manuel ne dit pas que la DT2 **enregistre**
   les notes reçues sur les canaux de track : il décrit l'enregistrement
-  externe via l'AUTO CHANNEL vers la track active. *À vérifier* : envoyer le
-  `.mid` complet en LIVE RECORDING et voir si les 16 tracks s'écrivent.
+  externe via l'AUTO CHANNEL vers la track active. **Vérifié le 2026-11-10**
+  (sonde `scripts/dt2_mpc_probe.py channels`, track 9 active) : en LIVE
+  RECORDING, les notes reçues sur les canaux 1, 3 et 5 s'écrivent sur T1, T3
+  et T5, rien sur la track active. Les CC sur une track non active restent à
+  vérifier.
 - *À vérifier* aussi : quelle note joue un sample à sa hauteur d'origine
   sur une track audio (60 supposé par `digitakt.py`).
 - Jouer et enregistrer depuis un contrôleur (Maschine MK2, tout USB via le
