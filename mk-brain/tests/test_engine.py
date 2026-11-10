@@ -273,8 +273,8 @@ def test_pad16_mute_refused_select_targets_active_track(cfg: Config) -> None:
     eng.handle(PadEvent(3, False, 0), MS)
     btn(eng, "MUTE", False)
     btn(eng, "SELECT")
-    eng.handle(PadEvent(3, True, 2500), 2 * MS)
-    eng.handle(PadEvent(3, False, 0), 3 * MS)
+    eng.handle(PadEvent(3, True, 2500), 300 * MS)  # au-delà de l'anti-rebond
+    eng.handle(PadEvent(3, False, 0), 310 * MS)
     btn(eng, "SELECT", False)
     assert eng.track == 16 and eng.last_control == "T16 selected (DT2 active)"
     assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(15, 54, 65))]
@@ -806,3 +806,16 @@ def test_solo_pitch_bend_with_shift_recenters_group(cfg: Config) -> None:
         (4 * MS, PitchBend(0, 0)),
         (4 * MS, PitchBend(6, 0)),
     ]
+
+
+def test_mute_tap_ignores_release_bounces(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    btn(eng, "MUTE")
+    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == [(0, ControlChange(6, 94, 127))]
+    eng.handle(PadEvent(PAD7, False, 0), 200 * MS)
+    assert eng.handle(PadEvent(PAD7, True, 600), 205 * MS) == []  # rebond : pas de démute
+    eng.handle(PadEvent(PAD7, False, 0), 210 * MS)
+    assert eng.faders.muted[7]
+    assert eng.handle(PadEvent(PAD7, True, 2500), 500 * MS) == [(500 * MS, ControlChange(6, 94, 0))]

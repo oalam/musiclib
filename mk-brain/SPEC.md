@@ -394,7 +394,9 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
   en bleu très faible (`leds.perform_idle`), pads du groupe en vert vif
   (`leds.perform_on`). **Anti-rebond** (constaté à l'essai : un tap
   basculait plusieurs fois en levant le doigt) : un appui sur un pad
-  relâché depuis moins de `play.tap_debounce_ms` (150 ms) est ignoré.
+  relâché depuis moins de `play.tap_debounce_ms` (150 ms) est ignoré ;
+  **étendu le 2026-11-10 à MUTE + pad et SELECT + pad** (un mute
+  rebondissait en démute).
 - **Mode courant toujours affiché** (2026-11-10) : `MPC`, `KEYS` ou `SOLO`
   en vidéo inverse, en bas à gauche du bandeau gauche, mutes et messages
   décalés à sa droite ; les divisions du NOTE REPEAT s'arrêtent au-dessus

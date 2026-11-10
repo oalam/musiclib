@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.26.1] - 2026-11-10
+
+### Corrigé
+
+- [9] Anti-rebond aussi sur MUTE + pad et SELECT + pad (un mute
+  rebondissait en démute au relâché du doigt).
+
 ## [0.26.0] - 2026-11-10
 
 ### Ajouté

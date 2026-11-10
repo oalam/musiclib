@@ -22,7 +22,7 @@ play:
   repeat: "1/16"            # division de départ du note repeat
   phrase: 32                 # 32 ou 64 mesures ; sans banque du projet (sinon celle de la banque, 6.B)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
-  tap_debounce_ms: 150       # SOLO : un pad relâché depuis moins de 150 ms ne rebascule pas (rebonds)
+  tap_debounce_ms: 150       # SOLO, MUTE, SELECT + pad : un pad relâché depuis moins de 150 ms ne rebascule pas
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le

@@ -707,6 +707,12 @@ class Engine:
             return
         self.leds_dirty = True
 
+    def _bounce(self, pad: int, now: int) -> bool:
+        """Appui moins de `play.tap_debounce_ms` après le relâché d'une commande (SOLO, SELECT,
+        MUTE) sur ce pad : rebond du doigt qui se lève, ignoré."""
+        released = self._released_at.get(pad)
+        return released is not None and now - released < int(self.cfg.play.tap_debounce_ms * 1e6)
+
     def _pad(self, pad: int, ev: PadEvent, now: int) -> list[Timed]:
         if pad in self._consumed:  # frappé avec un modificateur : pas de note jusqu'au relâché
             if not ev.pressed:
@@ -716,12 +722,10 @@ class Engine:
         if ev.pressed and pad not in self._pressure and self._held_buttons & set(MODIFIERS):
             self._consumed.add(pad)
             self.leds_dirty = True
-            return self._command(pad, now)
+            return self._command(pad, now) if not self._bounce(pad, now) else []
         if ev.pressed and pad not in self._pressure and self.perform_lock:
             self._consumed.add(pad)
-            released = self._released_at.get(pad)
-            debounce = int(self.cfg.play.tap_debounce_ms * 1e6)
-            if released is None or now - released >= debounce:  # sinon : rebond du relâché
+            if not self._bounce(pad, now):
                 self._latch(pad)
             return []
         if ev.pressed:
