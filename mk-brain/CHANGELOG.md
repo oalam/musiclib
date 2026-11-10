@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.25.0] - 2026-11-10
+
+### Modifié
+
+- [9] SOLO : pad n = track n en MPC comme en clavier (la table `mpc` ne
+  sert plus sous SOLO).
+- [9] PB tenu par MUTE au lieu de SHIFT (`PB: hold MUTE`), aussi en
+  perform ; au relâché de MUTE, retour au centre sur chaque track bendée.
+
 ## [0.24.2] - 2026-11-10
 
 ### Corrigé

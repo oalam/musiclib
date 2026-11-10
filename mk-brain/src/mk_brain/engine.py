@@ -203,7 +203,7 @@ class Engine:
         self.perform_lock = False  # SOLO : perform verrouillé, les pads ne jouent plus
         self._latched: dict[int, int] = {}  # perform verrouillé : pads allumés → track visée
         self._released_at: dict[int, int] = {}  # SOLO : dernier relâché de chaque pad (rebonds)
-        self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
+        self._bent: set[int] = set()  # tracks dont le pitch bend est hors du centre (MUTE tenu)
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
         self.announce: tuple[str, Bank, int | None] | None = None
@@ -270,7 +270,7 @@ class Engine:
     def handle(self, ev: Event, now: int) -> list[Timed]:
         if isinstance(ev, ButtonEvent):
             self._button(ev, now)
-            if ev.name == "SHIFT" and not ev.pressed:
+            if ev.name == "MUTE" and not ev.pressed:
                 return self._release_bend(now)
             return []
         if isinstance(ev, EncoderEvent):
@@ -300,12 +300,12 @@ class Engine:
     def _encoder(self, index: int, delta: int, now: int) -> list[Timed]:
         """CC sur le canal de la track sélectionnée ; la 16 est l'AUTO CHANNEL, donc la
         track active de la DT2 (p-locks en LIVE REC). En perform : sur les tracks des pads
-        tenus, la valeur d'avant gardée pour le relâché."""
+        tenus ou du groupe SOLO. PB seulement MUTE tenu, au centre au relâché de MUTE."""
+        if self.faders.page[index - 1][1] == PITCH_BEND and "MUTE" not in self._held_buttons:
+            self.last_control = "PB: hold MUTE"
+            return []
         if self._perform or self._latched:
             return self._perform_turn(index, delta, now)
-        if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
-            self.last_control = "PB: hold SHIFT"  # pitch bend tenu par SHIFT seulement
-            return []
         self.last_touch = (index, now)
         sent = self.faders.turn(self.track, index, delta)
         if sent is None:
@@ -315,7 +315,7 @@ class Engine:
         self.last_control = f"T{self.track:02d} {name} {value}"
         channel = self.track - 1
         if param == PITCH_BEND:
-            self._bent = (self.track, channel)
+            self._bent.add(self.track)
         return [(now, self._param_out(channel, param, value))]
 
     # --- perform : SHIFT + pad tenu --------------------------------------------
@@ -335,13 +335,14 @@ class Engine:
         self.leds_dirty = True
 
     def _latch(self, pad: int) -> None:
-        """Perform verrouillé : un tap ajoute la track du pad au groupe, un second la retire."""
+        """Perform verrouillé : un tap ajoute la track n du pad n au groupe, un second la
+        retire (grille des tracks, jamais la table `mpc`)."""
         self._consumed.add(pad)  # pas de note jusqu'au relâché
         self.leds_dirty = True
         if self._latched.pop(pad, None) is not None:
-            self.last_control = f"PERF -T{self._perform_target(pad):02d}"
+            self.last_control = f"PERF -T{pad:02d}"
             return
-        track = self._perform_target(pad)
+        track = pad  # SOLO : pad n = track n, en MPC comme en clavier
         if self._reachable(track):
             self._latched[pad] = track
             self.last_control = f"PERF +T{track:02d}"
@@ -367,6 +368,8 @@ class Engine:
             if value is None:
                 continue
             self.last_control = f"PERF T{track:02d} {name} {value}"
+            if param == PITCH_BEND:
+                self._bent.add(track)
             out.append((now, self._param_out(track - 1, param, value)))
         return out
 
@@ -640,14 +643,14 @@ class Engine:
         self.last_control = labels[new]
 
     def _release_bend(self, now: int) -> list[Timed]:
-        """SHIFT relâché : pitch bend remis au centre sur le canal où il est parti."""
-        if self._bent is None:
-            return []
-        track, channel = self._bent
-        self._bent = None
-        self.faders.received(track, PITCH_BEND, 64)
-        self.leds_dirty = True
-        return [(now, PitchBend(channel, 0))]
+        """MUTE relâché : pitch bend remis au centre sur chaque track où il est parti."""
+        out: list[Timed] = []
+        for track in sorted(self._bent):
+            self.faders.received(track, PITCH_BEND, 64)
+            out.append((now, PitchBend(track - 1, 0)))
+        self._bent.clear()
+        self.leds_dirty = bool(out) or self.leds_dirty
+        return out
 
     def _note(self, msg: str | None) -> None:
         if msg:

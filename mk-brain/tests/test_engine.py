@@ -475,17 +475,17 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
 
     eng = Engine(cfg)
     btn(eng, "BROWSE_RIGHT")  # page 2 : LVL CUT RES ENV MW BC PB PAN
-    assert eng.handle(EncoderEvent(7, 8, 0), 0) == []  # PB sans SHIFT : rien
-    assert eng.last_control == "PB: hold SHIFT"
-    btn(eng, "SHIFT")
+    assert eng.handle(EncoderEvent(7, 8, 0), 0) == []  # PB sans MUTE : rien
+    assert eng.last_control == "PB: hold MUTE"
+    btn(eng, "MUTE")
     assert eng.handle(EncoderEvent(7, 8, 0), 0) == [(0, PitchBend(0, 256))]  # PB : 64 → 66
     assert eng.faders.view(1)[6].value == 66
-    assert eng.handle(ButtonEvent("SHIFT", False), MS) == [(MS, PitchBend(0, 0))]  # au centre
+    assert eng.handle(ButtonEvent("MUTE", False), MS) == [(MS, PitchBend(0, 0))]  # au centre
     assert eng.faders.view(1)[6].value == 64
-    assert eng.handle(ButtonEvent("SHIFT", False), MS) == []  # une seule remise
-    btn(eng, "SHIFT")
+    assert eng.handle(ButtonEvent("MUTE", False), MS) == []  # une seule remise
+    btn(eng, "MUTE")
     eng.handle(EncoderEvent(7, 8, 0), 0)
-    btn(eng, "SHIFT", False)
+    btn(eng, "MUTE", False)
     assert eng.faders.view(1)[6].value == 64  # PB revenu au centre
     assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
     btn(eng, "BROWSE_LEFT")
@@ -776,19 +776,19 @@ def test_solo_locks_perform_taps_toggle_tracks(cfg: Config) -> None:
     eng.track = 9
     btn(eng, "SOLO")
     assert eng.perform_lock and eng.leds().buttons["SOLO"] == LED_MAX
-    assert press(eng, 0, pad=PAD7) == []  # SD2 : T3 ajoutée, pas de note
+    assert press(eng, 0, pad=PAD7) == []  # pad 7 : T7 (grille, pas la table mpc), pas de note
     eng.handle(PadEvent(PAD7, False, 0), MS)
-    assert press(eng, 2 * MS, pad=PAD1) == []  # BD : T1 ajoutée
+    assert press(eng, 2 * MS, pad=PAD1) == []  # pad 1 : T1 ajoutée
     eng.handle(PadEvent(PAD1, False, 0), 3 * MS)
-    assert eng.perform_tracks == [3, 1] and eng.fader_track == 3
+    assert eng.perform_tracks == [7, 1] and eng.fader_track == 7
     by_pad = {pad_label(i): rgb for i, rgb in enumerate(eng.leds().pads)}
     assert by_pad[7] == by_pad[1] == cfg.leds.perform_on  # groupe : vert vif
     assert by_pad[2] == by_pad[16] == cfg.leds.perform_idle  # les autres : bleu faible
     assert eng.handle(EncoderEvent(2, 8, 0), 4 * MS) == [
-        (4 * MS, ControlChange(2, 54, 66)),
+        (4 * MS, ControlChange(6, 54, 66)),
         (4 * MS, ControlChange(0, 54, 66)),
     ]
-    press(eng, 500 * MS, pad=PAD7)  # second tap (après l'anti-rebond) : T3 retirée
+    press(eng, 500 * MS, pad=PAD7)  # second tap (après l'anti-rebond) : T7 retirée
     eng.handle(PadEvent(PAD7, False, 0), 600 * MS)
     assert eng.perform_tracks == [1]
     btn(eng, "SOLO")  # sortie : groupe vidé, pads rejoués
@@ -806,12 +806,33 @@ def test_solo_lock_keyboard_pad16_refused(cfg: Config) -> None:
 def test_solo_tap_ignores_release_bounces(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "SOLO")
-    eng.handle(PadEvent(PAD7, True, 2500), 0)  # tap : T3 ajoutée
+    eng.handle(PadEvent(PAD7, True, 2500), 0)  # tap : T7 ajoutée
     eng.handle(PadEvent(PAD7, False, 0), 200 * MS)
     eng.handle(PadEvent(PAD7, True, 600), 205 * MS)  # rebonds en levant le doigt
     eng.handle(PadEvent(PAD7, False, 0), 210 * MS)
     eng.handle(PadEvent(PAD7, True, 600), 215 * MS)
     eng.handle(PadEvent(PAD7, False, 0), 220 * MS)
-    assert eng.perform_tracks == [3]
+    assert eng.perform_tracks == [7]
     eng.handle(PadEvent(PAD7, True, 2500), 500 * MS)  # vrai second tap : retirée
     assert eng.perform_tracks == []
+
+
+def test_solo_pitch_bend_with_mute_recenters_group(cfg: Config) -> None:
+    from mk_brain.engine import PitchBend
+
+    eng = Engine(cfg)
+    btn(eng, "BROWSE_RIGHT")  # page 2 : PB en encodeur 7
+    btn(eng, "SOLO")
+    for pad in (PAD1, PAD7):  # T1 et T7
+        eng.handle(PadEvent(pad, True, 2500), 0)
+        eng.handle(PadEvent(pad, False, 0), MS)
+    assert eng.handle(EncoderEvent(7, 8, 0), 2 * MS) == []  # sans MUTE : rien
+    btn(eng, "MUTE")
+    assert eng.handle(EncoderEvent(7, 8, 0), 3 * MS) == [
+        (3 * MS, PitchBend(0, 256)),
+        (3 * MS, PitchBend(6, 256)),
+    ]
+    assert eng.handle(ButtonEvent("MUTE", False), 4 * MS) == [
+        (4 * MS, PitchBend(0, 0)),
+        (4 * MS, PitchBend(6, 0)),
+    ]

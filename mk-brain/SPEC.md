@@ -379,7 +379,7 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
     (une fois par track) ;
   - la track sélectionnée ne bouge pas ; l'écran gauche montre la track du
     perform (`PERF SD/CP T03`) et les faders la sienne ; le pad tenu est
-    allumé plein. PB n'y demande pas SHIFT.
+    allumé plein. PB y demande MUTE tenu, comme ailleurs.
 - **Écrans du clavier = ceux du MPC** : bandeau gauche (pattern, track,
   mutes), bandeau droit (mesure, phrase, barre). Restent propres au
   clavier : le cadre, la frappe en note et degré (`Db6 minor 3rd` sur une
@@ -393,9 +393,9 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
   tap ajoute la track du pad au groupe (pad allumé plein), un second tap
   la retire ; les encodeurs agissent sur toutes les tracks du groupe, sans
   rien tenir. Groupe vide = track sélectionnée. SOLO à nouveau : groupe
-  vidé, pads rejoués. Mêmes cibles que SHIFT + pad (MPC : track de
-  l'entrée ; clavier : pad n, pad 16 refusé) ; SHIFT + pad tenu s'ajoute au
-  groupe le temps du pad. SELECT et MUTE + pad gardent leur rôle.
+  vidé, pads rejoués. **Sous SOLO, pad n = track n, en MPC comme en
+  clavier** (précisé le 2026-11-10 : la table `mpc` n'y sert pas) ; pad
+  16 refusé. SELECT et MUTE + pad gardent leur rôle.
   **Couleurs sous SOLO** (2026-11-10), à la place de celles du MPC et du
   clavier : pads en bleu très faible (`leds.perform_idle`), pads du groupe
   ou tenus en vert vif (`leds.perform_on`). **Anti-rebond** (2026-11-10,
@@ -972,10 +972,11 @@ modulations en page 2) :
 - MW, BC et PB n'agissent que si le preset leur assigne jusqu'à 4
   paramètres (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset,
   manuel p. 39). PB part en message pitch bend (0-127 → -8192..8191,
-  64 = centre). **PB seulement avec SHIFT tenu** (décidé le 2026-11-09) :
-  sans SHIFT, l'encodeur ne fait rien (`PB: hold SHIFT`) ; au relâché de
-  SHIFT, pitch bend remis au centre sur le canal où il est parti, comme
-  une molette à ressort.
+  64 = centre). **PB seulement avec MUTE tenu** (SHIFT le 2026-11-09,
+  MUTE depuis le 2026-11-10, SHIFT servant au perform) : sans MUTE,
+  l'encodeur ne fait rien (`PB: hold MUTE`) ; au relâché de MUTE, pitch
+  bend remis au centre sur chaque track où il est parti (track
+  sélectionnée ou groupe du perform), comme une molette à ressort.
 - Jauge depuis le centre : PB, ENV, PAN, TUNE (`bipolar`). Valeurs gardées
   par track et par paramètre, quelle que soit la page ; un CC reçu de la
   DT2 est appris même si sa page n'est pas affichée.
