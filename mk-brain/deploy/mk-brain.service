@@ -17,6 +17,8 @@ RuntimeDirectoryPreserve=yes
 ExecStartPre=/home/pi/musiclib/mk-brain/deploy/sync.sh
 ExecStart=/home/pi/musiclib/mk-brain/deploy/run.sh
 ExecStopPost=/home/pi/musiclib/mk-brain/deploy/stopped.sh
+# Sortie de play visible tout de suite dans journalctl.
+Environment=PYTHONUNBUFFERED=1
 Restart=always
 RestartSec=3
 TimeoutStopSec=5

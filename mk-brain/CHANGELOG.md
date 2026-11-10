@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.22.1] - 2026-11-10
+
+### Corrigé
+
+- [7] Service : `PYTHONUNBUFFERED=1`, la sortie de `play` arrive tout de
+  suite dans `journalctl` (elle restait en tampon).
+
 ## [0.22.0] - 2026-11-10
 
 ### Ajouté
