@@ -398,7 +398,10 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
   groupe le temps du pad. SELECT et MUTE + pad gardent leur rôle.
   **Couleurs sous SOLO** (2026-11-10), à la place de celles du MPC et du
   clavier : pads en bleu très faible (`leds.perform_idle`), pads du groupe
-  ou tenus en vert vif (`leds.perform_on`). Écran :
+  ou tenus en vert vif (`leds.perform_on`). **Anti-rebond** (2026-11-10,
+  constaté à l'essai : un tap basculait plusieurs fois en levant le
+  doigt) : un appui sur un pad relâché depuis moins de
+  `play.tap_debounce_ms` (150 ms) est ignoré. Écran :
   `PERF x2` quand le groupe compte plusieurs tracks.
 
 **Critère de fin** : sur la DT2, SHIFT + SD2 tenu, CUT tourné : le filtre

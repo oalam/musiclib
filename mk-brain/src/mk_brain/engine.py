@@ -202,6 +202,7 @@ class Engine:
         self._perform: dict[int, int] = {}  # perform (SHIFT + pad tenu) : pad → track visée
         self.perform_lock = False  # SOLO : perform verrouillé, les pads ne jouent plus
         self._latched: dict[int, int] = {}  # perform verrouillé : pads allumés → track visée
+        self._released_at: dict[int, int] = {}  # SOLO : dernier relâché de chaque pad (rebonds)
         self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
@@ -727,13 +728,18 @@ class Engine:
         if pad in self._consumed:  # frappé avec un modificateur : pas de note jusqu'au relâché
             if not ev.pressed:
                 self._consumed.discard(pad)
+                self._released_at[pad] = now
             return []
         if ev.pressed and pad not in self._pressure and self._held_buttons & set(MODIFIERS):
             self._consumed.add(pad)
             self.leds_dirty = True
             return self._command(pad, now)
         if ev.pressed and pad not in self._pressure and self.perform_lock:
-            self._latch(pad)
+            self._consumed.add(pad)
+            released = self._released_at.get(pad)
+            debounce = int(self.cfg.play.tap_debounce_ms * 1e6)
+            if released is None or now - released >= debounce:  # sinon : rebond du relâché
+                self._latch(pad)
             return []
         if ev.pressed and pad not in self._pressure and "SHIFT" in self._held_buttons:
             self._perform_press(pad)

@@ -61,6 +61,7 @@ class PlayConfig(BaseModel):
     repeat: Literal["1/4", "1/8", "1/8T", "1/16", "1/16T", "1/32", "1/32T", "1/64"] = "1/16"
     phrase: Literal[32, 64] = 32  # longueur de phrase sans banque du projet (6.B)
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
+    tap_debounce_ms: float = Field(150.0, ge=0)  # SOLO : appui ignoré si relâché depuis moins
 
 
 PITCH_BEND = 128  # identifiant du pitch bend parmi les paramètres (hors des CC 0-127)

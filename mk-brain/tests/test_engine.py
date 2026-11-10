@@ -788,16 +788,30 @@ def test_solo_locks_perform_taps_toggle_tracks(cfg: Config) -> None:
         (4 * MS, ControlChange(2, 54, 66)),
         (4 * MS, ControlChange(0, 54, 66)),
     ]
-    press(eng, 5 * MS, pad=PAD7)  # second tap : T3 retirée
-    eng.handle(PadEvent(PAD7, False, 0), 6 * MS)
+    press(eng, 500 * MS, pad=PAD7)  # second tap (après l'anti-rebond) : T3 retirée
+    eng.handle(PadEvent(PAD7, False, 0), 600 * MS)
     assert eng.perform_tracks == [1]
     btn(eng, "SOLO")  # sortie : groupe vidé, pads rejoués
     assert not eng.perform_lock and eng.perform_tracks == [] and eng.fader_track == 9
-    assert press(eng, 7 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)
+    assert press(eng, 700 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)
 
 
 def test_solo_lock_keyboard_pad16_refused(cfg: Config) -> None:
     eng = design(cfg)
     btn(eng, "SOLO")
     assert press(eng, 0, pad=3) == []  # pad 16 : AUTO CHANNEL, ni note ni groupe
+    assert eng.perform_tracks == []
+
+
+def test_solo_tap_ignores_release_bounces(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "SOLO")
+    eng.handle(PadEvent(PAD7, True, 2500), 0)  # tap : T3 ajoutée
+    eng.handle(PadEvent(PAD7, False, 0), 200 * MS)
+    eng.handle(PadEvent(PAD7, True, 600), 205 * MS)  # rebonds en levant le doigt
+    eng.handle(PadEvent(PAD7, False, 0), 210 * MS)
+    eng.handle(PadEvent(PAD7, True, 600), 215 * MS)
+    eng.handle(PadEvent(PAD7, False, 0), 220 * MS)
+    assert eng.perform_tracks == [3]
+    eng.handle(PadEvent(PAD7, True, 2500), 500 * MS)  # vrai second tap : retirée
     assert eng.perform_tracks == []

@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.24.2] - 2026-11-10
+
+### Corrigé
+
+- [9] SOLO : rebonds du pad au relâché (un tap basculait plusieurs fois) ;
+  un appui moins de `play.tap_debounce_ms` (150 ms) après le relâché du
+  même pad est ignoré.
+
 ## [0.24.1] - 2026-11-10
 
 ### Modifié
