@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.24.1] - 2026-11-10
+
+### Modifié
+
+- [9] Pads sous SOLO : bleu très faible au repos, vert vif dans le groupe,
+  à la place des couleurs du MPC et du clavier (`leds.perform_idle`,
+  `leds.perform_on`).
+
 ## [0.24.0] - 2026-11-10
 
 ### Ajouté

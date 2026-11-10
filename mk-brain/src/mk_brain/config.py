@@ -49,6 +49,8 @@ class LedConfig(BaseModel):
     selected: float = Field(0.5, ge=0, le=1)  # live : pad de la track sélectionnée, au repos
     phrase: RGB = (0, 255, 0)  # LED GROUP du compteur de phrases
     bank: RGB = (255, 255, 255)  # design : LED GROUP de la banque choisie (2026-11-09)
+    perform_idle: RGB = (0, 0, 40)  # SOLO : pad hors du groupe, bleu très faible (2026-11-10)
+    perform_on: RGB = (0, 255, 0)  # SOLO : pad du groupe, vert vif
 
 
 class PlayConfig(BaseModel):

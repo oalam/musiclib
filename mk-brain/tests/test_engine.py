@@ -781,6 +781,9 @@ def test_solo_locks_perform_taps_toggle_tracks(cfg: Config) -> None:
     assert press(eng, 2 * MS, pad=PAD1) == []  # BD : T1 ajoutée
     eng.handle(PadEvent(PAD1, False, 0), 3 * MS)
     assert eng.perform_tracks == [3, 1] and eng.fader_track == 3
+    by_pad = {pad_label(i): rgb for i, rgb in enumerate(eng.leds().pads)}
+    assert by_pad[7] == by_pad[1] == cfg.leds.perform_on  # groupe : vert vif
+    assert by_pad[2] == by_pad[16] == cfg.leds.perform_idle  # les autres : bleu faible
     assert eng.handle(EncoderEvent(2, 8, 0), 4 * MS) == [
         (4 * MS, ControlChange(2, 54, 66)),
         (4 * MS, ControlChange(0, 54, 66)),

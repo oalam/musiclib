@@ -395,7 +395,10 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
   rien tenir. Groupe vide = track sélectionnée. SOLO à nouveau : groupe
   vidé, pads rejoués. Mêmes cibles que SHIFT + pad (MPC : track de
   l'entrée ; clavier : pad n, pad 16 refusé) ; SHIFT + pad tenu s'ajoute au
-  groupe le temps du pad. SELECT et MUTE + pad gardent leur rôle. Écran :
+  groupe le temps du pad. SELECT et MUTE + pad gardent leur rôle.
+  **Couleurs sous SOLO** (2026-11-10), à la place de celles du MPC et du
+  clavier : pads en bleu très faible (`leds.perform_idle`), pads du groupe
+  ou tenus en vert vif (`leds.perform_on`). Écran :
   `PERF x2` quand le groupe compte plusieurs tracks.
 
 **Critère de fin** : sur la DT2, SHIFT + SD2 tenu, CUT tourné : le filtre

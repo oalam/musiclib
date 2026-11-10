@@ -866,6 +866,9 @@ class Engine:
                 pads[index] = (0, 0, 0) if auto or self.faders.muted.get(pad) else track
             elif "SELECT" in held:
                 pads[index] = track if pad == self.track else scale(track, dim)
+            elif self.perform_lock:  # SOLO : remplace les couleurs du MPC et du clavier
+                on = pad in self._latched or pad in self._perform
+                pads[index] = self.cfg.leds.perform_on if on else self.cfg.leds.perform_idle
             else:
                 full, rest = self._pad_full(pad)
                 pads[index] = full if pad in lit else scale(full, dim if rest else 0)
