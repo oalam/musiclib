@@ -11,6 +11,29 @@ python3.12 -m venv .venv
 .venv/bin/pip install -e '.[dev]'
 ```
 
+## Installation (Raspberry Pi, slice 7)
+
+Pi 3 Model B sous Raspberry Pi OS Trixie Lite 64 bits (hôte `mk-brain.local`,
+utilisateur `pi`). Clone partiel du seul dossier `mk-brain/`, avec une clé de
+déploiement en lecture seule (`~/.ssh/mkbrain_deploy`) :
+
+```bash
+sudo apt install git python3-venv python3-dev build-essential libasound2-dev \
+  libusb-1.0-0-dev libudev-dev
+git clone --filter=blob:none --no-checkout git@github.com:oalam/musiclib.git
+cd musiclib && git sparse-checkout set mk-brain && git checkout master
+cd mk-brain && python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
+sudo cp deploy/99-mk-brain.rules /etc/udev/rules.d/
+sudo udevadm control --reload && sudo udevadm trigger
+sudo cp deploy/mk-brain.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable --now mk-brain
+journalctl -u mk-brain -f        # journal du service
+```
+
+Au démarrage : `git pull` (10 s au plus), puis `mk-brain play`. Un nouveau
+commit qui échoue deux fois revient à `state/last_good` (SPEC « Service et
+retour arrière »).
+
 ## Configuration
 
 `config/default.yaml` : canal, courbe de vélocité, quantize, longueur de phrase,

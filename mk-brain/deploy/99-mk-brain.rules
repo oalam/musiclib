@@ -1,0 +1,7 @@
+# Maschine MK2 (17cc:1140) lisible sans root par le groupe plugdev.
+# Les deux nœuds : hidapi passe par libusb (/dev/bus/usb) ou par hidraw
+# selon le module chargé.
+# Installation : sudo cp deploy/99-mk-brain.rules /etc/udev/rules.d/
+#                sudo udevadm control --reload && sudo udevadm trigger
+SUBSYSTEM=="usb", ATTRS{idVendor}=="17cc", ATTRS{idProduct}=="1140", MODE="0660", GROUP="plugdev"
+KERNEL=="hidraw*", ATTRS{idVendor}=="17cc", ATTRS{idProduct}=="1140", MODE="0660", GROUP="plugdev"

@@ -177,8 +177,37 @@ Changer de projet en cours de route : SHIFT + BROWSE ramène à la sélection.
 Refusé en mode live tant que le transport tourne.
 
 Le code n'est mis à jour qu'au démarrage, jamais pendant le jeu. Un code qui
-ne démarre pas après un pull revient au commit précédent : **à préciser à
-la slice 7**.
+ne démarre pas après un pull revient au commit précédent.
+
+### Service et retour arrière (slice 7, décidé le 2026-11-10)
+
+Fichiers dans `deploy/` : `mk-brain.service` (systemd), `sync.sh` (avant
+chaque lancement), `run.sh` (lancement), `stopped.sh` (après chaque arrêt),
+`99-mk-brain.rules` (udev). État local dans `state/` (ignoré par git),
+statut de synchro dans `/run/mk-brain/sync` (effacé à l'extinction).
+
+1. **Synchro, une fois par démarrage du Pi** (`sync.sh`, repère
+   `/run/mk-brain/pulled`) : `git pull --ff-only` limité à 10 s. Si
+   `pyproject.toml` a changé, `pip install -e .`. Le statut écrit est
+   `sync a1b2c3d`, `offline 2026-11-08` (date du commit local) ou
+   `back a1b2c3d` après un retour arrière. Il s'affiche en haut à droite de
+   l'écran de sélection. Les écrans restent noirs pendant la synchro (au
+   plus 10 s) : pas d'écran « démarrage », le code n'est pas encore lancé.
+2. **Lancement** (`run.sh`) : `mk-brain play` reçoit le commit courant dans
+   `MKBRAIN_COMMIT`. Dès que la boucle principale tourne, il écrit ce commit
+   dans `state/last_good` et remet `state/fails` à zéro : c'est la preuve
+   que ce code démarre.
+3. **Échec** : après chaque arrêt en erreur, `stopped.sh` incrémente
+   `state/fails`. systemd relance au bout de 3 s. Au lancement suivant,
+   `sync.sh` revient à `state/last_good` (`git reset --hard`) si `fails`
+   vaut 2 ou plus **et** que le commit courant diffère de `last_good`. Si le
+   commit courant est déjà `last_good`, la panne vient de l'environnement
+   (MK2 ou DT2 débranchée) : on relance sans toucher au code.
+4. **Arrêt propre** : `SIGTERM` (arrêt du service, extinction du Pi) est
+   traité comme Ctrl-C : session sauvegardée, LED et écrans éteints.
+   Couper le courant sans extinction reste le cas de la scène : la carte SD
+   n'est protégée que par la journalisation d'ext4 (système en lecture seule
+   hors périmètre tant que le `git pull` au démarrage écrit sur la carte).
 
 ## Mode unique et pads MPC (slice 8, décidé le 2026-11-09)
 

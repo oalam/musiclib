@@ -1,0 +1,28 @@
+# Service mk-brain (slice 7, SPEC « Service et retour arrière »).
+# Installation : sudo cp deploy/mk-brain.service /etc/systemd/system/
+#                sudo systemctl daemon-reload && sudo systemctl enable --now mk-brain
+[Unit]
+Description=mk-brain : Maschine MK2 devant la Digitakt II
+Wants=network-online.target
+After=network-online.target sound.target
+# Relances sans fin : MK2 ou DT2 débranchée au démarrage, on attend.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/musiclib/mk-brain
+RuntimeDirectory=mk-brain
+RuntimeDirectoryPreserve=yes
+ExecStartPre=/home/pi/musiclib/mk-brain/deploy/sync.sh
+ExecStart=/home/pi/musiclib/mk-brain/deploy/run.sh
+ExecStopPost=/home/pi/musiclib/mk-brain/deploy/stopped.sh
+Restart=always
+RestartSec=3
+TimeoutStopSec=5
+# Le réseau ne retarde pas le jeu : sync.sh plafonne le pull à 10 s.
+TimeoutStartSec=60
+Nice=-10
+
+[Install]
+WantedBy=multi-user.target

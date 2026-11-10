@@ -153,3 +153,14 @@ def test_selection_takes_both_screens(cfg: Config, project: Project) -> None:
     eng.open_selection()
     assert render.left(eng, 0).tobytes() != left
     assert render.right(eng, 0).tobytes() != right
+
+
+def test_selection_shows_sync_status(cfg: Config, project: Project) -> None:
+    from test_engine import _catalog
+
+    eng = Engine(cfg, catalog=_catalog(project))
+    eng.open_selection()
+    assert eng.selector is not None
+    plain = render.left(eng, 0).tobytes()
+    eng.selector.sync = "sync a1b2c3d"
+    assert render.left(eng, 0).tobytes() != plain  # statut en haut à droite

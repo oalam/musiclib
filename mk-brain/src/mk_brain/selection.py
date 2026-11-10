@@ -78,8 +78,9 @@ def write_last(name: str, state: Path = STATE) -> None:
 class Selector:
     """Liste à l'encodeur maître ; le dernier joué présélectionné."""
 
-    def __init__(self, entries: list[Entry], last: str | None = None) -> None:
+    def __init__(self, entries: list[Entry], last: str | None = None, sync: str = "") -> None:
         self.entries = entries
+        self.sync = sync  # statut de la synchro du démarrage, en haut à droite
         names = [e.name for e in entries]
         self.index = names.index(last) if last in names else 0
 

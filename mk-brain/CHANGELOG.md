@@ -3,6 +3,26 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.22.0] - 2026-11-10
+
+### Ajouté
+
+- [7] Portage Pi, partie logicielle : `deploy/mk-brain.service` (systemd,
+  relances sans fin toutes les 3 s), `deploy/sync.sh` (`git pull` limité à
+  10 s une fois par démarrage, `pip install` si `pyproject.toml` change,
+  retour à `state/last_good` après 2 échecs d'un nouveau commit),
+  `deploy/run.sh`, `deploy/stopped.sh`, règle udev `deploy/99-mk-brain.rules`
+  pour la MK2. `boot.py` : la boucle de `play` qui tourne écrit le commit
+  dans `state/last_good`.
+- [7] Statut de synchro (`sync`, `offline`, `back` + commit ou date) en haut
+  à droite de l'écran de sélection.
+
+### Modifié
+
+- [7] `SIGTERM` traité comme Ctrl-C : session sauvegardée, LED et écrans
+  éteints à l'arrêt du service.
+- [7] Raspberry Pi OS Trixie Lite au lieu de Bookworm (Python 3.12 requis).
+
 ## [0.21.0] - 2026-11-09
 
 ### Ajouté

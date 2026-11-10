@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import signal
 import sys
 import time
 from pathlib import Path
@@ -173,7 +174,12 @@ def _clock_line(clock: ClockTracker) -> str:
     return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
 
 
+def _interrupt(signum: int, frame: object) -> None:
+    raise KeyboardInterrupt
+
+
 def cmd_play(dry_run: bool, project_path: Path | None) -> int:
+    from mk_brain.boot import mark_ready, read_sync
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
@@ -188,7 +194,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     clock = ClockTracker()
 
     def catalog() -> Selector:
-        return Selector(list_projects(), read_last())
+        return Selector(list_projects(), read_last(), read_sync())
 
     engine = Engine(cfg, clock, project, catalog)
     name = None if project_path is None else project_path.stem  # session de ce projet
@@ -235,10 +241,12 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
         "PAD MODE = MPC / clavier ; GROUP = banque ; SHIFT + BROWSE = projet ; "
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )
+    signal.signal(signal.SIGTERM, _interrupt)  # arrêt du service : comme Ctrl-C
     try:
         if sched is not None:
             sched.start()
         _show(dev, 1, display.new_image())
+        mark_ready()  # ce commit démarre : retour arrière possible vers lui
         while True:
             report = dev.read(timeout_ms=1)
             now = time.perf_counter_ns()

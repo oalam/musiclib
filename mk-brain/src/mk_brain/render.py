@@ -386,6 +386,9 @@ def _selection_left(engine: Engine) -> Image.Image:
     sel = engine.selector
     assert sel is not None
     _bold(d, (3, -2), "PROJECTS", _font(SMALL), 1)
+    if sel.sync:
+        f = _font(SMALL)
+        d.text((WIDTH - 3 - d.textlength(sel.sync, font=f), -2), sel.sync, font=f, fill=1)
     if not sel.entries:
         d.text((3, 24), "no project in projects/", font=_font(SMALL), fill=1)
         return img
