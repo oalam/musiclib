@@ -142,6 +142,11 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
   à la track sélectionnée.
 - L'écran affiche `PERF` et la track du pad ; la track sélectionnée ne
   change pas.
+- **SOLO** verrouille ce mode (LED SOLO pleine) : les pads ne jouent plus.
+  Un tap sur un pad ajoute sa track au groupe (pad allumé), un second tap
+  la retire ; les encodeurs règlent toutes les tracks du groupe, sans rien
+  tenir (`PERF x2` à l'écran s'il y en a plusieurs). SOLO à nouveau : groupe
+  vidé, les pads rejouent.
 
 ## 7. Mutes
 
@@ -212,6 +217,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | SELECT + pad | track des encodeurs et du clavier (16 = track active DT2) |
 | MUTE + pad | mute / ouvre la track |
 | SHIFT + pad tenu + encodeurs | perform : encodeurs sur la track du pad tant qu'il est tenu |
+| SOLO | perform verrouillé : tap = ajoute / retire la track du pad |
 | BROWSE ◀ ▶ | page d'encodeurs |
 | SHIFT + BROWSE | sélection de projet (transport arrêté) |
 | Flèches de transport | octave du clavier |

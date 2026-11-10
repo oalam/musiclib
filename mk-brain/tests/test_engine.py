@@ -767,3 +767,34 @@ def test_perform_keyboard_pad_n_is_track_n(cfg: Config) -> None:
     eng.handle(PadEvent(PAD7, False, 0), MS)
     eng.handle(PadEvent(3, True, 2500), 2 * MS)  # pad 16 : AUTO CHANNEL refusé, sans note
     assert eng.perform_track is None and eng.tick(20 * MS) == []
+
+
+def test_solo_locks_perform_taps_toggle_tracks(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    eng.track = 9
+    btn(eng, "SOLO")
+    assert eng.perform_lock and eng.leds().buttons["SOLO"] == LED_MAX
+    assert press(eng, 0, pad=PAD7) == []  # SD2 : T3 ajoutée, pas de note
+    eng.handle(PadEvent(PAD7, False, 0), MS)
+    assert press(eng, 2 * MS, pad=PAD1) == []  # BD : T1 ajoutée
+    eng.handle(PadEvent(PAD1, False, 0), 3 * MS)
+    assert eng.perform_tracks == [3, 1] and eng.fader_track == 3
+    assert eng.handle(EncoderEvent(2, 8, 0), 4 * MS) == [
+        (4 * MS, ControlChange(2, 54, 66)),
+        (4 * MS, ControlChange(0, 54, 66)),
+    ]
+    press(eng, 5 * MS, pad=PAD7)  # second tap : T3 retirée
+    eng.handle(PadEvent(PAD7, False, 0), 6 * MS)
+    assert eng.perform_tracks == [1]
+    btn(eng, "SOLO")  # sortie : groupe vidé, pads rejoués
+    assert not eng.perform_lock and eng.perform_tracks == [] and eng.fader_track == 9
+    assert press(eng, 7 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)
+
+
+def test_solo_lock_keyboard_pad16_refused(cfg: Config) -> None:
+    eng = design(cfg)
+    btn(eng, "SOLO")
+    assert press(eng, 0, pad=3) == []  # pad 16 : AUTO CHANNEL, ni note ni groupe
+    assert eng.perform_tracks == []

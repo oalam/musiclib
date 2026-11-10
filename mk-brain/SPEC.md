@@ -388,7 +388,15 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
   reste aux boutons d'écran 1-4 et à l'encodeur maître, sa valeur passe
   1,5 s dans le bandeau gauche.
 
-**Hors périmètre** (noté, pas pré-construit) : perform verrouillé.
+- **Perform verrouillé : SOLO** (décidé le 2026-11-10). SOLO bascule le
+  verrou, LED SOLO pleine quand il est mis. Les pads ne jouent plus : un
+  tap ajoute la track du pad au groupe (pad allumé plein), un second tap
+  la retire ; les encodeurs agissent sur toutes les tracks du groupe, sans
+  rien tenir. Groupe vide = track sélectionnée. SOLO à nouveau : groupe
+  vidé, pads rejoués. Mêmes cibles que SHIFT + pad (MPC : track de
+  l'entrée ; clavier : pad n, pad 16 refusé) ; SHIFT + pad tenu s'ajoute au
+  groupe le temps du pad. SELECT et MUTE + pad gardent leur rôle. Écran :
+  `PERF x2` quand le groupe compte plusieurs tracks.
 
 **Critère de fin** : sur la DT2, SHIFT + SD2 tenu, CUT tourné : le filtre
 de T3 bouge, aucune note ; pad relâché, le filtre reste et les encodeurs
@@ -1131,7 +1139,7 @@ conditionne tout le reste.
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
-| 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, SHIFT + pad tenu = encodeurs sur la track du pad tant qu'il est tenu (valeur gardée au relâché), écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0), à essayer sur la MK2 et la DT2 |
+| 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, SHIFT + pad tenu = encodeurs sur la track du pad tant qu'il est tenu (valeur gardée au relâché), écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0, SOLO = perform verrouillé en v0.24.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et

@@ -202,8 +202,10 @@ def _left_band(
     tw = int(d.textlength(track, font=big))
     _bold(d, (WIDTH - tw - 4, -6), track, big, 1)
     name = engine.cfg.track_names.get(shown, "")  # code de la grille (doctrine §1)
-    if engine.perform_track is not None:
-        name = f"PERF {name}".rstrip()
+    tracks = engine.perform_tracks
+    if tracks:  # perform : `PERF`, et le nombre de tracks du groupe s'il y en a plusieurs
+        more = f" x{len(tracks)}" if len(tracks) > 1 else ""
+        name = f"PERF{more} {name}".rstrip()
     if name:
         nw = int(d.textlength(name, font=mid))
         _bold(d, (WIDTH - tw - nw - 12, 1), name, mid, 1)

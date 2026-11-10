@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.24.0] - 2026-11-10
+
+### Ajouté
+
+- [9] Perform verrouillé par SOLO (LED pleine) : les pads ne jouent plus,
+  un tap ajoute ou retire la track du pad au groupe des encodeurs ; SOLO à
+  nouveau vide le groupe. Écran `PERF x2` pour plusieurs tracks.
+
 ## [0.23.2] - 2026-11-10
 
 ### Corrigé
