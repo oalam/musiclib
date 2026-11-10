@@ -46,8 +46,8 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   sont l'historique des slices 5-6.
 - Slice 9 : PATTERN + pad retiré (la DT2 seule change de pattern) ; LED GROUP
   arrêté = la banque courante seule ; perform : SHIFT + pad tenu ne joue pas,
-  les encodeurs règlent la track du pad (`perform_track`) et la valeur d'avant
-  revient au relâché ; écrans du clavier = ceux du MPC.
+  les encodeurs règlent la track du pad (`perform_track`), la valeur reste au
+  relâché ; écrans du clavier = ceux du MPC.
 """
 
 from __future__ import annotations
@@ -57,7 +57,7 @@ from dataclasses import dataclass
 
 from mk_brain.clock import ClockTracker
 from mk_brain.config import PITCH_BEND, RGB, Config, Layout
-from mk_brain.faders import Faders, FaderSnapshot
+from mk_brain.faders import Faders
 from mk_brain.hid_mk2 import (
     GROUPS,
     LED_MAX,
@@ -197,9 +197,7 @@ class Engine:
         self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
         self.last_hit: tuple[int, int, int, int] | None = None  # (pad, note, vélocité, instant)
         self.last_hit_mpc = False  # dernière frappe jouée en MPC (écran : label et cible)
-        # perform (SHIFT + pad tenu) : pad → track visée ; valeurs d'avant à remettre au relâché
-        self._perform: dict[int, int] = {}
-        self._perform_saved: dict[tuple[int, int], FaderSnapshot] = {}
+        self._perform: dict[int, int] = {}  # perform (SHIFT + pad tenu) : pad → track visée
         self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
@@ -327,8 +325,7 @@ class Engine:
         self.leds_dirty = True
 
     def _perform_turn(self, index: int, delta: int, now: int) -> list[Timed]:
-        """Encodeur en perform : même pas sur chaque track tenue (la valeur d'avant gardée
-        au premier cran)."""
+        """Encodeur en perform : même pas sur chaque track tenue."""
         self.last_touch = (index, now)
         steps = self.faders.steps(index, delta)
         if steps == 0:
@@ -337,30 +334,19 @@ class Engine:
         name = self.faders.page[index - 1][0]
         out: list[Timed] = []
         for track in dict.fromkeys(self._perform.values()):  # tracks distinctes, dans l'ordre
-            key = (track, param)
-            snap = self.faders.snapshot(key)
             value = self.faders.nudge(track, param, steps)
             if value is None:
                 continue
-            self._perform_saved.setdefault(key, snap)
             self.last_control = f"PERF T{track:02d} {name} {value}"
             out.append((now, self._param_out(track - 1, param, value)))
         return out
 
-    def _perform_release(self, pad: int, now: int) -> list[Timed]:
-        """Pad relâché : les tracks qu'aucun pad tenu ne vise reprennent leurs valeurs
-        d'avant (renvoyées à la DT2)."""
+    def _perform_release(self, pad: int) -> list[Timed]:
+        """Pad relâché : les valeurs réglées restent ; les encodeurs reviennent à la track
+        sélectionnée (ou au pad encore tenu). Rien n'est envoyé."""
         self._perform.pop(pad, None)
-        held = set(self._perform.values())
-        out: list[Timed] = []
-        for key in [k for k in self._perform_saved if k[0] not in held]:
-            snap = self._perform_saved.pop(key)
-            value = self.faders.put_back(key, snap)
-            out.append((now, self._param_out(key[0] - 1, key[1], value)))
-        if out:
-            self.last_control = f"PERF T{out[0][1].channel + 1:02d} back"
         self.leds_dirty = True
-        return out
+        return []
 
     def _command(self, pad: int, now: int) -> list[Timed]:
         held = self._held_buttons
@@ -707,7 +693,7 @@ class Engine:
 
     def _pad(self, pad: int, ev: PadEvent, now: int) -> list[Timed]:
         if pad in self._perform:  # perform : pas de note jusqu'au relâché
-            return [] if ev.pressed else self._perform_release(pad, now)
+            return [] if ev.pressed else self._perform_release(pad)
         if pad in self._consumed:  # frappé avec un modificateur : pas de note jusqu'au relâché
             if not ev.pressed:
                 self._consumed.discard(pad)

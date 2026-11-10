@@ -29,12 +29,6 @@ class FaderView:
     known: bool
 
 
-@dataclass(frozen=True, slots=True)
-class FaderSnapshot:
-    value: int | None  # None : jamais vu
-    stale: bool
-
-
 class Faders:
     def __init__(self, pages: list[list[tuple[str, int]]], mute_cc: int, raw_per_step: int) -> None:
         self.pages = pages  # pages de 8 × (abrégé, CC ou PITCH_BEND)
@@ -88,23 +82,6 @@ class Faders:
         _, cc = self.page[encoder - 1]
         new = self.nudge(track, cc, steps)
         return None if new is None else (cc, new)
-
-    def snapshot(self, key: tuple[int, int]) -> FaderSnapshot:
-        """État d'un paramètre, pour le remettre tel quel (perform)."""
-        return FaderSnapshot(self._values.get(key), key in self._stale)
-
-    def put_back(self, key: tuple[int, int], snap: FaderSnapshot) -> int:
-        """Remet un paramètre dans l'état d'un `snapshot` ; rend la valeur à renvoyer
-        (`DEFAULT_VALUE` pour un paramètre jamais vu)."""
-        if snap.value is None:
-            self._values.pop(key, None)
-        else:
-            self._values[key] = snap.value
-        if snap.stale:
-            self._stale.add(key)
-        else:
-            self._stale.discard(key)
-        return DEFAULT_VALUE if snap.value is None else snap.value
 
     def toggle_mute(self, track: int) -> tuple[int, int]:
         """MUTE + pad → (CC, valeur). Un mute jamais vu est supposé ouvert.

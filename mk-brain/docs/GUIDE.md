@@ -138,8 +138,8 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
 - **SHIFT + pad**, pad gardé enfoncé : pas de note. Les encodeurs règlent
   la track **du pad** (en MPC : sa track, SD2 → T3 ; en clavier : pad n =
   track n). SHIFT peut être relâché, c'est le pad qui compte.
-- **Pad relâché** : chaque paramètre tourné revient à sa valeur d'avant.
-  Une valeur que la DT2 n'a jamais donnée revient à 64.
+- **Pad relâché** : les valeurs réglées restent ; les encodeurs reviennent
+  à la track sélectionnée.
 - L'écran affiche `PERF` et la track du pad ; la track sélectionnée ne
   change pas.
 
@@ -211,7 +211,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | GROUP A-H | banque courante (sans envoi) |
 | SELECT + pad | track des encodeurs et du clavier (16 = track active DT2) |
 | MUTE + pad | mute / ouvre la track |
-| SHIFT + pad tenu + encodeurs | perform : track du pad, retour au relâché |
+| SHIFT + pad tenu + encodeurs | perform : encodeurs sur la track du pad tant qu'il est tenu |
 | BROWSE ◀ ▶ | page d'encodeurs |
 | SHIFT + BROWSE | sélection de projet (transport arrêté) |
 | Flèches de transport | octave du clavier |

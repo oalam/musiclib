@@ -724,7 +724,7 @@ def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
 # --- slice 9 : perform (SHIFT + pad tenu) ----------------------------------------
 
 
-def test_perform_turns_pad_track_and_restores_on_release(cfg: Config) -> None:
+def test_perform_turns_pad_track_and_keeps_value_on_release(cfg: Config) -> None:
     from mk_brain.engine import ControlChange
 
     eng = Engine(cfg)
@@ -736,13 +736,13 @@ def test_perform_turns_pad_track_and_restores_on_release(cfg: Config) -> None:
     btn(eng, "SHIFT", False)  # le pad tenu garde le perform
     assert (eng.perform_track, eng.fader_track) == (3, 3)
     assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(2, 54, 42))]
-    assert eng.handle(PadEvent(PAD7, False, 0), 2 * MS) == [(2 * MS, ControlChange(2, 54, 40))]
-    assert eng.faders.view(3)[1].value == 40 and eng.perform_track is None
+    assert eng.handle(PadEvent(PAD7, False, 0), 2 * MS) == []  # pas de retour
+    assert eng.faders.view(3)[1].value == 42 and eng.perform_track is None
     assert eng.track == 1  # la track sélectionnée n'a pas bougé
     assert press(eng, 3 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)  # rejoue
 
 
-def test_perform_two_pads_same_track_restores_after_last(cfg: Config) -> None:
+def test_perform_two_pads_same_track_turned_once(cfg: Config) -> None:
     from mk_brain.engine import ControlChange
 
     eng = Engine(cfg)
@@ -750,8 +750,10 @@ def test_perform_two_pads_same_track_restores_after_last(cfg: Config) -> None:
     eng.handle(PadEvent(PAD1, True, 2500), 0)  # BD : T1
     eng.handle(PadEvent(PAD1 + 1, True, 2500), 0)  # BD2 : T1
     assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(0, 54, 66))]  # une fois
-    assert eng.handle(PadEvent(PAD1, False, 0), 2 * MS) == []  # BD2 tient encore T1
-    assert eng.handle(PadEvent(PAD1 + 1, False, 0), 3 * MS) == [(3 * MS, ControlChange(0, 54, 64))]
+    assert eng.handle(PadEvent(PAD1, False, 0), 2 * MS) == []
+    assert eng.perform_track == 1  # BD2 tient encore T1
+    assert eng.handle(PadEvent(PAD1 + 1, False, 0), 3 * MS) == []
+    assert eng.perform_track is None and eng.fader_track == eng.track
 
 
 def test_perform_keyboard_pad_n_is_track_n(cfg: Config) -> None:

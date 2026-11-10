@@ -3,6 +3,14 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.23.2] - 2026-11-10
+
+### Corrigé
+
+- [9] Perform : plus de retour de valeur au relâché du pad ; la valeur
+  réglée reste, seuls les encodeurs reviennent à la track sélectionnée.
+  `Faders.snapshot` / `put_back` retirés.
+
 ## [0.23.1] - 2026-11-10
 
 ### Modifié
