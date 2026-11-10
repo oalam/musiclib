@@ -45,10 +45,9 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   PATTERN + pad toujours disponibles. Les mentions live / design ci-dessus
   sont l'historique des slices 5-6.
 - Slice 9 : PATTERN + pad retiré (la DT2 seule change de pattern) ; LED GROUP
-  arrêté = la banque courante seule ; perform : SHIFT + pad tenu ne joue pas,
-  les encodeurs règlent la track du pad (`perform_track`), la valeur reste au
-  relâché ; SOLO verrouille le perform (`perform_lock`) : les pads ne jouent
-  plus, un tap ajoute ou retire la track du pad au groupe des encodeurs ;
+  arrêté = la banque courante seule ; perform par SOLO (`perform_lock`) : les
+  pads ne jouent plus, un tap sur le pad n ajoute ou retire la track n au groupe
+  des encodeurs, PAD MODE en sort ; PB tenu par SHIFT ;
   écrans du clavier = ceux du MPC.
 """
 
@@ -199,14 +198,18 @@ class Engine:
         self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
         self.last_hit: tuple[int, int, int, int] | None = None  # (pad, note, vélocité, instant)
         self.last_hit_mpc = False  # dernière frappe jouée en MPC (écran : label et cible)
-        self._perform: dict[int, int] = {}  # perform (SHIFT + pad tenu) : pad → track visée
         self.perform_lock = False  # SOLO : perform verrouillé, les pads ne jouent plus
         self._latched: dict[int, int] = {}  # perform verrouillé : pads allumés → track visée
         self._released_at: dict[int, int] = {}  # SOLO : dernier relâché de chaque pad (rebonds)
-        self._bent: set[int] = set()  # tracks dont le pitch bend est hors du centre (MUTE tenu)
+        self._bent: set[int] = set()  # tracks dont le pitch bend est hors du centre (SHIFT tenu)
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
         self.announce: tuple[str, Bank, int | None] | None = None
+
+    @property
+    def mode_name(self) -> str:
+        """Mode courant, toujours affiché : SOLO, sinon KEYS ou MPC."""
+        return "SOLO" if self.perform_lock else "KEYS" if self.keyboard else "MPC"
 
     @property
     def keyboard(self) -> bool:
@@ -242,12 +245,12 @@ class Engine:
 
     @property
     def perform_tracks(self) -> list[int]:
-        """Tracks des encodeurs en perform, distinctes : pads tenus puis pads allumés (SOLO)."""
-        return list(dict.fromkeys([*self._perform.values(), *self._latched.values()]))
+        """Tracks des encodeurs en perform (SOLO) : pads allumés, dans l'ordre des taps."""
+        return list(self._latched.values())
 
     @property
     def perform_track(self) -> int | None:
-        """Première track du perform (pad tenu, sinon pad allumé), None hors perform."""
+        """Première track du groupe SOLO, None sans groupe."""
         return next(iter(self.perform_tracks), None)
 
     @property
@@ -270,7 +273,7 @@ class Engine:
     def handle(self, ev: Event, now: int) -> list[Timed]:
         if isinstance(ev, ButtonEvent):
             self._button(ev, now)
-            if ev.name == "MUTE" and not ev.pressed:
+            if ev.name == "SHIFT" and not ev.pressed:
                 return self._release_bend(now)
             return []
         if isinstance(ev, EncoderEvent):
@@ -300,11 +303,11 @@ class Engine:
     def _encoder(self, index: int, delta: int, now: int) -> list[Timed]:
         """CC sur le canal de la track sélectionnée ; la 16 est l'AUTO CHANNEL, donc la
         track active de la DT2 (p-locks en LIVE REC). En perform : sur les tracks des pads
-        tenus ou du groupe SOLO. PB seulement MUTE tenu, au centre au relâché de MUTE."""
-        if self.faders.page[index - 1][1] == PITCH_BEND and "MUTE" not in self._held_buttons:
-            self.last_control = "PB: hold MUTE"
+        du groupe SOLO. PB seulement SHIFT tenu, au centre au relâché de SHIFT."""
+        if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
+            self.last_control = "PB: hold SHIFT"
             return []
-        if self._perform or self._latched:
+        if self._latched:
             return self._perform_turn(index, delta, now)
         self.last_touch = (index, now)
         sent = self.faders.turn(self.track, index, delta)
@@ -318,21 +321,7 @@ class Engine:
             self._bent.add(self.track)
         return [(now, self._param_out(channel, param, value))]
 
-    # --- perform : SHIFT + pad tenu --------------------------------------------
-
-    def _perform_target(self, pad: int) -> int:
-        """Track visée par un pad en perform : celle de l'entrée `mpc`, ou pad n = track n
-        en clavier."""
-        return self.cfg.mpc_pad(pad).track if self.mpc else pad
-
-    def _perform_press(self, pad: int) -> None:
-        track = self._perform_target(pad)
-        if not self._reachable(track):
-            self._consumed.add(pad)  # pad 16 en clavier : ni note ni perform
-            return
-        self._perform[pad] = track
-        self.last_control = f"PERF T{track:02d}"
-        self.leds_dirty = True
+    # --- perform : SOLO -------------------------------------------------------
 
     def _latch(self, pad: int) -> None:
         """Perform verrouillé : un tap ajoute la track n du pad n au groupe, un second la
@@ -352,7 +341,7 @@ class Engine:
         self.perform_lock = not self.perform_lock
         if not self.perform_lock:
             self._latched.clear()
-        self.last_control = "PERF lock" if self.perform_lock else "PERF off"
+        self.last_control = "SOLO" if self.perform_lock else "SOLO off"
 
     def _perform_turn(self, index: int, delta: int, now: int) -> list[Timed]:
         """Encodeur en perform : même pas sur chaque track tenue."""
@@ -372,13 +361,6 @@ class Engine:
                 self._bent.add(track)
             out.append((now, self._param_out(track - 1, param, value)))
         return out
-
-    def _perform_release(self, pad: int) -> list[Timed]:
-        """Pad relâché : les valeurs réglées restent ; les encodeurs reviennent à la track
-        sélectionnée (ou au pad encore tenu). Rien n'est envoyé."""
-        self._perform.pop(pad, None)
-        self.leds_dirty = True
-        return []
 
     def _command(self, pad: int, now: int) -> list[Timed]:
         held = self._held_buttons
@@ -643,7 +625,7 @@ class Engine:
         self.last_control = labels[new]
 
     def _release_bend(self, now: int) -> list[Timed]:
-        """MUTE relâché : pitch bend remis au centre sur chaque track où il est parti."""
+        """SHIFT relâché : pitch bend remis au centre sur chaque track où il est parti."""
         out: list[Timed] = []
         for track in sorted(self._bent):
             self.faders.received(track, PITCH_BEND, 64)
@@ -698,8 +680,8 @@ class Engine:
             return
         if name.startswith("GROUP_"):
             self._choose_bank(GROUPS.index(name[-1]))
-        elif name == "SOLO":
-            self._toggle_lock()
+        elif name == "SOLO" or (name == "PAD_MODE" and self.perform_lock):
+            self._toggle_lock()  # PAD MODE sous SOLO : sortie, disposition inchangée
         elif name == "PAD_MODE":  # MPC <-> clavier ; les notes tenues gardent leur cible
             self.mpc = not self.mpc
             self.last_control = "MPC" if self.mpc else f"keyboard {self.layout.name}"
@@ -726,8 +708,6 @@ class Engine:
         self.leds_dirty = True
 
     def _pad(self, pad: int, ev: PadEvent, now: int) -> list[Timed]:
-        if pad in self._perform:  # perform : pas de note jusqu'au relâché
-            return [] if ev.pressed else self._perform_release(pad)
         if pad in self._consumed:  # frappé avec un modificateur : pas de note jusqu'au relâché
             if not ev.pressed:
                 self._consumed.discard(pad)
@@ -743,9 +723,6 @@ class Engine:
             debounce = int(self.cfg.play.tap_debounce_ms * 1e6)
             if released is None or now - released >= debounce:  # sinon : rebond du relâché
                 self._latch(pad)
-            return []
-        if ev.pressed and pad not in self._pressure and "SHIFT" in self._held_buttons:
-            self._perform_press(pad)
             return []
         if ev.pressed:
             was_held = pad in self._pressure
@@ -864,7 +841,7 @@ class Engine:
     def leds(self) -> LedState:
         dim = self.cfg.leds.dim
         lit = set(self._attacks) | set(self._sounding) | set(self._repeats)
-        lit |= set(self._perform) | set(self._latched)  # pads du perform : pleins
+        lit |= set(self._latched)  # pads du groupe SOLO : pleins
         held = self._held_buttons
         pads: list[RGB] = [(0, 0, 0)] * N_PADS
         for index in range(N_PADS):
@@ -876,7 +853,7 @@ class Engine:
             elif "SELECT" in held:
                 pads[index] = track if pad == self.track else scale(track, dim)
             elif self.perform_lock:  # SOLO : remplace les couleurs du MPC et du clavier
-                on = pad in self._latched or pad in self._perform
+                on = pad in self._latched
                 pads[index] = self.cfg.leds.perform_on if on else self.cfg.leds.perform_idle
             else:
                 full, rest = self._pad_full(pad)

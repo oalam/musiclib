@@ -204,13 +204,14 @@ def design_scale(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
 def perform(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     eng = Engine(cfg, ClockTracker(), project)
     now = running(eng, 12, program=4 * 16 + 2)
-    btn(eng, "SHIFT", t=now)
-    eng.handle(PadEvent(_index(7), True, 2500), now)  # SD2 : T3 tenu en perform
-    btn(eng, "SHIFT", False, t=now)
+    btn(eng, "SOLO", t=now)
+    for pad in (3, 7):  # T3 et T7 dans le groupe
+        eng.handle(PadEvent(_index(pad), True, 2500), now)
+        eng.handle(PadEvent(_index(pad), False, 0), now)
     btn(eng, "BROWSE_RIGHT", t=now)  # page 2 : filtre
     for _ in range(6):
-        eng.handle(EncoderEvent(2, 8, 0), now)  # CUT ouvert le temps du pad
-    return eng, now + 100 * MS, True
+        eng.handle(EncoderEvent(2, 8, 0), now)  # CUT des deux tracks
+    return eng, now + 3 * SECOND, True
 
 
 SCENES: dict[str, Scene] = {

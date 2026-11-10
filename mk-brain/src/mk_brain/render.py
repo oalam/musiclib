@@ -26,8 +26,9 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
   (le compte à rebours garde la priorité).
 - Slice 9 : le clavier reprend les deux bandeaux du MPC ; une frappe y
   montre sa note et son degré sous le pattern, `oct +1` à droite, le cadre
-  reste. Menu et fiche de banque du design retirés de l'écran. En perform,
-  la track du pad tenu (`PERF`) et ses faders.
+  reste. Menu et fiche de banque du design retirés de l'écran. Sous SOLO,
+  la première track du groupe et ses faders (`x2` si plusieurs). Le mode
+  (MPC, KEYS, SOLO) toujours en bas à gauche du bandeau gauche, inversé.
 - Sélection de projet (slice 6.C) : liste à gauche, la ligne choisie en
   gros et inversée ; à droite le projet choisi (banques, date) et les gestes.
   Elle remplace les deux écrans entiers.
@@ -133,7 +134,7 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
     font = _font(DIVISION)
     for i in range(COLS):
         name = DIVISIONS[screen * COLS + i][0]
-        box = (i * COL, 0, (i + 1) * COL - 2, BAND - 2)
+        box = (i * COL, 0, (i + 1) * COL - 2, TAG_TOP - 2)  # place pour l'étiquette du mode
         chosen = name == engine.division
         if chosen:
             d.rectangle(box, fill=1)
@@ -158,6 +159,16 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = 0) -> None:
 
 
 HIT_TOP = 26  # frappe du clavier : sous le pattern en gros, à la place des mutes
+TAG_W = 46  # étiquette du mode (MPC, KEYS, SOLO), en bas à gauche du bandeau gauche
+TAG_TOP = 25
+
+
+def _mode_tag(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+    """Mode courant en vidéo inverse, toujours affiché (demandé le 2026-11-10)."""
+    box = (2, TAG_TOP, TAG_W - 4, BAND - 3)
+    d.rectangle(box, fill=1)
+    name = engine.mode_name
+    _centered(d, box, name, _fit(d, name, box[2] - box[0] - 4, (SMALL, 10)), 0)
 
 
 def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int]) -> None:
@@ -166,7 +177,7 @@ def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int])
     _, note, vel, _ = hit
     lay = engine.layout
     name, role = flat_note(note), degree_name(lay, note)
-    top, bottom, left, right = HIT_TOP, BAND - 3, 3, WIDTH - 4
+    top, bottom, left, right = HIT_TOP, BAND - 3, TAG_W, WIDTH - 4
     bar = new_image()
     db = ImageDraw.Draw(bar)
     db.rectangle((left, top, left + round((right - left) * vel / 127), bottom), fill=1)
@@ -179,7 +190,7 @@ def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int])
     _centered(
         dt, (x, top, x + int(dt.textlength(role, font=role_font)), bottom), role, role_font, 1
     )
-    box = (0, top, WIDTH, bottom + 1)
+    box = (TAG_W - 2, top, WIDTH, bottom + 1)
     img.paste(ImageChops.logical_xor(bar, text).crop(box), box[:2])
     ImageDraw.Draw(img).rectangle((left, top, right, bottom), outline=1)
 
@@ -203,9 +214,8 @@ def _left_band(
     _bold(d, (WIDTH - tw - 4, -6), track, big, 1)
     name = engine.cfg.track_names.get(shown, "")  # code de la grille (doctrine §1)
     tracks = engine.perform_tracks
-    if tracks:  # perform : `PERF`, et le nombre de tracks du groupe s'il y en a plusieurs
-        more = f" x{len(tracks)}" if len(tracks) > 1 else ""
-        name = f"PERF{more} {name}".rstrip()
+    if len(tracks) > 1:  # groupe SOLO : nombre de tracks réglées ensemble
+        name = f"x{len(tracks)} {name}".rstrip()
     if name:
         nw = int(d.textlength(name, font=mid))
         _bold(d, (WIDTH - tw - nw - 12, 1), name, mid, 1)
@@ -229,9 +239,9 @@ def _left_band(
         entry = engine.cfg.mpc_pad(hit[0])
         text = f"{entry.label}  T{entry.track:02d}  {entry.note}  v{hit[2]}"
     if text:
-        _bold(d, (3, 23), text, _fit(d, text, WIDTH - 8, (12,)), 1)
+        _bold(d, (TAG_W + 2, 23), text, _fit(d, text, WIDTH - TAG_W - 6, (12,)), 1)
     else:
-        _mute_strip(d, engine)
+        _mute_strip(d, engine, TAG_W)
 
 
 def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
@@ -384,6 +394,7 @@ def left(
         _repeat_band(d, engine, 0)
     else:
         _left_band(img, d, engine, now, message, warn)
+    _mode_tag(d, engine)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
     _faders(d, engine, now, 0)
     if engine.keyboard:

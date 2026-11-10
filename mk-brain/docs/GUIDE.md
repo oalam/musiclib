@@ -128,28 +128,23 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
   (pad n = track n), pas le kit.
 - **Flèches BROWSE ◀ ▶** : page 1 (LVL BR OVER SRR / DEL REV CHO TUNE) ou
   page 2 (LVL CUT RES ENV / MW BC PB PAN), en boucle.
-- **PB** (pitch bend) seulement MUTE tenu ; il revient au centre au
-  relâché de MUTE. Marche aussi en perform, sur toutes les tracks du
-  groupe.
+- **PB** (pitch bend) seulement SHIFT tenu ; il revient au centre au
+  relâché de SHIFT. Marche aussi en SOLO, sur toutes les tracks du groupe.
 
-### Perform : SHIFT + pad tenu
+### Perform : SOLO
 
-![SHIFT + SD2 tenu, CUT ouvert](img/12-perform.png)
+![SOLO, pads 3 et 7 dans le groupe, CUT ouvert](img/12-perform.png)
 
-- **SHIFT + pad**, pad gardé enfoncé : pas de note. Les encodeurs règlent
-  la track **du pad** (en MPC : sa track, SD2 → T3 ; en clavier : pad n =
-  track n). SHIFT peut être relâché, c'est le pad qui compte.
-- **Pad relâché** : les valeurs réglées restent ; les encodeurs reviennent
-  à la track sélectionnée.
-- L'écran affiche `PERF` et la track du pad ; la track sélectionnée ne
-  change pas.
-- **SOLO** verrouille ce mode (LED SOLO pleine) : les pads ne jouent plus
-  et pad n = track n, que les pads soient en MPC ou en clavier.
-  Les pads passent en bleu très faible, ceux du groupe en vert vif.
-  Un tap sur un pad ajoute sa track au groupe, un second tap
-  la retire ; les encodeurs règlent toutes les tracks du groupe, sans rien
-  tenir (`PERF x2` à l'écran s'il y en a plusieurs). SOLO à nouveau : groupe
-  vidé, les pads rejouent.
+- **SOLO** (LED pleine) : les pads ne jouent plus, pad n = track n, que
+  les pads soient en MPC ou en clavier. Pads en bleu très faible, ceux du
+  groupe en vert vif.
+- Un tap sur un pad ajoute sa track au groupe, un second tap la retire.
+  Les encodeurs règlent toutes les tracks du groupe, sans rien tenir ; les
+  valeurs restent. Groupe vide : la track sélectionnée.
+- L'écran montre la première track du groupe et ses faders (`x2` s'il y en
+  a plusieurs).
+- **SOLO** à nouveau ou **PAD MODE** : sortie, groupe vidé, les pads
+  rejouent (PAD MODE ne change pas la disposition en sortant de SOLO).
 
 ## 7. Mutes
 
@@ -215,13 +210,12 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | Geste | Effet |
 |---|---|
 | Pad | kit MPC, ou clavier sur la track sélectionnée |
-| PAD MODE | MPC ↔ clavier |
+| PAD MODE | MPC ↔ clavier ; sous SOLO : sortie de SOLO |
 | GROUP A-H | banque courante (sans envoi) |
 | SELECT + pad | track des encodeurs et du clavier (16 = track active DT2) |
 | MUTE + pad | mute / ouvre la track |
-| SHIFT + pad tenu + encodeurs | perform : encodeurs sur la track du pad tant qu'il est tenu |
 | SOLO | perform verrouillé : tap sur pad n = ajoute / retire la track n |
-| MUTE + encodeur PB | pitch bend, au centre au relâché de MUTE |
+| SHIFT + encodeur PB | pitch bend, au centre au relâché de SHIFT |
 | BROWSE ◀ ▶ | page d'encodeurs |
 | SHIFT + BROWSE | sélection de projet (transport arrêté) |
 | Flèches de transport | octave du clavier |

@@ -67,11 +67,25 @@ def test_mute_strip_open_muted_and_selected(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.faders.muted[3] = True
     img = render.left(eng, 0)
-    cell = WIDTH // 16
-    assert img.getpixel((cell // 2, 32))  # track 1 ouverte : case pleine
-    assert not img.getpixel((2 * cell + cell // 2, 32))  # track 3 mutée : case vide
-    assert img.getpixel((cell // 2, 37))  # track 1 sélectionnée : soulignée
-    assert not img.getpixel((cell + cell // 2, 37))
+    x0, cell = render.TAG_W, (WIDTH - render.TAG_W) // 16  # à droite de l'étiquette du mode
+    assert img.getpixel((x0 + cell // 2, 32))  # track 1 ouverte : case pleine
+    assert not img.getpixel((x0 + 2 * cell + cell // 2, 32))  # track 3 mutée : case vide
+    assert img.getpixel((x0 + cell // 2, 37))  # track 1 sélectionnée : soulignée
+    assert not img.getpixel((x0 + cell + cell // 2, 37))
+
+
+def test_mode_tag_always_shown(cfg: Config) -> None:
+    """MPC, KEYS ou SOLO en bas à gauche, même NOTE REPEAT tenu."""
+    eng = Engine(cfg)
+    tag = (2, render.TAG_TOP, render.TAG_W - 4, render.BAND - 3)
+    mpc = render.left(eng, 0).crop(tag).tobytes()
+    eng.handle(ButtonEvent("SOLO", True), 0)
+    solo = render.left(eng, 0).crop(tag).tobytes()
+    eng.handle(ButtonEvent("NOTE_REPEAT", True), 0)
+    assert render.left(eng, 0).crop(tag).tobytes() == solo != mpc
+    eng.handle(ButtonEvent("NOTE_REPEAT", False), 0)
+    eng.handle(ButtonEvent("PAD_MODE", True), 0)  # sort de SOLO, toujours en MPC
+    assert eng.mode_name == "MPC" and render.left(eng, 0).crop(tag).tobytes() == mpc
 
 
 def test_design_left_is_framed(cfg: Config) -> None:
@@ -96,7 +110,7 @@ def test_keyboard_uses_mpc_bands_with_frame(cfg: Config, project: Project) -> No
     kbd = design(cfg, project=project)
     left_mpc, left_kbd = render.left(mpc, 0), render.left(kbd, 0)
     assert left_kbd.getpixel((0, 0)) and not left_mpc.getpixel((0, 0))  # cadre
-    inner = (1, 1, render.WIDTH - 1, render.BAND)
+    inner = (render.TAG_W, 1, render.WIDTH - 1, render.BAND)  # hors étiquette du mode
     assert left_kbd.crop(inner).tobytes() == left_mpc.crop(inner).tobytes()
     assert render.right(kbd, 0).tobytes() == render.right(mpc, 0).tobytes()
 
