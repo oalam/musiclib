@@ -34,10 +34,10 @@ class Session(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    design_bank: int | None = Field(None, ge=0, le=7)  # banque du design (GROUP), 0 = A
-    group: int = Field(1, ge=0, le=7)  # disposition du design
+    design_bank: int | None = Field(None, ge=0, le=7)  # avant la slice 8 : banque du design
+    layout: str | None = None  # nom de la disposition du clavier (avant : son groupe B-H)
     octave: int = 0
-    bank: int | None = Field(None, ge=0, le=7)  # banque de PATTERN + pad
+    bank: int | None = Field(None, ge=0, le=7)  # banque courante (PC reçu ou GROUP), 0 = A
     program: int | None = Field(None, ge=0, le=127)  # dernier PC reçu : pattern et banque live
     track: int = Field(1, ge=1, le=16)
     page: int = Field(0, ge=0)

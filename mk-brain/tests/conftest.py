@@ -8,9 +8,8 @@ from mk_brain.project import Project, load_project
 
 @pytest.fixture(scope="session")
 def cfg() -> Config:
-    """Config du dépôt, démarrage forcé en live : les tests partent du mode de scène."""
-    base = load_config()
-    return base.model_copy(update={"play": base.play.model_copy(update={"mode": "live"})})
+    """Config du dépôt."""
+    return load_config()
 
 
 @pytest.fixture(scope="session")

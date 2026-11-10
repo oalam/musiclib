@@ -14,7 +14,11 @@ python3.12 -m venv .venv
 ## Configuration
 
 `config/default.yaml` : canal, courbe de vélocité, quantize, longueur de phrase,
-couleurs, dispositions A-H.
+couleurs, dispositions du clavier (B-H), table `mpc` des 16 pads (track, tranche,
+label, couleur).
+
+Guide utilisateur : [docs/GUIDE.md](docs/GUIDE.md) ; captures régénérées par
+`.venv/bin/python docs/screens.py` (écrans et LED rendus par le vrai code).
 
 `projects/<set>.yaml` : fiche de chaque banque (titre, tempo, tonique, mode,
 phrase), **généré** par `mk-brain convert` depuis le front matter `mkbrain:` de
@@ -34,12 +38,12 @@ la tonique et le mode affichés ; en design, celle choisie par GROUP.
 .venv/bin/mk-brain spike --raw --no-chase   # + rapports bruts en hexa
 .venv/bin/mk-brain play               # sélection de projet (maître : choisir, appui : charger ;
                                       # dernier joué présélectionné, SHIFT + BROWSE = y revenir),
-                                      # pads → DT2 (AUTO CHANNEL), démarre en design (play.mode),
-                                      # SHIFT + CONTROL 1 s + appui maître = live / design,
-                                      # en design GROUP A-H = banque, PAD MODE = disposition,
-                                      # boutons d'écran 1-4 = menu (maître : choisir, appui : valider),
+                                      # pads en MPC (table mpc), PAD MODE = MPC / clavier,
+                                      # GROUP A-H = banque, boutons d'écran 1-4 = menu
+                                      # (maître : régler l'entrée au focus,
+                                      # appui : focus suivant),
                                       # flèches BROWSE = page d'encodeurs ◀ ▶ en boucle,
-                                      # flèches de transport = octave en design (±4),
+                                      # flèches de transport = octave du clavier (±4),
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 .venv/bin/mk-brain play --project projects/solaris.yaml   # projet chargé sans sélection

@@ -216,8 +216,12 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
                 sched.at(t, m)  # un seul fil écrit sur le port, même pour l'immédiat
         if msgs and engine.last_played is not None:
             pad, note, vel = engine.last_played
-            text = f"{describe_note(engine.layout, pad, note)} vel {vel}"
-            sheet = engine.context  # tonique et mode de la banque (slice 6.B)
+            if engine.last_hit_mpc:
+                e = cfg.mpc_pad(pad)
+                text = f"pad {pad} -> {e.label} T{e.track:02d} note {note} vel {vel}"
+            else:
+                text = f"{describe_note(engine.layout, pad, note)} T{engine.track:02d} vel {vel}"
+            sheet = engine.sheet  # tonique et mode de la banque courante
             if sheet is not None:
                 key, bank = sheet
                 text = f"{key} {bank.tonique} {cfg.scale(bank.mode).name} : {text}"
@@ -227,8 +231,8 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
                 engine.last_decision = ""
 
     print(
-        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; mode {engine.modes.mode} ; "
-        "SHIFT + CONTROL 1 s puis appui maître = changer de mode ; SHIFT + BROWSE = projet ; "
+        f"play : {'essai sans DT2' if dry_run else 'DT2'} ; pads en MPC ; "
+        "PAD MODE = MPC / clavier ; GROUP = banque ; SHIFT + BROWSE = projet ; "
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )
     try:
@@ -274,7 +278,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
             warn = "TRANSFER OPEN?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
                 warn = warn or "no clock"
-            left = render.left(engine, now, message, warn)  # cadre et bandeau DESIGN en design
+            left = render.left(engine, now, message, warn)  # cadre en clavier
             for screen, img in enumerate((left, render.right(engine, now))):
                 frame = display.image_to_frame(img)
                 if frame != shown[screen]:

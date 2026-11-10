@@ -7,10 +7,18 @@ import pytest
 
 from mk_brain.clock import ClockTracker
 from mk_brain.config import Config
-from mk_brain.engine import DESIGN_GROUP, NOTE_OFF_MIN_NS, Engine, NoteOff, NoteOn, Timed
-from mk_brain.hid_mk2 import BUTTONS, ButtonEvent, EncoderEvent, PadEvent
+from mk_brain.engine import (
+    KEYBOARD_GROUP,
+    NOTE_OFF_MIN_NS,
+    Engine,
+    NoteOff,
+    NoteOn,
+    Timed,
+)
+from mk_brain.hid_mk2 import BUTTONS, LED_MAX, ButtonEvent, EncoderEvent, PadEvent, pad_label
 from mk_brain.layouts import scale
 from mk_brain.project import Project
+from mk_brain.quantize import QUANTIZE_CYCLE
 from mk_brain.selection import Entry, Selector
 from mk_brain.session import Session
 
@@ -39,7 +47,7 @@ def btn(eng: Engine, name: str, pressed: bool = True, t: int = 0) -> None:
     eng.handle(ButtonEvent(name, pressed), t)
 
 
-def group(eng: Engine) -> str:
+def group(eng: Engine) -> str | None:
     """Disposition en cours (fonction : mypy ne fige pas la valeur entre deux gestes)."""
     return eng.layout.group
 
@@ -47,16 +55,11 @@ def group(eng: Engine) -> str:
 def design(
     cfg: Config, clock: ClockTracker | None = None, project: Project | None = None
 ) -> Engine:
-    """Moteur passé en design par le geste : SHIFT + CONTROL 1 s, appui maître."""
+    """Moteur aux pads en clavier (PAD MODE) ; le nom rappelle l'ancien mode design."""
     eng = Engine(cfg, clock, project)
-    btn(eng, "SHIFT")
-    btn(eng, "CONTROL")
-    eng.tick(SECOND)
-    btn(eng, "SHIFT", False)
-    btn(eng, "CONTROL", False)
-    btn(eng, "MASTER_PUSH")
-    btn(eng, "MASTER_PUSH", False)
-    assert eng.design
+    btn(eng, "PAD_MODE")
+    btn(eng, "PAD_MODE", False)
+    assert eng.keyboard
     return eng
 
 
@@ -67,25 +70,29 @@ def test_note_fires_after_window_with_peak(cfg: Config) -> None:
     eng = Engine(cfg)
     assert eng.handle(PadEvent(PAD1, True, 300), 0) == []
     assert eng.handle(PadEvent(PAD1, True, 2500), 1 * MS) == []
-    assert eng.tick(int(2.5 * MS)) == [(int(2.5 * MS), NoteOn(15, 0, 127))]
+    assert eng.tick(int(2.5 * MS)) == [(int(2.5 * MS), NoteOn(0, 60, 127))]
     assert eng.handle(PadEvent(PAD1, True, 2000), 3 * MS) == []  # tenu : rien de plus
-    assert eng.handle(PadEvent(PAD1, False, 0), 100 * MS) == [(100 * MS, NoteOff(15, 0))]
+    assert eng.handle(PadEvent(PAD1, False, 0), 100 * MS) == [(100 * MS, NoteOff(0, 60))]
 
 
 def test_short_hit_fires_on_release(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.handle(PadEvent(PAD1, True, 2500), 0)
     out = eng.handle(PadEvent(PAD1, False, 0), MS // 2)
-    assert out == [(MS // 2, NoteOn(15, 0, 127)), (MS // 2 + NOTE_OFF_MIN_NS, NoteOff(15, 0))]
+    assert out == [(MS // 2, NoteOn(0, 60, 127)), (MS // 2 + NOTE_OFF_MIN_NS, NoteOff(0, 60))]
 
 
-def test_pad_mode_changes_layout_and_note_off_keeps_note(cfg: Config) -> None:
-    eng = design(cfg)
-    btn(eng, "PAD_MODE")  # B → C
-    assert press(eng, 0) == [(3 * MS, NoteOn(15, 60, 127))]
-    for _ in range(6):
-        btn(eng, "PAD_MODE")  # … → A
-    assert eng.handle(PadEvent(PAD1, False, 0), 30 * MS) == [(30 * MS, NoteOff(15, 60))]
+def test_pad_mode_toggles_mpc_keyboard_and_note_off_keeps_target(cfg: Config) -> None:
+    eng = Engine(cfg)
+    assert eng.mpc
+    assert press(eng, 0) == [(3 * MS, NoteOn(0, 60, 127))]  # pad 1 = BD : T1, tranche 60
+    btn(eng, "PAD_MODE")  # clavier pendant que le pad est tenu
+    assert eng.keyboard and eng.leds().buttons["PAD_MODE"] == LED_MAX
+    assert eng.handle(PadEvent(PAD1, False, 0), 30 * MS) == [(30 * MS, NoteOff(0, 60))]
+    eng.track = 9
+    assert press(eng, 40 * MS) == [(43 * MS, NoteOn(8, 60, 127))]  # chromatique C5 sur T9
+    btn(eng, "PAD_MODE")
+    assert eng.mpc and eng.last_control == "MPC"
 
 
 def test_leds_lit_pad_and_active_group(cfg: Config) -> None:
@@ -108,14 +115,14 @@ def test_quantize_late_hit_goes_to_next_step(cfg: Config) -> None:
     out = press(eng, t)
     assert len(out) == 1
     target, msg = out[0]
-    assert msg == NoteOn(15, 0, 127)
+    assert msg == NoteOn(0, 60, 127)
     assert target == pytest.approx(12 * TICK, abs=MS // 100)
 
 
 def test_quantize_early_hit_is_immediate(cfg: Config) -> None:
     eng = Engine(cfg, running_clock())
     t = 7 * TICK  # 1 tick après le pas 6
-    assert press(eng, t) == [(t + 3 * MS, NoteOn(15, 0, 127))]
+    assert press(eng, t) == [(t + 3 * MS, NoteOn(0, 60, 127))]
 
 
 def test_grid_cycles_and_off_is_immediate(cfg: Config) -> None:
@@ -126,7 +133,7 @@ def test_grid_cycles_and_off_is_immediate(cfg: Config) -> None:
         modes.append(eng.quantize)
     assert modes == ["1/8", "off"]
     t = 10 * TICK
-    assert press(eng, t) == [(t + 3 * MS, NoteOn(15, 0, 127))]
+    assert press(eng, t) == [(t + 3 * MS, NoteOn(0, 60, 127))]
 
 
 def test_swing_delays_odd_sixteenth(cfg: Config) -> None:
@@ -175,7 +182,7 @@ def test_repeat_lock_with_shift(cfg: Config) -> None:
 def test_repeat_needs_running_transport(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "NOTE_REPEAT")
-    assert press(eng, 0) == [(3 * MS, NoteOn(15, 0, 127))]
+    assert press(eng, 0) == [(3 * MS, NoteOn(0, 60, 127))]
 
 
 # --- slice 4 : compteur de phrases -------------------------------------------
@@ -229,7 +236,7 @@ def test_shift_play_and_shift_group_recalibrate(cfg: Config) -> None:
     advance(eng, 1, 2 * 96 + 41)  # mesure 3
     btn(eng, "SHIFT")
     btn(eng, "GROUP_C")
-    assert eng.group == 1  # SHIFT + GROUP ne change pas la disposition
+    assert eng.group == KEYBOARD_GROUP and eng.bank is None  # SHIFT + GROUP : recalage seul
     advance(eng, 2 * 96 + 41, 3 * 96 + 1)
     assert eng.phrase_state is not None and eng.phrase_state.bar == 17
     btn(eng, "PLAY")
@@ -256,16 +263,21 @@ def test_select_then_encoder_sends_cc_on_track_channel(cfg: Config) -> None:
     assert eng.handle(EncoderEvent(2, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
 
 
-def test_auto_channel_track_refused(cfg: Config) -> None:
+def test_pad16_mute_refused_select_targets_active_track(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
     eng = Engine(cfg)
     btn(eng, "MUTE")
-    assert eng.handle(PadEvent(3, True, 2500), 0) == []  # index 3 = pad 16
+    assert eng.handle(PadEvent(3, True, 2500), 0) == []  # index 3 = pad 16 : pas de mute
+    assert eng.leds().pads[3] == (0, 0, 0)
     eng.handle(PadEvent(3, False, 0), MS)
     btn(eng, "MUTE", False)
     btn(eng, "SELECT")
     eng.handle(PadEvent(3, True, 2500), 2 * MS)
-    assert eng.track == 1 and "AUTO CHANNEL" in eng.last_control
-    assert eng.leds().pads[3] == (0, 0, 0)
+    eng.handle(PadEvent(3, False, 0), 3 * MS)
+    btn(eng, "SELECT", False)
+    assert eng.track == 16 and eng.last_control == "T16 selected (DT2 active)"
+    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
 
 
 def test_mute_pad_sends_cc94(cfg: Config) -> None:
@@ -284,9 +296,9 @@ def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
     btn(eng, "PATTERN")
     assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []
     assert eng.last_control.startswith("bank?")
-    btn(eng, "GROUP_B")  # PATTERN tenu : banque B, sans changer de disposition
-    assert eng.group == 1 and eng.layout.group == "A" and eng.bank == 1
-    assert eng.leds().groups[1] == cfg.families["chromatique"]
+    btn(eng, "GROUP_B")  # GROUP seul : banque B, sans envoi
+    assert eng.bank == 1 and eng.last_control == "bank B"
+    assert eng.leds().groups[1] == cfg.leds.bank
     assert eng.handle(PadEvent(PAD1, True, 2500), MS) == [(MS, ProgramChange(9, 16))]  # B01
     eng.handle(PadEvent(PAD1, False, 0), MS)
     eng.handle(PadEvent(PAD7, False, 0), MS)
@@ -319,73 +331,48 @@ def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
     assert not eng.faders.view(1)[1].stale
 
 
-# --- slice 5.B : modes live / design ---------------------------------------------
+# --- slice 8 : MPC, mode unique ------------------------------------------------
 
 
-def test_live_pads_stay_rhythmic(cfg: Config) -> None:
+def test_mpc_pads_play_slices_on_track_channels(cfg: Config) -> None:
+    idx = {pad_label(i): i for i in range(16)}
     eng = Engine(cfg)
-    btn(eng, "GROUP_C")
-    btn(eng, "PAD_MODE")
-    assert eng.layout.group == "A"
-    assert press(eng, 0) == [(3 * MS, NoteOn(15, 0, 127))]
+    assert press(eng, 0, pad=idx[12]) == [(3 * MS, NoteOn(4, 62, 127))]  # OH : T5, tranche 62
+    leds = eng.leds()
+    assert leds.pads[idx[12]] == cfg.mpc_pad(12).color  # frappé : plein
+    assert leds.pads[idx[13]] == scale(cfg.mpc_pad(13).color, cfg.leds.dim)  # CR au repos
+    btn(eng, "GROUP_C")  # banque choisie, les pads restent en MPC
+    assert eng.mpc and eng.bank == 2
 
 
-def test_design_starts_chromatic_with_own_quantize(cfg: Config) -> None:
-    eng = design(cfg)
-    assert (eng.layout.group, eng.quantize) == ("B", "off")
-    btn(eng, "PAD_MODE")
+def test_one_quantize_for_both_layouts(cfg: Config) -> None:
+    eng = Engine(cfg)
+    assert eng.quantize == cfg.play.quantize
     btn(eng, "GRID")
-    assert (eng.layout.group, eng.quantize) == ("C", "1/16")
-    eng.modes.mode = "live"
-    assert (eng.layout.group, eng.quantize) == ("A", cfg.play.quantize)
+    q = eng.quantize
+    btn(eng, "PAD_MODE")
+    assert eng.quantize == q and eng.layout.group == "B"  # clavier sans banque : chromatique
 
 
-def test_mode_switch_refused_in_live_while_running(cfg: Config) -> None:
-    eng = Engine(cfg, running_clock(1))
-    eng.on_start()
-    btn(eng, "SHIFT")
-    btn(eng, "CONTROL")
-    eng.tick(SECOND)
-    btn(eng, "MASTER_PUSH")
-    assert not eng.design and eng.last_control.startswith("transport running")
-
-
-def test_other_button_cancels_proposal(cfg: Config) -> None:
+def test_control_no_longer_switches_mode(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "SHIFT")
     btn(eng, "CONTROL")
     eng.tick(SECOND)
-    assert eng.modes.pending == "design" and eng.leds().buttons["CONTROL"] > 0
-    btn(eng, "GRID")
     btn(eng, "MASTER_PUSH")
-    assert not eng.design and eng.last_control == "switch cancelled"
+    assert eng.mpc and "CONTROL" not in eng.leds().buttons
 
 
-def test_design_encoders_on_auto_channel_with_rec_hint(cfg: Config) -> None:
-    from mk_brain.engine import ControlChange
-
-    eng = design(cfg)
-    btn(eng, "SELECT")
-    eng.handle(PadEvent(3, True, 2500), 0)  # index 3 = pad 16 : joignable en design
-    btn(eng, "SELECT", False)
-    assert eng.track == 16
-    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
-    assert eng.last_control.endswith("DT2 in LIVE REC?")
-    eng.handle(EncoderEvent(2, 4, 0), 0)
-    assert "LIVE REC" not in eng.last_control  # rappel une fois par passage en design
-
-
-def test_live_selected_track_pad_stays_lit(cfg: Config) -> None:
-    from mk_brain.layouts import scale
-
+def test_modifier_held_shows_track_grid(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "SELECT")
     eng.handle(PadEvent(PAD7, True, 2500), 0)
     eng.handle(PadEvent(PAD7, False, 0), MS)
-    btn(eng, "SELECT", False)
     pads = eng.leds().pads
-    assert pads[PAD7] == scale(cfg.track_colors[7], cfg.leds.selected)
+    assert pads[PAD7] == cfg.track_colors[7]  # pad n = track n pendant SELECT
     assert pads[PAD1] == scale(cfg.track_colors[1], cfg.leds.dim)
+    btn(eng, "SELECT", False)
+    assert eng.leds().pads[PAD7] == scale(cfg.mpc_pad(7).color, cfg.leds.dim)  # SD2 au repos
 
 
 def test_next_pattern_requested_then_announced(cfg: Config) -> None:
@@ -404,6 +391,21 @@ def test_next_pattern_requested_then_announced(cfg: Config) -> None:
     assert after == ("E07", None)
 
 
+def test_pattern_held_lights_current_pattern_only(cfg: Config) -> None:
+    from mk_brain.hid_mk2 import pad_label
+
+    eng = Engine(cfg)
+    eng.on_program_change(16 * 4 + 3)  # E04, arrêté : en cours tout de suite
+    btn(eng, "PATTERN")
+    lit = [pad_label(i) for i, rgb in enumerate(eng.leds().pads) if rgb != (0, 0, 0)]
+    assert lit == [4]
+    assert eng.leds().pads[[pad_label(i) for i in range(16)].index(4)] == cfg.track_colors[4]
+    btn(eng, "PATTERN", False)
+    btn(eng, "GROUP_B")  # banque B choisie : E04 hors banque, tout éteint
+    btn(eng, "PATTERN")
+    assert all(rgb == (0, 0, 0) for rgb in eng.leds().pads)
+
+
 def test_program_change_when_stopped_sets_current_pattern(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_program_change(16 + 1)
@@ -419,12 +421,12 @@ def turn_master(eng: Engine, delta: int) -> None:
 
 def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    assert eng.design_bank == 0  # pas de PC reçu : première banque
+    assert eng.bank is None  # ni PC reçu ni GROUP
     btn(eng, "GROUP_E")
     assert eng.last_control == "E-TRIBE  Bb Phrygian"
     assert eng.layout.group == "D"  # disposition calée sur le mode de la banque
-    eng.group = DESIGN_GROUP  # surcharge (PAD MODE, menu GAMME) : chromatique
-    assert press(eng, 0) == [(3 * MS, NoteOn(15, 70, 127))]  # chromatique depuis A#
+    eng.group = KEYBOARD_GROUP  # surcharge (PAD MODE, menu GAMME) : chromatique
+    assert press(eng, 0) == [(3 * MS, NoteOn(0, 70, 127))]  # chromatique depuis A#
     leds = eng.leds()
     assert leds.groups[4] == cfg.leds.bank  # choisie : blanc plein
     assert leds.groups[0] == scale(cfg.families["gamme"], cfg.leds.dim)  # les autres : mode × dim
@@ -435,75 +437,71 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     assert by_pad[2] != (0, 0, 0)  # B : ♭2, dans la gamme
     assert leds.groups[7] == (0, 0, 0)  # pas de banque H
     btn(eng, "GROUP_H")
-    assert (eng.design_bank, eng.last_control) == (4, "no bank H")
+    assert (eng.snapshot().bank, eng.last_control) == (7, "bank H (not in project)")
     assert group(eng) == "B"  # banque absente : la surcharge tient
     btn(eng, "GROUP_G")  # G-JOKER : chromatique sur la# (slice 6.A)
     assert eng.last_control == "G-JOKER  Bb Chroma"
     assert eng.leds().groups[6] == cfg.leds.bank  # choisie : blanc plein
     eng.handle(PadEvent(PAD1, False, 0), 10 * MS)
-    assert press(eng, 20 * MS)[0][1] == NoteOn(15, 70, 127)  # chromatique depuis A#
+    assert press(eng, 20 * MS)[0][1] == NoteOn(0, 70, 127)  # chromatique depuis A#
 
 
 def test_design_without_project(cfg: Config) -> None:
     eng = design(cfg)
     btn(eng, "GROUP_C")
-    assert (eng.layout.group, eng.last_control) == ("B", "no project")
-    assert eng.leds().groups == [(0, 0, 0)] * 8
+    assert (eng.layout.group, eng.last_control, eng.bank) == ("B", "bank C", 2)
+    assert eng.leds().groups[2] == cfg.leds.bank
 
 
-def test_design_starts_on_dt2_bank(cfg: Config, project: Project) -> None:
+def test_program_change_sets_current_bank(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, project=project)
     eng.on_program_change(4 * 16 + 2)  # E03
-    btn(eng, "SHIFT")
-    btn(eng, "CONTROL")
-    eng.tick(SECOND)
-    btn(eng, "MASTER_PUSH")
-    assert eng.design and eng.design_bank == 4
+    assert eng.bank == 4 and eng.layout.group == "D"  # clavier calé sur E-TRIBE phrygien
 
 
-def test_menu_choose_and_validate(cfg: Config, project: Project) -> None:
+def test_menu_master_applies_on_turn(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "DISPLAY_1")  # GAMME
+    btn(eng, "GROUP_A")
+    assert eng.menu == 0  # focus sur GAMME au départ
     assert eng.leds().buttons["DISPLAY_1"] > eng.leds().buttons["DISPLAY_2"]
     assert "DISPLAY_5" not in eng.leds().buttons  # 4 entrées, plus de BANK
     turn_master(eng, 1)  # A-HALF éolien : Aeolian au départ, Phrygian juste après
     assert eng.menu_view()[0] == ("GAMME", "Phrygian", True)
-    assert eng.layout.group == "C"  # rien d'appliqué avant l'appui
-    btn(eng, "MASTER_PUSH")
-    assert (eng.layout.group, eng.menu, eng.last_control) == ("D", None, "Phrygian")
-    btn(eng, "DISPLAY_3")  # QUANT : borné à la dernière valeur
-    turn_master(eng, 9)
-    btn(eng, "MASTER_PUSH")
-    assert (eng.quantize, eng.last_control) == ("1/8", "Q 1/8")
+    assert (eng.layout.group, eng.last_control) == ("D", "Phrygian")  # appliqué au cran
+    turn_master(eng, -2)  # Aeolian, puis Chroma
+    turn_master(eng, -1)  # en boucle : la dernière gamme
+    assert eng.layout.name == cfg.layouts[-1].name
+    btn(eng, "DISPLAY_3")  # QUANT : en boucle
+    q = eng.quantize
+    turn_master(eng, len(QUANTIZE_CYCLE))
+    assert eng.quantize == q
 
 
-def test_menu_same_button_closes_without_applying(cfg: Config, project: Project) -> None:
+def test_menu_push_cycles_focus(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "DISPLAY_2")  # TRACK
+    btn(eng, "MASTER_PUSH")  # GAMME -> TRACK
+    assert eng.menu == 1
     turn_master(eng, 4)
-    btn(eng, "DISPLAY_2")
+    assert eng.track == 5
     btn(eng, "MASTER_PUSH")
-    assert (eng.menu, eng.track) == (None, 1)
-    btn(eng, "DISPLAY_7")  # pas d'entrée : rien d'ouvert
-    assert eng.menu is None
+    btn(eng, "MASTER_PUSH")
+    btn(eng, "MASTER_PUSH")  # QUANT, PHRASE, puis retour à GAMME
+    assert eng.menu == 0
+    btn(eng, "DISPLAY_7")  # pas d'entrée : focus inchangé
+    assert eng.menu == 0
 
 
-def test_menu_phrase_design_only(cfg: Config, project: Project) -> None:
+def test_menu_phrase_until_bank_change(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
     btn(eng, "DISPLAY_4")  # PHRASE
     turn_master(eng, 1)
-    btn(eng, "MASTER_PUSH")
     assert eng.phrase.length == 64
     btn(eng, "GROUP_C")  # nouvelle banque : sa phrase
     assert eng.phrase.length == project.defaults.phrase
-    btn(eng, "DISPLAY_4")  # PHRASE
+    btn(eng, "DISPLAY_4")
     turn_master(eng, 1)
-    btn(eng, "MASTER_PUSH")
-    btn(eng, "SHIFT")
-    btn(eng, "CONTROL")
-    eng.tick(3 * SECOND)
-    btn(eng, "MASTER_PUSH")  # retour en live : la phrase de la config
-    assert not eng.design and eng.phrase.length == cfg.play.phrase
+    eng.on_program_change(2 * 16 + 1)  # C02 : la banque choisie, la surcharge tient
+    assert eng.phrase.length == 64
 
 
 def test_hit_kept_with_note_for_screen(cfg: Config, project: Project) -> None:
@@ -536,22 +534,23 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
 
 
-def test_pattern_has_no_effect_in_design(cfg: Config, project: Project) -> None:
+def test_pattern_pad_works_in_keyboard(cfg: Config, project: Project) -> None:
+    from mk_brain.engine import ProgramChange
+
     eng = design(cfg, project=project)
+    btn(eng, "GROUP_E")
     btn(eng, "PATTERN")
-    assert press(eng, 0) == [(3 * MS, NoteOn(15, 65, 127))]  # la note joue (A-HALF, fa)
-    btn(eng, "GROUP_E")  # GROUP choisit la banque, comme sans PATTERN
-    assert eng.design_bank == 4 and eng.bank is None
-    assert eng.leds().buttons["PATTERN"] == 0
+    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ProgramChange(9, 4 * 16))]  # E01
+    assert eng.leds().buttons["PATTERN"] == LED_MAX
 
 
 def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
     btn(eng, "GROUP_E")  # la#
-    eng.group = DESIGN_GROUP  # chromatique depuis A#5 (70)
+    eng.group = KEYBOARD_GROUP  # chromatique depuis A#5 (70)
     btn(eng, "TRANSPORT_RIGHT")
     assert (eng.octave, eng.last_control) == (1, "octave +1")
-    assert press(eng, 0) == [(3 * MS, NoteOn(15, 82, 127))]
+    assert press(eng, 0) == [(3 * MS, NoteOn(0, 82, 127))]
     buttons = eng.leds().buttons
     assert buttons["TRANSPORT_RIGHT"] > buttons["TRANSPORT_LEFT"] > 0
     btn(eng, "TRANSPORT_RIGHT")  # 70 + 24 + 15 = 109 : passe
@@ -592,7 +591,7 @@ def test_live_program_change_sets_bank_context_and_phrase_at_bar(
     eng.on_start()
     advance(eng, 1, 3 * 96 + 86 + 1)
     eng.on_program_change(16 * 4 + 3)  # E04
-    assert eng.context is not None and eng.context[0] == "E-TRIBE"
+    assert eng.sheet is not None and eng.sheet[0] == "E-TRIBE"
     assert eng.phrase.length == 32  # pas avant la barre
     assert eng.announce is not None and eng.announce[2] is None
     eng.tick(5 * MS)
@@ -609,7 +608,7 @@ def test_live_program_change_stopped_applies_phrase_now(cfg: Config, project: Pr
     eng.on_program_change(2 * 16)  # C01
     assert eng.phrase.length == 64
     eng.on_program_change(7 * 16)  # H01 : banque absente du projet, phrase de la config
-    assert eng.context is None and eng.phrase.length == cfg.play.phrase
+    assert eng.sheet is None and eng.phrase.length == cfg.play.phrase
 
 
 def test_announce_only_on_bank_change(cfg: Config, project: Project) -> None:
@@ -622,16 +621,15 @@ def test_announce_only_on_bank_change(cfg: Config, project: Project) -> None:
     assert eng.announce is not None and eng.announce[0] == "F-MENTAL"
 
 
-def test_design_follows_dt2_bank_change(cfg: Config, project: Project) -> None:
+def test_bank_follows_dt2_unless_same_pattern_bank(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    eng.on_program_change(4 * 16)  # E01 reçu en design : banque E, comme GROUP E
-    assert eng.context is not None and eng.context[0] == "E-TRIBE"
-    assert eng.announce is None  # la fiche est déjà à l'écran en design
+    eng.on_program_change(4 * 16)  # E01 : banque E, comme GROUP E, annoncée
+    assert eng.sheet is not None and eng.sheet[0] == "E-TRIBE" and eng.announce is not None
     btn(eng, "GROUP_A")  # choix à la main
-    eng.on_program_change(4 * 16 + 1)  # E02 : même banque, le choix tient
-    assert eng.context is not None and eng.context[0] == "A-HALF"
-    eng.on_program_change(7 * 16)  # H01 : banque absente du projet, rien ne change
-    assert eng.context is not None and eng.context[0] == "A-HALF"
+    eng.on_program_change(4 * 16 + 1)  # E02 : la DT2 reste en E, le choix tient
+    assert eng.sheet is not None and eng.sheet[0] == "A-HALF"
+    eng.on_program_change(7 * 16)  # H01 : la DT2 passe en H, absente du projet
+    assert eng.bank == 7 and eng.sheet is None and group(eng) == "C"  # disposition gardée
 
 
 # --- slice 6.C : sélection de projet --------------------------------------------
@@ -653,7 +651,7 @@ def test_selection_loads_preselected_project(cfg: Config, project: Project) -> N
     assert eng.selector is not None and eng.selector.index == 1
     btn(eng, "MASTER_PUSH")
     assert eng.selector is None and eng.project is project and eng.loaded == "solaris"
-    assert eng.context is not None and eng.context[0] == "E-TRIBE"  # contexte repris du PC
+    assert eng.sheet is not None and eng.sheet[0] == "E-TRIBE"  # contexte repris du PC
 
 
 def test_selection_scroll_and_invalid_refused(cfg: Config, project: Project) -> None:
@@ -670,15 +668,11 @@ def test_selection_scroll_and_invalid_refused(cfg: Config, project: Project) -> 
     assert eng.selector is None and eng.faders.page_index == 0
 
 
-def test_selection_refused_in_live_while_running(cfg: Config, project: Project) -> None:
+def test_selection_refused_while_running(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, running_clock(), project, _catalog(project))
     eng.on_start()
     eng.open_selection()
-    assert eng.selector is None
-    d = design(cfg, project=project)  # bascule faite à l'arrêt, puis Start
-    d.clock, d.catalog = running_clock(), _catalog(project)
-    d.open_selection()  # design : permise transport lancé
-    assert d.selector is not None
+    assert eng.selector is None and eng.last_control == "transport running: no project change"
 
 
 def test_start_in_live_closes_selection(cfg: Config, project: Project) -> None:
@@ -689,12 +683,9 @@ def test_start_in_live_closes_selection(cfg: Config, project: Project) -> None:
     assert eng.selector is None
 
 
-def test_start_mode_from_config(cfg: Config, project: Project) -> None:
-    start = cfg.model_copy(update={"play": cfg.play.model_copy(update={"mode": "design"})})
-    eng = Engine(start, project=project)
-    assert eng.design and eng.quantize == "off"
-    assert eng.sheet is not None and eng.sheet[0] == "A-HALF"  # première banque du projet
-    assert Engine(start).design  # sans projet aussi
+def test_starts_in_mpc_without_bank(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, project=project)
+    assert eng.mpc and eng.bank is None and eng.quantize == cfg.play.quantize
 
 
 # --- session : derniers réglages ---------------------------------------------------
@@ -723,19 +714,40 @@ def test_snapshot_restore_round_trip(cfg: Config, project: Project) -> None:
 def test_restore_keeps_program_already_received(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, project=project)
     eng.on_program_change(2 * 16)  # C01 reçu de la DT2
-    eng.restore(Session(program=4 * 16 + 3, design_bank=7, group=9 % 8))
-    assert eng.last_program == 2 * 16  # la DT2 l'emporte
-    assert eng.design_bank is None  # banque H absente du projet : ignorée
+    eng.restore(Session(program=4 * 16 + 3, bank=7))
+    assert eng.last_program == 2 * 16 and eng.bank == 2  # la DT2 l'emporte
 
 
-def test_design_layout_follows_bank_mode_until_pad_mode(cfg: Config, project: Project) -> None:
+def test_restore_session_from_before_slice_8(cfg: Config, project: Project) -> None:
+    old = Session.model_validate({"design_bank": 4, "group": 1, "octave": 0, "track": 3})
+    eng = Engine(cfg, project=project)
+    eng.restore(old)
+    assert eng.bank == 4 and group(eng) == "D" and eng.track == 3
+
+
+def test_session_keeps_layout_by_name_or_old_group(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    assert group(eng) == "C"  # A-HALF éolien
+    btn(eng, "GROUP_A")
+    turn_master(eng, -2)  # Aeolian, Chroma, puis en boucle la dernière gamme (sans groupe)
+    snap = eng.snapshot()
+    assert snap.layout == cfg.layouts[-1].name
+    fresh = Engine(cfg, project=project)
+    fresh.restore(snap)
+    assert fresh.layout.name == cfg.layouts[-1].name
+    old = Engine(cfg, project=project)
+    old.restore(Session(layout="E", bank=0))  # session d'avant : la lettre du groupe
+    assert group(old) == "E"
+
+
+def test_keyboard_layout_follows_bank_mode_until_gamme(cfg: Config, project: Project) -> None:
+    eng = design(cfg, project=project)
+    assert group(eng) == "B"  # sans banque : chromatique
     btn(eng, "GROUP_E")
     assert group(eng) == "D"  # E-TRIBE phrygien
-    btn(eng, "PAD_MODE")  # surcharge
+    btn(eng, "DISPLAY_1")  # GAMME : surcharge
+    turn_master(eng, 1)
     assert group(eng) == "E"
-    eng.on_program_change(4 * 16 + 1)  # même banque : la surcharge tient
+    eng.on_program_change(4 * 16 + 1)  # la DT2 en E, déjà choisie : la surcharge tient
     assert group(eng) == "E"
     eng.on_program_change(6 * 16)  # G-JOKER : chromatique
     assert group(eng) == "B"
@@ -756,8 +768,5 @@ def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
     assert eng.faders.view(4)[1].value == 112
     eng.on_control_change(6, 94, 1)  # mute de la track 7 : pas de sélection
     assert eng.track == 4 and eng.faders.muted[7]
-    eng.on_control_change(15, 74, 90)  # track 16 (AUTO CHANNEL) : pas joignable en live
-    assert eng.track == 4 and eng.faders.view(16)[1].value == 90
-    d = design(cfg)
-    d.on_control_change(15, 74, 90)  # en design, suivie
-    assert d.track == 16
+    eng.on_control_change(15, 74, 90)  # track 16 (AUTO CHANNEL) : suivie aussi
+    assert eng.track == 16 and eng.faders.view(16)[1].value == 90

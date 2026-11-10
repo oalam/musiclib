@@ -20,15 +20,13 @@ def pad_note(layout: Layout, pad: int) -> int:
     if not 1 <= pad <= N_PADS:
         raise LayoutError(f"pad {pad} hors 1-16")
     i = pad - 1
-    if layout.kind == "rythmique":
-        note = i  # note n - 1 = track n, quelle que soit la track active (manuel §8.4)
-    elif layout.kind == "chromatique":
+    if layout.kind == "chromatique":
         note = layout.base + i
     else:
         n = len(layout.intervals)
         note = layout.base + 12 * (i // n) + layout.intervals[i % n]
     if note > 127:
-        raise LayoutError(f"groupe {layout.group}, pad {pad} : note {note} > 127")
+        raise LayoutError(f"{layout.name}, pad {pad} : note {note} > 127")
     return note
 
 
@@ -39,8 +37,6 @@ def for_bank(layout: Layout, scale: Layout, tonic: int) -> Layout:
     `tonic` sa tonique (0 = C) : départ sur la tonique dans l'octave de C5,
     la chromatique prend la gamme de la banque pour éteindre le hors gamme.
     """
-    if layout.kind == "rythmique":
-        return layout
     update: dict[str, object] = {"base": 60 + tonic}
     if layout.kind == "chromatique":
         update["intervals"] = scale.intervals
@@ -48,8 +44,8 @@ def for_bank(layout: Layout, scale: Layout, tonic: int) -> Layout:
 
 
 def shift_octave(layout: Layout, octaves: int) -> Layout:
-    """Disposition décalée de `octaves` octaves ; la rythmique ne bouge pas."""
-    if octaves == 0 or layout.kind == "rythmique":
+    """Disposition décalée de `octaves` octaves."""
+    if octaves == 0:
         return layout
     return layout.model_copy(update={"base": layout.base + 12 * octaves})
 
@@ -73,14 +69,12 @@ def in_scale(layout: Layout, pad: int) -> bool:
 
 
 def pad_color(cfg: Config, layout: Layout, pad: int) -> RGB:
-    """Couleur pleine du pad (à la frappe) : track en rythmique, rôle de la note sinon.
+    """Couleur pleine du pad (à la frappe) : rôle de la note.
 
     Chromatique : seule la tonique est en couleur, le reste en blanc ; le
     hors gamme est éteint au repos (`in_scale`), pas ici (décidé le 2026-11-09).
     Gamme : tonique, tierce, quinte, puis la couleur de la famille.
     """
-    if layout.kind == "rythmique":
-        return cfg.track_colors[pad]
     degree = (pad_note(layout, pad) - layout.base) % 12
     if degree == 0:
         return cfg.roles.tonique
@@ -143,13 +137,11 @@ def note_name(note: int) -> str:
 
 
 def describe_note(layout: Layout, pad: int, note: int) -> str:
-    """Texte d'écran : track en rythmique, degré + nom MIDI sinon.
+    """Texte d'écran : degré + nom MIDI.
 
     Le nom suppose la DT2 sans TUNE. Avec un projet, la disposition part de la
     tonique de la banque (`for_bank`) : le nom est la vraie note, et la CLI
     affiche banque, tonique et mode devant (slice 6.B).
     """
-    if layout.kind == "rythmique":
-        return f"pad {pad} -> track {note + 1}"
     degree = DEGREES[(note - layout.base) % 12]
     return f"pad {pad} -> {degree} ({note_name(note)}, {note})"

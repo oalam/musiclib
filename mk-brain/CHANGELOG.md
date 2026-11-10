@@ -3,6 +3,50 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.21.0] - 2026-11-09
+
+### Ajouté
+
+- [8] Mode MPC : table `mpc` de `config/default.yaml`, 16 pads
+  `{pad, track, note, label, color}`, une tranche (machine SLICE, `SLICE`
+  = `NOTE`) sur le canal de sa track ; kit BD/BD2 (T1), SD/SD2/CP (T3),
+  RS et toms (T4), hats (T5), CR/RD (T6). Pads au chargement, label et
+  cible à l'écran à la frappe. Sonde `scripts/dt2_mpc_probe.py` passée
+  (SPEC questions 16-17) : les notes sur le canal d'une track non active
+  s'enregistrent sur elle en LIVE REC, la note 60 joue la tranche 1 et
+  le trig enregistré porte une NOTE.
+- [8] PAD MODE bascule MPC ↔ clavier ; une note tenue s'éteint sur le
+  canal et la note où elle est partie.
+- [8] `docs/screens.py` : captures des écrans et des LED rendues par le
+  vrai code, sans matériel (`docs/img/`).
+
+### Modifié
+
+- [8] Live et design fusionnés en un seul mode : une banque courante (PC
+  reçu ou GROUP seul, sans envoi), une quantize, menu et PATTERN + pad
+  partout, LED GROUP = compteur transport lancé, banques à l'arrêt.
+- [8] Le clavier et les encodeurs visent la track sélectionnée ; SELECT +
+  pad 16 = AUTO CHANNEL (track active de la DT2), suivie aussi depuis la
+  DT2. Pendant SELECT, MUTE ou PATTERN tenus, les pads montrent la grille
+  des tracks ; sous PATTERN, seul le pad du pattern en cours reste allumé.
+- [8] Menu en réglage direct : une entrée a toujours le focus (GAMME au
+  départ), l'encodeur maître règle sa valeur à chaque cran sans
+  validation, en boucle aux extrémités ; son appui passe le focus à
+  l'entrée suivante (GAMME, TRACK, QUANT, PHRASE, en boucle) ; les boutons
+  d'écran 1-4 y donnent le focus.
+- [8] Huit gammes exotiques au menu GAMME, après les sept dispositions
+  B-H : Locrian, Hung. min, Dbl harm., Blues, Hirajoshi, In-sen, Pelog,
+  Whole tone (sans groupe ni mode de banque). La session garde la
+  disposition par son nom ; les sessions d'avant, par sa lettre, restent
+  relues.
+- [8] Sessions d'avant la 0.21.0 relues : `design_bank` reprise comme
+  banque courante ; disposition du clavier gardée par son groupe (`layout`).
+
+### Retiré
+
+- [8] `modes.py`, bascule SHIFT + CONTROL, `play.mode`, rappel `DT2 in
+  LIVE REC?`, PATTERN + GROUP, disposition Drums (groupe A).
+
 ## [0.20.0] - 2026-11-09
 
 ### Ajouté

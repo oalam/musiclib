@@ -48,12 +48,13 @@ def test_touched_column_is_inverted_above_its_encoder(cfg: Config) -> None:
     assert not render.right(eng, SECOND).getpixel(probe)
 
 
-def test_pad_hit_shown_in_design_only(cfg: Config) -> None:
-    live = Engine(cfg)
-    before = render.left(live, 0).tobytes()
-    live.handle(PadEvent(PAD1, True, 2500), 0)
-    live.tick(3 * MS)
-    assert render.left(live, 3 * MS).tobytes() == before  # live : les LED suffisent
+def test_pad_hit_shown_in_both_layouts(cfg: Config) -> None:
+    mpc = Engine(cfg)
+    before = render.left(mpc, 0).tobytes()
+    mpc.handle(PadEvent(PAD1, True, 2500), 0)
+    mpc.tick(3 * MS)
+    assert render.left(mpc, 3 * MS).tobytes() != before  # MPC : label, track, tranche
+    assert render.left(mpc, 3 * MS + SECOND).tobytes() == before  # retombé sur les mutes
     eng = design(cfg)
     before = render.left(eng, 0).tobytes()
     eng.handle(PadEvent(PAD1, True, 2500), 0)
@@ -79,12 +80,6 @@ def test_design_left_is_framed(cfg: Config) -> None:
     assert render.left(design(cfg), 0).getpixel(corner)
 
 
-def test_mode_proposal_takes_right_screen(cfg: Config) -> None:
-    eng = at_bar(cfg, 15)
-    eng.modes.pending = "design"
-    assert not render.right(eng, 0).getpixel(BAND_PIXEL)
-
-
 def test_track_code_shown_next_to_track(cfg: Config) -> None:
     assert cfg.track_names[1] == "BD"  # grille de la doctrine §1
     with_name = render.left(Engine(cfg), 0).tobytes()
@@ -95,13 +90,13 @@ def test_track_code_shown_next_to_track(cfg: Config) -> None:
 # --- slice 5.D : menu du design -----------------------------------------------
 
 
-def test_design_menu_entry_inverted_while_open(cfg: Config, project: Project) -> None:
+def test_design_menu_focus_inverted(cfg: Config, project: Project) -> None:
     from test_engine import btn
 
     eng = design(cfg, project=project)
     corner = (render.COL + 1, 2)  # coin de l'entrée TRACK, hors texte
     assert not render.left(eng, 0).getpixel(corner)
-    btn(eng, "DISPLAY_2")
+    btn(eng, "MASTER_PUSH")  # focus GAMME -> TRACK
     assert render.left(eng, 0).getpixel(corner)
     assert render.left(eng, 0).getpixel((2, 2))  # icône du design
     assert not render.left(Engine(cfg), 0).getpixel((2, 2))
@@ -114,7 +109,7 @@ def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None
 
     eng = design(cfg, project=project)
     btn(eng, "GROUP_E")
-    eng.group = 1  # chromatique (surcharge de la disposition phrygienne)
+    eng.group = 0  # chromatique (surcharge de la disposition phrygienne)
     assert (flat_note(70), degree_name(eng.layout, 73)) == ("Bb5", "minor 3rd")
     assert degree_name(eng.layout, 72) == "2nd, out of scale"
     quiet = render.left(eng, 0).tobytes()

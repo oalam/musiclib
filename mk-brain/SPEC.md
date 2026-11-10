@@ -24,9 +24,11 @@ Maschine MK2 --USB HID--> Raspberry Pi (mk-brain) --USB MIDI--> Digitakt II
                            mk-brain/projects/*.yaml, convertis depuis la doctrine du set
 ```
 
-Deux modes : **live** (jouer le set, contexte suivi automatiquement) et
-**design** (préparer les patterns : mélodies et mouvements de paramètres
-enregistrés en LIVE REC sur la DT2). Aucun écran, clavier, front web ni
+Un seul mode depuis la slice 8 (2026-11-09) : les pads jouent un kit en
+tranches façon **MPC** ou un **clavier** calé sur la banque, bascule à
+PAD MODE ; le contexte suit la DT2, et on enregistre mélodies et
+mouvements de paramètres en LIVE REC sur la DT2 (live et design
+fusionnés, cf. Mode unique et pads MPC). Aucun écran, clavier, front web ni
 Wi-Fi sur scène : la MK2 est la seule interface, projet choisi à
 l'encodeur maître.
 
@@ -67,6 +69,8 @@ Le portage sur le Pi vient en fin de MVP.
    rebours avant le cap.
 5. **Deux modes, live et design** (ajouté le 2026-11-09), nettement
    distincts à l'écran et dans le comportement des contrôles.
+   **Fusionnés le 2026-11-09** (slice 8) : un seul mode, pads MPC ou
+   clavier à PAD MODE (cf. Mode unique et pads MPC).
 6. **Projets** (ajouté le 2026-11-09) : conversion de la doctrine d'un set
    (front matter + `solaris.json`) en fichier projet, commit dans
    `mk-brain/projects/`, récupération par git au démarrage du Pi, choix du
@@ -108,6 +112,7 @@ Le portage sur le Pi vient en fin de MVP.
 | Transport des projets | git : le Pi clone `oalam/musiclib` en partiel (`--filter=blob:none --sparse`, dossier `mk-brain/` seul), `git pull` au démarrage si le réseau répond, sinon dernière copie locale | le dépôt fait 677 Mo, le Pi n'en prend que `mk-brain/` ; le même mécanisme met à jour le code |
 | Accès GitHub du Pi | clé de déploiement en lecture seule | moindre privilège, le Pi ne pousse jamais |
 | Interface | la MK2 seule, aucun front web | décidé le 2026-11-09 |
+| Modes | un seul mode ; pads MPC (kit en tranches, table `mpc`) ou clavier, bascule PAD MODE | décidé le 2026-11-09 (slice 8) : live et design ne se distinguaient plus, la disposition Drums ne servait pas |
 
 ## Architecture
 
@@ -175,7 +180,158 @@ Le code n'est mis à jour qu'au démarrage, jamais pendant le jeu. Un code qui
 ne démarre pas après un pull revient au commit précédent : **à préciser à
 la slice 7**.
 
+## Mode unique et pads MPC (slice 8, décidé le 2026-11-09)
+
+**Fait foi sur les sections « Modes : live et design », « Pads en live » et
+« Affectation des contrôles »**, qui décrivent l'état jusqu'à la slice 6 et
+restent comme historique. Ordre : la slice 8 passe **avant** le portage Pi
+(slice 7).
+
+### Pourquoi
+
+- La disposition rythmique « Drums » (groupe A, pad n = track n) ne sert
+  pas au jeu : elle frappe chaque track à sa hauteur d'origine, une voix
+  par track. Le **mode MPC** la remplace : un kit joué en tranches, sur les
+  tracks de la grille (doctrine §1), sans rien changer aux canaux.
+- Les deux modes ne se distinguent presque plus : le design suit déjà les
+  PC d'une autre banque, la MK2 suit la track active de la DT2 (v0.20.0),
+  et la bascule MPC ↔ clavier rend inutile de réserver une disposition au
+  live. **Live et design fusionnent** : la seule bascule est celle des
+  pads, à PAD MODE.
+
+### Pads : deux dispositions, PAD MODE bascule
+
+| | **MPC** (au chargement) | **Clavier** |
+|---|---|---|
+| Pad | joue l'entrée de la table `mpc` : canal de sa track + note de sa tranche | joue la disposition de la banque (chromatique, gammes B-H) sur la **track sélectionnée** |
+| Couleurs | celle de l'entrée, × `dim` au repos, pleine à la frappe | rôles de la note (tonique, tierce, quinte, hors gamme éteint), comme le design |
+| Flèches de transport | sans effet | octave ±4 |
+| Écran gauche | vue « live » : pattern, track, mutes, compteur | vue « design » : disposition, note jouée et degré, cadre |
+
+- **PAD MODE** bascule MPC ↔ clavier, LED pleine en clavier. Le cycle des
+  dispositions passe par le menu GAMME seulement.
+- La disposition du clavier reste calée sur le mode de la banque (5.D) ;
+  GAMME la surcharge jusqu'au prochain changement de banque.
+- Une note tenue au moment de la bascule s'éteint sur le canal et la note
+  où elle est partie (pas de note bloquée).
+- Un PC ne remplace la banque courante que si la DT2 change de banque et
+  pas vers celle déjà choisie : GROUP A pendant que la DT2 joue E, puis
+  E02, garde A (règle de la 5.D, précisée au code le 2026-11-09).
+- Au chargement d'un projet : MPC. La session retient la dernière
+  disposition du clavier, pas la bascule.
+
+**Table `mpc` de `config/default.yaml`** (routage minimal, choisi le
+2026-11-09) : 16 entrées `{pad, track, note, label, color}`. Le canal
+est celui de la track (`TRACK n CHANNEL` = n) ; la track 16 (AUTO
+CHANNEL) y est refusée à la validation. Kit retenu, lecture MPC (rangée
+du bas = pads 1-4) :
+
+```
+ CR  T6/60   RD  T6/61   CH2 T5/63   OH2 T5/64     cymbales / variantes
+ LT  T4/61   MT  T4/62   HT  T4/63   OH  T5/62     toms, open hat
+ RS  T4/60   CP  T3/62   SD2 T3/61   CH  T5/61     rim, clap, snare 2, hat
+ BD  T1/60   BD2 T1/61   SD  T3/60   CH1 T5/60     kick, kick long, snare, hat
+```
+
+- Couleurs : BD rouge ; SD, SD2, CP, RS orange ; CH jaune ; OH blanc ;
+  toms bleu ; cymbales violet.
+- Chaque track joue un **sample découpé en tranches** (machine SLICE,
+  `SLICE` = `NOTE`) ; la note choisit la tranche. La note 60 joue la
+  tranche 1 (vérifié le 2026-11-10, question 17). Au-delà de la dernière
+  tranche, la note reboucle (grille de 6 : 66 rejoue la tranche 1) : la
+  grille d'un sample doit compter au moins autant de tranches que ses
+  pads dans la table.
+- **Choke gratuit** : une track ne joue qu'une voix, OH coupe CH (T5),
+  le clap coupe la snare (T3), un tom coupe le précédent (T4). Assumé.
+- Vélocité depuis la pression, quantize et note repeat **globaux**, comme
+  aujourd'hui ; chaque coup répété part sur le canal de son pad.
+- À la frappe, l'écran gauche affiche le label et la cible (`CH1 T05 60`).
+
+**Hors périmètre de la slice 8** (notés, pas pré-construits) :
+- options par pad (quantize, repeat automatique, sans retrig : question 3) ;
+- round-robin sur deux tracks, un pad vers plusieurs cibles (stack), layer
+  ou CC par la pression (question 4) ;
+- plusieurs tables `mpc` ou une table par projet ; rechargement à chaud de
+  la config.
+
+### Modifieurs, banque, encodeurs : un seul comportement
+
+- **SELECT + pad n** : track n pour les encodeurs et le clavier, quelle
+  que soit la disposition. **SELECT + pad 16** = l'AUTO CHANNEL, donc la
+  track active de la DT2 (comme le design). Un bouton tourné sur la DT2
+  sélectionne sa track (v0.20.0, inchangé).
+- **MUTE + pad n** : mute de la track n (pad 16 refusé, inchangé).
+- **PATTERN + pad n** : pattern n de la banque courante (PC), toujours
+  permis.
+- Pendant SELECT, MUTE ou PATTERN tenus, les pads montrent la grille des
+  tracks (`track_colors`), pas la table `mpc` : pad n = track n. Sous
+  PATTERN (pad n = pattern n de la banque courante), seul le pad du
+  pattern en cours est allumé, les autres éteints (demandé le 2026-11-10) ;
+  tout éteint si le pattern en cours n'est pas dans la banque courante.
+- **Banque courante, une seule** : suivie par PC (la DT2 la donne), ou
+  choisie par **GROUP seul** (sans envoi). Elle règle la tonique, le mode,
+  la disposition du clavier, la phrase et la banque de PATTERN + pad.
+  PATTERN + GROUP disparaît (doublon). GROUP ne touche que l'état du Pi :
+  un appui par erreur ne change aucun son.
+- **LED GROUP** : transport lancé, le compteur de phrases ; arrêté, les
+  banques du projet (choisie en blanc), comme le design.
+- **Encodeurs** : CC sur le canal de la track sélectionnée (ou l'AUTO
+  CHANNEL pour la 16). En LIVE REC, les CC reçus sur le canal de la track
+  active s'enregistrent en p-locks (vérifié) ; sur une track non active,
+  à vérifier (question 16, reste ouverte pour les CC).
+- **Clavier** : notes sur le canal de la track sélectionnée, l'AUTO
+  CHANNEL pour la 16. Les notes reçues sur le canal d'une track non
+  active s'enregistrent sur cette track en LIVE REC (vérifié le
+  2026-11-10, question 16).
+
+### Ce qui disparaît
+
+- La bascule SHIFT + CONTROL 1 s, la confirmation à l'encodeur maître,
+  `modes.py`, la clé `play.mode`, le verrou « live locked ». Le bouton
+  CONTROL redevient non affecté.
+- La quantize propre à chaque mode : **une seule quantize**, au réglage
+  `play.quantize` (1/16) au chargement, GRID la fait défiler. À couper
+  (GRID → off) avant un LIVE REC, la DT2 quantize l'enregistrement
+  (décision de la slice 3 inchangée). L'indicateur `Qoff` / `Q16` reste
+  dans le bandeau des deux vues.
+- Le rappel `DT2 en LIVE REC ?` du design.
+- La disposition rythmique « Drums » (groupe A) : `layouts` ne garde que
+  B-H, la table `mpc` prend sa place.
+
+Restent refusés transport lancé : SHIFT + BROWSE (sélection de projet).
+Le menu (boutons d'écran 1-4 : GAMME, TRACK, QUANT, PHRASE) est
+accessible dans les deux vues ; NOTE REPEAT garde la priorité.
+
+**Compatibilité** : les sessions écrites avant la slice 8 se relisent
+(`extra = "ignore"`, champs en trop ignorés) ; `design_bank` et `bank`
+convergent sur la banque courante, le premier présent l'emporte.
+
+### Préalable : sonde LIVE REC (passée le 2026-11-10, notes validées)
+
+`scripts/dt2_mpc_probe.py` (vault, hors `mk-brain/`), DT2 en LIVE REC :
+
+1. `channels` : notes 60 sur les canaux 1, 3 et 5, track 9 active. Les
+   trigs s'écrivent-ils sur T1, T3 et T5 ? (question 16)
+2. `slices --channel 5 --base 60` (puis `--base 0`) : quelle note joue la
+   tranche 1, et la relecture rejoue-t-elle la même tranche ? (question 17)
+
+Si 1 échoue : le MPC reste jouable, l'enregistrement d'un kit en un geste
+passe par une capture côté Pi puis une réinjection track par track sur
+l'AUTO CHANNEL (slice à part). Si la tranche ne s'enregistre pas : CC du
+paramètre `SLICE` envoyé juste avant la note (p-lock), CC à chercher dans
+l'annexe B.
+
+### Critère de fin
+
+Sur la DT2, kit de tranches chargé sur T1, T3, T4, T5, T6 : les 16 pads
+jouent leur tranche, OH coupe CH ; PAD MODE passe au clavier sur la track
+sélectionnée et revient sans note bloquée ; GROUP et PC changent la
+banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
+
 ## Modes : live et design
+
+> **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
+> Historique de la séparation live / design, slices 5.B à 6.
 
 | | **Live** | **Design** |
 |---|---|---|
@@ -266,10 +422,19 @@ la slice 7**.
   - **menu réduit** (décidé le 2026-11-09) : boutons d'écran 1-4 =
     GAMME (disposition), TRACK, QUANT, PHRASE ; BANK retirée à l'essai
     des écrans (GROUP la choisit, l'écran droit l'affiche) ; SLOTS, CANAL
-    et MON reportés tant que leur rôle n'est pas précisé. L'encodeur
-    maître choisit, son appui valide, le même bouton (ou un bouton sans
-    entrée) ferme sans appliquer ; NOTE REPEAT garde la priorité sur les
-    boutons d'écran ;
+    et MON reportés tant que leur rôle n'est pas précisé. **Réglage
+    direct** (demandé le 2026-11-10, à l'essai de la slice 8) : une entrée
+    a toujours le focus, GAMME au départ ; l'encodeur maître règle sa
+    valeur, appliquée à chaque cran, en boucle ; son appui
+    passe le focus à l'entrée suivante (GAMME → TRACK → QUANT → PHRASE,
+    en boucle) ; un bouton d'écran 1-4 donne le focus à son entrée, 5-8
+    sans effet ; NOTE REPEAT garde la priorité sur les boutons d'écran ;
+  - **gammes exotiques** (ajoutées le 2026-11-10) : après les 7
+    dispositions B-H, GAMME propose Locrian, Hung. min, Dbl harm., Blues,
+    Hirajoshi, In-sen, Pelog, Whole tone ; sans groupe ni mode de banque
+    (aucune banque ne les choisit), calées sur la tonique de la banque
+    courante ; la session garde la disposition par son nom (les sessions
+    d'avant, par sa lettre de groupe, restent relues) ;
   - provisoire jusqu'à l'essai sur la MK2 : disposition des écrans (cf.
     Écrans, design).
 
@@ -488,7 +653,7 @@ l'essai sur la MK2 :
 - Vélocité : courbe réglable dans la config. Les frappes légères donnaient
   5 à 26 en 7.D.
 
-**Pads en live** (décidé le 2026-11-09) :
+**Pads en live** (décidé le 2026-11-09 ; remplacé par le mode MPC, slice 8) :
 
 - **Pad seul = jouer**, disposition rythmique : pad n = note n − 1 sur
   l'AUTO CHANNEL = track n, à sa hauteur d'origine, quelle que soit la
@@ -784,6 +949,10 @@ revu le 2026-11-09** (demande utilisateur), TYPE retiré :
 
 ### Affectation des contrôles
 
+> **Jusqu'à la slice 6.** Depuis la slice 8 : une seule colonne, cf.
+> « Mode unique et pads MPC » (PAD MODE = MPC ↔ clavier, GROUP = banque,
+> PATTERN + pad partout, CONTROL non affecté).
+
 Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Constats HID).
 
 | Contrôle | Live | Design |
@@ -879,7 +1048,7 @@ Repris de `digitakt/kb/midi-config.md` :
 ajuster à l'usage ; formalisme du front matter validé avec la fiche de
 banque (titre, description, tempo, tonique, mode).
 
-Slices 0 à 4 faites le 2026-11-09, 5 et 6 en cours, 7 à venir. L'ordre suit le risque : le HID (phase 0)
+Slices 0 à 6 faites le 2026-11-09 ; 8 (mode MPC, mode unique) codée, à essayer, avant la 7 (Pi). L'ordre suit le risque : le HID (phase 0)
 conditionne tout le reste.
 
 | Slice | Contenu | Critère de fin | Statut |
@@ -891,7 +1060,8 @@ conditionne tout le reste.
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
-| 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir |
+| 7 | **Portage Pi** : image, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir, après la 8 |
+| 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et
 une version mineure dans `pyproject.toml`. Les deux fichiers sont créés à
@@ -957,6 +1127,15 @@ la slice 0.
     les 16 du `0-KIT` ont une track, et le sample d'une track change d'un
     pattern à l'autre. Il faudrait une table banque × pattern × track →
     sample, tenue dans le JSON ou la doctrine, avant de l'afficher.
+16. **Notes et CC sur le canal d'une track non active, en LIVE REC**
+    (slice 8) : pour les notes, oui (vérifié le 2026-11-10, sonde
+    `dt2_mpc_probe.py channels`, track 9 active : trigs sur T1, T3 et T5,
+    rien sur la 9). Pour les CC, reste à vérifier.
+17. ~~**Note → tranche** avec `SLICE` = `NOTE`~~ (slice 8) : vérifié le
+    2026-11-10 (sonde `dt2_mpc_probe.py slices --channel 5 --base 60`,
+    grille de 6 tranches) : 60 joue la tranche 1, 61 la 2… ; au-delà, la
+    note reboucle (66 et 67 rejouent les tranches 1 et 2). Le trig
+    enregistré porte une NOTE (pas un lock SLICE) et rejoue sa tranche.
 
 ## Constats HID (slice 0, 2026-11-09)
 

@@ -58,7 +58,6 @@ class PlayConfig(BaseModel):
     swing: int = Field(50, ge=50, le=75)
     repeat: Literal["1/4", "1/8", "1/8T", "1/16", "1/16T", "1/32", "1/32T", "1/64"] = "1/16"
     phrase: Literal[32, 64] = 32  # longueur de phrase sans banque du projet (6.B)
-    mode: Literal["live", "design"] = "live"  # mode au démarrage
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
 
 
@@ -104,7 +103,7 @@ class Roles(BaseModel):
     quinte: RGB
 
 
-Family = Literal["rythmique", "chromatique", "gamme"]
+Family = Literal["chromatique", "gamme"]
 Mode = Literal[
     "eolien",
     "phrygien",
@@ -117,9 +116,10 @@ Mode = Literal[
 
 
 class Layout(BaseModel):
-    group: Literal["A", "B", "C", "D", "E", "F", "G", "H"]
+    # groupe historique (B-H, template DT2 Pads) ; None pour les gammes ajoutées ensuite
+    group: Literal["B", "C", "D", "E", "F", "G", "H"] | None = None
     name: str
-    kind: Literal["rythmique", "chromatique", "gamme"]
+    kind: Literal["chromatique", "gamme"]
     family: Family
     mode: Mode | None = None  # mode d'une banque de projet que cette disposition joue
     base: int = Field(60, ge=0, le=127)
@@ -130,8 +130,18 @@ class Layout(BaseModel):
         if self.kind == "gamme":
             iv = self.intervals
             if not iv or iv[0] != 0 or iv != sorted(set(iv)) or iv[-1] > 11:
-                raise ValueError(f"groupe {self.group} : intervalles 0-11 croissants depuis 0")
+                raise ValueError(f"{self.name} : intervalles 0-11 croissants depuis 0")
         return self
+
+
+class MpcPad(BaseModel):
+    """Un pad du mode MPC (slice 8) : la tranche `note` sur le canal de la track `track`."""
+
+    pad: int = Field(ge=1, le=16)
+    track: int = Field(ge=1, le=16)
+    note: int = Field(ge=0, le=127)
+    label: str = Field(max_length=4)
+    color: RGB
 
 
 class Config(BaseModel):
@@ -145,6 +155,7 @@ class Config(BaseModel):
     track_colors: dict[int, RGB]
     track_names: dict[int, Annotated[str, Field(max_length=5)]] = {}
     layouts: list[Layout]
+    mpc: list[MpcPad]
 
     @field_validator("track_names")
     @classmethod
@@ -162,8 +173,18 @@ class Config(BaseModel):
 
     @model_validator(mode="after")
     def _groups(self) -> Config:
-        if [lay.group for lay in self.layouts] != list("ABCDEFGH"):
-            raise ValueError("layouts : un par groupe, dans l'ordre A-H")
+        if [lay.group for lay in self.layouts[:7]] != list("BCDEFGH"):
+            raise ValueError("layouts : un par groupe, dans l'ordre B-H, en tête")
+        if any(lay.group is not None for lay in self.layouts[7:]):
+            raise ValueError("layouts : au-delà de H, gammes sans groupe")
+        names = [lay.name for lay in self.layouts]
+        if len(set(names)) != len(names):
+            raise ValueError("layouts : noms en double")
+        if sorted(p.pad for p in self.mpc) != list(range(1, 17)):
+            raise ValueError("mpc : les 16 pads, une fois chacun")
+        auto = [p.pad for p in self.mpc if p.track == self.midi.auto_channel]
+        if auto:
+            raise ValueError(f"mpc : pads {auto} sur la track de l'AUTO CHANNEL")
         missing = {lay.family for lay in self.layouts} - set(self.families)
         if missing:
             raise ValueError(f"families : couleur manquante pour {sorted(missing)}")
@@ -171,6 +192,9 @@ class Config(BaseModel):
         if len(set(modes)) != len(modes):
             raise ValueError("layouts : un mode au plus par disposition")
         return self
+
+    def mpc_pad(self, pad: int) -> MpcPad:
+        return next(p for p in self.mpc if p.pad == pad)
 
     def scale(self, mode: Mode) -> Layout:
         """Disposition qui porte les intervalles et la famille du mode `mode`."""
