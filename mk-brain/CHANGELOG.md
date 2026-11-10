@@ -3,6 +3,30 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.23.0] - 2026-11-10
+
+### Ajouté
+
+- [9] Perform : SHIFT + pad tenu ne joue pas ; les encodeurs règlent la
+  track du pad (entrée `mpc` en MPC, pad n = track n en clavier) tant qu'il
+  est tenu, puis chaque paramètre touché reprend sa valeur d'avant,
+  renvoyée à la DT2. Écran : `PERF` et la track du pad, ses faders.
+  `Faders.steps` / `nudge` / `snapshot` / `put_back`.
+
+### Modifié
+
+- [9] LED GROUP transport arrêté : la banque courante seule, les autres
+  éteintes.
+- [9] Écrans du clavier = ceux du MPC (pattern, track, mutes, phrase) ;
+  restent le cadre, la frappe en note + degré et `oct +1`. Menu et fiche
+  de banque retirés de l'écran. Maquette `12-perform` au lieu de
+  `12-clavier-menu`.
+
+### Retiré
+
+- [9] PATTERN + pad (Program Change) : la DT2 seule change de pattern ;
+  PATTERN n'est plus affecté.
+
 ## [0.22.1] - 2026-11-10
 
 ### Corrigé

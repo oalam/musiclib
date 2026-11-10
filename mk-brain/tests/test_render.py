@@ -90,16 +90,15 @@ def test_track_code_shown_next_to_track(cfg: Config) -> None:
 # --- slice 5.D : menu du design -----------------------------------------------
 
 
-def test_design_menu_focus_inverted(cfg: Config, project: Project) -> None:
-    from test_engine import btn
-
-    eng = design(cfg, project=project)
-    corner = (render.COL + 1, 2)  # coin de l'entrée TRACK, hors texte
-    assert not render.left(eng, 0).getpixel(corner)
-    btn(eng, "MASTER_PUSH")  # focus GAMME -> TRACK
-    assert render.left(eng, 0).getpixel(corner)
-    assert render.left(eng, 0).getpixel((2, 2))  # icône du design
-    assert not render.left(Engine(cfg), 0).getpixel((2, 2))
+def test_keyboard_uses_mpc_bands_with_frame(cfg: Config, project: Project) -> None:
+    """Slice 9 : le clavier reprend les bandeaux du MPC ; seul le cadre les distingue."""
+    mpc = Engine(cfg, project=project)
+    kbd = design(cfg, project=project)
+    left_mpc, left_kbd = render.left(mpc, 0), render.left(kbd, 0)
+    assert left_kbd.getpixel((0, 0)) and not left_mpc.getpixel((0, 0))  # cadre
+    inner = (1, 1, render.WIDTH - 1, render.BAND)
+    assert left_kbd.crop(inner).tobytes() == left_mpc.crop(inner).tobytes()
+    assert render.right(kbd, 0).tobytes() == render.right(mpc, 0).tobytes()
 
 
 def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None:
@@ -116,16 +115,6 @@ def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None
     press(eng, 0, pressure=600)
     assert render.left(eng, 10 * MS).tobytes() != quiet  # bandeau de frappe
     assert render.left(eng, 2 * SECOND).tobytes() == quiet  # retombé sur les mutes
-
-
-def test_design_right_shows_bank_sheet(cfg: Config, project: Project) -> None:
-    from test_engine import btn
-
-    eng = design(cfg, project=project)
-    a = render.right(eng, 0).tobytes()
-    btn(eng, "GROUP_E")
-    assert render.right(eng, 0).tobytes() != a  # fiche E-TRIBE au lieu de A-HALF
-    assert render.right(design(cfg), 0).tobytes() != a  # sans projet : « pas de projet »
 
 
 def test_ascii_text_strips_accents() -> None:

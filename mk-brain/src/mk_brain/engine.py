@@ -44,6 +44,10 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   Une banque courante (PC reçu ou GROUP seul), une quantize, menu et
   PATTERN + pad toujours disponibles. Les mentions live / design ci-dessus
   sont l'historique des slices 5-6.
+- Slice 9 : PATTERN + pad retiré (la DT2 seule change de pattern) ; LED GROUP
+  arrêté = la banque courante seule ; perform : SHIFT + pad tenu ne joue pas,
+  les encodeurs règlent la track du pad (`perform_track`) et la valeur d'avant
+  revient au relâché ; écrans du clavier = ceux du MPC.
 """
 
 from __future__ import annotations
@@ -53,7 +57,7 @@ from dataclasses import dataclass
 
 from mk_brain.clock import ClockTracker
 from mk_brain.config import PITCH_BEND, RGB, Config, Layout
-from mk_brain.faders import Faders
+from mk_brain.faders import Faders, FaderSnapshot
 from mk_brain.hid_mk2 import (
     GROUPS,
     LED_MAX,
@@ -126,7 +130,7 @@ class PitchBend:
 
 
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend
-MODIFIERS = ("SELECT", "MUTE", "PATTERN")  # + pad : commande, pas de note
+MODIFIERS = ("SELECT", "MUTE")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # boutons d'écran 1-4 (banque : GROUP)
@@ -193,7 +197,9 @@ class Engine:
         self.last_touch: tuple[int, int] | None = None  # (encodeur 1-8, instant) pour l'écran
         self.last_hit: tuple[int, int, int, int] | None = None  # (pad, note, vélocité, instant)
         self.last_hit_mpc = False  # dernière frappe jouée en MPC (écran : label et cible)
-        self._requested: str | None = None  # pattern demandé par PATTERN + pad, pas encore confirmé
+        # perform (SHIFT + pad tenu) : pad → track visée ; valeurs d'avant à remettre au relâché
+        self._perform: dict[int, int] = {}
+        self._perform_saved: dict[tuple[int, int], FaderSnapshot] = {}
         self._bent: tuple[int, int] | None = None  # (track, canal) du pitch bend en cours
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
@@ -227,9 +233,20 @@ class Engine:
 
     @property
     def next_pattern(self) -> str | None:
-        """Prochain pattern : annoncé par la DT2 (PC reçu), sinon demandé par PATTERN + pad."""
-        nxt = self.phrase.next_pattern or self._requested
+        """Prochain pattern, annoncé par la DT2 (PC reçu)."""
+        nxt = self.phrase.next_pattern
         return None if nxt == self.phrase.pattern else nxt
+
+    @property
+    def perform_track(self) -> int | None:
+        """Track d'un pad tenu en perform (le premier frappé), None hors perform."""
+        return next(iter(self._perform.values()), None)
+
+    @property
+    def fader_track(self) -> int:
+        """Track dont les faders s'affichent : celle du perform, sinon la sélectionnée."""
+        perform = self.perform_track
+        return self.track if perform is None else perform
 
     @property
     def repeating(self) -> bool:
@@ -266,9 +283,18 @@ class Engine:
             return False
         return True
 
+    @staticmethod
+    def _param_out(channel: int, param: int, value: int) -> MidiOut:
+        if param == PITCH_BEND:  # 0-127 → -8192..8191, 64 = centre
+            return PitchBend(channel, max(-8192, min(8191, (value - 64) * 128)))
+        return ControlChange(channel, param, value)
+
     def _encoder(self, index: int, delta: int, now: int) -> list[Timed]:
         """CC sur le canal de la track sélectionnée ; la 16 est l'AUTO CHANNEL, donc la
-        track active de la DT2 (p-locks en LIVE REC)."""
+        track active de la DT2 (p-locks en LIVE REC). En perform : sur les tracks des pads
+        tenus, la valeur d'avant gardée pour le relâché."""
+        if self._perform:
+            return self._perform_turn(index, delta, now)
         if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
             self.last_control = "PB: hold SHIFT"  # pitch bend tenu par SHIFT seulement
             return []
@@ -280,10 +306,61 @@ class Engine:
         name = self.faders.page[index - 1][0]
         self.last_control = f"T{self.track:02d} {name} {value}"
         channel = self.track - 1
-        if param == PITCH_BEND:  # 0-127 → -8192..8191, 64 = centre
+        if param == PITCH_BEND:
             self._bent = (self.track, channel)
-            return [(now, PitchBend(channel, max(-8192, min(8191, (value - 64) * 128))))]
-        return [(now, ControlChange(channel, param, value))]
+        return [(now, self._param_out(channel, param, value))]
+
+    # --- perform : SHIFT + pad tenu --------------------------------------------
+
+    def _perform_target(self, pad: int) -> int:
+        """Track visée par un pad en perform : celle de l'entrée `mpc`, ou pad n = track n
+        en clavier."""
+        return self.cfg.mpc_pad(pad).track if self.mpc else pad
+
+    def _perform_press(self, pad: int) -> None:
+        track = self._perform_target(pad)
+        if not self._reachable(track):
+            self._consumed.add(pad)  # pad 16 en clavier : ni note ni perform
+            return
+        self._perform[pad] = track
+        self.last_control = f"PERF T{track:02d}"
+        self.leds_dirty = True
+
+    def _perform_turn(self, index: int, delta: int, now: int) -> list[Timed]:
+        """Encodeur en perform : même pas sur chaque track tenue (la valeur d'avant gardée
+        au premier cran)."""
+        self.last_touch = (index, now)
+        steps = self.faders.steps(index, delta)
+        if steps == 0:
+            return []
+        param = self.faders.page[index - 1][1]
+        name = self.faders.page[index - 1][0]
+        out: list[Timed] = []
+        for track in dict.fromkeys(self._perform.values()):  # tracks distinctes, dans l'ordre
+            key = (track, param)
+            snap = self.faders.snapshot(key)
+            value = self.faders.nudge(track, param, steps)
+            if value is None:
+                continue
+            self._perform_saved.setdefault(key, snap)
+            self.last_control = f"PERF T{track:02d} {name} {value}"
+            out.append((now, self._param_out(track - 1, param, value)))
+        return out
+
+    def _perform_release(self, pad: int, now: int) -> list[Timed]:
+        """Pad relâché : les tracks qu'aucun pad tenu ne vise reprennent leurs valeurs
+        d'avant (renvoyées à la DT2)."""
+        self._perform.pop(pad, None)
+        held = set(self._perform.values())
+        out: list[Timed] = []
+        for key in [k for k in self._perform_saved if k[0] not in held]:
+            snap = self._perform_saved.pop(key)
+            value = self.faders.put_back(key, snap)
+            out.append((now, self._param_out(key[0] - 1, key[1], value)))
+        if out:
+            self.last_control = f"PERF T{out[0][1].channel + 1:02d} back"
+        self.leds_dirty = True
+        return out
 
     def _command(self, pad: int, now: int) -> list[Timed]:
         held = self._held_buttons
@@ -298,13 +375,7 @@ class Engine:
             cc, value = self.faders.toggle_mute(pad)
             self.last_control = f"T{pad:02d} {'muted' if value else 'unmuted'}"
             return [(now, ControlChange(pad - 1, cc, value))]
-        if self.bank is None:
-            self.last_control = "bank? (GROUP)"
-            return []
-        program = self.bank * 16 + pad - 1
-        self._requested = pattern_label(program)
-        self.last_control = f"-> {self._requested}"
-        return [(now, ProgramChange(self.cfg.midi.program_channel - 1, program))]
+        return []
 
     def on_control_change(self, channel: int, control: int, value: int) -> None:
         """CC reçu de la DT2 (canal 0-15) : bouton ou mute joué sur la machine.
@@ -353,7 +424,6 @@ class Engine:
         moved = self.last_program is None or program // 16 != self.last_program // 16
         new_bank = moved and program // 16 != self.bank
         self.last_program = program
-        self._requested = None  # la DT2 a répondu
         if new_bank:
             self.log.append(f"banque {pattern_label(program)[0]} (PC reçu)")
             self._set_bank(program // 16)
@@ -461,13 +531,6 @@ class Engine:
         self.leds_dirty = True
 
     # --- banque courante et menu ----------------------------------------------
-
-    def _banks(self) -> list[tuple[int, str, Bank]]:
-        """Banques du projet : (lettre 0-7, clé, fiche)."""
-        if self.project is None:
-            return []
-        found = ((i, self.project.bank(i)) for i in range(len(GROUPS)))
-        return [(i, b[0], b[1]) for i, b in found if b is not None]
 
     def _set_bank(self, index: int) -> None:
         """Banque courante (GROUP, PC d'une autre banque, session) : octave à 0, phrase de
@@ -643,6 +706,8 @@ class Engine:
         self.leds_dirty = True
 
     def _pad(self, pad: int, ev: PadEvent, now: int) -> list[Timed]:
+        if pad in self._perform:  # perform : pas de note jusqu'au relâché
+            return [] if ev.pressed else self._perform_release(pad, now)
         if pad in self._consumed:  # frappé avec un modificateur : pas de note jusqu'au relâché
             if not ev.pressed:
                 self._consumed.discard(pad)
@@ -651,6 +716,9 @@ class Engine:
             self._consumed.add(pad)
             self.leds_dirty = True
             return self._command(pad, now)
+        if ev.pressed and pad not in self._pressure and "SHIFT" in self._held_buttons:
+            self._perform_press(pad)
+            return []
         if ev.pressed:
             was_held = pad in self._pressure
             self._pressure[pad] = ev.pressure
@@ -767,7 +835,7 @@ class Engine:
 
     def leds(self) -> LedState:
         dim = self.cfg.leds.dim
-        lit = set(self._attacks) | set(self._sounding) | set(self._repeats)
+        lit = set(self._attacks) | set(self._sounding) | set(self._repeats) | set(self._perform)
         held = self._held_buttons
         pads: list[RGB] = [(0, 0, 0)] * N_PADS
         for index in range(N_PADS):
@@ -778,11 +846,6 @@ class Engine:
                 pads[index] = (0, 0, 0) if auto or self.faders.muted.get(pad) else track
             elif "SELECT" in held:
                 pads[index] = track if pad == self.track else scale(track, dim)
-            elif "PATTERN" in held:  # le pattern en cours seul allumé, s'il est dans la banque
-                current = self.bank is not None and self.phrase.pattern == pattern_label(
-                    self.bank * 16 + pad - 1
-                )
-                pads[index] = track if current else (0, 0, 0)
             else:
                 full, rest = self._pad_full(pad)
                 pads[index] = full if pad in lit else scale(full, dim if rest else 0)
@@ -792,11 +855,8 @@ class Engine:
             groups = [color if g < st.blocks_lit else (0, 0, 0) for g in range(len(GROUPS))]
             if st.blinking and not st.half_beat_on:
                 groups[st.blocks_lit - 1] = (0, 0, 0)
-        else:  # arrêté : banques du projet en couleur de leur mode, la courante en blanc plein
+        else:  # arrêté : la banque courante seule allumée (slice 9)
             groups = [(0, 0, 0)] * len(GROUPS)
-            for g, _, bank in self._banks():
-                family = self.cfg.scale(bank.mode).family
-                groups[g] = scale(self.cfg.families[family], dim)
             if self.bank is not None:
                 groups[self.bank] = self.cfg.leds.bank
         low = round(LED_MAX * dim)

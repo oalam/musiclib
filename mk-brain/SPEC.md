@@ -235,7 +235,7 @@ restent comme historique. Ordre : la slice 8 passe **avant** le portage Pi
 | Pad | joue l'entrée de la table `mpc` : canal de sa track + note de sa tranche | joue la disposition de la banque (chromatique, gammes B-H) sur la **track sélectionnée** |
 | Couleurs | celle de l'entrée, × `dim` au repos, pleine à la frappe | rôles de la note (tonique, tierce, quinte, hors gamme éteint), comme le design |
 | Flèches de transport | sans effet | octave ±4 |
-| Écran gauche | vue « live » : pattern, track, mutes, compteur | vue « design » : disposition, note jouée et degré, cadre |
+| Écran gauche | vue « live » : pattern, track, mutes, compteur | vue « design » : disposition, note jouée et degré, cadre (slice 9 : vue « live », cadre et frappe en note + degré) |
 
 - **PAD MODE** bascule MPC ↔ clavier, LED pleine en clavier. Le cycle des
   dispositions passe par le menu GAMME seulement.
@@ -291,10 +291,10 @@ du bas = pads 1-4) :
   sélectionne sa track (v0.20.0, inchangé).
 - **MUTE + pad n** : mute de la track n (pad 16 refusé, inchangé).
 - **PATTERN + pad n** : pattern n de la banque courante (PC), toujours
-  permis.
+  permis. **Retiré à la slice 9** : PATTERN non affecté.
 - Pendant SELECT, MUTE ou PATTERN tenus, les pads montrent la grille des
   tracks (`track_colors`), pas la table `mpc` : pad n = track n. Sous
-  PATTERN (pad n = pattern n de la banque courante), seul le pad du
+  PATTERN (retiré à la slice 9) (pad n = pattern n de la banque courante), seul le pad du
   pattern en cours est allumé, les autres éteints (demandé le 2026-11-10) ;
   tout éteint si le pattern en cours n'est pas dans la banque courante.
 - **Banque courante, une seule** : suivie par PC (la DT2 la donne), ou
@@ -303,7 +303,8 @@ du bas = pads 1-4) :
   PATTERN + GROUP disparaît (doublon). GROUP ne touche que l'état du Pi :
   un appui par erreur ne change aucun son.
 - **LED GROUP** : transport lancé, le compteur de phrases ; arrêté, les
-  banques du projet (choisie en blanc), comme le design.
+  banques du projet (choisie en blanc), comme le design. **Slice 9** :
+  arrêté, la banque courante seule.
 - **Encodeurs** : CC sur le canal de la track sélectionnée (ou l'AUTO
   CHANNEL pour la 16). En LIVE REC, les CC reçus sur le canal de la track
   active s'enregistrent en p-locks (vérifié) ; sur une track non active,
@@ -356,6 +357,47 @@ Sur la DT2, kit de tranches chargé sur T1, T3, T4, T5, T6 : les 16 pads
 jouent leur tranche, OH coupe CH ; PAD MODE passe au clavier sur la track
 sélectionnée et revient sans note bloquée ; GROUP et PC changent la
 banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
+
+## Slice 9 : perform, PATTERN retiré, écrans du clavier (décidé le 2026-11-10)
+
+**Fait foi sur « Mode unique et pads MPC »** pour les points ci-dessous.
+
+- **PATTERN non affecté** : la DT2 seule change de pattern. PATTERN + pad
+  joue le pad comme sans modificateur ; LED PATTERN éteinte. Le prochain
+  pattern affiché (`> E07`) ne vient plus que de la DT2.
+- **LED GROUP** : transport arrêté, seule la banque courante (PC reçu ou
+  GROUP seul) est allumée, en `leds.bank` ; les autres éteintes. Transport
+  lancé, le compteur de phrases inchangé.
+- **Perform : SHIFT + pad tenu**. Le pad frappé SHIFT tenu ne joue pas ;
+  tant qu'il est tenu (SHIFT peut être relâché), les 8 encodeurs règlent la
+  track **du pad** au lieu de la track sélectionnée :
+  - MPC : la track de l'entrée `mpc` (BD et BD2 → T1, SD/SD2/CP → T3…) ;
+    clavier : pad n = track n ; pad 16 (AUTO CHANNEL) refusé, sans note ;
+  - au premier cran sur un paramètre, sa valeur d'avant est gardée ; au
+    relâché du dernier pad qui vise la track, chaque paramètre touché
+    reprend cette valeur, renvoyée à la DT2 (CC, pitch bend au centre). Une
+    valeur jamais apprise de la DT2 revient à 64, comme le départ des
+    encodeurs ; l'état « hors prise » est rétabli tel quel ;
+  - plusieurs pads tenus : chaque cran s'applique à toutes leurs tracks
+    (une fois par track) ;
+  - la track sélectionnée ne bouge pas ; l'écran gauche montre la track du
+    perform (`PERF SD/CP T03`) et les faders la sienne ; le pad tenu est
+    allumé plein. PB n'y demande pas SHIFT.
+- **Écrans du clavier = ceux du MPC** : bandeau gauche (pattern, track,
+  mutes), bandeau droit (mesure, phrase, barre). Restent propres au
+  clavier : le cadre, la frappe en note et degré (`Db6 minor 3rd` sur une
+  barre de vélocité, sous le pattern) et `oct +1` à droite. Menu (GAMME,
+  TRACK, QUANT, PHRASE) et fiche de banque retirés de l'écran : le menu
+  reste aux boutons d'écran 1-4 et à l'encodeur maître, sa valeur passe
+  1,5 s dans le bandeau gauche.
+
+**Hors périmètre** (noté, pas pré-construit) : perform verrouillé (pad
+relâché sans retour), retour progressif (glissé) au relâché.
+
+**Critère de fin** : sur la DT2, SHIFT + SD2 tenu, CUT tourné : le filtre
+de T3 bouge, aucune note ; pad relâché, le filtre revient à sa valeur ;
+PATTERN + pad joue ; transport arrêté, une seule LED GROUP ; en clavier,
+les écrans sont ceux du MPC encadrés.
 
 ## Modes : live et design
 
@@ -1090,6 +1132,7 @@ conditionne tout le reste.
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
+| 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, SHIFT + pad tenu = encodeurs sur la track du pad avec retour au relâché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et

@@ -97,13 +97,13 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
 ![Annonce de la banque E](img/03-mpc-annonce.png)
 
 - **GROUP A-H seul** choisit la banque courante sur la MK2, sans rien
-  envoyer à la DT2 (couleurs du clavier, phrase, banque de PATTERN + pad).
+  envoyer à la DT2 (couleurs du clavier, phrase).
   Si la DT2 reste dans sa banque, ce choix tient ; s'il change de banque,
   elle reprend la main.
-- **PATTERN + pad n** : pattern n de la banque courante, mis en file par la
-  DT2 comme ses propres changements. Sans banque connue : `bank? (GROUP)`.
-- **LED GROUP** : transport lancé, le compteur de phrases ; arrêté, les
-  banques du projet, la courante en blanc.
+- **Les patterns se changent sur la DT2 seulement** : PATTERN n'a pas de
+  rôle sur la MK2.
+- **LED GROUP** : transport lancé, le compteur de phrases ; arrêté, la
+  banque courante seule, en blanc.
 
 ## 5. Compteur de phrases
 
@@ -125,12 +125,23 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
   **SELECT + pad 16** : la track active de la DT2. Tourner un bouton sur la
   DT2 sélectionne aussi sa track sur la MK2.
 - Pendant SELECT ou MUTE tenus, les pads montrent la grille des 16 tracks
-  (pad n = track n), pas le kit. Pendant PATTERN tenu, seul le pad du
-  pattern en cours est allumé.
+  (pad n = track n), pas le kit.
 - **Flèches BROWSE ◀ ▶** : page 1 (LVL CUT RES ENV / OVER DEL REV SRR) ou
   page 2 (LVL MW BC PB / BR CHO TUNE PAN), en boucle.
 - **PB** (pitch bend) seulement SHIFT tenu ; il revient au centre au
   relâché de SHIFT.
+
+### Perform : SHIFT + pad tenu
+
+![SHIFT + SD2 tenu, CUT ouvert](img/12-perform.png)
+
+- **SHIFT + pad**, pad gardé enfoncé : pas de note. Les encodeurs règlent
+  la track **du pad** (en MPC : sa track, SD2 → T3 ; en clavier : pad n =
+  track n). SHIFT peut être relâché, c'est le pad qui compte.
+- **Pad relâché** : chaque paramètre tourné revient à sa valeur d'avant.
+  Une valeur que la DT2 n'a jamais donnée revient à 64.
+- L'écran affiche `PERF` et la track du pad ; la track sélectionnée ne
+  change pas.
 
 ## 7. Mutes
 
@@ -154,8 +165,9 @@ DT2 s'affichent aussi.
 ## 9. Le clavier (PAD MODE)
 
 **PAD MODE** bascule les pads entre le kit MPC et un clavier joué sur la
-**track sélectionnée** (LED PAD MODE pleine en clavier). L'écran gauche
-passe en vue détaillée, encadrée, icône `K`.
+**track sélectionnée** (LED PAD MODE pleine en clavier). Les écrans
+restent ceux du MPC, encadrés ; une frappe montre sa note et son degré
+sous le pattern, l'octave décalée s'affiche à droite (`oct +1`).
 
 ![Clavier chromatique en la# phrygien, track 13](img/10-clavier-chromatique.png)
 
@@ -175,9 +187,9 @@ passe en vue détaillée, encadrée, icône `K`.
   focus à l'entrée suivante, un bouton d'écran le donne à la sienne. GAMME
   propose aussi, après les sept dispositions, des gammes exotiques
   (Locrian, Hung. min, Dbl harm., Blues, Hirajoshi, In-sen, Pelog, Whole
-  tone) ; son choix tient jusqu'au prochain changement de banque.
-
-![Menu, focus sur GAMME](img/12-clavier-menu.png)
+  tone) ; son choix tient jusqu'au prochain changement de banque. Le menu
+  n'a plus de bandeau : l'entrée choisie et sa valeur passent 1,5 s dans
+  le bandeau gauche.
 
 ## 10. Enregistrer sur la DT2
 
@@ -199,7 +211,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | GROUP A-H | banque courante (sans envoi) |
 | SELECT + pad | track des encodeurs et du clavier (16 = track active DT2) |
 | MUTE + pad | mute / ouvre la track |
-| PATTERN + pad | pattern n de la banque courante |
+| SHIFT + pad tenu + encodeurs | perform : track du pad, retour au relâché |
 | BROWSE ◀ ▶ | page d'encodeurs |
 | SHIFT + BROWSE | sélection de projet (transport arrêté) |
 | Flèches de transport | octave du clavier |

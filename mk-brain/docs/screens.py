@@ -201,13 +201,15 @@ def design_scale(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     return eng, 3 * SECOND, True
 
 
-def design_menu(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
+def perform(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     eng = Engine(cfg, ClockTracker(), project)
-    to_keyboard(eng)
-    btn(eng, "GROUP_E")
-    btn(eng, "DISPLAY_1")  # menu GAMME
-    btn(eng, "DISPLAY_1", False)
-    return eng, 3 * SECOND, True
+    now = running(eng, 12, program=4 * 16 + 2)
+    btn(eng, "SHIFT", t=now)
+    eng.handle(PadEvent(_index(7), True, 2500), now)  # SD2 : T3 tenu en perform
+    btn(eng, "SHIFT", False, t=now)
+    for _ in range(6):
+        eng.handle(EncoderEvent(2, 8, 0), now)  # CUT ouvert le temps du pad
+    return eng, now + 100 * MS, True
 
 
 SCENES: dict[str, Scene] = {
@@ -222,7 +224,7 @@ SCENES: dict[str, Scene] = {
     "09-mute": live_mute,
     "10-clavier-chromatique": design_chroma,
     "11-clavier-gamme": design_scale,
-    "12-clavier-menu": design_menu,
+    "12-perform": perform,
 }
 
 

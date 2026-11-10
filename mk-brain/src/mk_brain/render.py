@@ -24,6 +24,10 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
   mode de la banque du dernier PC en haut à droite du bandeau droit ; à un
   changement de banque, titre et description 2 s à la place du bandeau
   (le compte à rebours garde la priorité).
+- Slice 9 : le clavier reprend les deux bandeaux du MPC ; une frappe y
+  montre sa note et son degré sous le pattern, `oct +1` à droite, le cadre
+  reste. Menu et fiche de banque du design retirés de l'écran. En perform,
+  la track du pad tenu (`PERF`) et ses faders.
 - Sélection de projet (slice 6.C) : liste à gauche, la ligne choisie en
   gros et inversée ; à droite le projet choisi (banques, date) et les gestes.
   Elle remplace les deux écrans entiers.
@@ -153,46 +157,25 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = 0) -> None:
             d.rectangle((x0 - 1, bottom + 2, x1 + 1, bottom + 3), fill=1)
 
 
-MENU_TOP = 15  # ligne du menu en clavier ; frappe ou mutes dessous
-ICON = 11  # icône du clavier, coin haut gauche
-
-
-def _menu_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
-    """Clavier : la valeur de chaque entrée du menu sous son bouton d'écran, sans libellé.
-    Entrée qui a le focus inversée."""
-    for i, (_, value, focus) in enumerate(engine.menu_view()[:COLS]):
-        x0 = ICON + 2 if i == 0 else i * COL  # la première laisse la place à l'icône
-        box = (x0, 1, (i + 1) * COL - 2, MENU_TOP)
-        ink = 1
-        if focus:
-            d.rectangle(box, fill=1)
-            ink = 0
-        font = _fit(d, value, box[2] - box[0] - 4, (16, 12, 10, 9))
-        _centered(d, box, value, font, ink)
-
-
-def _icon(d: ImageDraw.ImageDraw) -> None:
-    """Petit « K » inversé : la vue du clavier, au coin haut gauche."""
-    d.rectangle((1, 1, ICON, ICON), fill=1)
-    _centered(d, (1, 1, ICON + 1, ICON + 1), "K", _font(10), 0)
+HIT_TOP = 26  # frappe du clavier : sous le pattern en gros, à la place des mutes
 
 
 def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int]) -> None:
-    """Frappe : note en bémols et sa place dans la gamme, sur une barre de vélocité.
-    Le texte s'inverse là où la barre est pleine (OU exclusif)."""
+    """Frappe du clavier : note en bémols et sa place dans la gamme, sur une barre de
+    vélocité. Le texte s'inverse là où la barre est pleine (OU exclusif)."""
     _, note, vel, _ = hit
     lay = engine.layout
     name, role = flat_note(note), degree_name(lay, note)
-    top, bottom, left, right = MENU_TOP + 3, BAND - 3, 3, WIDTH - 4
+    top, bottom, left, right = HIT_TOP, BAND - 3, 3, WIDTH - 4
     bar = new_image()
     db = ImageDraw.Draw(bar)
     db.rectangle((left, top, left + round((right - left) * vel / 127), bottom), fill=1)
     text = new_image()
     dt = ImageDraw.Draw(text)
-    big = _font(18)
+    big = _font(12)
     _bold(dt, (left + 4, top - 2), name, big, 1)
     x = left + 14 + int(dt.textlength(name, font=big))
-    role_font = _fit(dt, role, right - x - 4, (14, 12, 10))
+    role_font = _fit(dt, role, right - x - 4, (12, 10, 9))
     _centered(
         dt, (x, top, x + int(dt.textlength(role, font=role_font)), bottom), role, role_font, 1
     )
@@ -201,7 +184,7 @@ def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int])
     ImageDraw.Draw(img).rectangle((left, top, right, bottom), outline=1)
 
 
-def _keyboard_left(
+def _left_band(
     img: Image.Image,
     d: ImageDraw.ImageDraw,
     engine: Engine,
@@ -209,68 +192,18 @@ def _keyboard_left(
     message: tuple[str, int] | None,
     warn: str,
 ) -> None:
-    """Icône et menu 1-4 en haut ; dessous la dernière frappe, une alerte, le dernier
-    geste ou les mutes."""
-    _icon(d)
-    _menu_band(d, engine)
-    hit = engine.last_hit
-    if hit is not None and now - hit[3] >= OVERLAY_NS:
-        hit = None
-    if message is not None and now - message[1] >= MESSAGE_NS:
-        message = None
-    text = warn
-    if not text and message is not None and (hit is None or message[1] >= hit[3]):
-        text = message[0]  # le plus récent l'emporte
-    if text:
-        _bold(d, (3, 23), text, _fit(d, text, WIDTH - 8, (12,)), 1)
-    elif hit is not None:
-        _hit_strip(img, engine, hit)
-    else:
-        _mute_strip(d, engine)
-
-
-def _keyboard_right(d: ImageDraw.ImageDraw, engine: Engine) -> None:
-    """Fiche de la banque (clé, tempo, tonique, mode, titre) ; pattern en cours en gros
-    en haut à droite (demandé le 2026-11-09) ; phrase en petit dessous."""
-    small, mid = _font(SMALL), _font(16)
-    pattern = engine.phrase.pattern or "---"
-    big = _font(BIG)
-    pw = int(d.textlength(pattern, font=big))
-    _bold(d, (WIDTH - pw - 4, -6), pattern, big, 1)
-    room = WIDTH - pw - 12  # largeur laissée à la fiche, à gauche du pattern
-    sheet = engine.sheet
-    octave = f"  oct {engine.octave:+d}" if engine.octave else ""
-    if sheet is None:
-        empty = "no project" if engine.project is None else "no bank (GROUP)"
-        d.text((3, 2), empty + octave, font=mid, fill=1)
-    else:
-        key, bank = sheet
-        head = f"{key}  {bank.tempo:g}{octave}"
-        _bold(d, (3, -3), head, _fit(d, head, room, (16, 12)), 1)
-        tonic, mode = FLAT_NAMES[bank.tonic], engine.cfg.scale(bank.mode).name
-        line = ascii_text(f"{tonic} {mode} - {bank.title}")
-        d.text((3, 12), line, font=_fit(d, line, room, (12, 10, 9)), fill=1)
-    st = engine.phrase_state
-    length = engine.phrase.length
-    bar = "--" if st is None else str(st.bar)
-    text = f"{bar} / {length}" + ("" if st is None else f"  -{st.to_cap} to {st.cap}")
-    d.text((3, 24), text, font=small, fill=1)
-    top, bottom, left, right = 28, 34, 140, WIDTH - 3
-    d.rectangle((left, top, right, bottom), outline=1)
-    if st is not None:
-        d.rectangle((left, top, left + round((right - left) * st.bar / length), bottom), fill=1)
-
-
-def _left_band(
-    d: ImageDraw.ImageDraw, engine: Engine, now: int, message: tuple[str, int] | None, warn: str
-) -> None:
-    """Pattern en cours (et prochain) et track sélectionnée en gros ; mutes dessous.
-    Tempo, quantize et swing ne sont pas affichés (LED GRID et SWING, écran de la DT2)."""
+    """Pattern en cours (et prochain) et track des faders en gros (celle du perform s'il y
+    en a un) ; mutes dessous. Même vue en MPC et en clavier (slice 9) ; une frappe du
+    clavier montre sa note et son degré. Tempo, quantize et swing ne sont pas affichés
+    (LED GRID et SWING, écran de la DT2)."""
     big, mid = _font(BIG), _font(16)
-    track = f"T{engine.track:02d}"
+    shown = engine.fader_track
+    track = f"T{shown:02d}"
     tw = int(d.textlength(track, font=big))
     _bold(d, (WIDTH - tw - 4, -6), track, big, 1)
-    name = engine.cfg.track_names.get(engine.track, "")  # code de la grille (doctrine §1)
+    name = engine.cfg.track_names.get(shown, "")  # code de la grille (doctrine §1)
+    if engine.perform_track is not None:
+        name = f"PERF {name}".rstrip()
     if name:
         nw = int(d.textlength(name, font=mid))
         _bold(d, (WIDTH - tw - nw - 12, 1), name, mid, 1)
@@ -283,11 +216,14 @@ def _left_band(
     # bande des mutes, ou alerte / dernier geste / dernière frappe MPC (la plus récente)
     text = warn
     hit = engine.last_hit
-    recent_hit = hit is not None and engine.last_hit_mpc and now - hit[3] < OVERLAY_NS
+    recent_hit = hit is not None and now - hit[3] < OVERLAY_NS
     newer = hit is None or not recent_hit or (message is not None and message[1] >= hit[3])
     if not text and message is not None and now - message[1] < MESSAGE_NS and newer:
         text = message[0]
     if not text and recent_hit and hit is not None:
+        if not engine.last_hit_mpc:
+            _hit_strip(img, engine, hit)
+            return
         entry = engine.cfg.mpc_pad(hit[0])
         text = f"{entry.label}  T{entry.track:02d}  {entry.note}  v{hit[2]}"
     if text:
@@ -311,17 +247,20 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
         _announce_band(d, engine)
         return
     bar = "--" if st is None else str(st.bar)
+    octave = f"  oct {engine.octave:+d}" if engine.keyboard and engine.octave else ""
     _bold(d, (3, -4), f"{bar} / {engine.phrase.length}", _font(BAR), 1)
     sheet = engine.sheet
     if sheet is not None:  # tonique et mode de la banque en haut, phrase et cap dessous
         bank = sheet[1]
         tonic = f"{FLAT_NAMES[bank.tonic]} {engine.cfg.scale(bank.mode).name}"
-        _bold(d, (150, -3), tonic, small, 1)
+        _bold(d, (150, -3), tonic + octave, small, 1)
         if st is not None:
             d.text((150, 9), f"ph {st.phrase}  -{st.to_cap} to {st.cap}", font=small, fill=1)
     elif st is not None:
-        d.text((150, -3), f"phrase {st.phrase}", font=small, fill=1)
+        d.text((150, -3), f"phrase {st.phrase}{octave}", font=small, fill=1)
         d.text((150, 9), f"-{st.to_cap} to {st.cap}", font=small, fill=1)
+    elif octave:
+        d.text((150, -3), octave.strip(), font=small, fill=1)
     # barre : une case par mesure, séparateurs tous les 8 ; 4 dernières en vidéo inverse
     length = engine.phrase.length
     top, bottom, left, right = 27, 35, 2, WIDTH - 3
@@ -345,7 +284,7 @@ def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> No
     if engine.last_touch is not None and now - engine.last_touch[1] < OVERLAY_NS:
         touched = engine.last_touch[0] - 1
     page = engine.cfg.encoders.pages[engine.faders.page_index]
-    views = engine.faders.view(engine.track)
+    views = engine.faders.view(engine.fader_track)
     for i in range(COLS):
         k = screen * COLS + i
         f = views[k]
@@ -441,10 +380,8 @@ def left(
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):
         _repeat_band(d, engine, 0)
-    elif engine.keyboard:
-        _keyboard_left(img, d, engine, now, message, warn)
     else:
-        _left_band(d, engine, now, message, warn)
+        _left_band(img, d, engine, now, message, warn)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
     _faders(d, engine, now, 0)
     if engine.keyboard:
@@ -453,15 +390,13 @@ def left(
 
 
 def right(engine: Engine, now: int) -> Image.Image:
-    """Écran droit : bandeau de phrase (MPC) ou fiche de la banque (clavier), faders 5-8."""
+    """Écran droit : bandeau de phrase (MPC et clavier), faders 5-8."""
     if engine.selector is not None:
         return _selection_right(engine)
     img = new_image()
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):
         _repeat_band(d, engine, 1)
-    elif engine.keyboard:
-        _keyboard_right(d, engine)
     else:
         _right_band(d, engine, now)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)

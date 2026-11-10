@@ -29,6 +29,12 @@ class FaderView:
     known: bool
 
 
+@dataclass(frozen=True, slots=True)
+class FaderSnapshot:
+    value: int | None  # None : jamais vu
+    stale: bool
+
+
 class Faders:
     def __init__(self, pages: list[list[tuple[str, int]]], mute_cc: int, raw_per_step: int) -> None:
         self.pages = pages  # pages de 8 × (abrégé, CC ou PITCH_BEND)
@@ -55,14 +61,16 @@ class Faders:
 
     # --- entrées ------------------------------------------------------------
 
-    def turn(self, track: int, encoder: int, raw_delta: int) -> tuple[int, int] | None:
-        """Rotation de l'encodeur 1-8 → (CC ou PITCH_BEND, valeur 0-127), ou None."""
+    def steps(self, encoder: int, raw_delta: int) -> int:
+        """Rotation brute de l'encodeur 1-8 → crans entiers (le reste est gardé)."""
         acc = self._residue.get(encoder, 0) + raw_delta
         steps = int(acc / self.raw_per_step)  # vers zéro, dans les deux sens
         self._residue[encoder] = acc - steps * self.raw_per_step
-        if steps == 0:
-            return None
-        _, cc = self.page[encoder - 1]
+        return steps
+
+    def nudge(self, track: int, cc: int, steps: int) -> int | None:
+        """Paramètre d'une track décalé de `steps` crans → nouvelle valeur, ou None si
+        rien ne change."""
         key = (track, cc)
         old = self._values.get(key, DEFAULT_VALUE)
         new = max(0, min(127, old + steps))
@@ -70,7 +78,33 @@ class Faders:
         if new == old and key in self._values:
             return None
         self._values[key] = new
-        return cc, new
+        return new
+
+    def turn(self, track: int, encoder: int, raw_delta: int) -> tuple[int, int] | None:
+        """Rotation de l'encodeur 1-8 → (CC ou PITCH_BEND, valeur 0-127), ou None."""
+        steps = self.steps(encoder, raw_delta)
+        if steps == 0:
+            return None
+        _, cc = self.page[encoder - 1]
+        new = self.nudge(track, cc, steps)
+        return None if new is None else (cc, new)
+
+    def snapshot(self, key: tuple[int, int]) -> FaderSnapshot:
+        """État d'un paramètre, pour le remettre tel quel (perform)."""
+        return FaderSnapshot(self._values.get(key), key in self._stale)
+
+    def put_back(self, key: tuple[int, int], snap: FaderSnapshot) -> int:
+        """Remet un paramètre dans l'état d'un `snapshot` ; rend la valeur à renvoyer
+        (`DEFAULT_VALUE` pour un paramètre jamais vu)."""
+        if snap.value is None:
+            self._values.pop(key, None)
+        else:
+            self._values[key] = snap.value
+        if snap.stale:
+            self._stale.add(key)
+        else:
+            self._stale.discard(key)
+        return DEFAULT_VALUE if snap.value is None else snap.value
 
     def toggle_mute(self, track: int) -> tuple[int, int]:
         """MUTE + pad → (CC, valeur). Un mute jamais vu est supposé ouvert.

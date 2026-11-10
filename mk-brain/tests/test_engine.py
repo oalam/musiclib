@@ -246,7 +246,7 @@ def test_shift_play_and_shift_group_recalibrate(cfg: Config) -> None:
     assert not eng.phrase.pending
 
 
-# --- slice 5.A : SELECT / MUTE / PATTERN + pad, encodeurs ---------------------
+# --- slice 5.A : SELECT / MUTE + pad, encodeurs ---------------------------------
 
 PAD7 = 10  # index HID du pad 7 (rangée 2 depuis le bas : index 8-11 = pads 5-8)
 
@@ -289,24 +289,14 @@ def test_mute_pad_sends_cc94(cfg: Config) -> None:
     assert eng.leds().pads[PAD1] == (0, 0, 0)  # muté : éteint pendant MUTE
 
 
-def test_pattern_pad_needs_known_bank(cfg: Config) -> None:
-    from mk_brain.engine import ProgramChange
-
+def test_pattern_button_unassigned(cfg: Config) -> None:
+    """Slice 9 : la DT2 seule change de pattern ; PATTERN + pad joue, sans PC."""
     eng = Engine(cfg)
-    btn(eng, "PATTERN")
-    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []
-    assert eng.last_control.startswith("bank?")
     btn(eng, "GROUP_B")  # GROUP seul : banque B, sans envoi
     assert eng.bank == 1 and eng.last_control == "bank B"
-    assert eng.leds().groups[1] == cfg.leds.bank
-    assert eng.handle(PadEvent(PAD1, True, 2500), MS) == [(MS, ProgramChange(9, 16))]  # B01
-    eng.handle(PadEvent(PAD1, False, 0), MS)
-    eng.handle(PadEvent(PAD7, False, 0), MS)
-    eng.on_program_change(16 * 4 + 3)  # E04 reçu, transport arrêté
-    assert eng.log == ["banque E (PC reçu)"]
-    assert eng.handle(PadEvent(PAD7, True, 2500), 2 * MS) == [
-        (2 * MS, ProgramChange(9, 16 * 4 + 6))
-    ]  # E07, canal 10
+    btn(eng, "PATTERN")
+    assert press(eng, 0, pad=PAD7) == [(3 * MS, NoteOn(2, 61, 127))]  # SD2 : T3 / 61
+    assert eng.leds().buttons.get("PATTERN", 0) == 0  # non affecté : éteint
 
 
 def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
@@ -375,37 +365,6 @@ def test_modifier_held_shows_track_grid(cfg: Config) -> None:
     assert eng.leds().pads[PAD7] == scale(cfg.mpc_pad(7).color, cfg.leds.dim)  # SD2 au repos
 
 
-def test_next_pattern_requested_then_announced(cfg: Config) -> None:
-    eng = Engine(cfg, running_clock(1))
-    eng.on_start()
-    eng.on_program_change(16 * 4 + 3)  # E04 annoncé
-    advance(eng, 1, 96 + 1)
-    assert (eng.phrase.pattern, eng.next_pattern) == ("E04", None)
-    btn(eng, "PATTERN")
-    eng.handle(PadEvent(PAD7, True, 2500), 96 * TICK)
-    assert eng.next_pattern == "E07"  # demandé, pas encore confirmé
-    eng.on_program_change(16 * 4 + 6)
-    assert eng.next_pattern == "E07"  # annoncé par la DT2, appliqué à la barre
-    advance(eng, 96 + 1, 2 * 96 + 1)
-    after: tuple[str | None, str | None] = (eng.phrase.pattern, eng.next_pattern)
-    assert after == ("E07", None)
-
-
-def test_pattern_held_lights_current_pattern_only(cfg: Config) -> None:
-    from mk_brain.hid_mk2 import pad_label
-
-    eng = Engine(cfg)
-    eng.on_program_change(16 * 4 + 3)  # E04, arrêté : en cours tout de suite
-    btn(eng, "PATTERN")
-    lit = [pad_label(i) for i, rgb in enumerate(eng.leds().pads) if rgb != (0, 0, 0)]
-    assert lit == [4]
-    assert eng.leds().pads[[pad_label(i) for i in range(16)].index(4)] == cfg.track_colors[4]
-    btn(eng, "PATTERN", False)
-    btn(eng, "GROUP_B")  # banque B choisie : E04 hors banque, tout éteint
-    btn(eng, "PATTERN")
-    assert all(rgb == (0, 0, 0) for rgb in eng.leds().pads)
-
-
 def test_program_change_when_stopped_sets_current_pattern(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.on_program_change(16 + 1)
@@ -429,7 +388,7 @@ def test_design_group_is_bank(cfg: Config, project: Project) -> None:
     assert press(eng, 0) == [(3 * MS, NoteOn(0, 70, 127))]  # chromatique depuis A#
     leds = eng.leds()
     assert leds.groups[4] == cfg.leds.bank  # choisie : blanc plein
-    assert leds.groups[0] == scale(cfg.families["gamme"], cfg.leds.dim)  # les autres : mode × dim
+    assert leds.groups[0] == (0, 0, 0)  # les autres éteintes (slice 9)
     from mk_brain.hid_mk2 import pad_label
 
     by_pad = {pad_label(i): rgb for i, rgb in enumerate(leds.pads)}
@@ -532,16 +491,6 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     btn(eng, "BROWSE_LEFT")
     assert eng.last_control == "page 1/2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
     assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
-
-
-def test_pattern_pad_works_in_keyboard(cfg: Config, project: Project) -> None:
-    from mk_brain.engine import ProgramChange
-
-    eng = design(cfg, project=project)
-    btn(eng, "GROUP_E")
-    btn(eng, "PATTERN")
-    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ProgramChange(9, 4 * 16))]  # E01
-    assert eng.leds().buttons["PATTERN"] == LED_MAX
 
 
 def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
@@ -770,3 +719,49 @@ def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
     assert eng.track == 4 and eng.faders.muted[7]
     eng.on_control_change(15, 74, 90)  # track 16 (AUTO CHANNEL) : suivie aussi
     assert eng.track == 16 and eng.faders.view(16)[1].value == 90
+
+
+# --- slice 9 : perform (SHIFT + pad tenu) ----------------------------------------
+
+
+def test_perform_turns_pad_track_and_restores_on_release(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    eng.on_control_change(2, 74, 40)  # T3 : filtre à 40 joué sur la DT2
+    eng.track = 1
+    btn(eng, "SHIFT")
+    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []  # SD2 (T3) : pas de note
+    assert eng.tick(10 * MS) == []
+    btn(eng, "SHIFT", False)  # le pad tenu garde le perform
+    assert (eng.perform_track, eng.fader_track) == (3, 3)
+    assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(2, 74, 42))]
+    assert eng.handle(PadEvent(PAD7, False, 0), 2 * MS) == [(2 * MS, ControlChange(2, 74, 40))]
+    assert eng.faders.view(3)[1].value == 40 and eng.perform_track is None
+    assert eng.track == 1  # la track sélectionnée n'a pas bougé
+    assert press(eng, 3 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)  # rejoue
+
+
+def test_perform_two_pads_same_track_restores_after_last(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    btn(eng, "SHIFT")
+    eng.handle(PadEvent(PAD1, True, 2500), 0)  # BD : T1
+    eng.handle(PadEvent(PAD1 + 1, True, 2500), 0)  # BD2 : T1
+    assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(0, 74, 66))]  # une fois
+    assert eng.handle(PadEvent(PAD1, False, 0), 2 * MS) == []  # BD2 tient encore T1
+    assert eng.handle(PadEvent(PAD1 + 1, False, 0), 3 * MS) == [(3 * MS, ControlChange(0, 74, 64))]
+
+
+def test_perform_keyboard_pad_n_is_track_n(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = design(cfg)
+    btn(eng, "SHIFT")
+    eng.handle(PadEvent(PAD7, True, 2500), 0)
+    assert eng.perform_track == 7
+    assert eng.handle(EncoderEvent(2, 4, 0), MS) == [(MS, ControlChange(6, 74, 65))]
+    eng.handle(PadEvent(PAD7, False, 0), MS)
+    eng.handle(PadEvent(3, True, 2500), 2 * MS)  # pad 16 : AUTO CHANNEL refusé, sans note
+    assert eng.perform_track is None and eng.tick(20 * MS) == []
