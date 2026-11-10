@@ -1060,7 +1060,7 @@ conditionne tout le reste.
 | 4 | **Compteur de phrases** : mesure, phrase, LED Group, resets manuel et PC | compteur juste sur un set de 64 mesures avec deux changements de pattern | fait 2026-11-09 : PC C02 et C16 remettent à 1 sur la mesure du nouveau pattern, recalages manuels justes, LED GROUP et PLAY conformes |
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
-| 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Bookworm Lite 64 bits, udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | à venir, après la 8 |
+| 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
 Chaque slice livrée produit une entrée de `CHANGELOG.md` balisée `[N]` et
@@ -1083,8 +1083,10 @@ la slice 0.
 5. ~~**Modèle de Pi**~~ : **Raspberry Pi 3 Model B Rev 1.2**, retenu le
    2026-11-10 (déjà en main ; Pi 4 ou 5 envisagés avant). Trouvé sur le
    réseau en `pi@10.20.20.56` (clé SSH du Mac acceptée), sous Raspbian 8
-   Jessie (Python 3.4) : à reflasher en Raspberry Pi OS Bookworm Lite
-   64 bits à l'ouverture de la slice 7. Restent à vérifier sur ce Pi : la
+   Jessie (Python 3.4) : reflashé en Raspberry Pi OS **Trixie** Lite
+   64 bits à l'ouverture de la slice 7 (décidé le 2026-11-10 : Bookworm
+   n'a que Python 3.11, le projet exige 3.12). Hôte `mk-brain.local`,
+   utilisateur `pi`, SSH par clé seule, Ethernet + Wi-Fi maison. Restent à vérifier sur ce Pi : la
    MK2 sur l'alimentation par bus (USB 2.0 partagé avec l'Ethernet, sinon
    hub alimenté), le rendu des deux écrans et la gigue d'horloge
    (`mk-brain clock --bench-note`).
