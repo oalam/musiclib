@@ -260,7 +260,7 @@ def test_select_then_encoder_sends_cc_on_track_channel(cfg: Config) -> None:
     assert eng.track == 7
     from mk_brain.engine import ControlChange
 
-    assert eng.handle(EncoderEvent(2, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 74, 66))]
+    assert eng.handle(EncoderEvent(2, 8, 0), 2 * MS) == [(2 * MS, ControlChange(6, 54, 66))]
 
 
 def test_pad16_mute_refused_select_targets_active_track(cfg: Config) -> None:
@@ -277,7 +277,7 @@ def test_pad16_mute_refused_select_targets_active_track(cfg: Config) -> None:
     eng.handle(PadEvent(3, False, 0), 3 * MS)
     btn(eng, "SELECT", False)
     assert eng.track == 16 and eng.last_control == "T16 selected (DT2 active)"
-    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(15, 74, 65))]
+    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(15, 54, 65))]
 
 
 def test_mute_pad_sends_cc94(cfg: Config) -> None:
@@ -305,17 +305,17 @@ def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     midi = cfg.midi.model_copy(update={"knobs_on_track_channel": False})  # DT2 OUTPUT CH = AUTO
     eng = Engine(cfg.model_copy(update={"midi": midi}))
     eng.track = 7
-    eng.on_control_change(15, 74, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
+    eng.on_control_change(15, 54, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
     eng.on_control_change(15, 94, 1)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
     assert not eng.faders.muted
-    assert eng.handle(EncoderEvent(2, -4, 0), 0) == [(0, ControlChange(6, 74, 73))]  # sans saut
+    assert eng.handle(EncoderEvent(2, -4, 0), 0) == [(0, ControlChange(6, 54, 73))]  # sans saut
 
 
 def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
     eng = Engine(cfg)
-    eng.on_control_change(0, 74, 30)
+    eng.on_control_change(0, 54, 30)
     eng.on_program_change(3)
-    assert eng.faders.view(1)[1].stale  # CUT, encodeur 2
+    assert eng.faders.view(1)[1].stale  # BR, encodeur 2
     eng.handle(EncoderEvent(2, 4, 0), 0)
     eng.on_program_change(3)  # même pattern (PC du Stop) : rien ne change
     assert not eng.faders.view(1)[1].stale
@@ -474,23 +474,23 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     from mk_brain.engine import ControlChange, PitchBend
 
     eng = Engine(cfg)
-    btn(eng, "BROWSE_RIGHT")  # page 2 : LVL MW BC PB BR CHO TUNE PAN
-    assert eng.handle(EncoderEvent(4, 8, 0), 0) == []  # PB sans SHIFT : rien
+    btn(eng, "BROWSE_RIGHT")  # page 2 : LVL CUT RES ENV MW BC PB PAN
+    assert eng.handle(EncoderEvent(7, 8, 0), 0) == []  # PB sans SHIFT : rien
     assert eng.last_control == "PB: hold SHIFT"
     btn(eng, "SHIFT")
-    assert eng.handle(EncoderEvent(4, 8, 0), 0) == [(0, PitchBend(0, 256))]  # PB : 64 → 66
-    assert eng.faders.view(1)[3].value == 66
+    assert eng.handle(EncoderEvent(7, 8, 0), 0) == [(0, PitchBend(0, 256))]  # PB : 64 → 66
+    assert eng.faders.view(1)[6].value == 66
     assert eng.handle(ButtonEvent("SHIFT", False), MS) == [(MS, PitchBend(0, 0))]  # au centre
-    assert eng.faders.view(1)[3].value == 64
+    assert eng.faders.view(1)[6].value == 64
     assert eng.handle(ButtonEvent("SHIFT", False), MS) == []  # une seule remise
     btn(eng, "SHIFT")
-    eng.handle(EncoderEvent(4, 8, 0), 0)
+    eng.handle(EncoderEvent(7, 8, 0), 0)
     btn(eng, "SHIFT", False)
-    assert eng.faders.view(1)[3].value == 64  # PB revenu au centre
-    assert eng.handle(EncoderEvent(5, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
+    assert eng.faders.view(1)[6].value == 64  # PB revenu au centre
+    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
     btn(eng, "BROWSE_LEFT")
     assert eng.last_control == "page 1/2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
-    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
+    assert eng.handle(EncoderEvent(2, 4, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
 
 
 def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
@@ -712,12 +712,12 @@ def test_arrows_cycle_both_ways(cfg: Config) -> None:
 
 def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
     eng = Engine(cfg)  # DT2 OUTPUT CH = TRACK CH
-    eng.on_control_change(3, 74, 112)  # CUTOFF tourné sur la track 4 active
+    eng.on_control_change(3, 54, 112)  # BR tourné sur la track 4 active
     assert eng.track == 4 and eng.last_control == "T04 selected (DT2)"
     assert eng.faders.view(4)[1].value == 112
     eng.on_control_change(6, 94, 1)  # mute de la track 7 : pas de sélection
     assert eng.track == 4 and eng.faders.muted[7]
-    eng.on_control_change(15, 74, 90)  # track 16 (AUTO CHANNEL) : suivie aussi
+    eng.on_control_change(15, 54, 90)  # track 16 (AUTO CHANNEL) : suivie aussi
     assert eng.track == 16 and eng.faders.view(16)[1].value == 90
 
 
@@ -728,15 +728,15 @@ def test_perform_turns_pad_track_and_restores_on_release(cfg: Config) -> None:
     from mk_brain.engine import ControlChange
 
     eng = Engine(cfg)
-    eng.on_control_change(2, 74, 40)  # T3 : filtre à 40 joué sur la DT2
+    eng.on_control_change(2, 54, 40)  # T3 : BR à 40 joué sur la DT2
     eng.track = 1
     btn(eng, "SHIFT")
     assert eng.handle(PadEvent(PAD7, True, 2500), 0) == []  # SD2 (T3) : pas de note
     assert eng.tick(10 * MS) == []
     btn(eng, "SHIFT", False)  # le pad tenu garde le perform
     assert (eng.perform_track, eng.fader_track) == (3, 3)
-    assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(2, 74, 42))]
-    assert eng.handle(PadEvent(PAD7, False, 0), 2 * MS) == [(2 * MS, ControlChange(2, 74, 40))]
+    assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(2, 54, 42))]
+    assert eng.handle(PadEvent(PAD7, False, 0), 2 * MS) == [(2 * MS, ControlChange(2, 54, 40))]
     assert eng.faders.view(3)[1].value == 40 and eng.perform_track is None
     assert eng.track == 1  # la track sélectionnée n'a pas bougé
     assert press(eng, 3 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)  # rejoue
@@ -749,9 +749,9 @@ def test_perform_two_pads_same_track_restores_after_last(cfg: Config) -> None:
     btn(eng, "SHIFT")
     eng.handle(PadEvent(PAD1, True, 2500), 0)  # BD : T1
     eng.handle(PadEvent(PAD1 + 1, True, 2500), 0)  # BD2 : T1
-    assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(0, 74, 66))]  # une fois
+    assert eng.handle(EncoderEvent(2, 8, 0), MS) == [(MS, ControlChange(0, 54, 66))]  # une fois
     assert eng.handle(PadEvent(PAD1, False, 0), 2 * MS) == []  # BD2 tient encore T1
-    assert eng.handle(PadEvent(PAD1 + 1, False, 0), 3 * MS) == [(3 * MS, ControlChange(0, 74, 64))]
+    assert eng.handle(PadEvent(PAD1 + 1, False, 0), 3 * MS) == [(3 * MS, ControlChange(0, 54, 64))]
 
 
 def test_perform_keyboard_pad_n_is_track_n(cfg: Config) -> None:
@@ -761,7 +761,7 @@ def test_perform_keyboard_pad_n_is_track_n(cfg: Config) -> None:
     btn(eng, "SHIFT")
     eng.handle(PadEvent(PAD7, True, 2500), 0)
     assert eng.perform_track == 7
-    assert eng.handle(EncoderEvent(2, 4, 0), MS) == [(MS, ControlChange(6, 74, 65))]
+    assert eng.handle(EncoderEvent(2, 4, 0), MS) == [(MS, ControlChange(6, 54, 65))]
     eng.handle(PadEvent(PAD7, False, 0), MS)
     eng.handle(PadEvent(3, True, 2500), 2 * MS)  # pad 16 : AUTO CHANNEL refusé, sans note
     assert eng.perform_track is None and eng.tick(20 * MS) == []

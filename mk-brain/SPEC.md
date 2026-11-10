@@ -941,12 +941,14 @@ remplace la page unique CUT RES ENV DEC LVL PAN DLY REV), définies dans
 `config/default.yaml`, choisies par les flèches à côté des écrans, en
 live comme en design. Numéros de l'annexe B du manuel DT2
 (`refs/Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf`, B.1-B.7). **Ordre
-revu le 2026-11-09** (demande utilisateur), TYPE retiré :
+revu le 2026-11-09** (demande utilisateur), TYPE retiré, **puis le
+2026-11-10** (demande utilisateur : grain et envois en page 1, filtre et
+modulations en page 2) :
 
 | Page | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
-| p1 | LVL 95 (niveau de track) | CUT 74 | RES 75 | ENV 77 | OVER 57 (overdrive) | DEL 84 (envoi delay) | REV 85 | SRR 55 |
-| p2 | LVL 95 | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | BR 54 (bit reduction) | CHO 12 (chorus) | TUNE 16 | PAN 90 |
+| p1 | LVL 95 (niveau de track) | BR 54 (bit reduction) | OVER 57 (overdrive) | SRR 55 | DEL 84 (envoi delay) | REV 85 | CHO 12 (chorus) | TUNE 16 |
+| p2 | LVL 95 | CUT 74 | RES 75 | ENV 77 | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | PAN 90 |
 
 - **Flèches** (2026-11-09) : `BROWSE_RIGHT` = page suivante,
   `BROWSE_LEFT` = précédente, **en boucle** ; LED des

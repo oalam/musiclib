@@ -119,15 +119,15 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
 
 ## 6. Encodeurs et tracks
 
-![SELECT + pad 9, puis RES tourné](img/07-encodeur.png)
+![SELECT + pad 9, puis BR et OVER tournés](img/07-encodeur.png)
 
 - **SELECT + pad n** : track n pour les 8 encodeurs (et pour le clavier).
   **SELECT + pad 16** : la track active de la DT2. Tourner un bouton sur la
   DT2 sélectionne aussi sa track sur la MK2.
 - Pendant SELECT ou MUTE tenus, les pads montrent la grille des 16 tracks
   (pad n = track n), pas le kit.
-- **Flèches BROWSE ◀ ▶** : page 1 (LVL CUT RES ENV / OVER DEL REV SRR) ou
-  page 2 (LVL MW BC PB / BR CHO TUNE PAN), en boucle.
+- **Flèches BROWSE ◀ ▶** : page 1 (LVL BR OVER SRR / DEL REV CHO TUNE) ou
+  page 2 (LVL CUT RES ENV / MW BC PB PAN), en boucle.
 - **PB** (pitch bend) seulement SHIFT tenu ; il revient au centre au
   relâché de SHIFT.
 

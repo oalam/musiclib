@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.23.1] - 2026-11-10
+
+### Modifié
+
+- [9] Pages d'encodeurs réordonnées : page 1 LVL BR OVER SRR / DEL REV CHO
+  TUNE, page 2 LVL CUT RES ENV / MW BC PB PAN.
+
 ## [0.23.0] - 2026-11-10
 
 ### Ajouté

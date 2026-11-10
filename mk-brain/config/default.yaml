@@ -25,7 +25,7 @@ play:
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le
-# même jour ; les flèches cyclent dans les deux sens.
+# même jour puis le 2026-11-10 (page 1 grain et envois, page 2 filtre et modulations) ; les flèches cyclent dans les deux sens.
 # DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine.
 # MW, BC et PB n'agissent que si le preset leur assigne des paramètres
 # (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset).
@@ -34,20 +34,20 @@ encoders:
   raw_per_step: 4            # pas minimal remonté par la MK2 (constat slice 0)
   pages:
     - - {name: LVL, cc: 95}                    # niveau de track
+      - {name: BR, cc: 54}                     # bit reduction
+      - {name: OVER, cc: 57}                   # overdrive de track
+      - {name: SRR, cc: 55}                    # sample rate reduction
+      - {name: DEL, cc: 84}                    # envoi delay
+      - {name: REV, cc: 85}                    # envoi reverb
+      - {name: CHO, cc: 12}                    # envoi chorus
+      - {name: TUNE, cc: 16, bipolar: true}
+    - - {name: LVL, cc: 95}
       - {name: CUT, cc: 74}                    # fréquence du filtre
       - {name: RES, cc: 75}                    # résonance (knob F du filtre)
       - {name: ENV, cc: 77, bipolar: true}     # profondeur d'enveloppe du filtre
-      - {name: OVER, cc: 57}                   # overdrive de track
-      - {name: DEL, cc: 84}                    # envoi delay
-      - {name: REV, cc: 85}                    # envoi reverb
-      - {name: SRR, cc: 55}                    # sample rate reduction
-    - - {name: LVL, cc: 95}
       - {name: MW, cc: 1}                      # mod wheel
       - {name: BC, cc: 2}                      # breath controller
       - {name: PB, pitchbend: true, bipolar: true}   # pitch bend, centré
-      - {name: BR, cc: 54}                     # bit reduction
-      - {name: CHO, cc: 12}                    # envoi chorus
-      - {name: TUNE, cc: 16, bipolar: true}
       - {name: PAN, cc: 90, bipolar: true}
 
 leds:
