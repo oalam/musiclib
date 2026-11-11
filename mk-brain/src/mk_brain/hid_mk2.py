@@ -15,6 +15,7 @@ Format repris de cabl (shaduzlabs, MIT), `src/devices/ni/MaschineMK2.cpp`,
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
@@ -245,31 +246,48 @@ class LedState:
 class HidHandle(Protocol):
     def write(self, data: list[int]) -> int: ...
     def read(self, max_length: int, timeout_ms: int = 0) -> list[int]: ...
+    def get_input_report(self, report_num: int, max_length: int) -> list[int]: ...
     def close(self) -> None: ...
 
 
-def enumerate_mk2() -> list[dict[str, Any]]:
+def _hid_module() -> Any:
+    """Module hidapi : backend hidraw sur Linux (requis par GET_REPORT), natif ailleurs."""
+    if sys.platform.startswith("linux"):
+        import hidraw
+
+        return hidraw
     import hid
 
-    return list(hid.enumerate(VENDOR_ID, PRODUCT_ID))
+    return hid
+
+
+def enumerate_mk2() -> list[dict[str, Any]]:
+    return list(_hid_module().enumerate(VENDOR_ID, PRODUCT_ID))
 
 
 class Mk2Device:
-    """Accès HID à la MK2 (hidapi), mêmes appels sur Mac et sur Linux."""
+    """Accès HID à la MK2 (hidapi), mêmes appels sur Mac et sur Linux.
 
-    def __init__(self, handle: HidHandle) -> None:
+    `poll_buttons` : sur le Pi, la MK2 n'émet jamais le rapport 0x01 par
+    interruption (constat du 2026-11-11, SPEC § Constats HID) ; l'état des
+    boutons et des encodeurs est alors demandé par GET_REPORT après chaque
+    lecture, et rendu comme un rapport 0x01 quand il a changé.
+    """
+
+    def __init__(self, handle: HidHandle, *, poll_buttons: bool = False) -> None:
         self._h = handle
+        self._poll_buttons = poll_buttons
+        self._last_buttons: bytes | None = None
+        self._pending: bytes | None = None
 
     @classmethod
     def open(cls) -> Mk2Device:
-        import hid
-
         infos = enumerate_mk2()
         if not infos:
             raise Mk2NotFoundError(
                 f"aucune MK2 en HID ({VENDOR_ID:04x}:{PRODUCT_ID:04x}) : câble, alimentation ?"
             )
-        dev = hid.device()
+        dev = _hid_module().device()
         try:
             dev.open_path(infos[0]["path"])
         except OSError as exc:
@@ -277,7 +295,7 @@ class Mk2Device:
                 "MK2 visible mais impossible à ouvrir : NIHardwareAgent la tient "
                 "peut-être, ou macOS refuse l'accès (Surveillance de l'entrée)"
             ) from exc
-        return cls(dev)
+        return cls(dev, poll_buttons=sys.platform.startswith("linux"))
 
     def write(self, report: bytes) -> None:
         n = self._h.write(list(report))
@@ -285,7 +303,30 @@ class Mk2Device:
             raise Mk2Error(f"écriture HID refusée (rapport 0x{report[0]:02x}, {len(report)} o)")
 
     def read(self, timeout_ms: int = 5) -> bytes:
-        return bytes(self._h.read(128, timeout_ms))
+        if self._pending is not None:
+            report, self._pending = self._pending, None
+            return report
+        report = bytes(self._h.read(128, timeout_ms))
+        if not self._poll_buttons:
+            return report
+        buttons = self._poll()
+        if buttons is None:
+            return report
+        if not report:
+            return buttons
+        self._pending = buttons
+        return report
+
+    def _poll(self) -> bytes | None:
+        """État 0x01 demandé à la MK2, rendu seulement s'il a changé."""
+        try:
+            state = bytes(self._h.get_input_report(REPORT_BUTTONS, BUTTONS_REPORT_LEN))
+        except OSError as exc:
+            raise Mk2Error("lecture de l'état des boutons refusée (GET_REPORT 0x01)") from exc
+        if len(state) < BUTTONS_REPORT_LEN or state == self._last_buttons:
+            return None
+        self._last_buttons = state
+        return state
 
     def send_leds(self, leds: LedState) -> None:
         for report in leds.reports():

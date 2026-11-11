@@ -8,10 +8,13 @@ from mk_brain.hid_mk2 import (
     LED_BUTTONS_LEN,
     LED_GROUPS_LEN,
     LED_PADS_LEN,
+    REPORT_BUTTONS,
+    REPORT_PADS,
     ButtonEvent,
     EncoderEvent,
     InputDecoder,
     LedState,
+    Mk2Device,
     Mk2ReportError,
     PadEvent,
     pad_label,
@@ -100,3 +103,62 @@ def test_led_reports_layout() -> None:
     assert groups[1 + 55] == 5  # SHIFT
     assert (buttons[0], len(buttons)) == (0x82, 1 + LED_BUTTONS_LEN)
     assert buttons[1 + 0] == 255 and buttons[1 + 30] == 10
+
+
+class _FakeHandle:
+    """Poignée hidapi factice : file de rapports d'interruption + état 0x01 interrogeable."""
+
+    def __init__(self, reads: list[bytes], state: bytes) -> None:
+        self.reads = list(reads)
+        self.state = state
+        self.polls = 0
+
+    def write(self, data: list[int]) -> int:
+        return len(data)
+
+    def read(self, max_length: int, timeout_ms: int = 0) -> list[int]:
+        return list(self.reads.pop(0)) if self.reads else []
+
+    def get_input_report(self, report_num: int, max_length: int) -> list[int]:
+        self.polls += 1
+        return list(self.state)
+
+    def close(self) -> None:
+        pass
+
+
+def _state(first_button_byte: int = 0) -> bytes:
+    return bytes([REPORT_BUTTONS, first_button_byte]) + bytes(BUTTONS_REPORT_LEN - 2)
+
+
+def test_device_without_poll_never_asks_state() -> None:
+    handle = _FakeHandle([b"\x20" + bytes(64)], _state())
+    dev = Mk2Device(handle)
+    assert dev.read()[0] == REPORT_PADS
+    assert dev.read() == b""
+    assert handle.polls == 0
+
+
+def test_device_poll_returns_state_only_on_change() -> None:
+    handle = _FakeHandle([], _state())
+    dev = Mk2Device(handle, poll_buttons=True)
+    assert dev.read() == _state()  # premier état : référence du décodeur
+    assert dev.read() == b""
+    handle.state = _state(0x01)
+    assert dev.read() == _state(0x01)
+    assert dev.read() == b""
+
+
+def test_device_poll_keeps_pad_report_and_queues_state() -> None:
+    pads = b"\x20" + bytes(64)
+    handle = _FakeHandle([pads], _state(0x02))
+    dev = Mk2Device(handle, poll_buttons=True)
+    assert dev.read() == pads
+    assert dev.read() == _state(0x02)
+    assert handle.polls == 1  # le rapport en attente sort sans nouvelle interrogation
+
+
+def test_device_poll_ignores_short_state() -> None:
+    handle = _FakeHandle([], b"\x01\x00")
+    dev = Mk2Device(handle, poll_buttons=True)
+    assert dev.read() == b""

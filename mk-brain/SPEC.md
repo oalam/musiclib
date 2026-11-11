@@ -104,7 +104,7 @@ Le portage sur le Pi vient en fin de MVP.
 | Indépendance | aucun import depuis `music/scripts/` | le Pi ne déploie que `mk-brain/` ; les constantes utiles (6 clocks par pas, message sysex Transfer) sont recopiées et citées |
 | Maître d'horloge | la DT2 mène (Clock Send + Transport Send) ; le Pi ne fait que suivre | les notes restent alignées sur les trigs de la DT2 |
 | MIDI | `mido` + `python-rtmidi` (CoreMIDI sur Mac, ALSA sur Pi) | déjà éprouvé en 7.E |
-| HID | `hidapi` (bindings Python `hid`) | le même code sur Mac et sur Linux (hidraw) |
+| HID | `hidapi` (bindings Python `hid`, module `hidraw` sous Linux) | le même code sur Mac et sur Linux (hidraw) |
 | Rendu écrans | Pillow, image 1 bit, thread dédié | la boucle MIDI ne doit jamais attendre le rendu |
 | Configuration | `config/default.yaml` (matériel, dispositions, page d'encodeurs) + un `projects/<set>.yaml` par set, validés par Pydantic | modifiable sans toucher au code |
 | Canal de jeu | AUTO CHANNEL de la DT2 sur le **canal 16** (décidé le 2026-11-09 ; c'était 10 en 7.D) | sur un canal partagé l'AUTO CHANNEL l'emporte : seule la track 16, jouée depuis la DT2, perd son canal propre |
@@ -1251,6 +1251,17 @@ le détail) :
 - **Encodeurs** : 8 compteurs absolus sur 10 bits qui bouclent à 1024,
   pas minimal remonté de 4 (zone morte du matériel), jusqu'à 70 par rapport
   en rotation rapide ; maître sur 4 bits, 1 par cran.
+- **Sur le Pi (2026-11-11, Pi 3 Model B, Trixie)** : la MK2 n'émet jamais
+  le rapport 0x01 par interruption, avec le backend libusb comme avec
+  hidraw (0 rapport en 60 s, presque tous les boutons pressés) ; les pads
+  arrivent à 500 rapports par seconde (1015 en 2 s) contre 755 sur le Mac.
+  L'état 0x01 se lit en revanche par GET_REPORT (0,09 ms par appel, suit
+  boutons et encodeurs en direct) : `Mk2Device` l'interroge après chaque
+  lecture, sous Linux seulement. Avec libusb, le rapport de pads de
+  65 octets arrive coupé en 64 + 1 (d'où des rapports d'un octet `f0`) :
+  backend hidraw imposé sous Linux. Cause non établie (hypothèse : le flux
+  de pads écrase le rapport de boutons en attente, le Pi relevant
+  l'interruption moins vite que le Mac).
 
 ## Constat DT2 (slice 1, 2026-11-09)
 

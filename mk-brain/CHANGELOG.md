@@ -3,6 +3,17 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.26.2] - 2026-11-11
+
+### Corrigé
+
+- [7] Boutons et encodeurs muets sur le Pi : la MK2 n'y émet jamais le
+  rapport 0x01 par interruption (pads et écrans seuls fonctionnaient).
+  L'état est demandé par GET_REPORT après chaque lecture et rendu comme
+  un rapport 0x01 quand il change ; sous Linux, hidapi passe par le
+  backend hidraw (module `hidraw`), plus par libusb. Rien ne change sur
+  le Mac.
+
 ## [0.26.1] - 2026-11-10
 
 ### Corrigé
