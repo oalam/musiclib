@@ -47,7 +47,7 @@ from typing import TYPE_CHECKING, Any
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-from mk_brain.arp import ACCENT, MOTIF_STEPS, REST, TIE
+from mk_brain.arp import ACCENT, MOTIF_STEPS, REST, TIE, chord_name
 from mk_brain.display import HEIGHT, WIDTH, new_image, text_image
 from mk_brain.layouts import FLAT_NAMES, degree_name, flat_note
 from mk_brain.phrase import BLOCK_BARS
@@ -300,6 +300,26 @@ def _dt2_column(d: ImageDraw.ImageDraw, engine: Engine) -> None:
             _centered(d, (box[0] + dx, box[1], box[2] + dx, box[3]), text, font, ink)
 
 
+DEGREE_CELL = 13  # case d'un degré de la progression, resserrée si la suite est longue
+
+
+def _progression(d: ImageDraw.ImageDraw, x: int, now: tuple[list[int], int, list[int]]) -> None:
+    """Progression qui joue, à la place de la banque : ses degrés, celui de l'accord en
+    cours en vidéo inverse, puis le nom de l'accord (`1 6 3 7  Gb`)."""
+    degrees, rank, tones = now
+    name = chord_name(tones, FLAT_NAMES)
+    font = _font(16)
+    room = WIDTH - x - 10 - int(d.textlength(name, font=font))
+    cell = min(DEGREE_CELL, room // len(degrees))
+    digits = _font(16 if cell >= 11 else 12)
+    for i, degree in enumerate(degrees):
+        box = (x + i * cell, 2, x + (i + 1) * cell - 2, 20)
+        if i == rank:
+            d.rectangle(box, fill=1)
+        _centered(d, box, str(degree), digits, 0 if i == rank else 1)
+    _bold(d, (x + len(degrees) * cell + 6, 2), name, font, 1)
+
+
 def _left_band(
     img: Image.Image,
     d: ImageDraw.ImageDraw,
@@ -311,7 +331,8 @@ def _left_band(
     """Colonne DT2 (pattern, track) ; à sa droite la banque et sa tonalité, remplacées
     un instant par une alerte, le dernier geste ou la frappe ;
     dessous les 16 mutes et la double croche en cours, toujours visibles. Même vue en MPC
-    et en clavier (revu le 2026-11-11)."""
+    et en clavier (revu le 2026-11-11). Progression d'accords qui joue (ARPG) : ses degrés
+    et l'accord en cours à la place de la banque."""
     _dt2_column(d, engine)
     _mute_strip(d, engine)
     x = COLUMN + 2
@@ -329,6 +350,10 @@ def _left_band(
         text = f"{entry.label}  T{entry.track:02d}  {entry.note}  v{hit[2]}"
     if text:
         _bold(d, (x, 2), text, _fit(d, text, WIDTH - x - 4, (16, 12)), 1)
+        return
+    playing = engine.arp_now
+    if playing is not None:
+        _progression(d, x, playing)
         return
     sheet = engine.sheet
     if sheet is not None:  # banque puis tonalité : `E-TRIBE  Bb Phrygian`

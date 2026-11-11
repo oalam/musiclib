@@ -264,6 +264,12 @@ n'y a pas d'arpège : les pads jouent comme au clavier.
   OFF` c'est la note seule qui se déplace (ligne de basse). Les
   progressions s'écrivent dans `arp.progressions` de
   `config/default.yaml` (`1637`, `1765`, `1645`, `1474`, `1516`, `1716`).
+- **Accord en cours** : tant qu'une progression joue, l'écran gauche
+  montre ses degrés à la place de la banque, celui de l'accord en cours en
+  vidéo inverse, puis le nom de l'accord (`Gb`, `Bbm`, `Cm7b5`… ; la note
+  seule avec `CHD OFF`). Plusieurs pads tenus : l'accord du premier.
+
+![Mode ARPG, progression 1637 sur le pad de la tonique en Bb phrygien : deuxième accord, le 6 en inverse, Gb](img/14-progression.png)
 - **Pads, PATTERN tenu** : la banque des 16 presets, un par pad. Un pad
   rappelle son preset ; **SHIFT + pad** y écrit les réglages courants
   (ordre, octaves, gate, division, motif, accord, progression et sa

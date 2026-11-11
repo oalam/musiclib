@@ -5,6 +5,7 @@ import pytest
 from mk_brain.arp import (
     MotifError,
     chord,
+    chord_name,
     degree_steps,
     parse_motif,
     sequence,
@@ -95,3 +96,13 @@ def test_shift_walks_the_scale() -> None:
     assert shift(59, 1, AEOLIAN) == 61  # sous la première note de la gamme (si bémol + 1)
     assert shift(64, -2, set()) == 60  # sans gamme : éolien sur la note
     assert shift(60, 2, {0, 3, 5, 7, 10}) == 65  # pentatonique : les degrés comptent ses notes
+
+
+def test_chord_name_reads_the_quality_from_the_intervals() -> None:
+    names = ("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B")
+    assert chord_name([60], names) == "C"  # CHD OFF : la note seule
+    assert chord_name([60, 63, 67], names) == "Cm"
+    assert chord_name([56, 60, 63], names) == "Ab"
+    assert chord_name([62, 65, 68, 72], names) == "Dm7b5"
+    assert chord_name([58, 65, 70], names) == "Bb5"
+    assert chord_name([60, 62, 66], names) == "C"  # sans nom connu : la fondamentale

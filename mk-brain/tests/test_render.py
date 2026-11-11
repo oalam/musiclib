@@ -257,3 +257,22 @@ def test_arp_config_shows_divisions_and_settings(cfg: Config) -> None:
     assert len(set(views)) == 5
     eng.handle(ButtonEvent("PATTERN", False), SECOND)
     assert eng.arp and render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes() != top
+
+
+def test_left_band_shows_the_chord_of_the_progression(cfg: Config) -> None:
+    """Progression qui joue : degrés et accord en cours à la place de la banque ; le
+    degré en cours change l'image, la fin de l'arpège rend la ligne d'avant."""
+    eng = Engine(cfg)
+    eng.handle(ButtonEvent("PATTERN", True), 0)
+    eng.handle(ButtonEvent("PATTERN", False), MS)
+    top = (render.COLUMN, 0, WIDTH, render.MUTE_TOP - 3)
+    idle = render.left(eng, SECOND).crop(top).tobytes()
+    eng.arp_progression = "1637"
+    assert render.left(eng, SECOND).crop(top).tobytes() == idle  # rien ne joue encore
+    views = []
+    for rank, tones in ((0, [60, 63, 67]), (1, [56, 60, 63]), (1, [56, 59, 63])):
+        eng._arp_degree, eng._arp_tones = rank, tones
+        views.append(render.left(eng, SECOND).crop(top).tobytes())
+    assert len({idle, *views}) == 4
+    eng._leave_arp()
+    assert render.left(eng, SECOND).crop(top).tobytes() == idle

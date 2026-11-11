@@ -3,6 +3,21 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.39.0] - 2026-11-11
+
+### Ajouté
+
+- [17] Accord en cours à l'écran : tant qu'une progression joue, le
+  bandeau gauche affiche ses degrés à la place de la banque, celui de
+  l'accord en cours en vidéo inverse, puis le nom de l'accord lu sur les
+  notes jouées (`1 6 3 7  Gb`, `Bbm`, `Cm7b5`, `Bb5` ; la note seule avec
+  `CHD OFF`). Plusieurs pads tenus : l'accord du premier.
+- Guide : paragraphe « Accord en cours », capture `14-progression.png`.
+
+### Modifié
+
+- Spec : slice 11 (arpégiateur) notée validée à l'essai.
+
 ## [0.38.0] - 2026-11-11
 
 ### Ajouté

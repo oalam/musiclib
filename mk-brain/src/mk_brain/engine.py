@@ -81,6 +81,7 @@ from mk_brain.arp import (
     spread,
     ties_after,
 )
+from mk_brain.arp import chord as arp_chord
 from mk_brain.arp import sequence as arp_sequence
 from mk_brain.clock import ClockTracker
 from mk_brain.config import PITCH_BEND, PRESET_SLOTS, RGB, ArpPreset, Config, Layout
@@ -232,6 +233,7 @@ class Engine:
         self.arp_progression = cfg.arp.progression  # nom de la progression (slice 16), ou OFF
         self.arp_bars: ArpBars = cfg.arp.bars  # durée de chaque accord, en mesures
         self._arp_degree: int | None = None  # rang de l'accord en cours dans la progression
+        self._arp_tones: list[int] = []  # son accord, sur le premier pad tenu (écran)
         self.arp_preset: str | None = None  # dernier preset rappelé (slice 13)
         # slice 14 : emplacements 1-16 sauvés depuis la MK2 (`state/arp-presets.json`), qui
         # l'emportent sur ceux de la config ; `arp_bank_dirty` : fichier à réécrire
@@ -431,6 +433,15 @@ class Engine:
         self.last_control = f"ARP PRE {slot[0]}"
 
     @property
+    def arp_now(self) -> tuple[list[int], int, list[int]] | None:
+        """Progression qui joue : (ses degrés, rang de l'accord en cours, notes de cet
+        accord sur le premier pad tenu). None sans progression ou sans arpège lancé."""
+        degrees = self.cfg.arp.progressions.get(self.arp_progression)
+        if degrees is None or self._arp_degree is None or not self._arp_tones:
+            return None
+        return degrees, self._arp_degree % len(degrees), self._arp_tones
+
+    @property
     def arp_steps(self) -> str | None:
         """Les 16 pas du motif choisi ; None sans motif (OFF)."""
         return self.cfg.arp.motifs.get(self.arp_motif)
@@ -529,6 +540,7 @@ class Engine:
         self._arp_pos = None
         self._arp_step = 0
         self._arp_degree = None
+        self._arp_tones = []
         self.leds_dirty = True
 
     def _toggle_hold(self) -> None:
@@ -630,6 +642,7 @@ class Engine:
                 if not held:  # tout est sorti de 0-127 : rien à jouer sur ce pas
                     self._arp_pos += div
                     continue
+                self._arp_tones = arp_chord(held[0][1], self.arp_chord, scale)
             if self.arp_chord != "off":  # un pad = un accord, pris dans la gamme du clavier
                 held = spread(held, self.arp_chord, scale)
             seq = arp_sequence(held, self.arp_order, self.arp_octaves)

@@ -1284,3 +1284,20 @@ def test_arp_progression_restarts_the_chord_on_each_change(cfg: Config) -> None:
     played = _ons(first) + [n for _, n, _ in _arp_notes(eng, range(24, 120, 24))]
     # do mineur (2 notes), puis la bémol majeur depuis sa fondamentale
     assert played == [root, root + 3, root - 4, root, root + 3]
+
+
+def test_arp_now_follows_the_chord_of_the_progression(cfg: Config) -> None:
+    """Accord en cours pour l'écran : degrés, rang, notes sur le premier pad tenu ; rien
+    sans progression, ni une fois l'arpège sorti."""
+    eng = arp(cfg, running_clock(200))
+    eng.group = next(i for i, lay in enumerate(cfg.layouts) if lay.name == "Aeolian")
+    eng.division, eng.arp_bars, eng.arp_chord = "1/4", "1/2", "tri"
+    root = eng.target(1)[1]
+    assert eng.arp_now is None
+    press(eng, 1 * TICK, pad=_index(1))
+    assert eng.arp_now is None  # PRG OFF
+    eng.arp_progression = "1637"
+    _arp_notes(eng, range(24, 72, 24))  # jusqu'au 2e accord
+    assert eng.arp_now == ([1, 6, 3, 7], 1, [root - 4, root, root + 3])
+    eng._leave_arp()
+    assert eng.arp_now is None

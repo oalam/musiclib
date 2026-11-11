@@ -495,7 +495,7 @@ La pression d'un pad tenu module sa track : la MK2 la mesure en continu
 filtre ; frapper le pad ne change pas le timbre, appuyer plus fort en le
 tenant l'ouvre, relâcher le referme.
 
-## Slice 11 : arpégiateur (cadré et codé le 2026-11-11, à essayer)
+## Slice 11 : arpégiateur (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : mode ARPG, track 10, division 1/16, ordre montant, 2 octaves.
 Les pads Bb, Db et F tenus jouent Bb3 Db4 F4 Bb4 Db5 F5 en boucle, une
@@ -837,12 +837,41 @@ Une **progression** est une suite de degrés (1 à 7) écrite en YAML :
 **Hors périmètre** : accords empruntés ou altérés (degrés hors gamme),
 qualité d'accord par degré, durées différentes par accord, progression
 relancée à l'appui, édition sur la machine, affichage de l'accord en
-cours.
+cours (slice 17).
 
 **Critère de fin** : banque en éolien, `CHD TRI`, `PRG 1637`, `BAR 1`, pad
 de la tonique tenu : quatre accords d'une mesure chacun, changement sur
 le premier temps, calé sur le kick ; `BAR 2` double la durée ; `PRG OFF`
 revient à l'accord du pad.
+
+## Slice 17 : accord en cours à l'écran (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : banque E (la# phrygien), mode ARPG, `CHD TRI`, `PRG 1637`, pad
+la# tenu. Sur le deuxième accord, l'écran gauche affiche `1 6 3 7  Gb`,
+le `6` en vidéo inverse.
+
+- **Bandeau gauche, à la place de la banque et de sa tonalité**, tant
+  qu'une progression joue : ses degrés (jusqu'à 16, cases resserrées
+  au-delà de 8), celui de l'accord en cours en vidéo inverse, puis le nom
+  de l'accord. Une alerte, le dernier geste ou la frappe d'un pad passent
+  devant, comme pour la banque.
+- **Nom de l'accord** : la fondamentale (noms en bémols, comme la
+  tonalité) et la qualité lue sur les notes réellement jouées : `Gb`,
+  `Bbm`, `Cdim`, `Ebmaj7`, `Bbm7`, `F7`, `Cm7b5`, `Absus2`, `Bbsus4`,
+  `Bb5`. Avec `CHD OFF` : la note seule. Un accord sans nom connu (gamme
+  à 5 ou 6 notes) ne garde que sa fondamentale.
+- **Plusieurs pads tenus** : l'accord du premier pad appuyé.
+- L'affichage suit les notes planifiées (quelques millisecondes d'avance
+  sur le son). Sans progression (`PRG OFF`), arpège arrêté ou sorti du
+  mode : la banque revient.
+- PATTERN tenu, rien ne change : les divisions gardent le haut de l'écran.
+
+**Hors périmètre** : accord en cours PATTERN tenu, accord affiché sans
+progression, tête de lecture du motif, chiffrage en degrés romains.
+
+**Critère de fin** : `PRG 1637`, `BAR 1`, pad de la tonique tenu : le
+degré en inverse avance d'une case par mesure, sur le premier temps, et
+le nom affiché est l'accord entendu ; relâcher le pad rend la banque.
 
 ## Modes : live et design
 
@@ -1637,12 +1666,13 @@ conditionne tout le reste.
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
 | 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0) ; seuils réglés sur mesure le 2026-11-11 (v0.30.3), à essayer avec un preset DT2 qui assigne l'aftertouch |
-| 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), à essayer sur la DT2 |
+| 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 13 | **Presets de l'arpège** : bibliothèque `arp.presets` (ordre, octaves, gate, division, motif), rappel par l'encodeur 5 `PRE` PATTERN tenu, `----` dès qu'un réglage s'en écarte | cf. « Slice 13 : presets de l'arpège », critère de fin | codée le 2026-11-11 (v0.35.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 14 | **Banque de 16 presets** : PATTERN tenu, pad n = rappel, SHIFT + pad n = sauvegarde des réglages courants ; `state/arp-presets.json`, commun aux projets ; la config remplit les emplacements non sauvés | cf. « Slice 14 », critère de fin | codée le 2026-11-11 (v0.36.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 15 | **Accords de l'arpège** : encodeur 6 `CHD` PATTERN tenu (`OFF`, `TRI`, `7TH`, `SUS2`, `SUS4`, `PWR`), un pad = un accord pris dans la gamme de la banque, gardé dans les presets | cf. « Slice 15 », critère de fin | codée le 2026-11-11 (v0.37.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 16 | **Progressions d'accords** : `arp.progressions` (suites de degrés), encodeur 7 `PRG` et encodeur 8 `BAR` (1/2 à 4 mesures par accord) PATTERN tenu, degrés comptés depuis le pad tenu, calées sur le transport, gardées dans les presets | cf. « Slice 16 », critère de fin | codée le 2026-11-11 (v0.38.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 17 | **Accord en cours à l'écran** : progression qui joue, bandeau gauche : ses degrés, celui en cours en vidéo inverse, nom de l'accord (`1 6 3 7  Gb`) | cf. « Slice 17 », critère de fin | codée le 2026-11-11 (v0.39.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

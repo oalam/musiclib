@@ -229,6 +229,19 @@ def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     return eng, now + 3 * SECOND, True
 
 
+def progression(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
+    eng = Engine(cfg, ClockTracker(), project)
+    now = running(eng, 12, program=4 * 16 + 2)
+    btn(eng, "PATTERN", t=now)  # mode ARPG
+    btn(eng, "PATTERN", False, t=now + MS)
+    eng.arp_chord, eng.arp_progression, eng.arp_bars = "tri", "1637", "1"
+    hit(eng, 1, now + 2 * MS)  # la tonique tenue : la progression part
+    for k in range(now // TICK + 1, 13 * 96 + 10):  # jusqu'au 2e accord, mesure 14
+        eng.clock.tick(k * TICK)
+        eng.tick(k * TICK)
+    return eng, k * TICK, True
+
+
 SCENES: dict[str, Scene] = {
     "01-selection": selection,
     "02-mpc-arret": live_stopped,
@@ -243,6 +256,7 @@ SCENES: dict[str, Scene] = {
     "11-clavier-gamme": design_scale,
     "12-perform": perform,
     "13-arpege": arpeggio,
+    "14-progression": progression,
 }
 
 

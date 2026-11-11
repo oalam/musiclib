@@ -1,4 +1,4 @@
-"""Arpégiateur (slices 11 à 15) : ordre des notes tenues, octaves, motifs, accords."""
+"""Arpégiateur (slices 11 à 17) : ordre des notes tenues, octaves, motifs, accords."""
 
 from __future__ import annotations
 
@@ -110,6 +110,33 @@ def chord(note: int, kind: ArpChord, scale: Set[int]) -> list[int]:
             note + next((c for c in candidates if (note + c) % 12 in scale), candidates[0])
         )
     return tones
+
+
+# Nom affiché de l'accord en cours : intervalles au-dessus de la fondamentale → suffixe.
+_QUALITIES: dict[tuple[int, ...], str] = {
+    (3, 7): "m",
+    (4, 7): "",
+    (3, 6): "dim",
+    (4, 8): "aug",
+    (3, 7, 10): "m7",
+    (4, 7, 11): "maj7",
+    (4, 7, 10): "7",
+    (3, 6, 10): "m7b5",
+    (3, 7, 11): "mM7",
+    (3, 6, 9): "dim7",
+    (2, 7): "sus2",
+    (1, 7): "susb2",
+    (5, 7): "sus4",
+    (6, 7): "sus#4",
+    (7, 12): "5",
+}
+
+
+def chord_name(tones: Sequence[int], names: Sequence[str]) -> str:
+    """`Ab`, `Cm`, `Ebmaj7`… : la fondamentale (`names`, 12 classes de hauteur) et la qualité
+    lue sur les intervalles ; un accord sans nom connu ne garde que sa fondamentale."""
+    root = tones[0]
+    return names[root % 12] + _QUALITIES.get(tuple(t - root for t in tones[1:]), "")
 
 
 def spread(held: Sequence[Held], kind: ArpChord, scale: Set[int]) -> list[Held]:
