@@ -44,11 +44,23 @@ def test_motif_parsed_without_spaces() -> None:
 
 @pytest.mark.parametrize(
     ("text", "match"),
-    [("X.xx", "4 pas"), ("X.xo X.xx X.xx X.xx", "inconnus"), ("-... .... .... ....", "aucune")],
+    [
+        ("X.xx" * 4 + "x", "17 pas"),
+        ("", "0 pas"),
+        ("X.xo X.xx X.xx X.xx", "inconnus"),
+        ("-... .... .... ....", "aucune"),
+    ],
 )
 def test_bad_motif_rejected(text: str, match: str) -> None:
     with pytest.raises(MotifError, match=match):
         parse_motif(text)
+
+
+def test_short_motifs_loop_on_their_own_length() -> None:
+    steps = parse_motif("X-x.-")
+    assert steps == "X-x.-"
+    assert [ties_after(steps, i) for i in (0, 2)] == [1, 0]
+    assert ties_after(parse_motif("x--"), 0) == 2  # le motif boucle : jamais plus que lui-même
 
 
 def test_ratchets_are_played_steps() -> None:

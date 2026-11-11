@@ -440,7 +440,7 @@ MOTIF_TOP, MOTIF_BOTTOM = TAG_TOP + 3, BAND - 3
 
 
 def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
-    """Les 16 pas du motif : accent en colonne pleine, note en demi-colonne, liée en trait
+    """Les pas du motif (1 à 16) : accent en colonne pleine, note en demi-colonne, liée en trait
     qui prolonge la note, silence en point, ratchet en colonne fendue ; un repère au-dessus
     de chaque temps."""
     mid = (MOTIF_TOP + MOTIF_BOTTOM) // 2

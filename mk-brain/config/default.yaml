@@ -53,7 +53,8 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
     "1516": [1, 5, 1, 6]
     "1716": [1, 7, 1, 6]
   motif: "OFF"               # motif de départ : un nom de `motifs`, ou "OFF" (une note par division)
-  # Motifs (slice 12), encodeur 4 MOT, PATTERN tenu. 16 pas, calés sur la mesure en 1/16 ;
+  # Motifs (slice 12), encodeur 4 MOT, PATTERN tenu. 1 à 16 pas, en boucle depuis le départ du
+  # transport : 16 pas tiennent une mesure en 1/16, un motif plus court tourne contre elle ;
   # les espaces séparent les temps. x note, X note accentuée, . silence, - liée (la note
   # précédente dure un pas de plus), r / R ratchet (la note jouée 2 fois dans le pas, R accentué),
   # t / T idem 3 fois. Nom : 4 caractères au plus, entre guillemets.
@@ -67,6 +68,8 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
     "LONG": "X--- x-x- X--- xxx-"   # notes tenues
     "ACID": "X-.x x.X- .xx. X.x-"   # ligne acid, liées et silences
     "RATC": "X.xr X.xx X.xr X.rT"   # galop à ratchets, triolet en fin de mesure
+    "CINQ": "X.xx."                 # 5 pas : l'accent tourne contre la mesure
+    "DOUZ": "X.xx X.x. X.xr"        # 12 pas : 3 temps contre 4
   # Presets (slices 13 et 14), encodeur 5 PRE ou pad n, PATTERN tenu : les cinq réglages d'un coup.
   # Ils remplissent les emplacements 1, 2, 3… des 16 pads (16 au plus) ; un emplacement sauvé depuis
   # la MK2 (PATTERN + SHIFT + pad, state/arp-presets.json) l'emporte. Noms U01 à U16 réservés.

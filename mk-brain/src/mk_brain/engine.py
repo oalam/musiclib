@@ -67,7 +67,6 @@ from mk_brain.arp import (
     GATE_MIN,
     GATE_STEP,
     MAX_OCTAVES,
-    MOTIF_STEPS,
     ORDER_LABELS,
     ORDERS,
     REST,
@@ -612,8 +611,9 @@ class Engine:
         """Notes de l'arpège à venir avant `horizon` : une par division, vélocité de la
         pression courante du pad (la dernière jouée s'il est relâché, en maintien).
 
-        Motif (slice 12) : le pas est la position sur la grille de la division, modulo 16
-        (calé sur la mesure en 1/16). Silence et liée ne consomment pas de note ; un pas
+        Motif (slice 12) : le pas est la position sur la grille de la division, modulo la
+        longueur du motif (16 pas : calé sur la mesure en 1/16 ; moins : il tourne contre elle).
+        Silence et liée ne consomment pas de note ; un pas
         `x` est atténué (`arp.unaccented`) ; les liées qui suivent allongent la note."""
         out: list[Timed] = []
         steps = self.arp_steps
@@ -623,7 +623,7 @@ class Engine:
                 break
             kind, ties = None, 0
             if steps is not None:
-                index = round(self._arp_pos / div) % MOTIF_STEPS
+                index = round(self._arp_pos / div) % len(steps)
                 kind = steps[index]
                 if kind in (REST, TIE):  # la note attend le prochain pas joué
                     self._arp_pos += div

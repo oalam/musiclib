@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.41.0] - 2026-11-11
+
+### Ajouté
+
+- [19] Motifs de longueur libre : 1 à 16 pas au lieu de 16. Le motif
+  boucle depuis le départ du transport ; plus court que 16, il tourne
+  contre la mesure. Motifs `CINQ` (5 pas) et `DOUZ` (12 pas) ajoutés à
+  `arp.motifs`.
+
 ## [0.40.0] - 2026-11-11
 
 ### Ajouté

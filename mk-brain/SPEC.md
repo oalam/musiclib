@@ -904,6 +904,33 @@ roulements s'entendent sur les pas 4, 12, 15 et 16, calés sur le kick,
 sans note bloquée ; en LIVE REC, le pattern relu les rejoue (dans la
 limite de la quantification de la DT2).
 
+## Slice 19 : motifs de longueur libre (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : motif `CINQ` (`X.xx.`, 5 pas), division 1/16, kick en 4/4 sur la
+DT2. L'accent tombe sur les pas 1, 6, 11, 16 de la première mesure, puis
+5, 10, 15 de la suivante : il tourne contre le kick et retombe sur le
+premier temps toutes les 5 mesures.
+
+- **Un motif fait de 1 à 16 pas** (16 restait la seule longueur en
+  slice 12). Même écriture, mêmes caractères ; les espaces séparent
+  toujours les temps.
+- **Boucle depuis le départ du transport** : le pas joué est la position
+  sur la grille de la division, modulo la longueur du motif. Un motif de
+  16 pas reste calé sur la mesure en 1/16 ; un motif plus court se décale
+  d'une mesure à l'autre. Relancer la DT2 remet tous les motifs au pas 1.
+- **Liées** : elles bouclent sur la longueur du motif.
+- **Écran** : autant de cases que de pas, à gauche ; les repères de temps
+  restent tous les 4 pas.
+- `CINQ` (5 pas) et `DOUZ` (12 pas, 3 temps contre 4) rejoignent la
+  bibliothèque de départ (11 motifs).
+
+**Hors périmètre** : longueur réglable à la volée (encodeur), motifs de
+plus de 16 pas, remise au pas 1 à l'appui ou à chaque phrase.
+
+**Critère de fin** : motif `CINQ`, un pad tenu, DT2 lancée : l'accent se
+déplace d'une mesure à l'autre et revient sur le premier temps à la
+mesure 6 ; `GALO` reste calé comme avant.
+
 ## Modes : live et design
 
 > **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
@@ -1705,6 +1732,7 @@ conditionne tout le reste.
 | 16 | **Progressions d'accords** : `arp.progressions` (suites de degrés), encodeur 7 `PRG` et encodeur 8 `BAR` (1/2 à 4 mesures par accord) PATTERN tenu, degrés comptés depuis le pad tenu, calées sur le transport, gardées dans les presets | cf. « Slice 16 », critère de fin | codée le 2026-11-11 (v0.38.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 17 | **Accord en cours à l'écran** : progression qui joue, bandeau gauche : ses degrés, celui en cours en vidéo inverse, nom de l'accord (`1 6 3 7  Gb`) | cf. « Slice 17 », critère de fin | codée le 2026-11-11 (v0.39.0), à essayer sur la DT2 |
 | 18 | **Ratchets** : pas `r` / `R` (note jouée 2 fois dans le pas) et `t` / `T` (3 fois) dans `arp.motifs`, motif `RATC` | cf. « Slice 18 », critère de fin | codée le 2026-11-11 (v0.40.0), à essayer sur la DT2 |
+| 19 | **Motifs de longueur libre** : 1 à 16 pas, en boucle depuis le départ du transport (polyrythmie contre la mesure), motifs `CINQ` et `DOUZ` | cf. « Slice 19 », critère de fin | codée le 2026-11-11 (v0.41.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

@@ -49,7 +49,7 @@ def test_arp_motifs_validated(tmp_path: Path, cfg: Config) -> None:
     good = {"order": "up", "octaves": 1, "gate": 50, "division": "1/16", "motif": "GALO"}
     assert cfg.arp.presets["RUSH"].division == "1/32"
     for change, match in (
-        ({"motifs": {"GALO": "X.xx"}}, "16 attendus"),
+        ({"motifs": {"GALO": "X.xx" * 5}}, "16 attendus"),
         ({"motifs": {"GALOP": "X.xx" * 4}}, "4 caractères"),
         ({"motifs": {"OFF": "X.xx" * 4}}, "réservé"),
         ({"motif": "RIEN"}, "absent"),

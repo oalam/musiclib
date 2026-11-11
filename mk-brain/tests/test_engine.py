@@ -1140,6 +1140,20 @@ def test_arp_motif_ties_lengthen_the_note(cfg: Config) -> None:
     assert [t / TICK for t, _ in out] == pytest.approx([24, 33], abs=0.01)  # 6 + 3 ticks
 
 
+def test_arp_short_motif_turns_against_the_bar(cfg: Config) -> None:
+    """Motif CINQ (`X.xx.`, 5 pas) : le pas joué est la position modulo 5, pas modulo 16 ;
+    l'accent tombe sur les pas 0, 5, 10, 15, 20 du transport."""
+    eng = arp(cfg)
+    eng.arp_motif = "CINQ"
+    note = eng.target(1)[1]
+    soft = round(127 * cfg.arp.unaccented / 100)
+    first = press(eng, 1 * TICK, pad=_index(1))  # position 0 : X
+    assert _ons(first) == [note]
+    played = _arp_notes(eng, range(6, 132, 6))  # pas 1 à 21
+    assert [round(pos / 6) for pos, _, _ in played] == [2, 3, 5, 7, 8, 10, 12, 13, 15, 17, 18, 20]
+    assert [v for _, _, v in played] == [soft, soft, 127] * 4
+
+
 def test_arp_ratchet_replays_the_note_inside_the_step(cfg: Config) -> None:
     """Motif RATC (`X.xr …`), 1/16, gate 50 % : le pas `r` joue deux fois la même note,
     atténuée, chaque coup durant un quart de pas ; l'arpège n'avance que d'une note."""

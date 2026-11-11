@@ -50,7 +50,7 @@ PROGRESSION_MAX = 16
 DEGREES_UP = 4  # dernier degré compté vers le haut
 AEOLIAN = (0, 2, 3, 5, 7, 8, 10)  # sans gamme connue
 
-MOTIF_STEPS = 16
+MOTIF_STEPS = 16  # longueur maximale d'un motif (slice 19 : 1 à 16 pas)
 MOTIF_OFF = "OFF"  # pas de motif : une note par division, sans atténuation
 MOTIF_NAME_MAX = 4  # largeur de la case de l'écran
 NOTE, ACCENT, REST, TIE = "x", "X", ".", "-"  # un caractère par pas du motif
@@ -66,10 +66,10 @@ class MotifError(ValueError):
 
 
 def parse_motif(text: str) -> str:
-    """Motif de la config → ses 16 pas, sans les espaces qui séparent les temps."""
+    """Motif de la config → ses pas (1 à 16), sans les espaces qui séparent les temps."""
     steps = "".join(text.split())
-    if len(steps) != MOTIF_STEPS:
-        raise MotifError(f"motif {text!r} : {len(steps)} pas, {MOTIF_STEPS} attendus")
+    if not 1 <= len(steps) <= MOTIF_STEPS:
+        raise MotifError(f"motif {text!r} : {len(steps)} pas, 1 à {MOTIF_STEPS} attendus")
     unknown = sorted(set(steps) - PLAYED - {REST, TIE})
     if unknown:
         raise MotifError(f"motif {text!r} : pas inconnus {''.join(unknown)!r}")
@@ -91,7 +91,7 @@ def accented(kind: str) -> bool:
 def ties_after(steps: str, index: int) -> int:
     """Nombre de pas liés qui prolongent la note du pas `index` (le motif boucle)."""
     n = 0
-    while n < MOTIF_STEPS - 1 and steps[(index + n + 1) % MOTIF_STEPS] == TIE:
+    while n < len(steps) - 1 and steps[(index + n + 1) % len(steps)] == TIE:
         n += 1
     return n
 
