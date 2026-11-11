@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.32.1] - 2026-11-11
+
+### Corrigé
+
+- [11] Page ARP : course des encodeurs allongée, il était très difficile
+  de viser une valeur. 24 unités brutes par valeur de `ORD` et `OCT`, 12
+  par pas de 5 % de `GATE` (un CC : 4 par cran), réglables dans `arp:`
+  (`raw_per_choice`, `raw_per_gate_step`).
+
 ## [0.32.0] - 2026-11-11
 
 ### Ajouté

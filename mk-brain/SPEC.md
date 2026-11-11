@@ -541,6 +541,10 @@ sur un pad accentue sa note.
   pendant que l'arpège joue. Page `ARP` : `ORD` (montant, descendant,
   aller-retour, ordre d'appui, aléatoire), `OCT` (1 à 3), `GATE` (10 à
   100 % de la division). Les 5 autres encodeurs de la page restent libres.
+  Course propre à la page (v0.32.1, après essai : au pas d'un CC, 4 unités
+  brutes, le moindre mouvement sautait plusieurs valeurs) : 24 unités
+  brutes par valeur de `ORD` et `OCT`, 12 par pas de 5 % de `GATE`
+  (`arp.raw_per_choice`, `arp.raw_per_gate_step`), à régler à la main.
 - **Maintien** : NOTE REPEAT bascule le maintien (LED allumée). Maintenu,
   l'arpège continue pads relâchés ; un nouvel appui, tous pads relâchés,
   remplace les notes ; un appui pendant qu'un pad est tenu en ajoute.

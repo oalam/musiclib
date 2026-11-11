@@ -88,6 +88,10 @@ class ArpConfig(BaseModel):
     order: ArpOrder = "up"
     octaves: int = Field(1, ge=1, le=MAX_OCTAVES)
     gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
+    # course des encodeurs de la page ARP, en unités brutes de la MK2 par valeur : bien plus
+    # longue que celle d'un CC (`encoders.raw_per_step`), ces réglages n'ont que 3 à 19 valeurs
+    raw_per_choice: int = Field(24, ge=1)  # ORD et OCT
+    raw_per_gate_step: int = Field(12, ge=1)  # GATE, par pas de 5 %
 
 
 PITCH_BEND = 128  # identifiant du pitch bend parmi les paramètres (hors des CC 0-127)

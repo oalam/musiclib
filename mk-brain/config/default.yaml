@@ -37,6 +37,8 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ, page A
   order: up                  # up, down, updown, played (ordre d'appui), random
   octaves: 1                 # 1 à 3
   gate: 50                   # durée d'une note, 10 à 100 % de la division
+  raw_per_choice: 24         # course d'encodeur par valeur de ORD et OCT (un CC : 4 par cran)
+  raw_per_gate_step: 12      # course d'encodeur par pas de 5 % de GATE
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le

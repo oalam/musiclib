@@ -1025,11 +1025,13 @@ def test_arp_needs_running_transport_and_stops_with_it(cfg: Config) -> None:
 
 def test_arp_page_encoders_and_division_buttons(cfg: Config) -> None:
     eng = arp(cfg)
-    step = cfg.encoders.raw_per_step
-    assert eng.handle(EncoderEvent(2, step, 0), 0) == [] and eng.arp_octaves == 2
+    step, gate_step = cfg.arp.raw_per_choice, cfg.arp.raw_per_gate_step
+    assert eng.handle(EncoderEvent(2, step - 1, 0), 0) == [] and eng.arp_octaves == 1
+    eng.handle(EncoderEvent(2, 1, 0), 0)  # la course s'accumule : une valeur par `step`
+    assert eng.arp_octaves == 2
     eng.handle(EncoderEvent(2, 5 * step, 0), 0)
     assert eng.arp_octaves == 3  # borné
-    eng.handle(EncoderEvent(3, -step, 0), 0)
+    eng.handle(EncoderEvent(3, -gate_step, 0), 0)
     assert eng.arp_gate == 45 and eng.last_control == "ARP GATE 45%"
     eng.handle(EncoderEvent(1, 3 * step, 0), 0)
     assert eng.arp_order == "played"
@@ -1038,7 +1040,7 @@ def test_arp_page_encoders_and_division_buttons(cfg: Config) -> None:
     assert eng.division == "1/8"
     btn(eng, "BROWSE_RIGHT")  # page de son 1 : les encodeurs envoient de nouveau
     assert not eng.arp_menu and eng.last_control == "page 1/2"
-    assert eng.handle(EncoderEvent(1, step, 0), 0) != []
+    assert eng.handle(EncoderEvent(1, cfg.encoders.raw_per_step, 0), 0) != []
     btn(eng, "BROWSE_LEFT")
     assert eng.arp_menu and eng.last_control == "page ARP"
 

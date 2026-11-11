@@ -212,6 +212,7 @@ class Engine:
         self._arp_notes: dict[int, _ArpNote] = {}  # pad → note, dans l'ordre d'appui
         self._arp_pos: float | None = None  # position (ticks) de la prochaine note
         self._arp_step = 0
+        self._arp_residue: dict[int, int] = {}  # encodeur de la page ARP → reste de rotation
         self._rng = random.Random()
         self._held_buttons: set[str] = set()
         self._attacks: dict[int, _Attack] = {}  # pad 1-16 → attaque en cours de mesure
@@ -408,6 +409,7 @@ class Engine:
     def _leave_arp(self) -> None:
         """Sortie : l'arpège et son maintien s'arrêtent (les note off sont déjà planifiés)."""
         self.arp = self.arp_page = self.arp_hold = False
+        self._arp_residue.clear()
         self._arp_clear()
 
     def _arp_clear(self) -> None:
@@ -435,9 +437,16 @@ class Engine:
         self.last_control = "page ARP" if v == 0 else f"page {v}/{n}"
 
     def _arp_turn(self, index: int, delta: int, now: int) -> None:
-        """Encodeurs 1-3 de la page ARP : ordre, octaves, gate (bornés, sans boucle)."""
-        steps = self.faders.steps(index, delta)
-        if steps == 0 or index > 3:
+        """Encodeurs 1-3 de la page ARP : ordre, octaves, gate (bornés, sans boucle).
+        Course propre à la page (`arp.raw_per_choice`, `arp.raw_per_gate_step`) : au pas
+        d'un CC, le moindre mouvement sautait plusieurs valeurs (essai du 2026-11-11)."""
+        if index > 3:
+            return
+        per = self.cfg.arp.raw_per_gate_step if index == 3 else self.cfg.arp.raw_per_choice
+        acc = self._arp_residue.get(index, 0) + delta
+        steps = int(acc / per)  # vers zéro, dans les deux sens
+        self._arp_residue[index] = acc - steps * per
+        if steps == 0:
             return
         self.last_touch = (index, now)
         if index == 1:

@@ -222,7 +222,7 @@ def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     eng.handle(PadEvent(_index(10), False, 0), now)
     btn(eng, "SELECT", False, t=now)
     btn(eng, "PATTERN", t=now)
-    eng.handle(EncoderEvent(2, cfg.encoders.raw_per_step, 0), now)  # OCT 2
+    eng.handle(EncoderEvent(2, cfg.arp.raw_per_choice, 0), now)  # OCT 2
     for pad in (1, 3, 5):
         hit(eng, pad, now)
     return eng, now + 3 * SECOND, True
