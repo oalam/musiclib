@@ -435,7 +435,8 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
   en vidéo inverse, en bas à gauche du bandeau gauche, mutes et messages
   décalés à sa droite ; les divisions du NOTE REPEAT s'arrêtent au-dessus
   pour le laisser visible. Seule la sélection de projet (écran entier) le
-  masque.
+  masque. **Déplacé le 2026-11-11** en haut à droite du bandeau droit (cf.
+  Écrans, revue du 2026-11-11).
 
 **Critère de fin** : sur la DT2, SOLO, taps sur les pads 3 et 7, CUT
 tourné : le filtre de T3 et T7 bouge, aucune note ; PAD MODE sort de SOLO
@@ -917,6 +918,44 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
 - rafraîchi au plus toutes les 50 ms dans la boucle principale, envoyé
   seulement si l'image change ; moins d'1 ms la paire d'écrans sur le
   Mac. Si le Pi est trop lent, passer au fil de rendu dédié (slice 7).
+
+**Revu le 2026-11-11 (v0.29.0), remplace les deux bandeaux ci-dessus** ;
+les faders, le NOTE REPEAT, le compte à rebours et l'annonce de banque ne
+changent pas :
+
+```
+écran gauche                              écran droit
+[E03]  E-TRIBE  Bb Phrygian               [PHR 01] 10 / 32  -7 to 16    [MPC]
+TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·                      > E04      143.0
+                                          [████:████|██░░:░░░░|░░░░:░░░░|░░░░:░░░░]
+```
+
+- bandeau gauche, colonne « écran de la DT2 » : le pattern en noir sur
+  blanc, puis `TR 12`, la track des faders, sans son code de la grille
+  (`x2 3` : groupe SOLO de 2 tracks, la première étant la 3) ;
+- à sa droite, la clé de la banque et sa tonalité (`E-TRIBE  Bb
+  Phrygian`), remplacées 1,5 s par le dernier geste, 1 s par la frappe, ou
+  par une alerte ; les mutes ne sont plus jamais masqués ;
+- mutes sur toute la largeur restante, cases de 10 px ; elles comptent
+  aussi les 16 doubles croches de la mesure : un carré intérieur, en
+  inverse de sa case, marque celle qui joue (rien à l'arrêt). L'écran
+  gauche est donc redessiné à chaque double croche, soit 60 / 165 / 4 =
+  91 ms à 165 BPM, environ 11 images par seconde : **à mesurer sur le
+  Pi** ; repli : un carré par noire ;
+- bandeau droit : la phrase en noir sur blanc dans le coin gauche (`PHR
+  01`, `PHR --` à l'arrêt), `mesure / longueur` en gros, les mesures avant
+  le cap, dessous le pattern suivant (`> E04`) ou l'octave du clavier ;
+- à droite, l'étiquette du mode (`MPC`, `KEYS`, `SOLO`, `MUTE`, `SELECT`),
+  qui quitte l'écran gauche, et dessous le **tempo de la clock** (la
+  décision « ni tempo » du 2026-11-09 est levée), lissé par régression sur
+  les 96 derniers ticks, soit une mesure : 4 × 60 / 160 = 1,5 s à 160 BPM
+  (`ClockTracker.bpm_smooth`) ; le placement des notes garde l'estimation
+  sur une noire (`bpm`) ;
+- barre de la phrase : en plus du trait tous les 8 mesures, un pointillé
+  à chaque tour de pattern, fixé à 4 mesures (64 pas) ; les longueurs par
+  pattern du front matter (`patterns:`) ne sont pas lues par le projet ;
+- NOTE REPEAT : l'étiquette du mode descend sous les divisions de l'écran
+  droit.
 
 **Fait le 2026-11-09 (slice 5.D), remplace les deux maquettes design
 ci-dessous** : les entrées du menu sous leurs boutons d'écran, comme les

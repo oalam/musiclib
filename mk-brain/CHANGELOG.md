@@ -3,6 +3,32 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.29.0] - 2026-11-11
+
+### Ajouté
+
+- [9] Bande des mutes : un carré intérieur marque la double croche en
+  cours dans la mesure (rien à l'arrêt).
+- [9] Tempo de la clock sur l'écran droit, sous le mode, lissé sur une
+  mesure (`ClockTracker.bpm_smooth`, régression sur 96 ticks).
+- [9] Barre de la phrase : pointillé à chaque tour de pattern (4 mesures).
+
+### Modifié
+
+- [9] Écran gauche : colonne « écran de la DT2 » (pattern en noir sur
+  blanc, `TR 12` dessous), puis la banque et sa tonalité ; alertes,
+  dernier geste et frappe remplacent cette ligne, les mutes restent
+  visibles.
+- [9] Écran droit : phrase en noir sur blanc dans le coin gauche
+  (`PHR 01`), mesure / longueur, mesures avant le cap, pattern suivant ;
+  étiquette du mode en haut à droite (avant : en bas à gauche de l'écran
+  gauche).
+
+### Retiré
+
+- [9] Code de la grille à côté de la track (`BD T01`) ; `track_names`
+  reste dans la config pour le menu.
+
 ## [0.28.0] - 2026-11-11
 
 ### Ajouté

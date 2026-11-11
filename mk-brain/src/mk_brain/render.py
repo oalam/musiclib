@@ -29,6 +29,11 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
   reste. Menu et fiche de banque du design retirés de l'écran. Sous SOLO,
   la première track du groupe et ses faders (`x2` si plusieurs). Le mode
   (MPC, KEYS, SOLO) toujours en bas à gauche du bandeau gauche, inversé.
+- Revue du 2026-11-11 (v0.29.0), qui remplace ce qui précède pour les deux bandeaux :
+  à gauche la colonne « écran de la DT2 » (pattern en noir sur blanc, `TR 12`), la
+  banque et sa tonalité, les mutes toujours visibles avec la double croche en cours ;
+  à droite `PHR 01` en noir sur blanc, mesure / longueur, cap, pattern suivant, le
+  mode et, dessous, le tempo lissé ; pointillé à chaque tour de pattern dans la barre.
 - Sélection de projet (slice 6.C) : liste à gauche, la ligne choisie en
   gros et inversée ; à droite le projet choisi (banques, date) et les gestes.
   Elle remplace les deux écrans entiers.
@@ -141,34 +146,55 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
         _centered(d, box, name, font, 0 if chosen else 1)
 
 
-def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = 0) -> None:
+COLUMN = 46  # colonne « écran de la DT2 » (pattern, SMP, track), à gauche du bandeau gauche
+MUTE_TOP, MUTE_BOTTOM = 26, 35  # cases des mutes, 10 px de haut
+STEPS_PER_BAR = 16
+TICKS_PER_STEP = 6  # 24 ticks par noire
+PATTERN_BARS = 4  # un tour de pattern de 64 pas
+TAG_W = 46  # étiquette du mode (MPC, KEYS, SOLO)
+TAG_TOP = 25
+TAG_BOX: Box = (WIDTH - TAG_W + 2, 1, WIDTH - 3, 12)  # en haut à droite du bandeau droit
+TAG_BOX_REPEAT: Box = (2, TAG_TOP, TAG_W - 4, BAND - 3)  # NOTE REPEAT : sous les divisions
+
+
+def _step(engine: Engine) -> int | None:
+    """Double croche en cours dans la mesure (0-15), None à l'arrêt."""
+    ticks = engine.clock.ticks_since_start
+    return None if ticks is None else ticks // TICKS_PER_STEP % STEPS_PER_BAR
+
+
+def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> None:
     """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
-    La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point."""
+    La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point. Les 16 cases
+    comptent aussi les doubles croches de la mesure : un carré intérieur, en inverse de sa
+    case, marque celle qui joue."""
     cell = (WIDTH - left) // 16
-    top, bottom = 29, 35
+    top, bottom = MUTE_TOP, MUTE_BOTTOM
+    step = _step(engine)
     for t in range(1, 17):
-        x0, x1 = left + (t - 1) * cell + 2, left + t * cell - 3
+        x0 = left + (t - 1) * cell + 2
+        x1 = x0 + cell - 3
+        full = False
         if t == engine.cfg.midi.auto_channel:
             d.point(((x0 + x1) // 2, (top + bottom) // 2), fill=1)
         elif engine.faders.muted.get(t):
             d.rectangle((x0, top, x1, bottom), outline=1)
         else:
             d.rectangle((x0, top, x1, bottom), fill=1)
+            full = True
+        if step == t - 1:
+            d.rectangle((x0 + 3, top + 3, x1 - 3, bottom - 3), fill=0 if full else 1)
         if t == engine.track:
-            d.rectangle((x0 - 1, bottom + 2, x1 + 1, bottom + 3), fill=1)
+            d.rectangle((x0, bottom + 2, x1, bottom + 3), fill=1)
 
 
-HIT_TOP = 26  # frappe du clavier : sous le pattern en gros, à la place des mutes
-TAG_W = 46  # étiquette du mode (MPC, KEYS, SOLO), en bas à gauche du bandeau gauche
-TAG_TOP = 25
-
-
-def _mode_tag(d: ImageDraw.ImageDraw, engine: Engine) -> None:
-    """Mode courant en vidéo inverse, toujours affiché (demandé le 2026-11-10)."""
-    box = (2, TAG_TOP, TAG_W - 4, BAND - 3)
-    d.rectangle(box, fill=1)
+def _mode_tag(d: ImageDraw.ImageDraw, engine: Engine, box: Box = TAG_BOX, ink: int = 1) -> None:
+    """Mode courant en vidéo inverse, toujours affiché (demandé le 2026-11-10), sur
+    l'écran droit depuis le 2026-11-11. `ink` 0 : sur un bandeau lui-même inversé."""
+    d.rectangle((box[0] - 2, box[1] - 1, box[2] + 2, box[3] + 1), fill=1 - ink)
+    d.rectangle(box, fill=ink)
     name = engine.mode_name
-    _centered(d, box, name, _fit(d, name, box[2] - box[0] - 4, (SMALL, 10)), 0)
+    _centered(d, box, name, _fit(d, name, box[2] - box[0] - 4, (SMALL, 10)), 1 - ink)
 
 
 def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int]) -> None:
@@ -177,22 +203,41 @@ def _hit_strip(img: Image.Image, engine: Engine, hit: tuple[int, int, int, int])
     _, note, vel, _ = hit
     lay = engine.layout
     name, role = flat_note(note), degree_name(lay, note)
-    top, bottom, left, right = HIT_TOP, BAND - 3, TAG_W, WIDTH - 4
+    top, bottom, left, right = 3, 20, COLUMN + 2, WIDTH - 4
     bar = new_image()
     db = ImageDraw.Draw(bar)
     db.rectangle((left, top, left + round((right - left) * vel / 127), bottom), fill=1)
     text = new_image()
     dt = ImageDraw.Draw(text)
-    big = _font(12)
-    _bold(dt, (left + 4, top - 2), name, big, 1)
+    big = _font(14)
+    _bold(dt, (left + 4, top), name, big, 1)
     x = left + 14 + int(dt.textlength(name, font=big))
     role_font = _fit(dt, role, right - x - 4, (12, 10, 9))
     _centered(
         dt, (x, top, x + int(dt.textlength(role, font=role_font)), bottom), role, role_font, 1
     )
-    box = (TAG_W - 2, top, WIDTH, bottom + 1)
+    box = (left, top, WIDTH - 1, bottom + 1)
     img.paste(ImageChops.logical_xor(bar, text).crop(box), box[:2])
     ImageDraw.Draw(img).rectangle((left, top, right, bottom), outline=1)
+
+
+PATTERN_H = 22  # pattern noir sur blanc, en haut de la colonne DT2
+
+
+def _dt2_column(d: ImageDraw.ImageDraw, engine: Engine) -> None:
+    """Comme le coin de l'écran de la DT2 : pattern (noir sur blanc), puis `TR 12`, la
+    track des faders (celle du perform s'il y en a un ; `x2 3` : groupe SOLO de 2 tracks)."""
+    right = COLUMN - 4
+    d.rectangle((0, 0, right, PATTERN_H - 1), fill=1)
+    tracks = engine.perform_tracks
+    head = f"x{len(tracks)}" if len(tracks) > 1 else "TR"
+    lines = (
+        (engine.phrase.pattern or "---", (0, 0, right, PATTERN_H - 1), _font(20), 0),
+        (f"{head} {engine.fader_track}", (0, PATTERN_H + 1, right, BAND - 1), _font(14), 1),
+    )
+    for text, box, font, ink in lines:
+        for dx in (0, 1):
+            _centered(d, (box[0] + dx, box[1], box[2] + dx, box[3]), text, font, ink)
 
 
 def _left_band(
@@ -203,29 +248,13 @@ def _left_band(
     message: tuple[str, int] | None,
     warn: str,
 ) -> None:
-    """Pattern en cours (et prochain) et track des faders en gros (celle du perform s'il y
-    en a un) ; mutes dessous. Même vue en MPC et en clavier (slice 9) ; une frappe du
-    clavier montre sa note et son degré. Tempo, quantize et swing ne sont pas affichés
-    (LED GRID et SWING, écran de la DT2)."""
-    big, mid = _font(BIG), _font(16)
-    shown = engine.fader_track
-    track = f"T{shown:02d}"
-    tw = int(d.textlength(track, font=big))
-    _bold(d, (WIDTH - tw - 4, -6), track, big, 1)
-    name = engine.cfg.track_names.get(shown, "")  # code de la grille (doctrine §1)
-    tracks = engine.perform_tracks
-    if len(tracks) > 1:  # groupe SOLO : nombre de tracks réglées ensemble
-        name = f"x{len(tracks)} {name}".rstrip()
-    if name:
-        nw = int(d.textlength(name, font=mid))
-        _bold(d, (WIDTH - tw - nw - 12, 1), name, mid, 1)
-    current = engine.phrase.pattern or "---"
-    _bold(d, (3, -6), current, big, 1)
-    nxt = engine.next_pattern
-    if nxt is not None:
-        x = 8 + int(d.textlength(current, font=big))
-        _bold(d, (x, 1), f"> {nxt}", mid, 1)
-    # bande des mutes, ou alerte / dernier geste / dernière frappe MPC (la plus récente)
+    """Colonne DT2 (pattern, track) ; à sa droite la banque et sa tonalité, remplacées
+    un instant par une alerte, le dernier geste ou la frappe ;
+    dessous les 16 mutes et la double croche en cours, toujours visibles. Même vue en MPC
+    et en clavier (revu le 2026-11-11)."""
+    _dt2_column(d, engine)
+    _mute_strip(d, engine)
+    x = COLUMN + 2
     text = warn
     hit = engine.last_hit
     recent_hit = hit is not None and now - hit[3] < OVERLAY_NS
@@ -239,13 +268,23 @@ def _left_band(
         entry = engine.cfg.mpc_pad(hit[0])
         text = f"{entry.label}  T{entry.track:02d}  {entry.note}  v{hit[2]}"
     if text:
-        _bold(d, (TAG_W + 2, 23), text, _fit(d, text, WIDTH - TAG_W - 6, (12,)), 1)
-    else:
-        _mute_strip(d, engine, TAG_W)
+        _bold(d, (x, 2), text, _fit(d, text, WIDTH - x - 4, (16, 12)), 1)
+        return
+    sheet = engine.sheet
+    if sheet is not None:  # banque puis tonalité : `E-TRIBE  Bb Phrygian`
+        bank = sheet[1]
+        tonic = f"{FLAT_NAMES[bank.tonic]} {engine.cfg.scale(bank.mode).name}"
+        line = ascii_text(f"{sheet[0]}  {tonic}")
+        font = _fit(d, line, WIDTH - x - 6, (18, 16, 14, 12))
+        top = int(d.textbbox((0, 0), line, font=font)[1])
+        _bold(d, (x, 5 - top), line, font, 1)
 
 
 def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
-    small = _font(SMALL)
+    """Phrase en noir sur blanc dans le coin gauche (`PHR 01`), mesure / longueur en gros,
+    mesures avant le cap et pattern suivant ; à droite le mode de la MK2 et, dessous, le
+    tempo lissé. Sous le tout, la barre de la phrase : trait tous les 8 mesures, pointillé
+    à chaque tour de pattern (4 mesures)."""
     st = engine.phrase_state
     if st is not None and st.countdown is not None:  # bandeau inversé, compte à rebours
         d.rectangle((0, 0, WIDTH - 1, BAND - 1), fill=1)
@@ -254,25 +293,38 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
             _centered(d, box, str(st.countdown), _font(COUNTDOWN), 0)
         d.text((WIDTH // 2 + 8, 4), f"to {st.cap}", font=_font(16), fill=0)
         d.text((WIDTH // 2 + 8, 22), f"{st.bar} / {st.length}", font=_font(16), fill=0)
+        _mode_tag(d, engine, ink=0)
         return
     if _announcing(engine, now):
         _announce_band(d, engine)
+        _mode_tag(d, engine)
         return
+    # coin gauche, comme le pattern de l'écran gauche : phrase en noir sur blanc
+    phrase = f"PHR {st.phrase:02d}" if st is not None else "PHR --"
+    font = _font(16)
+    edge = int(d.textlength(phrase, font=font)) + 8
+    d.rectangle((0, 0, edge, PATTERN_H - 1), fill=1)
+    for dx in (0, 1):
+        _centered(d, (dx, 0, edge + dx, PATTERN_H - 1), phrase, font, 0)
     bar = "--" if st is None else str(st.bar)
-    octave = f"  oct {engine.octave:+d}" if engine.keyboard and engine.octave else ""
-    _bold(d, (3, -4), f"{bar} / {engine.phrase.length}", _font(BAR), 1)
-    sheet = engine.sheet
-    if sheet is not None:  # tonique et mode de la banque en haut, phrase et cap dessous
-        bank = sheet[1]
-        tonic = f"{FLAT_NAMES[bank.tonic]} {engine.cfg.scale(bank.mode).name}"
-        _bold(d, (150, -3), tonic + octave, small, 1)
-        if st is not None:
-            d.text((150, 9), f"ph {st.phrase}  -{st.to_cap} to {st.cap}", font=small, fill=1)
-    elif st is not None:
-        d.text((150, -3), f"phrase {st.phrase}{octave}", font=small, fill=1)
-        d.text((150, 9), f"-{st.to_cap} to {st.cap}", font=small, fill=1)
-    elif octave:
-        d.text((150, -3), octave.strip(), font=small, fill=1)
+    count = f"{bar} / {engine.phrase.length}"
+    _bold(d, (edge + 6, -4), count, _font(BAR), 1)
+    x = edge + 14 + int(d.textlength(count, font=_font(BAR)))
+    room = TAG_BOX[0] - x - 3
+    if st is not None:  # mesures avant le cap
+        line = f"-{st.to_cap} to {st.cap}"
+        d.text((x, -2), line, font=_fit(d, line, room, (SMALL, 10, 9)), fill=1)
+    nxt = engine.next_pattern
+    side = f"> {nxt}" if nxt is not None else ""  # pattern suivant, à la fin de la phrase
+    if not side and engine.keyboard and engine.octave:
+        side = f"oct {engine.octave:+d}"
+    if side:
+        _bold(d, (x, 11), side, _fit(d, side, room, (SMALL, 10, 9)), 1)
+    bpm = engine.clock.bpm_smooth  # sous l'étiquette du mode, lissé sur une mesure
+    if bpm is not None:
+        tempo, font = f"{bpm:.1f}", _font(13)
+        _bold(d, (WIDTH - 3 - int(d.textlength(tempo, font=font)), 10), tempo, font, 1)
+    _mode_tag(d, engine)
     # barre : une case par mesure, séparateurs tous les 8 ; 4 dernières en vidéo inverse
     length = engine.phrase.length
     top, bottom, left, right = 27, 35, 2, WIDTH - 3
@@ -284,9 +336,14 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
     d.rectangle((left, top, right, bottom), outline=ink)
     if st is not None:
         d.rectangle((left, top, left + round(cell * st.bar), bottom), fill=ink)
-    for b in range(BLOCK_BARS, length, BLOCK_BARS):
+    done = left + round(cell * st.bar) if st is not None else left
+    for b in range(PATTERN_BARS, length, PATTERN_BARS):
         x = left + round(cell * b)
-        d.line((x, top - 2, x, bottom + 2), fill=ink)
+        if b % BLOCK_BARS == 0:
+            d.line((x, top - 2, x, bottom + 2), fill=ink)
+        else:  # tour de pattern : pointillé dans la barre, en inverse de son fond
+            dots = [(x, y) for y in range(top + 2, bottom - 1, 2)]
+            d.point(dots, fill=1 - ink if x <= done else ink)
 
 
 def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> None:
@@ -394,7 +451,6 @@ def left(
         _repeat_band(d, engine, 0)
     else:
         _left_band(img, d, engine, now, message, warn)
-    _mode_tag(d, engine)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
     _faders(d, engine, now, 0)
     if engine.keyboard:
@@ -410,6 +466,7 @@ def right(engine: Engine, now: int) -> Image.Image:
     d = ImageDraw.Draw(img)
     if _showing_repeat(engine):
         _repeat_band(d, engine, 1)
+        _mode_tag(d, engine, TAG_BOX_REPEAT)
     else:
         _right_band(d, engine, now)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)

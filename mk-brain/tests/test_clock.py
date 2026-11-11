@@ -83,3 +83,24 @@ def test_stats_summary() -> None:
     for x in (1e6, -1e6):
         s.add(x)
     assert "rms 1.000 ms" in s.summary()
+
+
+def test_bpm_smooth_follows_a_tempo_change_within_a_bar() -> None:
+    """Tempo affiché : lissé sur 96 ticks, plus lent à suivre que `bpm` (24 ticks)."""
+    c = ClockTracker()
+    assert c.bpm_smooth is None
+    slow, fast = 60e9 / (24 * 143), 60e9 / (24 * 152)
+    t = 0.0
+    for _ in range(200):
+        c.tick(round(t))
+        t += slow
+    assert c.bpm_smooth == 143.0
+    for _ in range(30):  # une noire et quart au nouveau tempo
+        c.tick(round(t))
+        t += fast
+    smooth = c.bpm_smooth
+    assert c.bpm == 152.0 and smooth is not None and 143.0 < smooth < 152.0
+    for _ in range(96):
+        c.tick(round(t))
+        t += fast
+    assert c.bpm_smooth == 152.0

@@ -17,6 +17,7 @@ TICKS_PER_STEP = 6  # double-croche ; repris de scripts/dt2_midi.py (CLOCKS_PER_
 TICKS_PER_BAR = 96  # 4/4
 WINDOW = TICKS_PER_BEAT
 MIN_POINTS = 8
+SMOOTH_TICKS = 96  # tempo affiché : régression sur une mesure (1,5 s à 160 BPM)
 STALL_NS = 250_000_000  # trou de plus de 250 ms : on repart de zéro
 ELEKTRON_SYSEX_ID = (0x00, 0x20, 0x3C)
 TRANSFER_HOLD_NS = 2_000_000_000
@@ -64,6 +65,7 @@ class ClockTracker:
         self._index = -1  # compteur de ticks reçus depuis la création
         self._start_index: int | None = None  # index du tick 0 après Start
         self._fit: tuple[float, float, float] | None = None  # (x moyen, t moyen, pente)
+        self._smooth: deque[int] = deque(maxlen=SMOOTH_TICKS + 1)  # instants des ticks
         self.running = False
         self.prediction_error = Stats()
         self._last_elektron_sysex: int | None = None
@@ -74,11 +76,13 @@ class ClockTracker:
         if self._points and t_ns - self._points[-1][1] > STALL_NS:
             self._points.clear()
             self._fit = None
+            self._smooth.clear()
         self._index += 1
         expected = self.tick_time(self._index)
         if expected is not None:
             self.prediction_error.add(t_ns - expected)
         self._points.append((self._index, t_ns))
+        self._smooth.append(t_ns)
         self._refit()
         if self.running and self._start_index is None:
             self._start_index = self._index
@@ -119,6 +123,19 @@ class ClockTracker:
     def bpm(self) -> float | None:
         p = self.period_ns
         return round(60e9 / (TICKS_PER_BEAT * p), 1) if p else None
+
+    @property
+    def bpm_smooth(self) -> float | None:
+        """Tempo pour l'affichage : pente sur les `SMOOTH_TICKS` derniers ticks, pour que la
+        gigue USB ne fasse pas danser la décimale ; suit un changement de tempo en une
+        mesure. `bpm` reste l'estimation rapide (une noire) qui sert au placement."""
+        n = len(self._smooth)
+        if n < MIN_POINTS:
+            return None
+        xm, tm = (n - 1) / 2, sum(self._smooth) / n
+        sxx = sum((i - xm) ** 2 for i in range(n))
+        slope = sum((i - xm) * (t - tm) for i, t in enumerate(self._smooth)) / sxx
+        return round(60e9 / (TICKS_PER_BEAT * slope), 1)
 
     def tick_time(self, index: float) -> float | None:
         """Instant prévu du tick d'index absolu `index`."""

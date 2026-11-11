@@ -63,29 +63,50 @@ def test_pad_hit_shown_in_both_layouts(cfg: Config) -> None:
     assert render.left(eng, 3 * MS + SECOND).tobytes() == before
 
 
+def _cell(track: int) -> int:
+    """Abscisse du centre de la case de mute de `track`."""
+    cell = (WIDTH - render.COLUMN) // 16
+    return render.COLUMN + (track - 1) * cell + cell // 2 + 1
+
+
 def test_mute_strip_open_muted_and_selected(cfg: Config) -> None:
     eng = Engine(cfg)
     eng.faders.muted[3] = True
     img = render.left(eng, 0)
-    x0, cell = render.TAG_W, (WIDTH - render.TAG_W) // 16  # à droite de l'étiquette du mode
-    assert img.getpixel((x0 + cell // 2, 32))  # track 1 ouverte : case pleine
-    assert not img.getpixel((x0 + 2 * cell + cell // 2, 32))  # track 3 mutée : case vide
-    assert img.getpixel((x0 + cell // 2, 37))  # track 1 sélectionnée : soulignée
-    assert not img.getpixel((x0 + cell + cell // 2, 37))
+    mid, under = render.MUTE_TOP + 4, render.MUTE_BOTTOM + 2
+    assert img.getpixel((_cell(1), mid))  # track 1 ouverte : case pleine
+    assert not img.getpixel((_cell(3), mid))  # track 3 mutée : case vide
+    assert img.getpixel((_cell(1), under))  # track 1 sélectionnée : soulignée
+    assert not img.getpixel((_cell(2), under))
+
+
+def test_mute_strip_marks_playing_sixteenth(cfg: Config) -> None:
+    """Carré intérieur, en inverse de sa case, sur la double croche en cours."""
+    mid = render.MUTE_TOP + 4
+    eng = at_bar(cfg, 3)  # 10 ticks dans la mesure : 2e double croche
+    eng.faders.muted[3] = True
+    img = render.left(eng, 0)
+    assert not img.getpixel((_cell(2), mid)) and img.getpixel((_cell(1), mid))
+    advance(eng, 2 * 96 + 10, 2 * 96 + 16)  # 3e double croche, case mutée
+    assert render.left(eng, 0).getpixel((_cell(3), mid))
+    assert render.left(Engine(cfg), 0).getpixel((_cell(2), mid))  # à l'arrêt : rien
 
 
 def test_mode_tag_always_shown(cfg: Config) -> None:
-    """MPC, KEYS ou SOLO en bas à gauche, même NOTE REPEAT tenu."""
+    """MPC, KEYS ou SOLO en haut à droite de l'écran droit ; NOTE REPEAT tenu : sous
+    les divisions."""
     eng = Engine(cfg)
-    tag = (2, render.TAG_TOP, render.TAG_W - 4, render.BAND - 3)
-    mpc = render.left(eng, 0).crop(tag).tobytes()
+    mpc = render.right(eng, 0).crop(render.TAG_BOX).tobytes()
     eng.handle(ButtonEvent("SOLO", True), 0)
-    solo = render.left(eng, 0).crop(tag).tobytes()
+    solo = render.right(eng, 0).crop(render.TAG_BOX).tobytes()
+    assert solo != mpc
     eng.handle(ButtonEvent("NOTE_REPEAT", True), 0)
-    assert render.left(eng, 0).crop(tag).tobytes() == solo != mpc
+    held = render.right(eng, 0).crop(render.TAG_BOX_REPEAT)
+    assert held.getpixel((1, 1)) and held.tobytes() != mpc
     eng.handle(ButtonEvent("NOTE_REPEAT", False), 0)
     eng.handle(ButtonEvent("PAD_MODE", True), 0)  # sort de SOLO, toujours en MPC
-    assert eng.mode_name == "MPC" and render.left(eng, 0).crop(tag).tobytes() == mpc
+    assert eng.mode_name == "MPC"
+    assert render.right(eng, 0).crop(render.TAG_BOX).tobytes() == mpc
 
 
 def test_design_left_is_framed(cfg: Config) -> None:
@@ -94,11 +115,14 @@ def test_design_left_is_framed(cfg: Config) -> None:
     assert render.left(design(cfg), 0).getpixel(corner)
 
 
-def test_track_code_shown_next_to_track(cfg: Config) -> None:
-    assert cfg.track_names[1] == "BD"  # grille de la doctrine §1
-    with_name = render.left(Engine(cfg), 0).tobytes()
-    bare = cfg.model_copy(update={"track_names": {}})
-    assert render.left(Engine(bare), 0).tobytes() != with_name
+def test_dt2_column_pattern_inverted_and_track(cfg: Config) -> None:
+    """Colonne DT2 : pattern noir sur blanc, puis `TR 11`, la track sélectionnée."""
+    eng = Engine(cfg)
+    column = (0, render.PATTERN_H, render.COLUMN - 3, render.BAND)
+    one = render.left(eng, 0)
+    assert one.getpixel((1, 1))  # fond blanc du pattern
+    eng.track = 11
+    assert render.left(eng, 0).crop(column).tobytes() != one.crop(column).tobytes()
 
 
 # --- slice 5.D : menu du design -----------------------------------------------
@@ -109,10 +133,13 @@ def test_keyboard_uses_mpc_bands_with_frame(cfg: Config, project: Project) -> No
     mpc = Engine(cfg, project=project)
     kbd = design(cfg, project=project)
     left_mpc, left_kbd = render.left(mpc, 0), render.left(kbd, 0)
-    assert left_kbd.getpixel((0, 0)) and not left_mpc.getpixel((0, 0))  # cadre
-    inner = (render.TAG_W, 1, render.WIDTH - 1, render.BAND)  # hors étiquette du mode
+    corner = (WIDTH - 1, 0)
+    assert left_kbd.getpixel(corner) and not left_mpc.getpixel(corner)  # cadre
+    inner = (1, 1, WIDTH - 1, render.BAND)
     assert left_kbd.crop(inner).tobytes() == left_mpc.crop(inner).tobytes()
-    assert render.right(kbd, 0).tobytes() == render.right(mpc, 0).tobytes()
+    beside_tag = (0, 0, render.TAG_BOX[0] - 2, HEIGHT)  # hors étiquette du mode
+    right_kbd, right_mpc = render.right(kbd, 0), render.right(mpc, 0)
+    assert right_kbd.crop(beside_tag).tobytes() == right_mpc.crop(beside_tag).tobytes()
 
 
 def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None:
@@ -135,17 +162,16 @@ def test_ascii_text_strips_accents() -> None:
     assert render.ascii_text("Cœur du set, ça s'ouvre, bémol") == "Coeur du set, ca s'ouvre, bemol"
 
 
-def test_live_right_shows_tonic_then_announce_for_two_seconds(
+def test_live_announce_for_two_seconds_then_bank_and_tonic_on_the_left(
     cfg: Config, project: Project
 ) -> None:
     eng = Engine(cfg, project=project)
-    plain = render.right(eng, 0).tobytes()
+    plain, bare = render.right(eng, 0).tobytes(), render.left(eng, 0).tobytes()
     eng.on_program_change(4 * 16)  # E01 : E-TRIBE annoncée
     eng.tick(0)
-    announced = render.right(eng, 10 * MS).tobytes()
-    assert announced != plain
-    after = render.right(eng, 3 * SECOND).tobytes()
-    assert after not in (plain, announced)  # tonique et mode en haut à droite
+    assert render.right(eng, 10 * MS).tobytes() != plain
+    assert render.right(eng, 3 * SECOND).tobytes() == plain  # annonce retombée
+    assert render.left(eng, 3 * SECOND).tobytes() != bare  # pattern, banque et tonalité
 
 
 def test_selection_takes_both_screens(cfg: Config, project: Project) -> None:

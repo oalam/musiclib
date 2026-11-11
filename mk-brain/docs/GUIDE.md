@@ -45,14 +45,23 @@ joué est présélectionné : un appui suffit. SHIFT + BROWSE (◀ ou ▶) revie
 
 ![Pads en MPC, transport arrêté](img/02-mpc-arret.png)
 
-- **Écran gauche, en haut** : pattern en cours (`---` tant que la DT2 n'a
-  rien dit) et la track sélectionnée en gros (`BD T01`, code de la grille de
-  la doctrine).
+- **Écran gauche, coin gauche** : comme sur la DT2, le pattern en cours en
+  noir sur blanc (`E03`, `---` tant que la DT2 n'a rien dit) et, dessous,
+  la track sélectionnée (`TR 1`).
+- **Écran gauche, en haut** : la banque et sa tonalité (`E-TRIBE  Bb
+  Phrygian`), remplacées un instant par une alerte, le dernier geste ou la
+  frappe d'un pad.
 - **Bande des mutes** : une case par track, pleine = ouverte, vide =
   mutée ; la track sélectionnée est soulignée ; la 16 n'a qu'un point
-  (AUTO CHANNEL, pas de mute).
-- **Écran droit, en haut** : mesure dans la phrase (`10 / 32`), tonique et
-  mode de la banque, phrase et mesures avant le prochain cap.
+  (AUTO CHANNEL, pas de mute). Transport lancé, un petit carré parcourt
+  les 16 cases : c'est la double croche en cours dans la mesure.
+- **Écran droit, en haut** : la phrase en noir sur blanc (`PHR 01`), la
+  mesure dans la phrase (`10 / 32`), les mesures avant le prochain cap
+  (`-7 to 16`) et, dessous, le pattern suivant quand il est annoncé
+  (`> E04`) ; à droite le mode des pads (`MPC`, `KEYS`, `SOLO`) et, dessous,
+  le tempo de la clock, lissé sur une mesure.
+- **Barre de la phrase** : une case par mesure, un trait tous les 8
+  mesures, un pointillé à chaque tour de pattern (4 mesures).
 - **En bas des deux écrans** : les 8 paramètres des encodeurs de la track
   sélectionnée, une jauge par encodeur. Jauge en pointillé = valeur pas
   encore confirmée par la DT2 (après un changement de pattern).
@@ -147,8 +156,8 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
 - Un tap sur un pad ajoute sa track au groupe, un second tap la retire.
   Les encodeurs règlent toutes les tracks du groupe, sans rien tenir ; les
   valeurs restent. Groupe vide : la track sélectionnée.
-- L'écran montre la première track du groupe et ses faders (`x2` s'il y en
-  a plusieurs).
+- L'écran montre la première track du groupe et ses faders (`x2 3` s'il y en
+  a deux, la première étant la 3).
 - **SOLO** à nouveau ou **PAD MODE** : sortie, groupe vidé, les pads
   rejouent (PAD MODE ne change pas la disposition en sortant de SOLO).
 
@@ -176,7 +185,7 @@ DT2 s'affichent aussi.
 **PAD MODE** bascule les pads entre le kit MPC et un clavier joué sur la
 **track sélectionnée** (LED PAD MODE pleine en clavier). Les écrans
 restent ceux du MPC, encadrés ; une frappe montre sa note et son degré
-sous le pattern, l'octave décalée s'affiche à droite (`oct +1`).
+à la place de la banque, l'octave décalée s'affiche à droite (`oct +1`).
 
 ![Clavier chromatique en la# phrygien, track 13](img/10-clavier-chromatique.png)
 
