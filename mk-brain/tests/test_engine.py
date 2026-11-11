@@ -928,8 +928,8 @@ def test_keyboard_aftertouch_takes_strongest_pad(cfg: Config) -> None:
     at = cfg.aftertouch
     eng = design(cfg)
     channel = eng.track - 1
-    press(eng, 0, pressure=3000)
-    press(eng, 0, pressure=3000, pad=PAD7)
+    press(eng, 0, pressure=at.threshold)  # frappes sous le seuil : rien avant la suite
+    press(eng, 0, pressure=at.threshold, pad=PAD7)
     late = SECOND
     span = at.full_scale - at.threshold
     eng.handle(PadEvent(PAD1, True, at.threshold + span // 4), late)

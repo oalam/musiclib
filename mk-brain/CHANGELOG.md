@@ -3,6 +3,17 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.3] - 2026-11-11
+
+### Modifié
+
+- [10] Aftertouch réglé sur une mesure de la MK2 (capture guidée sur le
+  Pi) : `delay_ms` 80 → 120 (frappes de 54 à 80 ms), `threshold`
+  900 → 2350 (pad tenu sans forcer : 1340 à 2263, pointe 2334),
+  `full_scale` 3600 → 3000 (pad enfoncé : 2882 à 3171, pointe 3213).
+- [9] Bande des mutes : carré de la double croche en cours agrandi
+  (5 × 4 px → 7 × 6 px).
+
 ## [0.30.2] - 2026-11-11
 
 ### Corrigé

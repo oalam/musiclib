@@ -467,9 +467,16 @@ La pression d'un pad tenu module sa track : la MK2 la mesure en continu
   aftertouch. **Clavier** : tous les pads jouent la track sélectionnée,
   la pression la plus forte des pads tenus l'emporte.
 - **La frappe n'en envoie pas** : un pad compte `aftertouch.delay_ms`
-  (80 ms) après sa note, et seulement au-dessus de `aftertouch.threshold`
-  (900 sur 4095) ; `full_scale` (3600) donne 127, en ligne droite entre
-  les deux. Seuils **provisoires, à régler à l'essai**.
+  (120 ms) après sa note, et seulement au-dessus de `aftertouch.threshold`
+  (2350 sur 4095) ; `full_scale` (3000) donne 127, en ligne droite entre
+  les deux. Seuils **réglés sur une mesure de la MK2 le 2026-11-11**
+  (capture guidée sur le Pi, un seul joueur) : frappes de 54 à 80 ms,
+  pics de 2553 à 3203 ; pad tenu sans forcer, médianes de 1340 à 2263,
+  pointe 2334 ; pad enfoncé au maximum confortable, médianes de 2882 à
+  3171, pointe 3213. La course utile est donc étroite : 3000 − 2350 =
+  650 unités pour 127 valeurs. Valeurs d'avant, choisies sans mesure :
+  80 ms, 900, 3600 (un pad simplement tenu envoyait déjà de l'aftertouch
+  et 127 n'était jamais atteint).
 - **Débit** : un message par canal au plus toutes les
   `aftertouch.interval_ms` (10 ms, soit 100 par seconde et par canal),
   seulement si la valeur change ; le retour à 0 au relâché part tout de
@@ -1261,7 +1268,7 @@ conditionne tout le reste.
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
-| 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0), à essayer sur la MK2 et la DT2 ; seuils à régler |
+| 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0) ; seuils réglés sur mesure le 2026-11-11 (v0.30.3), à essayer avec un preset DT2 qui assigne l'aftertouch |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

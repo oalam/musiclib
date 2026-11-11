@@ -57,9 +57,9 @@ class LedConfig(BaseModel):
 class AftertouchConfig(BaseModel):
     """Pression d'un pad tenu → aftertouch de canal de sa track (slice 10)."""
 
-    delay_ms: float = Field(80.0, ge=0)  # après la note : la frappe elle-même n'en envoie pas
-    threshold: int = Field(900, ge=0, lt=4095)  # pression d'un pad simplement tenu, sur 4095
-    full_scale: int = Field(3600, gt=0, le=4095)  # pression qui donne 127
+    delay_ms: float = Field(120.0, ge=0)  # après la note : la frappe elle-même n'en envoie pas
+    threshold: int = Field(2350, ge=0, lt=4095)  # pression d'un pad simplement tenu, sur 4095
+    full_scale: int = Field(3000, gt=0, le=4095)  # pression qui donne 127
     interval_ms: float = Field(10.0, ge=0)  # au plus un message par canal sur ce délai
 
     @model_validator(mode="after")

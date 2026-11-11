@@ -17,9 +17,11 @@ velocity:
   max: 127
 
 aftertouch:                  # pad tenu : sa pression module la track (aftertouch de canal)
-  delay_ms: 80               # après la note, pour que la frappe n'en envoie pas
-  threshold: 900             # pression d'un pad simplement tenu, sur 4095 (à régler à l'essai)
-  full_scale: 3600           # pression qui donne 127
+  # Mesuré sur la MK2 le 2026-11-11 : frappes de 54 à 80 ms ; pad tenu sans forcer
+  # 1340 à 2263 (pointe 2334) ; pad enfoncé 2882 à 3171 (pointe 3213).
+  delay_ms: 120              # après la note, pour que la frappe n'en envoie pas (80 → 120)
+  threshold: 2350            # au-dessus d'un pad simplement tenu, sur 4095 (900 → 2350)
+  full_scale: 3000           # pression qui donne 127 (3600 → 3000, jamais atteint avant)
   interval_ms: 10            # au plus un message par canal sur ce délai
 
 play:

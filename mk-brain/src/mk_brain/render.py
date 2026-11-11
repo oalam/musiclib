@@ -229,7 +229,7 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
             d.rectangle((x0, top, x1, bottom), fill=1)
             full = True
         if step == t - 1:
-            d.rectangle((x0 + 3, top + 3, x1 - 3, bottom - 3), fill=0 if full else 1)
+            d.rectangle((x0 + 2, top + 2, x1 - 2, bottom - 2), fill=0 if full else 1)
         if t == engine.track:
             d.rectangle((x0, bottom + 2, x1, bottom + 3), fill=1)
 
