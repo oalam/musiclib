@@ -46,11 +46,17 @@ def test_arp_motifs_validated(tmp_path: Path, cfg: Config) -> None:
     import yaml
 
     assert cfg.arp.motif_names[0] == "OFF" and cfg.arp.motifs["GALO"] == "X.xx" * 4
+    good = {"order": "up", "octaves": 1, "gate": 50, "division": "1/16", "motif": "GALO"}
+    assert cfg.arp.presets["RUSH"].division == "1/32"
     for change, match in (
         ({"motifs": {"GALO": "X.xx"}}, "16 attendus"),
         ({"motifs": {"GALOP": "X.xx" * 4}}, "4 caractères"),
         ({"motifs": {"OFF": "X.xx" * 4}}, "réservé"),
         ({"motif": "RIEN"}, "absent"),
+        ({"presets": {"TROPLONG": dict(good)}}, "4 caractères"),
+        ({"presets": {"P": {**good, "motif": "RIEN"}}}, "absent"),
+        ({"presets": {"P": {**good, "division": "1/5"}}}, "inconnue"),
+        ({"presets": {"P": {**good, "gate": 52}}}, "multiple"),
     ):
         raw = cfg.model_dump()
         raw["arp"].update(change)

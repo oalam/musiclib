@@ -11,12 +11,14 @@ from pydantic import BaseModel, Field, ValidationError, field_validator, model_v
 from mk_brain.arp import (
     GATE_MAX,
     GATE_MIN,
+    GATE_STEP,
     MAX_OCTAVES,
     MOTIF_NAME_MAX,
     MOTIF_OFF,
     ArpOrder,
     parse_motif,
 )
+from mk_brain.repeat import DIVISION_TICKS
 
 DEFAULT_CONFIG = Path(__file__).resolve().parents[2] / "config" / "default.yaml"
 
@@ -90,6 +92,23 @@ class PlayConfig(BaseModel):
     tap_debounce_ms: float = Field(150.0, ge=0)  # SOLO, MUTE, SELECT : rebond ignoré
 
 
+class ArpPreset(BaseModel):
+    """Preset d'arpège (slice 13) : les cinq réglages rappelés d'un coup."""
+
+    order: ArpOrder
+    octaves: int = Field(ge=1, le=MAX_OCTAVES)
+    gate: int = Field(ge=GATE_MIN, le=GATE_MAX, multiple_of=GATE_STEP)
+    division: str
+    motif: str = MOTIF_OFF
+
+    @field_validator("division")
+    @classmethod
+    def _division(cls, division: str) -> str:
+        if division not in DIVISION_TICKS:
+            raise ValueError(f"division {division!r} inconnue ({', '.join(DIVISION_TICKS)})")
+        return division
+
+
 class ArpConfig(BaseModel):
     """Arpégiateur (slice 11) : réglages de départ ; modifiables à la MK2, jamais réécrits."""
 
@@ -98,12 +117,13 @@ class ArpConfig(BaseModel):
     gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
     # course des encodeurs de la config (PATTERN tenu), en unités brutes par valeur : bien plus
     # longue que celle d'un CC (`encoders.raw_per_step`), ces réglages n'ont que 3 à 19 valeurs
-    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT et MOT
+    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT et PRE
     raw_per_gate_step: int = Field(12, ge=1)  # GATE, par pas de 5 %
     # motifs (slice 12) : nom → 16 pas (x note, X accent, . silence, - liée), ordre du fichier
     motifs: dict[str, str] = {}
     motif: str = MOTIF_OFF  # motif de départ : un nom de `motifs`, ou OFF
     unaccented: int = Field(70, ge=1, le=100)  # vélocité d'un pas `x`, en % de celle du pad
+    presets: dict[str, ArpPreset] = {}  # slice 13 : nom → réglages, ordre du fichier
 
     @field_validator("motifs")
     @classmethod
@@ -119,6 +139,11 @@ class ArpConfig(BaseModel):
     def _motif(self) -> ArpConfig:
         if self.motif != MOTIF_OFF and self.motif not in self.motifs:
             raise ValueError(f"arp.motif {self.motif!r} : absent de arp.motifs")
+        for name, preset in self.presets.items():
+            if not 1 <= len(name) <= MOTIF_NAME_MAX:
+                raise ValueError(f"preset {name!r} : nom de 1 à {MOTIF_NAME_MAX} caractères")
+            if preset.motif != MOTIF_OFF and preset.motif not in self.motifs:
+                raise ValueError(f"preset {name!r} : motif {preset.motif!r} absent de arp.motifs")
         return self
 
     @property

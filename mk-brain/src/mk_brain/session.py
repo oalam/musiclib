@@ -47,6 +47,7 @@ class Session(BaseModel):
     arp_order: str | None = None  # arpégiateur (slice 11) ; hors bornes : valeur de la config
     arp_octaves: int | None = None
     arp_gate: int | None = None
+    arp_preset: str | None = None  # dernier preset rappelé (slice 13)
     arp_motif: str | None = None  # motif (slice 12), par son nom ; disparu : celui de la config
 
 

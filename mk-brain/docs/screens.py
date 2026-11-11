@@ -222,8 +222,7 @@ def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     eng.handle(PadEvent(_index(10), False, 0), now)
     btn(eng, "SELECT", False, t=now)
     btn(eng, "PATTERN", t=now)  # tenu : la config de l'arpège à l'écran
-    eng.handle(EncoderEvent(2, cfg.arp.raw_per_choice, 0), now)  # OCT 2
-    eng.handle(EncoderEvent(4, 7 * cfg.arp.raw_per_choice, 0), now)  # MOT LONG
+    eng.handle(EncoderEvent(5, 6 * cfg.arp.raw_per_choice, 0), now)  # PRE NAPP
     for pad in (1, 3, 5):
         hit(eng, pad, now)
     return eng, now + 3 * SECOND, True

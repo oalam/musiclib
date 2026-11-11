@@ -1060,7 +1060,7 @@ def test_arp_config_encoders_and_division_buttons(cfg: Config) -> None:
     assert eng.arp_motif == cfg.arp.motif_names[1] and eng.last_control == "ARP MOT GALO"
     eng.handle(EncoderEvent(4, -5 * step, 0), 0)
     assert eng.arp_motif == "OFF" and eng.arp_steps is None  # borné
-    assert eng.handle(EncoderEvent(5, step, 0), 0) == []  # encodeurs 5-8 libres dans la config
+    assert eng.handle(EncoderEvent(6, step, 0), 0) == []  # encodeurs 6-8 libres dans la config
     btn(eng, "BROWSE_RIGHT")  # BROWSE : pages de son, comme partout
     assert eng.last_control == "page 2/2"
 
@@ -1128,3 +1128,36 @@ def test_arp_motif_ties_lengthen_the_note(cfg: Config) -> None:
         NoteOff(0, note),
     ]
     assert [t / TICK for t, _ in out] == pytest.approx([24, 33], abs=0.01)  # 6 + 3 ticks
+
+
+def test_arp_preset_recalls_the_five_settings(cfg: Config) -> None:
+    """Encodeur 5, PATTERN tenu : le preset s'applique dès qu'il est affiché ; un réglage
+    retouché affiche `----`, l'encodeur repart du dernier preset rappelé."""
+    eng = arp(cfg)
+    step = cfg.arp.raw_per_choice
+    names = list(cfg.arp.presets)
+    btn(eng, "PATTERN", t=SECOND)
+    assert eng.arp_view()[4] == ("PRE", "----")
+    assert eng.handle(EncoderEvent(5, step, 0), 0) == []
+    first = cfg.arp.presets[names[0]]
+    assert (eng.arp_order, eng.arp_octaves, eng.arp_gate, eng.division, eng.arp_motif) == (
+        first.order,
+        first.octaves,
+        first.gate,
+        first.division,
+        first.motif,
+    )
+    assert eng.arp_view()[4] == ("PRE", names[0]) and eng.last_control == f"ARP PRE {names[0]}"
+    eng.handle(EncoderEvent(3, cfg.arp.raw_per_gate_step, 0), 0)  # GATE retouché
+    assert eng.arp_view()[4] == ("PRE", "----") and eng.arp_preset == names[0]
+    eng.handle(EncoderEvent(5, step, 0), 0)  # repart du preset rappelé, pas du début
+    assert eng.arp_preset_shown == names[1] and eng.division == cfg.arp.presets[names[1]].division
+    eng.handle(EncoderEvent(5, -9 * step, 0), 0)  # `----` : borné, rien ne change
+    assert eng.arp_preset is None and eng.division == cfg.arp.presets[names[1]].division
+    eng.handle(EncoderEvent(5, 99 * step, 0), 0)
+    assert eng.arp_preset == names[-1]
+    other = Engine(cfg)
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert other.arp_preset_shown == names[-1]
+    other.restore(Session(arp_preset="DISPARU"))
+    assert other.arp_preset == names[-1]

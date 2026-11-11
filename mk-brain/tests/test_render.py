@@ -244,6 +244,8 @@ def test_arp_config_shows_divisions_and_settings(cfg: Config) -> None:
     eng.arp_motif = "GALO"  # le motif choisi : son nom à gauche, ses 16 pas à droite
     galop = render.right(eng, 0).crop(under).tobytes()
     eng.arp_motif = "LONG"
-    assert len({empty, galop, render.right(eng, 0).crop(under).tobytes()}) == 3
+    long = render.right(eng, 0).crop(under).tobytes()
+    eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)  # PRE : le nom du preset
+    assert len({empty, galop, long, render.right(eng, 0).crop(under).tobytes()}) == 4
     eng.handle(ButtonEvent("PATTERN", False), SECOND)
     assert eng.arp and render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes() != top

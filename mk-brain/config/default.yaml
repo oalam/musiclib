@@ -53,6 +53,17 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
     "ROLL": "X.x. X.x. X.xx Xxxx"   # roulement en fin de mesure
     "LONG": "X--- x-x- X--- xxx-"   # notes tenues
     "ACID": "X-.x x.X- .xx. X.x-"   # ligne acid, liées et silences
+  # Presets (slice 13), encodeur 5 PRE, PATTERN tenu : les cinq réglages d'un coup.
+  # gate par pas de 5 ; division : 1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64.
+  presets:
+    "ACD1": {order: up, octaves: 1, gate: 60, division: "1/16", motif: "ACID"}
+    "GAL2": {order: up, octaves: 2, gate: 50, division: "1/16", motif: "GALO"}
+    "TRIB": {order: updown, octaves: 2, gate: 40, division: "1/16", motif: "A332"}
+    "CTPS": {order: played, octaves: 1, gate: 50, division: "1/16", motif: "OFFB"}
+    "RUSH": {order: up, octaves: 3, gate: 30, division: "1/32", motif: "ROLL"}
+    "NAPP": {order: updown, octaves: 1, gate: 100, division: "1/8", motif: "LONG"}
+    "HASD": {order: random, octaves: 2, gate: 50, division: "1/16", motif: "SYNC"}
+    "TRIO": {order: up, octaves: 2, gate: 50, division: "1/16T", motif: "OFF"}
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le

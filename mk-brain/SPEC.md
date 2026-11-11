@@ -629,13 +629,57 @@ Un **motif** est une ligne de 16 pas, écrite en YAML, un caractère par pas
 
 **Hors périmètre** : édition des motifs sur les pads, longueurs autres
 que 16, ratchets, glissé, probabilités, tête de lecture à l'écran,
-presets nommés (ordre + octaves + gate + division + motif : slice
-suivante).
+presets nommés (ordre + octaves + gate + division + motif : slice 13).
 
 **Critère de fin** : DT2 lancée à 143 BPM, mode `ARPG`, trois pads tenus,
 motif `GALO` : le silence et les accents s'entendent, calés sur le kick ;
 `LONG` fait entendre des notes tenues ; revenir à `OFF` rend l'arpège
 continu ; en LIVE REC, le pattern relu rejoue le motif.
+
+## Slice 13 : presets de l'arpège (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : mode ARPG, PATTERN tenu, encodeur 5 tourné jusqu'à `RUSH` :
+l'arpège passe d'un coup en 1/32, montant, 3 octaves, gate 30 %, motif
+`ROLL`. Un cran de plus, `NAPP` : 1/8, aller-retour, gate 100 %, motif
+`LONG`.
+
+Un **preset** est un nom et cinq réglages : ordre, octaves, gate,
+division, motif.
+
+**Arbitré le 2026-11-11** :
+
+- **Bibliothèque globale en YAML** : `arp.presets` de
+  `config/default.yaml` (8 au départ), à côté des motifs, dans l'ordre du
+  fichier ; les mêmes pour tous les projets. Pas d'enregistrement depuis
+  la machine. Nom de 4 caractères au plus.
+- **Rappel par l'encodeur 5, PATTERN tenu** : `PRE`, à la suite de `ORD`,
+  `OCT`, `GATE` et `MOT`, même course (`arp.raw_per_choice`), borné. Le
+  preset s'applique dès qu'il est affiché, arpège en cours compris.
+
+**Tranché à l'écriture, à confirmer à l'essai** :
+
+- **`----` en premier** : pas de preset. Y revenir ne change aucun réglage.
+- **Un preset est un point de départ** : après le rappel, `ORD`, `OCT`,
+  `GATE`, `MOT` et la division se règlent comme avant. Dès qu'un réglage
+  s'écarte du preset, `PRE` affiche `----` ; l'encodeur repart quand même
+  du dernier preset rappelé (pas du début de la liste), et le nom revient
+  si les réglages retombent sur les siens.
+- **Écran droit, PATTERN tenu** : `PRE` au-dessus de l'encodeur 5 ; le
+  motif se resserre sur les trois colonnes suivantes (12 px par pas).
+- **Dernier preset rappelé gardé dans la session** par son nom, avec les
+  réglages. Pas de preset de départ dans la config : les valeurs de départ
+  restent `arp.order`, `arp.octaves`, `arp.gate`, `arp.motif` et
+  `play.repeat`.
+- Un preset mal écrit (division ou motif inconnus, valeurs hors bornes,
+  nom trop long) est refusé au chargement de la config.
+
+**Hors périmètre** : enregistrement d'un preset depuis la MK2, presets par
+projet ou par banque, rappel direct par pads ou boutons, swing et maintien
+dans le preset.
+
+**Critère de fin** : DT2 lancée, mode `ARPG`, trois pads tenus : faire
+défiler `PRE` change l'arpège à chaque cran, sans note bloquée ; retoucher
+`GATE` affiche `----` ; éteindre et rallumer le Pi retrouve les réglages.
 
 ## Modes : live et design
 
@@ -1422,7 +1466,8 @@ conditionne tout le reste.
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
 | 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0) ; seuils réglés sur mesure le 2026-11-11 (v0.30.3), à essayer avec un preset DT2 qui assigne l'aftertouch |
 | 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), à essayer sur la DT2 |
-| 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), à essayer sur la DT2 ; presets nommés ensuite |
+| 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), à essayer sur la DT2 |
+| 13 | **Presets de l'arpège** : bibliothèque `arp.presets` (ordre, octaves, gate, division, motif), rappel par l'encodeur 5 `PRE` PATTERN tenu, `----` dès qu'un réglage s'en écarte | cf. « Slice 13 : presets de l'arpège », critère de fin | codée le 2026-11-11 (v0.35.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

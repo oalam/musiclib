@@ -158,6 +158,7 @@ class Aftertouch:
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend | Aftertouch
 MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
+NO_PRESET = "----"  # PRE : aucun preset, ou réglages retouchés depuis le rappel
 ARP_TAP_NS = 300_000_000  # PATTERN relâché avant : appui bref (sortie d'ARPG), sinon config
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
@@ -217,6 +218,7 @@ class Engine:
         self.arp_octaves = cfg.arp.octaves
         self.arp_gate = cfg.arp.gate
         self.arp_motif = cfg.arp.motif  # nom du motif (slice 12), ou OFF
+        self.arp_preset: str | None = None  # dernier preset rappelé (slice 13)
         self.arp_hold = False  # maintien (NOTE REPEAT) : l'arpège continue pads relâchés
         self._arp_notes: dict[int, _ArpNote] = {}  # pad → note, dans l'ordre d'appui
         self._arp_pos: float | None = None  # position (ticks) de la prochaine note
@@ -336,13 +338,30 @@ class Engine:
         return self.arp and "PATTERN" in self._held_buttons
 
     def arp_view(self) -> list[tuple[str, str]]:
-        """Config de l'arpège, encodeurs 1-4 : (abrégé, valeur affichée)."""
+        """Config de l'arpège, encodeurs 1-5 : (abrégé, valeur affichée). `PRE` : le
+        dernier preset rappelé tant que les réglages sont les siens, sinon `----`."""
         return [
             ("ORD", ORDER_LABELS[self.arp_order]),
             ("OCT", str(self.arp_octaves)),
             ("GATE", f"{self.arp_gate}%"),
             ("MOT", self.arp_motif),
+            ("PRE", self.arp_preset_shown or NO_PRESET),
         ]
+
+    @property
+    def arp_preset_shown(self) -> str | None:
+        """Le dernier preset rappelé, si aucun réglage ne s'en est écarté."""
+        preset = self.cfg.arp.presets.get(self.arp_preset or "")
+        current = (self.arp_order, self.arp_octaves, self.arp_gate, self.division, self.arp_motif)
+        if preset is None or current != (
+            preset.order,
+            preset.octaves,
+            preset.gate,
+            preset.division,
+            preset.motif,
+        ):
+            return None
+        return self.arp_preset
 
     @property
     def arp_steps(self) -> str | None:
@@ -454,11 +473,11 @@ class Engine:
                 self._arp_clear()
 
     def _arp_turn(self, index: int, delta: int, now: int) -> None:
-        """Encodeurs 1-4, PATTERN tenu en ARPG : ordre, octaves, gate, motif (bornés, sans boucle).
+        """Encodeurs 1-5, PATTERN tenu en ARPG : ordre, octaves, gate, motif, preset (bornés).
         Course propre à la page (`arp.raw_per_choice`, `arp.raw_per_gate_step`) : au pas
         d'un CC, le moindre mouvement sautait plusieurs valeurs (essai du 2026-11-11)."""
         self._pattern_used()
-        if index > 4:
+        if index > 5:
             return
         per = self.cfg.arp.raw_per_gate_step if index == 3 else self.cfg.arp.raw_per_choice
         acc = self._arp_residue.get(index, 0) + delta
@@ -474,9 +493,17 @@ class Engine:
             self.arp_octaves = max(1, min(MAX_OCTAVES, self.arp_octaves + steps))
         elif index == 3:
             self.arp_gate = max(GATE_MIN, min(GATE_MAX, self.arp_gate + GATE_STEP * steps))
-        else:
+        elif index == 4:
             names = self.cfg.arp.motif_names
             self.arp_motif = names[max(0, min(len(names) - 1, names.index(self.arp_motif) + steps))]
+        else:  # preset : repart du dernier rappelé, même retouché ; `----` ne change rien
+            presets: list[str | None] = [None, *self.cfg.arp.presets]
+            at = presets.index(self.arp_preset) if self.arp_preset in presets else 0
+            self.arp_preset = presets[max(0, min(len(presets) - 1, at + steps))]
+            if self.arp_preset is not None:
+                p = self.cfg.arp.presets[self.arp_preset]
+                self.arp_order, self.arp_octaves, self.arp_gate = p.order, p.octaves, p.gate
+                self.division, self.arp_motif = p.division, p.motif
         name, value = self.arp_view()[index - 1]
         self.last_control = f"ARP {name} {value}"
 
@@ -725,6 +752,7 @@ class Engine:
             arp_octaves=self.arp_octaves,
             arp_gate=self.arp_gate,
             arp_motif=self.arp_motif,
+            arp_preset=self.arp_preset,
         )
 
     def restore(self, session: Session) -> None:
@@ -762,6 +790,8 @@ class Engine:
             self.arp_gate = session.arp_gate
         if session.arp_motif in self.cfg.arp.motif_names:
             self.arp_motif = session.arp_motif
+        if session.arp_preset in self.cfg.arp.presets:
+            self.arp_preset = session.arp_preset
         self._apply_phrase()
         self.leds_dirty = True
 

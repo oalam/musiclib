@@ -3,6 +3,24 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.35.0] - 2026-11-11
+
+### Ajouté
+
+- [13] Presets de l'arpège : `arp.presets` dans `config/default.yaml`,
+  un nom pour cinq réglages (ordre, octaves, gate, division, motif), 8 au
+  départ (`ACD1`, `GAL2`, `TRIB`, `CTPS`, `RUSH`, `NAPP`, `HASD`, `TRIO`).
+  Rappel par l'encodeur 5 `PRE`, PATTERN tenu : le preset s'applique dès
+  qu'il est affiché. Un réglage retouché ensuite affiche `----` ;
+  l'encodeur repart du dernier preset rappelé, gardé dans la session.
+  Un preset mal écrit est refusé au chargement de la config.
+
+### Modifié
+
+- [13] Écran droit, PATTERN tenu : `PRE` au-dessus de l'encodeur 5, le
+  motif resserré sur les trois colonnes suivantes (12 px par pas).
+- Guide : encodeur `PRE`, capture `13-arpege.png` refaite.
+
 ## [0.34.0] - 2026-11-11
 
 ### Ajouté
