@@ -406,9 +406,9 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
             d.point(dots, fill=1 - ink if x <= done else ink)
 
 
-MOTIF_LEFT = COL  # écran droit : PRE au-dessus de l'encodeur 5, le motif sur les 3 autres colonnes
+MOTIF_LEFT = 2 * COL  # écran droit : PRE et CHD (encodeurs 5-6), le motif sur les 2 autres colonnes
 MOTIF_CELL = (WIDTH - MOTIF_LEFT) // MOTIF_STEPS  # une case par pas
-MOTIF_BLOCK = MOTIF_CELL - 4  # largeur d'une note, 3 px de vide avant la suivante
+MOTIF_BLOCK = MOTIF_CELL - 4  # largeur d'une note, 3 px de vide avant la suivante (8 px par pas)
 MOTIF_TOP, MOTIF_BOTTOM = BAND + 5, HEIGHT - 3
 
 
@@ -424,15 +424,15 @@ def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
         if kind == TIE:  # part de la case précédente, sans trou
             d.rectangle((right - MOTIF_CELL, MOTIF_BOTTOM - 3, right, MOTIF_BOTTOM), fill=1)
         elif kind == REST:
-            d.rectangle((x + 3, MOTIF_BOTTOM - 1, x + 4, MOTIF_BOTTOM), fill=1)
+            d.rectangle((x + 1, MOTIF_BOTTOM - 1, x + 2, MOTIF_BOTTOM), fill=1)
         else:
             top = MOTIF_TOP if kind == ACCENT else mid
             d.rectangle((x, top, right, MOTIF_BOTTOM), fill=1)
 
 
 def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:
-    """Config de l'arpège : ORD, OCT, GATE, MOT et PRE au-dessus des encodeurs 1-5, en
-    toutes lettres ; le motif choisi en 16 cases à droite de PRE."""
+    """Config de l'arpège : ORD, OCT, GATE, MOT, PRE et CHD au-dessus des encodeurs 1-6,
+    en toutes lettres ; le motif choisi en 16 cases à droite de CHD."""
     steps = engine.arp_steps
     if screen == 1 and steps is not None:
         _motif(d, steps)

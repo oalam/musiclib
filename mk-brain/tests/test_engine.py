@@ -1067,7 +1067,7 @@ def test_arp_config_encoders_and_division_buttons(cfg: Config) -> None:
     assert eng.arp_motif == cfg.arp.motif_names[1] and eng.last_control == "ARP MOT GALO"
     eng.handle(EncoderEvent(4, -5 * step, 0), 0)
     assert eng.arp_motif == "OFF" and eng.arp_steps is None  # borné
-    assert eng.handle(EncoderEvent(6, step, 0), 0) == []  # encodeurs 6-8 libres dans la config
+    assert eng.handle(EncoderEvent(7, step, 0), 0) == []  # encodeurs 7-8 libres dans la config
     btn(eng, "BROWSE_RIGHT")  # BROWSE : pages de son, comme partout
     assert eng.last_control == "page 2/2"
 
@@ -1218,3 +1218,31 @@ def test_arp_bank_saved_slot_wins_over_config_and_encoder_scrolls_it(cfg: Config
     other.arp_user = dict(eng.arp_user)
     other.restore(Session.model_validate(eng.snapshot().model_dump()))
     assert other.arp_preset_shown == "U12"
+
+
+def test_arp_chord_one_pad_plays_a_chord_in_the_scale(cfg: Config) -> None:
+    """Encodeur 6 CHD, PATTERN tenu : un pad tenu donne son accord, pris dans la gamme du
+    clavier ; gardé dans les presets et la session."""
+    eng = arp(cfg)
+    eng.group = next(i for i, lay in enumerate(cfg.layouts) if lay.name == "Aeolian")
+    btn(eng, "PATTERN", t=SECOND)
+    eng.handle(EncoderEvent(6, cfg.arp.raw_per_choice, 0), 0)
+    assert eng.arp_chord == "tri" and eng.last_control == "ARP CHD TRI"
+    btn(eng, "PATTERN", False, t=2 * SECOND)
+    root = eng.target(1)[1]  # do : do mi bémol sol en éolien
+    first = press(eng, 13 * TICK, pad=_index(1))
+    played = _ons(first) + [n for _, n, _ in _arp_notes(eng, (18, 24, 30))]
+    assert played == [root, root + 3, root + 7, root]
+    eng.arp_chord = "7th"
+    assert [n for _, n, _ in _arp_notes(eng, (36, 42, 48, 54))] == [
+        root,
+        root + 3,
+        root + 7,
+        root + 10,
+    ]
+    assert eng._arp_current().chord == "7th"
+    other = Engine(cfg)
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert other.arp_chord == "7th"
+    other.restore(Session(arp_chord="jazz"))
+    assert other.arp_chord == "7th"

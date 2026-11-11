@@ -222,7 +222,7 @@ mais les pads tenus ne sonnent plus en accord, ils sont joués un par un,
 une note par division, calés sur l'horloge de la DT2. Transport arrêté, il
 n'y a pas d'arpège : les pads jouent comme au clavier.
 
-![Mode ARPG, PATTERN tenu : divisions en haut, ORD, OCT, GATE, MOT et PRE, le preset NAPP et son motif LONG à droite](img/13-arpege.png)
+![Mode ARPG, PATTERN tenu : divisions en haut, ORD, OCT, GATE, MOT, PRE et CHD, le motif LONG à droite ; les pads montrent la banque de presets](img/13-arpege.png)
 
 - **PATTERN tenu** : la config de l'arpège, ci-dessus. Les encodeurs 1-3
   règlent `ORD` (UP montant, DOWN descendant, UPDN aller-retour, PLAY
@@ -244,9 +244,16 @@ n'y a pas d'arpège : les pads jouent comme au clavier.
   un point de départ : tout se retouche ensuite, et `PRE` affiche alors
   `----` ; l'encodeur repart du dernier preset rappelé. `----`, en début
   de liste, ne change rien.
+- **Encodeur 6, PATTERN tenu** : `CHD`, les accords. `OFF` : chaque pad
+  tenu apporte sa note. Sinon un pad = un accord, pris dans la gamme de
+  la banque, et l'arpège en joue les notes : `TRI` (1-3-5), `7TH`
+  (1-3-5-7), `SUS2` (1-2-5), `SUS4` (1-4-5), `PWR` (1-5-8). En la# éolien,
+  `TRI` sur le pad la# joue la# réb fa, sur le pad réb : réb fa lab. Un
+  doigt suffit ; plusieurs pads tenus ajoutent leurs accords. Se combine
+  avec le motif, et se garde dans les presets.
 - **Pads, PATTERN tenu** : la banque des 16 presets, un par pad. Un pad
   rappelle son preset ; **SHIFT + pad** y écrit les réglages courants
-  (ordre, octaves, gate, division, motif), sans confirmation, sous le nom
+  (ordre, octaves, gate, division, motif, accord), sans confirmation, sous le nom
   `U` + numéro du pad (`U03`). Pad faiblement allumé : emplacement
   occupé ; plein : le preset courant ; éteint : vide. Pendant l'appui les
   pads ne jouent pas : pour changer de preset en jouant, garder l'arpège
@@ -295,7 +302,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | GRID | quantize off / 1/16 / 1/8 |
 | SWING + maître | swing |
 | NOTE REPEAT (+ SHIFT) | repeat tenu (verrouillé) ; boutons d'écran = division |
-| PATTERN | appui bref : mode ARPG ↔ clavier (pads tenus arpégés) ; tenu en ARPG : config, encodeurs 1-5 = ORD, OCT, GATE, MOT (motif), PRE (preset), pad n = preset n, SHIFT + pad n = sauver dans n ; boutons d'écran = division, NOTE REPEAT = maintien |
+| PATTERN | appui bref : mode ARPG ↔ clavier (pads tenus arpégés) ; tenu en ARPG : config, encodeurs 1-6 = ORD, OCT, GATE, MOT (motif), PRE (preset), CHD (accord), pad n = preset n, SHIFT + pad n = sauver dans n ; boutons d'écran = division, NOTE REPEAT = maintien |
 | Boutons d'écran 1-4 | focus du menu GAMME, TRACK, QUANT, PHRASE |
 | Encodeur maître | valeur de l'entrée au focus ; appui = entrée suivante |
 | SHIFT + PLAY | phrase à 1 à la barre suivante |

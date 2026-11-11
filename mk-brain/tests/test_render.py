@@ -248,6 +248,8 @@ def test_arp_config_shows_divisions_and_settings(cfg: Config) -> None:
     eng.arp_motif = "LONG"
     long = render.right(eng, 0).crop(under).tobytes()
     eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)  # PRE : le nom du preset
-    assert len({empty, galop, long, render.right(eng, 0).crop(under).tobytes()}) == 4
+    preset = render.right(eng, 0).crop(under).tobytes()
+    eng.arp_chord = "7th"  # CHD au-dessus de l'encodeur 6
+    assert len({empty, galop, long, preset, render.right(eng, 0).crop(under).tobytes()}) == 5
     eng.handle(ButtonEvent("PATTERN", False), SECOND)
     assert eng.arp and render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes() != top

@@ -1,8 +1,8 @@
-"""Arpégiateur (slices 11 et 12) : ordre des notes tenues, étendue en octaves, motifs."""
+"""Arpégiateur (slices 11 à 15) : ordre des notes tenues, octaves, motifs, accords."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Sequence, Set
 from typing import Literal
 
 ArpOrder = Literal["up", "down", "updown", "played", "random"]
@@ -16,6 +16,29 @@ ORDER_LABELS: dict[ArpOrder, str] = {  # écran : 4 lettres
 }
 MAX_OCTAVES = 3
 GATE_MIN, GATE_MAX, GATE_STEP = 10, 100, 5  # durée d'une note, en % de la division
+
+# Accords (slice 15) : un pad = un accord pris dans la gamme. Pour chaque note de l'accord,
+# les candidates en demi-tons au-dessus de la fondamentale, la première dans la gamme gagne.
+ArpChord = Literal["off", "tri", "7th", "sus2", "sus4", "pwr"]
+CHORDS: tuple[ArpChord, ...] = ("off", "tri", "7th", "sus2", "sus4", "pwr")
+CHORD_LABELS: dict[ArpChord, str] = {
+    "off": "OFF",
+    "tri": "TRI",
+    "7th": "7TH",
+    "sus2": "SUS2",
+    "sus4": "SUS4",
+    "pwr": "PWR",
+}
+_SECOND, _THIRD, _FOURTH = (2, 1, 3), (3, 4), (5, 6, 4)
+_FIFTH, _SEVENTH, _OCTAVE = (7, 6, 8), (10, 11, 9), (12,)
+CHORD_TONES: dict[ArpChord, tuple[tuple[int, ...], ...]] = {
+    "off": (),
+    "tri": (_THIRD, _FIFTH),
+    "7th": (_THIRD, _FIFTH, _SEVENTH),
+    "sus2": (_SECOND, _FIFTH),
+    "sus4": (_FOURTH, _FIFTH),
+    "pwr": (_FIFTH, _OCTAVE),
+}
 
 MOTIF_STEPS = 16
 MOTIF_OFF = "OFF"  # pas de motif : une note par division, sans atténuation
@@ -66,3 +89,27 @@ def sequence(held: Sequence[Held], order: ArpOrder, octaves: int) -> list[Held]:
     if order == "down":
         return up[::-1]
     return up + up[-2:0:-1]
+
+
+def chord(note: int, kind: ArpChord, scale: Set[int]) -> list[int]:
+    """Notes de l'accord `kind` sur la fondamentale `note`, prises dans `scale` (classes de
+    hauteur 0-11) : la première candidate dans la gamme, sinon la première tout court."""
+    tones = [note]
+    for candidates in CHORD_TONES[kind]:
+        tones.append(
+            note + next((c for c in candidates if (note + c) % 12 in scale), candidates[0])
+        )
+    return tones
+
+
+def spread(held: Sequence[Held], kind: ArpChord, scale: Set[int]) -> list[Held]:
+    """Pads tenus → notes de leurs accords, dans l'ordre d'appui ; une même note une seule
+    fois (le premier pad qui l'apporte la garde), rien au-delà de 127."""
+    out: list[Held] = []
+    seen: set[int] = set()
+    for pad, note in held:
+        for tone in chord(note, kind, scale):
+            if tone < 128 and tone not in seen:
+                seen.add(tone)
+                out.append((pad, tone))
+    return out

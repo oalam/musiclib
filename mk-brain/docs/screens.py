@@ -223,8 +223,7 @@ def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     btn(eng, "SELECT", False, t=now)
     btn(eng, "PATTERN", t=now)  # tenu : la config de l'arpège à l'écran
     eng.handle(EncoderEvent(5, 6 * cfg.arp.raw_per_choice, 0), now)  # PRE NAPP
-    for pad in (1, 3, 5):
-        hit(eng, pad, now)
+    eng.handle(EncoderEvent(6, 2 * cfg.arp.raw_per_choice, 0), now)  # CHD 7TH
     return eng, now + 3 * SECOND, True
 
 

@@ -15,6 +15,7 @@ from mk_brain.arp import (
     MAX_OCTAVES,
     MOTIF_NAME_MAX,
     MOTIF_OFF,
+    ArpChord,
     ArpOrder,
     parse_motif,
 )
@@ -104,6 +105,7 @@ class ArpPreset(BaseModel):
     gate: int = Field(ge=GATE_MIN, le=GATE_MAX)
     division: str
     motif: str = MOTIF_OFF
+    chord: ArpChord = "off"  # slice 15 ; absent d'un preset d'avant : pas d'accord
 
     @field_validator("division")
     @classmethod
@@ -121,11 +123,12 @@ class ArpConfig(BaseModel):
     gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
     # course des encodeurs de la config (PATTERN tenu), en unités brutes par valeur : bien plus
     # longue que celle d'un CC (`encoders.raw_per_step`), ces réglages n'ont que 3 à 19 valeurs
-    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT et PRE
+    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT, PRE et CHD
     raw_per_gate_step: int = Field(12, ge=1)  # GATE, par pas de 5 %
     # motifs (slice 12) : nom → 16 pas (x note, X accent, . silence, - liée), ordre du fichier
     motifs: dict[str, str] = {}
     motif: str = MOTIF_OFF  # motif de départ : un nom de `motifs`, ou OFF
+    chord: ArpChord = "off"  # accord de départ (slice 15) : off, tri, 7th, sus2, sus4, pwr
     unaccented: int = Field(70, ge=1, le=100)  # vélocité d'un pas `x`, en % de celle du pad
     presets: dict[str, ArpPreset] = {}  # slice 13 : nom → réglages, ordre du fichier
 

@@ -3,6 +3,25 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.37.0] - 2026-11-11
+
+### Ajouté
+
+- [15] Accords de l'arpège : encodeur 6 `CHD`, PATTERN tenu (`OFF`, `TRI`,
+  `7TH`, `SUS2`, `SUS4`, `PWR`). Un pad tenu devient la fondamentale d'un
+  accord pris dans la gamme de la banque (la première candidate dans la
+  gamme pour chaque note : tierce 3 ou 4 demi-tons, quinte 7, 6 ou 8…),
+  et l'arpège en joue les notes ; plusieurs pads ajoutent leurs accords.
+  Se combine avec le motif. `arp.chord` (départ), gardé dans la session
+  et dans les presets (champ `chord`, `off` s'il manque).
+
+### Modifié
+
+- [15] Écran droit, PATTERN tenu : `CHD` au-dessus de l'encodeur 6, le
+  motif resserré sur les deux dernières colonnes (8 px par pas).
+- Guide : encodeur `CHD`, capture `13-arpege.png` refaite (banque de
+  presets sur les pads).
+
 ## [0.36.0] - 2026-11-11
 
 ### Ajouté
