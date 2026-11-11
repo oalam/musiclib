@@ -16,6 +16,7 @@ from mk_brain.config import ConfigError
 from mk_brain.hid_mk2 import (
     BUTTON_LEDS,
     BUTTONS,
+    ENCODER_RANGE,
     GROUPS,
     LED_MAX,
     N_ENCODERS,
@@ -198,7 +199,19 @@ class _Stop:
             signal.signal(sig, self)
 
 
-def cmd_play(dry_run: bool, project_path: Path | None) -> int:
+def _positive(text: str) -> int:
+    value = int(text)
+    if value < 1:
+        raise argparse.ArgumentTypeError(f"{text} : entier d'au moins 1 attendu")
+    return value
+
+
+def cmd_play(
+    dry_run: bool,
+    project_path: Path | None,
+    raw_per_step: int | None = None,
+    show_speed: bool = False,
+) -> int:
     from mk_brain.boot import in_service, mark_ready, poweroff, read_sync
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
@@ -211,6 +224,11 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     from mk_brain.session import SAVE_EVERY_NS, Session, load_session, save_session
 
     cfg = load_config()
+    if raw_per_step is not None:  # essai d'une course fixe, sans toucher à la config
+        encoders = cfg.encoders.model_copy(update={"raw_per_step": raw_per_step, "accel": None})
+        cfg = cfg.model_copy(update={"encoders": encoders})
+        turns = 127 * raw_per_step / ENCODER_RANGE
+        print(f"course fixe des encodeurs : {raw_per_step} par cran, 0-127 en {turns:.2f} tour")
     project = None if project_path is None else load_project(project_path)
     clock = ClockTracker()
 
@@ -293,7 +311,8 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
             if engine.last_control:
                 last = engine.last_control
                 message = (last, now)
-                print(last)
+                speed = f"   ({engine.faders.speed:.0f} brut/s)" if show_speed else ""
+                print(f"{last}{speed}")
                 engine.last_control = ""
             if engine.loaded is not None:  # projet choisi : sa session reprise
                 write_last(engine.loaded)
@@ -434,6 +453,19 @@ def main(argv: list[str] | None = None) -> int:
         default=None,
         help="projet chargé sans passer par la sélection (ex. projects/solaris.yaml)",
     )
+    pp.add_argument(
+        "--raw-per-step",
+        type=_positive,
+        default=None,
+        help="essai d'une course fixe, sans accélération : unités brutes d'encodeur par "
+        "cran de CC, à la place de encoders.raw_per_step (8 = 0-127 en un tour)",
+    )
+    pp.add_argument(
+        "--show-speed",
+        action="store_true",
+        help="console : vitesse de l'encodeur tourné (unités brutes / s), pour régler "
+        "encoders.accel.slow et fast",
+    )
     vp = sub.add_parser("convert", help="slice 6 : doctrine du set → projects/<set>.yaml")
     vp.add_argument("doctrine", type=Path, help="doctrine du set (front matter mkbrain:)")
     cp = sub.add_parser("clock", help="slice 2 : horloge DT2, BPM, gigue ; banc d'envoi")
@@ -446,7 +478,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "list":
             return cmd_list()
         if args.cmd == "play":
-            return cmd_play(dry_run=args.dry_run, project_path=args.project)
+            return cmd_play(
+                dry_run=args.dry_run,
+                project_path=args.project,
+                raw_per_step=args.raw_per_step,
+                show_speed=args.show_speed,
+            )
         if args.cmd == "convert":
             from mk_brain.convert import write_project
 

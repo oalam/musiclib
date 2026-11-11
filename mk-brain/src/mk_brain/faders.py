@@ -8,10 +8,16 @@ sont marquées « hors prise » (`~`) : la DT2 a rechargé son kit.
 Plusieurs pages de 8 (flèches à côté des écrans, qui cyclent dans les deux
 sens) ; un paramètre est un CC ou le pitch bend (`PITCH_BEND`), sa valeur est
 gardée quelle que soit la page.
+
+Course des encodeurs : `raw_per_step` unités brutes par cran de CC en geste
+lent ; avec une accélération (`Accel`), le geste rapide en demande moins. La
+vitesse d'un encodeur est la somme signée de ses rotations sur une courte
+fenêtre glissante ; une rotation isolée compte toujours comme lente.
 """
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass
 
 DEFAULT_VALUE = 64  # valeur de départ d'un paramètre jamais vu
@@ -29,15 +35,34 @@ class FaderView:
     known: bool
 
 
+@dataclass(frozen=True, slots=True)
+class Accel:
+    """Accélération des encodeurs : pas rapide et seuils de vitesse (unités brutes / s)."""
+
+    raw_per_step: int  # unités brutes par cran de CC à pleine vitesse
+    slow: float  # en dessous : pas lent (`Faders.raw_per_step`)
+    fast: float  # au-dessus : pas rapide ; entre les deux, interpolation
+    window_ns: int  # fenêtre de mesure de la vitesse
+
+
 class Faders:
-    def __init__(self, pages: list[list[tuple[str, int]]], mute_cc: int, raw_per_step: int) -> None:
+    def __init__(
+        self,
+        pages: list[list[tuple[str, int]]],
+        mute_cc: int,
+        raw_per_step: int,
+        accel: Accel | None = None,
+    ) -> None:
         self.pages = pages  # pages de 8 × (abrégé, CC ou PITCH_BEND)
         self.page_index = 0
         self.mute_cc = mute_cc
         self.raw_per_step = raw_per_step
         self._values: dict[tuple[int, int], int] = {}  # (track, CC) → valeur connue
         self._stale: set[tuple[int, int]] = set()
-        self._residue: dict[int, int] = {}  # encodeur → reste de rotation brute
+        self.accel = accel
+        self.speed = 0.0  # vitesse de la dernière rotation, unités brutes / s (réglage des seuils)
+        self._residue: dict[int, float] = {}  # encodeur → reste de rotation brute (pondérée)
+        self._recent: dict[int, deque[tuple[int, int]]] = {}  # encodeur → (instant, rotation)
         self.muted: dict[int, bool] = {}
 
     @property
@@ -55,9 +80,26 @@ class Faders:
 
     # --- entrées ------------------------------------------------------------
 
-    def steps(self, encoder: int, raw_delta: int) -> int:
-        """Rotation brute de l'encodeur 1-8 → crans entiers (le reste est gardé)."""
-        acc = self._residue.get(encoder, 0) + raw_delta
+    def _boost(self, encoder: int, raw_delta: int, now: int | None) -> float:
+        """Facteur du geste : 1 en lent, `raw_per_step / accel.raw_per_step` à pleine vitesse."""
+        accel = self.accel
+        if accel is None or now is None:
+            return 1.0
+        recent = self._recent.setdefault(encoder, deque())
+        while recent and now - recent[0][0] > accel.window_ns:
+            recent.popleft()
+        recent.append((now, raw_delta))
+        if len(recent) < 2:  # rotation isolée : geste lent
+            self.speed = 0.0
+            return 1.0
+        self.speed = abs(sum(d for _, d in recent)) * 1e9 / accel.window_ns
+        ratio = (self.speed - accel.slow) / (accel.fast - accel.slow)
+        return 1.0 + (self.raw_per_step / accel.raw_per_step - 1.0) * max(0.0, min(1.0, ratio))
+
+    def steps(self, encoder: int, raw_delta: int, now: int | None = None) -> int:
+        """Rotation brute de l'encodeur 1-8 → crans entiers (le reste est gardé).
+        `now` (ns) : instant de la rotation, pour l'accélération ; sans lui, pas lent."""
+        acc = self._residue.get(encoder, 0.0) + raw_delta * self._boost(encoder, raw_delta, now)
         steps = int(acc / self.raw_per_step)  # vers zéro, dans les deux sens
         self._residue[encoder] = acc - steps * self.raw_per_step
         return steps
@@ -78,9 +120,11 @@ class Faders:
         self._values[key] = new
         return new
 
-    def turn(self, track: int, encoder: int, raw_delta: int) -> tuple[int, int] | None:
+    def turn(
+        self, track: int, encoder: int, raw_delta: int, now: int | None = None
+    ) -> tuple[int, int] | None:
         """Rotation de l'encodeur 1-8 → (CC ou PITCH_BEND, valeur 0-127), ou None."""
-        steps = self.steps(encoder, raw_delta)
+        steps = self.steps(encoder, raw_delta, now)
         if steps == 0:
             return None
         _, cc = self.page[encoder - 1]

@@ -222,13 +222,36 @@ class Encoder(BaseModel):
         return PITCH_BEND if self.cc is None else self.cc
 
 
+class EncoderAccel(BaseModel):
+    """Accélération des encodeurs de CC : geste rapide, course courte (SPEC, Encodeurs)."""
+
+    raw_per_step: int = Field(4, ge=1)  # unités brutes par cran de CC à pleine vitesse
+    slow: float = Field(300.0, gt=0)  # unités brutes / s : en dessous, pas lent
+    fast: float = Field(1500.0, gt=0)  # au-dessus, pas rapide ; entre les deux, interpolation
+    window_ms: float = Field(40.0, gt=0)  # fenêtre de mesure de la vitesse
+
+    @model_validator(mode="after")
+    def _ordered(self) -> EncoderAccel:
+        if self.fast <= self.slow:
+            raise ValueError("encoders.accel : fast doit dépasser slow")
+        return self
+
+
 class EncodersConfig(BaseModel):
     """Pages de 8 encodeurs, les mêmes pour toutes les tracks (SPEC, Encodeurs)."""
 
     pages: list[list[Encoder]]
     mute_cc: int = Field(94, ge=0, le=127)
     # unités brutes de la MK2 par cran de CC ; 15 : potard DT2, 17 crans par quart de tour
+    # avec `accel` : pas du geste lent
     raw_per_step: int = Field(15, ge=1)
+    accel: EncoderAccel | None = None  # absent : course fixe
+
+    @model_validator(mode="after")
+    def _fast_is_shorter(self) -> EncodersConfig:
+        if self.accel is not None and self.accel.raw_per_step > self.raw_per_step:
+            raise ValueError("encoders.accel.raw_per_step : au plus encoders.raw_per_step")
+        return self
 
     @field_validator("pages")
     @classmethod

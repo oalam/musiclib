@@ -90,7 +90,7 @@ from mk_brain.arp import chord as arp_chord
 from mk_brain.arp import sequence as arp_sequence
 from mk_brain.clock import ClockTracker
 from mk_brain.config import PITCH_BEND, PRESET_SLOTS, RGB, ArpPreset, Config, Layout
-from mk_brain.faders import Faders
+from mk_brain.faders import Accel, Faders
 from mk_brain.hid_mk2 import (
     GROUPS,
     LED_MAX,
@@ -266,7 +266,17 @@ class Engine:
         self.log: list[str] = []  # évènements du compteur, lus et vidés par la CLI
         enc = cfg.encoders
         pages = [[(e.name, e.param) for e in page] for page in enc.pages]
-        self.faders = Faders(pages, enc.mute_cc, enc.raw_per_step)
+        accel = (
+            None
+            if enc.accel is None
+            else Accel(
+                enc.accel.raw_per_step,
+                enc.accel.slow,
+                enc.accel.fast,
+                int(enc.accel.window_ms * 1e6),
+            )
+        )
+        self.faders = Faders(pages, enc.mute_cc, enc.raw_per_step, accel)
         self.track = 1  # track des encodeurs (SELECT + pad)
         self.last_program: int | None = None  # dernier PC reçu
         self.bank: int | None = None  # banque courante, 0 = A : PC reçu ou GROUP seul
@@ -499,7 +509,7 @@ class Engine:
             return self._perform_turn(index, delta, now)
         self.last_touch = (index, now)
         before = self.faders.value(self.track, self.faders.page[index - 1][1])
-        sent = self.faders.turn(self.track, index, delta)
+        sent = self.faders.turn(self.track, index, delta, now)
         if sent is None:
             return []
         param, value = sent
@@ -704,7 +714,7 @@ class Engine:
     def _perform_turn(self, index: int, delta: int, now: int) -> list[Timed]:
         """Encodeur en perform : même pas sur chaque track tenue."""
         self.last_touch = (index, now)
-        steps = self.faders.steps(index, delta)
+        steps = self.faders.steps(index, delta, now)
         if steps == 0:
             return []
         param = self.faders.page[index - 1][1]

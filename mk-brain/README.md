@@ -74,6 +74,10 @@ la tonique et le mode affichés ; en design, celle choisie par GROUP.
                                       # compteur de phrases (SHIFT + PLAY / GROUP n = recalage)
 .venv/bin/mk-brain play --dry-run     # sans DT2, notes affichées
 .venv/bin/mk-brain play --project projects/solaris.yaml   # projet chargé sans sélection
+.venv/bin/mk-brain play --raw-per-step 8   # essai d'une course d'encodeur fixe, sans accélération
+                                      # ni toucher à encoders.raw_per_step (8 : 0-127 en un tour)
+.venv/bin/mk-brain play --show-speed  # console : vitesse de l'encodeur tourné (brut/s), pour
+                                      # régler encoders.accel.slow et fast
                                       # derniers réglages repris de state/session-<projet>.json
 .venv/bin/mk-brain convert ../digitakt/doctrine-dt2-solaris.md   # → projects/solaris.yaml
 .venv/bin/mk-brain clock              # BPM, transport, gigue d'arrivée des ticks

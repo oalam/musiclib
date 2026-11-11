@@ -97,7 +97,12 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
 # TRACK) ; le menu PITCH BEND du preset n'ajoute que des paramètres modulés en plus.
 encoders:
   mute_cc: 94
-  raw_per_step: 15           # unités brutes par cran de CC : course d'un potard DT2, 17 crans par quart de tour (256 / 17) ; pas minimal de la MK2 : 4
+  raw_per_step: 15           # geste lent : unités brutes par cran de CC, course d'un potard DT2, 17 crans par quart de tour (256 / 17) ; pas minimal de la MK2 : 4
+  accel:                     # geste rapide : course plus courte (2026-11-11) ; bloc absent = course fixe
+    raw_per_step: 4          # à pleine vitesse : 0-127 en 127 x 4 / 1024 = 0,50 tour (lent : 127 x 15 / 1024 = 1,86 tour)
+    slow: 300                # vitesse (unités brutes / s, 1024 = un tour / s) sous laquelle le pas reste lent
+    fast: 1500               # vitesse au-dessus de laquelle le pas est rapide ; entre les deux, interpolation
+    window_ms: 40            # fenêtre de mesure de la vitesse ; une rotation isolée compte comme lente
   pages:
     - - {name: LVL, cc: 95}                    # niveau de track
       - {name: BR, cc: 54}                     # bit reduction

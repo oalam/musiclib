@@ -28,6 +28,7 @@ MS = 1_000_000
 SECOND = 1_000_000_000
 TICK = round(60e9 / (24 * 143))  # 143 BPM : 17 482 517 ns
 CC_STEP = 15  # `encoders.raw_per_step` : unités brutes de la MK2 par cran de CC
+APART = 100 * MS  # deux rotations ainsi espacées : gestes lents, sans accélération
 
 
 def running_clock(ticks: int = 30) -> ClockTracker:
@@ -484,21 +485,23 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     assert eng.handle(EncoderEvent(7, 2 * CC_STEP, 0), 0) == []  # PB sans SHIFT : rien
     assert eng.last_control == "PB: hold SHIFT"
     btn(eng, "SHIFT")
-    assert eng.handle(EncoderEvent(7, 2 * CC_STEP, 0), 0) == [
-        (0, PitchBend(0, 256))
+    assert eng.handle(EncoderEvent(7, 2 * CC_STEP, 0), APART) == [
+        (APART, PitchBend(0, 256))
     ]  # PB : 64 → 66
     assert eng.faders.view(1)[6].value == 66
     assert eng.handle(ButtonEvent("SHIFT", False), MS) == [(MS, PitchBend(0, 0))]  # au centre
     assert eng.faders.view(1)[6].value == 64
     assert eng.handle(ButtonEvent("SHIFT", False), MS) == []  # une seule remise
     btn(eng, "SHIFT")
-    eng.handle(EncoderEvent(7, 2 * CC_STEP, 0), 0)
+    eng.handle(EncoderEvent(7, 2 * CC_STEP, 0), 2 * APART)
     btn(eng, "SHIFT", False)
     assert eng.faders.view(1)[6].value == 64  # PB revenu au centre
     assert eng.handle(EncoderEvent(2, CC_STEP, 0), 0) == [(0, ControlChange(0, 74, 65))]  # CUT
     btn(eng, "BROWSE_LEFT")
     assert eng.last_control == "page 1/2" and eng.leds().buttons["BROWSE_RIGHT"] > 0
-    assert eng.handle(EncoderEvent(2, CC_STEP, 0), 0) == [(0, ControlChange(0, 54, 65))]  # BR
+    assert eng.handle(EncoderEvent(2, CC_STEP, 0), APART) == [
+        (APART, ControlChange(0, 54, 65))
+    ]  # BR
 
 
 def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
@@ -885,8 +888,10 @@ def test_shift_turn_is_temporary_and_cumulative(cfg: Config) -> None:
     kept = eng.faders.value(1, cc1)
     start2 = eng.faders.value(1, cc2)
     btn(eng, "SHIFT")
-    eng.handle(EncoderEvent(1, 5 * step, 0), 0)
-    eng.handle(EncoderEvent(1, 2 * step, 0), 0)  # second geste : la valeur d'avant reste la 1re
+    eng.handle(EncoderEvent(1, 5 * step, 0), APART)
+    eng.handle(
+        EncoderEvent(1, 2 * step, 0), 2 * APART
+    )  # second geste : la valeur d'avant reste la 1re
     eng.handle(EncoderEvent(2, -4 * step, 0), 0)
     assert eng.faders.value(1, cc1) == kept + 7
     out = eng.handle(ButtonEvent("SHIFT", False), MS)
@@ -1389,3 +1394,14 @@ def test_arp_now_follows_the_chord_of_the_progression(cfg: Config) -> None:
     assert eng.arp_now == ([1, 6, 3, 7], 1, [root - 4, root, root + 3])
     eng._leave_arp()
     assert eng.arp_now is None
+
+
+def test_fast_encoder_gesture_travels_further(cfg: Config) -> None:
+    """Accélération (`encoders.accel`) : la même rotation va plus loin en geste rapide."""
+    slow, fast = Engine(cfg), Engine(cfg)
+    for i in range(8):
+        slow.handle(EncoderEvent(1, CC_STEP, 0), i * APART)
+        fast.handle(EncoderEvent(1, CC_STEP, 0), i * 2 * MS)
+    cc = slow.faders.page[0][1]
+    assert slow.faders.value(1, cc) == 64 + 8
+    assert fast.faders.value(1, cc) > 64 + 16

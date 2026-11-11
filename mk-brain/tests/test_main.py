@@ -17,7 +17,9 @@ STOPPED_SH = Path(__file__).resolve().parents[1] / "deploy" / "stopped.sh"
 
 
 def _play_raising(monkeypatch: pytest.MonkeyPatch, exc: Exception) -> int:
-    def cmd_play(dry_run: bool, project_path: Path | None) -> int:
+    def cmd_play(
+        dry_run: bool, project_path: Path | None, raw_per_step: int | None, show_speed: bool
+    ) -> int:
         raise exc
 
     monkeypatch.setattr(cli, "cmd_play", cmd_play)
@@ -73,3 +75,20 @@ def test_stop_signal_sets_a_flag_and_never_raises(sig: signal.Signals) -> None:
     finally:
         for s, handler in previous.items():
             signal.signal(s, handler)
+
+
+def test_play_passes_the_encoder_travel_to_try(monkeypatch: pytest.MonkeyPatch) -> None:
+    seen: list[int | None] = []
+
+    def cmd_play(
+        dry_run: bool, project_path: Path | None, raw_per_step: int | None, show_speed: bool
+    ) -> int:
+        seen.append(raw_per_step)
+        return 0
+
+    monkeypatch.setattr(cli, "cmd_play", cmd_play)
+    assert cli.main(["play", "--raw-per-step", "8"]) == 0
+    assert cli.main(["play"]) == 0
+    assert seen == [8, None]
+    with pytest.raises(SystemExit):
+        cli.main(["play", "--raw-per-step", "0"])

@@ -1759,6 +1759,19 @@ modulations en page 2) :
   un quart de tour = 256, 256 / 17 = 15,06 ; 0 à 127 en 127 × 15 / 1024 =
   1,86 tour. Avant : 4 unités par cran (le pas minimal de la MK2), soit
   64 crans par quart de tour.
+- Accélération (`encoders.accel`, 2026-11-11, demandée après un essai à
+  4 unités par cran) : geste lent = course fine ci-dessus, geste rapide =
+  course courte, `accel.raw_per_step` 4, soit 0 à 127 en 127 × 4 / 1024 =
+  0,50 tour. Vitesse d'un encodeur = somme signée de ses rotations sur
+  `window_ms` (40 ms), en unités brutes par seconde (1024 = un tour par
+  seconde) ; sous `slow` (300) le pas reste lent, au-dessus de `fast`
+  (1500) il est rapide, interpolation linéaire entre les deux. Une
+  rotation isolée dans la fenêtre compte toujours comme lente. Vaut aussi
+  pour le groupe SOLO ; les réglages de l'arpège (`arp.raw_per_choice`)
+  gardent leur course fixe. Bloc `accel` absent : course fixe. Seuils de
+  départ, à régler à l'essai : `mk-brain play --show-speed` affiche la
+  vitesse de chaque geste, `--raw-per-step N` essaie une course fixe sans
+  accélération.
 
 ### Affectation des contrôles
 

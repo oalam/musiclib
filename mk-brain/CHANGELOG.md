@@ -3,6 +3,20 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.44.0] - 2026-11-11
+
+### Ajouté
+
+- Accélération des encodeurs de CC (`encoders.accel`) : geste lent, course
+  fine (15 unités brutes par cran, 0 à 127 en 1,86 tour) ; geste rapide,
+  course courte (4 par cran, 0,50 tour) ; interpolation entre les seuils
+  `slow` et `fast` (unités brutes par seconde), vitesse mesurée sur
+  `window_ms`. Groupe SOLO compris ; réglages de l'arpège inchangés. Seuils
+  de départ à régler à l'essai.
+- `mk-brain play --show-speed` : vitesse de l'encodeur tourné dans la
+  console, pour régler les seuils. `mk-brain play --raw-per-step N` : essai
+  d'une course fixe, sans accélération ni modification de la config.
+
 ## [0.43.0] - 2026-11-11
 
 ### Ajouté

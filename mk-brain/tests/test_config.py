@@ -69,3 +69,19 @@ def test_arp_motifs_validated(tmp_path: Path, cfg: Config) -> None:
         bad.write_text(yaml.safe_dump(raw))
         with pytest.raises(ConfigError, match=match):
             load_config(bad)
+
+
+def test_encoder_accel_validated(tmp_path: Path, cfg: Config) -> None:
+    import yaml
+
+    assert cfg.encoders.accel is not None and cfg.encoders.accel.raw_per_step == 4
+    for change, match in (
+        ({"slow": 2000}, "fast doit dépasser slow"),
+        ({"raw_per_step": 20}, "au plus encoders.raw_per_step"),
+    ):
+        raw = cfg.model_dump()
+        raw["encoders"]["accel"].update(change)
+        bad = tmp_path / "bad.yaml"
+        bad.write_text(yaml.safe_dump(raw))
+        with pytest.raises(ConfigError, match=match):
+            load_config(bad)
