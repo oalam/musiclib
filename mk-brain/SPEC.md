@@ -444,6 +444,35 @@ tourné : le filtre de T3 et T7 bouge, aucune note ; PAD MODE sort de SOLO
 PATTERN + pad joue ; transport arrêté, une seule LED GROUP ; en clavier,
 les écrans sont ceux du MPC encadrés.
 
+## Slice 10 : aftertouch (décidé le 2026-11-11)
+
+La pression d'un pad tenu module sa track : la MK2 la mesure en continu
+(12 bits, environ 755 relevés par seconde), mk-brain l'envoie en
+**aftertouch de canal** sur le canal de la track du pad.
+
+- **Toujours actif**, en MPC comme au clavier, sans geste ni réglage à la
+  MK2. Il n'agit que si le preset de la track assigne des paramètres à
+  l'aftertouch (page de modulation de la DT2, comme MW, BC et PB).
+- **MPC** : chaque pad joue sa track sur son canal, donc chaque pad a son
+  aftertouch. **Clavier** : tous les pads jouent la track sélectionnée,
+  la pression la plus forte des pads tenus l'emporte.
+- **La frappe n'en envoie pas** : un pad compte `aftertouch.delay_ms`
+  (80 ms) après sa note, et seulement au-dessus de `aftertouch.threshold`
+  (900 sur 4095) ; `full_scale` (3600) donne 127, en ligne droite entre
+  les deux. Seuils **provisoires, à régler à l'essai**.
+- **Débit** : un message par canal au plus toutes les
+  `aftertouch.interval_ms` (10 ms, soit 100 par seconde et par canal),
+  seulement si la valeur change ; le retour à 0 au relâché part tout de
+  suite.
+- **NOTE REPEAT** : les coups répétés n'en envoient pas, leur pression
+  règle déjà la vélocité (question ouverte 4, tranchée ainsi).
+- Rien à l'écran ni aux LED. Hors périmètre : aftertouch polyphonique
+  (la DT2 ne le reçoit pas, à ma connaissance), pression vers un CC.
+
+**Critère de fin** : sur la DT2, un preset dont l'aftertouch ouvre le
+filtre ; frapper le pad ne change pas le timbre, appuyer plus fort en le
+tenant l'ouvre, relâcher le referme.
+
 ## Modes : live et design
 
 > **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
@@ -752,7 +781,8 @@ l'essai sur la MK2 :
   division ; durée de chaque coup = moitié de la division. Transport
   arrêté : pas de repeat, le pad joue une fois.
 - Vélocité de chaque coup = pression courante du pad (aftertouch MK2).
-  Pression vers un CC (filtre) : **à arbitrer** (question ouverte 4).
+  Pression vers un CC (filtre) : **tranché le 2026-11-11**, vélocité seule
+  en repeat ; hors repeat, la pression part en aftertouch (slice 10).
 - Division courante en gros caractères sur l'écran gauche pendant le maintien.
 
 ### Pads, dispositions, LED
@@ -1221,6 +1251,7 @@ conditionne tout le reste.
 | 5 | **Écrans, encodeurs, modes** : pages live et design, superpositions, CC, soft-takeover, bascule de mode verrouillée | lisible dans le noir d'un coup d'œil ; aucun saut de valeur à la reprise ; impossible de quitter le live par erreur transport lancé | en cours, découpée le 2026-11-09 : 5.A encodeurs, SELECT / MUTE / PATTERN + pad, faite et essayée sur la DT2 le 2026-11-09 ; 5.B modes et bascule, faite et essayée sur la MK2 le 2026-11-09 ; 5.C écrans live et superpositions, faite le 2026-11-09 et revue à l'essai ; 5.D design (banques solaris, GROUP = banque, menu à 4 entrées), faite et essayée sur la MK2 le 2026-11-09, octave aux flèches de transport (±4) essayée |
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
+| 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0), à essayer sur la MK2 et la DT2 ; seuils à régler |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

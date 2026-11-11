@@ -16,6 +16,12 @@ velocity:
   min: 1
   max: 127
 
+aftertouch:                  # pad tenu : sa pression module la track (aftertouch de canal)
+  delay_ms: 80               # après la note, pour que la frappe n'en envoie pas
+  threshold: 900             # pression d'un pad simplement tenu, sur 4095 (à régler à l'essai)
+  full_scale: 3600           # pression qui donne 127
+  interval_ms: 10            # au plus un message par canal sur ce délai
+
 play:
   quantize: "1/16"         # off, 1/16, 1/8 ; GRID fait défiler
   swing: 50                  # 50-75 %, SWING + encodeur maître

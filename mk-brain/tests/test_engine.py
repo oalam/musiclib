@@ -896,3 +896,45 @@ def test_shift_turn_is_temporary_and_cumulative(cfg: Config) -> None:
     assert (eng.faders.value(1, cc1), eng.faders.value(1, cc2)) == (kept, start2)
     assert eng.handle(ButtonEvent("SHIFT", True), 2 * MS) == []
     assert eng.handle(ButtonEvent("SHIFT", False), 3 * MS) == []  # rien à rendre
+
+
+# --- slice 10 : aftertouch ----------------------------------------------------
+
+
+def test_held_pad_pressure_sends_channel_aftertouch(cfg: Config) -> None:
+    """Pad tenu : pas d'aftertouch à la frappe, puis la pression au-dessus du seuil,
+    au plus un message par intervalle, et 0 au relâché."""
+    from mk_brain.engine import Aftertouch
+
+    at = cfg.aftertouch
+    eng = Engine(cfg)
+    assert press(eng, 0, pressure=3000) == [(3 * MS, NoteOn(0, 60, 127))]  # frappe seule
+    late = 3 * MS + int(at.delay_ms * 1e6)
+    assert eng.handle(PadEvent(PAD1, True, at.threshold), late) == []  # tenu sans appuyer
+    full = eng.handle(PadEvent(PAD1, True, at.full_scale), late + MS)
+    assert full == [(late + MS, Aftertouch(0, 127))]
+    assert eng.handle(PadEvent(PAD1, True, at.threshold + 100), late + 2 * MS) == []  # trop tôt
+    after = late + MS + int(at.interval_ms * 1e6)
+    ((t, msg),) = eng.handle(PadEvent(PAD1, True, at.threshold + 100), after)
+    assert t == after and isinstance(msg, Aftertouch) and 0 < msg.value < 127
+    out = eng.handle(PadEvent(PAD1, False, 0), after + MS)  # relâché : retour à 0 immédiat
+    assert (after + MS, Aftertouch(0, 0)) in out and NoteOff(0, 60) in [m for _, m in out]
+    assert eng.tick(after + SECOND) == []
+
+
+def test_keyboard_aftertouch_takes_strongest_pad(cfg: Config) -> None:
+    from mk_brain.engine import Aftertouch
+
+    at = cfg.aftertouch
+    eng = design(cfg)
+    channel = eng.track - 1
+    press(eng, 0, pressure=3000)
+    press(eng, 0, pressure=3000, pad=PAD7)
+    late = SECOND
+    span = at.full_scale - at.threshold
+    eng.handle(PadEvent(PAD1, True, at.threshold + span // 4), late)
+    out = eng.handle(PadEvent(PAD7, True, at.full_scale), late + 20 * MS)
+    assert out == [(late + 20 * MS, Aftertouch(channel, 127))]
+    out = eng.handle(PadEvent(PAD7, False, 0), late + 40 * MS)  # reste le pad le plus léger
+    values = [m.value for _, m in out if isinstance(m, Aftertouch)]
+    assert values == [round(127 / 4)]

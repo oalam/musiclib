@@ -88,6 +88,10 @@ Au chargement, les 16 pads sont un kit, lu comme sur une MPC (pad 1 en bas
   frappe.
 - **Choke gratuit** : une track ne joue qu'une voix. L'open hat coupe le
   closed hat (T5), le clap coupe la snare (T3), un tom coupe le précédent.
+- **Aftertouch** : tenir un pad et appuyer plus fort module sa track
+  (aftertouch de canal), si le preset de la DT2 lui assigne un paramètre.
+  La frappe seule n'en envoie pas ; au clavier, le pad le plus appuyé
+  l'emporte.
 - Vélocité = force de frappe. À la frappe, l'écran gauche affiche le pad,
   la track, la tranche et la vélocité :
 

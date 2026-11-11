@@ -11,6 +11,7 @@ import mido
 
 from mk_brain.clock import ClockTracker
 from mk_brain.engine import (
+    Aftertouch,
     ControlChange,
     Engine,
     MidiOut,
@@ -69,6 +70,8 @@ def to_mido(msg: MidiOut) -> Any:
         )
     if isinstance(msg, PitchBend):
         return mido.Message("pitchwheel", channel=msg.channel, pitch=msg.pitch)
+    if isinstance(msg, Aftertouch):
+        return mido.Message("aftertouch", channel=msg.channel, value=msg.value)
     assert isinstance(msg, ProgramChange)
     return mido.Message("program_change", channel=msg.channel, program=msg.program)
 

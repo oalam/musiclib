@@ -130,7 +130,15 @@ class PitchBend:
     pitch: int  # -8192..8191, 0 = centre (mido)
 
 
-MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend
+@dataclass(frozen=True, slots=True)
+class Aftertouch:
+    """Aftertouch de canal (channel pressure) : une valeur pour toute la track."""
+
+    channel: int
+    value: int  # 0-127
+
+
+MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend | Aftertouch
 MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
@@ -181,6 +189,8 @@ class Engine:
         self._sounding: dict[int, tuple[int, int, int]] = {}  # pad → (canal, note, instant du on)
         self._repeats: dict[int, _Repeat] = {}
         self._pressure: dict[int, int] = {}
+        # aftertouch : dernier envoi par canal (valeur, instant) ; absent = au repos
+        self._aftertouch_sent: dict[int, tuple[int, int]] = {}
         self.leds_dirty = True
         self.last_played: tuple[int, int, int] | None = None  # (pad, note, vélocité)
         self.last_decision = ""  # diagnostic quantize : position de la frappe et décision
@@ -780,7 +790,7 @@ class Engine:
             channel, note, on_at = self._sounding.pop(pad)
             out.append((max(now, on_at + NOTE_OFF_MIN_NS), NoteOff(channel, note)))
             self.leds_dirty = True
-        return out
+        return out + self._aftertouch(now)
 
     # --- temps ----------------------------------------------------------------
 
@@ -809,6 +819,38 @@ class Engine:
                 out.append((max(gate, now + NOTE_OFF_MIN_NS), NoteOff(rep.channel, rep.note)))
                 self.last_played = (pad, rep.note, vel)
                 rep.next_pos += div
+        return out + self._aftertouch(now)
+
+    def _aftertouch(self, now: int) -> list[Timed]:
+        """Pression des pads tenus → aftertouch de canal de leur track (slice 10).
+
+        Un pad compte `aftertouch.delay_ms` après sa note, au-dessus de `threshold` : une
+        frappe n'en envoie pas. Plusieurs pads sur un canal (clavier) : la pression la plus
+        forte. Un message par canal et par `interval_ms`, seulement si la valeur change ;
+        le retour à 0 au relâché part tout de suite. Les coups du NOTE REPEAT n'en envoient
+        pas (leur pression règle déjà la vélocité)."""
+        cfg = self.cfg.aftertouch
+        delay, interval = int(cfg.delay_ms * 1e6), int(cfg.interval_ms * 1e6)
+        levels: dict[int, int] = {}
+        for pad, (channel, _, on_at) in self._sounding.items():
+            if now - on_at < delay:
+                continue
+            span = cfg.full_scale - cfg.threshold
+            x = min(1.0, max(0.0, (self._pressure.get(pad, 0) - cfg.threshold) / span))
+            levels[channel] = max(levels.get(channel, 0), round(127 * x))
+        out: list[Timed] = []
+        for channel in sorted(set(levels) | set(self._aftertouch_sent)):
+            value = levels.get(channel, 0)
+            sent = self._aftertouch_sent.get(channel)
+            if sent is None and value == 0:
+                continue
+            if sent is not None and (value == sent[0] or (value and now - sent[1] < interval)):
+                continue
+            out.append((now, Aftertouch(channel, value)))
+            if value:
+                self._aftertouch_sent[channel] = (value, now)
+            else:
+                del self._aftertouch_sent[channel]
         return out
 
     def _update_phrase(self) -> None:

@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.0] - 2026-11-11
+
+### Ajouté
+
+- [10] Aftertouch : la pression d'un pad tenu part en aftertouch de canal
+  sur sa track, en MPC et au clavier (le pad le plus appuyé), toujours
+  actif ; pas à la frappe (`aftertouch.delay_ms`, `threshold`), un message
+  par canal toutes les `interval_ms` au plus, 0 au relâché. Seuils à
+  régler à l'essai.
+
 ## [0.29.0] - 2026-11-11
 
 ### Ajouté

@@ -4,7 +4,7 @@ import pytest
 
 from mk_brain import midi_io
 from mk_brain.config import Config
-from mk_brain.engine import Engine, NoteOff, NoteOn
+from mk_brain.engine import Aftertouch, Engine, NoteOff, NoteOn
 
 
 def test_find_port(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -30,9 +30,11 @@ def test_send_converts_to_mido() -> None:
     out = midi_io.Dt2Out(port)
     out.send(NoteOn(15, 0, 100))
     out.send(NoteOff(15, 0))
+    out.send(Aftertouch(2, 90))  # aftertouch de canal (slice 10)
     assert [str(m) for m in port.sent] == [
         "note_on channel=15 note=0 velocity=100 time=0",
         "note_off channel=15 note=0 velocity=0 time=0",
+        "aftertouch channel=2 value=90 time=0",
     ]
 
 

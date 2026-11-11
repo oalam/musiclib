@@ -39,7 +39,7 @@ retour arrière »).
 
 ## Configuration
 
-`config/default.yaml` : canal, courbe de vélocité, quantize, longueur de phrase,
+`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, longueur de phrase,
 couleurs, dispositions du clavier (B-H), table `mpc` des 16 pads (track, tranche,
 label, couleur).
 
