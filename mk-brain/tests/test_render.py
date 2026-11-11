@@ -92,6 +92,16 @@ def test_mute_strip_marks_playing_sixteenth(cfg: Config) -> None:
     assert render.left(Engine(cfg), 0).getpixel((_cell(2), mid))  # à l'arrêt : rien
 
 
+def test_mute_strip_square_is_bigger_on_the_beat(cfg: Config) -> None:
+    """Sur un temps (cases 1, 5, 9, 13) le carré prend presque toute la case."""
+    edge = render.MUTE_TOP + 1  # ligne juste sous le bord de la case
+    eng = at_bar(cfg, 3)  # 2e double croche : petit carré, la ligne reste pleine
+    assert render.left(eng, 0).getpixel((_cell(2), edge))
+    advance(eng, 2 * 96 + 10, 2 * 96 + 26)  # 5e double croche : 2e temps
+    img = render.left(eng, 0)
+    assert not img.getpixel((_cell(5), edge)) and img.getpixel((_cell(5), render.MUTE_TOP))
+
+
 def test_mode_tag_always_shown(cfg: Config) -> None:
     """MPC, KEYS ou SOLO en haut à droite de l'écran droit ; NOTE REPEAT tenu : sous
     les divisions."""

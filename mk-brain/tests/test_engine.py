@@ -37,7 +37,7 @@ def running_clock(ticks: int = 30) -> ClockTracker:
     return c
 
 
-def press(eng: Engine, t: int, pressure: int = 2500, pad: int = PAD1) -> list[Timed]:
+def press(eng: Engine, t: int, pressure: int = 3000, pad: int = PAD1) -> list[Timed]:
     out = eng.handle(PadEvent(pad, True, pressure), t)
     return out + eng.tick(t + 3 * MS)
 
@@ -69,7 +69,7 @@ def design(
 def test_note_fires_after_window_with_peak(cfg: Config) -> None:
     eng = Engine(cfg)
     assert eng.handle(PadEvent(PAD1, True, 300), 0) == []
-    assert eng.handle(PadEvent(PAD1, True, 2500), 1 * MS) == []
+    assert eng.handle(PadEvent(PAD1, True, 3000), 1 * MS) == []
     assert eng.tick(int(2.5 * MS)) == [(int(2.5 * MS), NoteOn(0, 60, 127))]
     assert eng.handle(PadEvent(PAD1, True, 2000), 3 * MS) == []  # tenu : rien de plus
     assert eng.handle(PadEvent(PAD1, False, 0), 100 * MS) == [(100 * MS, NoteOff(0, 60))]
@@ -77,7 +77,7 @@ def test_note_fires_after_window_with_peak(cfg: Config) -> None:
 
 def test_short_hit_fires_on_release(cfg: Config) -> None:
     eng = Engine(cfg)
-    eng.handle(PadEvent(PAD1, True, 2500), 0)
+    eng.handle(PadEvent(PAD1, True, 3000), 0)
     out = eng.handle(PadEvent(PAD1, False, 0), MS // 2)
     assert out == [(MS // 2, NoteOn(0, 60, 127)), (MS // 2 + NOTE_OFF_MIN_NS, NoteOff(0, 60))]
 
@@ -99,7 +99,7 @@ def test_pad_mode_toggles_mpc_keyboard_and_note_off_keeps_target(cfg: Config) ->
 
 def test_leds_lit_pad_and_active_group(cfg: Config) -> None:
     eng = Engine(cfg)
-    eng.handle(PadEvent(PAD1, True, 2500), 0)
+    eng.handle(PadEvent(PAD1, True, 3000), 0)
     leds = eng.leds()
     assert leds.pads[PAD1] == cfg.track_colors[1]
     assert leds.pads[0] != cfg.track_colors[13]  # pad 13 au repos, atténué
@@ -476,7 +476,7 @@ def test_menu_phrase_until_bank_change(cfg: Config, project: Project) -> None:
 def test_hit_kept_with_note_for_screen(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
     btn(eng, "GROUP_E")
-    press(eng, 0, pressure=2500)
+    press(eng, 0, pressure=3000)
     assert eng.last_hit is not None and eng.last_hit[1:3] == (70, 127)
 
 

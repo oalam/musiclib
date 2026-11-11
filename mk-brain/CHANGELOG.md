@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.4] - 2026-11-11
+
+### Modifié
+
+- [9] Bande des mutes : le carré de la double croche en cours est plus
+  gros sur les temps (9 × 8 px en cases 1, 5, 9, 13 ; 7 × 6 ailleurs).
+- [1] Vélocité : `velocity.full_scale` 2000 → 3000. Les frappes d'un jeu
+  normal mesurées sur la MK2 vont de 2553 à 3203 et donnaient toutes 127.
+- Captures du guide (`docs/img/`) régénérées.
+
 ## [0.30.3] - 2026-11-11
 
 ### Modifié

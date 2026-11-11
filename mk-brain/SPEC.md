@@ -985,10 +985,12 @@ TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           
   par une alerte ; les mutes ne sont plus jamais masqués ;
 - mutes sur toute la largeur restante, cases de 10 px ; elles comptent
   aussi les 16 doubles croches de la mesure : un carré intérieur, en
-  inverse de sa case, marque celle qui joue (rien à l'arrêt). L'écran
-  gauche est donc redessiné à chaque double croche, soit 60 / 165 / 4 =
-  91 ms à 165 BPM, environ 11 images par seconde : **à mesurer sur le
-  Pi** ; repli : un carré par noire ;
+  inverse de sa case, marque celle qui joue (rien à l'arrêt) : 7 × 6 px
+  sur une double croche ordinaire, 9 × 8 px sur un temps (cases 1, 5, 9,
+  13 ; demandé le 2026-11-11). L'écran gauche est donc redessiné à chaque
+  double croche, soit 60 / 165 / 4 = 91 ms à 165 BPM, environ 11 images
+  par seconde ; essayé sur le Pi le 2026-11-11, sans retard depuis le
+  cache du rendu (v0.30.2) ;
 - bandeau droit : la phrase en noir sur blanc dans le coin gauche (`PHR
   01`, `PHR --` à l'arrêt), `mesure / longueur` en gros, les mesures avant
   le cap, dessous le pattern suivant (`> E04`) ou l'octave du clavier ;

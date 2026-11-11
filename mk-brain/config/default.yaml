@@ -11,7 +11,8 @@ midi:
 velocity:
   window_ms: 2.0             # la vélocité = pression maximale sur cette fenêtre après l'attaque
   threshold: 200             # pression d'attaque, sur 4095 (constat slice 0)
-  full_scale: 2000           # pression qui donne la vélocité maximale (2500 → 2000 le 2026-11-09)
+  full_scale: 3000           # pression qui donne la vélocité maximale (2500 → 2000 le 2026-11-09 ;
+                             # 2000 → 3000 le 2026-11-11 : frappes normales mesurées de 2553 à 3203)
   gamma: 0.4                 # < 1 : remonte les frappes légères (0.6 → 0.4 le 2026-11-09 : 2 à 14 relevés)
   min: 1
   max: 127

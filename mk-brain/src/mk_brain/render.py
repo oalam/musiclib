@@ -195,6 +195,7 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
 COLUMN = 46  # colonne « écran de la DT2 » (pattern, SMP, track), à gauche du bandeau gauche
 MUTE_TOP, MUTE_BOTTOM = 26, 35  # cases des mutes, 10 px de haut
 STEPS_PER_BAR = 16
+STEPS_PER_BEAT = 4
 TICKS_PER_STEP = 6  # 24 ticks par noire
 PATTERN_BARS = 4  # un tour de pattern de 64 pas
 TAG_W = 46  # étiquette du mode (MPC, KEYS, SOLO)
@@ -213,7 +214,7 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
     """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
     La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point. Les 16 cases
     comptent aussi les doubles croches de la mesure : un carré intérieur, en inverse de sa
-    case, marque celle qui joue."""
+    case, marque celle qui joue, plus gros sur les temps (cases 1, 5, 9, 13)."""
     cell = (WIDTH - left) // 16
     top, bottom = MUTE_TOP, MUTE_BOTTOM
     step = _step(engine)
@@ -229,7 +230,10 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
             d.rectangle((x0, top, x1, bottom), fill=1)
             full = True
         if step == t - 1:
-            d.rectangle((x0 + 2, top + 2, x1 - 2, bottom - 2), fill=0 if full else 1)
+            inset = 1 if step % STEPS_PER_BEAT == 0 else 2  # plus gros sur le temps
+            d.rectangle(
+                (x0 + inset, top + inset, x1 - inset, bottom - inset), fill=0 if full else 1
+            )
         if t == engine.track:
             d.rectangle((x0, bottom + 2, x1, bottom + 3), fill=1)
 
