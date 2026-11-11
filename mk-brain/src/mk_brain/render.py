@@ -465,7 +465,7 @@ def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
 
 def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:
     """Config de l'arpège au-dessus des 8 encodeurs, en toutes lettres : ORD, OCT, GATE,
-    MOT, puis PRE, CHD, PRG, BAR."""
+    MOT, puis INV, CHD, PRG, BAR."""
     small = _font(SMALL)
     for k, (name, value) in enumerate(engine.arp_view()):
         if k // COLS != screen:

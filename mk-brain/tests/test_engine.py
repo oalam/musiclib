@@ -1203,15 +1203,14 @@ def test_arp_ratchet_replays_the_note_inside_the_step(cfg: Config) -> None:
     assert [(n, v) for _, n, v in _arp_notes(eng, (24,))] == [(notes[0], 127)]  # pas 4 : X
 
 
-def test_arp_preset_recalls_the_five_settings(cfg: Config) -> None:
-    """Encodeur 5, PATTERN tenu : le preset s'applique dès qu'il est affiché ; un réglage
-    retouché affiche `----`, l'encodeur repart du dernier preset rappelé."""
+def test_arp_preset_recalls_the_settings(cfg: Config) -> None:
+    """PATTERN tenu, pad n : le preset s'applique d'un coup ; un réglage retouché ne
+    l'affiche plus comme courant, le dernier rappelé reste connu et suit la session."""
     eng = arp(cfg)
-    step = cfg.arp.raw_per_choice
     names = list(cfg.arp.presets)
     btn(eng, "PATTERN", t=SECOND)
-    assert eng.arp_view()[4] == ("PRE", "----")
-    assert eng.handle(EncoderEvent(5, step, 0), 0) == []
+    assert eng.arp_preset_shown is None
+    assert press(eng, SECOND, pad=_index(1)) == []
     first = cfg.arp.presets[names[0]]
     assert (eng.arp_order, eng.arp_octaves, eng.arp_gate, eng.division, eng.arp_motif) == (
         first.order,
@@ -1220,20 +1219,46 @@ def test_arp_preset_recalls_the_five_settings(cfg: Config) -> None:
         first.division,
         first.motif,
     )
-    assert eng.arp_view()[4] == ("PRE", names[0]) and eng.last_control == f"ARP PRE {names[0]}"
+    assert eng.arp_preset_shown == names[0] and eng.last_control == f"ARP PRE {names[0]}"
     eng.handle(EncoderEvent(3, cfg.arp.raw_per_gate_step, 0), 0)  # GATE retouché
-    assert eng.arp_view()[4] == ("PRE", "----") and eng.arp_preset == names[0]
-    eng.handle(EncoderEvent(5, step, 0), 0)  # repart du preset rappelé, pas du début
-    assert eng.arp_preset_shown == names[1] and eng.division == cfg.arp.presets[names[1]].division
-    eng.handle(EncoderEvent(5, -9 * step, 0), 0)  # `----` : borné, rien ne change
-    assert eng.arp_preset is None and eng.division == cfg.arp.presets[names[1]].division
-    eng.handle(EncoderEvent(5, 99 * step, 0), 0)
-    assert eng.arp_preset == names[-1]
+    assert eng.arp_preset_shown is None and eng.arp_preset == names[0]
     other = Engine(cfg)
     other.restore(Session.model_validate(eng.snapshot().model_dump()))
-    assert other.arp_preset_shown == names[-1]
+    assert other.arp_preset == names[0] and other.arp_gate == eng.arp_gate
     other.restore(Session(arp_preset="DISPARU"))
-    assert other.arp_preset == names[-1]
+    assert other.arp_preset == names[0]
+
+
+def test_arp_inversion_moves_the_low_notes_up_and_fix_holds_the_register(cfg: Config) -> None:
+    """Encodeur 5 INV, PATTERN tenu. `1` : la fondamentale passe au-dessus. `FIX` sous une
+    progression : les accords restent dans l'octave au-dessus du pad tenu."""
+    eng = arp(cfg, running_clock(300))
+    eng.group = next(i for i, lay in enumerate(cfg.layouts) if lay.name == "Aeolian")
+    eng.division, eng.arp_chord = "1/4", "tri"
+    step = cfg.arp.raw_per_choice
+    btn(eng, "PATTERN", t=0)
+    eng.handle(EncoderEvent(5, step, 0), 0)
+    assert eng.arp_view()[4] == ("INV", "1") and eng.last_control == "ARP INV 1"
+    eng.handle(EncoderEvent(5, 99 * step, 0), 0)
+    assert eng.arp_view()[4] == ("INV", "FIX") and eng._arp_current().inversion == "fix"
+    btn(eng, "PATTERN", False, t=SECOND)
+    eng.arp_inversion, root = "1", eng.target(1)[1]
+    first = press(eng, 1 * TICK, pad=_index(1))
+    played = _ons(first) + [n for _, n, _ in _arp_notes(eng, (24, 48))]
+    assert played == [root + 3, root + 7, root + 12]  # do mineur, premier renversement
+    eng.arp_inversion, eng.arp_progression, eng.arp_bars = "fix", "1637", "1/2"
+    played = [n for _, n, _ in _arp_notes(eng, range(72, 216, 24))]
+    assert played == [
+        root,  # 6 : la bémol majeur ramené au-dessus du pad (do mib lab), une note
+        *[root + 3, root + 7],  # 3 : mi bémol majeur
+        *[root + 2, root + 5],  # 7 : si bémol majeur, ré en bas (ré fa sib)
+        root,  # 1 : do mineur
+    ]
+    other = Engine(cfg)
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert other.arp_inversion == "fix"
+    other.restore(Session(arp_inversion="3"))
+    assert other.arp_inversion == "fix"
 
 
 def test_arp_bank_pads_recall_and_shift_saves(cfg: Config) -> None:
@@ -1261,7 +1286,7 @@ def test_arp_bank_pads_recall_and_shift_saves(cfg: Config) -> None:
     tap(9, 3 * SECOND)
     btn(eng, "SHIFT", False, t=3 * SECOND)
     assert eng.arp_bank_dirty and list(eng.arp_user) == [9]
-    assert eng.arp_view()[4] == ("PRE", "U09") and eng.last_control == "ARP PRE U09 saved"
+    assert eng.arp_preset_shown == "U09" and eng.last_control == "ARP PRE U09 saved"
     tap(1, 4 * SECOND)
     assert eng.arp_preset_shown == names[0]
     tap(9, 5 * SECOND)
@@ -1270,15 +1295,15 @@ def test_arp_bank_pads_recall_and_shift_saves(cfg: Config) -> None:
     assert eng.arp  # un rappel compte comme un réglage
 
 
-def test_arp_bank_saved_slot_wins_over_config_and_encoder_scrolls_it(cfg: Config) -> None:
+def test_arp_bank_saved_slot_wins_over_config(cfg: Config) -> None:
     eng = arp(cfg)
     names = list(cfg.arp.presets)
     eng.arp_user = {1: cfg.arp.presets[names[3]], 12: cfg.arp.presets[names[4]]}
     assert list(eng.arp_bank) == ["U01", *names[1:], "U12"]
     btn(eng, "PATTERN", t=SECOND)
-    eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)
+    press(eng, SECOND, pad=_index(1))
     assert eng.arp_preset_shown == "U01" and eng.arp_motif == cfg.arp.presets[names[3]].motif
-    eng.handle(EncoderEvent(5, 99 * cfg.arp.raw_per_choice, 0), 0)
+    press(eng, 2 * SECOND, pad=_index(12))
     assert eng.arp_preset_shown == "U12"
     other = Engine(cfg)
     other.arp_user = dict(eng.arp_user)

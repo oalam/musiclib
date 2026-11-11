@@ -9,6 +9,7 @@ from mk_brain.arp import (
     chord_name,
     degree_steps,
     hits,
+    invert,
     parse_motif,
     sequence,
     shift,
@@ -116,6 +117,17 @@ def test_shift_walks_the_scale() -> None:
     assert shift(59, 1, AEOLIAN) == 61  # sous la première note de la gamme (si bémol + 1)
     assert shift(64, -2, set()) == 60  # sans gamme : éolien sur la note
     assert shift(60, 2, {0, 3, 5, 7, 10}) == 65  # pentatonique : les degrés comptent ses notes
+
+
+def test_invert_raises_low_notes_or_folds_above_the_anchor() -> None:
+    cm = [60, 63, 67]
+    assert invert(cm, "off", 60) == cm
+    assert invert(cm, "1", 60) == [63, 67, 72]
+    assert invert(cm, "2", 60) == [67, 72, 75]
+    assert invert([60], "2", 60) == [60]  # note seule : rien à renverser
+    assert invert([60, 67, 72], "1", 60) == [67, 72]  # PWR : l'octave n'est pas doublée
+    assert invert([56, 60, 63], "fix", 60) == [60, 63, 68]  # la bémol ramené au-dessus de do
+    assert spread([(1, 56)], "tri", AEOLIAN, "fix", {1: 60}) == [(1, 60), (1, 63), (1, 68)]
 
 
 def test_chord_name_reads_the_quality_from_the_intervals() -> None:

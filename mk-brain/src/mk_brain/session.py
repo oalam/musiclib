@@ -51,6 +51,7 @@ class Session(BaseModel):
     arp_chord: str | None = None  # accord (slice 15)
     arp_progression: str | None = None  # progression et durée d'un accord (slice 16)
     arp_bars: str | None = None
+    arp_inversion: str | None = None  # renversement (slice 21)
     arp_motif: str | None = None  # motif (slice 12), par son nom ; disparu : celui de la config
 
 

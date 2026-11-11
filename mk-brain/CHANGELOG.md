@@ -3,6 +3,24 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.43.0] - 2026-11-11
+
+### Ajouté
+
+- [21] Renversements des accords de l'arpège : encodeur 5 `INV`, PATTERN
+  tenu (`OFF`, `1`, `2`, `FIX`). `1` / `2` : les notes basses de l'accord
+  montent d'une octave. `FIX` : toutes les notes restent dans l'octave
+  au-dessus du pad tenu, les accords d'une progression ne sautent plus de
+  registre. `arp.inversion` (départ), gardé dans la session et dans les
+  presets (champ `inversion`, facultatif).
+
+### Modifié
+
+- [21] L'encodeur 5 ne fait plus défiler les presets (`PRE` et `----`
+  quittent l'écran) : ils se rappellent aux pads, PATTERN tenu. Le pad du
+  preset courant retombe en faible dès qu'un réglage s'en écarte.
+- Guide : encodeur `INV`, capture `13-arpege.png` refaite.
+
 ## [0.42.0] - 2026-11-11
 
 ### Ajouté

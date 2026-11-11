@@ -37,10 +37,11 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
   order: up                  # up, down, updown, played (ordre d'appui), random
   octaves: 1                 # 1 à 3
   gate: 50                   # durée d'une note, 10 à 100 % de la division
-  raw_per_choice: 24         # course d'encodeur par valeur de ORD, OCT, MOT, PRE, CHD, PRG et BAR (un CC : 15 par cran)
+  raw_per_choice: 24         # course d'encodeur par valeur de ORD, OCT, MOT, INV, CHD, PRG et BAR (un CC : 15 par cran)
   raw_per_gate_step: 12      # course d'encodeur par pas de 5 % de GATE
   unaccented: 70             # vélocité d'un pas `x` d'un motif, en % de celle du pad (`X` : 100 %)
   chord: "off"               # accord de départ (encodeur 6 CHD) : "off", tri, 7th, sus2, sus4, pwr ; un pad = un accord dans la gamme
+  inversion: "off"           # renversement de départ (encodeur 5 INV) : "off", "1", "2" (les 1 ou 2 notes basses de l'accord montent d'une octave), fix (tout reste dans l'octave au-dessus du pad)
   progression: "OFF"         # progression de départ (encodeur 7 PRG) : un nom de `progressions`, ou "OFF"
   bars: "1"                  # durée de chaque accord de la progression (encodeur 8 BAR) : "1/2", "1", "2", "4" mesures
   # Progressions (slice 16) : degrés 1-7 comptés depuis le pad tenu, dans la gamme de la banque
@@ -71,11 +72,11 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
     "HASA": "X.?x ?.x? X.?x ?.??"   # galop troué au hasard
     "CINQ": "X.xx."                 # 5 pas : l'accent tourne contre la mesure
     "DOUZ": "X.xx X.x. X.xr"        # 12 pas : 3 temps contre 4
-  # Presets (slices 13 et 14), encodeur 5 PRE ou pad n, PATTERN tenu : les cinq réglages d'un coup.
+  # Presets (slices 13 et 14), pad n, PATTERN tenu : tous les réglages d'un coup.
   # Ils remplissent les emplacements 1, 2, 3… des 16 pads (16 au plus) ; un emplacement sauvé depuis
   # la MK2 (PATTERN + SHIFT + pad, state/arp-presets.json) l'emporte. Noms U01 à U16 réservés.
   # Champs facultatifs : `chord` (off par défaut ; tri, 7th, sus2, sus4, pwr), `progression`
-  # ("OFF" par défaut) et `bars` ("1" par défaut).
+  # ("OFF" par défaut), `bars` ("1" par défaut) et `inversion` ("off" par défaut).
   # gate par pas de 5 ; division : 1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64.
   presets:
     "ACD1": {order: up, octaves: 1, gate: 60, division: "1/16", motif: "ACID"}

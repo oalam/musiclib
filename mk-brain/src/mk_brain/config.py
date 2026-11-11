@@ -19,6 +19,7 @@ from mk_brain.arp import (
     PROGRESSION_OFF,
     ArpBars,
     ArpChord,
+    ArpInversion,
     ArpOrder,
     parse_motif,
 )
@@ -111,6 +112,7 @@ class ArpPreset(BaseModel):
     chord: ArpChord = "off"  # slice 15 ; absent d'un preset d'avant : pas d'accord
     progression: str = PROGRESSION_OFF  # slice 16, idem
     bars: ArpBars = "1"
+    inversion: ArpInversion = "off"  # slice 21, idem
 
     @field_validator("division")
     @classmethod
@@ -128,7 +130,7 @@ class ArpConfig(BaseModel):
     gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
     # course des encodeurs de la config (PATTERN tenu), en unités brutes par valeur : bien plus
     # longue que celle d'un CC (`encoders.raw_per_step`), ces réglages n'ont que 3 à 19 valeurs
-    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT, PRE, CHD, PRG et BAR
+    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT, INV, CHD, PRG et BAR
     raw_per_gate_step: int = Field(12, ge=1)  # GATE, par pas de 5 %
     # motifs (slice 12) : nom → 16 pas (x note, X accent, . silence, - liée), ordre du fichier
     motifs: dict[str, str] = {}
@@ -138,6 +140,7 @@ class ArpConfig(BaseModel):
     progressions: dict[str, list[int]] = {}
     progression: str = PROGRESSION_OFF  # progression de départ : un nom, ou OFF
     bars: ArpBars = "1"  # durée de chaque accord, en mesures
+    inversion: ArpInversion = "off"  # renversement de départ (slice 21) : off, 1, 2, fix
 
     @field_validator("progressions")
     @classmethod

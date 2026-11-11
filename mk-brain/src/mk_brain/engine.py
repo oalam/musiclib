@@ -68,6 +68,8 @@ from mk_brain.arp import (
     GATE_MAX,
     GATE_MIN,
     GATE_STEP,
+    INVERSION_LABELS,
+    INVERSIONS,
     MAX_OCTAVES,
     ORDER_LABELS,
     ORDERS,
@@ -75,6 +77,7 @@ from mk_brain.arp import (
     TIE,
     ArpBars,
     ArpChord,
+    ArpInversion,
     ArpOrder,
     accented,
     degree_steps,
@@ -171,7 +174,6 @@ class Aftertouch:
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend | Aftertouch
 MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
-NO_PRESET = "----"  # PRE : aucun preset, ou réglages retouchés depuis le rappel
 ARP_TAP_NS = 300_000_000  # PATTERN relâché avant : appui bref (sortie d'ARPG), sinon config
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
@@ -234,6 +236,7 @@ class Engine:
         self.arp_chord: ArpChord = cfg.arp.chord  # un pad = un accord (slice 15), ou off
         self.arp_progression = cfg.arp.progression  # nom de la progression (slice 16), ou OFF
         self.arp_bars: ArpBars = cfg.arp.bars  # durée de chaque accord, en mesures
+        self.arp_inversion: ArpInversion = cfg.arp.inversion  # renversement (slice 21)
         self._arp_degree: int | None = None  # rang de l'accord en cours dans la progression
         self._arp_tones: list[int] = []  # son accord, sur le premier pad tenu (écran)
         self.arp_preset: str | None = None  # dernier preset rappelé (slice 13)
@@ -360,14 +363,13 @@ class Engine:
         return self.arp and "PATTERN" in self._held_buttons
 
     def arp_view(self) -> list[tuple[str, str]]:
-        """Config de l'arpège, encodeurs 1-8 : (abrégé, valeur affichée). `PRE` : le
-        dernier preset rappelé tant que les réglages sont les siens, sinon `----`."""
+        """Config de l'arpège, encodeurs 1-8 : (abrégé, valeur affichée)."""
         return [
             ("ORD", ORDER_LABELS[self.arp_order]),
             ("OCT", str(self.arp_octaves)),
             ("GATE", f"{self.arp_gate}%"),
             ("MOT", self.arp_motif),
-            ("PRE", self.arp_preset_shown or NO_PRESET),
+            ("INV", INVERSION_LABELS[self.arp_inversion]),
             ("CHD", CHORD_LABELS[self.arp_chord]),
             ("PRG", self.arp_progression),
             ("BAR", self.arp_bars),
@@ -390,6 +392,7 @@ class Engine:
             chord=self.arp_chord,
             progression=self.arp_progression,
             bars=self.arp_bars,
+            inversion=self.arp_inversion,
         )
 
     def arp_slots(self) -> list[tuple[str, ArpPreset] | None]:
@@ -415,6 +418,7 @@ class Engine:
         self.arp_order, self.arp_octaves, self.arp_gate = p.order, p.octaves, p.gate
         self.division, self.arp_motif, self.arp_chord = p.division, p.motif, p.chord
         self.arp_progression, self.arp_bars = p.progression, p.bars
+        self.arp_inversion = p.inversion
         self.leds_dirty = True
 
     def _preset_pad(self, pad: int) -> None:
@@ -586,13 +590,10 @@ class Engine:
             self.arp_progression = names[i]
         elif index == 8:
             self.arp_bars = BARS[max(0, min(len(BARS) - 1, BARS.index(self.arp_bars) + steps))]
-        else:  # preset : repart du dernier rappelé, même retouché ; `----` ne change rien
-            presets: list[str | None] = [None, *self.arp_bank]
-            at = presets.index(self.arp_preset) if self.arp_preset in presets else 0
-            self.arp_preset = presets[max(0, min(len(presets) - 1, at + steps))]
-            self.leds_dirty = True
-            if self.arp_preset is not None:
-                self._arp_recall(self.arp_preset)
+        else:  # renversement (les presets se rappellent aux pads)
+            i = INVERSIONS.index(self.arp_inversion) + steps
+            self.arp_inversion = INVERSIONS[max(0, min(len(INVERSIONS) - 1, i))]
+        self.leds_dirty = True  # le pad du preset courant s'éteint dès qu'un réglage s'en écarte
         name, value = self.arp_view()[index - 1]
         self.last_control = f"ARP {name} {value}"
 
@@ -633,6 +634,7 @@ class Engine:
                     continue
                 ties = ties_after(steps, index)
             held = [(p, n.note) for p, n in self._arp_notes.items()]
+            anchors = dict(held)  # notes des pads avant progression : repère de `INV FIX`
             lay = self.layout
             scale = {(lay.base + i) % 12 for i in lay.intervals}
             degrees = self.cfg.arp.progressions.get(self.arp_progression)
@@ -647,8 +649,9 @@ class Engine:
                     self._arp_pos += div
                     continue
                 self._arp_tones = arp_chord(held[0][1], self.arp_chord, scale)
-            if self.arp_chord != "off":  # un pad = un accord, pris dans la gamme du clavier
-                held = spread(held, self.arp_chord, scale)
+            if self.arp_chord != "off" or self.arp_inversion != "off":
+                # un pad = un accord, pris dans la gamme du clavier, renversé ou non
+                held = spread(held, self.arp_chord, scale, self.arp_inversion, anchors)
             seq = arp_sequence(held, self.arp_order, self.arp_octaves)
             if self.arp_order == "random":
                 pad, note = seq[self._rng.randrange(len(seq))]
@@ -867,6 +870,7 @@ class Engine:
             arp_chord=self.arp_chord,
             arp_progression=self.arp_progression,
             arp_bars=self.arp_bars,
+            arp_inversion=self.arp_inversion,
             arp_preset=self.arp_preset,
         )
 
@@ -913,6 +917,9 @@ class Engine:
         for bars in BARS:
             if bars == session.arp_bars:
                 self.arp_bars = bars
+        for inversion in INVERSIONS:
+            if inversion == session.arp_inversion:
+                self.arp_inversion = inversion
         if session.arp_preset in self.arp_bank:
             self.arp_preset = session.arp_preset
         self._apply_phrase()

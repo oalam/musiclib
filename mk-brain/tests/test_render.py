@@ -249,7 +249,7 @@ def test_arp_config_shows_divisions_and_settings(cfg: Config) -> None:
     eng.arp_motif = "LONG"
     assert len({empty, galop, render.right(eng, 0).crop(beside).tobytes()}) == 3
     views = [render.right(eng, 0).crop(under).tobytes()]
-    eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)  # PRE : le nom du preset
+    eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)  # INV : le renversement
     views.append(render.right(eng, 0).crop(under).tobytes())
     for name, value in (("arp_chord", "7th"), ("arp_progression", "1637"), ("arp_bars", "4")):
         setattr(eng, name, value)  # CHD, PRG, BAR au-dessus des encodeurs 6 à 8

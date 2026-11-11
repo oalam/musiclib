@@ -1,8 +1,8 @@
-"""Arpégiateur (slices 11 à 17) : ordre des notes tenues, octaves, motifs, accords."""
+"""Arpégiateur (slices 11 à 21) : ordre des notes tenues, octaves, motifs, accords."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence, Set
+from collections.abc import Mapping, Sequence, Set
 from typing import Literal
 
 ArpOrder = Literal["up", "down", "updown", "played", "random"]
@@ -39,6 +39,12 @@ CHORD_TONES: dict[ArpChord, tuple[tuple[int, ...], ...]] = {
     "sus4": (_FOURTH, _FIFTH),
     "pwr": (_FIFTH, _OCTAVE),
 }
+
+# Renversements (slice 21) : 1 / 2 = les 1 ou 2 notes les plus basses de l'accord montent
+# d'une octave ; fix = toutes les notes ramenées dans l'octave au-dessus du pad tenu.
+ArpInversion = Literal["off", "1", "2", "fix"]
+INVERSIONS: tuple[ArpInversion, ...] = ("off", "1", "2", "fix")
+INVERSION_LABELS: dict[ArpInversion, str] = {"off": "OFF", "1": "1", "2": "2", "fix": "FIX"}
 
 # Progressions (slice 16) : suites de degrés 1-7 comptés depuis le pad tenu, un accord par
 # durée `BAR` ; degrés 2-4 vers le haut, 5-7 vers le bas (une quarte au plus du pad).
@@ -154,13 +160,33 @@ def chord_name(tones: Sequence[int], names: Sequence[str]) -> str:
     return names[root % 12] + _QUALITIES.get(tuple(t - root for t in tones[1:]), "")
 
 
-def spread(held: Sequence[Held], kind: ArpChord, scale: Set[int]) -> list[Held]:
+def invert(tones: Sequence[int], kind: ArpInversion, anchor: int) -> list[int]:
+    """Accord renversé. `1` / `2` : ses 1 ou 2 notes les plus basses montent d'une octave
+    (la plus haute ne bouge jamais). `fix` : chaque note ramenée dans l'octave qui part de
+    `anchor` (la note du pad tenu), du grave à l'aigu : une progression reste en place."""
+    if kind == "off":
+        return list(tones)
+    if kind == "fix":
+        return sorted({anchor + (t - anchor) % 12 for t in tones})
+    n = min(int(kind), len(tones) - 1)
+    return list(dict.fromkeys([*tones[n:], *(t + 12 for t in tones[:n])]))
+
+
+def spread(
+    held: Sequence[Held],
+    kind: ArpChord,
+    scale: Set[int],
+    inversion: ArpInversion = "off",
+    anchors: Mapping[int, int] | None = None,
+) -> list[Held]:
     """Pads tenus → notes de leurs accords, dans l'ordre d'appui ; une même note une seule
-    fois (le premier pad qui l'apporte la garde), rien au-delà de 127."""
+    fois (le premier pad qui l'apporte la garde), rien au-delà de 127. `anchors` : pad →
+    note du pad avant progression, repère du renversement `fix`."""
     out: list[Held] = []
     seen: set[int] = set()
     for pad, note in held:
-        for tone in chord(note, kind, scale):
+        anchor = note if anchors is None else anchors.get(pad, note)
+        for tone in invert(chord(note, kind, scale), inversion, anchor):
             if tone < 128 and tone not in seen:
                 seen.add(tone)
                 out.append((pad, tone))
