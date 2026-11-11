@@ -53,7 +53,9 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
     "ROLL": "X.x. X.x. X.xx Xxxx"   # roulement en fin de mesure
     "LONG": "X--- x-x- X--- xxx-"   # notes tenues
     "ACID": "X-.x x.X- .xx. X.x-"   # ligne acid, liées et silences
-  # Presets (slice 13), encodeur 5 PRE, PATTERN tenu : les cinq réglages d'un coup.
+  # Presets (slices 13 et 14), encodeur 5 PRE ou pad n, PATTERN tenu : les cinq réglages d'un coup.
+  # Ils remplissent les emplacements 1, 2, 3… des 16 pads (16 au plus) ; un emplacement sauvé depuis
+  # la MK2 (PATTERN + SHIFT + pad, state/arp-presets.json) l'emporte. Noms U01 à U16 réservés.
   # gate par pas de 5 ; division : 1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32, 1/32T, 1/64.
   presets:
     "ACD1": {order: up, octaves: 1, gate: 60, division: "1/16", motif: "ACID"}
@@ -100,6 +102,7 @@ leds:
   bank: [255, 255, 255]      # design : GROUP de la banque choisie, les autres en couleur de mode × dim
   perform_idle: [0, 0, 40]   # SOLO (perform verrouillé) : pad hors du groupe, bleu très faible
   perform_on: [0, 255, 0]    # SOLO : pad du groupe (ou tenu), vert vif ; remplace MPC et clavier
+  preset: [255, 255, 255]    # ARPG, PATTERN tenu : pad d'un preset occupé (× dim), le courant plein, vide éteint
 
 # Couleurs des rôles de note : tonique partout (B-H), tierce et quinte en gamme (C-H)
 roles:

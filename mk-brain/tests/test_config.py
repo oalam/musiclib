@@ -56,7 +56,8 @@ def test_arp_motifs_validated(tmp_path: Path, cfg: Config) -> None:
         ({"presets": {"TROPLONG": dict(good)}}, "4 caractères"),
         ({"presets": {"P": {**good, "motif": "RIEN"}}}, "absent"),
         ({"presets": {"P": {**good, "division": "1/5"}}}, "inconnue"),
-        ({"presets": {"P": {**good, "gate": 52}}}, "multiple"),
+        ({"presets": {"U03": dict(good)}}, "réservés"),
+        ({"presets": {f"P{n}": dict(good) for n in range(17)}}, "16 au plus"),
     ):
         raw = cfg.model_dump()
         raw["arp"].update(change)

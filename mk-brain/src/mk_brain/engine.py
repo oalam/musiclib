@@ -74,7 +74,7 @@ from mk_brain.arp import (
 )
 from mk_brain.arp import sequence as arp_sequence
 from mk_brain.clock import ClockTracker
-from mk_brain.config import PITCH_BEND, RGB, Config, Layout
+from mk_brain.config import PITCH_BEND, PRESET_SLOTS, RGB, ArpPreset, Config, Layout
 from mk_brain.faders import Faders
 from mk_brain.hid_mk2 import (
     GROUPS,
@@ -99,6 +99,7 @@ from mk_brain.layouts import (
     velocity,
 )
 from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseLength, PhraseState, pattern_label
+from mk_brain.presets import user_name
 from mk_brain.project import Bank, Project
 from mk_brain.quantize import (
     GRID_TICKS,
@@ -219,6 +220,10 @@ class Engine:
         self.arp_gate = cfg.arp.gate
         self.arp_motif = cfg.arp.motif  # nom du motif (slice 12), ou OFF
         self.arp_preset: str | None = None  # dernier preset rappelé (slice 13)
+        # slice 14 : emplacements 1-16 sauvés depuis la MK2 (`state/arp-presets.json`), qui
+        # l'emportent sur ceux de la config ; `arp_bank_dirty` : fichier à réécrire
+        self.arp_user: dict[int, ArpPreset] = {}
+        self.arp_bank_dirty = False
         self.arp_hold = False  # maintien (NOTE REPEAT) : l'arpège continue pads relâchés
         self._arp_notes: dict[int, _ArpNote] = {}  # pad → note, dans l'ordre d'appui
         self._arp_pos: float | None = None  # position (ticks) de la prochaine note
@@ -351,17 +356,59 @@ class Engine:
     @property
     def arp_preset_shown(self) -> str | None:
         """Le dernier preset rappelé, si aucun réglage ne s'en est écarté."""
-        preset = self.cfg.arp.presets.get(self.arp_preset or "")
-        current = (self.arp_order, self.arp_octaves, self.arp_gate, self.division, self.arp_motif)
-        if preset is None or current != (
-            preset.order,
-            preset.octaves,
-            preset.gate,
-            preset.division,
-            preset.motif,
-        ):
-            return None
-        return self.arp_preset
+        preset = self.arp_bank.get(self.arp_preset or "")
+        return self.arp_preset if preset == self._arp_current() else None
+
+    def _arp_current(self) -> ArpPreset:
+        """Les cinq réglages courants, tels qu'un preset les garde."""
+        return ArpPreset(
+            order=self.arp_order,
+            octaves=self.arp_octaves,
+            gate=self.arp_gate,
+            division=self.division,
+            motif=self.arp_motif,
+        )
+
+    def arp_slots(self) -> list[tuple[str, ArpPreset] | None]:
+        """Les 16 emplacements de la banque, pad 1 à 16 : (nom, réglages), ou None si vide.
+        Sauvé depuis la MK2 (`U03`) d'abord, sinon le preset de même rang de la config."""
+        config = list(self.cfg.arp.presets.items())
+        slots: list[tuple[str, ArpPreset] | None] = []
+        for n in range(1, PRESET_SLOTS + 1):
+            if n in self.arp_user:
+                slots.append((user_name(n), self.arp_user[n]))
+            else:
+                slots.append(config[n - 1] if n <= len(config) else None)
+        return slots
+
+    @property
+    def arp_bank(self) -> dict[str, ArpPreset]:
+        """Emplacements occupés, dans l'ordre des pads : nom → réglages."""
+        return dict(slot for slot in self.arp_slots() if slot is not None)
+
+    def _arp_recall(self, name: str) -> None:
+        p = self.arp_bank[name]
+        self.arp_preset = name
+        self.arp_order, self.arp_octaves, self.arp_gate = p.order, p.octaves, p.gate
+        self.division, self.arp_motif = p.division, p.motif
+        self.leds_dirty = True
+
+    def _preset_pad(self, pad: int) -> None:
+        """PATTERN tenu en ARPG : pad n = rappel de l'emplacement n ; SHIFT + pad n = les
+        réglages courants y sont écrits (slice 14)."""
+        self._pattern_used()
+        if "SHIFT" in self._held_buttons:
+            self.arp_user[pad] = self._arp_current()
+            self.arp_preset = user_name(pad)
+            self.arp_bank_dirty = True
+            self.last_control = f"ARP PRE {self.arp_preset} saved"
+            return
+        slot = self.arp_slots()[pad - 1]
+        if slot is None:
+            self.last_control = f"ARP PRE {pad:02d} empty"
+            return
+        self._arp_recall(slot[0])
+        self.last_control = f"ARP PRE {slot[0]}"
 
     @property
     def arp_steps(self) -> str | None:
@@ -497,13 +544,12 @@ class Engine:
             names = self.cfg.arp.motif_names
             self.arp_motif = names[max(0, min(len(names) - 1, names.index(self.arp_motif) + steps))]
         else:  # preset : repart du dernier rappelé, même retouché ; `----` ne change rien
-            presets: list[str | None] = [None, *self.cfg.arp.presets]
+            presets: list[str | None] = [None, *self.arp_bank]
             at = presets.index(self.arp_preset) if self.arp_preset in presets else 0
             self.arp_preset = presets[max(0, min(len(presets) - 1, at + steps))]
+            self.leds_dirty = True
             if self.arp_preset is not None:
-                p = self.cfg.arp.presets[self.arp_preset]
-                self.arp_order, self.arp_octaves, self.arp_gate = p.order, p.octaves, p.gate
-                self.division, self.arp_motif = p.division, p.motif
+                self._arp_recall(self.arp_preset)
         name, value = self.arp_view()[index - 1]
         self.last_control = f"ARP {name} {value}"
 
@@ -790,7 +836,7 @@ class Engine:
             self.arp_gate = session.arp_gate
         if session.arp_motif in self.cfg.arp.motif_names:
             self.arp_motif = session.arp_motif
-        if session.arp_preset in self.cfg.arp.presets:
+        if session.arp_preset in self.arp_bank:
             self.arp_preset = session.arp_preset
         self._apply_phrase()
         self.leds_dirty = True
@@ -1015,6 +1061,12 @@ class Engine:
                 self._consumed.discard(pad)
                 self._released_at[pad] = now
             return []
+        if ev.pressed and pad not in self._pressure and self.arp_menu:  # banque de presets
+            self._consumed.add(pad)
+            self.leds_dirty = True
+            if not self._bounce(pad, now):
+                self._preset_pad(pad)
+            return []
         if ev.pressed and pad not in self._pressure and self._held_buttons & set(MODIFIERS):
             self._consumed.add(pad)
             self.leds_dirty = True
@@ -1188,6 +1240,7 @@ class Engine:
         lit |= set(self._latched)  # pads du groupe SOLO : pleins
         held = self._held_buttons
         pads: list[RGB] = [(0, 0, 0)] * N_PADS
+        slots, shown = self.arp_slots(), self.arp_preset_shown
         for index in range(N_PADS):
             pad = pad_label(index)
             track = self.cfg.track_colors[pad]  # modificateur tenu : pad n = track n
@@ -1196,6 +1249,11 @@ class Engine:
                 pads[index] = (0, 0, 0) if auto or self.faders.muted.get(pad) else track
             elif "SELECT" in held:
                 pads[index] = track if pad == self.track else (0, 0, 0)
+            elif self.arp_menu:  # banque de presets : occupé faible, courant plein, vide éteint
+                slot = slots[pad - 1]
+                if slot is not None:
+                    full = self.cfg.leds.preset
+                    pads[index] = full if slot[0] == shown else scale(full, dim)
             elif self.perform_lock:  # SOLO : remplace les couleurs du MPC et du clavier
                 on = pad in self._latched
                 pads[index] = self.cfg.leds.perform_on if on else self.cfg.leds.perform_idle

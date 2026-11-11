@@ -243,8 +243,17 @@ n'y a pas d'arpège : les pads jouent comme au clavier.
   (`ACD1`, `GAL2`, `TRIB`, `CTPS`, `RUSH`, `NAPP`, `HASD`, `TRIO`). C'est
   un point de départ : tout se retouche ensuite, et `PRE` affiche alors
   `----` ; l'encodeur repart du dernier preset rappelé. `----`, en début
-  de liste, ne change rien. Les presets s'écrivent dans `arp.presets` de
-  `config/default.yaml`.
+  de liste, ne change rien.
+- **Pads, PATTERN tenu** : la banque des 16 presets, un par pad. Un pad
+  rappelle son preset ; **SHIFT + pad** y écrit les réglages courants
+  (ordre, octaves, gate, division, motif), sans confirmation, sous le nom
+  `U` + numéro du pad (`U03`). Pad faiblement allumé : emplacement
+  occupé ; plein : le preset courant ; éteint : vide. Pendant l'appui les
+  pads ne jouent pas : pour changer de preset en jouant, garder l'arpège
+  avec le maintien (NOTE REPEAT). Les presets sauvés sont gardés sur la
+  machine (`state/arp-presets.json`), communs à tous les projets ; ceux de
+  `arp.presets` de `config/default.yaml` remplissent les pads 1 à 8 tant
+  qu'on n'a rien sauvé dessus.
 - **Boutons d'écran 1-8** : la division (1/4 à 1/64), comme le note
   repeat, PATTERN tenu ou non.
 - **Pression** : appuyer plus fort sur un pad accentue sa note.
@@ -286,7 +295,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | GRID | quantize off / 1/16 / 1/8 |
 | SWING + maître | swing |
 | NOTE REPEAT (+ SHIFT) | repeat tenu (verrouillé) ; boutons d'écran = division |
-| PATTERN | appui bref : mode ARPG ↔ clavier (pads tenus arpégés) ; tenu en ARPG : config, encodeurs 1-5 = ORD, OCT, GATE, MOT (motif), PRE (preset) ; boutons d'écran = division, NOTE REPEAT = maintien |
+| PATTERN | appui bref : mode ARPG ↔ clavier (pads tenus arpégés) ; tenu en ARPG : config, encodeurs 1-5 = ORD, OCT, GATE, MOT (motif), PRE (preset), pad n = preset n, SHIFT + pad n = sauver dans n ; boutons d'écran = division, NOTE REPEAT = maintien |
 | Boutons d'écran 1-4 | focus du menu GAMME, TRACK, QUANT, PHRASE |
 | Encodeur maître | valeur de l'entrée au focus ; appui = entrée suivante |
 | SHIFT + PLAY | phrase à 1 à la barre suivante |

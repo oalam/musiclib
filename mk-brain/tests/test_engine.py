@@ -1168,3 +1168,53 @@ def test_arp_preset_recalls_the_five_settings(cfg: Config) -> None:
     assert other.arp_preset_shown == names[-1]
     other.restore(Session(arp_preset="DISPARU"))
     assert other.arp_preset == names[-1]
+
+
+def test_arp_bank_pads_recall_and_shift_saves(cfg: Config) -> None:
+    """PATTERN tenu : pad n = rappel de l'emplacement n, SHIFT + pad n = sauvegarde des
+    réglages courants ; les pads ne jouent pas, le relâché de PATTERN ne sort pas du mode."""
+    eng = arp(cfg)
+    names = list(cfg.arp.presets)
+    btn(eng, "PATTERN", t=SECOND)
+
+    def tap(pad: int, t: int) -> None:
+        assert press(eng, t, pad=_index(pad)) == []
+        eng.handle(PadEvent(_index(pad), False, 0), t + MS)
+
+    assert press(eng, SECOND, pad=_index(2)) == [] and eng.arp_preset_shown == names[1]
+    eng.handle(PadEvent(_index(2), False, 0), SECOND + MS)
+    assert eng._arp_notes == {}  # pas de note dans l'arpège
+    dim = eng.leds().pads
+    assert dim[_index(2)] == cfg.leds.preset and dim[_index(16)] == (0, 0, 0)  # courant, vide
+    assert (0, 0, 0) != dim[_index(1)] != cfg.leds.preset  # occupé : faible
+    tap(16, 2 * SECOND)  # emplacement vide : rien ne change
+    assert eng.arp_preset_shown == names[1] and eng.last_control == "ARP PRE 16 empty"
+    eng.handle(EncoderEvent(3, -cfg.arp.raw_per_gate_step, 0), 0)  # réglage à l'oreille
+    mine = (eng.arp_order, eng.arp_octaves, eng.arp_gate, eng.division, eng.arp_motif)
+    btn(eng, "SHIFT", t=3 * SECOND)
+    tap(9, 3 * SECOND)
+    btn(eng, "SHIFT", False, t=3 * SECOND)
+    assert eng.arp_bank_dirty and list(eng.arp_user) == [9]
+    assert eng.arp_view()[4] == ("PRE", "U09") and eng.last_control == "ARP PRE U09 saved"
+    tap(1, 4 * SECOND)
+    assert eng.arp_preset_shown == names[0]
+    tap(9, 5 * SECOND)
+    assert (eng.arp_order, eng.arp_octaves, eng.arp_gate, eng.division, eng.arp_motif) == mine
+    btn(eng, "PATTERN", False, t=5 * SECOND + 100 * MS)
+    assert eng.arp  # un rappel compte comme un réglage
+
+
+def test_arp_bank_saved_slot_wins_over_config_and_encoder_scrolls_it(cfg: Config) -> None:
+    eng = arp(cfg)
+    names = list(cfg.arp.presets)
+    eng.arp_user = {1: cfg.arp.presets[names[3]], 12: cfg.arp.presets[names[4]]}
+    assert list(eng.arp_bank) == ["U01", *names[1:], "U12"]
+    btn(eng, "PATTERN", t=SECOND)
+    eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)
+    assert eng.arp_preset_shown == "U01" and eng.arp_motif == cfg.arp.presets[names[3]].motif
+    eng.handle(EncoderEvent(5, 99 * cfg.arp.raw_per_choice, 0), 0)
+    assert eng.arp_preset_shown == "U12"
+    other = Engine(cfg)
+    other.arp_user = dict(eng.arp_user)
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert other.arp_preset_shown == "U12"

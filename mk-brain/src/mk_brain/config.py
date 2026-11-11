@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -11,7 +12,6 @@ from pydantic import BaseModel, Field, ValidationError, field_validator, model_v
 from mk_brain.arp import (
     GATE_MAX,
     GATE_MIN,
-    GATE_STEP,
     MAX_OCTAVES,
     MOTIF_NAME_MAX,
     MOTIF_OFF,
@@ -64,6 +64,7 @@ class LedConfig(BaseModel):
     bank: RGB = (255, 255, 255)  # design : LED GROUP de la banque choisie (2026-11-09)
     perform_idle: RGB = (0, 0, 40)  # SOLO : pad hors du groupe, bleu très faible (2026-11-10)
     perform_on: RGB = (0, 255, 0)  # SOLO : pad du groupe, vert vif
+    preset: RGB = (255, 255, 255)  # ARPG, PATTERN tenu : emplacement de preset occupé (slice 14)
 
 
 class AftertouchConfig(BaseModel):
@@ -92,12 +93,15 @@ class PlayConfig(BaseModel):
     tap_debounce_ms: float = Field(150.0, ge=0)  # SOLO, MUTE, SELECT : rebond ignoré
 
 
+PRESET_SLOTS = 16  # un emplacement par pad (slice 14)
+
+
 class ArpPreset(BaseModel):
     """Preset d'arpège (slice 13) : les cinq réglages rappelés d'un coup."""
 
     order: ArpOrder
     octaves: int = Field(ge=1, le=MAX_OCTAVES)
-    gate: int = Field(ge=GATE_MIN, le=GATE_MAX, multiple_of=GATE_STEP)
+    gate: int = Field(ge=GATE_MIN, le=GATE_MAX)
     division: str
     motif: str = MOTIF_OFF
 
@@ -142,8 +146,12 @@ class ArpConfig(BaseModel):
         for name, preset in self.presets.items():
             if not 1 <= len(name) <= MOTIF_NAME_MAX:
                 raise ValueError(f"preset {name!r} : nom de 1 à {MOTIF_NAME_MAX} caractères")
+            if re.fullmatch(r"U\d\d", name):
+                raise ValueError(f"preset {name!r} : U01 à U16 réservés aux presets sauvés")
             if preset.motif != MOTIF_OFF and preset.motif not in self.motifs:
                 raise ValueError(f"preset {name!r} : motif {preset.motif!r} absent de arp.motifs")
+        if len(self.presets) > PRESET_SLOTS:
+            raise ValueError(f"arp.presets : {len(self.presets)} presets, {PRESET_SLOTS} au plus")
         return self
 
     @property

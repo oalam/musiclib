@@ -142,6 +142,7 @@ mk-brain/
 │   ├── project.py                # modèle Pydantic du projet, chargement
 │   ├── selection.py              # liste des projets, dernier joué (6.C)
 │   ├── session.py                # derniers réglages par projet (state/)
+│   ├── presets.py                # banque des presets d'arpège sauvés (state/arp-presets.json)
 │   ├── modes.py                  # bascule live / design
 │   ├── hid_mk2.py                # rapports HID MK2 : parse entrée, LED, écrans
 │   ├── display.py                # Pillow 1 bit → octets écran
@@ -651,7 +652,7 @@ division, motif.
 - **Bibliothèque globale en YAML** : `arp.presets` de
   `config/default.yaml` (8 au départ), à côté des motifs, dans l'ordre du
   fichier ; les mêmes pour tous les projets. Pas d'enregistrement depuis
-  la machine. Nom de 4 caractères au plus.
+  la machine (levé par la slice 14). Nom de 4 caractères au plus.
 - **Rappel par l'encodeur 5, PATTERN tenu** : `PRE`, à la suite de `ORD`,
   `OCT`, `GATE` et `MOT`, même course (`arp.raw_per_choice`), borné. Le
   preset s'applique dès qu'il est affiché, arpège en cours compris.
@@ -680,6 +681,58 @@ dans le preset.
 **Critère de fin** : DT2 lancée, mode `ARPG`, trois pads tenus : faire
 défiler `PRE` change l'arpège à chaque cran, sans note bloquée ; retoucher
 `GATE` affiche `----` ; éteindre et rallumer le Pi retrouve les réglages.
+
+## Slice 14 : banque de 16 presets, sauvés depuis la MK2 (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : mode ARPG, l'arpège réglé à l'oreille (1/16, aller-retour,
+2 octaves, gate 35 %, motif `SYNC`). PATTERN tenu, SHIFT + pad 3 : ces
+réglages sont écrits dans l'emplacement 3, `PRE` affiche `U03`. Plus
+tard, PATTERN tenu, pad 3 : ils reviennent d'un coup.
+
+Demandé le 2026-11-11 après l'essai de la slice 13 (les presets écrits à
+l'estime ne suffisent pas, `TRIB` en tête) : la décision « pas
+d'enregistrement depuis la machine » de la slice 13 est levée.
+
+**Arbitré le 2026-11-11** :
+
+- **Une banque de 16 emplacements, un par pad**, commune à tous les
+  projets.
+- **PATTERN tenu, pad n** : rappel de l'emplacement n. **PATTERN tenu,
+  SHIFT + pad n** : les cinq réglages courants (ordre, octaves, gate,
+  division, motif) sont écrits dans l'emplacement n, sans confirmation.
+- **L'encodeur 5 `PRE` reste** : il fait défiler les emplacements
+  occupés, dans l'ordre des pads.
+- **Fichier `state/arp-presets.json`** sur la machine (hors dépôt, comme
+  les sessions), écrit à chaque sauvegarde. Il ne contient que les
+  emplacements écrits depuis la MK2 ; les autres viennent de
+  `arp.presets` de la config, qui remplit les emplacements 1, 2, 3… dans
+  l'ordre du fichier (16 au plus). Un emplacement sauvé depuis la MK2
+  l'emporte sur celui de la config.
+
+**Tranché à l'écriture, à confirmer à l'essai** :
+
+- **PATTERN tenu, les pads ne jouent plus** : ils n'ajoutent pas de note à
+  l'arpège ; les notes déjà tenues ou maintenues (NOTE REPEAT) continuent.
+  Un rappel ou une sauvegarde compte comme un réglage : le relâché de
+  PATTERN ne sort pas du mode.
+- **Noms** : un emplacement de la config garde son nom (`NAPP`) ; un
+  emplacement sauvé depuis la MK2 s'appelle `U` + son numéro (`U03`). La
+  config ne peut donc pas nommer un preset `U01` à `U16`.
+- **LED des pads, PATTERN tenu** : emplacement occupé faible, emplacement
+  courant (réglages intacts) plein, emplacement vide éteint
+  (`leds.preset`).
+- **Pad d'un emplacement vide** : rien ne change.
+- Un emplacement du fichier dont le motif n'existe plus dans la config
+  est ignoré (celui de la config, s'il y en a un, reprend sa place).
+
+**Hors périmètre** : effacer un emplacement ou revenir à celui de la
+config depuis la MK2 (supprimer la ligne dans `state/arp-presets.json`),
+nommer un preset, banques par projet, copie du fichier du Pi vers le
+dépôt.
+
+**Critère de fin** : régler un arpège, PATTERN + SHIFT + pad 9 ; changer
+tous les réglages ; PATTERN + pad 9 les rend ; éteindre et rallumer le
+Pi, PATTERN + pad 9 les rend encore.
 
 ## Modes : live et design
 
@@ -1473,6 +1526,7 @@ conditionne tout le reste.
 | 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), à essayer sur la DT2 |
 | 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), à essayer sur la DT2 |
 | 13 | **Presets de l'arpège** : bibliothèque `arp.presets` (ordre, octaves, gate, division, motif), rappel par l'encodeur 5 `PRE` PATTERN tenu, `----` dès qu'un réglage s'en écarte | cf. « Slice 13 : presets de l'arpège », critère de fin | codée le 2026-11-11 (v0.35.0), à essayer sur la DT2 |
+| 14 | **Banque de 16 presets** : PATTERN tenu, pad n = rappel, SHIFT + pad n = sauvegarde des réglages courants ; `state/arp-presets.json`, commun aux projets ; la config remplit les emplacements non sauvés | cf. « Slice 14 », critère de fin | codée le 2026-11-11 (v0.36.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

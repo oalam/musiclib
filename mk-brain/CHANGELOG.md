@@ -3,6 +3,26 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.36.0] - 2026-11-11
+
+### Ajouté
+
+- [14] Banque de 16 presets d'arpège, un par pad, PATTERN tenu : un pad
+  rappelle son preset, SHIFT + pad y écrit les réglages courants (ordre,
+  octaves, gate, division, motif) sous le nom `U01` à `U16`. LED : occupé
+  faible, courant plein, vide éteint (`leds.preset`). Les presets sauvés
+  vivent dans `state/arp-presets.json` (`presets.py`), communs à tous les
+  projets, écrits à chaque sauvegarde ; ceux de `arp.presets` remplissent
+  les emplacements non sauvés, dans l'ordre du fichier.
+
+### Modifié
+
+- [14] PATTERN tenu en `ARPG`, les pads n'ajoutent plus de note à
+  l'arpège (ils rappellent ou sauvent un preset). L'encodeur `PRE` fait
+  défiler les emplacements occupés de la banque.
+- [14] `arp.presets` : 16 presets au plus, noms `U01` à `U16` réservés ;
+  le gate d'un preset n'est plus tenu d'être un multiple de 5.
+
 ## [0.35.1] - 2026-11-11
 
 ### Modifié

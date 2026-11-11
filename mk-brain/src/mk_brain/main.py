@@ -204,6 +204,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
     from mk_brain.midi_io import Dt2In, Dt2Out, feed_engine
+    from mk_brain.presets import load_bank, save_bank
     from mk_brain.project import load_project
     from mk_brain.scheduler import Scheduler
     from mk_brain.selection import Selector, list_projects, read_last, write_last
@@ -217,6 +218,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
         return Selector(list_projects(), read_last(), read_sync())
 
     engine = Engine(cfg, clock, project, catalog)
+    engine.arp_user = load_bank(cfg.arp)  # presets sauvés depuis la MK2, avant la session
     name = None if project_path is None else project_path.stem  # session de ce projet
     saved: Session | None = None
     if name is not None and (saved := load_session(name)) is not None:
@@ -299,6 +301,9 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
                 if (saved := load_session(name)) is not None:
                     engine.restore(saved)
                     print(f"session {name} reprise")
+            if engine.arp_bank_dirty:  # preset sauvé : écrit tout de suite, hors session
+                engine.arp_bank_dirty = False
+                save_bank(engine.arp_user)
             if name is not None and now - last_save >= SAVE_EVERY_NS:
                 last_save = now
                 snap = engine.snapshot()
