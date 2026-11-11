@@ -133,6 +133,7 @@ class PitchBend:
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend
 MODIFIERS = ("SELECT", "MUTE")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
+POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # boutons d'écran 1-4 (banque : GROUP)
 PHRASES: tuple[PhraseLength, ...] = (32, 64)
@@ -202,6 +203,9 @@ class Engine:
         self._latched: dict[int, int] = {}  # perform verrouillé : pads allumés → track visée
         self._released_at: dict[int, int] = {}  # SOLO : dernier relâché de chaque pad (rebonds)
         self._bent: set[int] = set()  # tracks dont le pitch bend est hors du centre (SHIFT tenu)
+        self.poweroff_enabled = False  # vrai sous le service du Pi (posé par la CLI)
+        self.poweroff = False  # extinction demandée : la CLI sort de la boucle et éteint
+        self._poweroff_since: int | None = None  # début de l'appui SHIFT + ERASE
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
         self.announce: tuple[str, Bank, int | None] | None = None
@@ -644,6 +648,9 @@ class Engine:
         name = ev.name
         if not ev.pressed:
             self._held_buttons.discard(name)
+            if name in ("SHIFT", "ERASE") and self._poweroff_since is not None:
+                self._poweroff_since = None
+                self.last_control = "power off cancelled"
             if name in MODIFIERS or name.startswith("BROWSE_"):
                 self.leds_dirty = True
             if name == "NOTE_REPEAT":
@@ -653,7 +660,12 @@ class Engine:
                 self.leds_dirty = True
             return
         self._held_buttons.add(name)
-        shift = "SHIFT" in self._held_buttons
+        held = self._held_buttons
+        shift = "SHIFT" in held
+        if self.poweroff_enabled and name in ("SHIFT", "ERASE") and {"SHIFT", "ERASE"} <= held:
+            self._poweroff_since = now
+            self.last_control = "POWER OFF: hold 2 s"
+            return
         if shift and name == "PLAY":
             self._recalibrate(1)
             return
@@ -761,6 +773,9 @@ class Engine:
         if self.announce is not None and self.announce[2] is None:
             self.announce = (self.announce[0], self.announce[1], now)
         self._update_phrase()
+        if self._poweroff_since is not None and now - self._poweroff_since >= POWEROFF_HOLD_NS:
+            self._poweroff_since = None
+            self.poweroff = True
         window = int(self.cfg.velocity.window_ms * 1e6)
         out: list[Timed] = []
         for pad in [p for p, a in self._attacks.items() if now - a.start >= window]:

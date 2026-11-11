@@ -183,16 +183,22 @@ ne démarre pas après un pull revient au commit précédent.
 
 Fichiers dans `deploy/` : `mk-brain.service` (systemd), `sync.sh` (avant
 chaque lancement), `run.sh` (lancement), `stopped.sh` (après chaque arrêt),
+`mk-brain-pull.service` et `pull.sh` (mise à jour à l'arrivée du réseau),
 `99-mk-brain.rules` (udev). État local dans `state/` (ignoré par git),
 statut de synchro dans `/run/mk-brain/sync` (effacé à l'extinction).
 
-1. **Synchro, une fois par démarrage du Pi** (`sync.sh`, repère
-   `/run/mk-brain/pulled`) : `git pull --ff-only` limité à 10 s. Si
-   `pyproject.toml` a changé, `pip install -e .`. Le statut écrit est
-   `sync a1b2c3d`, `offline 2026-11-08` (date du commit local) ou
-   `back a1b2c3d` après un retour arrière. Il s'affiche en haut à droite de
-   l'écran de sélection. Les écrans restent noirs pendant la synchro (au
-   plus 10 s) : pas d'écran « démarrage », le code n'est pas encore lancé.
+1. **Synchro, une fois par démarrage du Pi, sans retarder le jeu** (révisé
+   le 2026-11-11 : le service attendait le réseau, boot en 65,6 s pour un
+   objectif de 30 s). `mk-brain.service` ne dépend plus du réseau et lance
+   la copie locale tout de suite. `mk-brain-pull.service` (oneshot, après
+   `network-online.target`) lance `pull.sh` : `git pull --ff-only` limité
+   à 30 s ; si `mk-brain/` a changé, `pip install -e .` quand
+   `pyproject.toml` a bougé, puis **une relance du service** (coupure de
+   quelques secondes, une trentaine de secondes après le boot). Un commit
+   du reste du dépôt ne relance rien. Sans réseau, rien ne se passe. Le
+   statut écrit est `sync a1b2c3d`, `offline 2026-11-08` (date du commit
+   local) ou `back a1b2c3d` après un retour arrière ; il s'affiche en haut
+   à droite de l'écran de sélection, vide tant que le pull n'a pas eu lieu.
 2. **Lancement** (`run.sh`) : `mk-brain play` reçoit le commit courant dans
    `MKBRAIN_COMMIT`. Dès que la boucle principale tourne, il écrit ce commit
    dans `state/last_good` et remet `state/fails` à zéro : c'est la preuve
@@ -200,14 +206,21 @@ statut de synchro dans `/run/mk-brain/sync` (effacé à l'extinction).
 3. **Échec** : après chaque arrêt en erreur, `stopped.sh` incrémente
    `state/fails`. systemd relance au bout de 3 s. Au lancement suivant,
    `sync.sh` revient à `state/last_good` (`git reset --hard`) si `fails`
-   vaut 2 ou plus **et** que le commit courant diffère de `last_good`. Si le
-   commit courant est déjà `last_good`, la panne vient de l'environnement
+   vaut 2 ou plus **et** que `mk-brain/` diffère de `last_good`. Si le
+   code est celui de `last_good`, la panne vient de l'environnement
    (MK2 ou DT2 débranchée) : on relance sans toucher au code.
 4. **Arrêt propre** : `SIGTERM` (arrêt du service, extinction du Pi) est
    traité comme Ctrl-C : session sauvegardée, LED et écrans éteints.
    Couper le courant sans extinction reste le cas de la scène : la carte SD
    n'est protégée que par la journalisation d'ext4 (système en lecture seule
    hors périmètre tant que le `git pull` au démarrage écrit sur la carte).
+5. **Extinction depuis la MK2** (décidé le 2026-11-11) : **SHIFT + ERASE
+   tenus 2 s**, sous le service du Pi seulement (`MKBRAIN_COMMIT` posé ;
+   sans effet sur le Mac). L'écran affiche `POWER OFF: hold 2 s`, relâcher
+   avant annule. Au bout de 2 s : session sauvegardée, LED éteintes, les
+   écrans gardent `POWER OFF` / `unplug in 15 s` (la MK2 reste alimentée
+   et conserve l'image une fois le Pi arrêté), puis `sudo systemctl
+   poweroff`. Le délai de 15 s est une marge, à confirmer par mesure.
 
 ## Mode unique et pads MPC (slice 8, décidé le 2026-11-09)
 
@@ -1062,6 +1075,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | Encodeur maître | sans effet (sauf avec SWING) | valeur de l'entrée de menu ; appui = valider |
 | SHIFT + CONTROL (1 s) | changer de mode (refusé transport lancé) | changer de mode |
 | SHIFT + BROWSE | sélection de projet (refusé transport lancé) | idem |
+| SHIFT + ERASE (2 s) | extinction du Pi (service seulement) | idem |
 | Autres (PLAY, REC, ERASE, RESTART, STEP, SAMPLING, ALL, AUTO WRITE, SCENE, NAVIGATE, DUPLICATE, SOLO, TEMPO, VOLUME, flèches du maître) | non affectés, LED éteintes | idem |
 
 - **La DT2 reste maître du transport** : PLAY et REC de la MK2 n'envoient

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from mk_brain.boot import COMMIT_ENV, mark_ready, read_sync
+from mk_brain.boot import COMMIT_ENV, in_service, mark_ready, poweroff, read_sync
 
 
 def test_mark_ready_keeps_commit_and_clears_fails(tmp_path: Path) -> None:
@@ -32,3 +32,22 @@ def test_read_sync(tmp_path: Path) -> None:
     assert read_sync(tmp_path / "absent") == ""
     (tmp_path / "sync").write_text("offline 2026-11-08\n")
     assert read_sync(tmp_path / "sync") == "offline 2026-11-08"
+
+
+def test_in_service_follows_commit_env(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv(COMMIT_ENV, raising=False)
+    assert not in_service()
+    monkeypatch.setenv(COMMIT_ENV, "a1b2c3d")
+    assert in_service()
+
+
+def test_poweroff_reports_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[list[str]] = []
+
+    def fake_run(cmd: list[str], **kwargs: object) -> None:
+        calls.append(cmd)
+        raise OSError("sudo absent")
+
+    monkeypatch.setattr("mk_brain.boot.subprocess.run", fake_run)
+    assert not poweroff()
+    assert calls == [["sudo", "systemctl", "poweroff"]]

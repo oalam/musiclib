@@ -3,6 +3,24 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.27.0] - 2026-11-11
+
+### Ajouté
+
+- [7] Extinction propre du Pi depuis la MK2 : SHIFT + ERASE tenus 2 s
+  (sous le service seulement, relâcher avant annule). Session sauvée, LED
+  éteintes, `POWER OFF` / `unplug in 15 s` laissé à l'écran, puis
+  `systemctl poweroff`.
+- [7] `deploy/mk-brain-pull.service` et `deploy/pull.sh` : `git pull` à
+  l'arrivée du réseau, relance du service si `mk-brain/` a changé.
+
+### Modifié
+
+- [7] Le service ne dépend plus du réseau : le jeu démarre avec la copie
+  locale sans attendre (boot mesuré à 65,6 s avec l'attente). `sync.sh`
+  ne fait plus que le retour arrière, décidé sur le contenu de
+  `mk-brain/` et plus sur le commit du dépôt.
+
 ## [0.26.2] - 2026-11-11
 
 ### Corrigé

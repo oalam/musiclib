@@ -179,7 +179,7 @@ def _interrupt(signum: int, frame: object) -> None:
 
 
 def cmd_play(dry_run: bool, project_path: Path | None) -> int:
-    from mk_brain.boot import mark_ready, read_sync
+    from mk_brain.boot import in_service, mark_ready, poweroff, read_sync
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
     from mk_brain.layouts import describe_note
@@ -242,6 +242,7 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )
     signal.signal(signal.SIGTERM, _interrupt)  # arrêt du service : comme Ctrl-C
+    engine.poweroff_enabled = in_service()  # SHIFT + ERASE 2 s : sur le Pi seulement
     try:
         if sched is not None:
             sched.start()
@@ -258,6 +259,9 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
             for hid_ev in decoder.feed(report):
                 emit(engine.handle(hid_ev, now))
             emit(engine.tick(now))
+            if engine.poweroff:
+                print("extinction demandée (SHIFT + ERASE)")
+                break
             if engine.last_control:
                 last = engine.last_control
                 message = (last, now)
@@ -300,8 +304,10 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
             save_session(name, engine.snapshot())
         try:
             dev.send_leds(LedState.off())
-            for s in range(display.N_DISPLAYS):
-                _show(dev, s, display.new_image())
+            # extinction : le message reste affiché, la MK2 garde l'image une fois le Pi arrêté
+            texts = ("POWER OFF", "unplug in 15 s") if engine.poweroff else ("", "")
+            for s, text in enumerate(texts):
+                _show(dev, s, display.big_text_image(text, 28) if text else display.new_image())
         finally:
             dev.close()
             if sched is not None:
@@ -313,6 +319,9 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
     print(f"clock, écart d'arrivée des ticks à la prévision : {clock.prediction_error.summary()}")
     if sched is not None:
         print(f"envoi vs cible : {sched.errors.summary()} ; abandonnés : {sched.dropped}")
+    if engine.poweroff and not poweroff():
+        print("erreur : extinction refusée (sudo systemctl poweroff)", file=sys.stderr)
+        return 1
     return 0
 
 

@@ -1,0 +1,20 @@
+# Mise à jour de mk-brain à l'arrivée du réseau (slice 7, SPEC « Service et
+# retour arrière ») : le jeu a déjà démarré, il n'attend pas ce service.
+# Installation : sudo cp deploy/mk-brain-pull.service /etc/systemd/system/
+#                sudo systemctl daemon-reload && sudo systemctl enable mk-brain-pull
+[Unit]
+Description=mk-brain : git pull quand le réseau est là
+Wants=network-online.target
+After=network-online.target mk-brain.service
+
+[Service]
+Type=oneshot
+User=pi
+WorkingDirectory=/home/pi/musiclib/mk-brain
+RuntimeDirectory=mk-brain
+RuntimeDirectoryPreserve=yes
+ExecStart=/home/pi/musiclib/mk-brain/deploy/pull.sh
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target

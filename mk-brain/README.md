@@ -25,12 +25,15 @@ cd musiclib && git sparse-checkout set mk-brain && git checkout master
 cd mk-brain && python3 -m venv .venv && .venv/bin/pip install -e '.[dev]'
 sudo cp deploy/99-mk-brain.rules /etc/udev/rules.d/
 sudo udevadm control --reload && sudo udevadm trigger
-sudo cp deploy/mk-brain.service /etc/systemd/system/
-sudo systemctl daemon-reload && sudo systemctl enable --now mk-brain
+sudo cp deploy/mk-brain.service deploy/mk-brain-pull.service /etc/systemd/system/
+sudo systemctl daemon-reload && sudo systemctl enable mk-brain-pull
+sudo systemctl enable --now mk-brain
 journalctl -u mk-brain -f        # journal du service
 ```
 
-Au démarrage : `git pull` (10 s au plus), puis `mk-brain play`. Un nouveau
+Au démarrage : `mk-brain play` sans attendre le réseau ; le `git pull` se
+fait à part quand le réseau arrive et relance le service si `mk-brain/` a
+changé. Extinction propre : SHIFT + ERASE tenus 2 s. Un nouveau
 commit qui échoue deux fois revient à `state/last_good` (SPEC « Service et
 retour arrière »).
 

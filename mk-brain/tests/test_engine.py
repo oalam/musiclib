@@ -819,3 +819,37 @@ def test_mute_tap_ignores_release_bounces(cfg: Config) -> None:
     eng.handle(PadEvent(PAD7, False, 0), 210 * MS)
     assert eng.faders.muted[7]
     assert eng.handle(PadEvent(PAD7, True, 2500), 500 * MS) == [(500 * MS, ControlChange(6, 94, 0))]
+
+
+def _hold_shift_erase(eng: Engine, t: int = 0) -> None:
+    eng.handle(ButtonEvent("SHIFT", True), t)
+    eng.handle(ButtonEvent("ERASE", True), t)
+
+
+def test_shift_erase_held_two_seconds_requests_poweroff(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.poweroff_enabled = True
+    _hold_shift_erase(eng)
+    assert eng.last_control == "POWER OFF: hold 2 s"
+    eng.tick(2 * SECOND - 1)
+    assert not eng.poweroff
+    eng.tick(2 * SECOND)
+    assert eng.poweroff
+
+
+def test_shift_erase_released_early_cancels_poweroff(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.poweroff_enabled = True
+    _hold_shift_erase(eng)
+    eng.handle(ButtonEvent("ERASE", False), SECOND)
+    assert eng.last_control == "power off cancelled"
+    eng.tick(3 * SECOND)
+    assert not eng.poweroff
+
+
+def test_shift_erase_ignored_outside_service(cfg: Config) -> None:
+    eng = Engine(cfg)
+    _hold_shift_erase(eng)
+    eng.tick(3 * SECOND)
+    assert not eng.poweroff
+    assert eng.last_control == ""

@@ -226,6 +226,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | Encodeur maître | valeur de l'entrée au focus ; appui = entrée suivante |
 | SHIFT + PLAY | phrase à 1 à la barre suivante |
 | SHIFT + GROUP n | recalage au bloc n |
+| SHIFT + ERASE tenus 2 s | extinction propre du Pi (sur le Pi seulement) ; relâcher avant annule |
 
 PLAY et REC de la MK2 n'envoient ni Start ni Stop : la DT2 reste maître du
 transport. Les boutons sans rôle ont leur LED éteinte.

@@ -6,11 +6,13 @@ commit dans `state/last_good` et efface `state/fails` : `deploy/sync.sh` sait
 alors à quel commit revenir si un code tiré ensuite ne démarre pas.
 `read_sync` lit le statut de synchro écrit par `sync.sh`, affiché sur
 l'écran de sélection. Hors service (Mac, tests), rien n'est écrit ni lu.
+`in_service` ouvre le geste d'extinction (SHIFT + ERASE), `poweroff` éteint le Pi.
 """
 
 from __future__ import annotations
 
 import os
+import subprocess
 from pathlib import Path
 
 STATE_DIR = Path(__file__).resolve().parents[2] / "state"
@@ -38,3 +40,17 @@ def read_sync(path: Path = SYNC_FILE) -> str:
         return path.read_text(encoding="utf-8").strip()[:20]
     except OSError:
         return ""
+
+
+def in_service() -> bool:
+    """Vrai quand `mk-brain play` est lancé par le service du Pi."""
+    return bool(os.environ.get(COMMIT_ENV, ""))
+
+
+def poweroff() -> bool:
+    """Demande l'extinction du Pi (sudo sans mot de passe) ; False si la commande échoue."""
+    try:
+        subprocess.run(["sudo", "systemctl", "poweroff"], check=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return True
