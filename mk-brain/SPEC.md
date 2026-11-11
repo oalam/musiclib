@@ -571,7 +571,7 @@ l'arpège tourne en 1/16 sans flam sur le kick ; changer la division, l'ordre
 et le gate s'entend aussitôt ; en LIVE REC, le pattern relu rejoue les
 mêmes notes ; PATTERN ramène au clavier sans note bloquée.
 
-## Slice 12 : motifs de l'arpège (cadré et codé le 2026-11-11, à essayer)
+## Slice 12 : motifs de l'arpège (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : mode ARPG, division 1/16, pads Bb, Db et F tenus, motif `GALO`
 (`X.xx X.xx X.xx X.xx`). Sur une mesure, la DT2 reçoit Bb accentué,
@@ -637,7 +637,7 @@ motif `GALO` : le silence et les accents s'entendent, calés sur le kick ;
 `LONG` fait entendre des notes tenues ; revenir à `OFF` rend l'arpège
 continu ; en LIVE REC, le pattern relu rejoue le motif.
 
-## Slice 13 : presets de l'arpège (cadré et codé le 2026-11-11, à essayer)
+## Slice 13 : presets de l'arpège (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : mode ARPG, PATTERN tenu, encodeur 5 tourné jusqu'à `RUSH` :
 l'arpège passe d'un coup en 1/32, montant, 3 octaves, gate 30 %, motif
@@ -682,7 +682,7 @@ dans le preset.
 défiler `PRE` change l'arpège à chaque cran, sans note bloquée ; retoucher
 `GATE` affiche `----` ; éteindre et rallumer le Pi retrouve les réglages.
 
-## Slice 14 : banque de 16 presets, sauvés depuis la MK2 (cadré et codé le 2026-11-11, à essayer)
+## Slice 14 : banque de 16 presets, sauvés depuis la MK2 (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : mode ARPG, l'arpège réglé à l'oreille (1/16, aller-retour,
 2 octaves, gate 35 %, motif `SYNC`). PATTERN tenu, SHIFT + pad 3 : ces
@@ -734,7 +734,7 @@ dépôt.
 tous les réglages ; PATTERN + pad 9 les rend ; éteindre et rallumer le
 Pi, PATTERN + pad 9 les rend encore.
 
-## Slice 15 : accords de l'arpège (cadré et codé le 2026-11-11, à essayer)
+## Slice 15 : accords de l'arpège (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : banque C (la# éolien), mode ARPG, `CHD` sur `TRI`. Un seul pad
 tenu, la# : l'arpège joue la# réb fa. Le pad réb à la place : réb fa lab.
@@ -1574,10 +1574,10 @@ conditionne tout le reste.
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
 | 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0) ; seuils réglés sur mesure le 2026-11-11 (v0.30.3), à essayer avec un preset DT2 qui assigne l'aftertouch |
 | 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), à essayer sur la DT2 |
-| 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), à essayer sur la DT2 |
-| 13 | **Presets de l'arpège** : bibliothèque `arp.presets` (ordre, octaves, gate, division, motif), rappel par l'encodeur 5 `PRE` PATTERN tenu, `----` dès qu'un réglage s'en écarte | cf. « Slice 13 : presets de l'arpège », critère de fin | codée le 2026-11-11 (v0.35.0), à essayer sur la DT2 |
-| 14 | **Banque de 16 presets** : PATTERN tenu, pad n = rappel, SHIFT + pad n = sauvegarde des réglages courants ; `state/arp-presets.json`, commun aux projets ; la config remplit les emplacements non sauvés | cf. « Slice 14 », critère de fin | codée le 2026-11-11 (v0.36.0), à essayer sur la DT2 |
-| 15 | **Accords de l'arpège** : encodeur 6 `CHD` PATTERN tenu (`OFF`, `TRI`, `7TH`, `SUS2`, `SUS4`, `PWR`), un pad = un accord pris dans la gamme de la banque, gardé dans les presets | cf. « Slice 15 », critère de fin | codée le 2026-11-11 (v0.37.0), à essayer sur la DT2 |
+| 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 13 | **Presets de l'arpège** : bibliothèque `arp.presets` (ordre, octaves, gate, division, motif), rappel par l'encodeur 5 `PRE` PATTERN tenu, `----` dès qu'un réglage s'en écarte | cf. « Slice 13 : presets de l'arpège », critère de fin | codée le 2026-11-11 (v0.35.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 14 | **Banque de 16 presets** : PATTERN tenu, pad n = rappel, SHIFT + pad n = sauvegarde des réglages courants ; `state/arp-presets.json`, commun aux projets ; la config remplit les emplacements non sauvés | cf. « Slice 14 », critère de fin | codée le 2026-11-11 (v0.36.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 15 | **Accords de l'arpège** : encodeur 6 `CHD` PATTERN tenu (`OFF`, `TRI`, `7TH`, `SUS2`, `SUS4`, `PWR`), un pad = un accord pris dans la gamme de la banque, gardé dans les presets | cf. « Slice 15 », critère de fin | codée le 2026-11-11 (v0.37.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
