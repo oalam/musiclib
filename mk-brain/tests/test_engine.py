@@ -299,16 +299,6 @@ def test_mute_pad_sends_cc94(cfg: Config) -> None:
     assert eng.leds().pads[PAD1] == (0, 0, 0)  # muté : éteint pendant MUTE
 
 
-def test_pattern_button_unassigned(cfg: Config) -> None:
-    """Slice 9 : la DT2 seule change de pattern ; PATTERN + pad joue, sans PC."""
-    eng = Engine(cfg)
-    btn(eng, "GROUP_B")  # GROUP seul : banque B, sans envoi
-    assert eng.bank == 1 and eng.last_control == "bank B"
-    btn(eng, "PATTERN")
-    assert press(eng, 0, pad=PAD7) == [(3 * MS, NoteOn(2, 61, 127))]  # SD2 : T3 / 61
-    assert eng.leds().buttons.get("PATTERN", 0) == 0  # non affecté : éteint
-
-
 def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     from mk_brain.engine import ControlChange
 
@@ -938,3 +928,127 @@ def test_keyboard_aftertouch_takes_strongest_pad(cfg: Config) -> None:
     out = eng.handle(PadEvent(PAD7, False, 0), late + 40 * MS)  # reste le pad le plus léger
     values = [m.value for _, m in out if isinstance(m, Aftertouch)]
     assert values == [round(127 / 4)]
+
+
+# --- slice 11 : arpégiateur ----------------------------------------------------
+
+
+def _index(pad: int) -> int:
+    """Index HID du pad imprimé `pad`."""
+    return next(i for i in range(16) if pad_label(i) == pad)
+
+
+def arp(cfg: Config, clock: ClockTracker | None = None) -> Engine:
+    """Moteur en mode ARPG (PATTERN), horloge lancée par défaut."""
+    eng = Engine(cfg, clock or running_clock(80))
+    btn(eng, "PATTERN")
+    btn(eng, "PATTERN", False)
+    return eng
+
+
+def _ons(out: list[Timed]) -> list[int]:
+    return [m.note for _, m in out if isinstance(m, NoteOn)]
+
+
+def test_pattern_toggles_arpg_and_pad_mode_leaves_to_mpc(cfg: Config) -> None:
+    eng = arp(cfg)
+    assert eng.mode_name == "ARPG" and eng.keyboard and eng.arp_menu
+    assert eng.leds().buttons["PATTERN"] == LED_MAX
+    btn(eng, "PATTERN")
+    assert eng.mode_name == "KEYS" and not eng.arp_menu
+    assert 0 < eng.leds().buttons["PATTERN"] < LED_MAX
+    btn(eng, "PATTERN")
+    btn(eng, "PAD_MODE")
+    assert eng.mode_name == "MPC" and not eng.arp
+
+
+def test_arp_plays_held_pads_one_per_division(cfg: Config) -> None:
+    """Trois pads tenus : montant, une note par double croche, note off à mi-division."""
+    eng = arp(cfg)
+    pads = [_index(p) for p in (1, 3, 5)]
+    notes = [eng.target(p)[1] for p in (1, 3, 5)]
+    t = 13 * TICK  # 1 tick après le 12 : première note tout de suite
+    first = press(eng, t, pad=pads[0])
+    assert first == [
+        (t + 3 * MS, NoteOn(0, notes[0], 127)),
+        (pytest.approx(15 * TICK, abs=MS // 100), NoteOff(0, notes[0])),
+    ]
+    assert _ons(press(eng, t, pad=pads[1]) + press(eng, t, pad=pads[2])) == []  # pas d'accord
+    played: list[tuple[float, int]] = []
+    for k in (18, 24, 30, 36):
+        out = eng.tick(k * TICK - 10 * MS)
+        played += [(tt / TICK, m.note) for tt, m in out if isinstance(m, NoteOn)]
+    assert [n for _, n in played] == [notes[1], notes[2], notes[0], notes[1]]
+    assert [pos for pos, _ in played] == pytest.approx([18, 24, 30, 36], abs=0.01)
+
+
+def test_arp_release_stops_and_hold_keeps(cfg: Config) -> None:
+    eng = arp(cfg)
+    a, b = _index(1), _index(3)
+    press(eng, 13 * TICK, pad=a)
+    eng.handle(PadEvent(a, False, 0), 14 * TICK)
+    assert eng.tick(18 * TICK) == []  # relâché, sans maintien : l'arpège s'arrête
+    btn(eng, "NOTE_REPEAT")  # maintien
+    assert eng.arp_hold and not eng.repeat_active
+    assert eng.leds().buttons["NOTE_REPEAT"] == LED_MAX
+    press(eng, 19 * TICK, pad=a)
+    eng.handle(PadEvent(a, False, 0), 20 * TICK)
+    note_a, note_b = eng.target(1)[1], eng.target(3)[1]
+    assert _ons(eng.tick(24 * TICK - 10 * MS)) == [note_a]  # tient pad relâché
+    press(eng, 25 * TICK, pad=b)  # aucun pad tenu : la nouvelle note remplace
+    assert _ons(eng.tick(30 * TICK - 10 * MS) + eng.tick(36 * TICK - 10 * MS)) == [note_b, note_b]
+    btn(eng, "NOTE_REPEAT", False)
+    btn(eng, "NOTE_REPEAT")  # maintien coupé, pad b encore tenu : il reste
+    assert _ons(eng.tick(42 * TICK - 10 * MS)) == [note_b]
+    eng.handle(PadEvent(b, False, 0), 43 * TICK)
+    assert eng.tick(48 * TICK) == []
+
+
+def test_arp_gate_full_ends_before_next_note(cfg: Config) -> None:
+    eng = arp(cfg)
+    eng.arp_gate = 100
+    out = press(eng, 13 * TICK, pad=_index(1))
+    off = next(t for t, m in out if isinstance(m, NoteOff))
+    assert off == pytest.approx(18 * TICK - NOTE_OFF_MIN_NS, abs=MS // 100)
+
+
+def test_arp_needs_running_transport_and_stops_with_it(cfg: Config) -> None:
+    eng = arp(cfg, ClockTracker())  # transport arrêté : le clavier joue
+    note = eng.target(1)[1]
+    assert press(eng, 0, pad=_index(1)) == [(3 * MS, NoteOn(0, note, 127))]
+    eng = arp(cfg)
+    btn(eng, "NOTE_REPEAT")
+    press(eng, 13 * TICK, pad=_index(1))
+    eng.on_stop()
+    assert eng.tick(18 * TICK) == []
+
+
+def test_arp_page_encoders_and_division_buttons(cfg: Config) -> None:
+    eng = arp(cfg)
+    step = cfg.encoders.raw_per_step
+    assert eng.handle(EncoderEvent(2, step, 0), 0) == [] and eng.arp_octaves == 2
+    eng.handle(EncoderEvent(2, 5 * step, 0), 0)
+    assert eng.arp_octaves == 3  # borné
+    eng.handle(EncoderEvent(3, -step, 0), 0)
+    assert eng.arp_gate == 45 and eng.last_control == "ARP GATE 45%"
+    eng.handle(EncoderEvent(1, 3 * step, 0), 0)
+    assert eng.arp_order == "played"
+    assert eng.handle(EncoderEvent(5, step, 0), 0) == []  # encodeurs 4-8 libres sur la page ARP
+    btn(eng, "DISPLAY_2")
+    assert eng.division == "1/8"
+    btn(eng, "BROWSE_RIGHT")  # page de son 1 : les encodeurs envoient de nouveau
+    assert not eng.arp_menu and eng.last_control == "page 1/2"
+    assert eng.handle(EncoderEvent(1, step, 0), 0) != []
+    btn(eng, "BROWSE_LEFT")
+    assert eng.arp_menu and eng.last_control == "page ARP"
+
+
+def test_arp_settings_survive_the_session(cfg: Config) -> None:
+    eng = arp(cfg)
+    eng.arp_order, eng.arp_octaves, eng.arp_gate, eng.division = "updown", 2, 80, "1/8T"
+    other = Engine(cfg)
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert (other.arp_order, other.arp_octaves, other.arp_gate) == ("updown", 2, 80)
+    assert other.division == "1/8T" and not other.arp
+    other.restore(Session(arp_order="zigzag", arp_octaves=9, arp_gate=0, division="1/5"))
+    assert (other.arp_order, other.arp_octaves, other.arp_gate) == ("updown", 2, 80)

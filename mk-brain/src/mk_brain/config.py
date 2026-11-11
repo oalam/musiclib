@@ -8,6 +8,8 @@ from typing import Annotated, Literal
 import yaml
 from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 
+from mk_brain.arp import GATE_MAX, GATE_MIN, MAX_OCTAVES, ArpOrder
+
 DEFAULT_CONFIG = Path(__file__).resolve().parents[2] / "config" / "default.yaml"
 
 Byte = Annotated[int, Field(ge=0, le=255)]
@@ -78,6 +80,14 @@ class PlayConfig(BaseModel):
     phrase: Literal[32, 64] = 32  # longueur de phrase sans banque du projet (6.B)
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
     tap_debounce_ms: float = Field(150.0, ge=0)  # SOLO, MUTE, SELECT : rebond ignoré
+
+
+class ArpConfig(BaseModel):
+    """Arpégiateur (slice 11) : réglages de départ ; modifiables à la MK2, jamais réécrits."""
+
+    order: ArpOrder = "up"
+    octaves: int = Field(1, ge=1, le=MAX_OCTAVES)
+    gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
 
 
 PITCH_BEND = 128  # identifiant du pitch bend parmi les paramètres (hors des CC 0-127)
@@ -169,6 +179,7 @@ class Config(BaseModel):
     aftertouch: AftertouchConfig = AftertouchConfig()
     leds: LedConfig = LedConfig()
     play: PlayConfig = PlayConfig()
+    arp: ArpConfig = ArpConfig()
     encoders: EncodersConfig
     roles: Roles
     families: dict[Family, RGB]

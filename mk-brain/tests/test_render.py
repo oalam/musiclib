@@ -225,3 +225,19 @@ def test_font_cache_keeps_the_same_pixels() -> None:
         assert d.textlength("PHR 01", font=font) == d.textlength("PHR 01", font=cached)
     assert images[0] == images[1] == images[2]
     assert any(key[:2] == ("getmask2", "PHR 01") for key in cached._cache)  # type: ignore[union-attr]
+
+
+def test_arp_menu_shows_divisions_and_settings(cfg: Config) -> None:
+    """Page ARP : divisions en haut des deux écrans, ORD / OCT / GATE sur le gauche ;
+    une page de son ramène le bandeau habituel."""
+    eng = Engine(cfg)
+    keys = render.left(eng, 0).tobytes()
+    eng.handle(ButtonEvent("PATTERN", True), 0)
+    menu = render.left(eng, 0)
+    assert menu.tobytes() != keys
+    before = menu.crop((0, render.BAND + 1, WIDTH, HEIGHT)).tobytes()
+    eng.arp_octaves = 3
+    assert render.left(eng, 0).crop((0, render.BAND + 1, WIDTH, HEIGHT)).tobytes() != before
+    top = render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes()
+    eng.handle(ButtonEvent("BROWSE_RIGHT", True), 0)
+    assert render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes() != top

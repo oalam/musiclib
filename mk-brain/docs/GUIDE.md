@@ -215,7 +215,35 @@ restent ceux du MPC, encadrés ; une frappe montre sa note et son degré
   n'a plus de bandeau : l'entrée choisie et sa valeur passent 1,5 s dans
   le bandeau gauche.
 
-## 10. Enregistrer sur la DT2
+## 10. L'arpégiateur (PATTERN)
+
+**PATTERN** ouvre le mode `ARPG` : le clavier de la track sélectionnée,
+mais les pads tenus ne sonnent plus en accord, ils sont joués un par un,
+une note par division, calés sur l'horloge de la DT2. Transport arrêté, il
+n'y a pas d'arpège : les pads jouent comme au clavier.
+
+![Mode ARPG, page ARP : divisions en haut, ORD, OCT et GATE](img/13-arpege.png)
+
+- **Boutons d'écran 1-8** : la division (1/4 à 1/64), comme le note repeat.
+- **Encodeurs 1-3, page ARP** : `ORD` (UP montant, DOWN descendant,
+  UPDN aller-retour, PLAY ordre d'appui, RAND aléatoire), `OCT` (1 à 3
+  octaves), `GATE` (durée de chaque note, 10 à 100 % de la division).
+- **BROWSE ◀ ▶** : la page ARP est en tête des pages de son. Sur une page
+  de son, le bandeau habituel revient (pattern, mutes, compteur) et les
+  encodeurs règlent la track pendant que l'arpège joue ; les boutons
+  d'écran restent les divisions.
+- **Pression** : appuyer plus fort sur un pad accentue sa note.
+- **NOTE REPEAT** : maintien (LED allumée). L'arpège continue pads
+  relâchés ; frapper un pad alors qu'aucun n'est tenu remplace les notes,
+  en frapper un pendant qu'un autre est tenu l'ajoute. Pour un nouvel
+  accord, poser les pads et les tenir un instant avant de relâcher.
+- **Sortir** : PATTERN revient au clavier, PAD MODE au kit MPC ; l'arpège
+  et son maintien s'arrêtent.
+
+La DT2 reçoit des notes ordinaires : en LIVE REC, l'arpège s'enregistre
+dans le pattern de la track.
+
+## 11. Enregistrer sur la DT2
 
 1. **GRID → off** : la DT2 quantize l'enregistrement elle-même.
 2. Sur la DT2 : `[RECORD] + [PLAY]` (LIVE REC).
@@ -226,7 +254,7 @@ les notes envoyées sur le canal d'une track qui n'est pas la track active
 s'enregistrent-elles ? Et la tranche jouée en MPC ? En attendant, le plus
 sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 
-## 11. Aide-mémoire
+## 12. Aide-mémoire
 
 | Geste | Effet |
 |---|---|
@@ -243,6 +271,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | GRID | quantize off / 1/16 / 1/8 |
 | SWING + maître | swing |
 | NOTE REPEAT (+ SHIFT) | repeat tenu (verrouillé) ; boutons d'écran = division |
+| PATTERN | mode ARPG ↔ clavier : pads tenus arpégés ; boutons d'écran = division, encodeurs 1-3 = ORDER, OCT, GATE, NOTE REPEAT = maintien |
 | Boutons d'écran 1-4 | focus du menu GAMME, TRACK, QUANT, PHRASE |
 | Encodeur maître | valeur de l'entrée au focus ; appui = entrée suivante |
 | SHIFT + PLAY | phrase à 1 à la barre suivante |

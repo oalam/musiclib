@@ -33,6 +33,11 @@ play:
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
   tap_debounce_ms: 150       # SOLO, MUTE, SELECT + pad : un pad relâché depuis moins de 150 ms ne rebascule pas
 
+arp:                        # mode ARPG (PATTERN) : réglages de départ, page ARP des encodeurs
+  order: up                  # up, down, updown, played (ordre d'appui), random
+  octaves: 1                 # 1 à 3
+  gate: 50                   # durée d'une note, 10 à 100 % de la division
+
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le
 # même jour puis le 2026-11-10 (page 1 grain et envois, page 2 filtre et modulations) ; les flèches cyclent dans les deux sens.

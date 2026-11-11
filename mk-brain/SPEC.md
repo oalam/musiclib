@@ -410,7 +410,8 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
     temps, transport lancé ; éteinte à l'arrêt (elle ne pulsait que sur le
     1 de la mesure).
 - **PATTERN non affecté** : la DT2 seule change de pattern. PATTERN + pad
-  joue le pad comme sans modificateur ; LED PATTERN éteinte. Le prochain
+  joue le pad comme sans modificateur ; LED PATTERN éteinte (slice 11 :
+  PATTERN devient l'entrée du mode `ARPG`). Le prochain
   pattern affiché (`> E07`) ne vient plus que de la DT2.
 - **LED GROUP** : transport arrêté, seule la banque courante (PC reçu ou
   GROUP seul) est allumée, en `leds.bank` ; les autres éteintes. Transport
@@ -492,6 +493,73 @@ La pression d'un pad tenu module sa track : la MK2 la mesure en continu
 **Critère de fin** : sur la DT2, un preset dont l'aftertouch ouvre le
 filtre ; frapper le pad ne change pas le timbre, appuyer plus fort en le
 tenant l'ouvre, relâcher le referme.
+
+## Slice 11 : arpégiateur (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : mode ARPG, track 10, division 1/16, ordre montant, 2 octaves.
+Les pads Bb, Db et F tenus jouent Bb3 Db4 F4 Bb4 Db5 F5 en boucle, une
+note par double croche, calée sur l'horloge de la DT2. Appuyer plus fort
+sur un pad accentue sa note.
+
+**Arbitré le 2026-11-11** :
+
+- **Un mode à part, `ARPG`, sur le bouton PATTERN** (libre depuis la
+  slice 9). Il s'ajoute à `MPC`, `KEYS` et `SOLO` ; l'étiquette du mode
+  affiche `ARPG`, la LED PATTERN est allumée.
+- **Pads** : le clavier de `KEYS` (gamme de la banque, track sélectionnée,
+  octave par les flèches de transport). Les pads tenus ne sonnent pas en
+  accord : ils forment l'arpège. L'arpège **remplace** donc le repeat
+  d'accord ; pas de NOTE REPEAT d'accord dans ce mode.
+- **Réglages par menus contextuels**, propres au mode : les 8 boutons
+  au-dessus des écrans et les encodeurs changent de rôle tant que `ARPG`
+  est actif, et retrouvent le leur à la sortie.
+- **La DT2 reçoit l'arpège comme des notes ordinaires** (note on, vélocité,
+  note off à la durée du gate) sur le canal de la track : il s'entend, et
+  s'enregistre en LIVE REC comme n'importe quelle frappe. Les CC des
+  encodeurs partent comme d'habitude et s'enregistrent en p-locks.
+- **Durée des notes (gate) réglable**, valeur de départ dans
+  `config/default.yaml` (`arp.gate`).
+
+**Validé le 2026-11-11** (repris du NOTE REPEAT quand c'est possible) :
+
+- **Moteur** : celui du repeat (divisions, grille d'horloge, swing, envoi
+  planifié). Première note sur la division la plus proche, puis une note
+  par division. **Transport arrêté : pas d'arpège**, les pads jouent comme
+  en `KEYS` (le Pi n'a pas d'horloge à lui).
+- **Vélocité** de chaque note = pression courante de son pad, comme le
+  repeat ; pas d'aftertouch pendant l'arpège.
+- **8 boutons d'écran** : les 8 divisions du repeat, tant que le mode est
+  actif. Elles s'affichent en haut des écrans, la choisie inversée, **sur
+  la page `ARP` seulement** : sur une page de son, le bandeau habituel
+  revient (pattern, mutes, compteur de phrases), sinon le compte à rebours
+  de la phrase serait perdu pendant tout l'arpège (écart à la proposition
+  « en permanence », choisi au codage, à confirmer). Le menu GAMME, TRACK,
+  QUANT, PHRASE n'a plus ses boutons d'écran en `ARPG` ; l'encodeur maître
+  règle toujours l'entrée au focus.
+- **Encodeurs** : une page `ARP` s'ajoute en tête des pages de la track ;
+  BROWSE ◀ ▶ passe aux pages de son habituelles, pour tourner le filtre
+  pendant que l'arpège joue. Page `ARP` : `ORD` (montant, descendant,
+  aller-retour, ordre d'appui, aléatoire), `OCT` (1 à 3), `GATE` (10 à
+  100 % de la division). Les 5 autres encodeurs de la page restent libres.
+- **Maintien** : NOTE REPEAT bascule le maintien (LED allumée). Maintenu,
+  l'arpège continue pads relâchés ; un nouvel appui, tous pads relâchés,
+  remplace les notes ; un appui pendant qu'un pad est tenu en ajoute.
+  Limite connue : un accord tapé très bref (pads relâchés avant la fin de
+  la fenêtre de vélocité) ne garde que sa dernière note.
+- **Entrée et sortie** : PATTERN bascule (un appui entre, un appui sort
+  vers `KEYS`) ; PAD MODE sort aussi, vers `MPC`. La sortie coupe
+  l'arpège et son maintien, note off envoyé.
+- **Réglages gardés** dans la session (ordre, octaves, gate, division),
+  valeurs de départ dans `arp:` de `config/default.yaml`.
+
+**Hors périmètre** : motifs rythmiques (silences, liaisons, ratchets),
+accords plaqués, arpège en `MPC`, plusieurs arpèges à la fois, horloge
+interne au Pi.
+
+**Critère de fin** : DT2 lancée à 143 BPM, mode `ARPG`, trois pads tenus :
+l'arpège tourne en 1/16 sans flam sur le kick ; changer la division, l'ordre
+et le gate s'entend aussitôt ; en LIVE REC, le pattern relu rejoue les
+mêmes notes ; PATTERN ramène au clavier sans note bloquée.
 
 ## Modes : live et design
 
@@ -1277,6 +1345,7 @@ conditionne tout le reste.
 | 6 | **Projets** : front matter `mkbrain:` dans la doctrine solaris, `convert`, `projects/solaris.yaml`, écran de sélection, contexte suivi par Program Change | changer de pattern sur la DT2 change banque, gamme et phrase sur la MK2 | **faite, close le 2026-11-09** : 6.A front matter et `convert` ; 6.B contexte suivi par PC ; 6.C sélection de projet ; en plus, à l'essai : session par projet, mutes DT2 (1 = muté), design qui suit la banque de la DT2 et cale la disposition sur son mode, pattern en gros, GROUP choisi en blanc, pages d'encodeurs réordonnées et flèches en boucle. Noms de samples reportés (question 15). Reste à essayer : sélection de projet et reprise de session |
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
 | 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0) ; seuils réglés sur mesure le 2026-11-11 (v0.30.3), à essayer avec un preset DT2 qui assigne l'aftertouch |
+| 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

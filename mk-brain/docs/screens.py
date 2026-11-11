@@ -214,6 +214,20 @@ def perform(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     return eng, now + 3 * SECOND, True
 
 
+def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
+    eng = Engine(cfg, ClockTracker(), project)
+    now = running(eng, 12, program=4 * 16 + 2)
+    btn(eng, "SELECT", t=now)
+    hit(eng, 10, now)  # track 10 pour l'arpège
+    eng.handle(PadEvent(_index(10), False, 0), now)
+    btn(eng, "SELECT", False, t=now)
+    btn(eng, "PATTERN", t=now)
+    eng.handle(EncoderEvent(2, cfg.encoders.raw_per_step, 0), now)  # OCT 2
+    for pad in (1, 3, 5):
+        hit(eng, pad, now)
+    return eng, now + 3 * SECOND, True
+
+
 SCENES: dict[str, Scene] = {
     "01-selection": selection,
     "02-mpc-arret": live_stopped,
@@ -227,6 +241,7 @@ SCENES: dict[str, Scene] = {
     "10-clavier-chromatique": design_chroma,
     "11-clavier-gamme": design_scale,
     "12-perform": perform,
+    "13-arpege": arpeggio,
 }
 
 

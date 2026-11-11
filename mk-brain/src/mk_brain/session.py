@@ -43,6 +43,10 @@ class Session(BaseModel):
     page: int = Field(0, ge=0)
     faders: list[FaderValue] = []
     muted: list[int] = []  # tracks mutées (affichage seulement)
+    division: str | None = None  # division du repeat et de l'arpège
+    arp_order: str | None = None  # arpégiateur (slice 11) ; hors bornes : valeur de la config
+    arp_octaves: int | None = None
+    arp_gate: int | None = None
 
 
 def session_path(project: str, directory: Path = STATE_DIR) -> Path:

@@ -3,6 +3,26 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.32.0] - 2026-11-11
+
+### Ajouté
+
+- [11] Arpégiateur : mode `ARPG` sur le bouton PATTERN. Les pads tenus du
+  clavier sont joués un par un, une note par division, sur l'horloge de
+  la DT2 ; vélocité par la pression de chaque pad. Boutons d'écran =
+  division ; page `ARP` des encodeurs en tête des pages de son (`ORD`
+  up, down, updown, played, random ; `OCT` 1 à 3 ; `GATE` 10 à 100 %) ;
+  NOTE REPEAT = maintien ; PATTERN sort vers le clavier, PAD MODE vers le
+  MPC. Transport arrêté : pas d'arpège.
+- [11] `arp:` dans `config/default.yaml` (valeurs de départ) ; ordre,
+  octaves, gate et division gardés dans la session.
+- Guide : section « L'arpégiateur », capture `13-arpege.png`.
+
+### Modifié
+
+- [9] LED PATTERN : atténuée hors `ARPG`, pleine en `ARPG` (elle était
+  éteinte, le bouton n'avait pas de rôle).
+
 ## [0.31.0] - 2026-11-11
 
 ### Modifié

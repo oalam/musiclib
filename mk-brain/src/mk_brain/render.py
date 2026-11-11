@@ -177,7 +177,8 @@ def _announce_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
 
 
 def _showing_repeat(engine: Engine) -> bool:
-    return engine.repeat_active and (engine.repeat_held or engine.repeating)
+    """Divisions en haut des écrans : NOTE REPEAT en cours, ou menu de l'arpège (page ARP)."""
+    return engine.arp_menu or (engine.repeat_active and (engine.repeat_held or engine.repeating))
 
 
 def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
@@ -404,12 +405,31 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
             d.point(dots, fill=1 - ink if x <= done else ink)
 
 
+def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:
+    """Page ARP : ORDER, OCT et GATE au-dessus des encodeurs 1-3, en toutes lettres."""
+    small = _font(SMALL)
+    for k, (name, value) in enumerate(engine.arp_view()):
+        if k // COLS != screen:
+            continue
+        x = k % COLS * COL
+        ink = 1
+        if k == touched:
+            d.rectangle((x, BAND + 1, x + COL - 2, HEIGHT - 1), fill=1)
+            ink = 0
+        _centered(d, (x + 2, BAND + 1, x + 26, HEIGHT - 1), name, small, ink)
+        box = (x + 30, BAND + 1, x + COL - 4, HEIGHT - 1)
+        _centered(d, box, value, _fit(d, value, box[2] - box[0], (12, 10)), ink)
+
+
 def _faders(d: ImageDraw.ImageDraw, engine: Engine, now: int, screen: int) -> None:
     """Les 4 faders au-dessus des encodeurs de cet écran."""
     small = _font(SMALL)
     touched = None
     if engine.last_touch is not None and now - engine.last_touch[1] < OVERLAY_NS:
         touched = engine.last_touch[0] - 1
+    if engine.arp_menu:
+        _arp_faders(d, engine, touched, screen)
+        return
     page = engine.cfg.encoders.pages[engine.faders.page_index]
     views = engine.faders.view(engine.fader_track)
     for i in range(COLS):

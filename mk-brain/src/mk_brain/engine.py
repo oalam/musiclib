@@ -53,9 +53,21 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
 
 from __future__ import annotations
 
+import math
+import random
 from collections.abc import Callable
 from dataclasses import dataclass
 
+from mk_brain.arp import (
+    GATE_MAX,
+    GATE_MIN,
+    GATE_STEP,
+    MAX_OCTAVES,
+    ORDER_LABELS,
+    ORDERS,
+    ArpOrder,
+)
+from mk_brain.arp import sequence as arp_sequence
 from mk_brain.clock import ClockTracker
 from mk_brain.config import PITCH_BEND, RGB, Config, Layout
 from mk_brain.faders import Faders
@@ -161,6 +173,13 @@ class _Repeat:
     next_pos: float
 
 
+@dataclass
+class _ArpNote:
+    channel: int
+    note: int
+    velocity: int  # dernière vélocité jouée : celle des notes maintenues, pad relâché
+
+
 class Engine:
     def __init__(
         self,
@@ -184,6 +203,16 @@ class Engine:
         self.division: str = cfg.play.repeat
         self.repeat_held = False
         self.repeat_locked = False
+        self.arp = False  # mode ARPG (PATTERN) : les pads tenus du clavier sont arpégés
+        self.arp_page = False  # page ARP des encodeurs affichée (BROWSE : pages de son)
+        self.arp_order: ArpOrder = cfg.arp.order
+        self.arp_octaves = cfg.arp.octaves
+        self.arp_gate = cfg.arp.gate
+        self.arp_hold = False  # maintien (NOTE REPEAT) : l'arpège continue pads relâchés
+        self._arp_notes: dict[int, _ArpNote] = {}  # pad → note, dans l'ordre d'appui
+        self._arp_pos: float | None = None  # position (ticks) de la prochaine note
+        self._arp_step = 0
+        self._rng = random.Random()
         self._held_buttons: set[str] = set()
         self._attacks: dict[int, _Attack] = {}  # pad 1-16 → attaque en cours de mesure
         self._sounding: dict[int, tuple[int, int, int]] = {}  # pad → (canal, note, instant du on)
@@ -224,11 +253,14 @@ class Engine:
 
     @property
     def mode_name(self) -> str:
-        """Mode courant, toujours affiché : MUTE ou SELECT tenu, SOLO, sinon KEYS ou MPC."""
+        """Mode courant, toujours affiché : MUTE ou SELECT tenu, SOLO, ARPG, sinon KEYS
+        ou MPC."""
         for name in MODIFIERS:  # tenu : le pad commande, comme les LED
             if name in self._held_buttons:
                 return name
-        return "SOLO" if self.perform_lock else "KEYS" if self.keyboard else "MPC"
+        if self.perform_lock:
+            return "SOLO"
+        return "ARPG" if self.arp else "KEYS" if self.keyboard else "MPC"
 
     @property
     def keyboard(self) -> bool:
@@ -285,7 +317,21 @@ class Engine:
 
     @property
     def repeat_active(self) -> bool:
-        return self.repeat_held or self.repeat_locked
+        """NOTE REPEAT tenu ou verrouillé ; jamais en ARPG, où l'arpège le remplace."""
+        return not self.arp and (self.repeat_held or self.repeat_locked)
+
+    @property
+    def arp_menu(self) -> bool:
+        """Menu de l'arpège à l'écran : mode ARPG et page ARP des encodeurs."""
+        return self.arp and self.arp_page
+
+    def arp_view(self) -> list[tuple[str, str]]:
+        """Page ARP des encodeurs 1-3 : (abrégé, valeur affichée)."""
+        return [
+            ("ORD", ORDER_LABELS[self.arp_order]),
+            ("OCT", str(self.arp_octaves)),
+            ("GATE", f"{self.arp_gate}%"),
+        ]
 
     # --- entrées ------------------------------------------------------------
 
@@ -322,7 +368,11 @@ class Engine:
     def _encoder(self, index: int, delta: int, now: int) -> list[Timed]:
         """CC sur le canal de la track sélectionnée ; la 16 est l'AUTO CHANNEL, donc la
         track active de la DT2 (p-locks en LIVE REC). En perform : sur les tracks des pads
-        du groupe SOLO. PB seulement SHIFT tenu, au centre au relâché de SHIFT."""
+        du groupe SOLO. PB seulement SHIFT tenu, au centre au relâché de SHIFT.
+        Page ARP du mode ARPG : réglages de l'arpège, rien n'est envoyé."""
+        if self.arp_menu:
+            self._arp_turn(index, delta, now)
+            return []
         if self.faders.page[index - 1][1] == PITCH_BEND and "SHIFT" not in self._held_buttons:
             self.last_control = "PB: hold SHIFT"
             return []
@@ -341,6 +391,106 @@ class Engine:
         if param == PITCH_BEND:
             self._bent.add(self.track)
         return [(now, self._param_out(channel, param, value))]
+
+    # --- arpégiateur : mode ARPG (slice 11) -------------------------------------
+
+    def _toggle_arp(self) -> None:
+        """PATTERN : entre en ARPG (clavier, page ARP) ou en sort vers KEYS."""
+        if self.arp:
+            self._leave_arp()
+            return
+        self.arp = True
+        self.arp_page = True
+        self.mpc = False
+        self.repeat_held = False
+        self._repeats.clear()
+
+    def _leave_arp(self) -> None:
+        """Sortie : l'arpège et son maintien s'arrêtent (les note off sont déjà planifiés)."""
+        self.arp = self.arp_page = self.arp_hold = False
+        self._arp_clear()
+
+    def _arp_clear(self) -> None:
+        self._arp_notes.clear()
+        self._arp_pos = None
+        self._arp_step = 0
+        self.leds_dirty = True
+
+    def _toggle_hold(self) -> None:
+        """NOTE REPEAT en ARPG : maintien. Coupé, seules les notes des pads tenus restent."""
+        self.arp_hold = not self.arp_hold
+        if not self.arp_hold:
+            for pad in [p for p in self._arp_notes if p not in self._pressure]:
+                del self._arp_notes[pad]
+            if not self._arp_notes:
+                self._arp_clear()
+
+    def _cycle_arp_page(self, step: int) -> None:
+        """BROWSE en ARPG : la page ARP en tête des pages de son, en boucle."""
+        n = self.faders.n_pages
+        v = ((0 if self.arp_page else self.faders.page_index + 1) + step) % (n + 1)
+        self.arp_page = v == 0
+        if v:
+            self.faders.page_index = v - 1
+        self.last_control = "page ARP" if v == 0 else f"page {v}/{n}"
+
+    def _arp_turn(self, index: int, delta: int, now: int) -> None:
+        """Encodeurs 1-3 de la page ARP : ordre, octaves, gate (bornés, sans boucle)."""
+        steps = self.faders.steps(index, delta)
+        if steps == 0 or index > 3:
+            return
+        self.last_touch = (index, now)
+        if index == 1:
+            i = max(0, min(len(ORDERS) - 1, ORDERS.index(self.arp_order) + steps))
+            self.arp_order = ORDERS[i]
+        elif index == 2:
+            self.arp_octaves = max(1, min(MAX_OCTAVES, self.arp_octaves + steps))
+        else:
+            self.arp_gate = max(GATE_MIN, min(GATE_MAX, self.arp_gate + GATE_STEP * steps))
+        name, value = self.arp_view()[index - 1]
+        self.last_control = f"ARP {name} {value}"
+
+    def _arp_add(self, pad: int, channel: int, note: int, vel: int, ticks: float) -> None:
+        """Frappe en ARPG : la note entre dans l'arpège. En maintien, une frappe alors
+        qu'aucun pad de l'arpège n'est tenu remplace les notes ; sinon elle s'ajoute."""
+        if self.arp_hold and not any(p in self._pressure for p in self._arp_notes if p != pad):
+            self._arp_notes.clear()
+            self._arp_step = 0
+        self._arp_notes.pop(pad, None)
+        self._arp_notes[pad] = _ArpNote(channel, note, vel)
+        if self._arp_pos is None:
+            self._arp_pos, _ = nearest(ticks, DIVISION_TICKS[self.division])
+            self._arp_step = 0
+        self.leds_dirty = True
+
+    def _arp_tick(self, now: int, horizon: int, div: float) -> list[Timed]:
+        """Notes de l'arpège à venir avant `horizon` : une par division, vélocité de la
+        pression courante du pad (la dernière jouée s'il est relâché, en maintien)."""
+        out: list[Timed] = []
+        while self._arp_notes and self._arp_pos is not None:
+            t = self._time_of(self._arp_pos)
+            if t is None or t >= horizon:
+                break
+            held = [(p, n.note) for p, n in self._arp_notes.items()]
+            seq = arp_sequence(held, self.arp_order, self.arp_octaves)
+            if self.arp_order == "random":
+                pad, note = seq[self._rng.randrange(len(seq))]
+            else:
+                pad, note = seq[self._arp_step % len(seq)]
+            entry = self._arp_notes[pad]
+            if pad in self._pressure and pad not in self._attacks:
+                entry.velocity = velocity(self.cfg.velocity, self._pressure[pad])
+            on = max(t, now)
+            off = self._time_of(self._arp_pos + div * self.arp_gate / 100) or on
+            nxt = self._time_of(self._arp_pos + div)
+            if nxt is not None:  # gate 100 % : coupée juste avant la note suivante
+                off = min(off, nxt - NOTE_OFF_MIN_NS)
+            out.append((on, NoteOn(entry.channel, note, entry.velocity)))
+            out.append((max(off, on + NOTE_OFF_MIN_NS), NoteOff(entry.channel, note)))
+            self.last_played = (pad, note, entry.velocity)
+            self._arp_pos += div
+            self._arp_step += 1
+        return out
 
     # --- perform : SOLO -------------------------------------------------------
 
@@ -428,6 +578,7 @@ class Engine:
         self.phrase.start()
 
     def on_stop(self) -> None:
+        self._arp_clear()  # pas d'arpège à l'arrêt, même maintenu
         self.phrase.stop()
         self.phrase_state = None
         self.leds_dirty = True
@@ -523,6 +674,10 @@ class Engine:
                 if p != PITCH_BEND  # ressort : toujours au centre au départ
             ],
             muted=sorted(t for t, m in self.faders.muted.items() if m),
+            division=self.division,
+            arp_order=self.arp_order,
+            arp_octaves=self.arp_octaves,
+            arp_gate=self.arp_gate,
         )
 
     def restore(self, session: Session) -> None:
@@ -549,6 +704,15 @@ class Engine:
             self.faders.page_index = session.page
         values = {(f.track, f.param): f.value for f in session.faders}
         self.faders.restore(values, set(session.muted))
+        if session.division in DIVISION_TICKS:
+            self.division = session.division
+        for order in ORDERS:
+            if order == session.arp_order:
+                self.arp_order = order
+        if session.arp_octaves is not None and 1 <= session.arp_octaves <= MAX_OCTAVES:
+            self.arp_octaves = session.arp_octaves
+        if session.arp_gate is not None and GATE_MIN <= session.arp_gate <= GATE_MAX:
+            self.arp_gate = session.arp_gate
         self._apply_phrase()
         self.leds_dirty = True
 
@@ -711,8 +875,12 @@ class Engine:
             self._load_selected()
             return
         if name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # page d'encodeurs
-            page = self.faders.cycle(-1 if name == "BROWSE_LEFT" else 1)  # en boucle
-            self.last_control = f"page {page + 1}/{self.faders.n_pages}"
+            step = -1 if name == "BROWSE_LEFT" else 1
+            if self.arp:
+                self._cycle_arp_page(step)
+            else:
+                page = self.faders.cycle(step)  # en boucle
+                self.last_control = f"page {page + 1}/{self.faders.n_pages}"
             self.leds_dirty = True
             return
         if name in ("TRANSPORT_LEFT", "TRANSPORT_RIGHT"):  # octave du clavier
@@ -722,13 +890,19 @@ class Engine:
             self._choose_bank(GROUPS.index(name[-1]))
         elif name == "SOLO" or (name == "PAD_MODE" and self.perform_lock):
             self._toggle_lock()  # PAD MODE sous SOLO : sortie, disposition inchangée
+        elif name == "PATTERN":
+            self._toggle_arp()
         elif name == "PAD_MODE":  # MPC <-> clavier ; les notes tenues gardent leur cible
+            if self.arp:  # ARPG : sortie vers MPC
+                self._leave_arp()
             self.mpc = not self.mpc
             if not self.mpc:  # le mode est déjà affiché en bas à gauche : seule la gamme
                 self.last_control = self.layout.name
         elif name == "GRID":
             i = QUANTIZE_CYCLE.index(self.quantize)
             self.quantize = QUANTIZE_CYCLE[(i + 1) % len(QUANTIZE_CYCLE)]
+        elif name == "NOTE_REPEAT" and self.arp:
+            self._toggle_hold()
         elif name == "NOTE_REPEAT":
             if shift:
                 self.repeat_locked = not self.repeat_locked
@@ -736,8 +910,11 @@ class Engine:
                     self._repeats.clear()
             else:
                 self.repeat_held = True
-        elif name.startswith("DISPLAY_") and self.repeat_active:
+        elif name.startswith("DISPLAY_") and (self.repeat_active or self.arp):
             self.division = DIVISIONS[int(name[-1]) - 1][0]
+            if self._arp_pos is not None:  # arpège en cours : recalé sur la nouvelle grille
+                div = DIVISION_TICKS[self.division]
+                self._arp_pos = math.ceil(self._arp_pos / div) * div
         elif name.startswith("DISPLAY_"):
             self._focus_menu(int(name[-1]) - 1)
         elif name == "MASTER_PUSH":  # focus à l'entrée suivante, en boucle
@@ -786,6 +963,11 @@ class Engine:
             out += self._fire(pad, now)
         if self._repeats.pop(pad, None) is not None:
             self.leds_dirty = True
+        if pad in self._arp_notes and not self.arp_hold:  # sans maintien : la note sort
+            del self._arp_notes[pad]
+            if not self._arp_notes:
+                self._arp_clear()
+            self.leds_dirty = True
         if pad in self._sounding:
             channel, note, on_at = self._sounding.pop(pad)
             out.append((max(now, on_at + NOTE_OFF_MIN_NS), NoteOff(channel, note)))
@@ -819,6 +1001,7 @@ class Engine:
                 out.append((max(gate, now + NOTE_OFF_MIN_NS), NoteOff(rep.channel, rep.note)))
                 self.last_played = (pad, rep.note, vel)
                 rep.next_pos += div
+        out += self._arp_tick(now, horizon, div)
         return out + self._aftertouch(now)
 
     def _aftertouch(self, now: int) -> list[Timed]:
@@ -887,6 +1070,9 @@ class Engine:
         if ticks is None:  # transport arrêté : immédiat, pas de repeat
             self._sounding[pad] = (channel, note, now)
             return [(now, NoteOn(channel, note, vel))]
+        if self.arp:  # la note entre dans l'arpège au lieu de sonner
+            self._arp_add(pad, channel, note, vel, ticks)
+            return self.tick(now)
         if self.repeat_active:
             pos, _ = nearest(ticks, DIVISION_TICKS[self.division])
             self._repeats[pad] = _Repeat(channel, note, pos)
@@ -920,7 +1106,7 @@ class Engine:
 
     def leds(self) -> LedState:
         dim = self.cfg.leds.dim
-        lit = set(self._attacks) | set(self._sounding) | set(self._repeats)
+        lit = set(self._attacks) | set(self._sounding) | set(self._repeats) | set(self._arp_notes)
         lit |= set(self._latched)  # pads du groupe SOLO : pleins
         held = self._held_buttons
         pads: list[RGB] = [(0, 0, 0)] * N_PADS
@@ -952,7 +1138,8 @@ class Engine:
         low = round(LED_MAX * dim)
         buttons = {
             "GRID": LED_MAX if self.quantize != "off" else 0,
-            "NOTE_REPEAT": LED_MAX if self.repeat_active else 0,
+            "NOTE_REPEAT": LED_MAX if self.repeat_active or self.arp_hold else 0,
+            "PATTERN": LED_MAX if self.arp else low,
             "SWING": LED_MAX if self.swing > 50 else 0,
             "PLAY": LED_MAX if st is not None and st.half_beat_on else 0,  # au tempo
             "PAD_MODE": low if self.mpc else LED_MAX,
@@ -965,7 +1152,7 @@ class Engine:
         if self.keyboard:  # pleine du côté où l'on est décalé
             buttons["TRANSPORT_LEFT"] = LED_MAX if self.octave < 0 else low
             buttons["TRANSPORT_RIGHT"] = LED_MAX if self.octave > 0 else low
-        if self.repeat_active:
+        if self.repeat_active or self.arp:
             for i, (name, _) in enumerate(DIVISIONS):
                 buttons[f"DISPLAY_{i + 1}"] = LED_MAX if name == self.division else low
         else:
