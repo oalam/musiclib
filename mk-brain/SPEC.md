@@ -334,8 +334,9 @@ du bas = pads 1-4) :
   arrêté, la banque courante seule.
 - **Encodeurs** : CC sur le canal de la track sélectionnée (ou l'AUTO
   CHANNEL pour la 16). En LIVE REC, les CC reçus sur le canal de la track
-  active s'enregistrent en p-locks (vérifié) ; sur une track non active,
-  à vérifier (question 16, reste ouverte pour les CC).
+  active s'enregistrent en p-locks (vérifié) ; sur une track non active
+  aussi : en SOLO, les tracks du groupe enregistrent toutes les mêmes
+  p-locks (constaté par l'utilisateur le 2026-11-11, question 16).
 - **Clavier** : notes sur le canal de la track sélectionnée, l'AUTO
   CHANNEL pour la 16. Les notes reçues sur le canal d'une track non
   active s'enregistrent sur cette track en LIVE REC (vérifié le
@@ -1062,9 +1063,13 @@ et les CC en p-locks, à bricoler ensuite sur la machine.
 3. Densité des CC : un encodeur tourné vite donne des dizaines de
    messages par mesure ; plafonner ce que la boucle garde (un par tick
    d'horloge et par paramètre).
-4. P-locks en LIVE REC : la DT2 n'enregistre les CC que sur la track
-   active (vérifié le 2026-11-09) ; une boucle qui bouge des encodeurs
-   sur plusieurs tracks ne se fige donc qu'une track à la fois.
+4. P-locks en LIVE REC : les CC reçus sur le canal d'une track
+   s'enregistrent sur cette track, active ou non. En SOLO, toutes les
+   tracks du groupe reçoivent les mêmes mouvements et enregistrent donc
+   les mêmes p-locks (constaté par l'utilisateur, 2026-11-11) : une
+   boucle qui bouge des encodeurs sur plusieurs tracks se fige en un
+   seul tour. La boucle doit donc garder aussi le groupe SOLO de chaque
+   geste d'encodeur.
 5. Pas `?` et ordre `RAND` : rejoués, ils retirent au sort à chaque tour
    (c'est le geste qui est gardé, pas le tirage).
 
@@ -1968,7 +1973,9 @@ la slice 0.
 16. **Notes et CC sur le canal d'une track non active, en LIVE REC**
     (slice 8) : pour les notes, oui (vérifié le 2026-11-10, sonde
     `dt2_mpc_probe.py channels`, track 9 active : trigs sur T1, T3 et T5,
-    rien sur la 9). Pour les CC, reste à vérifier.
+    rien sur la 9). Pour les CC, oui aussi : en SOLO, les tracks du
+    groupe enregistrent toutes les mêmes p-locks (constaté par
+    l'utilisateur à l'usage le 2026-11-11, sans sonde dédiée).
 17. ~~**Note → tranche** avec `SLICE` = `NOTE`~~ (slice 8) : vérifié le
     2026-11-10 (sonde `dt2_mpc_probe.py slices --channel 5 --base 60`,
     grille de 6 tranches) : 60 joue la tranche 1, 61 la 2… ; au-delà, la
