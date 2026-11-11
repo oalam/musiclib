@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.2] - 2026-11-11
+
+### Corrigé
+
+- [7] Pads en retard sur le Pi : le rendu des deux écrans prenait environ
+  80 ms (35,8 + 43,5, mesuré sur le Pi 3B) et repassait toutes les 50 ms
+  dans la boucle qui lit les pads. Les polices et leurs tracés de texte
+  sont gardés en cache (`render._CachedFont`) : 4 ms par paire d'écrans
+  (1,8 + 2,2), pixels identiques.
+
 ## [0.30.1] - 2026-11-11
 
 ### Corrigé

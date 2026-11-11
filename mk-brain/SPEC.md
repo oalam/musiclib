@@ -1446,6 +1446,16 @@ noire sur la droite de régression, DT2 à 151 BPM, 2 minutes.
   23.1.1) : appliqués une mesure plus tard. Tolérance sur le premier
   temps proposée, **à trancher**.
 
+## Constat rendu des écrans (slice 7, 2026-11-11, Pi 3B)
+
+Symptôme : pads en retard sur le Pi depuis la v0.29.0. Mesure : `render.left`
+35,8 ms et `render.right` 43,5 ms, soit environ 80 ms toutes les 50 ms dans
+la boucle qui lit les pads ; l'essentiel dans FreeType (tracé et mesure des
+textes) et le rechargement de la police à chaque texte. L'aftertouch n'y
+était pour rien (au plus un message par canal toutes les 10 ms). Correctif
+v0.30.2 : polices et tracés en cache (`render._CachedFont`), 1,8 + 2,2 ms,
+pixels identiques. Non mesuré : le temps d'écriture HID d'une trame d'écran.
+
 ## Références
 
 - `cabl` (shaduzlabs, C++) : pilotage HID des contrôleurs NI, Canvas pour

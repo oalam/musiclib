@@ -193,3 +193,20 @@ def test_selection_shows_sync_status(cfg: Config, project: Project) -> None:
     plain = render.left(eng, 0).tobytes()
     eng.selector.sync = "sync a1b2c3d"
     assert render.left(eng, 0).tobytes() != plain  # statut en haut à droite
+
+
+def test_font_cache_keeps_the_same_pixels() -> None:
+    """Le cache de texte (rendu trop lent sur le Pi) ne change aucun pixel."""
+    from PIL import Image, ImageDraw, ImageFont
+
+    cached = render._font(16)
+    assert cached is render._font(16)
+    images = []
+    for font in (ImageFont.load_default(size=16), cached, cached):
+        img = Image.new("1", (120, 30))
+        d = ImageDraw.Draw(img)
+        d.text((3, 2), "PHR 01", font=font, fill=1)
+        images.append((img.tobytes(), d.textbbox((0, 0), "PHR 01", font=font)))
+        assert d.textlength("PHR 01", font=font) == d.textlength("PHR 01", font=cached)
+    assert images[0] == images[1] == images[2]
+    assert any(key[:2] == ("getmask2", "PHR 01") for key in cached._cache)  # type: ignore[union-attr]

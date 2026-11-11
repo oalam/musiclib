@@ -42,7 +42,8 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
 from __future__ import annotations
 
 import unicodedata
-from typing import TYPE_CHECKING
+from functools import cache
+from typing import TYPE_CHECKING, Any
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
@@ -65,13 +66,58 @@ BIG = 30  # pattern et track sélectionnée
 BAR = 24  # mesure / longueur
 DIVISION = 20
 COUNTDOWN = 40
+FONT_CACHE = 2000  # textes retenus par taille de police avant remise à zéro
 
 Font = ImageFont.FreeTypeFont | ImageFont.ImageFont
 Box = tuple[int, int, int, int]
 
 
+class _CachedFont(ImageFont.FreeTypeFont):
+    """Police qui retient ses mesures et ses tracés de texte.
+
+    Les mêmes chaînes reviennent d'une image à l'autre ; FreeType coûtait
+    environ 80 ms par paire d'écrans sur le Pi 3B, dans la boucle qui lit les
+    pads. Sous-classe et non enveloppe : Pillow teste `FreeTypeFont` avant
+    d'appeler `getmask2`. Les masques rendus sont seulement lus par Pillow.
+    """
+
+    _cache: dict[tuple[Any, ...], Any]
+
+    @classmethod
+    def wrap(cls, font: ImageFont.FreeTypeFont) -> _CachedFont:
+        cached = cls.__new__(cls)
+        cached.__dict__.update(font.__dict__)
+        cached._cache = {}
+        return cached
+
+    def _memo(self, method: str, text: Any, args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
+        call = getattr(super(), method)
+        try:
+            key = (method, text, args, tuple(sorted(kwargs.items())))
+            return self._cache[key]
+        except KeyError:
+            pass
+        except TypeError:  # argument non hachable : pas de cache
+            return call(text, *args, **kwargs)
+        if len(self._cache) >= FONT_CACHE:
+            self._cache.clear()
+        value = self._cache[key] = call(text, *args, **kwargs)
+        return value
+
+    def getmask2(self, text: Any, *args: Any, **kwargs: Any) -> Any:
+        return self._memo("getmask2", text, args, kwargs)
+
+    def getbbox(self, text: Any, *args: Any, **kwargs: Any) -> Any:
+        return self._memo("getbbox", text, args, kwargs)
+
+    def getlength(self, text: Any, *args: Any, **kwargs: Any) -> Any:
+        return self._memo("getlength", text, args, kwargs)
+
+
+@cache
 def _font(size: int) -> Font:
-    return ImageFont.load_default(size=size)
+    font = ImageFont.load_default(size=size)
+    return _CachedFont.wrap(font) if isinstance(font, ImageFont.FreeTypeFont) else font
 
 
 def _bold(d: ImageDraw.ImageDraw, xy: tuple[int, int], text: str, font: Font, ink: int) -> None:
