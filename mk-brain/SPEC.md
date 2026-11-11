@@ -848,7 +848,7 @@ de la tonique tenu : quatre accords d'une mesure chacun, changement sur
 le premier temps, calé sur le kick ; `BAR 2` double la durée ; `PRG OFF`
 revient à l'accord du pad.
 
-## Slice 17 : accord en cours à l'écran (cadré et codé le 2026-11-11, à essayer)
+## Slice 17 : accord en cours à l'écran (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : banque E (la# phrygien), mode ARPG, `CHD TRI`, `PRG 1637`, pad
 la# tenu. Sur le deuxième accord, l'écran gauche affiche `1 6 3 7  Gb`,
@@ -877,7 +877,7 @@ progression, tête de lecture du motif, chiffrage en degrés romains.
 degré en inverse avance d'une case par mesure, sur le premier temps, et
 le nom affiché est l'accord entendu ; relâcher le pad rend la banque.
 
-## Slice 18 : ratchets dans les motifs (cadré et codé le 2026-11-11, à essayer)
+## Slice 18 : ratchets dans les motifs (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : motif `RATC` (`X.xr X.xx X.xr X.rT`), division 1/16. Sur le
 quatrième pas de la mesure, la note de l'arpège part deux fois, en deux
@@ -908,7 +908,7 @@ roulements s'entendent sur les pas 4, 12, 15 et 16, calés sur le kick,
 sans note bloquée ; en LIVE REC, le pattern relu les rejoue (dans la
 limite de la quantification de la DT2).
 
-## Slice 19 : motifs de longueur libre (cadré et codé le 2026-11-11, à essayer)
+## Slice 19 : motifs de longueur libre (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : motif `CINQ` (`X.xx.`, 5 pas), division 1/16, kick en 4/4 sur la
 DT2. L'accent tombe sur les pas 1, 6, 11, 16 de la première mesure, puis
@@ -935,7 +935,7 @@ plus de 16 pas, remise au pas 1 à l'appui ou à chaque phrase.
 déplace d'une mesure à l'autre et revient sur le premier temps à la
 mesure 6 ; `GALO` reste calé comme avant.
 
-## Slice 20 : pas probabilistes (cadré et codé le 2026-11-11, à essayer)
+## Slice 20 : pas probabilistes (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : motif `HASA` (`X.?x ?.x? X.?x ?.??`), division 1/16. Les `X` et
 les `x` jouent à chaque mesure ; chaque `?` ne joue qu'une fois sur deux,
@@ -959,7 +959,7 @@ ratchet probabilistes, tirage reproductible (graine).
 restent sur les temps 1 et 3, le reste change d'une mesure à l'autre,
 sans note bloquée ni note sautée dans l'ordre de l'arpège.
 
-## Slice 21 : renversements (cadré et codé le 2026-11-11, à essayer)
+## Slice 21 : renversements (cadré, codé et validé à l'essai le 2026-11-11)
 
 Exemple : banque C (la# éolien), `CHD TRI`, `PRG 1637`, `INV FIX`, pad la#
 tenu. Sans `FIX` les accords sautent avec leur fondamentale (la# en bas,
@@ -1797,11 +1797,11 @@ conditionne tout le reste.
 | 14 | **Banque de 16 presets** : PATTERN tenu, pad n = rappel, SHIFT + pad n = sauvegarde des réglages courants ; `state/arp-presets.json`, commun aux projets ; la config remplit les emplacements non sauvés | cf. « Slice 14 », critère de fin | codée le 2026-11-11 (v0.36.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 15 | **Accords de l'arpège** : encodeur 6 `CHD` PATTERN tenu (`OFF`, `TRI`, `7TH`, `SUS2`, `SUS4`, `PWR`), un pad = un accord pris dans la gamme de la banque, gardé dans les presets | cf. « Slice 15 », critère de fin | codée le 2026-11-11 (v0.37.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 16 | **Progressions d'accords** : `arp.progressions` (suites de degrés), encodeur 7 `PRG` et encodeur 8 `BAR` (1/2 à 4 mesures par accord) PATTERN tenu, degrés comptés depuis le pad tenu, calées sur le transport, gardées dans les presets | cf. « Slice 16 », critère de fin | codée le 2026-11-11 (v0.38.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
-| 17 | **Accord en cours à l'écran** : progression qui joue, bandeau gauche : ses degrés, celui en cours en vidéo inverse, nom de l'accord (`1 6 3 7  Gb`) | cf. « Slice 17 », critère de fin | codée le 2026-11-11 (v0.39.0), à essayer sur la DT2 |
-| 18 | **Ratchets** : pas `r` / `R` (note jouée 2 fois dans le pas) et `t` / `T` (3 fois) dans `arp.motifs`, motif `RATC` | cf. « Slice 18 », critère de fin | codée le 2026-11-11 (v0.40.0), à essayer sur la DT2 |
-| 19 | **Motifs de longueur libre** : 1 à 16 pas, en boucle depuis le départ du transport (polyrythmie contre la mesure), motifs `CINQ` et `DOUZ` | cf. « Slice 19 », critère de fin | codée le 2026-11-11 (v0.41.0), à essayer sur la DT2 |
-| 20 | **Pas probabilistes** : pas `?` dans `arp.motifs` (note jouée une fois sur deux, silence sinon), motif `HASA` | cf. « Slice 20 », critère de fin | codée le 2026-11-11 (v0.42.0), à essayer sur la DT2 |
-| 21 | **Renversements** : encodeur 5 `INV` PATTERN tenu, à la place de `PRE` (`OFF`, `1`, `2`, `FIX` = accords gardés dans l'octave au-dessus du pad), gardé dans les presets | cf. « Slice 21 », critère de fin | codée le 2026-11-11 (v0.43.0), à essayer sur la DT2 |
+| 17 | **Accord en cours à l'écran** : progression qui joue, bandeau gauche : ses degrés, celui en cours en vidéo inverse, nom de l'accord (`1 6 3 7  Gb`) | cf. « Slice 17 », critère de fin | codée le 2026-11-11 (v0.39.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 18 | **Ratchets** : pas `r` / `R` (note jouée 2 fois dans le pas) et `t` / `T` (3 fois) dans `arp.motifs`, motif `RATC` | cf. « Slice 18 », critère de fin | codée le 2026-11-11 (v0.40.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 19 | **Motifs de longueur libre** : 1 à 16 pas, en boucle depuis le départ du transport (polyrythmie contre la mesure), motifs `CINQ` et `DOUZ` | cf. « Slice 19 », critère de fin | codée le 2026-11-11 (v0.41.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 20 | **Pas probabilistes** : pas `?` dans `arp.motifs` (note jouée une fois sur deux, silence sinon), motif `HASA` | cf. « Slice 20 », critère de fin | codée le 2026-11-11 (v0.42.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 21 | **Renversements** : encodeur 5 `INV` PATTERN tenu, à la place de `PRE` (`OFF`, `1`, `2`, `FIX` = accords gardés dans l'octave au-dessus du pad), gardé dans les presets | cf. « Slice 21 », critère de fin | codée le 2026-11-11 (v0.43.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
