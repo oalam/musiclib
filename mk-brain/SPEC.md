@@ -209,6 +209,16 @@ statut de synchro dans `/run/mk-brain/sync` (effacé à l'extinction).
    vaut 2 ou plus **et** que `mk-brain/` diffère de `last_good`. Si le
    code est celui de `last_good`, la panne vient de l'environnement
    (MK2 ou DT2 débranchée) : on relance sans toucher au code.
+   **Matériel absent** (révisé le 2026-11-11 : le Pi avait tiré un
+   nouveau commit sans MK2 ni DT2 branchées, deux échecs « aucun port
+   Digitakt » l'avaient ramené au commit précédent) : quand la MK2 n'est
+   pas visible en HID ou qu'aucun port MIDI ne porte le nom de la DT2,
+   `mk-brain` sort avec le code **3** (`boot.EXIT_NO_HARDWARE`), que
+   `stopped.sh` ne compte pas. Le service relance toutes les 3 s et
+   attend le branchement, sans retour arrière. Les autres erreurs
+   (code 2, exception non prévue, signal) comptent toujours. Limite
+   acceptée : un code tiré qui casserait la détection du matériel
+   lui-même ne déclencherait plus le retour arrière.
 4. **Arrêt propre** : `SIGTERM` (arrêt du service, extinction du Pi) est
    traité comme Ctrl-C : session sauvegardée, LED et écrans éteints.
    Couper le courant sans extinction reste le cas de la scène : la carte SD

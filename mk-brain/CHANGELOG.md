@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.1] - 2026-11-11
+
+### Corrigé
+
+- [7] Retour arrière : MK2 ou DT2 absente au lancement ne compte plus
+  comme un échec du code tiré. `mk-brain` sort avec le code 3
+  (`boot.EXIT_NO_HARDWARE`, `Mk2NotFoundError` ou `MidiPortNotFoundError`),
+  ignoré par `deploy/stopped.sh` ; le service relance et attend le
+  branchement sans revenir à `state/last_good`.
+
 ## [0.30.0] - 2026-11-11
 
 ### Ajouté

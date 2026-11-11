@@ -34,8 +34,9 @@ journalctl -u mk-brain -f        # journal du service
 Au démarrage : `mk-brain play` sans attendre le réseau ; le `git pull` se
 fait à part quand le réseau arrive et relance le service si `mk-brain/` a
 changé. Extinction propre : SHIFT + ERASE tenus 2 s. Un nouveau
-commit qui échoue deux fois revient à `state/last_good` (SPEC « Service et
-retour arrière »).
+commit qui échoue deux fois revient à `state/last_good` ; MK2 ou DT2
+absente (code de sortie 3) ne compte pas comme un échec, le service attend
+le branchement (SPEC « Service et retour arrière »).
 
 ## Configuration
 

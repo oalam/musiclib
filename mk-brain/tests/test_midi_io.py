@@ -10,7 +10,7 @@ from mk_brain.engine import Aftertouch, Engine, NoteOff, NoteOn
 def test_find_port(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(midi_io, "output_names", lambda: ["IAC", "Elektron Digitakt II"])
     assert midi_io.find_port("digitakt") == "Elektron Digitakt II"
-    with pytest.raises(midi_io.MidiError):
+    with pytest.raises(midi_io.MidiPortNotFoundError):
         midi_io.find_port("Syntakt")
 
 

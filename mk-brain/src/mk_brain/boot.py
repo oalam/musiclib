@@ -7,6 +7,8 @@ alors à quel commit revenir si un code tiré ensuite ne démarre pas.
 `read_sync` lit le statut de synchro écrit par `sync.sh`, affiché sur
 l'écran de sélection. Hors service (Mac, tests), rien n'est écrit ni lu.
 `in_service` ouvre le geste d'extinction (SHIFT + ERASE), `poweroff` éteint le Pi.
+`EXIT_NO_HARDWARE` est le code de sortie « MK2 ou DT2 absente » : `deploy/stopped.sh`
+ne le compte pas comme un échec du code, il n'y a donc pas de retour arrière.
 """
 
 from __future__ import annotations
@@ -18,6 +20,8 @@ from pathlib import Path
 STATE_DIR = Path(__file__).resolve().parents[2] / "state"
 SYNC_FILE = Path("/run/mk-brain/sync")
 COMMIT_ENV = "MKBRAIN_COMMIT"
+EXIT_ERROR = 2
+EXIT_NO_HARDWARE = 3  # même valeur dans deploy/stopped.sh
 
 
 def mark_ready(state_dir: Path = STATE_DIR, commit: str | None = None) -> bool:

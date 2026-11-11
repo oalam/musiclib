@@ -34,7 +34,11 @@ class MidiIn:
 
 
 class MidiError(Exception):
-    """Backend absent ou port DT2 introuvable."""
+    """Backend absent ou port DT2 inutilisable."""
+
+
+class MidiPortNotFoundError(MidiError):
+    """Aucun port MIDI ne porte le nom attendu : DT2 débranchée ou éteinte."""
 
 
 def output_names() -> list[str]:
@@ -56,7 +60,7 @@ def find_port(hint: str, names: list[str] | None = None) -> str:
     for name in names:
         if hint.lower() in name.lower():
             return name
-    raise MidiError(f"aucun port contenant {hint!r} ; vus : {names or 'aucun'}")
+    raise MidiPortNotFoundError(f"aucun port contenant {hint!r} ; vus : {names or 'aucun'}")
 
 
 def to_mido(msg: MidiOut) -> Any:

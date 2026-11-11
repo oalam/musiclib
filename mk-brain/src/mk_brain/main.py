@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from mk_brain import display, render
+from mk_brain.boot import EXIT_ERROR, EXIT_NO_HARDWARE
 from mk_brain.clock import ClockTracker
 from mk_brain.config import ConfigError
 from mk_brain.hid_mk2 import (
@@ -27,11 +28,12 @@ from mk_brain.hid_mk2 import (
     LedState,
     Mk2Device,
     Mk2Error,
+    Mk2NotFoundError,
     PadEvent,
     enumerate_mk2,
     pad_label,
 )
-from mk_brain.midi_io import MidiError
+from mk_brain.midi_io import MidiError, MidiPortNotFoundError
 from mk_brain.project import ProjectError
 
 if TYPE_CHECKING:
@@ -426,9 +428,13 @@ def main(argv: list[str] | None = None) -> int:
         if args.cmd == "clock":
             return cmd_clock(bench_note=args.bench_note, every=args.every)
         return cmd_spike(chase=not args.no_chase, raw=args.raw, step_s=args.step)
+    except (Mk2NotFoundError, MidiPortNotFoundError) as exc:
+        # matériel absent : le service relance et attend, sans retour arrière
+        print(f"matériel absent : {exc}", file=sys.stderr)
+        return EXIT_NO_HARDWARE
     except (Mk2Error, ConfigError, MidiError, ProjectError) as exc:
         print(f"erreur : {exc}", file=sys.stderr)
-        return 2
+        return EXIT_ERROR
 
 
 if __name__ == "__main__":
