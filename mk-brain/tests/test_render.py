@@ -92,18 +92,21 @@ def test_mute_strip_marks_playing_sixteenth(cfg: Config) -> None:
     assert render.left(Engine(cfg), 0).getpixel((_cell(2), mid))  # à l'arrêt : rien
 
 
-def test_mute_strip_square_is_bigger_on_the_beat(cfg: Config) -> None:
-    """Sur un temps (cases 1, 5, 9, 13) la case qui joue grossit ; le carré intérieur
-    garde sa taille, la case ouverte reste donc lisible comme ouverte."""
+def test_mute_strip_beat_cells_are_bigger(cfg: Config) -> None:
+    """Les cases des temps (1, 5, 9, 13) dépassent de la rangée, à l'arrêt comme en jeu,
+    ouvertes ou mutées ; le carré de la double croche en cours garde sa taille."""
     above = render.MUTE_TOP - render.BEAT_GROW  # ligne au-dessus des cases ordinaires
-    edge = render.MUTE_TOP + 1  # ligne juste sous le bord de la case
-    eng = at_bar(cfg, 3)  # 2e double croche : la case garde sa taille
-    assert not render.left(eng, 0).getpixel((_cell(2), above))
+    eng = Engine(cfg)
+    eng.faders.muted[9] = True
+    img = render.left(eng, 0)
+    for track in range(1, 17):
+        assert bool(img.getpixel((_cell(track), above))) == (track in (1, 5, 9, 13))
+    assert not img.getpixel((_cell(9), render.MUTE_TOP + 4))  # mutée : toujours vide
+    eng = at_bar(cfg, 3)
     advance(eng, 2 * 96 + 10, 2 * 96 + 26)  # 5e double croche : 2e temps
     img = render.left(eng, 0)
-    assert img.getpixel((_cell(5), above)) and img.getpixel((_cell(5), edge))
+    assert img.getpixel((_cell(5), above)) and img.getpixel((_cell(5), render.MUTE_TOP + 1))
     assert not img.getpixel((_cell(5), render.MUTE_TOP + 4))  # carré intérieur en inverse
-    assert not img.getpixel((_cell(4), above)) and not img.getpixel((_cell(6), above))
 
 
 def test_mode_tag_always_shown(cfg: Config) -> None:

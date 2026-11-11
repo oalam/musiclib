@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import signal
 import subprocess
 from pathlib import Path
 
@@ -56,3 +57,19 @@ def test_stopped_counts_code_failures(tmp_path: Path) -> None:
 def test_stopped_ignores_success_and_missing_hardware(tmp_path: Path) -> None:
     assert _stopped(tmp_path, "success", "exited", "0") is None
     assert _stopped(tmp_path, "exit-code", "exited", str(EXIT_NO_HARDWARE)) is None
+
+
+@pytest.mark.parametrize("sig", [signal.SIGINT, signal.SIGTERM])
+def test_stop_signal_sets_a_flag_and_never_raises(sig: signal.Signals) -> None:
+    """Ctrl-C et l'arrêt du service lèvent un drapeau : aucune exception ne peut tomber
+    pendant la sauvegarde de la session."""
+    previous = {s: signal.getsignal(s) for s in (signal.SIGINT, signal.SIGTERM)}
+    stop = cli._Stop()
+    try:
+        stop.install()
+        assert not stop.requested()
+        os.kill(os.getpid(), sig)
+        assert stop.requested()
+    finally:
+        for s, handler in previous.items():
+            signal.signal(s, handler)

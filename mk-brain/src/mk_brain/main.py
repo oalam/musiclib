@@ -176,8 +176,26 @@ def _clock_line(clock: ClockTracker) -> str:
     return f"{bpm} bpm  {'>' if clock.running else '[]'}  {pos or '-'}"
 
 
-def _interrupt(signum: int, frame: object) -> None:
-    raise KeyboardInterrupt
+class _Stop:
+    """Arrêt demandé par SIGINT (Ctrl-C) ou SIGTERM (arrêt du service) : un drapeau lu par
+    la boucle de jeu, jamais d'exception. Une exception levée par le signal pouvait tomber
+    pendant la sauvegarde de la session et la faire perdre (vu sur le Pi le 2026-11-11)."""
+
+    def __init__(self) -> None:
+        self._requested = False
+
+    def __call__(self, signum: int, frame: object) -> None:
+        self._requested = True
+
+    def requested(self) -> bool:
+        """À appeler, pas à lire en attribut : c'est à l'entrée d'une fonction Python que
+        l'interpréteur passe la main au signal en attente, donc le drapeau est à jour même
+        juste après une lecture HID coupée par ce signal."""
+        return self._requested
+
+    def install(self) -> None:
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            signal.signal(sig, self)
 
 
 def cmd_play(dry_run: bool, project_path: Path | None) -> int:
@@ -243,15 +261,21 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
         "PAD MODE = MPC / clavier ; GROUP = banque ; SHIFT + BROWSE = projet ; "
         "SHIFT + PLAY / GROUP n = recalage de la phrase ; Ctrl-C"
     )
-    signal.signal(signal.SIGTERM, _interrupt)  # arrêt du service : comme Ctrl-C
+    stop = _Stop()
+    stop.install()  # Ctrl-C et arrêt du service : sortie de boucle, sans exception
     engine.poweroff_enabled = in_service()  # SHIFT + ERASE 2 s : sur le Pi seulement
     try:
         if sched is not None:
             sched.start()
         _show(dev, 1, display.new_image())
         mark_ready()  # ce commit démarre : retour arrière possible vers lui
-        while True:
-            report = dev.read(timeout_ms=1)
+        while not stop.requested():
+            try:
+                report = dev.read(timeout_ms=1)
+            except OSError:  # lecture HID coupée par le signal d'arrêt (hidraw sur le Pi)
+                if stop.requested():
+                    break
+                raise
             now = time.perf_counter_ns()
             if inp is not None:
                 for ev in inp.drain():
@@ -299,10 +323,8 @@ def cmd_play(dry_run: bool, project_path: Path | None) -> int:
                     for report in display.frame_reports(screen, frame):
                         dev.write(report)
                     shown[screen] = frame
-    except KeyboardInterrupt:
-        pass
     finally:
-        if name is not None:  # derniers réglages, même après Ctrl-C
+        if name is not None:  # derniers réglages, même après Ctrl-C ou l'arrêt du service
             save_session(name, engine.snapshot())
         try:
             dev.send_leds(LedState.off())

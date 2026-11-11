@@ -194,7 +194,7 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
 
 COLUMN = 46  # colonne « écran de la DT2 » (pattern, SMP, track), à gauche du bandeau gauche
 MUTE_TOP, MUTE_BOTTOM = 26, 35  # cases des mutes, 10 px de haut
-BEAT_GROW = 2  # sur un temps, la case qui joue monte de 2 px et s'élargit de 1 px par côté
+BEAT_GROW = 2  # cases des temps : 2 px plus hautes, 1 px plus larges de chaque côté
 STEPS_PER_BAR = 16
 STEPS_PER_BEAT = 4
 TICKS_PER_STEP = 6  # 24 ticks par noire
@@ -215,9 +215,8 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
     """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
     La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point. Les 16 cases
     comptent aussi les doubles croches de la mesure : un carré intérieur, en inverse de sa
-    case, marque celle qui joue. Sur les temps (cases 1, 5, 9, 13) c'est la case elle-même
-    qui grossit (`BEAT_GROW`) : un carré plus gros n'y laissait qu'un liseré, et la case
-    ouverte passait pour mutée."""
+    case, marque celle qui joue. Les cases des temps (1, 5, 9, 13) sont plus grosses que
+    les autres (`BEAT_GROW`), en permanence : ce sont les repères de la rangée."""
     cell = (WIDTH - left) // 16
     top, bottom = MUTE_TOP, MUTE_BOTTOM
     step = _step(engine)
@@ -226,7 +225,7 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
         x1 = x0 + cell - 3
         playing = step == t - 1
         box = (x0, top, x1, bottom)
-        if playing and t % STEPS_PER_BEAT == 1:  # sur le temps : la case grossit
+        if t % STEPS_PER_BEAT == 1:  # case d'un temps : plus grosse, repère de la rangée
             box = (x0 - 1, top - BEAT_GROW, x1 + 1, bottom)
         full = False
         if t == engine.cfg.midi.auto_channel:

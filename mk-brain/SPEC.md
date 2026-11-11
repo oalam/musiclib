@@ -220,7 +220,10 @@ statut de synchro dans `/run/mk-brain/sync` (effacé à l'extinction).
    acceptée : un code tiré qui casserait la détection du matériel
    lui-même ne déclencherait plus le retour arrière.
 4. **Arrêt propre** : `SIGTERM` (arrêt du service, extinction du Pi) est
-   traité comme Ctrl-C : session sauvegardée, LED et écrans éteints.
+   traité comme Ctrl-C : session sauvegardée, LED et écrans éteints. Les
+   deux signaux lèvent un drapeau que la boucle de jeu lit, sans exception
+   (v0.30.6) : une exception levée par le signal tombait pendant la
+   sauvegarde et la faisait perdre, vu sur le Pi le 2026-11-11.
    Couper le courant sans extinction reste le cas de la scène : la carte SD
    n'est protégée que par la journalisation d'ext4 (système en lecture seule
    hors périmètre tant que le `git pull` au démarrage écrit sur la carte).
@@ -746,7 +749,7 @@ l'essai sur la MK2 :
   par git) : banque du design, disposition, octave, banque de PATTERN +
   pad, dernier PC reçu (pattern et banque live), track sélectionnée, page
   et valeurs des faders, mutes ;
-- sauvée au plus toutes les 2 s si elle a changé, et à l'arrêt (Ctrl-C) :
+- sauvée au plus toutes les 2 s si elle a changé, et à l'arrêt (Ctrl-C, arrêt du service) :
   une coupure du Pi perd au plus 2 s ; écriture atomique ;
 - reprise au chargement du projet (`--project` ou sélection), **sans rien
   envoyer à la DT2** : faders hors prise (pointillé), mutes à l'affichage
@@ -986,11 +989,10 @@ TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           
 - mutes sur toute la largeur restante, cases de 10 px ; elles comptent
   aussi les 16 doubles croches de la mesure : un carré intérieur, en
   inverse de sa case, marque celle qui joue (rien à l'arrêt), 7 × 6 px.
-  Sur un temps (cases 1, 5, 9, 13 ; demandé le 2026-11-11) c'est la case
-  qui grossit, de 11 × 10 à 13 × 12 px (2 px vers le haut, 1 px de chaque
-  côté), le carré gardant sa taille : le carré de 9 × 8 px essayé d'abord
-  ne laissait qu'un liseré de 1 px, et la case ouverte passait pour une
-  case mutée (v0.30.5). L'écran gauche est donc redessiné à chaque
+  Les cases des temps (1, 5, 9, 13) sont plus grosses que les autres, en
+  permanence, pour se repérer dans la rangée : 13 × 12 px au lieu de
+  11 × 10 (2 px vers le haut, 1 px de chaque côté ; demandé le
+  2026-11-11, v0.30.6). L'écran gauche est donc redessiné à chaque
   double croche, soit 60 / 165 / 4 = 91 ms à 165 BPM, environ 11 images
   par seconde ; essayé sur le Pi le 2026-11-11, sans retard depuis le
   cache du rendu (v0.30.2) ;

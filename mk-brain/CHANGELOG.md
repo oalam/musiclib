@@ -3,6 +3,23 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.6] - 2026-11-11
+
+### Corrigé
+
+- [7] Session perdue à l'arrêt du service : le signal d'arrêt levait une
+  exception qui pouvait tomber pendant la sauvegarde (vu sur le Pi à la
+  relance de 12:34). Ctrl-C et `SIGTERM` lèvent maintenant un drapeau lu
+  par la boucle de jeu ; une lecture HID coupée par le signal sort de la
+  boucle au lieu de planter.
+
+### Modifié
+
+- [9] Bande des mutes : les cases des temps (1, 5, 9, 13) sont plus
+  grosses en permanence (13 × 12 px au lieu de 11 × 10), pour se repérer
+  dans la rangée ; en v0.30.5 seule la case en train de jouer grossissait.
+- Captures du guide (`docs/img/`) régénérées.
+
 ## [0.30.5] - 2026-11-11
 
 ### Corrigé
