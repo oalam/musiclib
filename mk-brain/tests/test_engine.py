@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from collections.abc import Callable, Iterable
 from pathlib import Path
 
@@ -1152,6 +1153,34 @@ def test_arp_short_motif_turns_against_the_bar(cfg: Config) -> None:
     played = _arp_notes(eng, range(6, 132, 6))  # pas 1 à 21
     assert [round(pos / 6) for pos, _, _ in played] == [2, 3, 5, 7, 8, 10, 12, 13, 15, 17, 18, 20]
     assert [v for _, _, v in played] == [soft, soft, 127] * 4
+
+
+class _FixedDraw(random.Random):
+    """Tirage figé pour les pas `?`."""
+
+    def __init__(self, draw: float) -> None:
+        super().__init__()
+        self._draw = draw
+
+    def random(self) -> float:
+        return self._draw
+
+
+def test_arp_chance_step_plays_once_in_two(cfg: Config) -> None:
+    """Motif HASA (`X.?x …`) : le pas `?` joue, atténué, si le tirage passe ; sinon c'est
+    un silence et la note attend le pas suivant."""
+    soft = round(127 * cfg.arp.unaccented / 100)
+    for draw, expected in ((0.2, [(12, 1), (18, 0)]), (0.8, [(18, 1)])):
+        eng = arp(cfg)
+        eng.arp_motif = "HASA"
+        eng._rng = _FixedDraw(draw)
+        notes = [eng.target(p)[1] for p in (1, 3)]
+        press(eng, 1 * TICK, pad=_index(1))  # position 0 : X
+        press(eng, 1 * TICK, pad=_index(3))
+        played = _arp_notes(eng, (12, 18))  # pas 2 : ?, pas 3 : x
+        assert [(round(pos), n, v) for pos, n, v in played] == [
+            (pos, notes[i], soft) for pos, i in expected
+        ]
 
 
 def test_arp_ratchet_replays_the_note_inside_the_step(cfg: Config) -> None:

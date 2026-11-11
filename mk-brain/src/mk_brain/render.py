@@ -47,7 +47,7 @@ from typing import TYPE_CHECKING, Any
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-from mk_brain.arp import MOTIF_STEPS, REST, TIE, accented, chord_name, hits
+from mk_brain.arp import CHANCE, MOTIF_STEPS, REST, TIE, accented, chord_name, hits
 from mk_brain.display import HEIGHT, WIDTH, new_image, text_image
 from mk_brain.layouts import FLAT_NAMES, degree_name, flat_note
 from mk_brain.phrase import BLOCK_BARS
@@ -441,8 +441,8 @@ MOTIF_TOP, MOTIF_BOTTOM = TAG_TOP + 3, BAND - 3
 
 def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
     """Les pas du motif (1 à 16) : accent en colonne pleine, note en demi-colonne, liée en trait
-    qui prolonge la note, silence en point, ratchet en colonne fendue ; un repère au-dessus
-    de chaque temps."""
+    qui prolonge la note, silence en point, ratchet en colonne fendue, `?` en demi-colonne vide ;
+    un repère au-dessus de chaque temps."""
     mid = (MOTIF_TOP + MOTIF_BOTTOM) // 2
     for i, kind in enumerate(steps):
         x = MOTIF_LEFT + i * MOTIF_CELL + 2
@@ -453,6 +453,8 @@ def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
             d.rectangle((right - MOTIF_CELL, MOTIF_BOTTOM - 2, right, MOTIF_BOTTOM), fill=1)
         elif kind == REST:
             d.rectangle((x + 3, MOTIF_BOTTOM - 1, x + 4, MOTIF_BOTTOM), fill=1)
+        elif kind == CHANCE:  # une fois sur deux : demi-colonne vide
+            d.rectangle((x, mid, right, MOTIF_BOTTOM), outline=1)
         else:
             top = MOTIF_TOP if accented(kind) else mid
             d.rectangle((x, top, right, MOTIF_BOTTOM), fill=1)

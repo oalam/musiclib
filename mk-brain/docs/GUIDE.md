@@ -235,10 +235,11 @@ n'y a pas d'arpège : les pads jouent comme au clavier.
   règlent de nouveau la track, pendant que l'arpège joue.
 - **Encodeur 4, PATTERN tenu** : `MOT`, le motif rythmique. `OFF` joue une
   note par division ; les autres (`GALO`, `OFFB`, `TRES`, `A332`, `SYNC`,
-  `ROLL`, `LONG`, `ACID`, `RATC`, `CINQ`, `DOUZ`) posent l'arpège sur 1 à 16 pas, dessinés sur l'écran
+  `ROLL`, `LONG`, `ACID`, `RATC`, `HASA`, `CINQ`, `DOUZ`) posent l'arpège sur 1 à 16 pas, dessinés sur l'écran
   droit : colonne pleine = note accentuée, demi-colonne = note plus
   douce, point = silence, trait = la note précédente dure un pas de plus,
-  colonne fendue en 2 ou 3 = ratchet (la note rejouée dans le pas).
+  colonne fendue en 2 ou 3 = ratchet (la note rejouée dans le pas),
+  demi-colonne vide = note jouée une fois sur deux.
   Sur un silence la note attend : toutes les notes tenues sonnent. En
   1/16 un motif de 16 pas fait une mesure, calé sur celle de la DT2 ; un
   motif plus court (`CINQ`, 5 pas ; `DOUZ`, 12 pas) tourne contre la

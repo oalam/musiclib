@@ -931,6 +931,30 @@ plus de 16 pas, remise au pas 1 à l'appui ou à chaque phrase.
 déplace d'une mesure à l'autre et revient sur le premier temps à la
 mesure 6 ; `GALO` reste calé comme avant.
 
+## Slice 20 : pas probabilistes (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : motif `HASA` (`X.?x ?.x? X.?x ?.??`), division 1/16. Les `X` et
+les `x` jouent à chaque mesure ; chaque `?` ne joue qu'une fois sur deux,
+tiré à chaque passage : le galop se troue différemment à chaque tour.
+
+- **Un caractère, `?`** : une note ordinaire (atténuée comme un `x`) qui
+  joue une fois sur deux. Quand elle ne joue pas, c'est un silence : la
+  note de l'arpège attend le pas suivant, aucune note n'est sautée.
+- **Tirage à chaque passage**, indépendant d'un pas à l'autre ; rien n'est
+  mémorisé.
+- **LIVE REC** : la DT2 enregistre les notes reçues, donc le tirage du
+  moment. Le pattern relu rejoue ce tirage, figé.
+- **Écran** : demi-colonne vide (contour seul).
+- Un motif fait seulement de `?` est valide. `HASA` rejoint la
+  bibliothèque de départ (12 motifs).
+
+**Hors périmètre** : probabilité réglable (autre que 50 %), accent ou
+ratchet probabilistes, tirage reproductible (graine).
+
+**Critère de fin** : motif `HASA`, trois pads tenus, DT2 lancée : les `X`
+restent sur les temps 1 et 3, le reste change d'une mesure à l'autre,
+sans note bloquée ni note sautée dans l'ordre de l'arpège.
+
 ## Modes : live et design
 
 > **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
@@ -1733,6 +1757,7 @@ conditionne tout le reste.
 | 17 | **Accord en cours à l'écran** : progression qui joue, bandeau gauche : ses degrés, celui en cours en vidéo inverse, nom de l'accord (`1 6 3 7  Gb`) | cf. « Slice 17 », critère de fin | codée le 2026-11-11 (v0.39.0), à essayer sur la DT2 |
 | 18 | **Ratchets** : pas `r` / `R` (note jouée 2 fois dans le pas) et `t` / `T` (3 fois) dans `arp.motifs`, motif `RATC` | cf. « Slice 18 », critère de fin | codée le 2026-11-11 (v0.40.0), à essayer sur la DT2 |
 | 19 | **Motifs de longueur libre** : 1 à 16 pas, en boucle depuis le départ du transport (polyrythmie contre la mesure), motifs `CINQ` et `DOUZ` | cf. « Slice 19 », critère de fin | codée le 2026-11-11 (v0.41.0), à essayer sur la DT2 |
+| 20 | **Pas probabilistes** : pas `?` dans `arp.motifs` (note jouée une fois sur deux, silence sinon), motif `HASA` | cf. « Slice 20 », critère de fin | codée le 2026-11-11 (v0.42.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

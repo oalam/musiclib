@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.42.0] - 2026-11-11
+
+### Ajouté
+
+- [20] Pas probabilistes dans les motifs de l'arpège : `?`, une note
+  ordinaire jouée une fois sur deux, tirée à chaque passage ; un silence
+  sinon (la note attend). Demi-colonne vide à l'écran. Motif `HASA`
+  ajouté à `arp.motifs`.
+
 ## [0.41.0] - 2026-11-11
 
 ### Ajouté

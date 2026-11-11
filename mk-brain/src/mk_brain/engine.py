@@ -61,6 +61,8 @@ from dataclasses import dataclass
 from mk_brain.arp import (
     BARS,
     BARS_TICKS,
+    CHANCE,
+    CHANCE_ODDS,
     CHORD_LABELS,
     CHORDS,
     GATE_MAX,
@@ -625,7 +627,8 @@ class Engine:
             if steps is not None:
                 index = round(self._arp_pos / div) % len(steps)
                 kind = steps[index]
-                if kind in (REST, TIE):  # la note attend le prochain pas joué
+                # silence, liée, ou pas `?` perdu au tirage : la note attend le prochain pas joué
+                if kind in (REST, TIE) or (kind == CHANCE and self._rng.random() >= CHANCE_ODDS):
                     self._arp_pos += div
                     continue
                 ties = ties_after(steps, index)

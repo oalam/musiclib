@@ -56,7 +56,9 @@ MOTIF_NAME_MAX = 4  # largeur de la case de l'écran
 NOTE, ACCENT, REST, TIE = "x", "X", ".", "-"  # un caractère par pas du motif
 # Ratchets (slice 18) : la note du pas rejouée 2 ou 3 fois dans le pas ; majuscule = accent.
 RATCHETS: dict[str, int] = {"r": 2, "R": 2, "t": 3, "T": 3}
-PLAYED = frozenset({NOTE, ACCENT, *RATCHETS})  # pas qui prennent une note de l'arpège
+CHANCE = "?"  # slice 20 : note ordinaire jouée une fois sur deux, silence sinon
+CHANCE_ODDS = 0.5
+PLAYED = frozenset({NOTE, ACCENT, CHANCE, *RATCHETS})  # pas qui prennent une note de l'arpège
 
 Held = tuple[int, int]  # (pad, note)
 
