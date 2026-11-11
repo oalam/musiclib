@@ -1345,8 +1345,13 @@ modulations en page 2) :
   (c'était un `~` devant la valeur avant la 5.C). La première rotation
   repart de la dernière valeur connue (saut possible, assumé) et rend la
   jauge pleine.
-- Rotation : 4 unités brutes de la MK2 par cran de CC
-  (`encoders.raw_per_step`), restes cumulés.
+- Rotation : 15 unités brutes de la MK2 par cran de CC
+  (`encoders.raw_per_step`), restes cumulés. Course calée le 2026-11-11 sur
+  celle d'un potard de la DT2, mesurée par l'utilisateur à environ 17 crans
+  par quart de tour : un tour d'encodeur MK2 = 1024 unités brutes (10 bits),
+  un quart de tour = 256, 256 / 17 = 15,06 ; 0 à 127 en 127 × 15 / 1024 =
+  1,86 tour. Avant : 4 unités par cran (le pas minimal de la MK2), soit
+  64 crans par quart de tour.
 
 ### Affectation des contrôles
 

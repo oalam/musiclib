@@ -153,8 +153,8 @@ def live_encoder(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     hit(eng, 9, now)
     btn(eng, "SELECT", False, t=now)
     for _ in range(8):
-        eng.handle(EncoderEvent(2, 4, 0), now)  # BR
-    eng.handle(EncoderEvent(3, -12, 0), now)
+        eng.handle(EncoderEvent(2, cfg.encoders.raw_per_step, 0), now)  # BR
+    eng.handle(EncoderEvent(3, -3 * cfg.encoders.raw_per_step, 0), now)
     return eng, now + 100 * MS, True
 
 
@@ -210,7 +210,7 @@ def perform(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
         eng.handle(PadEvent(_index(pad), False, 0), now)
     btn(eng, "BROWSE_RIGHT", t=now)  # page 2 : filtre
     for _ in range(6):
-        eng.handle(EncoderEvent(2, 8, 0), now)  # CUT des deux tracks
+        eng.handle(EncoderEvent(2, 2 * cfg.encoders.raw_per_step, 0), now)  # CUT des deux tracks
     return eng, now + 3 * SECOND, True
 
 

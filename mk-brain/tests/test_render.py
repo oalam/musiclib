@@ -41,7 +41,9 @@ def test_repeat_shows_divisions_under_display_buttons(cfg: Config) -> None:
 
 def test_touched_column_is_inverted_above_its_encoder(cfg: Config) -> None:
     eng = Engine(cfg)
-    eng.handle(EncoderEvent(6, 4, 0), 0)  # encodeur 6 : 2e colonne de l'écran droit
+    eng.handle(
+        EncoderEvent(6, cfg.encoders.raw_per_step, 0), 0
+    )  # encodeur 6 : 2e colonne de l'écran droit
     probe = (render.COL + 1, render.BAND + 2)
     assert render.right(eng, 0).getpixel(probe)
     assert not render.left(eng, 0).getpixel(probe)

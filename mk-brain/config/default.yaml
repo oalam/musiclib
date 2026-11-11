@@ -37,7 +37,7 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
   order: up                  # up, down, updown, played (ordre d'appui), random
   octaves: 1                 # 1 à 3
   gate: 50                   # durée d'une note, 10 à 100 % de la division
-  raw_per_choice: 24         # course d'encodeur par valeur de ORD, OCT et MOT (un CC : 4 par cran)
+  raw_per_choice: 24         # course d'encodeur par valeur de ORD, OCT, MOT et PRE (un CC : 15 par cran)
   raw_per_gate_step: 12      # course d'encodeur par pas de 5 % de GATE
   unaccented: 70             # vélocité d'un pas `x` d'un motif, en % de celle du pad (`X` : 100 %)
   motif: "OFF"               # motif de départ : un nom de `motifs`, ou "OFF" (une note par division)
@@ -73,7 +73,7 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
 # (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset).
 encoders:
   mute_cc: 94
-  raw_per_step: 4            # pas minimal remonté par la MK2 (constat slice 0)
+  raw_per_step: 15           # unités brutes par cran de CC : course d'un potard DT2, 17 crans par quart de tour (256 / 17) ; pas minimal de la MK2 : 4
   pages:
     - - {name: LVL, cc: 95}                    # niveau de track
       - {name: BR, cc: 54}                     # bit reduction

@@ -178,7 +178,8 @@ class EncodersConfig(BaseModel):
 
     pages: list[list[Encoder]]
     mute_cc: int = Field(94, ge=0, le=127)
-    raw_per_step: int = Field(4, ge=1)  # unités brutes de la MK2 par cran de CC
+    # unités brutes de la MK2 par cran de CC ; 15 : potard DT2, 17 crans par quart de tour
+    raw_per_step: int = Field(15, ge=1)
 
     @field_validator("pages")
     @classmethod

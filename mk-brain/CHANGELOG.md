@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.35.1] - 2026-11-11
+
+### Modifié
+
+- Encodeurs de son : course calée sur celle d'un potard de la DT2, environ
+  17 crans par quart de tour. `encoders.raw_per_step` passe de 4 à 15
+  (256 unités brutes par quart de tour / 17 = 15,06) ; 0 à 127 en 1,86
+  tour au lieu d'un demi. La config de l'arpège garde sa course propre.
+
 ## [0.35.0] - 2026-11-11
 
 ### Ajouté
