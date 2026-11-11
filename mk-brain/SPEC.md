@@ -775,7 +775,7 @@ pad change d'accord.
   motif se resserre sur les deux dernières colonnes (8 px par pas).
 - Un preset sauvé avant cette slice (sans accord) vaut `OFF`.
 
-**Hors périmètre** : progressions d'accords automatiques, renversements,
+**Hors périmètre** : progressions d'accords automatiques (slice 16), renversements,
 accords plaqués (non arpégés), accords hors `ARPG`, choix majeur / mineur
 forcé hors gamme.
 
@@ -783,6 +783,66 @@ forcé hors gamme.
 notes arpégées, justes dans la gamme sur chaque degré ; `7TH` en ajoute
 une quatrième ; `OFF` revient à la note seule ; sauvé dans un preset,
 l'accord revient au rappel.
+
+## Slice 16 : progressions d'accords de l'arpège (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : banque C (la# éolien), mode ARPG, `CHD TRI`, `PRG 1637`,
+`BAR 1`. Le pad la# tenu, sans rien toucher d'autre : une mesure de la#
+mineur (la# réb fa), une de fa# majeur, une de réb majeur, une de sol#
+majeur, et la boucle reprend. Le pad réb à la place : la même suite,
+partie de réb, toujours dans la gamme.
+
+Une **progression** est une suite de degrés (1 à 7) écrite en YAML :
+`"1637": [1, 6, 3, 7]`.
+
+**Arbitré le 2026-11-11** :
+
+- **Degrés comptés depuis le pad tenu** : le degré 1 est la note du pad,
+  les autres la déplacent dans la gamme de la banque. Pad sur la tonique :
+  la progression classique ; un autre pad décale toute la suite. Plusieurs
+  pads tenus bougent ensemble.
+- **Encodeur 7 `PRG`, PATTERN tenu** : la progression, `OFF` en premier,
+  puis celles de `arp.progressions` dans l'ordre du fichier (6 au départ,
+  nommées par leurs degrés). **Encodeur 8 `BAR`** : durée de chaque
+  accord, `1/2`, `1`, `2` ou `4` mesures. Même course que les autres
+  réglages, bornés.
+- **Gardés dans les presets** (septième et huitième réglages) et dans la
+  session ; valeurs de départ `arp.progression` et `arp.bars`.
+
+**Tranché à l'écriture, à confirmer à l'essai** :
+
+- **Calée sur le transport** : l'accord joué est celui de la position
+  depuis le départ du transport, divisée par la durée `BAR`, modulo la
+  longueur de la suite. Poser le pad en cours de route prend la
+  progression là où elle en est ; elle ne repart pas à l'appui.
+- **Sens du déplacement** : degrés 2 à 4 vers le haut, 5 à 7 vers le bas
+  (le 5 est une quarte sous le pad, le 7 une seconde sous lui) : la
+  fondamentale reste à une quarte au plus du pad.
+- **À chaque changement d'accord l'arpège repart de sa première note**
+  (la fondamentale en ordre montant).
+- **Avec `CHD OFF`** la progression déplace la note seule : une ligne de
+  basse qui suit les degrés.
+- **Gamme** : comme pour les accords, celle de la disposition du clavier
+  calée sur la banque. Gamme à 5 ou 6 notes : les degrés comptent les
+  notes de cette gamme. Sans gamme (chromatique hors projet) : éolien
+  construit sur la note du pad. Pad hors gamme (chromatique dans une
+  banque) : il garde son écart avec la note de la gamme juste en dessous.
+- **Écran droit, PATTERN tenu** : `PRE`, `CHD`, `PRG`, `BAR` au-dessus des
+  encodeurs 5 à 8 ; le motif remonte à droite de l'étiquette `ARPG`, sous
+  les divisions (12 px par pas).
+- Une progression mal écrite (degré hors 1-7, plus de 16 accords, nom de
+  plus de 4 caractères ou `OFF`) est refusée au chargement ; un preset
+  sauvé dont la progression a disparu de la config est ignoré.
+
+**Hors périmètre** : accords empruntés ou altérés (degrés hors gamme),
+qualité d'accord par degré, durées différentes par accord, progression
+relancée à l'appui, édition sur la machine, affichage de l'accord en
+cours.
+
+**Critère de fin** : banque en éolien, `CHD TRI`, `PRG 1637`, `BAR 1`, pad
+de la tonique tenu : quatre accords d'une mesure chacun, changement sur
+le premier temps, calé sur le kick ; `BAR 2` double la durée ; `PRG OFF`
+revient à l'accord du pad.
 
 ## Modes : live et design
 
@@ -1578,6 +1638,7 @@ conditionne tout le reste.
 | 13 | **Presets de l'arpège** : bibliothèque `arp.presets` (ordre, octaves, gate, division, motif), rappel par l'encodeur 5 `PRE` PATTERN tenu, `----` dès qu'un réglage s'en écarte | cf. « Slice 13 : presets de l'arpège », critère de fin | codée le 2026-11-11 (v0.35.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 14 | **Banque de 16 presets** : PATTERN tenu, pad n = rappel, SHIFT + pad n = sauvegarde des réglages courants ; `state/arp-presets.json`, commun aux projets ; la config remplit les emplacements non sauvés | cf. « Slice 14 », critère de fin | codée le 2026-11-11 (v0.36.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 15 | **Accords de l'arpège** : encodeur 6 `CHD` PATTERN tenu (`OFF`, `TRI`, `7TH`, `SUS2`, `SUS4`, `PWR`), un pad = un accord pris dans la gamme de la banque, gardé dans les presets | cf. « Slice 15 », critère de fin | codée le 2026-11-11 (v0.37.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
+| 16 | **Progressions d'accords** : `arp.progressions` (suites de degrés), encodeur 7 `PRG` et encodeur 8 `BAR` (1/2 à 4 mesures par accord) PATTERN tenu, degrés comptés depuis le pad tenu, calées sur le transport, gardées dans les presets | cf. « Slice 16 », critère de fin | codée le 2026-11-11 (v0.38.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

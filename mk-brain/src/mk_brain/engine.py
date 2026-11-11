@@ -59,6 +59,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from mk_brain.arp import (
+    BARS,
+    BARS_TICKS,
     CHORD_LABELS,
     CHORDS,
     GATE_MAX,
@@ -71,8 +73,11 @@ from mk_brain.arp import (
     ORDERS,
     REST,
     TIE,
+    ArpBars,
     ArpChord,
     ArpOrder,
+    degree_steps,
+    shift,
     spread,
     ties_after,
 )
@@ -224,6 +229,9 @@ class Engine:
         self.arp_gate = cfg.arp.gate
         self.arp_motif = cfg.arp.motif  # nom du motif (slice 12), ou OFF
         self.arp_chord: ArpChord = cfg.arp.chord  # un pad = un accord (slice 15), ou off
+        self.arp_progression = cfg.arp.progression  # nom de la progression (slice 16), ou OFF
+        self.arp_bars: ArpBars = cfg.arp.bars  # durée de chaque accord, en mesures
+        self._arp_degree: int | None = None  # rang de l'accord en cours dans la progression
         self.arp_preset: str | None = None  # dernier preset rappelé (slice 13)
         # slice 14 : emplacements 1-16 sauvés depuis la MK2 (`state/arp-presets.json`), qui
         # l'emportent sur ceux de la config ; `arp_bank_dirty` : fichier à réécrire
@@ -348,7 +356,7 @@ class Engine:
         return self.arp and "PATTERN" in self._held_buttons
 
     def arp_view(self) -> list[tuple[str, str]]:
-        """Config de l'arpège, encodeurs 1-6 : (abrégé, valeur affichée). `PRE` : le
+        """Config de l'arpège, encodeurs 1-8 : (abrégé, valeur affichée). `PRE` : le
         dernier preset rappelé tant que les réglages sont les siens, sinon `----`."""
         return [
             ("ORD", ORDER_LABELS[self.arp_order]),
@@ -357,6 +365,8 @@ class Engine:
             ("MOT", self.arp_motif),
             ("PRE", self.arp_preset_shown or NO_PRESET),
             ("CHD", CHORD_LABELS[self.arp_chord]),
+            ("PRG", self.arp_progression),
+            ("BAR", self.arp_bars),
         ]
 
     @property
@@ -374,6 +384,8 @@ class Engine:
             division=self.division,
             motif=self.arp_motif,
             chord=self.arp_chord,
+            progression=self.arp_progression,
+            bars=self.arp_bars,
         )
 
     def arp_slots(self) -> list[tuple[str, ArpPreset] | None]:
@@ -398,6 +410,7 @@ class Engine:
         self.arp_preset = name
         self.arp_order, self.arp_octaves, self.arp_gate = p.order, p.octaves, p.gate
         self.division, self.arp_motif, self.arp_chord = p.division, p.motif, p.chord
+        self.arp_progression, self.arp_bars = p.progression, p.bars
         self.leds_dirty = True
 
     def _preset_pad(self, pad: int) -> None:
@@ -515,6 +528,7 @@ class Engine:
         self._arp_notes.clear()
         self._arp_pos = None
         self._arp_step = 0
+        self._arp_degree = None
         self.leds_dirty = True
 
     def _toggle_hold(self) -> None:
@@ -527,12 +541,11 @@ class Engine:
                 self._arp_clear()
 
     def _arp_turn(self, index: int, delta: int, now: int) -> None:
-        """Encodeurs 1-6, PATTERN tenu en ARPG : ordre, octaves, gate, motif, preset, accord.
+        """Encodeurs 1-8, PATTERN tenu en ARPG : ordre, octaves, gate, motif, preset, accord,
+        progression, durée d'un accord.
         Course propre à la page (`arp.raw_per_choice`, `arp.raw_per_gate_step`) : au pas
         d'un CC, le moindre mouvement sautait plusieurs valeurs (essai du 2026-11-11)."""
         self._pattern_used()
-        if index > 6:
-            return
         per = self.cfg.arp.raw_per_gate_step if index == 3 else self.cfg.arp.raw_per_choice
         acc = self._arp_residue.get(index, 0) + delta
         steps = int(acc / per)  # vers zéro, dans les deux sens
@@ -553,6 +566,12 @@ class Engine:
         elif index == 6:
             i = max(0, min(len(CHORDS) - 1, CHORDS.index(self.arp_chord) + steps))
             self.arp_chord = CHORDS[i]
+        elif index == 7:
+            names = self.cfg.arp.progression_names
+            i = max(0, min(len(names) - 1, names.index(self.arp_progression) + steps))
+            self.arp_progression = names[i]
+        elif index == 8:
+            self.arp_bars = BARS[max(0, min(len(BARS) - 1, BARS.index(self.arp_bars) + steps))]
         else:  # preset : repart du dernier rappelé, même retouché ; `----` ne change rien
             presets: list[str | None] = [None, *self.arp_bank]
             at = presets.index(self.arp_preset) if self.arp_preset in presets else 0
@@ -598,9 +617,21 @@ class Engine:
                     continue
                 ties = ties_after(steps, index)
             held = [(p, n.note) for p, n in self._arp_notes.items()]
+            lay = self.layout
+            scale = {(lay.base + i) % 12 for i in lay.intervals}
+            degrees = self.cfg.arp.progressions.get(self.arp_progression)
+            if degrees is not None:  # progression : les pads tenus suivent les degrés
+                rank = int((self._arp_pos + 0.01) // BARS_TICKS[self.arp_bars]) % len(degrees)
+                if rank != self._arp_degree:  # nouvel accord : l'arpège repart de sa 1re note
+                    self._arp_degree = rank
+                    self._arp_step = 0
+                move = degree_steps(degrees[rank])
+                held = [(p, m) for p, n in held if (m := shift(n, move, scale)) in range(128)]
+                if not held:  # tout est sorti de 0-127 : rien à jouer sur ce pas
+                    self._arp_pos += div
+                    continue
             if self.arp_chord != "off":  # un pad = un accord, pris dans la gamme du clavier
-                lay = self.layout
-                held = spread(held, self.arp_chord, {(lay.base + i) % 12 for i in lay.intervals})
+                held = spread(held, self.arp_chord, scale)
             seq = arp_sequence(held, self.arp_order, self.arp_octaves)
             if self.arp_order == "random":
                 pad, note = seq[self._rng.randrange(len(seq))]
@@ -812,6 +843,8 @@ class Engine:
             arp_gate=self.arp_gate,
             arp_motif=self.arp_motif,
             arp_chord=self.arp_chord,
+            arp_progression=self.arp_progression,
+            arp_bars=self.arp_bars,
             arp_preset=self.arp_preset,
         )
 
@@ -853,6 +886,11 @@ class Engine:
         for kind in CHORDS:
             if kind == session.arp_chord:
                 self.arp_chord = kind
+        if session.arp_progression in self.cfg.arp.progression_names:
+            self.arp_progression = session.arp_progression
+        for bars in BARS:
+            if bars == session.arp_bars:
+                self.arp_bars = bars
         if session.arp_preset in self.arp_bank:
             self.arp_preset = session.arp_preset
         self._apply_phrase()

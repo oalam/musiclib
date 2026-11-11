@@ -19,7 +19,10 @@ def test_bank_round_trip(tmp_path: Path, cfg: Config) -> None:
 def test_unusable_slots_are_dropped(tmp_path: Path, cfg: Config) -> None:
     """Hors des 16 pads, ou motif disparu de la config : ignoré ; fichier illisible : rien."""
     path = tmp_path / "arp-presets.json"
-    save_bank({0: MINE, 17: MINE, 5: MINE.model_copy(update={"motif": "RIEN"}), 9: MINE}, path)
+    gone = MINE.model_copy(update={"progression": "2514"})
+    save_bank(
+        {0: MINE, 17: MINE, 5: MINE.model_copy(update={"motif": "RIEN"}), 6: gone, 9: MINE}, path
+    )
     assert load_bank(cfg.arp, path) == {9: MINE}
     path.write_text("{", encoding="utf-8")
     assert load_bank(cfg.arp, path) == {}

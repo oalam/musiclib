@@ -49,6 +49,8 @@ class Session(BaseModel):
     arp_gate: int | None = None
     arp_preset: str | None = None  # dernier preset rappelé (slice 13)
     arp_chord: str | None = None  # accord (slice 15)
+    arp_progression: str | None = None  # progression et durée d'un accord (slice 16)
+    arp_bars: str | None = None
     arp_motif: str | None = None  # motif (slice 12), par son nom ; disparu : celui de la config
 
 

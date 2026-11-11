@@ -406,10 +406,12 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
             d.point(dots, fill=1 - ink if x <= done else ink)
 
 
-MOTIF_LEFT = 2 * COL  # écran droit : PRE et CHD (encodeurs 5-6), le motif sur les 2 autres colonnes
-MOTIF_CELL = (WIDTH - MOTIF_LEFT) // MOTIF_STEPS  # une case par pas
-MOTIF_BLOCK = MOTIF_CELL - 4  # largeur d'une note, 3 px de vide avant la suivante (8 px par pas)
-MOTIF_TOP, MOTIF_BOTTOM = BAND + 5, HEIGHT - 3
+# Motif : écran droit, à droite de l'étiquette du mode, entre les divisions et les faders
+MOTIF_LEFT = COL
+MOTIF_CELL = (WIDTH - MOTIF_LEFT) // MOTIF_STEPS  # une case par pas (12 px)
+MOTIF_BLOCK = MOTIF_CELL - 4  # largeur d'une note, 3 px de vide avant la suivante
+MOTIF_MARK = TAG_TOP  # repère de temps, juste sous les divisions
+MOTIF_TOP, MOTIF_BOTTOM = TAG_TOP + 3, BAND - 3
 
 
 def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
@@ -420,22 +422,19 @@ def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
         x = MOTIF_LEFT + i * MOTIF_CELL + 2
         right = x + MOTIF_BLOCK
         if i % STEPS_PER_BEAT == 0:
-            d.line((x, BAND + 2, right, BAND + 2), fill=1)
+            d.line((x, MOTIF_MARK, right, MOTIF_MARK), fill=1)
         if kind == TIE:  # part de la case précédente, sans trou
-            d.rectangle((right - MOTIF_CELL, MOTIF_BOTTOM - 3, right, MOTIF_BOTTOM), fill=1)
+            d.rectangle((right - MOTIF_CELL, MOTIF_BOTTOM - 2, right, MOTIF_BOTTOM), fill=1)
         elif kind == REST:
-            d.rectangle((x + 1, MOTIF_BOTTOM - 1, x + 2, MOTIF_BOTTOM), fill=1)
+            d.rectangle((x + 3, MOTIF_BOTTOM - 1, x + 4, MOTIF_BOTTOM), fill=1)
         else:
             top = MOTIF_TOP if kind == ACCENT else mid
             d.rectangle((x, top, right, MOTIF_BOTTOM), fill=1)
 
 
 def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:
-    """Config de l'arpège : ORD, OCT, GATE, MOT, PRE et CHD au-dessus des encodeurs 1-6,
-    en toutes lettres ; le motif choisi en 16 cases à droite de CHD."""
-    steps = engine.arp_steps
-    if screen == 1 and steps is not None:
-        _motif(d, steps)
+    """Config de l'arpège au-dessus des 8 encodeurs, en toutes lettres : ORD, OCT, GATE,
+    MOT, puis PRE, CHD, PRG, BAR."""
     small = _font(SMALL)
     for k, (name, value) in enumerate(engine.arp_view()):
         if k // COLS != screen:
@@ -574,6 +573,9 @@ def right(engine: Engine, now: int) -> Image.Image:
     if _showing_repeat(engine):
         _repeat_band(d, engine, 1)
         _mode_tag(d, engine, TAG_BOX_REPEAT)
+        steps = engine.arp_steps
+        if engine.arp_menu and steps is not None:  # le motif choisi, à droite de l'étiquette
+            _motif(d, steps)
     else:
         _right_band(d, engine, now)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)

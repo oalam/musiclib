@@ -2,7 +2,16 @@ from __future__ import annotations
 
 import pytest
 
-from mk_brain.arp import MotifError, chord, parse_motif, sequence, spread, ties_after
+from mk_brain.arp import (
+    MotifError,
+    chord,
+    degree_steps,
+    parse_motif,
+    sequence,
+    shift,
+    spread,
+    ties_after,
+)
 
 HELD = [(5, 65), (1, 58), (3, 61)]  # (pad, note), dans l'ordre d'appui
 
@@ -65,3 +74,24 @@ def test_spread_merges_the_chords_of_held_pads() -> None:
     held = [(1, 60), (3, 63)]
     assert spread(held, "tri", AEOLIAN) == [(1, 60), (1, 63), (1, 67), (3, 70)]
     assert spread([(1, 122)], "tri", AEOLIAN) == [(1, 122), (1, 125)]  # rien au-delà de 127
+
+
+def test_degrees_stay_within_a_fourth_of_the_pad() -> None:
+    assert [degree_steps(d) for d in range(1, 8)] == [0, 1, 2, 3, -3, -2, -1]
+
+
+def test_shift_walks_the_scale() -> None:
+    assert [shift(60, s, AEOLIAN) for s in (0, 1, 2, 3, -1, -2, -3, 7)] == [
+        60,
+        62,
+        63,
+        65,
+        58,
+        56,
+        55,
+        72,
+    ]
+    assert shift(61, 2, AEOLIAN) == 64  # hors gamme : garde son demi-ton au-dessus de do
+    assert shift(59, 1, AEOLIAN) == 61  # sous la première note de la gamme (si bémol + 1)
+    assert shift(64, -2, set()) == 60  # sans gamme : éolien sur la note
+    assert shift(60, 2, {0, 3, 5, 7, 10}) == 65  # pentatonique : les degrés comptent ses notes

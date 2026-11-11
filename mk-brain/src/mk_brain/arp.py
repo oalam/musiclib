@@ -40,6 +40,16 @@ CHORD_TONES: dict[ArpChord, tuple[tuple[int, ...], ...]] = {
     "pwr": (_FIFTH, _OCTAVE),
 }
 
+# Progressions (slice 16) : suites de degrés 1-7 comptés depuis le pad tenu, un accord par
+# durée `BAR` ; degrés 2-4 vers le haut, 5-7 vers le bas (une quarte au plus du pad).
+ArpBars = Literal["1/2", "1", "2", "4"]
+BARS: tuple[ArpBars, ...] = ("1/2", "1", "2", "4")
+BARS_TICKS: dict[ArpBars, int] = {"1/2": 48, "1": 96, "2": 192, "4": 384}  # 96 ticks par mesure
+PROGRESSION_OFF = "OFF"
+PROGRESSION_MAX = 16
+DEGREES_UP = 4  # dernier degré compté vers le haut
+AEOLIAN = (0, 2, 3, 5, 7, 8, 10)  # sans gamme connue
+
 MOTIF_STEPS = 16
 MOTIF_OFF = "OFF"  # pas de motif : une note par division, sans atténuation
 MOTIF_NAME_MAX = 4  # largeur de la case de l'écran
@@ -113,3 +123,21 @@ def spread(held: Sequence[Held], kind: ArpChord, scale: Set[int]) -> list[Held]:
                 seen.add(tone)
                 out.append((pad, tone))
     return out
+
+
+def degree_steps(degree: int) -> int:
+    """Degré 1-7 d'une progression → pas de gamme depuis le pad (2-4 montent, 5-7 descendent)."""
+    return degree - 1 if degree <= DEGREES_UP else degree - 8
+
+
+def shift(note: int, steps: int, scale: Set[int]) -> int:
+    """`note` déplacée de `steps` notes de la gamme `scale` (classes de hauteur 0-11).
+
+    Hors gamme, la note garde son écart avec celle de la gamme juste en dessous ; sans
+    gamme, éolien construit sur la note elle-même."""
+    pcs = sorted(scale) or sorted((note + i) % 12 for i in AEOLIAN)
+    pc = note % 12
+    index = sum(1 for p in pcs if p <= pc) - 1  # -1 : sous la première, dernière d'en dessous
+    below = pcs[index] if index >= 0 else pcs[-1] - 12
+    octave, k = divmod(index + steps, len(pcs))
+    return note - pc + pcs[k] + 12 * octave + (pc - below)

@@ -242,14 +242,18 @@ def test_arp_config_shows_divisions_and_settings(cfg: Config) -> None:
     assert render.left(eng, 0).crop((0, render.BAND + 1, WIDTH, HEIGHT)).tobytes() != before
     top = render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes()
     under = (0, render.BAND + 1, WIDTH, HEIGHT)
-    empty = render.right(eng, 0).crop(under).tobytes()
-    eng.arp_motif = "GALO"  # le motif choisi : son nom à gauche, ses 16 pas à droite
-    galop = render.right(eng, 0).crop(under).tobytes()
+    beside = (render.COL, render.TAG_TOP, WIDTH, render.BAND)  # à droite de l'étiquette ARPG
+    empty = render.right(eng, 0).crop(beside).tobytes()
+    eng.arp_motif = "GALO"  # le motif choisi : ses 16 pas sous les divisions de l'écran droit
+    galop = render.right(eng, 0).crop(beside).tobytes()
     eng.arp_motif = "LONG"
-    long = render.right(eng, 0).crop(under).tobytes()
+    assert len({empty, galop, render.right(eng, 0).crop(beside).tobytes()}) == 3
+    views = [render.right(eng, 0).crop(under).tobytes()]
     eng.handle(EncoderEvent(5, cfg.arp.raw_per_choice, 0), 0)  # PRE : le nom du preset
-    preset = render.right(eng, 0).crop(under).tobytes()
-    eng.arp_chord = "7th"  # CHD au-dessus de l'encodeur 6
-    assert len({empty, galop, long, preset, render.right(eng, 0).crop(under).tobytes()}) == 5
+    views.append(render.right(eng, 0).crop(under).tobytes())
+    for name, value in (("arp_chord", "7th"), ("arp_progression", "1637"), ("arp_bars", "4")):
+        setattr(eng, name, value)  # CHD, PRG, BAR au-dessus des encodeurs 6 à 8
+        views.append(render.right(eng, 0).crop(under).tobytes())
+    assert len(set(views)) == 5
     eng.handle(ButtonEvent("PATTERN", False), SECOND)
     assert eng.arp and render.right(eng, 0).crop((0, 0, WIDTH, render.BAND)).tobytes() != top

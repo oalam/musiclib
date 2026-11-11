@@ -13,7 +13,6 @@ from pathlib import Path
 
 from pydantic import BaseModel, ValidationError
 
-from mk_brain.arp import MOTIF_OFF
 from mk_brain.config import PRESET_SLOTS, ArpConfig, ArpPreset
 from mk_brain.session import STATE_DIR
 
@@ -30,12 +29,8 @@ def user_name(slot: int) -> str:
 
 
 def usable(arp: ArpConfig, slots: dict[int, ArpPreset]) -> dict[int, ArpPreset]:
-    """Emplacements valides : numéro 1-16, motif encore présent dans la config."""
-    return {
-        n: p
-        for n, p in sorted(slots.items())
-        if 1 <= n <= PRESET_SLOTS and (p.motif == MOTIF_OFF or p.motif in arp.motifs)
-    }
+    """Emplacements valides : numéro 1-16, motif et progression encore dans la config."""
+    return {n: p for n, p in sorted(slots.items()) if 1 <= n <= PRESET_SLOTS and arp.knows(p)}
 
 
 def load_bank(arp: ArpConfig, path: Path = PATH) -> dict[int, ArpPreset]:

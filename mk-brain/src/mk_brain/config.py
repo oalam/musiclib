@@ -15,6 +15,9 @@ from mk_brain.arp import (
     MAX_OCTAVES,
     MOTIF_NAME_MAX,
     MOTIF_OFF,
+    PROGRESSION_MAX,
+    PROGRESSION_OFF,
+    ArpBars,
     ArpChord,
     ArpOrder,
     parse_motif,
@@ -106,6 +109,8 @@ class ArpPreset(BaseModel):
     division: str
     motif: str = MOTIF_OFF
     chord: ArpChord = "off"  # slice 15 ; absent d'un preset d'avant : pas d'accord
+    progression: str = PROGRESSION_OFF  # slice 16, idem
+    bars: ArpBars = "1"
 
     @field_validator("division")
     @classmethod
@@ -123,12 +128,40 @@ class ArpConfig(BaseModel):
     gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
     # course des encodeurs de la config (PATTERN tenu), en unités brutes par valeur : bien plus
     # longue que celle d'un CC (`encoders.raw_per_step`), ces réglages n'ont que 3 à 19 valeurs
-    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT, PRE et CHD
+    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT, MOT, PRE, CHD, PRG et BAR
     raw_per_gate_step: int = Field(12, ge=1)  # GATE, par pas de 5 %
     # motifs (slice 12) : nom → 16 pas (x note, X accent, . silence, - liée), ordre du fichier
     motifs: dict[str, str] = {}
     motif: str = MOTIF_OFF  # motif de départ : un nom de `motifs`, ou OFF
     chord: ArpChord = "off"  # accord de départ (slice 15) : off, tri, 7th, sus2, sus4, pwr
+    # progressions (slice 16) : nom → degrés 1-7 depuis le pad tenu, ordre du fichier
+    progressions: dict[str, list[int]] = {}
+    progression: str = PROGRESSION_OFF  # progression de départ : un nom, ou OFF
+    bars: ArpBars = "1"  # durée de chaque accord, en mesures
+
+    @field_validator("progressions")
+    @classmethod
+    def _progressions(cls, progressions: dict[str, list[int]]) -> dict[str, list[int]]:
+        for name, degrees in progressions.items():
+            if name == PROGRESSION_OFF or not 1 <= len(name) <= MOTIF_NAME_MAX:
+                raise ValueError(
+                    f"progression {name!r} : nom de 1 à {MOTIF_NAME_MAX} caractères, OFF réservé"
+                )
+            if not 1 <= len(degrees) <= PROGRESSION_MAX or any(not 1 <= d <= 7 for d in degrees):
+                raise ValueError(f"progression {name!r} : 1 à {PROGRESSION_MAX} degrés, de 1 à 7")
+        return progressions
+
+    @property
+    def progression_names(self) -> list[str]:
+        """Choix de l'encodeur PRG : OFF, puis les progressions dans l'ordre du fichier."""
+        return [PROGRESSION_OFF, *self.progressions]
+
+    def knows(self, preset: ArpPreset) -> bool:
+        """Motif et progression du preset présents dans la config."""
+        return (preset.motif == MOTIF_OFF or preset.motif in self.motifs) and (
+            preset.progression in self.progression_names
+        )
+
     unaccented: int = Field(70, ge=1, le=100)  # vélocité d'un pas `x`, en % de celle du pad
     presets: dict[str, ArpPreset] = {}  # slice 13 : nom → réglages, ordre du fichier
 
@@ -146,13 +179,15 @@ class ArpConfig(BaseModel):
     def _motif(self) -> ArpConfig:
         if self.motif != MOTIF_OFF and self.motif not in self.motifs:
             raise ValueError(f"arp.motif {self.motif!r} : absent de arp.motifs")
+        if self.progression not in self.progression_names:
+            raise ValueError(f"arp.progression {self.progression!r} : absente de arp.progressions")
         for name, preset in self.presets.items():
             if not 1 <= len(name) <= MOTIF_NAME_MAX:
                 raise ValueError(f"preset {name!r} : nom de 1 à {MOTIF_NAME_MAX} caractères")
             if re.fullmatch(r"U\d\d", name):
                 raise ValueError(f"preset {name!r} : U01 à U16 réservés aux presets sauvés")
-            if preset.motif != MOTIF_OFF and preset.motif not in self.motifs:
-                raise ValueError(f"preset {name!r} : motif {preset.motif!r} absent de arp.motifs")
+            if not self.knows(preset):
+                raise ValueError(f"preset {name!r} : motif ou progression absents de la config")
         if len(self.presets) > PRESET_SLOTS:
             raise ValueError(f"arp.presets : {len(self.presets)} presets, {PRESET_SLOTS} au plus")
         return self

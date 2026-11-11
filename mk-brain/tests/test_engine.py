@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 
 import pytest
@@ -1067,7 +1067,10 @@ def test_arp_config_encoders_and_division_buttons(cfg: Config) -> None:
     assert eng.arp_motif == cfg.arp.motif_names[1] and eng.last_control == "ARP MOT GALO"
     eng.handle(EncoderEvent(4, -5 * step, 0), 0)
     assert eng.arp_motif == "OFF" and eng.arp_steps is None  # borné
-    assert eng.handle(EncoderEvent(7, step, 0), 0) == []  # encodeurs 7-8 libres dans la config
+    assert eng.handle(EncoderEvent(7, step, 0), 0) == []  # rien n'est envoyé à la DT2
+    assert eng.arp_progression == cfg.arp.progression_names[1]
+    eng.handle(EncoderEvent(8, 9 * step, 0), 0)
+    assert eng.arp_bars == "4" and eng.last_control == "ARP BAR 4"  # borné
     btn(eng, "BROWSE_RIGHT")  # BROWSE : pages de son, comme partout
     assert eng.last_control == "page 2/2"
 
@@ -1088,7 +1091,7 @@ def test_arp_settings_survive_the_session(cfg: Config) -> None:
     assert other.arp_motif == "LONG"
 
 
-def _arp_notes(eng: Engine, positions: tuple[int, ...]) -> list[tuple[float, int, int]]:
+def _arp_notes(eng: Engine, positions: Iterable[int]) -> list[tuple[float, int, int]]:
     """(position en ticks, note, vélocité) des note on de l'arpège à ces positions."""
     played: list[tuple[float, int, int]] = []
     for k in positions:
@@ -1246,3 +1249,38 @@ def test_arp_chord_one_pad_plays_a_chord_in_the_scale(cfg: Config) -> None:
     assert other.arp_chord == "7th"
     other.restore(Session(arp_chord="jazz"))
     assert other.arp_chord == "7th"
+
+
+def test_arp_progression_moves_the_held_pad_through_the_scale(cfg: Config) -> None:
+    """PRG 1637, BAR 1/2, sans accord : le pad tenu suit les degrés, un par demi-mesure
+    (48 ticks), calé sur le transport ; 6 et 7 passent sous le pad."""
+    eng = arp(cfg, running_clock(300))
+    eng.group = next(i for i, lay in enumerate(cfg.layouts) if lay.name == "Aeolian")
+    eng.division, eng.arp_progression, eng.arp_bars = "1/4", "1637", "1/2"
+    root = eng.target(1)[1]  # do éolien
+    first = press(eng, 1 * TICK, pad=_index(1))  # position 0 : degré 1
+    played = _ons(first) + [n for _, n, _ in _arp_notes(eng, range(24, 216, 24))]
+    assert played == [
+        *[root] * 2,  # 1
+        *[root - 4] * 2,  # 6 : la bémol, sous le pad
+        *[root + 3] * 2,  # 3 : mi bémol
+        *[root - 2] * 2,  # 7 : si bémol, sous le pad
+        root,  # la boucle reprend
+    ]
+    assert eng._arp_current().progression == "1637"
+    other = Engine(cfg)
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert (other.arp_progression, other.arp_bars) == ("1637", "1/2")
+    other.restore(Session(arp_progression="2514", arp_bars="8"))
+    assert (other.arp_progression, other.arp_bars) == ("1637", "1/2")
+
+
+def test_arp_progression_restarts_the_chord_on_each_change(cfg: Config) -> None:
+    eng = arp(cfg, running_clock(200))
+    eng.group = next(i for i, lay in enumerate(cfg.layouts) if lay.name == "Aeolian")
+    eng.division, eng.arp_progression, eng.arp_bars, eng.arp_chord = "1/4", "1637", "1/2", "tri"
+    root = eng.target(1)[1]
+    first = press(eng, 1 * TICK, pad=_index(1))
+    played = _ons(first) + [n for _, n, _ in _arp_notes(eng, range(24, 120, 24))]
+    # do mineur (2 notes), puis la bémol majeur depuis sa fondamentale
+    assert played == [root, root + 3, root - 4, root, root + 3]

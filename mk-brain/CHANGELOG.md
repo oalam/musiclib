@@ -3,6 +3,28 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.38.0] - 2026-11-11
+
+### Ajouté
+
+- [16] Progressions d'accords de l'arpège : `arp.progressions` dans
+  `config/default.yaml`, des suites de degrés 1 à 7 (`1637`, `1765`,
+  `1645`, `1474`, `1516`, `1716`). Encodeur 7 `PRG` (progression, `OFF`
+  en premier) et encodeur 8 `BAR` (durée d'un accord : 1/2, 1, 2 ou 4
+  mesures), PATTERN tenu. Le pad tenu est le degré 1 ; les autres degrés
+  le déplacent dans la gamme de la banque (2 à 4 vers le haut, 5 à 7 vers
+  le bas), calés sur le transport ; l'arpège repart de sa première note à
+  chaque accord. Avec `CHD OFF`, la note seule se déplace.
+- [16] `arp.progression` et `arp.bars` (départ), gardés dans la session et
+  dans les presets (champs `progression` et `bars`, facultatifs).
+
+### Modifié
+
+- [16] Écran droit, PATTERN tenu : `PRE`, `CHD`, `PRG`, `BAR` au-dessus des
+  encodeurs 5 à 8 ; le motif remonte à droite de l'étiquette `ARPG`, sous
+  les divisions (12 px par pas).
+- Guide : encodeurs `PRG` et `BAR`, capture `13-arpege.png` refaite.
+
 ## [0.37.0] - 2026-11-11
 
 ### Ajouté

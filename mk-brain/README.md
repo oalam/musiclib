@@ -40,7 +40,7 @@ le branchement (SPEC « Service et retour arrière »).
 
 ## Configuration
 
-`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur, ses motifs et ses presets (`arp`, `arp.motifs`, `arp.presets` ; presets sauvés depuis la MK2 dans `state/arp-presets.json`), longueur de phrase,
+`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur, ses motifs et ses presets (`arp`, `arp.motifs`, `arp.progressions`, `arp.presets` ; presets sauvés depuis la MK2 dans `state/arp-presets.json`), longueur de phrase,
 couleurs, dispositions du clavier (B-H), table `mpc` des 16 pads (track, tranche,
 label, couleur).
 

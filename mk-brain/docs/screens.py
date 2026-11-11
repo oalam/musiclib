@@ -224,6 +224,8 @@ def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     btn(eng, "PATTERN", t=now)  # tenu : la config de l'arpège à l'écran
     eng.handle(EncoderEvent(5, 6 * cfg.arp.raw_per_choice, 0), now)  # PRE NAPP
     eng.handle(EncoderEvent(6, 2 * cfg.arp.raw_per_choice, 0), now)  # CHD 7TH
+    eng.handle(EncoderEvent(7, cfg.arp.raw_per_choice, 0), now)  # PRG 1637
+    eng.handle(EncoderEvent(8, cfg.arp.raw_per_choice, 0), now)  # BAR 2
     return eng, now + 3 * SECOND, True
 
 
