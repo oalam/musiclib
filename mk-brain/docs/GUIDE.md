@@ -151,6 +151,9 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
   page 2 (LVL CUT RES ENV / MW BC PB PAN), en boucle.
 - **PB** (pitch bend) seulement SHIFT tenu ; il revient au centre au
   relâché de SHIFT. Marche aussi en SOLO, sur toutes les tracks du groupe.
+  Il change la hauteur sans rien assigner sur la DT2 : l'étendue se règle
+  par PITCH BEND DEPTH (SOUND SETUP > TRACK) ; le menu PITCH BEND du preset
+  n'ajoute que des paramètres modulés en plus.
 
 ### Perform : SOLO
 

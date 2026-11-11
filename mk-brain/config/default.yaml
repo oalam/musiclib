@@ -85,8 +85,9 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le
 # même jour puis le 2026-11-10 (page 1 grain et envois, page 2 filtre et modulations) ; les flèches cyclent dans les deux sens.
 # DT2 : ENCODER DEST et MUTE DEST = INT + EXT, le Pi apprend les valeurs jouées sur la machine.
-# MW, BC et PB n'agissent que si le preset leur assigne des paramètres
-# (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset).
+# MW et BC n'agissent que si le preset leur assigne des paramètres (menus MODULATION WHEEL
+# et BREATH CTRL du preset). PB change toujours la hauteur, de PITCH BEND DEPTH (SOUND SETUP >
+# TRACK) ; le menu PITCH BEND du preset n'ajoute que des paramètres modulés en plus.
 encoders:
   mute_cc: 94
   raw_per_step: 15           # unités brutes par cran de CC : course d'un potard DT2, 17 crans par quart de tour (256 / 17) ; pas minimal de la MK2 : 4

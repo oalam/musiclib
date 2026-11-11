@@ -1447,9 +1447,13 @@ modulations en page 2) :
 
 - TYPE (CC 76, knob G du filtre) retiré des pages le 2026-11-09 : le type
   sur la machine MULTI-MODE seulement, un autre paramètre ailleurs.
-- MW, BC et PB n'agissent que si le preset leur assigne jusqu'à 4
-  paramètres (menus MODULATION WHEEL, BREATH CTRL, PITCH BEND du preset,
-  manuel p. 39). PB part en message pitch bend (0-127 → -8192..8191,
+- MW et BC n'agissent que si le preset leur assigne jusqu'à 4
+  paramètres (menus MODULATION WHEEL et BREATH CTRL du preset, manuel
+  p. 39). **PB change toujours la hauteur** (corrigé le 2026-11-11, constat
+  de l'utilisateur) : son étendue est PITCH BEND DEPTH, dans SOUND SETUP >
+  TRACK (manuel p. 38), sans aucune assignation ; le menu PITCH BEND
+  (p. 39) n'ajoute que jusqu'à 4 paramètres modulés en plus de la hauteur.
+  PITCH BEND DEPTH à 0 : PB ne pilote que ces paramètres. PB part en message pitch bend (0-127 → -8192..8191,
   64 = centre). **PB seulement avec SHIFT tenu** (décidé le 2026-11-09 ;
   passé un temps sur MUTE le 2026-11-10, revenu à SHIFT le même jour,
   SHIFT lui est réservé) : sans SHIFT, l'encodeur ne fait rien
