@@ -91,8 +91,10 @@ def test_pad_mode_toggles_mpc_keyboard_and_note_off_keeps_target(cfg: Config) ->
     assert eng.handle(PadEvent(PAD1, False, 0), 30 * MS) == [(30 * MS, NoteOff(0, 60))]
     eng.track = 9
     assert press(eng, 40 * MS) == [(43 * MS, NoteOn(8, 60, 127))]  # chromatique C5 sur T9
+    assert eng.last_control == "Chroma"  # le mode est à l'écran : seule la gamme en message
+    eng.last_control = ""
     btn(eng, "PAD_MODE")
-    assert eng.mpc and eng.last_control == "MPC"
+    assert eng.mpc and eng.last_control == ""  # pas de « MPC » en double
 
 
 def test_leds_lit_pad_and_active_group(cfg: Config) -> None:
@@ -203,7 +205,15 @@ def test_phrase_leds_follow_transport(cfg: Config) -> None:
     assert st is not None and st.bar == 10
     leds = eng.leds()
     assert leds.groups[:3] == [cfg.leds.phrase, cfg.leds.phrase, (0, 0, 0)]
-    assert leds.buttons["PLAY"] > 0  # pulse sur le 1
+    assert leds.buttons["PLAY"] > 0  # première moitié du temps : allumé
+    advance(eng, 9 * 96 + 1, 9 * 96 + 13)  # seconde moitié du temps 1
+    leds = eng.leds()
+    assert leds.groups[:3] == [cfg.leds.phrase, (0, 0, 0), (0, 0, 0)]  # bloc en cours clignote
+    assert leds.buttons["PLAY"] == 0  # PLAY clignote au tempo
+    advance(eng, 9 * 96 + 13, 15 * 96 + 1)  # mesure 16 : dernière avant le cap
+    st = eng.phrase_state
+    assert st is not None and st.bar == 16 and st.blinking
+    assert eng.leds().groups[:2] == [cfg.leds.phrase, cfg.leds.phrase_warn]  # orange
     eng.on_stop()
     eng.clock.stop(0)
     eng.tick(0)
@@ -360,7 +370,7 @@ def test_modifier_held_shows_track_grid(cfg: Config) -> None:
     eng.handle(PadEvent(PAD7, False, 0), MS)
     pads = eng.leds().pads
     assert pads[PAD7] == cfg.track_colors[7]  # pad n = track n pendant SELECT
-    assert pads[PAD1] == scale(cfg.track_colors[1], cfg.leds.dim)
+    assert pads[PAD1] == (0, 0, 0)  # les autres éteints, comme sous MUTE
     btn(eng, "SELECT", False)
     assert eng.leds().pads[PAD7] == scale(cfg.mpc_pad(7).color, cfg.leds.dim)  # SD2 au repos
 
@@ -853,3 +863,36 @@ def test_shift_erase_ignored_outside_service(cfg: Config) -> None:
     eng.tick(3 * SECOND)
     assert not eng.poweroff
     assert eng.last_control == ""
+
+
+def test_held_modifier_is_the_displayed_mode(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "MUTE")
+    assert eng.mode_name == "MUTE"
+    btn(eng, "MUTE", False)
+    btn(eng, "SELECT")
+    assert eng.mode_name == "SELECT"
+    btn(eng, "SELECT", False)
+    btn(eng, "SOLO")
+    assert eng.mode_name == "SOLO" and eng.last_control == ""  # pas de « SOLO » en double
+
+
+def test_shift_turn_is_temporary_and_cumulative(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    step = cfg.encoders.raw_per_step
+    (_, cc1), (_, cc2) = eng.faders.page[0], eng.faders.page[1]
+    eng.handle(EncoderEvent(1, 3 * step, 0), 0)  # hors SHIFT : réglage gardé
+    kept = eng.faders.value(1, cc1)
+    start2 = eng.faders.value(1, cc2)
+    btn(eng, "SHIFT")
+    eng.handle(EncoderEvent(1, 5 * step, 0), 0)
+    eng.handle(EncoderEvent(1, 2 * step, 0), 0)  # second geste : la valeur d'avant reste la 1re
+    eng.handle(EncoderEvent(2, -4 * step, 0), 0)
+    assert eng.faders.value(1, cc1) == kept + 7
+    out = eng.handle(ButtonEvent("SHIFT", False), MS)
+    assert {m for _, m in out} == {ControlChange(0, cc1, kept), ControlChange(0, cc2, start2)}
+    assert (eng.faders.value(1, cc1), eng.faders.value(1, cc2)) == (kept, start2)
+    assert eng.handle(ButtonEvent("SHIFT", True), 2 * MS) == []
+    assert eng.handle(ButtonEvent("SHIFT", False), 3 * MS) == []  # rien à rendre

@@ -3,6 +3,28 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.28.0] - 2026-11-11
+
+### Ajouté
+
+- [9] SHIFT + encodeur : réglage temporaire sur tous les paramètres,
+  rendu à sa valeur d'avant au relâché de SHIFT (cumulable, aussi sur le
+  groupe SOLO) ; le PB garde son retour au centre.
+- [9] Étiquette de mode : `MUTE` ou `SELECT` tant que le bouton est tenu.
+
+### Modifié
+
+- [9] LED GROUP transport lancé : le bloc en cours clignote au temps, en
+  vert puis en orange (`leds.phrase_warn`) la dernière mesure avant un
+  cap ; les blocs passés restent fixes.
+- [9] LED PLAY : clignote au tempo (avant : pulse sur le 1 de la mesure).
+- [9] SELECT tenu : seul le pad de la track sélectionnée reste allumé.
+
+### Retiré
+
+- [9] Messages `MPC`, `SOLO`, `SOLO off` qui doublaient l'étiquette de
+  mode ; le passage en clavier n'affiche plus que la gamme.
+
 ## [0.27.0] - 2026-11-11
 
 ### Ajouté

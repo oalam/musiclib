@@ -375,6 +375,27 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
 
 **Fait foi sur « Mode unique et pads MPC »** pour les points ci-dessous.
 
+- **Révisions du 2026-11-11** (demandées à l'essai sur le Pi, font foi sur
+  les points de cette section et des précédentes qu'elles contredisent) :
+  - **mode affiché** : l'étiquette en bas à gauche montre `MUTE` ou
+    `SELECT` tant que le bouton est tenu, sinon `SOLO`, `KEYS` ou `MPC` ;
+    plus de message qui répète le mode (`MPC`, `SOLO`, `SOLO off`
+    supprimés ; au passage en clavier, seul le nom de la gamme) ;
+  - **SELECT tenu** : seul le pad de la track sélectionnée est allumé,
+    les autres éteints (plus de couleur × `dim`), comme sous MUTE ;
+  - **SHIFT + encodeur = réglage temporaire**, sur tous les paramètres et
+    plus seulement le PB : chaque paramètre tourné SHIFT tenu revient à sa
+    valeur d'avant au relâché de SHIFT (CC renvoyé), cumulable sur
+    plusieurs encodeurs et, en SOLO, sur toutes les tracks du groupe. Le
+    PB reste réservé à SHIFT et revient au centre. Sans SHIFT, rien ne
+    change : le réglage est gardé ;
+  - **LED GROUP, transport lancé** : blocs passés en vert fixe, bloc en
+    cours clignotant au temps (allumé la première moitié de chaque temps),
+    en vert, puis en orange (`leds.phrase_warn`) la dernière mesure avant
+    un cap (16, 32, 64) ;
+  - **LED PLAY** : clignote au tempo, allumée la première moitié de chaque
+    temps, transport lancé ; éteinte à l'arrêt (elle ne pulsait que sur le
+    1 de la mesure).
 - **PATTERN non affecté** : la DT2 seule change de pattern. PATTERN + pad
   joue le pad comme sans modificateur ; LED PATTERN éteinte. Le prochain
   pattern affiché (`> E07`) ne vient plus que de la DT2.
@@ -1110,7 +1131,8 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
     dernière, donc `cap 32 : -6` à la mesure 27 (32 − 27 + 1 = 6) ;
   - PC reçu transport arrêté : ignoré (le Start remet à 1) ; Stop reçu
     avant la barre : la remise en attente est oubliée ;
-  - le 1 de chaque mesure pulse sur la LED PLAY (première croche) ;
+  - la LED PLAY clignote au tempo (révisé le 2026-11-11 ; avant : pulse
+    sur le 1 de chaque mesure) ;
   - transport lancé, les LED GROUP montrent le compteur ; arrêté, la
     disposition en design, rien en live, où GROUP seul est sans effet
     (slice 5.B, cf. Modes). Longueur de phrase dans `config/default.yaml`

@@ -62,6 +62,10 @@ class Faders:
         self._residue[encoder] = acc - steps * self.raw_per_step
         return steps
 
+    def value(self, track: int, cc: int) -> int:
+        """Valeur tenue pour ce paramètre (celle d'où part le prochain cran)."""
+        return self._values.get((track, cc), DEFAULT_VALUE)
+
     def nudge(self, track: int, cc: int, steps: int) -> int | None:
         """Paramètre d'une track décalé de `steps` crans → nouvelle valeur, ou None si
         rien ne change."""

@@ -131,7 +131,7 @@ class PitchBend:
 
 
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend
-MODIFIERS = ("SELECT", "MUTE")  # + pad : commande, pas de note
+MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
@@ -202,6 +202,8 @@ class Engine:
         self.perform_lock = False  # SOLO : perform verrouillé, les pads ne jouent plus
         self._latched: dict[int, int] = {}  # perform verrouillé : pads allumés → track visée
         self._released_at: dict[int, int] = {}  # SOLO : dernier relâché de chaque pad (rebonds)
+        # SHIFT tenu : valeur d'avant de chaque (track, paramètre) tourné, rendue au relâché
+        self._shift_saved: dict[tuple[int, int], int] = {}
         self._bent: set[int] = set()  # tracks dont le pitch bend est hors du centre (SHIFT tenu)
         self.poweroff_enabled = False  # vrai sous le service du Pi (posé par la CLI)
         self.poweroff = False  # extinction demandée : la CLI sort de la boucle et éteint
@@ -212,7 +214,10 @@ class Engine:
 
     @property
     def mode_name(self) -> str:
-        """Mode courant, toujours affiché : SOLO, sinon KEYS ou MPC."""
+        """Mode courant, toujours affiché : MUTE ou SELECT tenu, SOLO, sinon KEYS ou MPC."""
+        for name in MODIFIERS:  # tenu : le pad commande, comme les LED
+            if name in self._held_buttons:
+                return name
         return "SOLO" if self.perform_lock else "KEYS" if self.keyboard else "MPC"
 
     @property
@@ -278,7 +283,7 @@ class Engine:
         if isinstance(ev, ButtonEvent):
             self._button(ev, now)
             if ev.name == "SHIFT" and not ev.pressed:
-                return self._release_bend(now)
+                return self._release_shift(now)
             return []
         if isinstance(ev, EncoderEvent):
             if ev.index == 0:
@@ -314,10 +319,12 @@ class Engine:
         if self._latched:
             return self._perform_turn(index, delta, now)
         self.last_touch = (index, now)
+        before = self.faders.value(self.track, self.faders.page[index - 1][1])
         sent = self.faders.turn(self.track, index, delta)
         if sent is None:
             return []
         param, value = sent
+        self._keep_for_shift(self.track, param, before)
         name = self.faders.page[index - 1][0]
         self.last_control = f"T{self.track:02d} {name} {value}"
         channel = self.track - 1
@@ -345,7 +352,6 @@ class Engine:
         self.perform_lock = not self.perform_lock
         if not self.perform_lock:
             self._latched.clear()
-        self.last_control = "SOLO" if self.perform_lock else "SOLO off"
 
     def _perform_turn(self, index: int, delta: int, now: int) -> list[Timed]:
         """Encodeur en perform : même pas sur chaque track tenue."""
@@ -357,9 +363,11 @@ class Engine:
         name = self.faders.page[index - 1][0]
         out: list[Timed] = []
         for track in self.perform_tracks:
+            before = self.faders.value(track, param)
             value = self.faders.nudge(track, param, steps)
             if value is None:
                 continue
+            self._keep_for_shift(track, param, before)
             self.last_control = f"PERF T{track:02d} {name} {value}"
             if param == PITCH_BEND:
                 self._bent.add(track)
@@ -628,9 +636,19 @@ class Engine:
             self.leds_dirty = True
         self.last_control = labels[new]
 
-    def _release_bend(self, now: int) -> list[Timed]:
-        """SHIFT relâché : pitch bend remis au centre sur chaque track où il est parti."""
+    def _keep_for_shift(self, track: int, param: int, before: int) -> None:
+        """SHIFT tenu : retient la valeur d'avant le premier cran (le PB a son centre)."""
+        if "SHIFT" in self._held_buttons and param != PITCH_BEND:
+            self._shift_saved.setdefault((track, param), before)
+
+    def _release_shift(self, now: int) -> list[Timed]:
+        """SHIFT relâché : chaque paramètre tourné sous SHIFT revient à sa valeur d'avant,
+        le pitch bend au centre sur chaque track où il est parti."""
         out: list[Timed] = []
+        for (track, param), value in sorted(self._shift_saved.items()):
+            self.faders.received(track, param, value)
+            out.append((now, self._param_out(track - 1, param, value)))
+        self._shift_saved.clear()
         for track in sorted(self._bent):
             self.faders.received(track, PITCH_BEND, 64)
             out.append((now, PitchBend(track - 1, 0)))
@@ -696,7 +714,8 @@ class Engine:
             self._toggle_lock()  # PAD MODE sous SOLO : sortie, disposition inchangée
         elif name == "PAD_MODE":  # MPC <-> clavier ; les notes tenues gardent leur cible
             self.mpc = not self.mpc
-            self.last_control = "MPC" if self.mpc else f"keyboard {self.layout.name}"
+            if not self.mpc:  # le mode est déjà affiché en bas à gauche : seule la gamme
+                self.last_control = self.layout.name
         elif name == "GRID":
             i = QUANTIZE_CYCLE.index(self.quantize)
             self.quantize = QUANTIZE_CYCLE[(i + 1) % len(QUANTIZE_CYCLE)]
@@ -797,7 +816,7 @@ class Engine:
         st = None if ticks is None else self.phrase.update(ticks)
         self.phrase_state = st
         sig: tuple[object, ...] = (
-            () if st is None else (st.blocks_lit, st.blinking and st.half_beat_on, st.pulse)
+            () if st is None else (st.blocks_lit, st.blinking, st.half_beat_on)
         )
         if sig != self._phrase_leds:
             self._phrase_leds = sig
@@ -870,7 +889,7 @@ class Engine:
             if "MUTE" in held:  # tracks ouvertes pleines, mutées éteintes ; la 16 sans mute
                 pads[index] = (0, 0, 0) if auto or self.faders.muted.get(pad) else track
             elif "SELECT" in held:
-                pads[index] = track if pad == self.track else scale(track, dim)
+                pads[index] = track if pad == self.track else (0, 0, 0)
             elif self.perform_lock:  # SOLO : remplace les couleurs du MPC et du clavier
                 on = pad in self._latched
                 pads[index] = self.cfg.leds.perform_on if on else self.cfg.leds.perform_idle
@@ -878,11 +897,12 @@ class Engine:
                 full, rest = self._pad_full(pad)
                 pads[index] = full if pad in lit else scale(full, dim if rest else 0)
         st = self.phrase_state
-        if st is not None:  # un bouton de plus toutes les 8 mesures ; clignote avant un cap
+        if st is not None:  # un bouton de plus toutes les 8 mesures, les passés fixes
             color = self.cfg.leds.phrase
             groups = [color if g < st.blocks_lit else (0, 0, 0) for g in range(len(GROUPS))]
-            if st.blinking and not st.half_beat_on:
-                groups[st.blocks_lit - 1] = (0, 0, 0)
+            # bloc en cours : clignote au temps, orange la dernière mesure avant un cap
+            now_color = self.cfg.leds.phrase_warn if st.blinking else color
+            groups[st.blocks_lit - 1] = now_color if st.half_beat_on else (0, 0, 0)
         else:  # arrêté : la banque courante seule allumée (slice 9)
             groups = [(0, 0, 0)] * len(GROUPS)
             if self.bank is not None:
@@ -892,7 +912,7 @@ class Engine:
             "GRID": LED_MAX if self.quantize != "off" else 0,
             "NOTE_REPEAT": LED_MAX if self.repeat_active else 0,
             "SWING": LED_MAX if self.swing > 50 else 0,
-            "PLAY": LED_MAX if st is not None and st.pulse else 0,
+            "PLAY": LED_MAX if st is not None and st.half_beat_on else 0,  # au tempo
             "PAD_MODE": low if self.mpc else LED_MAX,
             "SOLO": LED_MAX if self.perform_lock else low,
         }

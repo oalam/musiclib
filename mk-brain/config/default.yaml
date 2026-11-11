@@ -55,6 +55,7 @@ leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine
   selected: 0.5              # live : pad de la track sélectionnée (encodeurs), entre repos et frappe
   phrase: [0, 255, 0]        # LED GROUP du compteur de phrases (transport lancé)
+  phrase_warn: [255, 110, 0] # bloc en cours, dernière mesure avant un cap (orange)
   bank: [255, 255, 255]      # design : GROUP de la banque choisie, les autres en couleur de mode × dim
   perform_idle: [0, 0, 40]   # SOLO (perform verrouillé) : pad hors du groupe, bleu très faible
   perform_on: [0, 255, 0]    # SOLO : pad du groupe (ou tenu), vert vif ; remplace MPC et clavier

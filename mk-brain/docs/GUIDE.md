@@ -110,7 +110,9 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
 ![Dernières mesures avant le cap](img/06-compte-a-rebours.png)
 
 - Mesure 1 au Start de la DT2 et à chaque changement de pattern (à la barre
-  suivante). Une LED GROUP de plus toutes les 8 mesures ; PLAY pulse sur le 1.
+  suivante). Une LED GROUP de plus toutes les 8 mesures : celle du bloc en cours
+  clignote au temps, en vert, puis en orange la dernière mesure avant un cap.
+  PLAY clignote au tempo.
 - Les 4 dernières mesures d'une phrase s'inversent ; `-2`, `-1` en grand
   avant le cap.
 - **SHIFT + PLAY** : mesure 1 à la barre suivante. **SHIFT + GROUP n** :
@@ -125,7 +127,11 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
   **SELECT + pad 16** : la track active de la DT2. Tourner un bouton sur la
   DT2 sélectionne aussi sa track sur la MK2.
 - Pendant SELECT ou MUTE tenus, les pads montrent la grille des 16 tracks
-  (pad n = track n), pas le kit.
+  (pad n = track n), pas le kit ; sous SELECT, seul le pad de la track
+  sélectionnée est allumé. L'étiquette de mode affiche `MUTE` ou `SELECT`.
+- **SHIFT + encodeur** : réglage temporaire. Tout ce qui est tourné SHIFT
+  tenu revient à sa valeur d'avant au relâché, sur plusieurs encodeurs à la
+  fois et, en SOLO, sur toutes les tracks du groupe.
 - **Flèches BROWSE ◀ ▶** : page 1 (LVL BR OVER SRR / DEL REV CHO TUNE) ou
   page 2 (LVL CUT RES ENV / MW BC PB PAN), en boucle.
 - **PB** (pitch bend) seulement SHIFT tenu ; il revient au centre au
@@ -215,7 +221,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | SELECT + pad | track des encodeurs et du clavier (16 = track active DT2) |
 | MUTE + pad | mute / ouvre la track |
 | SOLO | perform verrouillé : tap sur pad n = ajoute / retire la track n |
-| SHIFT + encodeur PB | pitch bend, au centre au relâché de SHIFT |
+| SHIFT + encodeur | réglage temporaire, rendu au relâché de SHIFT (PB : au centre) |
 | BROWSE ◀ ▶ | page d'encodeurs |
 | SHIFT + BROWSE | sélection de projet (transport arrêté) |
 | Flèches de transport | octave du clavier |
