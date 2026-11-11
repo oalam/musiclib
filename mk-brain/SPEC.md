@@ -1251,6 +1251,13 @@ la slice 0.
     capturer sur un PC Windows (Wireshark + USBPcap) en bougeant le
     curseur Display de Maschine 2. Ne pas sonder au hasard les rapports de
     sortie (`0xd0`-`0xdf` ressemblent à la flash : calibration, série).
+    **Constat du 2026-11-11** : les écrans sont nettement plus lumineux
+    sur le Pi que sur le Mac. Écarté le même jour : les agents NI (essai
+    sur le Mac agents coupés, pas plus lumineux) et un réglage gardé par
+    la MK2 (rapports `0xf0`, `0xf8`, `0xf9`, `0xd0`, `0xd1`, `0xd8`
+    identiques octet pour octet sur le Pi et sur le Mac). Piste restante,
+    non vérifiée : la tension fournie par le port USB (essayer la MK2 sur
+    le Mac derrière un hub alimenté).
 15. **Noms de samples à la frappe** (reporté le 2026-11-09, 6.C) : le
     lives JSON range les samples par banque sans track (288 sur 304), seuls
     les 16 du `0-KIT` ont une track, et le sample d'une track change d'un
