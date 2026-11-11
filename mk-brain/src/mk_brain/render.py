@@ -194,6 +194,7 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
 
 COLUMN = 46  # colonne « écran de la DT2 » (pattern, SMP, track), à gauche du bandeau gauche
 MUTE_TOP, MUTE_BOTTOM = 26, 35  # cases des mutes, 10 px de haut
+BEAT_GROW = 2  # sur un temps, la case qui joue monte de 2 px et s'élargit de 1 px par côté
 STEPS_PER_BAR = 16
 STEPS_PER_BEAT = 4
 TICKS_PER_STEP = 6  # 24 ticks par noire
@@ -214,26 +215,29 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
     """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
     La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point. Les 16 cases
     comptent aussi les doubles croches de la mesure : un carré intérieur, en inverse de sa
-    case, marque celle qui joue, plus gros sur les temps (cases 1, 5, 9, 13)."""
+    case, marque celle qui joue. Sur les temps (cases 1, 5, 9, 13) c'est la case elle-même
+    qui grossit (`BEAT_GROW`) : un carré plus gros n'y laissait qu'un liseré, et la case
+    ouverte passait pour mutée."""
     cell = (WIDTH - left) // 16
     top, bottom = MUTE_TOP, MUTE_BOTTOM
     step = _step(engine)
     for t in range(1, 17):
         x0 = left + (t - 1) * cell + 2
         x1 = x0 + cell - 3
+        playing = step == t - 1
+        box = (x0, top, x1, bottom)
+        if playing and t % STEPS_PER_BEAT == 1:  # sur le temps : la case grossit
+            box = (x0 - 1, top - BEAT_GROW, x1 + 1, bottom)
         full = False
         if t == engine.cfg.midi.auto_channel:
             d.point(((x0 + x1) // 2, (top + bottom) // 2), fill=1)
         elif engine.faders.muted.get(t):
-            d.rectangle((x0, top, x1, bottom), outline=1)
+            d.rectangle(box, outline=1)
         else:
-            d.rectangle((x0, top, x1, bottom), fill=1)
+            d.rectangle(box, fill=1)
             full = True
-        if step == t - 1:
-            inset = 1 if step % STEPS_PER_BEAT == 0 else 2  # plus gros sur le temps
-            d.rectangle(
-                (x0 + inset, top + inset, x1 - inset, bottom - inset), fill=0 if full else 1
-            )
+        if playing:
+            d.rectangle((x0 + 2, top + 2, x1 - 2, bottom - 2), fill=0 if full else 1)
         if t == engine.track:
             d.rectangle((x0, bottom + 2, x1, bottom + 3), fill=1)
 

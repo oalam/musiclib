@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.30.5] - 2026-11-11
+
+### Corrigé
+
+- [9] Bande des mutes : le temps ne se voyait pas. Le carré de 9 × 8 px
+  ne laissait qu'un liseré de 1 px autour de lui, et la case ouverte
+  ressemblait à une case mutée. Sur les temps (cases 1, 5, 9, 13) c'est
+  maintenant la case qui grossit (11 × 10 → 13 × 12 px) ; le carré
+  intérieur reste à 7 × 6 px partout.
+
 ## [0.30.4] - 2026-11-11
 
 ### Modifié

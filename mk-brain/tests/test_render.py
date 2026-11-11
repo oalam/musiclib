@@ -93,13 +93,17 @@ def test_mute_strip_marks_playing_sixteenth(cfg: Config) -> None:
 
 
 def test_mute_strip_square_is_bigger_on_the_beat(cfg: Config) -> None:
-    """Sur un temps (cases 1, 5, 9, 13) le carré prend presque toute la case."""
+    """Sur un temps (cases 1, 5, 9, 13) la case qui joue grossit ; le carré intérieur
+    garde sa taille, la case ouverte reste donc lisible comme ouverte."""
+    above = render.MUTE_TOP - render.BEAT_GROW  # ligne au-dessus des cases ordinaires
     edge = render.MUTE_TOP + 1  # ligne juste sous le bord de la case
-    eng = at_bar(cfg, 3)  # 2e double croche : petit carré, la ligne reste pleine
-    assert render.left(eng, 0).getpixel((_cell(2), edge))
+    eng = at_bar(cfg, 3)  # 2e double croche : la case garde sa taille
+    assert not render.left(eng, 0).getpixel((_cell(2), above))
     advance(eng, 2 * 96 + 10, 2 * 96 + 26)  # 5e double croche : 2e temps
     img = render.left(eng, 0)
-    assert not img.getpixel((_cell(5), edge)) and img.getpixel((_cell(5), render.MUTE_TOP))
+    assert img.getpixel((_cell(5), above)) and img.getpixel((_cell(5), edge))
+    assert not img.getpixel((_cell(5), render.MUTE_TOP + 4))  # carré intérieur en inverse
+    assert not img.getpixel((_cell(4), above)) and not img.getpixel((_cell(6), above))
 
 
 def test_mode_tag_always_shown(cfg: Config) -> None:

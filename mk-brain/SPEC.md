@@ -985,9 +985,12 @@ TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           
   par une alerte ; les mutes ne sont plus jamais masqués ;
 - mutes sur toute la largeur restante, cases de 10 px ; elles comptent
   aussi les 16 doubles croches de la mesure : un carré intérieur, en
-  inverse de sa case, marque celle qui joue (rien à l'arrêt) : 7 × 6 px
-  sur une double croche ordinaire, 9 × 8 px sur un temps (cases 1, 5, 9,
-  13 ; demandé le 2026-11-11). L'écran gauche est donc redessiné à chaque
+  inverse de sa case, marque celle qui joue (rien à l'arrêt), 7 × 6 px.
+  Sur un temps (cases 1, 5, 9, 13 ; demandé le 2026-11-11) c'est la case
+  qui grossit, de 11 × 10 à 13 × 12 px (2 px vers le haut, 1 px de chaque
+  côté), le carré gardant sa taille : le carré de 9 × 8 px essayé d'abord
+  ne laissait qu'un liseré de 1 px, et la case ouverte passait pour une
+  case mutée (v0.30.5). L'écran gauche est donc redessiné à chaque
   double croche, soit 60 / 165 / 4 = 91 ms à 165 BPM, environ 11 images
   par seconde ; essayé sur le Pi le 2026-11-11, sans retard depuis le
   cache du rendu (v0.30.2) ;
