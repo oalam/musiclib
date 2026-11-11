@@ -3,6 +3,25 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.34.0] - 2026-11-11
+
+### Ajouté
+
+- [12] Motifs de l'arpège : 16 pas par motif (`x` note, `X` note
+  accentuée, `.` silence, `-` liée), bibliothèque de 8 motifs dans
+  `arp.motifs` de `config/default.yaml` (`GALO`, `OFFB`, `TRES`, `A332`,
+  `SYNC`, `ROLL`, `LONG`, `ACID`). Choix par l'encodeur 4 `MOT`, PATTERN
+  tenu, `OFF` en premier ; le motif s'affiche en 16 cases sur l'écran
+  droit. Le motif est calé sur la mesure (position sur la grille de la
+  division, modulo 16) ; sur un silence la note attend ; un pas `x` part
+  à `arp.unaccented` % (70) de la vélocité du pad, un pas `X` à la
+  pression ; une note suivie de liées dure ces pas en plus de son gate.
+- [12] `arp.motif` (motif de départ) et `arp.unaccented` dans la config ;
+  motif gardé dans la session par son nom. Un motif mal écrit est refusé
+  au chargement (`MotifError`).
+- Guide : encodeur `MOT` et lecture du motif à l'écran, capture
+  `13-arpege.png` refaite.
+
 ## [0.33.0] - 2026-11-11
 
 ### Modifié

@@ -40,3 +40,21 @@ def test_invalid_scale_rejected(tmp_path: Path, cfg: Config) -> None:
 def test_missing_file() -> None:
     with pytest.raises(ConfigError):
         load_config(Path("/nonexistent.yaml"))
+
+
+def test_arp_motifs_validated(tmp_path: Path, cfg: Config) -> None:
+    import yaml
+
+    assert cfg.arp.motif_names[0] == "OFF" and cfg.arp.motifs["GALO"] == "X.xx" * 4
+    for change, match in (
+        ({"motifs": {"GALO": "X.xx"}}, "16 attendus"),
+        ({"motifs": {"GALOP": "X.xx" * 4}}, "4 caractères"),
+        ({"motifs": {"OFF": "X.xx" * 4}}, "réservé"),
+        ({"motif": "RIEN"}, "absent"),
+    ):
+        raw = cfg.model_dump()
+        raw["arp"].update(change)
+        bad = tmp_path / "bad.yaml"
+        bad.write_text(yaml.safe_dump(raw))
+        with pytest.raises(ConfigError, match=match):
+            load_config(bad)

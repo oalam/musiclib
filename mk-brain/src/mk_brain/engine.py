@@ -63,9 +63,14 @@ from mk_brain.arp import (
     GATE_MIN,
     GATE_STEP,
     MAX_OCTAVES,
+    MOTIF_STEPS,
+    NOTE,
     ORDER_LABELS,
     ORDERS,
+    REST,
+    TIE,
     ArpOrder,
+    ties_after,
 )
 from mk_brain.arp import sequence as arp_sequence
 from mk_brain.clock import ClockTracker
@@ -211,6 +216,7 @@ class Engine:
         self.arp_order: ArpOrder = cfg.arp.order
         self.arp_octaves = cfg.arp.octaves
         self.arp_gate = cfg.arp.gate
+        self.arp_motif = cfg.arp.motif  # nom du motif (slice 12), ou OFF
         self.arp_hold = False  # maintien (NOTE REPEAT) : l'arpège continue pads relâchés
         self._arp_notes: dict[int, _ArpNote] = {}  # pad → note, dans l'ordre d'appui
         self._arp_pos: float | None = None  # position (ticks) de la prochaine note
@@ -330,12 +336,18 @@ class Engine:
         return self.arp and "PATTERN" in self._held_buttons
 
     def arp_view(self) -> list[tuple[str, str]]:
-        """Config de l'arpège, encodeurs 1-3 : (abrégé, valeur affichée)."""
+        """Config de l'arpège, encodeurs 1-4 : (abrégé, valeur affichée)."""
         return [
             ("ORD", ORDER_LABELS[self.arp_order]),
             ("OCT", str(self.arp_octaves)),
             ("GATE", f"{self.arp_gate}%"),
+            ("MOT", self.arp_motif),
         ]
+
+    @property
+    def arp_steps(self) -> str | None:
+        """Les 16 pas du motif choisi ; None sans motif (OFF)."""
+        return self.cfg.arp.motifs.get(self.arp_motif)
 
     # --- entrées ------------------------------------------------------------
 
@@ -442,11 +454,11 @@ class Engine:
                 self._arp_clear()
 
     def _arp_turn(self, index: int, delta: int, now: int) -> None:
-        """Encodeurs 1-3, PATTERN tenu en ARPG : ordre, octaves, gate (bornés, sans boucle).
+        """Encodeurs 1-4, PATTERN tenu en ARPG : ordre, octaves, gate, motif (bornés, sans boucle).
         Course propre à la page (`arp.raw_per_choice`, `arp.raw_per_gate_step`) : au pas
         d'un CC, le moindre mouvement sautait plusieurs valeurs (essai du 2026-11-11)."""
         self._pattern_used()
-        if index > 3:
+        if index > 4:
             return
         per = self.cfg.arp.raw_per_gate_step if index == 3 else self.cfg.arp.raw_per_choice
         acc = self._arp_residue.get(index, 0) + delta
@@ -460,8 +472,11 @@ class Engine:
             self.arp_order = ORDERS[i]
         elif index == 2:
             self.arp_octaves = max(1, min(MAX_OCTAVES, self.arp_octaves + steps))
-        else:
+        elif index == 3:
             self.arp_gate = max(GATE_MIN, min(GATE_MAX, self.arp_gate + GATE_STEP * steps))
+        else:
+            names = self.cfg.arp.motif_names
+            self.arp_motif = names[max(0, min(len(names) - 1, names.index(self.arp_motif) + steps))]
         name, value = self.arp_view()[index - 1]
         self.last_control = f"ARP {name} {value}"
 
@@ -480,12 +495,25 @@ class Engine:
 
     def _arp_tick(self, now: int, horizon: int, div: float) -> list[Timed]:
         """Notes de l'arpège à venir avant `horizon` : une par division, vélocité de la
-        pression courante du pad (la dernière jouée s'il est relâché, en maintien)."""
+        pression courante du pad (la dernière jouée s'il est relâché, en maintien).
+
+        Motif (slice 12) : le pas est la position sur la grille de la division, modulo 16
+        (calé sur la mesure en 1/16). Silence et liée ne consomment pas de note ; un pas
+        `x` est atténué (`arp.unaccented`) ; les liées qui suivent allongent la note."""
         out: list[Timed] = []
+        steps = self.arp_steps
         while self._arp_notes and self._arp_pos is not None:
             t = self._time_of(self._arp_pos)
             if t is None or t >= horizon:
                 break
+            kind, ties = None, 0
+            if steps is not None:
+                index = round(self._arp_pos / div) % MOTIF_STEPS
+                kind = steps[index]
+                if kind in (REST, TIE):  # la note attend le prochain pas joué
+                    self._arp_pos += div
+                    continue
+                ties = ties_after(steps, index)
             held = [(p, n.note) for p, n in self._arp_notes.items()]
             seq = arp_sequence(held, self.arp_order, self.arp_octaves)
             if self.arp_order == "random":
@@ -495,14 +523,17 @@ class Engine:
             entry = self._arp_notes[pad]
             if pad in self._pressure and pad not in self._attacks:
                 entry.velocity = velocity(self.cfg.velocity, self._pressure[pad])
+            vel = entry.velocity
+            if kind == NOTE:  # pas ordinaire d'un motif : atténué, l'accent garde la pression
+                vel = max(1, round(vel * self.cfg.arp.unaccented / 100))
             on = max(t, now)
-            off = self._time_of(self._arp_pos + div * self.arp_gate / 100) or on
-            nxt = self._time_of(self._arp_pos + div)
-            if nxt is not None:  # gate 100 % : coupée juste avant la note suivante
+            off = self._time_of(self._arp_pos + div * (ties + self.arp_gate / 100)) or on
+            nxt = self._time_of(self._arp_pos + div * (ties + 1))
+            if nxt is not None:  # gate 100 % : coupée juste avant le pas suivant
                 off = min(off, nxt - NOTE_OFF_MIN_NS)
-            out.append((on, NoteOn(entry.channel, note, entry.velocity)))
+            out.append((on, NoteOn(entry.channel, note, vel)))
             out.append((max(off, on + NOTE_OFF_MIN_NS), NoteOff(entry.channel, note)))
-            self.last_played = (pad, note, entry.velocity)
+            self.last_played = (pad, note, vel)
             self._arp_pos += div
             self._arp_step += 1
         return out
@@ -693,6 +724,7 @@ class Engine:
             arp_order=self.arp_order,
             arp_octaves=self.arp_octaves,
             arp_gate=self.arp_gate,
+            arp_motif=self.arp_motif,
         )
 
     def restore(self, session: Session) -> None:
@@ -728,6 +760,8 @@ class Engine:
             self.arp_octaves = session.arp_octaves
         if session.arp_gate is not None and GATE_MIN <= session.arp_gate <= GATE_MAX:
             self.arp_gate = session.arp_gate
+        if session.arp_motif in self.cfg.arp.motif_names:
+            self.arp_motif = session.arp_motif
         self._apply_phrase()
         self.leds_dirty = True
 

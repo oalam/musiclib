@@ -8,7 +8,15 @@ from typing import Annotated, Literal
 import yaml
 from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 
-from mk_brain.arp import GATE_MAX, GATE_MIN, MAX_OCTAVES, ArpOrder
+from mk_brain.arp import (
+    GATE_MAX,
+    GATE_MIN,
+    MAX_OCTAVES,
+    MOTIF_NAME_MAX,
+    MOTIF_OFF,
+    ArpOrder,
+    parse_motif,
+)
 
 DEFAULT_CONFIG = Path(__file__).resolve().parents[2] / "config" / "default.yaml"
 
@@ -90,8 +98,33 @@ class ArpConfig(BaseModel):
     gate: int = Field(50, ge=GATE_MIN, le=GATE_MAX)  # durée d'une note, en % de la division
     # course des encodeurs de la config (PATTERN tenu), en unités brutes par valeur : bien plus
     # longue que celle d'un CC (`encoders.raw_per_step`), ces réglages n'ont que 3 à 19 valeurs
-    raw_per_choice: int = Field(24, ge=1)  # ORD et OCT
+    raw_per_choice: int = Field(24, ge=1)  # ORD, OCT et MOT
     raw_per_gate_step: int = Field(12, ge=1)  # GATE, par pas de 5 %
+    # motifs (slice 12) : nom → 16 pas (x note, X accent, . silence, - liée), ordre du fichier
+    motifs: dict[str, str] = {}
+    motif: str = MOTIF_OFF  # motif de départ : un nom de `motifs`, ou OFF
+    unaccented: int = Field(70, ge=1, le=100)  # vélocité d'un pas `x`, en % de celle du pad
+
+    @field_validator("motifs")
+    @classmethod
+    def _motifs(cls, motifs: dict[str, str]) -> dict[str, str]:
+        for name in motifs:
+            if name == MOTIF_OFF or not 1 <= len(name) <= MOTIF_NAME_MAX:
+                raise ValueError(
+                    f"motif {name!r} : nom de 1 à {MOTIF_NAME_MAX} caractères, {MOTIF_OFF} réservé"
+                )
+        return {name: parse_motif(text) for name, text in motifs.items()}
+
+    @model_validator(mode="after")
+    def _motif(self) -> ArpConfig:
+        if self.motif != MOTIF_OFF and self.motif not in self.motifs:
+            raise ValueError(f"arp.motif {self.motif!r} : absent de arp.motifs")
+        return self
+
+    @property
+    def motif_names(self) -> list[str]:
+        """Choix de l'encodeur MOT : OFF, puis les motifs dans l'ordre du fichier."""
+        return [MOTIF_OFF, *self.motifs]
 
 
 PITCH_BEND = 128  # identifiant du pitch bend parmi les paramètres (hors des CC 0-127)

@@ -1056,7 +1056,11 @@ def test_arp_config_encoders_and_division_buttons(cfg: Config) -> None:
     assert eng.arp_gate == 45 and eng.last_control == "ARP GATE 45%"
     eng.handle(EncoderEvent(1, 3 * step, 0), 0)
     assert eng.arp_order == "played"
-    assert eng.handle(EncoderEvent(5, step, 0), 0) == []  # encodeurs 4-8 libres dans la config
+    eng.handle(EncoderEvent(4, step, 0), 0)  # MOT : OFF, puis les motifs de la config
+    assert eng.arp_motif == cfg.arp.motif_names[1] and eng.last_control == "ARP MOT GALO"
+    eng.handle(EncoderEvent(4, -5 * step, 0), 0)
+    assert eng.arp_motif == "OFF" and eng.arp_steps is None  # borné
+    assert eng.handle(EncoderEvent(5, step, 0), 0) == []  # encodeurs 5-8 libres dans la config
     btn(eng, "BROWSE_RIGHT")  # BROWSE : pages de son, comme partout
     assert eng.last_control == "page 2/2"
 
@@ -1067,6 +1071,60 @@ def test_arp_settings_survive_the_session(cfg: Config) -> None:
     other = Engine(cfg)
     other.restore(Session.model_validate(eng.snapshot().model_dump()))
     assert (other.arp_order, other.arp_octaves, other.arp_gate) == ("updown", 2, 80)
-    assert other.division == "1/8T" and not other.arp
+    assert other.division == "1/8T" and not other.arp and other.arp_motif == "OFF"
     other.restore(Session(arp_order="zigzag", arp_octaves=9, arp_gate=0, division="1/5"))
     assert (other.arp_order, other.arp_octaves, other.arp_gate) == ("updown", 2, 80)
+    eng.arp_motif = "LONG"
+    other.restore(Session.model_validate(eng.snapshot().model_dump()))
+    assert other.arp_motif == "LONG"
+    other.restore(Session(arp_motif="DISPARU"))
+    assert other.arp_motif == "LONG"
+
+
+def _arp_notes(eng: Engine, positions: tuple[int, ...]) -> list[tuple[float, int, int]]:
+    """(position en ticks, note, vélocité) des note on de l'arpège à ces positions."""
+    played: list[tuple[float, int, int]] = []
+    for k in positions:
+        out = eng.tick(k * TICK - 10 * MS)
+        played += [(tt / TICK, m.note, m.velocity) for tt, m in out if isinstance(m, NoteOn)]
+    return played
+
+
+def test_arp_motif_rests_wait_and_plain_steps_are_softer(cfg: Config) -> None:
+    """Motif GALO (`X.xx`), calé sur la mesure : le silence ne consomme pas de note, les
+    pas `x` partent à `arp.unaccented` % de la vélocité du pad, les `X` à la pression."""
+    eng = arp(cfg)
+    eng.arp_motif = "GALO"
+    notes = [eng.target(p)[1] for p in (1, 3, 5)]
+    soft = round(127 * cfg.arp.unaccented / 100)
+    first = press(eng, 13 * TICK, pad=_index(1))  # position 12 : pas 2 du motif, un `x`
+    assert [m for _, m in first if isinstance(m, NoteOn)] == [NoteOn(0, notes[0], soft)]
+    press(eng, 13 * TICK, pad=_index(3))
+    press(eng, 13 * TICK, pad=_index(5))
+    played = _arp_notes(eng, (18, 24, 30, 36, 42))
+    assert [(n, v) for _, n, v in played] == [
+        (notes[1], soft),  # pas 3 : x
+        (notes[2], 127),  # pas 4 : X
+        (notes[0], soft),  # pas 5 : silence, la note attend le pas 6
+        (notes[1], soft),  # pas 7 : x
+    ]
+    assert [pos for pos, _, _ in played] == pytest.approx([18, 24, 36, 42], abs=0.01)
+
+
+def test_arp_motif_ties_lengthen_the_note(cfg: Config) -> None:
+    """Motif LONG (`X--- x-x- …`), gate 50 % : la note dure ses pas liés plus son gate."""
+    eng = arp(cfg)
+    eng.arp_motif = "LONG"
+    note = eng.target(1)[1]
+    first = press(eng, 1 * TICK, pad=_index(1))  # position 0 : X suivi de 3 liées
+    assert first == [
+        (1 * TICK + 3 * MS, NoteOn(0, note, 127)),
+        (pytest.approx(21 * TICK, abs=MS // 100), NoteOff(0, note)),  # 3 × 6 + 3 ticks
+    ]
+    assert _arp_notes(eng, (6, 12, 18)) == []  # pas liés : pas de nouvelle attaque
+    out = eng.tick(24 * TICK - 10 * MS)  # pas 4 : x suivi d'une liée
+    assert [m for _, m in out] == [
+        NoteOn(0, note, round(127 * cfg.arp.unaccented / 100)),
+        NoteOff(0, note),
+    ]
+    assert [t / TICK for t, _ in out] == pytest.approx([24, 33], abs=0.01)  # 6 + 3 ticks

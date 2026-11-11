@@ -37,8 +37,22 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
   order: up                  # up, down, updown, played (ordre d'appui), random
   octaves: 1                 # 1 à 3
   gate: 50                   # durée d'une note, 10 à 100 % de la division
-  raw_per_choice: 24         # course d'encodeur par valeur de ORD et OCT (un CC : 4 par cran)
+  raw_per_choice: 24         # course d'encodeur par valeur de ORD, OCT et MOT (un CC : 4 par cran)
   raw_per_gate_step: 12      # course d'encodeur par pas de 5 % de GATE
+  unaccented: 70             # vélocité d'un pas `x` d'un motif, en % de celle du pad (`X` : 100 %)
+  motif: "OFF"               # motif de départ : un nom de `motifs`, ou "OFF" (une note par division)
+  # Motifs (slice 12), encodeur 4 MOT, PATTERN tenu. 16 pas, calés sur la mesure en 1/16 ;
+  # les espaces séparent les temps. x note, X note accentuée, . silence, - liée (la note
+  # précédente dure un pas de plus). Nom : 4 caractères au plus, entre guillemets.
+  motifs:
+    "GALO": "X.xx X.xx X.xx X.xx"   # galop
+    "OFFB": "..x. ..x. ..x. ..x."   # contretemps
+    "TRES": "X..x ..x. X..x ..x."   # tresillo 3-3-2
+    "A332": "XxxX xxXx XxxX xxXx"   # continu, accents en 3-3-2
+    "SYNC": "x.xX .x.x X.x. .xX."   # syncopes
+    "ROLL": "X.x. X.x. X.xx Xxxx"   # roulement en fin de mesure
+    "LONG": "X--- x-x- X--- xxx-"   # notes tenues
+    "ACID": "X-.x x.X- .xx. X.x-"   # ligne acid, liées et silences
 
 # 8 encodeurs → CC sur le canal de la track sélectionnée (annexe B du manuel DT2,
 # refs/ ; fiche cc-nrpn), deux pages, flèches à côté des écrans (2026-11-09), ordre revu le

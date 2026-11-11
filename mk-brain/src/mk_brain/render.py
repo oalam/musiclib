@@ -47,6 +47,7 @@ from typing import TYPE_CHECKING, Any
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
+from mk_brain.arp import ACCENT, MOTIF_STEPS, REST, TIE
 from mk_brain.display import HEIGHT, WIDTH, new_image, text_image
 from mk_brain.layouts import FLAT_NAMES, degree_name, flat_note
 from mk_brain.phrase import BLOCK_BARS
@@ -405,8 +406,33 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
             d.point(dots, fill=1 - ink if x <= done else ink)
 
 
+MOTIF_CELL = WIDTH // MOTIF_STEPS  # une case par pas, sur toute la largeur de l'écran droit
+MOTIF_TOP, MOTIF_BOTTOM = BAND + 5, HEIGHT - 3
+
+
+def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
+    """Les 16 pas du motif : accent en colonne pleine, note en demi-colonne, liée en trait
+    qui prolonge la note, silence en point ; un repère au-dessus de chaque temps."""
+    mid = (MOTIF_TOP + MOTIF_BOTTOM) // 2
+    for i, kind in enumerate(steps):
+        x = i * MOTIF_CELL + 2
+        if i % STEPS_PER_BEAT == 0:
+            d.line((x, BAND + 2, x + MOTIF_CELL - 6, BAND + 2), fill=1)
+        if kind == TIE:  # part de la case précédente, sans trou
+            d.rectangle((x - 6, MOTIF_BOTTOM - 3, x + MOTIF_CELL - 6, MOTIF_BOTTOM), fill=1)
+        elif kind == REST:
+            d.rectangle((x + 4, MOTIF_BOTTOM - 1, x + 5, MOTIF_BOTTOM), fill=1)
+        else:
+            top = MOTIF_TOP if kind == ACCENT else mid
+            d.rectangle((x, top, x + MOTIF_CELL - 6, MOTIF_BOTTOM), fill=1)
+
+
 def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:
-    """Config de l'arpège : ORD, OCT et GATE au-dessus des encodeurs 1-3, en toutes lettres."""
+    """Config de l'arpège : ORD, OCT, GATE et MOT au-dessus des encodeurs 1-4, en toutes
+    lettres ; le motif choisi en 16 cases sur l'écran droit."""
+    steps = engine.arp_steps
+    if screen == 1 and steps is not None:
+        _motif(d, steps)
     small = _font(SMALL)
     for k, (name, value) in enumerate(engine.arp_view()):
         if k // COLS != screen:

@@ -40,7 +40,7 @@ le branchement (SPEC « Service et retour arrière »).
 
 ## Configuration
 
-`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur (`arp`), longueur de phrase,
+`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur et ses motifs (`arp`, `arp.motifs`), longueur de phrase,
 couleurs, dispositions du clavier (B-H), table `mpc` des 16 pads (track, tranche,
 label, couleur).
 

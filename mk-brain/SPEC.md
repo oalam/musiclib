@@ -561,14 +561,81 @@ sur un pad accentue sa note.
 - **Réglages gardés** dans la session (ordre, octaves, gate, division),
   valeurs de départ dans `arp:` de `config/default.yaml`.
 
-**Hors périmètre** : motifs rythmiques (silences, liaisons, ratchets),
-accords plaqués, arpège en `MPC`, plusieurs arpèges à la fois, horloge
+**Hors périmètre** : motifs rythmiques (silences, liaisons : slice 12 ;
+ratchets), accords plaqués, arpège en `MPC`, plusieurs arpèges à la fois, horloge
 interne au Pi.
 
 **Critère de fin** : DT2 lancée à 143 BPM, mode `ARPG`, trois pads tenus :
 l'arpège tourne en 1/16 sans flam sur le kick ; changer la division, l'ordre
 et le gate s'entend aussitôt ; en LIVE REC, le pattern relu rejoue les
 mêmes notes ; PATTERN ramène au clavier sans note bloquée.
+
+## Slice 12 : motifs de l'arpège (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : mode ARPG, division 1/16, pads Bb, Db et F tenus, motif `GALO`
+(`X.xx X.xx X.xx X.xx`). Sur une mesure, la DT2 reçoit Bb accentué,
+silence, Db, F, puis Bb accentué, silence, Db, F : le rythme vient du
+motif, les notes de l'arpège. Sans motif (`OFF`), l'arpège joue comme en
+slice 11, une note par division.
+
+Un **motif** est une ligne de 16 pas, écrite en YAML, un caractère par pas
+(les espaces ne comptent pas, ils séparent les temps) :
+
+| Caractère | Pas | Effet |
+|---|---|---|
+| `x` | note | la note suivante de l'arpège, atténuée |
+| `X` | note accentuée | la note suivante de l'arpège, à la pression du pad |
+| `.` | silence | rien n'est joué |
+| `-` | liée | la note précédente dure un pas de plus, sans nouvelle attaque |
+
+**Arbitré le 2026-11-11** :
+
+- **Bibliothèque en YAML, pas d'édition sur la machine** : les motifs
+  nommés vivent dans `arp.motifs` de `config/default.yaml` (8 au départ),
+  dans l'ordre du fichier. Le nom fait 4 caractères au plus (largeur de la
+  case à l'écran) ; `OFF` est réservé à « pas de motif ».
+- **Choix par l'encodeur 4, PATTERN tenu** : `MOT`, à la suite de `ORD`,
+  `OCT` et `GATE`, même course (`arp.raw_per_choice`), borné, `OFF` en
+  premier. L'écran droit montre le motif choisi en 16 cases sous les
+  divisions.
+- **Sur un silence, la note attend** : ni le silence ni la liée ne
+  consomment de note. Bb Db F sur `x.xx` donne Bb, silence, Db, F ; toutes
+  les notes tenues sonnent, la mélodie se décale contre le motif.
+- **Accent par atténuation du reste** : un pas `X` part à la vélocité de la
+  pression du pad, un pas `x` à `arp.unaccented` % de cette vélocité (70 au
+  départ, jamais sous 1). Sans motif (`OFF`), rien n'est atténué.
+
+**Tranché à l'écriture, à confirmer à l'essai** :
+
+- **Motif calé sur la mesure**, pas sur le début de l'arpège : le pas joué
+  est la position sur la grille de la division depuis le départ du
+  transport, modulo 16. En 1/16 le motif fait une mesure et ses accents
+  tombent toujours aux mêmes endroits, quel que soit l'instant où les pads
+  sont posés ; dans une autre division il s'étire ou se resserre (1/8 :
+  deux mesures ; 1/16T : 16 pas sur 12 par mesure, il tourne contre la
+  mesure).
+- **Liée = durée, pas glissé** : une note suivie de n pas `-` dure n pas
+  de plus, puis son gate (`n × division + GATE`), coupée au plus tard
+  juste avant le pas suivant. Un `-` sans note en cours (première note pas
+  encore jouée, ou notes relâchées) vaut un silence. Le glissé façon
+  Acid V (notes qui se chevauchent) n'est pas fait : il dépend de la
+  réaction de la DT2 aux chevauchements, à vérifier sur la machine d'abord.
+- **Longueur fixe de 16 pas**, au moins une note par motif ; un motif mal
+  écrit (longueur, caractère inconnu, aucune note, nom trop long ou `OFF`)
+  est refusé au chargement de la config.
+- **Motif gardé dans la session** par son nom, valeur de départ
+  `arp.motif` ; un nom disparu de la config retombe sur la valeur de
+  départ.
+
+**Hors périmètre** : édition des motifs sur les pads, longueurs autres
+que 16, ratchets, glissé, probabilités, tête de lecture à l'écran,
+presets nommés (ordre + octaves + gate + division + motif : slice
+suivante).
+
+**Critère de fin** : DT2 lancée à 143 BPM, mode `ARPG`, trois pads tenus,
+motif `GALO` : le silence et les accents s'entendent, calés sur le kick ;
+`LONG` fait entendre des notes tenues ; revenir à `OFF` rend l'arpège
+continu ; en LIVE REC, le pattern relu rejoue le motif.
 
 ## Modes : live et design
 
@@ -1355,6 +1422,7 @@ conditionne tout le reste.
 | 7 | **Portage Pi** (Pi 3 Model B, question 5) : image Trixie Lite 64 bits (Python 3.13 ; Bookworm n'a que 3.11), udev (hidraw), clone partiel + clé de déploiement, `git pull` au démarrage, service systemd, alimentation, arrêt propre, retour au commit précédent si échec | débrancher le Mac, allumer le Pi : projet présélectionné, jouable en moins de 30 s, sans réseau | en cours (2026-11-10) |
 | 10 | **Aftertouch** : pression d'un pad tenu → aftertouch de canal de sa track, MPC et clavier, toujours actif | cf. « Slice 10 : aftertouch » | codée le 2026-11-11 (v0.30.0) ; seuils réglés sur mesure le 2026-11-11 (v0.30.3), à essayer avec un preset DT2 qui assigne l'aftertouch |
 | 11 | **Arpégiateur** : mode `ARPG` sur PATTERN, clavier de `KEYS`, pads tenus arpégés sur l'horloge, menus contextuels (divisions, ordre, octaves, gate), maintien | cf. « Slice 11 : arpégiateur », critère de fin | codée le 2026-11-11 (v0.32.0), à essayer sur la DT2 |
+| 12 | **Motifs de l'arpège** : bibliothèque `arp.motifs` (16 pas : note, accent, silence, liée), choix par l'encodeur 4 `MOT` PATTERN tenu, motif calé sur la mesure, pas ordinaires atténués | cf. « Slice 12 : motifs de l'arpège », critère de fin | codée le 2026-11-11 (v0.34.0), à essayer sur la DT2 ; presets nommés ensuite |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

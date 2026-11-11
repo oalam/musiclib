@@ -222,7 +222,7 @@ mais les pads tenus ne sonnent plus en accord, ils sont joués un par un,
 une note par division, calés sur l'horloge de la DT2. Transport arrêté, il
 n'y a pas d'arpège : les pads jouent comme au clavier.
 
-![Mode ARPG, PATTERN tenu : divisions en haut, ORD, OCT et GATE](img/13-arpege.png)
+![Mode ARPG, PATTERN tenu : divisions en haut, ORD, OCT, GATE et MOT, le motif LONG à droite](img/13-arpege.png)
 
 - **PATTERN tenu** : la config de l'arpège, ci-dessus. Les encodeurs 1-3
   règlent `ORD` (UP montant, DOWN descendant, UPDN aller-retour, PLAY
@@ -230,6 +230,14 @@ n'y a pas d'arpège : les pads jouent comme au clavier.
   de chaque note, 10 à 100 % de la division). Relâché, les écrans
   principaux reviennent (pattern, mutes, compteur) et les encodeurs
   règlent de nouveau la track, pendant que l'arpège joue.
+- **Encodeur 4, PATTERN tenu** : `MOT`, le motif rythmique. `OFF` joue une
+  note par division ; les autres (`GALO`, `OFFB`, `TRES`, `A332`, `SYNC`,
+  `ROLL`, `LONG`, `ACID`) posent l'arpège sur 16 pas, dessinés sur l'écran
+  droit : colonne pleine = note accentuée, demi-colonne = note plus
+  douce, point = silence, trait = la note précédente dure un pas de plus.
+  Sur un silence la note attend : toutes les notes tenues sonnent. En
+  1/16 le motif fait une mesure, calé sur celle de la DT2. Les motifs
+  s'écrivent dans `arp.motifs` de `config/default.yaml`.
 - **Boutons d'écran 1-8** : la division (1/4 à 1/64), comme le note
   repeat, PATTERN tenu ou non.
 - **Pression** : appuyer plus fort sur un pad accentue sa note.
@@ -271,7 +279,7 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | GRID | quantize off / 1/16 / 1/8 |
 | SWING + maître | swing |
 | NOTE REPEAT (+ SHIFT) | repeat tenu (verrouillé) ; boutons d'écran = division |
-| PATTERN | appui bref : mode ARPG ↔ clavier (pads tenus arpégés) ; tenu en ARPG : config, encodeurs 1-3 = ORD, OCT, GATE ; boutons d'écran = division, NOTE REPEAT = maintien |
+| PATTERN | appui bref : mode ARPG ↔ clavier (pads tenus arpégés) ; tenu en ARPG : config, encodeurs 1-4 = ORD, OCT, GATE, MOT (motif) ; boutons d'écran = division, NOTE REPEAT = maintien |
 | Boutons d'écran 1-4 | focus du menu GAMME, TRACK, QUANT, PHRASE |
 | Encodeur maître | valeur de l'entrée au focus ; appui = entrée suivante |
 | SHIFT + PLAY | phrase à 1 à la barre suivante |
