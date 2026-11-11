@@ -33,7 +33,7 @@ play:
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
   tap_debounce_ms: 150       # SOLO, MUTE, SELECT + pad : un pad relâché depuis moins de 150 ms ne rebascule pas
 
-arp:                        # mode ARPG (PATTERN) : réglages de départ, page ARP des encodeurs
+arp:                        # mode ARPG (PATTERN) : réglages de départ (config : PATTERN tenu)
   order: up                  # up, down, updown, played (ordre d'appui), random
   octaves: 1                 # 1 à 3
   gate: 50                   # durée d'une note, 10 à 100 % de la division

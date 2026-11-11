@@ -528,20 +528,23 @@ sur un pad accentue sa note.
   en `KEYS` (le Pi n'a pas d'horloge à lui).
 - **Vélocité** de chaque note = pression courante de son pad, comme le
   repeat ; pas d'aftertouch pendant l'arpège.
+- **Config sur PATTERN tenu** (révisé le 2026-11-11 après essai, v0.33.0 ;
+  remplace la page `ARP` en tête des pages de son, où l'on entrait et
+  sortait par BROWSE) : tant que PATTERN est tenu en `ARPG`, les écrans
+  montrent la config (les 8 divisions en haut, la choisie inversée ;
+  `ORD`, `OCT`, `GATE` en bas) et les encodeurs 1-3 la règlent. Relâché,
+  les écrans principaux reviennent (pattern, mutes, compteur de phrases)
+  et les encodeurs retrouvent la track ; BROWSE ne change que les pages
+  de son.
 - **8 boutons d'écran** : les 8 divisions du repeat, tant que le mode est
-  actif. Elles s'affichent en haut des écrans, la choisie inversée, **sur
-  la page `ARP` seulement** : sur une page de son, le bandeau habituel
-  revient (pattern, mutes, compteur de phrases), sinon le compte à rebours
-  de la phrase serait perdu pendant tout l'arpège (écart à la proposition
-  « en permanence », choisi au codage, à confirmer). Le menu GAMME, TRACK,
-  QUANT, PHRASE n'a plus ses boutons d'écran en `ARPG` ; l'encodeur maître
-  règle toujours l'entrée au focus.
-- **Encodeurs** : une page `ARP` s'ajoute en tête des pages de la track ;
-  BROWSE ◀ ▶ passe aux pages de son habituelles, pour tourner le filtre
-  pendant que l'arpège joue. Page `ARP` : `ORD` (montant, descendant,
+  actif, PATTERN tenu ou non (changer de division en jouant reste un geste
+  à une main). Le menu GAMME, TRACK, QUANT, PHRASE n'a donc plus ses
+  boutons d'écran en `ARPG` ; l'encodeur maître règle toujours l'entrée au
+  focus.
+- **Encodeurs 1-3, PATTERN tenu** : `ORD` (montant, descendant,
   aller-retour, ordre d'appui, aléatoire), `OCT` (1 à 3), `GATE` (10 à
-  100 % de la division). Les 5 autres encodeurs de la page restent libres.
-  Course propre à la page (v0.32.1, après essai : au pas d'un CC, 4 unités
+  100 % de la division) ; les 5 autres sont sans effet pendant l'appui.
+  Course propre à la config (v0.32.1, après essai : au pas d'un CC, 4 unités
   brutes, le moindre mouvement sautait plusieurs valeurs) : 24 unités
   brutes par valeur de `ORD` et `OCT`, 12 par pas de 5 % de `GATE`
   (`arp.raw_per_choice`, `arp.raw_per_gate_step`), à régler à la main.
@@ -550,9 +553,11 @@ sur un pad accentue sa note.
   remplace les notes ; un appui pendant qu'un pad est tenu en ajoute.
   Limite connue : un accord tapé très bref (pads relâchés avant la fin de
   la fenêtre de vélocité) ne garde que sa dernière note.
-- **Entrée et sortie** : PATTERN bascule (un appui entre, un appui sort
-  vers `KEYS`) ; PAD MODE sort aussi, vers `MPC`. La sortie coupe
-  l'arpège et son maintien, note off envoyé.
+- **Entrée et sortie** : un appui sur PATTERN entre ; en `ARPG`, un appui
+  bref (moins de 300 ms, sans réglage pendant l'appui) sort vers `KEYS`,
+  au relâché ; un appui long ou qui a servi à régler ne sort pas. PAD MODE
+  sort aussi, vers `MPC`. La sortie coupe l'arpège et son maintien, note
+  off envoyé.
 - **Réglages gardés** dans la session (ordre, octaves, gate, division),
   valeurs de départ dans `arp:` de `config/default.yaml`.
 

@@ -153,6 +153,7 @@ class Aftertouch:
 MidiOut = NoteOn | NoteOff | ControlChange | ProgramChange | PitchBend | Aftertouch
 MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
+ARP_TAP_NS = 300_000_000  # PATTERN relâché avant : appui bref (sortie d'ARPG), sinon config
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # boutons d'écran 1-4 (banque : GROUP)
@@ -204,7 +205,9 @@ class Engine:
         self.repeat_held = False
         self.repeat_locked = False
         self.arp = False  # mode ARPG (PATTERN) : les pads tenus du clavier sont arpégés
-        self.arp_page = False  # page ARP des encodeurs affichée (BROWSE : pages de son)
+        # PATTERN tenu en ARPG : (instant de l'appui, appui qui a ouvert le mode ou servi
+        # à un réglage) ; un appui bref qui n'a servi à rien sort du mode au relâché
+        self._pattern_down: tuple[int, bool] | None = None
         self.arp_order: ArpOrder = cfg.arp.order
         self.arp_octaves = cfg.arp.octaves
         self.arp_gate = cfg.arp.gate
@@ -323,11 +326,11 @@ class Engine:
 
     @property
     def arp_menu(self) -> bool:
-        """Menu de l'arpège à l'écran : mode ARPG et page ARP des encodeurs."""
-        return self.arp and self.arp_page
+        """Config de l'arpège à l'écran et sous les encodeurs : ARPG, PATTERN tenu."""
+        return self.arp and "PATTERN" in self._held_buttons
 
     def arp_view(self) -> list[tuple[str, str]]:
-        """Page ARP des encodeurs 1-3 : (abrégé, valeur affichée)."""
+        """Config de l'arpège, encodeurs 1-3 : (abrégé, valeur affichée)."""
         return [
             ("ORD", ORDER_LABELS[self.arp_order]),
             ("OCT", str(self.arp_octaves)),
@@ -370,7 +373,7 @@ class Engine:
         """CC sur le canal de la track sélectionnée ; la 16 est l'AUTO CHANNEL, donc la
         track active de la DT2 (p-locks en LIVE REC). En perform : sur les tracks des pads
         du groupe SOLO. PB seulement SHIFT tenu, au centre au relâché de SHIFT.
-        Page ARP du mode ARPG : réglages de l'arpège, rien n'est envoyé."""
+        PATTERN tenu en ARPG : réglages de l'arpège, rien n'est envoyé."""
         if self.arp_menu:
             self._arp_turn(index, delta, now)
             return []
@@ -395,20 +398,31 @@ class Engine:
 
     # --- arpégiateur : mode ARPG (slice 11) -------------------------------------
 
-    def _toggle_arp(self) -> None:
-        """PATTERN : entre en ARPG (clavier, page ARP) ou en sort vers KEYS."""
+    def _pattern_pressed(self, now: int) -> None:
+        """PATTERN : entre en ARPG (clavier) ; déjà en ARPG, l'appui ouvre la config tant
+        qu'il est tenu, et sort du mode au relâché s'il a été bref et n'a rien réglé."""
+        self._pattern_down = (now, not self.arp)
         if self.arp:
-            self._leave_arp()
             return
         self.arp = True
-        self.arp_page = True
         self.mpc = False
         self.repeat_held = False
         self._repeats.clear()
 
+    def _pattern_released(self, now: int) -> None:
+        down, self._pattern_down = self._pattern_down, None
+        if self.arp and down is not None and not down[1] and now - down[0] < ARP_TAP_NS:
+            self._leave_arp()
+        self.leds_dirty = True
+
+    def _pattern_used(self) -> None:
+        """Un réglage fait PATTERN tenu : le relâché ne sortira pas du mode."""
+        if self._pattern_down is not None:
+            self._pattern_down = (self._pattern_down[0], True)
+
     def _leave_arp(self) -> None:
         """Sortie : l'arpège et son maintien s'arrêtent (les note off sont déjà planifiés)."""
-        self.arp = self.arp_page = self.arp_hold = False
+        self.arp = self.arp_hold = False
         self._arp_residue.clear()
         self._arp_clear()
 
@@ -427,19 +441,11 @@ class Engine:
             if not self._arp_notes:
                 self._arp_clear()
 
-    def _cycle_arp_page(self, step: int) -> None:
-        """BROWSE en ARPG : la page ARP en tête des pages de son, en boucle."""
-        n = self.faders.n_pages
-        v = ((0 if self.arp_page else self.faders.page_index + 1) + step) % (n + 1)
-        self.arp_page = v == 0
-        if v:
-            self.faders.page_index = v - 1
-        self.last_control = "page ARP" if v == 0 else f"page {v}/{n}"
-
     def _arp_turn(self, index: int, delta: int, now: int) -> None:
-        """Encodeurs 1-3 de la page ARP : ordre, octaves, gate (bornés, sans boucle).
+        """Encodeurs 1-3, PATTERN tenu en ARPG : ordre, octaves, gate (bornés, sans boucle).
         Course propre à la page (`arp.raw_per_choice`, `arp.raw_per_gate_step`) : au pas
         d'un CC, le moindre mouvement sautait plusieurs valeurs (essai du 2026-11-11)."""
+        self._pattern_used()
         if index > 3:
             return
         per = self.cfg.arp.raw_per_gate_step if index == 3 else self.cfg.arp.raw_per_choice
@@ -854,6 +860,8 @@ class Engine:
                 self.last_control = "power off cancelled"
             if name in MODIFIERS or name.startswith("BROWSE_"):
                 self.leds_dirty = True
+            if name == "PATTERN":
+                self._pattern_released(now)
             if name == "NOTE_REPEAT":
                 self.repeat_held = False
                 if not self.repeat_locked:
@@ -884,12 +892,8 @@ class Engine:
             self._load_selected()
             return
         if name in ("BROWSE_LEFT", "BROWSE_RIGHT"):  # page d'encodeurs
-            step = -1 if name == "BROWSE_LEFT" else 1
-            if self.arp:
-                self._cycle_arp_page(step)
-            else:
-                page = self.faders.cycle(step)  # en boucle
-                self.last_control = f"page {page + 1}/{self.faders.n_pages}"
+            page = self.faders.cycle(-1 if name == "BROWSE_LEFT" else 1)  # en boucle
+            self.last_control = f"page {page + 1}/{self.faders.n_pages}"
             self.leds_dirty = True
             return
         if name in ("TRANSPORT_LEFT", "TRANSPORT_RIGHT"):  # octave du clavier
@@ -900,7 +904,7 @@ class Engine:
         elif name == "SOLO" or (name == "PAD_MODE" and self.perform_lock):
             self._toggle_lock()  # PAD MODE sous SOLO : sortie, disposition inchangée
         elif name == "PATTERN":
-            self._toggle_arp()
+            self._pattern_pressed(now)
         elif name == "PAD_MODE":  # MPC <-> clavier ; les notes tenues gardent leur cible
             if self.arp:  # ARPG : sortie vers MPC
                 self._leave_arp()
@@ -921,6 +925,7 @@ class Engine:
                 self.repeat_held = True
         elif name.startswith("DISPLAY_") and (self.repeat_active or self.arp):
             self.division = DIVISIONS[int(name[-1]) - 1][0]
+            self._pattern_used()
             if self._arp_pos is not None:  # arpège en cours : recalé sur la nouvelle grille
                 div = DIVISION_TICKS[self.division]
                 self._arp_pos = math.ceil(self._arp_pos / div) * div

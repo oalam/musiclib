@@ -177,7 +177,7 @@ def _announce_band(d: ImageDraw.ImageDraw, engine: Engine) -> None:
 
 
 def _showing_repeat(engine: Engine) -> bool:
-    """Divisions en haut des écrans : NOTE REPEAT en cours, ou menu de l'arpège (page ARP)."""
+    """Divisions en haut des écrans : NOTE REPEAT en cours, ou config de l'arpège (PATTERN tenu)."""
     return engine.arp_menu or (engine.repeat_active and (engine.repeat_held or engine.repeating))
 
 
@@ -406,7 +406,7 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
 
 
 def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:
-    """Page ARP : ORDER, OCT et GATE au-dessus des encodeurs 1-3, en toutes lettres."""
+    """Config de l'arpège : ORD, OCT et GATE au-dessus des encodeurs 1-3, en toutes lettres."""
     small = _font(SMALL)
     for k, (name, value) in enumerate(engine.arp_view()):
         if k // COLS != screen:

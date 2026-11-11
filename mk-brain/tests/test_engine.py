@@ -950,16 +950,34 @@ def _ons(out: list[Timed]) -> list[int]:
     return [m.note for _, m in out if isinstance(m, NoteOn)]
 
 
-def test_pattern_toggles_arpg_and_pad_mode_leaves_to_mpc(cfg: Config) -> None:
+def test_pattern_enters_arpg_tap_leaves_and_pad_mode_goes_to_mpc(cfg: Config) -> None:
     eng = arp(cfg)
-    assert eng.mode_name == "ARPG" and eng.keyboard and eng.arp_menu
+    assert eng.mode_name == "ARPG" and eng.keyboard and not eng.arp_menu
     assert eng.leds().buttons["PATTERN"] == LED_MAX
-    btn(eng, "PATTERN")
+    btn(eng, "PATTERN", t=SECOND)  # appui bref : sortie vers le clavier, au relâché
+    assert eng.arp and eng.arp_menu
+    btn(eng, "PATTERN", False, t=SECOND + 100 * MS)
     assert eng.mode_name == "KEYS" and not eng.arp_menu
     assert 0 < eng.leds().buttons["PATTERN"] < LED_MAX
-    btn(eng, "PATTERN")
+    btn(eng, "PATTERN", t=2 * SECOND)
+    btn(eng, "PATTERN", False, t=2 * SECOND + 100 * MS)  # l'appui qui entre ne sort pas
     btn(eng, "PAD_MODE")
     assert eng.mode_name == "MPC" and not eng.arp
+
+
+def test_pattern_held_is_the_arp_config(cfg: Config) -> None:
+    """PATTERN tenu : config à l'écran, encodeurs 1-3 sur l'arpège ; relâché, le mode
+    reste (appui long ou réglage fait) et les encodeurs retrouvent la track."""
+    eng = arp(cfg)
+    step = cfg.arp.raw_per_choice
+    btn(eng, "PATTERN", t=SECOND)
+    assert eng.handle(EncoderEvent(2, step, 0), SECOND) == [] and eng.arp_octaves == 2
+    btn(eng, "PATTERN", False, t=SECOND + 100 * MS)  # bref, mais un réglage a été fait
+    assert eng.arp and not eng.arp_menu
+    assert eng.handle(EncoderEvent(1, cfg.encoders.raw_per_step, 0), 2 * SECOND) != []
+    btn(eng, "PATTERN", t=3 * SECOND)
+    btn(eng, "PATTERN", False, t=4 * SECOND)  # tenu 1 s sans rien régler : simple regard
+    assert eng.arp
 
 
 def test_arp_plays_held_pads_one_per_division(cfg: Config) -> None:
@@ -1023,8 +1041,11 @@ def test_arp_needs_running_transport_and_stops_with_it(cfg: Config) -> None:
     assert eng.tick(18 * TICK) == []
 
 
-def test_arp_page_encoders_and_division_buttons(cfg: Config) -> None:
+def test_arp_config_encoders_and_division_buttons(cfg: Config) -> None:
     eng = arp(cfg)
+    btn(eng, "DISPLAY_2")  # divisions : tout le temps en ARPG, PATTERN tenu ou non
+    assert eng.division == "1/8"
+    btn(eng, "PATTERN", t=SECOND)
     step, gate_step = cfg.arp.raw_per_choice, cfg.arp.raw_per_gate_step
     assert eng.handle(EncoderEvent(2, step - 1, 0), 0) == [] and eng.arp_octaves == 1
     eng.handle(EncoderEvent(2, 1, 0), 0)  # la course s'accumule : une valeur par `step`
@@ -1035,14 +1056,9 @@ def test_arp_page_encoders_and_division_buttons(cfg: Config) -> None:
     assert eng.arp_gate == 45 and eng.last_control == "ARP GATE 45%"
     eng.handle(EncoderEvent(1, 3 * step, 0), 0)
     assert eng.arp_order == "played"
-    assert eng.handle(EncoderEvent(5, step, 0), 0) == []  # encodeurs 4-8 libres sur la page ARP
-    btn(eng, "DISPLAY_2")
-    assert eng.division == "1/8"
-    btn(eng, "BROWSE_RIGHT")  # page de son 1 : les encodeurs envoient de nouveau
-    assert not eng.arp_menu and eng.last_control == "page 1/2"
-    assert eng.handle(EncoderEvent(1, cfg.encoders.raw_per_step, 0), 0) != []
-    btn(eng, "BROWSE_LEFT")
-    assert eng.arp_menu and eng.last_control == "page ARP"
+    assert eng.handle(EncoderEvent(5, step, 0), 0) == []  # encodeurs 4-8 libres dans la config
+    btn(eng, "BROWSE_RIGHT")  # BROWSE : pages de son, comme partout
+    assert eng.last_control == "page 2/2"
 
 
 def test_arp_settings_survive_the_session(cfg: Config) -> None:

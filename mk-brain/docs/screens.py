@@ -221,7 +221,7 @@ def arpeggio(cfg: Config, project: Project) -> tuple[Engine, int, bool]:
     hit(eng, 10, now)  # track 10 pour l'arpège
     eng.handle(PadEvent(_index(10), False, 0), now)
     btn(eng, "SELECT", False, t=now)
-    btn(eng, "PATTERN", t=now)
+    btn(eng, "PATTERN", t=now)  # tenu : la config de l'arpège à l'écran
     eng.handle(EncoderEvent(2, cfg.arp.raw_per_choice, 0), now)  # OCT 2
     for pad in (1, 3, 5):
         hit(eng, pad, now)

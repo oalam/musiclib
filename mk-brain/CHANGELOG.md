@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.33.0] - 2026-11-11
+
+### Modifié
+
+- [11] Config de l'arpège sur **PATTERN tenu** : divisions, `ORD`, `OCT`
+  et `GATE` ne s'affichent, et les encodeurs 1-3 ne les règlent, que
+  pendant l'appui ; relâché, les écrans principaux et les encodeurs de la
+  track reviennent. Un appui bref (moins de 300 ms, sans réglage) sort du
+  mode. La page `ARP` en tête des pages de son disparaît, BROWSE ne change
+  que les pages de son. Les boutons d'écran restent les divisions tant
+  que le mode est actif.
+
 ## [0.32.1] - 2026-11-11
 
 ### Corrigé
