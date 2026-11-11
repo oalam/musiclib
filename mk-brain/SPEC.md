@@ -629,7 +629,7 @@ Un **motif** est une ligne de 16 pas, écrite en YAML, un caractère par pas
   départ.
 
 **Hors périmètre** : édition des motifs sur les pads, longueurs autres
-que 16, ratchets, glissé, probabilités, tête de lecture à l'écran,
+que 16 (slice 19), ratchets (slice 18), glissé, probabilités (slice 20), tête de lecture à l'écran,
 presets nommés (ordre + octaves + gate + division + motif : slice 13).
 
 **Critère de fin** : DT2 lancée à 143 BPM, mode `ARPG`, trois pads tenus,
@@ -872,6 +872,37 @@ progression, tête de lecture du motif, chiffrage en degrés romains.
 **Critère de fin** : `PRG 1637`, `BAR 1`, pad de la tonique tenu : le
 degré en inverse avance d'une case par mesure, sur le premier temps, et
 le nom affiché est l'accord entendu ; relâcher le pad rend la banque.
+
+## Slice 18 : ratchets dans les motifs (cadré et codé le 2026-11-11, à essayer)
+
+Exemple : motif `RATC` (`X.xr X.xx X.xr X.rT`), division 1/16. Sur le
+quatrième pas de la mesure, la note de l'arpège part deux fois, en deux
+1/32 ; sur le dernier pas, trois fois, accentuée.
+
+| Caractère | Pas | Effet |
+|---|---|---|
+| `r` | ratchet double | la note suivante de l'arpège, jouée 2 fois dans le pas, atténuée |
+| `R` | ratchet double accentué | idem, à la pression du pad |
+| `t` | ratchet triple | la note jouée 3 fois dans le pas, atténuée |
+| `T` | ratchet triple accentué | idem, à la pression du pad |
+
+- **Une seule note de l'arpège par ratchet** : les coups rejouent la même
+  note, l'arpège avance d'une note comme pour un `x`.
+- **Coups égaux** : le pas est partagé en 2 ou 3 parts ; le gate
+  s'applique à chaque coup (gate 50 % en 1/16, ratchet double : deux
+  notes d'un 1/64 chacune). Une liée après un ratchet prolonge son
+  dernier coup.
+- **Écran** : la colonne du pas fendue en 2 ou 3, pleine si accentuée.
+- Un motif fait seulement de ratchets est valide. `RATC` rejoint la
+  bibliothèque de départ (9 motifs).
+
+**Hors périmètre** : ratchet réglable à la volée (encodeur), vélocité
+décroissante des coups, ratchets de plus de 3 coups.
+
+**Critère de fin** : motif `RATC`, trois pads tenus, DT2 lancée : les
+roulements s'entendent sur les pas 4, 12, 15 et 16, calés sur le kick,
+sans note bloquée ; en LIVE REC, le pattern relu les rejoue (dans la
+limite de la quantification de la DT2).
 
 ## Modes : live et design
 
@@ -1673,6 +1704,7 @@ conditionne tout le reste.
 | 15 | **Accords de l'arpège** : encodeur 6 `CHD` PATTERN tenu (`OFF`, `TRI`, `7TH`, `SUS2`, `SUS4`, `PWR`), un pad = un accord pris dans la gamme de la banque, gardé dans les presets | cf. « Slice 15 », critère de fin | codée le 2026-11-11 (v0.37.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 16 | **Progressions d'accords** : `arp.progressions` (suites de degrés), encodeur 7 `PRG` et encodeur 8 `BAR` (1/2 à 4 mesures par accord) PATTERN tenu, degrés comptés depuis le pad tenu, calées sur le transport, gardées dans les presets | cf. « Slice 16 », critère de fin | codée le 2026-11-11 (v0.38.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 17 | **Accord en cours à l'écran** : progression qui joue, bandeau gauche : ses degrés, celui en cours en vidéo inverse, nom de l'accord (`1 6 3 7  Gb`) | cf. « Slice 17 », critère de fin | codée le 2026-11-11 (v0.39.0), à essayer sur la DT2 |
+| 18 | **Ratchets** : pas `r` / `R` (note jouée 2 fois dans le pas) et `t` / `T` (3 fois) dans `arp.motifs`, motif `RATC` | cf. « Slice 18 », critère de fin | codée le 2026-11-11 (v0.40.0), à essayer sur la DT2 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

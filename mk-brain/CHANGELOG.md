@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.40.0] - 2026-11-11
+
+### Ajouté
+
+- [18] Ratchets dans les motifs de l'arpège : pas `r` / `R` (la note jouée
+  2 fois dans le pas, `R` accentué) et `t` / `T` (3 fois). Une seule note
+  de l'arpège par ratchet, gate appliqué à chaque coup, colonne fendue à
+  l'écran. Motif `RATC` ajouté à `arp.motifs`.
+
 ## [0.39.0] - 2026-11-11
 
 ### Ajouté

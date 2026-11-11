@@ -1140,6 +1140,26 @@ def test_arp_motif_ties_lengthen_the_note(cfg: Config) -> None:
     assert [t / TICK for t, _ in out] == pytest.approx([24, 33], abs=0.01)  # 6 + 3 ticks
 
 
+def test_arp_ratchet_replays_the_note_inside_the_step(cfg: Config) -> None:
+    """Motif RATC (`X.xr …`), 1/16, gate 50 % : le pas `r` joue deux fois la même note,
+    atténuée, chaque coup durant un quart de pas ; l'arpège n'avance que d'une note."""
+    eng = arp(cfg)
+    eng.arp_motif = "RATC"
+    notes = [eng.target(p)[1] for p in (1, 3)]
+    soft = round(127 * cfg.arp.unaccented / 100)
+    press(eng, 13 * TICK, pad=_index(1))  # position 12 : pas 2, un `x`
+    press(eng, 13 * TICK, pad=_index(3))
+    out = eng.tick(18 * TICK - 10 * MS)  # pas 3 : r
+    assert [m for _, m in out] == [
+        NoteOn(0, notes[1], soft),
+        NoteOff(0, notes[1]),
+        NoteOn(0, notes[1], soft),
+        NoteOff(0, notes[1]),
+    ]
+    assert [t / TICK for t, _ in out] == pytest.approx([18, 19.5, 21, 22.5], abs=0.01)
+    assert [(n, v) for _, n, v in _arp_notes(eng, (24,))] == [(notes[0], 127)]  # pas 4 : X
+
+
 def test_arp_preset_recalls_the_five_settings(cfg: Config) -> None:
     """Encodeur 5, PATTERN tenu : le preset s'applique dès qu'il est affiché ; un réglage
     retouché affiche `----`, l'encodeur repart du dernier preset rappelé."""

@@ -4,9 +4,11 @@ import pytest
 
 from mk_brain.arp import (
     MotifError,
+    accented,
     chord,
     chord_name,
     degree_steps,
+    hits,
     parse_motif,
     sequence,
     shift,
@@ -47,6 +49,12 @@ def test_motif_parsed_without_spaces() -> None:
 def test_bad_motif_rejected(text: str, match: str) -> None:
     with pytest.raises(MotifError, match=match):
         parse_motif(text)
+
+
+def test_ratchets_are_played_steps() -> None:
+    assert parse_motif("r... .... .... ....") == "r" + "." * 15  # un ratchet suffit comme note
+    assert [hits(k) for k in "xXrRtT"] == [1, 1, 2, 2, 3, 3]
+    assert [accented(k) for k in "xXrRtT"] == [False, True] * 3
 
 
 def test_ties_after_a_step_wrap_around() -> None:

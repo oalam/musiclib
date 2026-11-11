@@ -47,7 +47,7 @@ from typing import TYPE_CHECKING, Any
 
 from PIL import Image, ImageChops, ImageDraw, ImageFont
 
-from mk_brain.arp import ACCENT, MOTIF_STEPS, REST, TIE, chord_name
+from mk_brain.arp import MOTIF_STEPS, REST, TIE, accented, chord_name, hits
 from mk_brain.display import HEIGHT, WIDTH, new_image, text_image
 from mk_brain.layouts import FLAT_NAMES, degree_name, flat_note
 from mk_brain.phrase import BLOCK_BARS
@@ -441,7 +441,8 @@ MOTIF_TOP, MOTIF_BOTTOM = TAG_TOP + 3, BAND - 3
 
 def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
     """Les 16 pas du motif : accent en colonne pleine, note en demi-colonne, liée en trait
-    qui prolonge la note, silence en point ; un repère au-dessus de chaque temps."""
+    qui prolonge la note, silence en point, ratchet en colonne fendue ; un repère au-dessus
+    de chaque temps."""
     mid = (MOTIF_TOP + MOTIF_BOTTOM) // 2
     for i, kind in enumerate(steps):
         x = MOTIF_LEFT + i * MOTIF_CELL + 2
@@ -453,8 +454,11 @@ def _motif(d: ImageDraw.ImageDraw, steps: str) -> None:
         elif kind == REST:
             d.rectangle((x + 3, MOTIF_BOTTOM - 1, x + 4, MOTIF_BOTTOM), fill=1)
         else:
-            top = MOTIF_TOP if kind == ACCENT else mid
+            top = MOTIF_TOP if accented(kind) else mid
             d.rectangle((x, top, right, MOTIF_BOTTOM), fill=1)
+            for h in range(1, hits(kind)):  # ratchet : la colonne fendue en 2 ou 3
+                cut = x + (MOTIF_BLOCK + 1) * h // hits(kind)
+                d.line((cut, top, cut, MOTIF_BOTTOM), fill=0)
 
 
 def _arp_faders(d: ImageDraw.ImageDraw, engine: Engine, touched: int | None, screen: int) -> None:

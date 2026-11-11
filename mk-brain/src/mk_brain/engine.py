@@ -68,7 +68,6 @@ from mk_brain.arp import (
     GATE_STEP,
     MAX_OCTAVES,
     MOTIF_STEPS,
-    NOTE,
     ORDER_LABELS,
     ORDERS,
     REST,
@@ -76,7 +75,9 @@ from mk_brain.arp import (
     ArpBars,
     ArpChord,
     ArpOrder,
+    accented,
     degree_steps,
+    hits,
     shift,
     spread,
     ties_after,
@@ -654,15 +655,20 @@ class Engine:
             if pad in self._pressure and pad not in self._attacks:
                 entry.velocity = velocity(self.cfg.velocity, self._pressure[pad])
             vel = entry.velocity
-            if kind == NOTE:  # pas ordinaire d'un motif : atténué, l'accent garde la pression
+            if kind is not None and not accented(kind):  # pas ordinaire : atténué
                 vel = max(1, round(vel * self.cfg.arp.unaccented / 100))
-            on = max(t, now)
-            off = self._time_of(self._arp_pos + div * (ties + self.arp_gate / 100)) or on
-            nxt = self._time_of(self._arp_pos + div * (ties + 1))
-            if nxt is not None:  # gate 100 % : coupée juste avant le pas suivant
-                off = min(off, nxt - NOTE_OFF_MIN_NS)
-            out.append((on, NoteOn(entry.channel, note, vel)))
-            out.append((max(off, on + NOTE_OFF_MIN_NS), NoteOff(entry.channel, note)))
+            count = hits(kind) if kind is not None else 1  # ratchet : la note rejouée dans le pas
+            part = div / count
+            for h in range(count):
+                start = self._arp_pos + part * h
+                tied = div * ties if h == count - 1 else 0  # les liées prolongent le dernier coup
+                on = max(self._time_of(start) or t, now)
+                off = self._time_of(start + tied + part * self.arp_gate / 100) or on
+                nxt = self._time_of(start + tied + part)
+                if nxt is not None:  # gate 100 % : coupée juste avant le coup suivant
+                    off = min(off, nxt - NOTE_OFF_MIN_NS)
+                out.append((on, NoteOn(entry.channel, note, vel)))
+                out.append((max(off, on + NOTE_OFF_MIN_NS), NoteOff(entry.channel, note)))
             self.last_played = (pad, note, vel)
             self._arp_pos += div
             self._arp_step += 1

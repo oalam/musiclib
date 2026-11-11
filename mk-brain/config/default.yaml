@@ -55,7 +55,8 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
   motif: "OFF"               # motif de départ : un nom de `motifs`, ou "OFF" (une note par division)
   # Motifs (slice 12), encodeur 4 MOT, PATTERN tenu. 16 pas, calés sur la mesure en 1/16 ;
   # les espaces séparent les temps. x note, X note accentuée, . silence, - liée (la note
-  # précédente dure un pas de plus). Nom : 4 caractères au plus, entre guillemets.
+  # précédente dure un pas de plus), r / R ratchet (la note jouée 2 fois dans le pas, R accentué),
+  # t / T idem 3 fois. Nom : 4 caractères au plus, entre guillemets.
   motifs:
     "GALO": "X.xx X.xx X.xx X.xx"   # galop
     "OFFB": "..x. ..x. ..x. ..x."   # contretemps
@@ -65,6 +66,7 @@ arp:                        # mode ARPG (PATTERN) : réglages de départ (config
     "ROLL": "X.x. X.x. X.xx Xxxx"   # roulement en fin de mesure
     "LONG": "X--- x-x- X--- xxx-"   # notes tenues
     "ACID": "X-.x x.X- .xx. X.x-"   # ligne acid, liées et silences
+    "RATC": "X.xr X.xx X.xr X.rT"   # galop à ratchets, triolet en fin de mesure
   # Presets (slices 13 et 14), encodeur 5 PRE ou pad n, PATTERN tenu : les cinq réglages d'un coup.
   # Ils remplissent les emplacements 1, 2, 3… des 16 pads (16 au plus) ; un emplacement sauvé depuis
   # la MK2 (PATTERN + SHIFT + pad, state/arp-presets.json) l'emporte. Noms U01 à U16 réservés.

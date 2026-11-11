@@ -54,6 +54,9 @@ MOTIF_STEPS = 16
 MOTIF_OFF = "OFF"  # pas de motif : une note par division, sans atténuation
 MOTIF_NAME_MAX = 4  # largeur de la case de l'écran
 NOTE, ACCENT, REST, TIE = "x", "X", ".", "-"  # un caractère par pas du motif
+# Ratchets (slice 18) : la note du pas rejouée 2 ou 3 fois dans le pas ; majuscule = accent.
+RATCHETS: dict[str, int] = {"r": 2, "R": 2, "t": 3, "T": 3}
+PLAYED = frozenset({NOTE, ACCENT, *RATCHETS})  # pas qui prennent une note de l'arpège
 
 Held = tuple[int, int]  # (pad, note)
 
@@ -67,12 +70,22 @@ def parse_motif(text: str) -> str:
     steps = "".join(text.split())
     if len(steps) != MOTIF_STEPS:
         raise MotifError(f"motif {text!r} : {len(steps)} pas, {MOTIF_STEPS} attendus")
-    unknown = sorted(set(steps) - {NOTE, ACCENT, REST, TIE})
+    unknown = sorted(set(steps) - PLAYED - {REST, TIE})
     if unknown:
         raise MotifError(f"motif {text!r} : pas inconnus {''.join(unknown)!r}")
-    if NOTE not in steps and ACCENT not in steps:
+    if not PLAYED & set(steps):
         raise MotifError(f"motif {text!r} : aucune note")
     return steps
+
+
+def hits(kind: str) -> int:
+    """Nombre de coups d'un pas joué : 1, ou 2 / 3 pour un ratchet."""
+    return RATCHETS.get(kind, 1)
+
+
+def accented(kind: str) -> bool:
+    """Pas à la pression du pad (`X`, `R`, `T`) ; les autres sont atténués."""
+    return kind.isupper()
 
 
 def ties_after(steps: str, index: int) -> int:
