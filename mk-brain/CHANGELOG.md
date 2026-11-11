@@ -3,6 +3,16 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.31.0] - 2026-11-11
+
+### Modifié
+
+- [9] Bande des mutes : un fin pointillé vertical sépare les temps, entre
+  les cases 4/5, 8/9 et 12/13 ; les 4 groupes de cases s'écartent de 1 px
+  pour lui faire place. Les cases plus grosses sur les temps (v0.30.5,
+  v0.30.6) sont retirées : elles ne se voyaient pas sur l'écran de la MK2.
+- Captures du guide (`docs/img/`) régénérées.
+
 ## [0.30.6] - 2026-11-11
 
 ### Corrigé

@@ -194,7 +194,7 @@ def _repeat_band(d: ImageDraw.ImageDraw, engine: Engine, screen: int) -> None:
 
 COLUMN = 46  # colonne « écran de la DT2 » (pattern, SMP, track), à gauche du bandeau gauche
 MUTE_TOP, MUTE_BOTTOM = 26, 35  # cases des mutes, 10 px de haut
-BEAT_GROW = 2  # cases des temps : 2 px plus hautes, 1 px plus larges de chaque côté
+BEAT_LINE = (MUTE_TOP - 2, MUTE_BOTTOM + 3)  # pointillé entre deux temps, dépasse des cases
 STEPS_PER_BAR = 16
 STEPS_PER_BEAT = 4
 TICKS_PER_STEP = 6  # 24 ticks par noire
@@ -211,31 +211,36 @@ def _step(engine: Engine) -> int | None:
     return None if ticks is None else ticks // TICKS_PER_STEP % STEPS_PER_BAR
 
 
+def _mute_x0(track: int, left: int = COLUMN) -> int:
+    """Bord gauche de la case de `track`. Les 4 groupes d'un temps s'écartent de 1 px
+    (-1, 0, +1, +2) : 3 px entre deux temps au lieu de 2, la place du pointillé."""
+    cell = (WIDTH - left) // 16
+    return left + (track - 1) * cell + 2 + (track - 1) // STEPS_PER_BEAT - 1
+
+
 def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> None:
     """16 cases, une par track : pleine = ouverte, vide = mutée ; track sélectionnée soulignée.
     La track de l'AUTO CHANNEL (pas de mute par son canal) n'a qu'un point. Les 16 cases
     comptent aussi les doubles croches de la mesure : un carré intérieur, en inverse de sa
-    case, marque celle qui joue. Les cases des temps (1, 5, 9, 13) sont plus grosses que
-    les autres (`BEAT_GROW`), en permanence : ce sont les repères de la rangée."""
+    case, marque celle qui joue. Un fin pointillé vertical sépare les temps (entre les
+    cases 4/5, 8/9 et 12/13)."""
     cell = (WIDTH - left) // 16
     top, bottom = MUTE_TOP, MUTE_BOTTOM
     step = _step(engine)
     for t in range(1, 17):
-        x0 = left + (t - 1) * cell + 2
+        x0 = _mute_x0(t, left)
         x1 = x0 + cell - 3
-        playing = step == t - 1
-        box = (x0, top, x1, bottom)
-        if t % STEPS_PER_BEAT == 1:  # case d'un temps : plus grosse, repère de la rangée
-            box = (x0 - 1, top - BEAT_GROW, x1 + 1, bottom)
+        if t > 1 and t % STEPS_PER_BEAT == 1:  # nouveau temps : pointillé au milieu de l'écart
+            d.point([(x0 - 2, y) for y in range(BEAT_LINE[0], BEAT_LINE[1] + 1, 2)], fill=1)
         full = False
         if t == engine.cfg.midi.auto_channel:
             d.point(((x0 + x1) // 2, (top + bottom) // 2), fill=1)
         elif engine.faders.muted.get(t):
-            d.rectangle(box, outline=1)
+            d.rectangle((x0, top, x1, bottom), outline=1)
         else:
-            d.rectangle(box, fill=1)
+            d.rectangle((x0, top, x1, bottom), fill=1)
             full = True
-        if playing:
+        if step == t - 1:
             d.rectangle((x0 + 2, top + 2, x1 - 2, bottom - 2), fill=0 if full else 1)
         if t == engine.track:
             d.rectangle((x0, bottom + 2, x1, bottom + 3), fill=1)

@@ -989,10 +989,11 @@ TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           
 - mutes sur toute la largeur restante, cases de 10 px ; elles comptent
   aussi les 16 doubles croches de la mesure : un carré intérieur, en
   inverse de sa case, marque celle qui joue (rien à l'arrêt), 7 × 6 px.
-  Les cases des temps (1, 5, 9, 13) sont plus grosses que les autres, en
-  permanence, pour se repérer dans la rangée : 13 × 12 px au lieu de
-  11 × 10 (2 px vers le haut, 1 px de chaque côté ; demandé le
-  2026-11-11, v0.30.6). L'écran gauche est donc redessiné à chaque
+  Un fin pointillé vertical sépare les temps, entre les cases 4/5, 8/9 et
+  12/13 (demandé le 2026-11-11, v0.31.0) ; les 4 groupes de cases
+  s'écartent de 1 px pour lui laisser 3 px. Les cases plus grosses sur les
+  temps, essayées en v0.30.5 et v0.30.6, ne se voyaient pas sur l'écran de
+  la MK2. L'écran gauche est donc redessiné à chaque
   double croche, soit 60 / 165 / 4 = 91 ms à 165 BPM, environ 11 images
   par seconde ; essayé sur le Pi le 2026-11-11, sans retard depuis le
   cache du rendu (v0.30.2) ;

@@ -65,8 +65,7 @@ def test_pad_hit_shown_in_both_layouts(cfg: Config) -> None:
 
 def _cell(track: int) -> int:
     """Abscisse du centre de la case de mute de `track`."""
-    cell = (WIDTH - render.COLUMN) // 16
-    return render.COLUMN + (track - 1) * cell + cell // 2 + 1
+    return render._mute_x0(track) + 5
 
 
 def test_mute_strip_open_muted_and_selected(cfg: Config) -> None:
@@ -92,21 +91,20 @@ def test_mute_strip_marks_playing_sixteenth(cfg: Config) -> None:
     assert render.left(Engine(cfg), 0).getpixel((_cell(2), mid))  # à l'arrêt : rien
 
 
-def test_mute_strip_beat_cells_are_bigger(cfg: Config) -> None:
-    """Les cases des temps (1, 5, 9, 13) dépassent de la rangée, à l'arrêt comme en jeu,
-    ouvertes ou mutées ; le carré de la double croche en cours garde sa taille."""
-    above = render.MUTE_TOP - render.BEAT_GROW  # ligne au-dessus des cases ordinaires
-    eng = Engine(cfg)
-    eng.faders.muted[9] = True
-    img = render.left(eng, 0)
-    for track in range(1, 17):
-        assert bool(img.getpixel((_cell(track), above))) == (track in (1, 5, 9, 13))
-    assert not img.getpixel((_cell(9), render.MUTE_TOP + 4))  # mutée : toujours vide
-    eng = at_bar(cfg, 3)
-    advance(eng, 2 * 96 + 10, 2 * 96 + 26)  # 5e double croche : 2e temps
-    img = render.left(eng, 0)
-    assert img.getpixel((_cell(5), above)) and img.getpixel((_cell(5), render.MUTE_TOP + 1))
-    assert not img.getpixel((_cell(5), render.MUTE_TOP + 4))  # carré intérieur en inverse
+def test_mute_strip_dotted_line_between_beats(cfg: Config) -> None:
+    """Pointillé vertical entre les cases 4/5, 8/9 et 12/13, à 1 px de chaque case,
+    dépassant de la rangée ; rien entre les autres cases."""
+    img = render.left(Engine(cfg), 0)
+    top, bottom = render.BEAT_LINE
+    for track in (5, 9, 13):
+        x = render._mute_x0(track) - 2
+        column = [bool(img.getpixel((x, y))) for y in range(top, bottom + 1)]
+        assert column == [i % 2 == 0 for i in range(len(column))]
+        assert not img.getpixel((x - 1, render.MUTE_TOP + 4))
+        assert not img.getpixel((x + 1, render.MUTE_TOP + 4))
+    for track in (2, 6, 16):
+        assert not img.getpixel((render._mute_x0(track) - 2, top))
+    assert render._mute_x0(16) + 10 < WIDTH
 
 
 def test_mode_tag_always_shown(cfg: Config) -> None:

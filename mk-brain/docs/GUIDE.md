@@ -54,9 +54,9 @@ joué est présélectionné : un appui suffit. SHIFT + BROWSE (◀ ou ▶) revie
 - **Bande des mutes** : une case par track, pleine = ouverte, vide =
   mutée ; la track sélectionnée est soulignée ; la 16 n'a qu'un point
   (AUTO CHANNEL, pas de mute). Transport lancé, un petit carré parcourt
-  les 16 cases : c'est la double croche en cours dans la mesure. Les
-  cases des temps (1, 5, 9, 13) sont plus grosses que les autres, en
-  permanence : ce sont les repères de la rangée.
+  les 16 cases : c'est la double croche en cours dans la mesure. Un
+  fin pointillé vertical sépare les temps, entre les cases 4/5, 8/9 et
+  12/13.
 - **Écran droit, en haut** : la phrase en noir sur blanc (`PHR 01`), la
   mesure dans la phrase (`10 / 32`), les mesures avant le prochain cap
   (`-7 to 16`) et, dessous, le pattern suivant quand il est annoncé
