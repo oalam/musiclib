@@ -1677,7 +1677,17 @@ modulations en page 2) :
 | Page | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|---|
 | p1 | LVL 95 (niveau de track) | BR 54 (bit reduction) | OVER 57 (overdrive) | SRR 55 | DEL 84 (envoi delay) | REV 85 | CHO 12 (chorus) | TUNE 16 |
-| p2 | LVL 95 | CUT 74 | RES 75 | ENV 77 | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | PAN 90 |
+| p2 | LVL 95 | CUT 74 | RES 75 | ENV 77 | MW 1 (mod wheel) | BC 2 (breath) | PB (pitch bend) | FBK 24 (feedback du délai, global) |
+
+- **FBK** (2026-11-11, à la place de `PAN 90`, inutilisé) : feedback du
+  délai de la DT2 (SEND FX > DELAY > `FDBK`, annexe B.9 : CC 24). Réglage
+  global, pas de track : l'encodeur est marqué `fx` et envoie sur
+  `midi.fx_channel` (9, le `FX CONTROL CH` de la DT2), une seule valeur
+  quelle que soit la track sélectionnée, envoyée une fois en groupe SOLO.
+  Plafond `max: 125` sur les valeurs envoyées (au-delà le délai s'emballe).
+  Tourné sur la DT2, il est appris sans changer la track sélectionnée.
+  Console et bandeau : `FX FBK 90`. Le canal 9 est aussi celui de la
+  track 9 : à vérifier à l'essai que le CC 24 y agit bien sur le délai.
 
 - **Flèches** (2026-11-09) : `BROWSE_RIGHT` = page suivante,
   `BROWSE_LEFT` = précédente, **en boucle** ; LED des
@@ -1700,7 +1710,7 @@ modulations en page 2) :
   (`PB: hold SHIFT`) ; au relâché de SHIFT, pitch
   bend remis au centre sur chaque track où il est parti (track
   sélectionnée ou groupe du perform), comme une molette à ressort.
-- Jauge depuis le centre : PB, ENV, PAN, TUNE (`bipolar`). Valeurs gardées
+- Jauge depuis le centre : PB, ENV, TUNE (`bipolar`). Valeurs gardées
   par track et par paramètre, quelle que soit la page ; un CC reçu de la
   DT2 est appris même si sa page n'est pas affichée.
 

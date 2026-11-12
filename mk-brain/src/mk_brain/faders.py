@@ -52,7 +52,12 @@ class Faders:
         mute_cc: int,
         raw_per_step: int,
         accel: Accel | None = None,
+        fixed: dict[int, int] | None = None,
+        limits: dict[int, int] | None = None,
     ) -> None:
+        # paramètres globaux de la DT2 (FX CONTROL CH) : CC → canal fixe 1-16, tenu lieu de track
+        self.fixed = fixed or {}
+        self.limits = limits or {}  # CC → plafond des valeurs envoyées (127 sinon)
         self.pages = pages  # pages de 8 × (abrégé, CC ou PITCH_BEND)
         self.page_index = 0
         self.mute_cc = mute_cc
@@ -104,16 +109,20 @@ class Faders:
         self._residue[encoder] = acc - steps * self.raw_per_step
         return steps
 
+    def target(self, track: int, cc: int) -> int:
+        """Track (canal) visée : celle demandée, ou le canal fixe d'un paramètre global."""
+        return self.fixed.get(cc, track)
+
     def value(self, track: int, cc: int) -> int:
         """Valeur tenue pour ce paramètre (celle d'où part le prochain cran)."""
-        return self._values.get((track, cc), DEFAULT_VALUE)
+        return self._values.get((self.target(track, cc), cc), DEFAULT_VALUE)
 
     def nudge(self, track: int, cc: int, steps: int) -> int | None:
         """Paramètre d'une track décalé de `steps` crans → nouvelle valeur, ou None si
         rien ne change."""
-        key = (track, cc)
+        key = (self.target(track, cc), cc)
         old = self._values.get(key, DEFAULT_VALUE)
-        new = max(0, min(127, old + steps))
+        new = max(0, min(self.limits.get(cc, 127), old + steps))
         self._stale.discard(key)
         if new == old and key in self._values:
             return None
@@ -145,6 +154,8 @@ class Faders:
         if cc == self.mute_cc:  # la DT2 envoie 1 = muté, 0 = ouvert (constaté le 2026-11-09)
             self.muted[track] = value != OPEN
             return
+        if cc in self.fixed and track != self.fixed[cc]:
+            return  # paramètre global : seulement sur son canal
         if any(c == cc for page in self.pages for _, c in page):
             self._values[(track, cc)] = value
             self._stale.discard((track, cc))
@@ -170,7 +181,7 @@ class Faders:
     def view(self, track: int) -> list[FaderView]:
         out = []
         for name, cc in self.page:
-            key = (track, cc)
+            key = (self.target(track, cc), cc)
             out.append(
                 FaderView(
                     name,

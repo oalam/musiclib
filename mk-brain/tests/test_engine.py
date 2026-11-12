@@ -481,7 +481,7 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
     from mk_brain.engine import ControlChange, PitchBend
 
     eng = Engine(cfg)
-    btn(eng, "BROWSE_RIGHT")  # page 2 : LVL CUT RES ENV MW BC PB PAN
+    btn(eng, "BROWSE_RIGHT")  # page 2 : LVL CUT RES ENV MW BC PB FBK
     assert eng.handle(EncoderEvent(7, 2 * CC_STEP, 0), 0) == []  # PB sans SHIFT : rien
     assert eng.last_control == "PB: hold SHIFT"
     btn(eng, "SHIFT")
@@ -1405,3 +1405,38 @@ def test_fast_encoder_gesture_travels_further(cfg: Config) -> None:
     cc = slow.faders.page[0][1]
     assert slow.faders.value(1, cc) == 64 + 8
     assert fast.faders.value(1, cc) > 64 + 16
+
+
+def test_fx_encoder_is_global_and_capped(cfg: Config) -> None:
+    """FBK : feedback du délai, CC 24 sur FX CONTROL CH (canal 9), plafonné à 125."""
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    btn(eng, "BROWSE_RIGHT")  # page 2, encodeur 8 = FBK
+    eng.track = 4
+    assert eng.handle(EncoderEvent(8, CC_STEP, 0), 0) == [(0, ControlChange(8, 24, 65))]
+    assert eng.last_control == "FX FBK 65"
+    eng.track = 2  # même valeur quelle que soit la track
+    assert eng.faders.view(2)[7].value == 65
+    out = eng.handle(EncoderEvent(8, 100 * CC_STEP, 0), APART)
+    assert out == [(APART, ControlChange(8, 24, 125))]  # plafond
+    assert eng.handle(EncoderEvent(8, CC_STEP, 0), 2 * APART) == []
+    eng.on_control_change(8, 24, 40)  # FDBK tourné sur la DT2 : appris, track inchangée
+    assert eng.track == 2 and eng.faders.view(2)[7].value == 40
+    eng.on_control_change(3, 24, 90)  # CC 24 d'une track : pas le feedback
+    assert eng.faders.view(2)[7].value == 40
+
+
+def test_fx_encoder_sent_once_for_a_solo_group(cfg: Config) -> None:
+    from mk_brain.engine import ControlChange
+
+    eng = Engine(cfg)
+    btn(eng, "BROWSE_RIGHT")
+    btn(eng, "SOLO")
+    btn(eng, "SOLO", False)
+    for pad_index in (PAD7, 0):
+        eng.handle(PadEvent(pad_index, True, 2000), 0)
+        eng.handle(PadEvent(pad_index, False, 0), 10 * MS)
+    assert len(eng.perform_tracks) == 2
+    out = eng.handle(EncoderEvent(8, CC_STEP, 0), APART)
+    assert out == [(APART, ControlChange(8, 24, 65))]

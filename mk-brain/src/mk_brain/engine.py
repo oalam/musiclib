@@ -276,7 +276,10 @@ class Engine:
                 int(enc.accel.window_ms * 1e6),
             )
         )
-        self.faders = Faders(pages, enc.mute_cc, enc.raw_per_step, accel)
+        flat = [e for page in enc.pages for e in page]
+        fixed = {e.param: cfg.midi.fx_channel for e in flat if e.fx}
+        limits = {e.param: e.max for e in flat if e.max < 127}
+        self.faders = Faders(pages, enc.mute_cc, enc.raw_per_step, accel, fixed, limits)
         self.track = 1  # track des encodeurs (SELECT + pad)
         self.last_program: int | None = None  # dernier PC reçu
         self.bank: int | None = None  # banque courante, 0 = A : PC reçu ou GROUP seul
@@ -508,18 +511,19 @@ class Engine:
         if self._latched:
             return self._perform_turn(index, delta, now)
         self.last_touch = (index, now)
-        before = self.faders.value(self.track, self.faders.page[index - 1][1])
-        sent = self.faders.turn(self.track, index, delta, now)
+        name, param = self.faders.page[index - 1]
+        track = self.faders.target(self.track, param)  # paramètre global : FX CONTROL CH
+        before = self.faders.value(track, param)
+        sent = self.faders.turn(track, index, delta, now)
         if sent is None:
             return []
-        param, value = sent
-        self._keep_for_shift(self.track, param, before)
-        name = self.faders.page[index - 1][0]
-        self.last_control = f"T{self.track:02d} {name} {value}"
-        channel = self.track - 1
+        value = sent[1]
+        self._keep_for_shift(track, param, before)
+        who = "FX" if param in self.faders.fixed else f"T{track:02d}"
+        self.last_control = f"{who} {name} {value}"
         if param == PITCH_BEND:
-            self._bent.add(self.track)
-        return [(now, self._param_out(channel, param, value))]
+            self._bent.add(track)
+        return [(now, self._param_out(track - 1, param, value))]
 
     # --- arpégiateur : mode ARPG (slice 11) -------------------------------------
 
@@ -720,13 +724,16 @@ class Engine:
         param = self.faders.page[index - 1][1]
         name = self.faders.page[index - 1][0]
         out: list[Timed] = []
-        for track in self.perform_tracks:
+        # paramètre global (FX CONTROL CH) : une seule cible, quel que soit le groupe
+        targets = dict.fromkeys(self.faders.target(t, param) for t in self.perform_tracks)
+        for track in targets:
             before = self.faders.value(track, param)
             value = self.faders.nudge(track, param, steps)
             if value is None:
                 continue
             self._keep_for_shift(track, param, before)
-            self.last_control = f"PERF T{track:02d} {name} {value}"
+            who = "FX" if param in self.faders.fixed else f"PERF T{track:02d}"
+            self.last_control = f"{who} {name} {value}"
             if param == PITCH_BEND:
                 self._bent.add(track)
             out.append((now, self._param_out(track - 1, param, value)))
@@ -756,8 +763,13 @@ class Engine:
           sélectionne (sur l'AUTO CHANNEL, c'est la track 16) ;
         - AUTO CH : sans dire quelle track est active, la valeur va à la track
           sélectionnée sur la MK2.
+        Paramètre global d'un encodeur `fx` (FX CONTROL CH) : valeur apprise, sans
+        sélection de track.
         """
         track = channel + 1
+        if self.faders.fixed.get(control) == track:  # réglage global tourné sur la DT2
+            self.faders.received(track, control, value)
+            return
         auto = track == self.cfg.midi.auto_channel
         if control == self.faders.mute_cc:
             if not auto:

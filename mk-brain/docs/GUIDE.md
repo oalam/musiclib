@@ -148,7 +148,9 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
   tenu revient à sa valeur d'avant au relâché, sur plusieurs encodeurs à la
   fois et, en SOLO, sur toutes les tracks du groupe.
 - **Flèches BROWSE ◀ ▶** : page 1 (LVL BR OVER SRR / DEL REV CHO TUNE) ou
-  page 2 (LVL CUT RES ENV / MW BC PB PAN), en boucle.
+  page 2 (LVL CUT RES ENV / MW BC PB FBK), en boucle.
+- **FBK** : feedback du délai de la DT2, le même pour toutes les tracks
+  (canal `FX CONTROL CH` de la DT2 = 9), plafonné à 125.
 - **PB** (pitch bend) seulement SHIFT tenu ; il revient au centre au
   relâché de SHIFT. Marche aussi en SOLO, sur toutes les tracks du groupe.
   Il change la hauteur sans rien assigner sur la DT2 : l'étendue se règle

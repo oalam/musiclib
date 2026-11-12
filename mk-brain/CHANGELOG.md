@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.45.0] - 2026-11-11
+
+### Ajouté
+
+- Encodeur `FBK` (page 2, encodeur 8) : feedback du délai de la DT2, CC 24
+  sur `midi.fx_channel` (9, `FX CONTROL CH`), global à toutes les tracks,
+  plafonné à 125. Champs `fx` et `max` des encodeurs.
+
+### Retiré
+
+- Encodeur `PAN` (CC 90), inutilisé, remplacé par `FBK`.
+
 ## [0.44.0] - 2026-11-11
 
 ### Ajouté

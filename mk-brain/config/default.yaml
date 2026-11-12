@@ -5,6 +5,7 @@ midi:
   port_hint: Digitakt        # sous-chaîne du nom de port de sortie
   auto_channel: 16           # AUTO CHANNEL de la DT2 (SPEC, décidé le 2026-11-09)
   program_channel: 10        # canal des Program Change (PRG CH SEND / RECEIVE, fiche midi-config)
+  fx_channel: 9              # FX CONTROL CH de la DT2 (MIDI CONFIG > CHANNELS) : canal des encodeurs `fx` (FBK)
   knobs_on_track_channel: true   # DT2 PORT CONFIG > OUTPUT CH = TRACK CH : la MK2 suit la track
                                  # active au premier bouton tourné sur la DT2 (2026-11-09)
 
@@ -119,7 +120,9 @@ encoders:
       - {name: MW, cc: 1}                      # mod wheel
       - {name: BC, cc: 2}                      # breath controller
       - {name: PB, pitchbend: true, bipolar: true}   # pitch bend, centré
-      - {name: PAN, cc: 90, bipolar: true}
+      - {name: FBK, cc: 24, fx: true, max: 125}   # feedback du délai (SEND FX > DELAY > FDBK), global :
+                                                  # envoyé sur fx_channel, plafonné à 125 (au-delà le délai s'emballe) ;
+                                                  # à la place de PAN (cc 90, bipolar) le 2026-11-11
 
 leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine

@@ -42,6 +42,8 @@ class MidiConfig(BaseModel):
     # DT2 OUTPUT CH = TRACK CH : ses boutons sortent sur le canal de la track active, le Pi
     # suit la track (vérifié le 2026-11-09) ; False = AUTO CH, valeur à la track de la MK2
     knobs_on_track_channel: bool = True
+    # FX CONTROL CH de la DT2 : délai, reverb, chorus, compresseur (encodeurs `fx`)
+    fx_channel: int = Field(9, ge=1, le=16)
 
 
 class VelocityConfig(BaseModel):
@@ -209,11 +211,15 @@ class Encoder(BaseModel):
     cc: int | None = Field(None, ge=0, le=127)
     pitchbend: bool = False  # message pitch bend au lieu d'un CC
     bipolar: bool = False  # jauge depuis le centre (pan, tune, pitch bend)
+    fx: bool = False  # réglage global de la DT2 : CC sur `midi.fx_channel`, pas sur la track
+    max: int = Field(127, ge=1, le=127)  # plafond des valeurs envoyées par l'encodeur
 
     @model_validator(mode="after")
     def _target(self) -> Encoder:
         if (self.cc is None) == (not self.pitchbend):
             raise ValueError(f"encodeur {self.name} : un CC ou pitchbend, pas les deux")
+        if self.fx and self.cc is None:
+            raise ValueError(f"encodeur {self.name} : fx demande un CC")
         return self
 
     @property
