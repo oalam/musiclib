@@ -999,7 +999,7 @@ tenu : `INV OFF` fait sauter les accords, `INV FIX` les garde dans une
 octave ; `INV 1` sans progression joue tierce, quinte, fondamentale à
 l'octave ; sauvé dans un preset, le renversement revient au rappel.
 
-## Slice 22 : boucle de gestes, REC de la MK2 (cadré le 2026-11-11, à coder)
+## Slice 22 : boucle de gestes, REC de la MK2 (cadré le 2026-11-11, annulation ajoutée le 2026-11-12, à coder)
 
 Exemple : DT2 lancée à 143 BPM, mode ARPG, track 10, boucle de 8 mesures.
 REC : la boucle s'arme et part au début de la mesure suivante. Mesures 1
@@ -1029,6 +1029,52 @@ et les CC en p-locks, à bricoler ensuite sur la machine.
 - **En mémoire seulement** : la boucle est un brouillon, perdue à
   l'extinction du Pi et au changement de projet. Ce qui compte est figé
   dans la DT2 par son LIVE REC.
+
+**Annuler et rétablir, arbitré le 2026-11-12** (réponses de
+l'utilisateur ; l'annulation était hors périmètre la veille) :
+
+Exemple : la boucle tourne avec trois pads en `GALO` ; en overdub, un
+mouvement de RES puis une frappe de pad en trop. SHIFT + pad 1 retire la
+frappe, un second SHIFT + pad 1 retire le mouvement de RES, SHIFT + pad 2
+remet le mouvement de RES.
+
+- **Portée : le dernier geste enregistré**, pas la prise ni le tour.
+  L'ordre est celui de l'enregistrement (le dernier joué), pas la
+  position dans la boucle.
+- **SHIFT + pad 1 = annuler, SHIFT + pad 2 = rétablir**, comme la
+  sérigraphie Undo / Redo de la MK2.
+- **Plusieurs niveaux** : chaque annulation retire un geste de plus,
+  jusqu'à la boucle vide ; rétablir les remet dans l'ordre inverse. Un
+  nouveau geste enregistré vide la pile de ce qui peut être rétabli.
+
+**Détail de l'annulation, confirmé par l'utilisateur le 2026-11-12** :
+
+- **Ce qu'est un geste** (unité d'annulation) :
+  - pad : de la frappe au relâché d'un pad, pression comprise ; des pads
+    frappés sur le même pas de quantize (un accord) forment un seul geste ;
+  - encodeur : un mouvement continu d'un encodeur, clos par 300 ms sans
+    rotation ; en groupe SOLO, un seul geste pour toutes les tracks du
+    groupe ;
+  - réglage de l'arpège, division, maintien, rappel de preset : un
+    changement = un geste ; un encodeur de choix tourné d'une traite à
+    travers plusieurs valeurs = un seul geste.
+- **Effet immédiat** : une note tenue par le geste annulé est coupée tout
+  de suite ; un geste rétabli rejoue à son prochain passage dans la
+  boucle. Annuler un geste en cours (pad encore tenu, encodeur en
+  mouvement) le clôt et le retire.
+- **Encodeurs** : le CC reste à sa dernière valeur sur la DT2 après
+  l'annulation, jusqu'au prochain geste qui le bouge (le Pi ne renvoie
+  pas de valeur « d'avant »). Les réglages de l'arpège reviennent au tour
+  suivant par la photo de l'état de départ.
+- **SHIFT + pad 1 / 2 hors boucle** : sans boucle ni geste à rétablir,
+  SHIFT + pad joue la note comme aujourd'hui (slice 9) ; dès qu'une
+  boucle existe, les pads 1 et 2 sous SHIFT ne jouent plus.
+- **ERASE** vide la boucle et les deux piles : pas de retour par SHIFT +
+  pad 1.
+- **Retour à l'écran** : bandeau gauche, `UNDO CUT T10` ou `REDO pad T03`,
+  et `nothing to undo` / `nothing to redo` quand la pile est vide.
+- **Hors enregistrement** : annuler et rétablir marchent aussi REC éteint
+  (lecture seule).
 
 **Proposé, à confirmer avant de coder** :
 
@@ -1075,13 +1121,15 @@ et les CC en p-locks, à bricoler ensuite sur la machine.
 
 **Hors périmètre** : sauvegarde des boucles (par pattern DT2, par
 projet), plusieurs boucles ou une par track, édition d'un geste
-enregistré, annulation du dernier overdub, longueurs au-delà de 8
-mesures, pilotage du LIVE REC de la DT2 depuis la MK2, boucle transport
+enregistré (hors annuler / rétablir), retour des CC à leur valeur d'avant
+après une annulation, longueurs au-delà de 8 mesures, pilotage du LIVE REC de la DT2 depuis la MK2, boucle transport
 arrêté.
 
 **Critère de fin** : l'exemple ci-dessus se rejoue à l'identique sur
 trois tours, sans note bloquée ni dérive contre le kick ; un overdub
-s'ajoute sans effacer ; ERASE vide tout ; un tour capté en LIVE REC sur
+s'ajoute sans effacer ; SHIFT + pad 1 retire les gestes un par un dans
+l'ordre inverse de leur enregistrement, sans note bloquée, et SHIFT +
+pad 2 les remet ; ERASE vide tout ; un tour capté en LIVE REC sur
 la DT2 relit les mêmes notes et le mouvement de CUT.
 
 ## Modes : live et design
@@ -1911,7 +1959,7 @@ conditionne tout le reste.
 | 19 | **Motifs de longueur libre** : 1 à 16 pas, en boucle depuis le départ du transport (polyrythmie contre la mesure), motifs `CINQ` et `DOUZ` | cf. « Slice 19 », critère de fin | codée le 2026-11-11 (v0.41.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 20 | **Pas probabilistes** : pas `?` dans `arp.motifs` (note jouée une fois sur deux, silence sinon), motif `HASA` | cf. « Slice 20 », critère de fin | codée le 2026-11-11 (v0.42.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 21 | **Renversements** : encodeur 5 `INV` PATTERN tenu, à la place de `PRE` (`OFF`, `1`, `2`, `FIX` = accords gardés dans l'octave au-dessus du pad), gardé dans les presets | cf. « Slice 21 », critère de fin | codée le 2026-11-11 (v0.43.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
-| 22 | **Boucle de gestes** : REC de la MK2 enregistre dans le Pi pads, encodeurs, réglages de l'arpège et divisions sur 1, 2, 4 ou 8 mesures, rejoués en boucle par le moteur, overdub, ERASE pour vider ; en mémoire | cf. « Slice 22 », critère de fin | cadrée le 2026-11-11, à coder (gestes REC / ERASE et points durs à confirmer) |
+| 22 | **Boucle de gestes** : REC de la MK2 enregistre dans le Pi pads, encodeurs, réglages de l'arpège et divisions sur 1, 2, 4 ou 8 mesures, rejoués en boucle par le moteur, overdub, annuler / rétablir geste par geste (SHIFT + pad 1 / pad 2), ERASE pour vider ; en mémoire | cf. « Slice 22 », critère de fin | cadrée le 2026-11-11, annulation arbitrée le 2026-11-12, à coder (gestes REC / ERASE et points durs à confirmer) |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
