@@ -8,6 +8,117 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.J9b] Niveau sur la ligne inclinée, automatisé : `analyzer/line.py`
+  (spectre aux maxima maintenus incliné de +4,5 dB/oct, étalonné sur un kick
+  de référence, plafond de crête à -6 dBFS, coupure sous 20 Hz, passe-haut de
+  la famille, mono sous 120 Hz ; hub `FAMILY` par code) et `premaster.py`
+  (import d'un dossier de pack vers le pack perso solaris, 48 kHz / 24 bits,
+  `_import.tsv`, rejouable). Premier import : 391 drums de Serum 2 dans
+  `solaris/_import/serum/`. Analyseur étalonné sur 4 sons préparés dans
+  Live + Pro-Q 4 (écarts de -0,5 à +1,7 dB). Commande `apply` pour les sons
+  déjà dans le pack (original en `_backup/<date>/`) : les 11 BL de solaris
+  passés sur la ligne, 4 restent en BL, 7 partent en ML (`18 MELO LOOP`).
+  Déroulé consigné dans [[digitakt/doctrine-samples]], section « Import dans
+  le pack perso » ; BL mono sous 150 Hz dans la table « Par track ».
+- [7.J9b] L'export des samples et celui des lives rendent chaque fichier sur
+  la ligne (au lieu de le copier) : coupures, mono, gain sur la ligne du kick
+  de référence (`paths.LINE_REF_KICK`), plafond -6 dBFS, 48 kHz / 16 bits
+  avec dither TPDF. L'index d'export garde le rendu (`line`) : rejouable, et
+  tout est réécrit si la ligne ou `LINE_VERSION` change. `samples.py
+  --no-line` garde la copie. `PLAN.md` liste les traitements appliqués. Tests dans `tests/test_line.py` et `tests/test_premaster.py`.
+- [7.J9] Doctrine dédiée [[digitakt/doctrine-samples]], d'après la vidéo
+  Synthackers sur la gestion des samples de la DT2 : arbre numéroté dans
+  l'ordre de la grille, 48 kHz / 16 bits, niveau sur la ligne inclinée à
+  4,5 dB/oct avec crête à -6 dBFS, pré-mastering dans Live, sauvegardes
+  datées. Nouveau tuto [[digitakt/kb/tutos/maison-premaster-samples]]
+  (lot 4, ch. 8) pour le pas à pas dans Live 12 Intro avec Pro-Q 4.
+- [7.J9] Doctrine des samples : section « Pool du projet ». La banque du
+  pool suit la position de la track (A corps BD/RM/CP/SD avec le 0-KIT en
+  A01-A16, B percussions, C aigus, D boucles Id1, E tonal grave, F tonal
+  médium et aigu, G FX, H travail), avec des blocs de 16 slots par code.
+  Single-cycles en tête de F (F01-F16), rangés en ST dans la lib avec `SC`
+  dans le nom.
+- [7.J9a] Migration des chemins après le rangement des packs sous
+  `<MEDIA>/Samples/packs/` (2026-11-06) : `migrate_packs.py` (rejouable,
+  `--dry-run`, copie `.bak` avant écriture) préfixe `packs/` dans le
+  manifeste, les overrides, l'index d'export, le live et son index (12 005,
+  89, 1 048, 303 et 343 chemins). Les règles de classement (famille, pack,
+  kit, code, tempo, sous-catégorie, nom, tags) lisent le chemin sans
+  `packs/` (`samples.logical`) : vérifié sur les 11 979 chemins, aucune
+  différence. Tests dans `tests/test_migrate_packs.py`.
+- [7.J9a] Rendus `SoundDesign/` supprimés du disque retirés du manifeste
+  (33 entrées dont 27 retenues, 7 non classés, 1 en corbeille) et leurs 67
+  overrides orphelins retirés, comme le fait `purge_renders`. Les six
+  dossiers touchés sont resélectionnés (1 233 -> 1 240 retenus). Le live
+  solaris garde ses 14 items `SoundDesign/` (à trancher).
+- [7.J9a] Caisses claires (SD) : sous-catégories HARD, LONG et CLEAN à
+  côté de RIM, d'abord par les mots du nom, sinon par mesure (`snare_sub`,
+  mesure `tail_crest` partagée avec les kicks). Catalogue : CLEAN 514,
+  LONG 172, HARD 136, RIM 83. Export : CLEAN 27, RIM 16, HARD 13, LONG 13,
+  plus rien à la racine de `04 SNARE`. Test dans `tests/test_samples.py`.
+- [7.J9a] Boucles de batterie (DL) rangées par feel (FILL, BROKEN, HALF,
+  HARD, FOUR, MISC) au lieu des tranches de tempo : d'abord le genre du
+  nom ou de la famille, sinon la mesure `groove_feel` (signature de groove
+  6.D sur la grille du tempo du nom ou du tempo mesuré). Les fills de DL et
+  de PL sont regroupés dans `11 DRUM LOOP/FILL`. Résultat exporté :
+  BROKEN 52, HALF 35, FOUR 32, HARD 32, MISC 32, FILL 33 (20 DL et 13 PL),
+  plus aucune boucle à la racine. Tests dans `tests/test_samples.py`.
+- [7.J9a] Boucles de percussions (PL) : nouvelles familles FILL, ELEC,
+  WOOD et METAL, et SHAKER élargi (maraca, guiro, shell, bean). Les boucles
+  sans mot reconnu sont rangées par mesure du spectre et de la dynamique
+  (`perc_loop_sub`), avec repli sur `MISC`. Plus aucune boucle à la racine
+  de `12 PERC LOOP`, qui compte 195 boucles exportées (SKIN 46, TOPS 34,
+  SHAKER 32, ELEC 21, FILL 13, METAL 10, MISC 9). Tests dans
+  `tests/test_samples.py`.
+- [7.J9a] Percussions (PC) sans mot de sous-catégorie rangées dans `MISC`
+  (`FALLBACK_SUBS`) au lieu de la racine. Une sous-catégorie PC de moins de
+  4 fichiers part elle aussi dans `MISC`. 549 percussions concernées, plus
+  aucune à la racine de `06 PERC`. Test dans `tests/test_samples.py`.
+- [7.J9a] Kicks sans mot de sous-catégorie rangés par mesure de l'audio
+  (`kick_sub` : queue d'au moins 0,7 s -> SUB, crête basse -> HARD, sinon
+  CLEAN), appliqué à la reconstruction et à l'entrée d'un fichier. Appliqué
+  au manifeste : 1 258 kicks classés (219 SUB, 424 HARD, 615 CLEAN), et
+  plus aucun kick à la racine de `01 KICK` (38 CLEAN, 39 HARD, 18 SUB
+  exportés). Test dans `tests/test_samples.py`.
+- [7.J9a] Samples de l'ancien export du live solaris (`00-live/solaris`,
+  401 sources) versés dans la lib, avec la décision « garder » :
+  - 304 samples de packs (217 sortis de réserve) ;
+  - 59 rendus `SoundDesign/` supprimés, rapatriés depuis leurs copies
+    accordées vers `<MEDIA>/Samples/recorded/solaris/` (famille UNIVERSEL,
+    code lu dans le nom, tag `rendu-solaris`).
+
+  Pour que rien ne sorte des retenus, les 1 226 samples non écoutés du
+  précédent export passent aussi en « garder », avec le tag `pre-solaris`.
+  L'export compte 1 603 retenus : 363 copiés, aucun retiré.
+- [7.J9a] Export de la lib dans l'arbre numéroté
+  (`<MEDIA>/Live/samples/01 KICK/HARD/…` à `20 SAMPLE/<CODE>/`, constante
+  `EXPORT_FOLDERS`). Le rangement interne `BRANCHE/CODE/SOUS` est inchangé.
+  Plan d'action `PLAN.md` à la racine de l'export, écrit seul par
+  `samples.py --plan` et `POST /api/samples/plan`, puis réécrit après chaque
+  `--export`. Il donne le bilan, les traitements prévus et, par fichier, le
+  format lu dans l'en-tête et les conversions. Tests dans
+  `tests/test_samples.py` et `tests/test_api.py`.
+- [7.K] Front, liste des morceaux : bookmark « morceau de référence »
+  (étoile sur chaque ligne, bascule optimiste annulée si l'API refuse) et
+  case de filtre « réf », mémorisée avec les autres filtres. Stocké dans
+  une nouvelle colonne `ref` de `library/library.md` (« x » ou vide),
+  ajoutée aux champs préservés (`PRESERVED_FIELDS`) pour survivre aux
+  relances de grab ; route `PUT /api/tracks/{slug}/ref`, champ `ref` dans
+  `TrackSummary`, test dans `tests/test_api.py`.
+- [7.K] Front, liste des morceaux : tri par BPM sorti du menu en bouton à
+  côté de Date et A→Z, second clic pour inverser le sens (mémorisé), morceaux
+  sans BPM toujours en fin de liste, égalités départagées par artiste.
+- [7.M] KB tutos, lot 4 : début de la transposition du chapitre 2 vers
+  Live, nouvelle fiche [[maison-grave-projet-live]] avec le seul §2.4,
+  saturation lourde sans multibande. Le splitter, le pin connector et le
+  joiner de Reaper sont remplacés par un Audio Effect Rack « Trash 3
+  bandes » : trois chaînes SUB / BODY / CLICK, le même EQ Three dans
+  chacune (100 Hz et 2,5 kHz, pente 48) avec deux bandes tuées, Trash
+  dans BODY seul, coupures tenues identiques par deux macros, contrôle de
+  la somme sur SPAN (Underlay) et compensation de latence. Le levier du
+  creux à 100 Hz (crossover monté à 140-150 Hz) passe par la macro. Hub,
+  ch. 3 kick (renvois « hub §8 »), index et version Reaper y renvoient ;
+  la version Reaper fait foi pour le reste du chapitre.
 - [7.M] KB tutos, recette maison 3 [[maison-groove-tribe-battement]] :
   un extrait de live tribe à 143,25 BPM démonté (analyse rangée dans
   `refs/`, sons isolés dans `~/Downloads/sons_isoles_live/`, destination
@@ -21,7 +132,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   comme réglage de groove, en écart assumé avec KT5 et la doctrine §11.
   Index des tutos et de `refs/` mis à jour.
 - [7.M] KB tutos, lot 4 « Sound design préparatoire » : l'ex-recette
-  maison 3 [[maison-sounddesign-grave-reaper]], devenue trop longue
+  maison 3 [[maison-sounddesign-grave-live]], devenue trop longue
   (860 lignes), est découpée en un hub (arbitrages, stack, notions
   Reaper, pièges, exercices, ressources) et six chapitres
   [[maison-grave-projet-reaper]], [[maison-grave-kick]],
@@ -37,7 +148,7 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   à la machine le 2026-10-31 ; exception à la règle « kick en ONESHOT »
   documentée dans [[machines-src]], renvoi depuis
   [[elektronauts-velocite-macros]] §1.
-- [7.M] KB tutos, recette maison 3 [[maison-sounddesign-grave-reaper]]
+- [7.M] KB tutos, recette maison 3 [[maison-sounddesign-grave-live]]
   (d'abord écrite dans `technique/`, déplacée dans la KB pour être dans le
   hub) : tuto complet du grave sur Mac avec la stack gratuite (Reaper, Vital, Maschine Drumsynth Kick,
   Kick 3, iZotope Trash Lite, SPAN, ReaComp, Acid V) : projet modèle au
@@ -67,6 +178,14 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
   Passe-haut avant reverb : une seule bande High Pass, A = 30 Hz ou
   B = 120 Hz, réglage à l'écran dans ReaEQ (résonance de Bandwidth, bandes
   par défaut à retirer, deux presets pour comparer).
+- `technique/` : trois fiches hors Digitakt issues des chats claude.ai du
+  projet « Sound » : [[sound-system-ampli-caissons]] (JBL GTO 755.6,
+  câblage des deux 12" the box 12-280, crossover miniDSP 2x4 trois voies
+  avec les Pro 8 et le Pro 10S, bass-reflex 50 L contre pavillon replié
+  BIDET112), [[controleur-midi-faders-diy]] (16 faders Bourns sur RP2040,
+  barres SK6812, soft takeover, ~115 €) et [[station-ecoute-odroid]]
+  (Odroid XU4 « chamos », MPD sur U-SABRE en mono, ympd, iptables,
+  AirPlay et DietPi à venir).
 - [7.M] KT24 [[kt-percussions]] : la voix du milieu (tracks 3, 4, 5), bande
   mid de la passe `rhythm_signature` par style (tribe, acid, tekno :
   `X..X` par temps, le temps puis le « a »), trois rôles plutôt que trois
@@ -117,6 +236,78 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.L] Doctrine, grille révisée le 2026-11-07 : rangée haute en quatre
+  paires, 1-2 kick / sub-rumble, 3-4 clap-snare / percs-toms, 5-6 hats /
+  cymbales, 7-8 textures rythmiques en call and response (Id1 passe de la 5
+  à 7-8). Tableaux §1 et §12, règles dérivées et ordre de montée §4 mis à
+  jour ; `grille.html` et `KIT_TRACK_FOR` restent à aligner. Nouvelle fiche
+  [[technique/chaine-909-slices]] : le 909 Core Kit de Live rendu en un
+  sample de 16 slices partagé par les tracks 3, 4, 5, 6.
+- [7.L] Live solaris, plan des banques révisé le 2026-11-06 : A Half-time
+  (fa, 160), B DnB (fa phrygien, 165), C Groove (la#, 143 → 152), D Acid
+  (la#, 152 → 162, palier de la montée, kick-sub sans rumble), E Tribe (la#
+  phrygien, 162, respiration en fin de banque), F Mental (do, 168, fin du
+  set sans saturation massive), G Jokers. `library/lives/solaris.json`
+  migré (99 kicks, rumbles et basses en sol et en la sortis du live,
+  non accordés repris en E-TRIBE et F-MENTAL, F-JOKER devient G-JOKER,
+  rumbles par banque reportés) ; [[doctrine-dt2-solaris]] et le pense-bête
+  (`scripts/solaris_pense_bete.py`, deux SVG régénérés) suivent.
+
+- [7.K] Front : choisir un autre morceau dans la liste pendant la lecture
+  enchaîne sur le nouveau en lecture (comme précédent / suivant de la
+  télécommande) ; à l'arrêt, il s'ouvre sans jouer.
+- [7.K] Front, vue bank : la façade Digitakt passe tout en bas, sous le
+  lecteur, la chaîne, l'envoi DT2 et la vue d'ensemble (ou les mutes) ; la
+  mise en page à deux colonnes des grands écrans (façade figée à gauche)
+  est retirée au profit d'une colonne unique.
+- [7.L] Doctrine du live solaris [[digitakt/doctrine-dt2-solaris]] : section
+  « Groove tribe » ajoutée après la DnB, retombée à 143 BPM sur le groove
+  kick-sub en la# de [[maison-groove-tribe-battement]] (testé, c'est en la#
+  que ça sonne) puis montée par paliers de 2 BPM jusqu'au tribe ; les
+  tonalités sont recalées autour du la# : fa, fa phrygien, la#, la#, la#
+  phrygien, do (finish sec sur do 2, do 1 sortant sous l'accord des
+  caissons), pivots fa → la# (si bémol et ré bémol, contenus dans fa
+  phrygien) et la# → do (fa) ; six banques de section A à F dans l'ordre de
+  jeu plus G jokers, arborescence +Drive cible, samples à refaire en la# et
+  do, fills et checklist. `solaris.json` et le +Drive restent à réaligner.
+- [7.L] Pense-bête imprimable du live solaris, deux pages A4 paysage en couleur
+  `digitakt/solaris-pense-bete-p1.svg` (le live : déroulé par banque avec
+  tempos, tonalités, kick et durées au tempo, chrono, transitions et pivots,
+  rappels de jeu) et `-p2.svg` (le son : notes par section en grandes cases
+  avec tonique et seconde phrygienne repérées, grille des 16 tracks, fills,
+  samples par tonalité), produit par `scripts/solaris_pense_bete.py`
+  (tableaux recopiés de la doctrine) ; couleur par tonalité (fa bleu, la#
+  vert, do violet), lié depuis la checklist de la doctrine.
+- [7.M] KB tutos, lot 4 « Sound design préparatoire » : le DAW retenu
+  devient Ableton Live 12 Intro à la place de Reaper. Hub renommé
+  `maison-sounddesign-grave-reaper` → [[maison-sounddesign-grave-live]]
+  (liens entrants corrigés : index, chapitres, README, KB, KT23) et
+  réécrit : stack Live 12 Intro (16 pistes, 2 retours, sans EQ Eight ni
+  Spectrum ; devices natifs à la place des Rea*,
+  tableau d'équivalence Reaper → Live pour lire les chapitres non
+  transposés), notions Live, glossaire Live → Digitakt, nouveau §1.3 « le
+  projet modèle, pont avec la DT2 » (groupes de pistes OB réduit au grave
+  et SD, template d'enregistrement multipiste à part, trois
+  circuits : DT2 → Live par Overbridge, Live → DT2 en direct par `SRC` =
+  USB pour essayer, Live → fichier → +Drive pour figer), pièges Live et
+  Overbridge, exercice 6 d'aller-retour par les deux voies. Chapitre 3
+  [[maison-grave-kick]] transposé à Live : recettes A (Drumsynth) et B
+  (Kick 3) adaptées, recette C réécrite en **Vital multi-couche** (OSC 1
+  sub direct, OSC 2 thump par le filtre 1 avec Drive, SAMPLE click par le
+  filtre 2, une enveloppe de niveau et de pitch par couche, macros pour la
+  famille, Instrument Rack `.adg` qui emporte l'état de Vital), chaîne de
+  sortie en devices natifs d'Intro (rack Trash 3 bandes, Auto Filter 28
+  Hz, Saturator Soft Clip, SPAN), validation par Freeze, Tuner et voie
+  directe `SRC` = USB. Les cinq autres chapitres restent rédigés pour
+  Reaper, à transposer un par un.
+- [[digitakt/doctrine-dt2-solaris]], progression harmonique : table des
+  notes par section (gamme et `ROOT NOTE` du KEYBOARD SETUP, notes de la
+  gamme, ce que jouent kick et rumble, la basse 9 et l'acid), fréquences
+  du sub calculées depuis A1 = 55 Hz et période d'un cycle, pivots
+  exprimés en degrés, triton de la respiration signalé hors gamme
+  phrygienne (trig chromatique) ; notation anglaise. Seconde table :
+  durées au tempo de chaque section (temps, croche, double-croche,
+  mesure, aux deux bornes de la fourchette) avec repères par section.
 - Terrain de tempo corrigé dans les sources of truth ([[README]], [[SPEC]],
   [[doctrine]] §9) : tribe / acid core **160-170 BPM, jamais plus**, au lieu
   du 180-200 des débuts ; la double-croche de la doctrine §9 passe de

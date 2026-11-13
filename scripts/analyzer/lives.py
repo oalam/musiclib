@@ -666,12 +666,14 @@ def summary(live: Live) -> LiveSummary:
 
 
 def export_live(live: Live, root: Path, dest_root: Path, meta_dir: Path,
-                dry_run: bool = False) -> ExportReport:
-    """Synchronise `<dest_root>/<live>/` avec le live (voir l'en-tete)."""
+                dry_run: bool = False, line_db: float | None = None) -> ExportReport:
+    """Synchronise `<dest_root>/<live>/` avec le live (voir l'en-tete) ;
+    `line_db` : chaque sample est rendu sur la ligne (7.J9b)."""
     try:
         placed = _placed(live)
         shifts = {rel: it.shift for rel, it in placed.items() if it.shift}
         return sync({rel: it.source for rel, it in placed.items()}, root, dest_root / live.name,
-                    index_file(meta_dir, live.name), dry_run, shifts)
+                    index_file(meta_dir, live.name), dry_run, shifts,
+                    codes={rel: it.code for rel, it in placed.items()}, line_db=line_db)
     except SampleError as exc:
         raise LiveError(str(exc)) from exc

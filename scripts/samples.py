@@ -19,7 +19,10 @@ Usage:
                                # dans overrides.json)
     samples.py --tag-report    # mots de dossiers frequents hors du dictionnaire
                                # de tags inferes (7.J6)
-    samples.py --export        # copie les retenus vers <MEDIA>/Live/samples (7.J3)
+    samples.py --plan          # ecrit seulement <MEDIA>/Live/samples/PLAN.md :
+                               # plan d'action de l'export, aucun WAV touche (7.J9)
+    samples.py --export        # copie les retenus vers <MEDIA>/Live/samples, arbre
+                               # numerote (7.J3, 7.J9), puis reecrit PLAN.md
     samples.py --export --dry-run   # bilan de l'export sans rien ecrire
 
 Fichiers (vault) :
@@ -48,8 +51,10 @@ from pathlib import Path
 
 from analyzer.samples import (
     BRANCHES,
+    ActionPlan,
     ExportReport,
     Manifest,
+    PLAN_FILE,
     Override,
     SampleError,
     build_manifest,
@@ -62,8 +67,10 @@ from analyzer.samples import (
     measure_note,
     register_subs,
     tag_report,
+    write_action_plan,
 )
-from paths import DT2_SAMPLES_DIR, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
+from analyzer.line import LineError, ref_line
+from paths import DT2_SAMPLES_DIR, LINE_REF_KICK, SAMPLES_META_DIR, SAMPLES_SRC_DIR, media_ok
 
 MANIFEST_FILE = SAMPLES_META_DIR / "manifest.json"
 OVERRIDES_FILE = SAMPLES_META_DIR / "overrides.json"
@@ -171,6 +178,14 @@ def render_export(r: ExportReport) -> str:
     return "\n".join(lines)
 
 
+def render_plan_summary(p: ActionPlan) -> str:
+    states = [f.state for f in p.files]
+    return (f"plan -> {Path(p.dest) / PLAN_FILE}\n"
+            f"{len(p.files)} retenus : {states.count('a ecrire')} a ecrire, "
+            f"{states.count('inchange')} inchanges, {len(p.removed)} a retirer, "
+            f"{sum(1 for f in p.files if f.ops)} a convertir")
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--dry-run", action="store_true", help="n'ecrit pas le manifeste")
@@ -180,6 +195,10 @@ def main(argv: list[str] | None = None) -> int:
                     help="mots de dossiers frequents non couverts par les tags inferes")
     ap.add_argument("--export", action="store_true",
                     help="copie les retenus du manifeste vers --dest (avec --dry-run : bilan)")
+    ap.add_argument("--no-line", action="store_true",
+                    help="export par copie, sans rendu sur la ligne (7.J9b)")
+    ap.add_argument("--plan", action="store_true",
+                    help="ecrit seulement PLAN.md a la racine de --dest (plan d'action)")
     ap.add_argument("--dest", type=Path, default=DT2_SAMPLES_DIR)
     ap.add_argument("--no-measure", action="store_true",
                     help="saute la mesure qualite des nouveaux candidats")
@@ -189,14 +208,23 @@ def main(argv: list[str] | None = None) -> int:
     try:
         load_manual_subs(FOLDERS_FILE)
         previous = load_manifest(MANIFEST_FILE)
-        if args.export:
+        if args.export or args.plan:
             if previous is None:
                 print(f"pas de manifeste : {MANIFEST_FILE}", file=sys.stderr)
                 return 1
             if args.source == SAMPLES_SRC_DIR and not media_ok():
                 return 1
+            try:
+                line_db = None if args.no_line else ref_line(LINE_REF_KICK)
+            except LineError as exc:
+                print(f"{exc} (MUSIC_LINE_REF_KICK, ou --no-line)", file=sys.stderr)
+                return 1
+            if args.plan and not args.export:
+                print(render_plan_summary(write_action_plan(previous, args.source, args.dest,
+                                                            EXPORT_INDEX_FILE, line_db=line_db)))
+                return 0
             print(render_export(export(previous, args.source, args.dest, EXPORT_INDEX_FILE,
-                                       dry_run=args.dry_run)))
+                                       dry_run=args.dry_run, line_db=line_db)))
             return 0
         if args.tag_report:
             if previous is None:

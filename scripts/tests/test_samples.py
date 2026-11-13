@@ -189,7 +189,7 @@ def test_cinematic_thumps_and_transitions_are_fx() -> None:
 def test_target_folders() -> None:
     folders = smp.target_folders()
     assert folders[0] == "DRUMS/BD" and "DRUMS/BD/HARD" in folders
-    assert "LOOPS/DL/180" in folders and "FX/RISE" in folders and "VX/MC" in folders
+    assert "LOOPS/DL/FOUR" in folders and "LOOPS/BR/180" in folders and "FX/RISE" in folders and "VX/MC" in folders
     assert not any(f.startswith("SAMPLE") for f in folders)
 
 
@@ -201,7 +201,7 @@ def test_build_manifest(tree: Path) -> None:
     assert any("/Stereo/" in s for s in by_src)
     # BD/CLEAN (2 fichiers) remonte a la racine du code
     assert by_src["909/clean/bd01.wav"].folder == "DRUMS/BD"
-    assert m.folded == ["DRUMS/BD/CLEAN"]
+    assert m.folded[0] == "DRUMS/BD/CLEAN"
     # BD/HARD a 5 fichiers : reste ; la famille devient un tag de genre
     kick = by_src["Hardcore free samples/Kicks/Hard Kick 01.wav"]
     assert (kick.folder, kick.family) == ("DRUMS/BD/HARD", "HARDCORE")
@@ -638,7 +638,7 @@ def test_reserve_lists_files_beyond_cap_and_promotes(tmp_path: Path) -> None:
     assert (len(m.entries), len(m.reserve)) == (48, 12)
     spare = m.reserve[0].source
     assert smp.known(m, spare)
-    rows = smp.overflow_of(m, "DRUMS/SD", "Hardcore free samples/" + spare.split("/")[1])
+    rows = smp.overflow_of(m, "DRUMS/SD/HARD", "Hardcore free samples/" + spare.split("/")[1])
     assert rows and all(r.overflow and not r.selected for r in rows)
     ovs: dict[str, Override] = {}
     assert smp.promote(m, ovs, spare, root, measure_fn=lambda p, c: [], bpm_fn=None)
@@ -866,11 +866,12 @@ def _export_setup(tmp_path: Path) -> tuple[smp.Manifest, Path, Path, Path]:
 def test_export_copies_selected_and_is_rerunnable(tmp_path: Path) -> None:
     m, root, dest, index = _export_setup(tmp_path)
     dry = smp.export(m, root, dest, index, dry_run=True)
-    assert dry.copied == ["FX/FX 1 p.wav", "FX/FX 2 p.wav"] and dry.files == 2
+    assert dry.copied == ["19 FX/FX 1 p.wav", "19 FX/FX 2 p.wav"] and dry.files == 2
     assert not dest.exists() and not index.exists()
     first = smp.export(m, root, dest, index)
-    assert sorted(p.name for p in (dest / "FX").iterdir()) == ["FX 1 p.wav", "FX 2 p.wav"]
-    assert (dest / "FX/FX 1 p.wav").read_bytes() == (root / "p/fx1.wav").read_bytes()
+    assert sorted(p.name for p in (dest / "19 FX").iterdir()) == ["FX 1 p.wav", "FX 2 p.wav"]
+    assert (dest / smp.PLAN_FILE).is_file()                          # plan reecrit apres export
+    assert (dest / "19 FX/FX 1 p.wav").read_bytes() == (root / "p/fx1.wav").read_bytes()
     assert first.bytes == sum((root / f"p/fx{i}.wav").stat().st_size for i in (1, 2))
     again = smp.export(m, root, dest, index)
     assert (again.copied, again.unchanged, again.removed) == ([], 2, [])
@@ -879,29 +880,30 @@ def test_export_copies_selected_and_is_rerunnable(tmp_path: Path) -> None:
 def test_export_removes_only_its_own_files(tmp_path: Path) -> None:
     m, root, dest, index = _export_setup(tmp_path)
     smp.export(m, root, dest, index)
-    (dest / "FX/mine.wav").write_bytes(b"x")                 # pose a la main
+    (dest / "19 FX/mine.wav").write_bytes(b"x")              # pose a la main
     m.entries[0].selected = False
     m.entries[1].sub = "RISE"                                        # case changee
     r = smp.export(m, root, dest, index)
-    assert r.removed == ["FX/FX 1 p.wav", "FX/FX 2 p.wav"]
-    assert r.copied == ["FX/RISE/FX 2 p.wav"]
-    assert sorted(p.name for p in (dest / "FX").iterdir() if p.is_file()) == ["mine.wav"]
+    assert r.removed == ["19 FX/FX 1 p.wav", "19 FX/FX 2 p.wav"]
+    assert r.copied == ["19 FX/RISE/FX 2 p.wav"]
+    assert sorted(p.name for p in (dest / "19 FX").iterdir() if p.is_file()) == ["mine.wav"]
     m.entries[1].sub = ""
     m.entries[0].selected = True
-    (dest / "FX/FX 1 p.wav").write_bytes(b"autre")          # conflit : pas ecrase
+    (dest / "19 FX/FX 1 p.wav").write_bytes(b"autre")       # conflit : pas ecrase
     r = smp.export(m, root, dest, index)
-    assert r.conflicts == ["FX/FX 1 p.wav"] and (dest / "FX/FX 1 p.wav").read_bytes() == b"autre"
-    assert not (dest / "FX" / "RISE").exists()                       # case videe retiree
+    assert r.conflicts == ["19 FX/FX 1 p.wav"]
+    assert (dest / "19 FX/FX 1 p.wav").read_bytes() == b"autre"
+    assert not (dest / "19 FX" / "RISE").exists()                    # case videe retiree
 
 
 def test_export_resumes_interrupted_copy_and_reports_missing(tmp_path: Path) -> None:
     m, root, dest, index = _export_setup(tmp_path)
-    (dest / "FX").mkdir(parents=True)
-    (dest / "FX/FX 1 p.wav").write_bytes((root / "p/fx1.wav").read_bytes())
+    (dest / "19 FX").mkdir(parents=True)
+    (dest / "19 FX/FX 1 p.wav").write_bytes((root / "p/fx1.wav").read_bytes())
     (root / "p/fx2.wav").unlink()
     r = smp.export(m, root, dest, index)
     assert (r.unchanged, r.copied, r.missing, r.conflicts) == (1, [], ["p/fx2.wav"], [])
-    assert list(smp.load_export_index(index)) == ["FX/FX 1 p.wav"]
+    assert list(smp.load_export_index(index)) == ["19 FX/FX 1 p.wav"]
 
 
 def test_cli_export(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
@@ -910,10 +912,51 @@ def test_cli_export(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
     monkeypatch.setattr(cli, "MANIFEST_FILE", tmp_path / "manifest.json")
     monkeypatch.setattr(cli, "EXPORT_INDEX_FILE", index)
     cli.save_manifest(m, cli.MANIFEST_FILE)
-    assert cli.main(["--export", "--dry-run", "--source", str(root), "--dest", str(dest)]) == 0
+    assert cli.main(["--export", "--dry-run", "--no-line", "--source", str(root), "--dest", str(dest)]) == 0
     assert "2 a copier" in capsys.readouterr().out and not dest.exists()
-    assert cli.main(["--export", "--source", str(root), "--dest", str(dest)]) == 0
-    assert "2 copies" in capsys.readouterr().out and (dest / "FX/FX 2 p.wav").exists()
+    assert cli.main(["--export", "--no-line", "--source", str(root), "--dest", str(dest)]) == 0
+    assert "2 copies" in capsys.readouterr().out and (dest / "19 FX/FX 2 p.wav").exists()
+
+
+def test_export_folder_numbered_tree() -> None:
+    """Arbre numerote de l'export (7.J9) : ordre de la grille, sous-categories gardees."""
+    assert smp.export_folder("DRUMS/BD/HARD") == "01 KICK/HARD"
+    assert smp.export_folder("DRUMS/HH") == "07 HAT"
+    assert smp.export_folder("LOOPS/BR/060") == "10 BREAK/060"
+    assert smp.export_folder("FX/RISE") == "19 FX/RISE"
+    assert smp.export_folder("VX") == "17 VOX"
+    assert smp.export_folder("SAMPLE/BD") == "20 SAMPLE/BD"
+    assert set(smp.EXPORT_FOLDERS) == set(smp.CODES) - {"RS"}       # RS : 20 SAMPLE
+    tops = sorted(smp.EXPORT_FOLDERS.values()) + [smp.EXPORT_SAMPLE_FOLDER]
+    assert [t[:2] for t in tops] == [f"{i:02d}" for i in range(1, 21)]
+
+
+def test_action_plan_writes_only_plan_md(tmp_path: Path) -> None:
+    """Plan d'action (7.J9) : PLAN.md seul, etat et conversions par fichier."""
+    m, root, dest, index = _export_setup(tmp_path)
+    _wav(root / "p/fx2.wav", rate=48000)                             # deja a 48 kHz
+    p = smp.write_action_plan(m, root, dest, index)
+    assert [f.name for f in dest.iterdir()] == [smp.PLAN_FILE] and not index.exists()
+    by = {f.dest: f for f in p.files}
+    assert by["19 FX/FX 1 p.wav"].state == "a ecrire"
+    assert by["19 FX/FX 1 p.wav"].format == "WAV 8 kHz 16 bits mono"
+    assert by["19 FX/FX 1 p.wav"].ops == ["8 -> 48 kHz"] and by["19 FX/FX 2 p.wav"].ops == []
+    md = (dest / smp.PLAN_FILE).read_text(encoding="utf-8")
+    assert "## 19 FX (2)" in md and "a ecrire : 2" in md and "coupure sous 20 Hz" in md
+    smp.export(m, root, dest, index)
+    again = smp.write_action_plan(m, root, dest, index)
+    assert {f.state for f in again.files} == {"inchange"}
+
+
+def test_cli_plan(tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+                  capsys: pytest.CaptureFixture[str]) -> None:
+    m, root, dest, index = _export_setup(tmp_path)
+    monkeypatch.setattr(cli, "MANIFEST_FILE", tmp_path / "manifest.json")
+    monkeypatch.setattr(cli, "EXPORT_INDEX_FILE", index)
+    cli.save_manifest(m, cli.MANIFEST_FILE)
+    assert cli.main(["--plan", "--source", str(root), "--dest", str(dest)]) == 0
+    assert "2 a ecrire" in capsys.readouterr().out
+    assert [f.name for f in dest.iterdir()] == [smp.PLAN_FILE]
 
 
 def test_bpm_bands_filter_and_facet() -> None:
@@ -953,3 +996,141 @@ def test_rebuild_converges_with_measured_tempo(tmp_path: Path) -> None:
         runs.append(state(m))
     assert runs[-1] == runs[-2]
     assert all(r.bpm for r in m.reserve if r.folder != "LOOPS/BR")
+
+
+def _kick(path: Path, seconds: float, decay: float, drive: float = 1.0, sr: int = 48000) -> None:
+    import numpy as np
+    import soundfile as sf
+    t = np.arange(int(sr * seconds)) / sr
+    y = np.sin(2 * np.pi * 50 * t) * np.exp(-t / decay)
+    y = np.tanh(drive * y) / np.tanh(drive)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    sf.write(str(path), (0.8 * y).astype("float32"), sr)
+
+
+def test_kick_sub_measured(tmp_path: Path) -> None:
+    """Kick sans mot reconnu : sous-categorie mesuree (queue, crete)."""
+    _kick(tmp_path / "long.wav", 1.5, decay=0.4)                 # boom long
+    _kick(tmp_path / "hard.wav", 0.4, decay=0.15, drive=12.0)    # ecrase
+    _kick(tmp_path / "clean.wav", 0.4, decay=0.03)               # court, transitoire
+    (tmp_path / "mute.wav").write_bytes(b"")
+    assert smp.kick_sub(tmp_path / "long.wav") == "SUB"
+    assert smp.kick_sub(tmp_path / "hard.wav") == "HARD"
+    assert smp.kick_sub(tmp_path / "clean.wav") == "CLEAN"
+    assert smp.kick_sub(tmp_path / "mute.wav") == ""
+    # le mot du chemin passe avant la mesure ; sans chemin audio, racine
+    assert smp.sub_of("p/909 kick.wav", "BD", 1.5, tmp_path / "long.wav") == "CLEAN"
+    assert smp.sub_of("p/kick.wav", "BD", 1.5, tmp_path / "long.wav") == "SUB"
+    assert smp.sub_of("p/kick.wav", "BD", 1.5) == ""
+
+
+def test_perc_without_word_goes_to_misc() -> None:
+    """06 PERC : sans mot reconnu, sous-dossier MISC plutot que la racine."""
+    assert smp.sub_of("p/perc 01.wav", "PC", 0.2) == "MISC"
+    assert smp.sub_of("p/shaker 01.wav", "PC", 0.2) == "SHAKER"
+    assert "MISC" in smp.SUBS["PC"]
+    assert smp.export_folder("DRUMS/PC/MISC") == "06 PERC/MISC"
+
+
+def test_perc_loop_sub_measured(tmp_path: Path) -> None:
+    """12 PERC LOOP : sous-categorie mesuree, MISC pour une boucle melangee."""
+    import numpy as np
+    import soundfile as sf
+    sr = 48000
+    t = np.arange(sr * 2) / sr
+    rng = np.random.default_rng(0)
+    gate = (np.sin(2 * np.pi * 4 * t) > 0.9).astype("float32")      # 8 coups / 2 s
+    noise = rng.standard_normal(t.size).astype("float32")
+    hiss = np.diff(np.diff(noise, prepend=0), prepend=0)                 # bruit tres aigu
+    loops = {"skin": np.sin(2 * np.pi * 120 * t) * gate,
+             "tops": hiss * (0.2 + gate),
+             "shaker": hiss * gate,
+             "mix": np.sin(2 * np.pi * 120 * t) * gate * 0.05 + np.sin(2 * np.pi * 1500 * t) * 0.5}
+    for name, y in loops.items():
+        sf.write(str(tmp_path / f"{name}.wav"), (0.5 * y / np.abs(y).max()).astype("float32"), sr)
+    assert smp.perc_loop_sub(tmp_path / "skin.wav") == "SKIN"
+    assert smp.perc_loop_sub(tmp_path / "tops.wav") == "TOPS"
+    assert smp.perc_loop_sub(tmp_path / "shaker.wav") == "SHAKER"
+    assert smp.perc_loop_sub(tmp_path / "mix.wav") == "MISC"
+    assert smp.sub_of("p/loop 01.wav", "PL", 2.0) == "MISC"         # sans audio : fourre-tout
+    assert smp.sub_of("p/conga loop.wav", "PL", 2.0, tmp_path / "tops.wav") == "SKIN"
+    assert smp.sub_of("p/conga fill 2.wav", "PL", 2.0) == "FILL"
+    assert smp.sub_of("p/buchla hat loop.wav", "PL", 2.0) == "ELEC"
+    assert smp.sub_of("p/maraca loop.wav", "PL", 2.0) == "SHAKER"
+    assert smp.sub_of("p/temple blocks.wav", "PL", 2.0) == "WOOD"
+    assert smp.sub_of("p/WP_TempleBell_110.wav", "PL", 2.0) == "METAL"
+    assert smp.sub_of("p/cowbell loop.wav", "PL", 2.0) == "METAL"
+
+
+def test_drum_loop_feel_and_fills(tmp_path: Path) -> None:
+    """11 DRUM LOOP : feel (genre, puis mesure), fills regroupes a l'export."""
+    import numpy as np
+    import soundfile as sf
+    assert smp.sub_of("p/jungle/amen 170.wav", "DL", 4.0) == "BROKEN"
+    assert smp.sub_of("p/dubstep 140 loop.wav", "DL", 4.0) == "HALF"
+    assert smp.sub_of("p/gabber 190 loop.wav", "DL", 4.0) == "HARD"
+    assert smp.sub_of("p/drum fill 170.wav", "DL", 4.0) == "FILL"
+    assert smp.sub_of("p/loop 01.wav", "DL", 4.0) == "MISC"          # ni mot ni tempo
+    sr, bpm = 48000, 120
+    beat = int(sr * 60 / bpm)
+    y = np.zeros(beat * 16, dtype="float32")
+    t = np.arange(int(sr * 0.15)) / sr
+    kick = (np.sin(2 * np.pi * 55 * t) * np.exp(-t / 0.05)).astype("float32")
+    for b in range(16):                                              # 4 mesures en 4/4
+        y[b * beat:b * beat + kick.size] += kick
+    sf.write(str(tmp_path / "four 120.wav"), y, sr)
+    assert smp.groove_feel(tmp_path / "four 120.wav", bpm) == "FOUR"
+    assert smp.groove_feel(tmp_path / "four 120.wav", 30) == ""      # moins de 2 mesures
+    assert smp.export_folder("LOOPS/DL/FILL") == smp.export_folder("LOOPS/PL/FILL") == "11 DRUM LOOP/FILL"
+    assert smp.export_folder("LOOPS/DL/BROKEN") == "11 DRUM LOOP/BROKEN"
+
+
+def test_snare_sub_words_then_measure(tmp_path: Path) -> None:
+    """04 SNARE : mots (RIM, HARD, LONG, CLEAN), sinon mesure."""
+    assert smp.sub_of("p/rimshot 01.wav", "SD", 0.2) == "RIM"
+    assert smp.sub_of("p/snare distorted.wav", "SD", 0.2) == "HARD"
+    assert smp.sub_of("p/snare reverb.wav", "SD", 0.2) == "LONG"
+    _kick(tmp_path / "long.wav", 1.5, decay=0.4)
+    _kick(tmp_path / "short.wav", 0.3, decay=0.02)
+    assert smp.snare_sub(tmp_path / "long.wav") == "LONG"
+    assert smp.sub_of("p/snare 01.wav", "SD", 0.3, tmp_path / "short.wav") in ("CLEAN", "HARD")
+
+
+# --- Rendu sur la ligne a l'export (7.J9b) -----------------------------------
+
+
+def _line_tone(path: Path, hz: float, amp: float, rate: int = 44100) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    t = np.arange(rate // 4) / rate
+    sf.write(str(path), amp * np.sin(2 * np.pi * hz * t) * np.exp(-t * 15), rate, subtype="PCM_24")
+
+
+def test_sync_renders_on_line_and_rerenders_when_line_changes(tmp_path: Path) -> None:
+    from analyzer.line import CEILING_DB, peak_db
+
+    root, dest, index = tmp_path / "src", tmp_path / "dest", tmp_path / "index.json"
+    _line_tone(root / "clap.wav", 1500, 0.9)
+    _line_tone(root / "silence.wav", 1500, 0.0)
+    plan = {"03 CLAP/CP A x.wav": "clap.wav", "03 CLAP/CP B x.wav": "silence.wav"}
+    codes = {rel: "CP" for rel in plan}
+    rep = smp.sync(plan, root, dest, index, codes=codes, line_db=-30.0)
+    assert sorted(rep.copied) == sorted(plan)
+    out = dest / "03 CLAP/CP A x.wav"
+    info = sf.info(str(out))
+    assert (info.samplerate, info.subtype) == (48000, "PCM_16")
+    y, _ = sf.read(str(out))
+    assert peak_db(y) <= CEILING_DB + 0.01
+    # silencieux : copie telle quelle, sans bloquer l'export
+    assert (dest / "03 CLAP/CP B x.wav").read_bytes() == (root / "silence.wav").read_bytes()
+    assert smp.load_export_index(index)["03 CLAP/CP A x.wav"].line.startswith("CP -30.00 v")
+    # rejouable : rien a reecrire
+    assert smp.sync(plan, root, dest, index, codes=codes, line_db=-30.0).unchanged == 2
+    # nouvelle ligne : reecriture
+    assert len(smp.sync(plan, root, dest, index, codes=codes, line_db=-40.0).copied) == 2
+
+
+def test_sync_without_line_still_copies(tmp_path: Path) -> None:
+    root, dest, index = tmp_path / "src", tmp_path / "dest", tmp_path / "index.json"
+    _line_tone(root / "a.wav", 1000, 0.5)
+    smp.sync({"x/a.wav": "a.wav"}, root, dest, index, codes={"x/a.wav": "CP"})
+    assert (dest / "x/a.wav").read_bytes() == (root / "a.wav").read_bytes()

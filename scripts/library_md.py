@@ -14,7 +14,8 @@ Un backup `.backup-pre-table-YYYY-MM-DD` doit etre fait manuellement
 avant la 1ere migration (voir SPEC.md).
 
 Champs preserves (`PRESERVED_FIELDS`) : jamais ecrases lors d'une
-re-execution automatique (edition manuelle protegee).
+re-execution automatique (edition manuelle protegee). `ref` marque un
+morceau de reference (« x » ou vide), pose depuis le front ou a la main.
 """
 from __future__ import annotations
 
@@ -24,7 +25,7 @@ from datetime import date
 from pathlib import Path
 
 # Champs preserves a chaque re-ecriture (edition humaine attendue)
-PRESERVED_FIELDS: tuple[str, ...] = ("energy", "mood", "tags", "notes")
+PRESERVED_FIELDS: tuple[str, ...] = ("energy", "mood", "tags", "notes", "ref")
 
 # Ordre canonique des champs (= colonnes de la table)
 FIELD_ORDER: tuple[str, ...] = (
@@ -193,10 +194,10 @@ def write_library(path: Path, entries: dict[str, dict[str, str]]) -> None:
         "",
         "# Library — morceaux pour les sets",
         "",
-        "> Une ligne par morceau. **`energy`, `mood`, `tags`, `notes`** sont",
+        "> Une ligne par morceau. **`energy`, `mood`, `tags`, `notes`, `ref`** sont",
         "> preserves lors des re-runs automatiques : edite-les directement",
         "> dans la cellule correspondante. `<br>` dans une cellule = retour",
-        "> a la ligne (rendu Obsidian).",
+        "> a la ligne (rendu Obsidian). `ref` = « x » pour un morceau de reference.",
         "",
         "| " + " | ".join(FIELD_ORDER) + " |",
         "|" + "|".join("---" for _ in FIELD_ORDER) + "|",

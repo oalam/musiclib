@@ -15,13 +15,16 @@ Deux racines :
 │   ├── audio/            # <slug>.{flac,m4a,mp3} (+ sous-dossiers de style)
 │   ├── stems/<slug>/     # Demucs
 │   └── visuals/          # PNG Phase 5 + _index.md
-├── Samples/              # copie des samples DT2 (packs bruts, lecture seule)
+├── Samples/              # samples DT2 bruts, lecture seule : packs/<pack>/
+│                         # (regles lues sans packs/, cf. samples.logical),
+│                         # cuts/, recorded/
+├── Sets/<set>/<banque>/  # projets Live et rendus de samples maison
 ├── SoundDesign/<traitement>/  # rendus du sound design (Phase 8) : .wav + sidecar .json
 └── Live/                 # materiel de set live
     ├── renoise/          # .xrns
     ├── grooves/          # .mid / .tidal
     ├── digitakt/<slug>/  # pNN.mid
-    └── samples/          # <FAMILLE>/<CODE>/<nom>.wav pour Transfer (7.J)
+    └── samples/          # <NN NOM>/[<SOUS>/]<nom>.wav + PLAN.md pour Transfer (7.J9)
 ```
 
 La colonne `file` de library.md (`[[audio/<slug>.flac]]`) est relative a
@@ -61,11 +64,16 @@ LIVE_DIR = MEDIA_ROOT / "Live"
 RENOISE_DIR = LIVE_DIR / "renoise"
 GROOVES_DIR = LIVE_DIR / "grooves"
 DIGITAKT_MIDI_DIR = LIVE_DIR / "digitakt"
-DT2_SAMPLES_DIR = LIVE_DIR / "samples"   # arborescence famille/code prete pour Transfer
+DT2_SAMPLES_DIR = LIVE_DIR / "samples" / "00 curated"   # arbre numerote pret pour Transfer (deplace le 2026-11-13)
 DT2_LIVES_DIR = LIVE_DIR / "00-live"     # un dossier par live (7.L), meme nom sur le +Drive
 
 # Copie des samples de la DT2 faite depuis Transfer (packs bruts, lecture seule)
 SAMPLES_SRC_DIR = MEDIA_ROOT / "Samples"
+# Kick de reference de la ligne inclinee (doctrine-samples, 7.J9b) : pack perso,
+# hors SSD ; l'export rend chaque sample sur sa ligne.
+LINE_REF_KICK = Path(os.environ.get(
+    "MUSIC_LINE_REF_KICK",
+    "/Users/tom/Documents/samples/solaris/01 KICK/BD 145 A# longtail 1 slr.wav"))
 SAMPLES_META_DIR = LIBRARY / "samples"   # manifeste + overrides (vault)
 LIVES_META_DIR = LIBRARY / "lives"       # <live>.json + index d'export (7.L)
 

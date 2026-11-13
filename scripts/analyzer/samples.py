@@ -122,7 +122,29 @@ BIG_CAP = frozenset({"BR", "DL", "PL"})   # boucles rythmiques : 32 par dossier,
 # plafonds propres a un dossier final (prioritaires) : breaks lents nombreux
 FOLDER_CAPS = {"LOOPS/BR/060": 64}
 
-# Arbre du +Drive (7.J8) : BRANCHE / CODE / [SOUS] ; FX et VX sans niveau code.
+# Arbre de l'export (7.J9) : dossiers numerotes dans l'ordre de la grille des
+# tracks ; la table de digitakt/doctrine-samples.md (« Arbre ») fait foi.
+# L'identite interne d'un dossier reste BRANCHE / CODE / [SOUS] (7.J8).
+EXPORT_FOLDERS = {"BD": "01 KICK", "RM": "02 RUMBLE", "CP": "03 CLAP", "SD": "04 SNARE",
+                  "TM": "05 TOM", "PC": "06 PERC", "HH": "07 HAT", "OH": "08 OPEN HAT",
+                  "CY": "09 CYMBAL", "BR": "10 BREAK", "DL": "11 DRUM LOOP",
+                  "PL": "12 PERC LOOP", "BS": "13 BASS", "BL": "14 BASS LOOP",
+                  "ST": "15 SYNTH", "PD": "16 PAD", "VX": "17 VOX", "ML": "18 MELO LOOP",
+                  "FX": "19 FX"}
+EXPORT_SAMPLE_FOLDER = "20 SAMPLE"   # samples et resamples maison, ranges par code
+PLAN_FILE = "PLAN.md"                # plan d'action a la racine de l'export (7.J9)
+TARGET_SR = 48000                    # format cible de l'export (doctrine-samples)
+TARGET_BITS = 16
+SUBTYPE_BITS = {"PCM_S8": 8, "PCM_U8": 8, "PCM_16": 16, "PCM_24": 24, "PCM_32": 32,
+                "FLOAT": 32, "DOUBLE": 64}
+# Traitements appliques a l'ecriture de chaque fichier (7.J9b, analyzer/line.py)
+PLANNED_FOR_ALL = ("coupure sous 20 Hz, passe-haut de la famille (24 dB/oct)",
+                   "mono integral pour BD, RM, BS ; mono sous 150 Hz (boucles), 120 Hz (autres)",
+                   "gain sur la ligne inclinee a 4,5 dB/oct (kick de reference), decalage de la famille",
+                   "plafond de crete a -6 dBFS",
+                   "ecriture 48 kHz / 16 bits, dither TPDF")
+
+# Arbre interne (7.J8) : BRANCHE / CODE / [SOUS] ; FX et VX sans niveau code.
 BRANCHES = ("DRUMS", "TONAL", "LOOPS", "FX", "VX", "SAMPLE")
 # Sous-categories par code : debuts de mots du chemin (minuscules), dans
 # l'ordre de priorite ; sans mot reconnu, le fichier reste a la racine du code.
@@ -147,9 +169,15 @@ SUB_RULES: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
            ("METAL", ("cowbell", "bell", "metal", "agogo", "triang", "chime")),
            ("WOOD", ("block", "clave", "stick", "rim", "wood", "click", "tick")),
            ("FOLEY", ("foley", "cartoon", "orch", "sting"))),
-    "PL": (("SKIN", ("conga", "bongo", "djembe", "cajon", "tabla", "udu", "bodhran", "hand")),
+    # FILL d'abord (un fill de congas reste un fill), puis les familles du
+    # 2026-11-11 (ELEC, WOOD, METAL, SHAKER elargi) avant les regles d'origine
+    "PL": (("FILL", ("fill",)),
+           ("ELEC", ("buchla", "modular", "feedback", "gaspiel", "glitch", "synth")),
+           ("WOOD", ("block", "clave", "wood")),          # « TempleBell » : METAL
+           ("METAL", ("bell", "cowbell", "agogo", "metal")),
+           ("SKIN", ("conga", "bongo", "djembe", "cajon", "tabla", "udu", "bodhran", "hand")),
            ("TOPS", ("top", "hat", "ride", "cym")),
-           ("SHAKER", ("shaker", "tamb"))),
+           ("SHAKER", ("shaker", "tamb", "maraca", "guiro", "shell", "bean"))),
     "ST": (("CHORD", ("chord",)), ("STAB", ("stab", "hit")), ("METAL", ("metal",)),
            ("ANALOG", ("minimoog", "moog", "modular", "analog", "minibrute")),
            ("BELL", ("bell", "blip", "blop", "pluck", "zap")),
@@ -165,11 +193,34 @@ SUB_RULES: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
            ("WOB", ("wob", "dubstep", "growl")),
            ("DIST", ("dist", "filth", "buzz", "dirt", "grit", "crunch", "acid", "303")),
            ("ANALOG", ("minimoog", "moog", "analog", "minibrute", "buchla"))),
-    "SD": (("RIM", ("rim",)),),
+    # Caisses claires (2026-11-11) : mots, sinon mesure (`snare_sub`)
+    "SD": (("RIM", ("rim", "stick")),
+           ("HARD", ("distort", "drive", "dirt", "tortured", "hard", "crunch", "indus")),
+           ("LONG", ("rev", "verb", "room", "long")),
+           ("CLEAN", ("clean", "tight"))),
+    # Boucles de batterie (2026-11-11) : par « feel » rythmique ; le tempo reste
+    # en tete du nom (tri de la DT2). FILL d'abord, puis le genre ecrit dans le
+    # chemin ; sans mot, la famille (FEEL_OF_FAMILY), puis la mesure
+    # (`groove_feel`), sinon MISC.
+    "DL": (("FILL", ("fill",)),
+           ("BROKEN", ("jungle", "dnb", "breakbeat", "break", "amen", "drumandbass")),
+           ("HALF", ("dubstep", "halftime", "half")),
+           ("HARD", ("hardcore", "gabber", "indus", "hardtek", "tekno", "frenchcore")),
+           ("FOUR", ("techno", "house", "tribe", "909", "four"))),
 }
-# Boucles BR / DL : sous-categorie = tranche de tempo, nommee par sa borne
-# basse pour le tri alphabetique de la DT2 (tempo du nom, sinon mesure).
-TEMPO_SUBS = frozenset({"BR", "DL"})
+FEEL_OF_FAMILY = {"JUNGLE": "BROKEN", "DUBSTEP": "HALF", "HARDCORE": "HARD",
+                  "TECHNO": "FOUR", "TRIBE": "FOUR"}
+# Feel mesure (calibre sur 446 boucles de genre connu, rappel ~60 %) : kick sur
+# chaque temps -> FOUR ; caisse claire sur le 3 -> HALF ; sur le 2 et le 4 sans
+# kick regulier -> BROKEN ; sinon MISC.
+FEEL_FOUR_MIN = 0.35        # minimum du pattern grave sur les 4 temps
+FEEL_HALF_MIN = -0.1        # medium au pas 9 moins max(pas 5, pas 13)
+FEEL_BACK_MIN = 0.05        # min(pas 5, pas 13) moins medium au pas 9
+# Fills de batterie et de percussions regroupes a l'export
+FILL_EXPORT = "11 DRUM LOOP/FILL"
+# Boucles BR : sous-categorie = tranche de tempo, nommee par sa borne basse
+# pour le tri alphabetique de la DT2 (tempo du nom, sinon mesure).
+TEMPO_SUBS = frozenset({"BR"})
 TEMPO_BANDS = (("060", 0), ("120", 120), ("150", 150), ("180", 180))
 # Sans mot reconnu, sous-categorie par duree (lue dans l'en-tete, gratuite) :
 # nom, duree minimale en secondes.
@@ -178,12 +229,39 @@ DURATION_SUBS: dict[str, tuple[tuple[str, float], ...]] = {
     "ST": (("SHORT", 0.0), ("MID", 0.6), ("LONG", 2.0)),
     "PD": (("SHORT", 0.0), ("LONG", 4.0)),      # nappes : mediane 5,4 s
 }
+# Kicks sans mot reconnu : sous-categorie mesuree dans l'audio (2026-11-11),
+# calibree sur les kicks etiquetes par leur nom (rappel moyen ~63 %, a
+# corriger a l'ecoute) : queue longue -> SUB, crete basse (son ecrase) -> HARD,
+# sinon CLEAN.
+KICK_SUB_TAIL_S = 0.7       # queue au-dessus de -30 dB du max de l'enveloppe
+KICK_HARD_CREST_DB = 6.5    # crete / RMS des 150 premieres ms
+KICK_TAIL_DB = -30.0
+# Caisses claires sans mot reconnu (2026-11-11), seuils par quantiles du
+# catalogue (pas d'etiquettes pour calibrer, a verifier a l'ecoute) : queue
+# d'au moins 0,45 s -> LONG (~22 %), crete d'au plus 9 dB -> HARD (~15 %),
+# sinon CLEAN.
+SNARE_LONG_S = 0.45
+SNARE_HARD_CREST_DB = 9.0
+# Sans mot reconnu ni repli mesure : sous-dossier fourre-tout plutot que la
+# racine du code (2026-11-11, 06 PERC seulement).
+FALLBACK_SUBS = {"PC": "MISC", "PL": "MISC", "DL": "MISC"}
+# Boucles de percussions sans mot reconnu : sous-categorie mesuree (2026-11-11),
+# calibree sur 598 boucles etiquetees (rappel SKIN 98 %, SHAKER 63 %, TOPS
+# 57 %) : grave dominant -> SKIN ; aigu presque seul -> SHAKER si tres
+# dynamique, sinon TOPS ; aigu notable -> TOPS ; sinon MISC (boucle melangee).
+PL_SKIN_LOW = 0.5           # part d'energie sous 400 Hz
+PL_HIGH_ONLY = 0.8          # part d'energie au-dessus de 4 kHz
+PL_TOPS_HIGH = 0.25
+PL_SHAKER_DYN_DB = 35.0     # ecart RMS entre trames fortes (q95) et creux (q20)
+PL_READ_S = 8.0
 SUBS: dict[str, tuple[str, ...]] = {
     **{c: tuple(s for s, _ in rules) for c, rules in SUB_RULES.items()},
     **{c: tuple(name for name, _ in TEMPO_BANDS) for c in TEMPO_SUBS},
 }
 for _c, _bands in DURATION_SUBS.items():
     SUBS[_c] = (*SUBS.get(_c, ()), *(name for name, _ in _bands))
+for _c, _sub in FALLBACK_SUBS.items():
+    SUBS[_c] = (*SUBS.get(_c, ()), _sub)
 # Famille -> tag de genre : la famille sort de l'arbre, elle reste filtrable.
 GENRE_TAGS = {"HARDCORE": "hardcore", "JUNGLE": "jungle", "DUBSTEP": "dubstep",
               "TECHNO": "techno", "TRIBE": "tribe"}
@@ -320,6 +398,10 @@ _CAMEL_RX = re.compile(r"(?<=[a-z])(?=[A-Z])|(?<=[A-Za-z])(?=\d)|(?<=\d)(?=[A-Za
 TAG_MAX = 24
 STARS_MAX = 5
 
+# Dossier de rangement des packs a la racine de <MEDIA>/Samples (2026-11-06) :
+# il reste dans les chemins sources, mais les regles (famille, pack, kit,
+# code, tags...) lisent le chemin sans lui (`logical`).
+SOURCE_CONTAINERS = ("packs/",)
 KIT_CONTAINERS = frozenset({"packs"})   # dossier qui regroupe des kits (rthm/packs)
 
 # Tags inferes des noms de dossiers (7.J6) : groupe -> tag -> mots (minuscules).
@@ -489,6 +571,7 @@ class ExportItem(BaseModel):
     size: int
     mtime_ns: int
     shift: int = 0      # demi-tons de varispeed appliques a l'ecriture (lives 7.L)
+    line: str = ""      # rendu sur la ligne (7.J9b) : "<code> <ligne dB> v<version>"
 
 
 class ExportReport(BaseModel):
@@ -501,6 +584,28 @@ class ExportReport(BaseModel):
     removed: list[str] = Field(default_factory=list)
     missing: list[str] = Field(default_factory=list)    # source absente du disque
     conflicts: list[str] = Field(default_factory=list)  # fichier pose a la main a cet endroit
+
+
+PlanState = Literal["a ecrire", "inchange", "conflit", "absent"]
+
+
+class PlanFile(BaseModel):
+    """Ligne du plan d'action (7.J9) : un fichier retenu et ce qui l'attend."""
+    dest: str                       # chemin d'arrivee, relatif a la racine de l'export
+    source: str
+    state: PlanState
+    format: str | None = None       # « WAV 44.1 kHz 24 bits stereo », None : illisible
+    ops: list[str] = Field(default_factory=list)   # conversions propres a ce fichier
+
+
+class ActionPlan(BaseModel):
+    """Plan d'action de l'export de la lib (7.J9), ecrit en PLAN.md."""
+    dest: str
+    generated: str                  # horodatage local, AAAA-MM-JJ HH:MM
+    files: list[PlanFile] = Field(default_factory=list)
+    removed: list[str] = Field(default_factory=list)
+    bytes: int = 0
+    last_export: ExportReport | None = None   # export qui vient d'ecrire (sinon simple plan)
 
 
 class _Raw(BaseModel):
@@ -635,16 +740,28 @@ def iter_wavs(root: Path) -> Iterable[Path]:
 
 # --- Classement -------------------------------------------------------------
 
+def logical(rel: str) -> str:
+    """Chemin source sans le dossier de rangement (`packs/Grey Forge/x.wav`
+    -> `Grey Forge/x.wav`) : ce que lisent les regles de classement."""
+    low = rel.lower()
+    for c in SOURCE_CONTAINERS:
+        if low.startswith(c):
+            return rel[len(c):]
+    return rel
+
+
 def _longest_prefix(rel_low: str, table: dict[str, str]) -> str | None:
     best = max((k for k in table if rel_low.startswith(k)), key=len, default=None)
     return table[best] if best is not None else None
 
 
 def family_of(rel: str) -> str:
+    rel = logical(rel)
     return _longest_prefix(rel.lower(), FAMILY_RULES) or "UNIVERSEL"
 
 
 def pack_of(rel: str) -> str:
+    rel = logical(rel)
     code = _longest_prefix(rel.lower(), PACK_CODES)
     if code:
         return code
@@ -660,7 +777,7 @@ def loop_code(low: str) -> str:
 def kit_of(rel: str) -> str:
     """Prefixe du kit d'un fichier : pack, puis son sous-dossier (on traverse
     un dossier `packs`). Un fichier pose a la racine du pack : le pack."""
-    parts = rel.split("/")[:-1]
+    parts = logical(rel).split("/")[:-1]
     if not parts:
         return ""
     out = [parts[0]]
@@ -673,7 +790,7 @@ def kit_of(rel: str) -> str:
 
 def in_kit(source: str, kit: str) -> bool:
     """`kit` : prefixe de kit ou de pack."""
-    return source.startswith(kit + "/")
+    return logical(source).startswith(kit + "/")
 
 
 def tags_of(overrides: dict[str, Override], source: str) -> list[str]:
@@ -687,6 +804,7 @@ def tags_of(overrides: dict[str, Override], source: str) -> list[str]:
 
 
 def _dir_words(rel: str) -> set[str]:
+    rel = logical(rel)
     return {t.lower() for d in rel.split("/")[:-1] for t in _tokens(d)}
 
 
@@ -723,6 +841,7 @@ def kit_rules(overrides: dict[str, Override]) -> list[str]:
 
 
 def code_of(rel: str, duration: float | None) -> str | None:
+    rel = logical(rel)
     low = rel.lower()
     code = next((c for c, rx in _CODE_RX if rx.search(low)), None)
     if code == "BR":
@@ -760,6 +879,7 @@ def tempo_from_name(stem_low: str) -> int | None:
 
 def tempo_of(rel: str) -> int | None:
     """Tempo ecrit dans le chemin : `NNN bpm` n'importe ou, sinon dans le nom."""
+    rel = logical(rel)
     m = _BPM_RX.search(rel.lower())
     if m and _in_range(int(m.group(1))):
         return int(m.group(1))
@@ -832,6 +952,18 @@ def folder_of(family: str, code: str, sub: str = "") -> str:
     return "/".join(parts + [sub] if sub and code in SUBS else parts)
 
 
+def export_folder(folder: str) -> str:
+    """Dossier d'arrivee de l'export (7.J9) d'un dossier interne :
+    `DRUMS/BD/HARD` -> `01 KICK/HARD`, `SAMPLE/BD` -> `20 SAMPLE/BD`."""
+    branch, code, sub = folder_parts(folder)
+    if branch == "SAMPLE":
+        return f"{EXPORT_SAMPLE_FOLDER}/{code}"
+    if sub == "FILL" and code in ("DL", "PL"):
+        return FILL_EXPORT
+    top = EXPORT_FOLDERS[code]
+    return f"{top}/{sub}" if sub else top
+
+
 def folder_parts(folder: str) -> tuple[str, str, str]:
     """(branche, code, sous-categorie) d'un dossier final."""
     parts = folder.split("/")
@@ -902,25 +1034,149 @@ def tempo_band(bpm: int | None) -> str:
     return [name for name, lo in TEMPO_BANDS if bpm >= lo][-1]
 
 
-def sub_of(rel: str, code: str, duration: float | None = None) -> str:
+def tail_crest(path: Path) -> tuple[float, float] | None:
+    """Queue (s au-dessus de -30 dB du max de l'enveloppe) et crete (dB,
+    crete / RMS des 150 premieres ms) d'un one-shot ; None si illisible ou muet."""
+    try:
+        y, sr = sf.read(str(path), dtype="float32", always_2d=True)
+    except (RuntimeError, sf.LibsndfileError):
+        return None
+    mono = y.mean(axis=1)
+    a = np.abs(mono)
+    peak = float(a.max()) if a.size else 0.0
+    if peak < 1e-4:
+        return None
+    start = int(np.argmax(a >= peak * 0.1))
+    hop = max(int(sr * 0.01), 1)
+    body = mono[start:]
+    frames = body[: len(body) // hop * hop].reshape(-1, hop) if len(body) >= hop else body[None, :]
+    env = np.sqrt((frames ** 2).mean(axis=1))
+    above = np.nonzero(env >= env.max() * 10 ** (KICK_TAIL_DB / 20))[0]
+    tail = (int(above[-1]) + 1) * hop / sr if above.size else 0.0
+    head = mono[start:start + int(sr * 0.15)]
+    crest = 20 * np.log10(peak / max(float(np.sqrt((head ** 2).mean())), 1e-9))
+    return tail, float(crest)
+
+
+def kick_sub(path: Path) -> str:
+    """Sous-categorie d'un kick mesuree dans l'audio : SUB (queue longue),
+    HARD (crete basse), CLEAN ; "" si illisible ou muet."""
+    tc = tail_crest(path)
+    if tc is None:
+        return ""
+    if tc[0] >= KICK_SUB_TAIL_S:
+        return "SUB"
+    return "HARD" if tc[1] <= KICK_HARD_CREST_DB else "CLEAN"
+
+
+def snare_sub(path: Path) -> str:
+    """Sous-categorie d'une caisse claire mesuree : LONG, HARD, CLEAN ; "" si
+    illisible ou muette."""
+    tc = tail_crest(path)
+    if tc is None:
+        return ""
+    if tc[0] >= SNARE_LONG_S:
+        return "LONG"
+    return "HARD" if tc[1] <= SNARE_HARD_CREST_DB else "CLEAN"
+
+
+def perc_loop_sub(path: Path) -> str:
+    """Sous-categorie d'une boucle de percussions mesuree dans l'audio
+    (8 premieres secondes) : SKIN, SHAKER, TOPS ou MISC ; "" si illisible."""
+    try:
+        info = sf.info(str(path))
+        y, sr = sf.read(str(path), dtype="float32", always_2d=True,
+                        frames=int(info.samplerate * PL_READ_S))
+    except (RuntimeError, sf.LibsndfileError):
+        return ""
+    mono = y.mean(axis=1)
+    n, hop = 2048, 1024
+    if mono.size < n or float(np.abs(mono).max()) < 1e-4:
+        return ""
+    frames = np.lib.stride_tricks.sliding_window_view(mono, n)[::hop] * np.hanning(n)
+    power = np.abs(np.fft.rfft(frames, axis=1)) ** 2
+    freqs = np.fft.rfftfreq(n, 1 / sr)
+    total = float(power.sum()) + 1e-12
+    low = float(power[:, freqs < 400].sum()) / total
+    high = float(power[:, freqs >= 4000].sum()) / total
+    rms = np.sqrt((frames ** 2).mean(axis=1))
+    dyn = 20 * np.log10((np.quantile(rms, 0.95) + 1e-9) / (np.quantile(rms, 0.2) + 1e-9))
+    if low >= PL_SKIN_LOW:
+        return "SKIN"
+    if high >= PL_HIGH_ONLY:
+        return "SHAKER" if dyn >= PL_SHAKER_DYN_DB else "TOPS"
+    return "TOPS" if high >= PL_TOPS_HIGH else "MISC"
+
+
+def groove_feel(path: Path, bpm: int) -> str:
+    """Feel d'une boucle de batterie mesure sur la grille de son tempo (la
+    boucle commence sur le temps) : FOUR, HALF, BROKEN, MISC ; "" si
+    illisible ou trop courte (moins de 2 mesures)."""
+    from . import rhythm_signature as rs
+
+    try:
+        y, sr = sf.read(str(path), dtype="float32", always_2d=True)
+    except (RuntimeError, sf.LibsndfileError):
+        return ""
+    beat = 60.0 / bpm
+    beats = int(len(y) / sr / beat)
+    if beats < 8:
+        return ""
+    sig = rs.analyze(y, sr, [i * beat for i in range(beats + 1)])
+    if not sig.bars_used:
+        return ""
+    sub, mid = np.asarray(sig.sub_pattern), np.asarray(sig.mid_pattern)
+    if float(sub[[0, 4, 8, 12]].min()) >= FEEL_FOUR_MIN:
+        return "FOUR"
+    if float(mid[8] - max(mid[4], mid[12])) >= FEEL_HALF_MIN:
+        return "HALF"
+    if float(min(mid[4], mid[12]) - mid[8]) >= FEEL_BACK_MIN:
+        return "BROKEN"
+    return "MISC"
+
+
+def sub_of(rel: str, code: str, duration: float | None = None,
+           path: Path | None = None) -> str:
     """Sous-categorie inferee des mots du chemin (`SUB_RULES`), sinon de la
-    duree (`DURATION_SUBS`) ; pour BR / DL, du tempo ecrit dans le nom ; ""
-    sinon."""
+    duree (`DURATION_SUBS`), sinon pour un kick de l'audio (`kick_sub`, si
+    `path` est donne) ou d'une boucle de percussions (`perc_loop_sub`), sinon
+    du fourre-tout (`FALLBACK_SUBS`) ; pour BR / DL, du tempo ecrit dans le nom ; "" sinon."""
+    rel = logical(rel)
     if code in TEMPO_SUBS:
         return tempo_band(tempo_of(rel))
     words = [t.lower() for t in _tokens(rel.rsplit(".", 1)[0].replace("/", " "))]
     by_word = next((sub for sub, starts in SUB_RULES.get(code, ())
                     if any(w.startswith(starts) for w in words)), "")
-    if by_word or duration is None or code not in DURATION_SUBS:
+    if by_word:
         return by_word
+    if code == "BD" and path is not None:
+        return kick_sub(path)
+    if code == "SD" and path is not None:
+        return snare_sub(path)
+    if code == "PL" and path is not None:
+        measured = perc_loop_sub(path)
+        if measured:
+            return measured
+    if code == "DL":
+        feel = FEEL_OF_FAMILY.get(family_of(rel), "")
+        tempo = tempo_of(rel)
+        if not feel and path is not None and tempo:
+            feel = groove_feel(path, tempo)
+        if feel:
+            return feel
+    if code in FALLBACK_SUBS:
+        return FALLBACK_SUBS[code]
+    if duration is None or code not in DURATION_SUBS:
+        return ""
     return [name for name, lo in DURATION_SUBS[code] if duration >= lo][-1]
 
 
-def _sub_for(rel: str, family: str, code: str, ov: Override, duration: float | None) -> str:
+def _sub_for(rel: str, family: str, code: str, ov: Override, duration: float | None,
+             path: Path | None = None) -> str:
     """Sous-categorie forcee par l'override, sinon inferee ; aucune en SAMPLE."""
     if branch_of(family, code) == "SAMPLE":
         return ""
-    return ov.sub if ov.sub is not None else sub_of(rel, code, duration)
+    return ov.sub if ov.sub is not None else sub_of(rel, code, duration, path)
 
 
 # --- Nommage ----------------------------------------------------------------
@@ -948,7 +1204,7 @@ def short_name(rel: str, code: str, pack: str, bpm: int | None = None,
     """`<CODE> [BPM|note] <desc> <num> <pack>`, NAME_MAX caracteres au plus.
     `bpm` : tempo mesure, utilise si le chemin n'en donne pas ; `note` : note
     mesuree, utilisee si le nom n'en donne pas (7.J7)."""
-    parts = rel.split("/")
+    parts = logical(rel).split("/")
     stem = Path(parts[-1]).stem
     folder_words = {t.lower() for d in parts[:-1] for t in _tokens(d)}
     toks = _tokens(stem)
@@ -1019,7 +1275,7 @@ def classify(root: Path, overrides: dict[str, Override]
     paths = list(iter_wavs(root))
     rels = [p.relative_to(root).as_posix() for p in paths]
     all_low = {r.lower() for r in rels}
-    found: list[tuple[str, float | None, str | None, Override, tuple[str, int]]] = []
+    found: list[tuple[str, float | None, str | None, Override, tuple[str, int], Path]] = []
     trashed: list[str] = []
     for p, rel in zip(paths, rels):
         ov = overrides.get(rel, Override())
@@ -1034,16 +1290,16 @@ def classify(root: Path, overrides: dict[str, Override]
             continue
         dur = wav_duration(p)
         found.append((rel, dur, ov.code or code_of(rel, dur), ov,
-                      (p.name.lower(), p.stat().st_size)))
+                      (p.name.lower(), p.stat().st_size), p))
     # doublon exact entre packs (meme nom, meme taille) : une seule copie, la
     # classee de preference, puis la plus profonde (plus de contexte de dossier :
     # jungle dnb rthm/ est une copie de rthm/loops/jungle dnb/)
     keeper: dict[tuple[str, int], str] = {}
-    for rel, _, code, _, key in sorted(found, key=lambda f: (f[2] is None, -f[0].count("/"), f[0])):
+    for rel, _, code, _, key, _ in sorted(found, key=lambda f: (f[2] is None, -f[0].count("/"), f[0])):
         keeper.setdefault(key, rel)
     raws: list[_Raw] = []
     unclassified: list[str] = []
-    for rel, dur, code, ov, key in found:
+    for rel, dur, code, ov, key, path in found:
         if keeper[key] != rel:
             continue
         if code is None:
@@ -1051,7 +1307,7 @@ def classify(root: Path, overrides: dict[str, Override]
             continue
         fam = ov.family or family_of(rel)
         raws.append(_Raw(source=rel, family=fam, code=code, pack=pack_of(rel), duration=dur,
-                         sub=_sub_for(rel, fam, code, ov, dur)))
+                         sub=_sub_for(rel, fam, code, ov, dur, path)))
     return raws, unclassified, sorted(trashed), trashed_kits
 
 
@@ -1071,7 +1327,8 @@ def fold_small_subs(raws: list[_Raw], overrides: dict[str, Override]) -> list[st
     for r in raws:
         forced = overrides.get(r.source, Override()).sub is not None
         if r.sub and not forced and _raw_folder(r) in folded:
-            r.sub = ""
+            fallback = FALLBACK_SUBS.get(r.code, "")
+            r.sub = fallback if r.sub != fallback else ""   # PC : vers MISC, pas la racine
     return folded
 
 
@@ -1153,6 +1410,10 @@ def build_manifest(root: Path, overrides: dict[str, Override],
                 and branch_of(r.family, r.code) != "SAMPLE"
                 and overrides.get(r.source, Override()).sub is None):
             r.sub = tempo_band(old_bpm[0])
+        # boucle DL sans genre ni tempo dans le nom : feel mesure au tempo deja mesure
+        if (r.code == "DL" and r.sub == FALLBACK_SUBS["DL"] and old_bpm is not None
+                and overrides.get(r.source, Override()).sub is None):
+            r.sub = groove_feel(root / r.source, old_bpm[0]) or r.sub
     folded = fold_small_subs(raws, overrides)
     prev_status = {k: e.status for k, e in prev.items()}
 
@@ -1319,6 +1580,8 @@ def _adopt(manifest: Manifest, source: str, family: str, code: str, sub: str,
     if (not sub and code in TEMPO_SUBS and ov.sub is None
             and branch_of(family, code) != "SAMPLE"):
         sub = tempo_band(bpm)
+    if code == "DL" and sub == FALLBACK_SUBS["DL"] and bpm and ov.sub is None and present:
+        sub = groove_feel(path, bpm) or sub
     folder = folder_of(family, code, sub)
     target = cell_of(manifest, folder)
     pack = pack_of(source)
@@ -1467,8 +1730,8 @@ def restore(manifest: Manifest, overrides: dict[str, Override], source: str, roo
         manifest.unclassified = sorted({*manifest.unclassified, source})
         return
     family = ov.family or family_of(source)
-    _adopt(manifest, source, family, code, _sub_for(source, family, code, ov, dur), overrides, root,
-           measure_fn, bpm_fn, note_fn)
+    _adopt(manifest, source, family, code, _sub_for(source, family, code, ov, dur, path), overrides,
+           root, measure_fn, bpm_fn, note_fn)
 
 
 def promote(manifest: Manifest, overrides: dict[str, Override], source: str, root: Path,
@@ -1760,21 +2023,136 @@ def save_export_index(index: dict[str, ExportItem], path: Path) -> None:
 
 
 def export_plan(manifest: Manifest) -> dict[str, str]:
-    """Chemin d'arrivee (relatif a dest) -> source, pour les retenus. Les noms
-    sont uniques par case ; la casse est ignoree (disque macOS)."""
+    """Chemin d'arrivee (relatif a dest, arbre numerote 7.J9) -> source, pour
+    les retenus. Les noms sont uniques par case ; la casse est ignoree (disque
+    macOS)."""
     plan: dict[str, str] = {}
     seen: set[str] = set()
     for e in sorted(manifest.entries, key=lambda e: (e.folder, e.rank)):
-        if e.selected and e.dest.lower() not in seen:
-            seen.add(e.dest.lower())
-            plan[e.dest] = e.source
+        rel = f"{export_folder(e.folder)}/{e.name}.wav"
+        if e.selected and rel.lower() not in seen:
+            seen.add(rel.lower())
+            plan[rel] = e.source
     return plan
 
 
+def export_codes(manifest: Manifest) -> dict[str, str]:
+    """Chemin d'arrivee -> code de la doctrine, pour le rendu sur la ligne."""
+    by_source = {e.source: e.code for e in manifest.entries}
+    return {rel: by_source[src] for rel, src in export_plan(manifest).items()}
+
+
 def export(manifest: Manifest, root: Path, dest: Path, index_path: Path,
-           dry_run: bool = False) -> ExportReport:
-    """Synchronise `dest` avec les retenus du manifeste (voir l'en-tete)."""
-    return sync(export_plan(manifest), root, dest, index_path, dry_run)
+           dry_run: bool = False, line_db: float | None = None) -> ExportReport:
+    """Synchronise `dest` avec les retenus du manifeste (voir l'en-tete) ;
+    hors simulation, reecrit ensuite PLAN.md a la racine de `dest`.
+    `line_db` : ligne du kick de reference ; chaque fichier est alors rendu
+    sur la ligne (7.J9b) au lieu d'etre copie."""
+    report = sync(export_plan(manifest), root, dest, index_path, dry_run,
+                  codes=export_codes(manifest), line_db=line_db)
+    if not dry_run:
+        write_action_plan(manifest, root, dest, index_path, last_export=report, line_db=line_db)
+    return report
+
+
+def _format_ops(path: Path) -> tuple[str | None, list[str]]:
+    """Format lu dans l'en-tete (sans decoder) et conversions propres au
+    fichier pour atteindre 48 kHz / 16 bits en WAV."""
+    try:
+        info = sf.info(str(path))
+    except (RuntimeError, sf.LibsndfileError):
+        return None, ["illisible : a verifier"]
+    bits = SUBTYPE_BITS.get(info.subtype)
+    chans = {1: "mono", 2: "stereo"}.get(info.channels, f"{info.channels} canaux")
+    depth = f"{bits} bits" if bits else info.subtype
+    fmt = f"{info.format} {info.samplerate / 1000:g} kHz {depth} {chans}"
+    ops: list[str] = []
+    if info.format != "WAV":
+        ops.append(f"{info.format} -> WAV")
+    if info.samplerate != TARGET_SR:
+        ops.append(f"{info.samplerate / 1000:g} -> 48 kHz")
+    if bits is None or bits > TARGET_BITS or info.subtype in ("FLOAT", "DOUBLE"):
+        ops.append(f"{depth} -> 16 bits + dither TPDF")
+    elif bits < TARGET_BITS:
+        ops.append(f"{bits} -> 16 bits")
+    return fmt, ops
+
+
+def action_plan(manifest: Manifest, root: Path, dest: Path, index_path: Path,
+                last_export: ExportReport | None = None,
+                line_db: float | None = None) -> ActionPlan:
+    """Plan d'action de l'export (7.J9) : etat de chaque retenu (simulation
+    de `sync`, rien n'est ecrit), format lu dans l'en-tete et conversions."""
+    from datetime import datetime
+
+    plan = export_plan(manifest)
+    dry = sync(plan, root, dest, index_path, dry_run=True, codes=export_codes(manifest),
+               line_db=line_db)
+    copied, conflicts, missing = set(dry.copied), set(dry.conflicts), set(dry.missing)
+    out = ActionPlan(dest=str(dest), generated=datetime.now().strftime("%Y-%m-%d %H:%M"),
+                     removed=dry.removed, bytes=dry.bytes, last_export=last_export)
+    for rel, source in plan.items():
+        state: PlanState = ("absent" if source in missing else "conflit" if rel in conflicts
+                            else "a ecrire" if rel in copied else "inchange")
+        fmt, ops = (None, []) if state == "absent" else _format_ops(root / source)
+        out.files.append(PlanFile(dest=rel, source=source, state=state, format=fmt, ops=ops))
+    return out
+
+
+def _md_cell(text: str) -> str:
+    return text.replace("|", "\\|")
+
+
+def render_action_plan(p: ActionPlan) -> str:
+    """PLAN.md : bilan, traitements communs, puis une table par dossier numerote."""
+    count: dict[str, int] = defaultdict(int)
+    for f in p.files:
+        count[f.state] += 1
+    convert = sum(1 for f in p.files if f.ops)
+    lines = ["# Plan d'action de l'export des samples", "",
+             f"Genere le {p.generated} (`samples.py --plan`, 7.J9) pour `{p.dest}`.",
+             "Regles : `digitakt/doctrine-samples.md`. Ce fichier est reecrit a chaque "
+             "plan et a chaque export ; ne pas l'editer.", ""]
+    if p.last_export is not None:
+        r = p.last_export
+        lines += [f"**Dernier export** : {len(r.copied)} copies, {r.unchanged} inchanges, "
+                  f"{len(r.removed)} retires.", ""]
+    lines += ["## Bilan", "",
+              f"- {len(p.files)} retenus ({p.bytes / 1e6:.0f} Mo)",
+              f"- a ecrire : {count['a ecrire']} ; inchanges : {count['inchange']} ; "
+              f"a retirer : {len(p.removed)}",
+              f"- conflits (fichier pose a la main, jamais ecrase) : {count['conflit']} ; "
+              f"sources absentes : {count['absent']}",
+              f"- fichiers a convertir (format) : {convert}", "",
+              "## Traitements a l'ecriture de chaque fichier (7.J9b)", ""]
+    lines += [f"- {op}" for op in PLANNED_FOR_ALL]
+    groups: dict[str, list[PlanFile]] = defaultdict(list)
+    for f in p.files:
+        groups[f.dest.split("/")[0]].append(f)
+    for top in sorted(groups):
+        files = sorted(groups[top], key=lambda f: f.dest.lower())
+        lines += ["", f"## {top} ({len(files)})", "",
+                  "| Fichier | Source | Format | Conversions | Etat |", "|---|---|---|---|---|"]
+        for f in files:
+            name = f.dest.split("/", 1)[1]
+            lines.append(f"| {_md_cell(name)} | {_md_cell(f.source)} | {f.format or '-'} | "
+                         f"{', '.join(f.ops) or '-'} | {f.state} |")
+    if p.removed:
+        lines += ["", f"## A retirer ({len(p.removed)})", ""]
+        lines += [f"- {_md_cell(rel)}" for rel in p.removed]
+    return "\n".join(lines) + "\n"
+
+
+def write_action_plan(manifest: Manifest, root: Path, dest: Path, index_path: Path,
+                      last_export: ExportReport | None = None,
+                      line_db: float | None = None) -> ActionPlan:
+    """Ecrit PLAN.md a la racine de `dest` (seule ecriture du plan, rejouable)."""
+    p = action_plan(manifest, root, dest, index_path, last_export, line_db)
+    dest.mkdir(parents=True, exist_ok=True)
+    tmp = dest / f".{PLAN_FILE}.tmp"
+    tmp.write_text(render_action_plan(p), encoding="utf-8")
+    tmp.replace(dest / PLAN_FILE)
+    return p
 
 
 def write_varispeed(src: Path, out: Path | BinaryIO, semitones: int) -> None:
@@ -1792,13 +2170,18 @@ def write_varispeed(src: Path, out: Path | BinaryIO, semitones: int) -> None:
 
 
 def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
-         dry_run: bool = False, shifts: dict[str, int] | None = None) -> ExportReport:
+         dry_run: bool = False, shifts: dict[str, int] | None = None,
+         codes: dict[str, str] | None = None, line_db: float | None = None) -> ExportReport:
     """Copie rejouable d'un plan (chemin relatif a dest -> source relative a
     root) : ne recopie que ce qui a change, ne retire que les fichiers de
     l'index, jamais un fichier pose a la main. Partage par l'export de la lib
     (7.J3) et celui des lives (7.L). `shifts` (chemin relatif -> demi-tons) :
-    fichiers ecrits transposes en varispeed au lieu d'etre copies."""
-    shifts = shifts or {}
+    fichiers ecrits transposes en varispeed au lieu d'etre copies. `codes`
+    (chemin relatif -> code) et `line_db` : fichiers rendus sur la ligne
+    (7.J9b, 48 kHz / 16 bits) ; un code hors de `line.FAMILY` est copie."""
+    from .line import FAMILY, LINE_VERSION
+
+    shifts, codes = shifts or {}, codes or {}
     index = load_export_index(index_path)
     report = ExportReport(dest=str(dest), dry_run=dry_run)
     new_index: dict[str, ExportItem] = {}
@@ -1810,12 +2193,17 @@ def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
             report.missing.append(source)
             continue
         shift = shifts.get(rel, 0)
-        item = ExportItem(source=source, size=st.st_size, mtime_ns=st.st_mtime_ns, shift=shift)
+        code = codes.get(rel, "")
+        line = (f"{code} {line_db:.2f} v{LINE_VERSION}"
+                if line_db is not None and code in FAMILY else "")
+        item = ExportItem(source=source, size=st.st_size, mtime_ns=st.st_mtime_ns, shift=shift,
+                          line=line)
         report.files += 1
         report.bytes += st.st_size
         old = index.get(rel)
-        # fichier transpose : sa taille differe de la source, seul l'index fait foi
-        same_size = out.is_file() and (old == item if shift else out.stat().st_size == st.st_size)
+        # fichier transpose ou rendu : sa taille differe de la source, seul l'index fait foi
+        rendered = bool(shift or line)
+        same_size = out.is_file() and (old == item if rendered else out.stat().st_size == st.st_size)
         if out.exists() and old is None and not same_size:
             report.conflicts.append(rel)
             continue
@@ -1829,7 +2217,9 @@ def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
         if not dry_run:
             out.parent.mkdir(parents=True, exist_ok=True)
             tmp = out.with_name(f".{out.name}.tmp")
-            if shift:
+            if line and _render_to(tmp, src, code, line_db or 0.0, shift):
+                pass
+            elif shift:
                 write_varispeed(src, tmp, shift)
             else:
                 shutil.copy2(src, tmp)
@@ -1842,6 +2232,19 @@ def sync(plan: dict[str, str], root: Path, dest: Path, index_path: Path,
         _prune_empty_dirs(dest)
         save_export_index(new_index, index_path)
     return report
+
+
+def _render_to(out: Path, src: Path, code: str, line_db: float, shift: int) -> bool:
+    """Ecrit `src` rendu sur la ligne (7.J9b) ; False si le son est silencieux
+    ou illisible (il est alors copie tel quel par l'appelant)."""
+    from .line import LineError, render, write_pcm16
+
+    try:
+        y, _ = render(src, code, line_db, shift)
+    except (LineError, RuntimeError, sf.LibsndfileError):
+        return False
+    write_pcm16(out, y)
+    return True
 
 
 def _prune_empty_dirs(dest: Path) -> None:

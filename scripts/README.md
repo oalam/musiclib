@@ -14,6 +14,13 @@ Cinq outils :
   (waveform + mel-spectrogram + structure + cues overlay + tonal profile)
 - **`stems.py`** : Phase 6.B, sépare en 4 stems via Demucs
   (drums/bass/other/vocals) pour sampling TidalCycles
+- **`solaris_pense_bete.py`** : pense-bête du live solaris, deux pages A4
+  paysage en couleur (`digitakt/solaris-pense-bete-p1.svg` « le live » : déroulé par
+  banque, chrono, transitions, rappels ; `-p2.svg` « le son » : gammes en
+  grandes cases par section, grille des 16 tracks, fills, samples). Les
+  tableaux sont recopiés à la main de `digitakt/doctrine-dt2-solaris.md`, qui
+  fait foi : `python solaris_pense_bete.py` après chaque changement de la
+  doctrine, puis imprimer à 100 %.
 
 Format library.md : **table markdown unique** (migration de 2026-05-31).
 Voir `../SPEC.md` (source of truth) pour l'état détaillé.
@@ -170,8 +177,8 @@ Le fichier `library/library.md` contient un bloc par morceau :
 - **notes**: bon en sortie d'intro, attention break vers 3:20
 ```
 
-Les champs **`energy`, `mood`, `tags`, `notes`** sont préservés lors des
-ré-exécutions du script. Tout autre champ est régénéré.
+Les champs **`energy`, `mood`, `tags`, `notes`, `ref`** sont préservés lors des
+ré-exécutions du script (`ref` = « x » pour un morceau de référence). Tout autre champ est régénéré.
 
 ## Idempotence
 
@@ -864,11 +871,30 @@ BL basse.
   barre de recherche (clic = ajout / retrait du filtre), facette note (`g#`,
   `ab`) ; API : paramètre `notes`, `GET /api/samples/notes`.
   `--no-measure` saute aussi la note.
-- **Export (7.J3)** : `samples.py --export --dry-run` (bilan), puis
-  `samples.py --export`, ou le bouton « Exporter… » de l'onglet Samples.
-  Copie les retenus tels quels vers
-  `<MEDIA>/Live/samples/<dossier final>/<nom>.wav` (7.J8 :
-  `DRUMS/BD/HARD/BD G# Overd 02 vtl.wav`), à envoyer sur le +Drive
+- **Rangement des sources** : les packs sont sous `<MEDIA>/Samples/packs/`
+  (avec `cuts/` et `recorded/` à la racine). Les chemins sources gardent
+  `packs/`, et les règles le retirent (`samples.logical`). Migration one-shot
+  des chemins du vault : `migrate_packs.py --dry-run`, puis `migrate_packs.py`
+  (rejouable, copie `.bak`).
+- **Plan d'action (7.J9a)** : `samples.py --plan` (ou
+  `POST /api/samples/plan`) écrit seulement `<MEDIA>/Live/samples/00 curated/PLAN.md`.
+  Le plan contient le bilan, les traitements prévus ([[digitakt/doctrine-samples]])
+  et, par dossier numéroté, le format de chaque fichier (lu dans l'en-tête),
+  ses conversions et son état. Aucun WAV n'est touché.
+- **Export (7.J3, 7.J9a)** : `samples.py --export --dry-run` (bilan), puis
+  `samples.py --export` (ou `POST /api/samples/export`). Copie les retenus
+  tels quels vers l'arbre numéroté
+  `<MEDIA>/Live/samples/00 curated/<NN NOM>/[<SOUS>/]<nom>.wav`
+  (`01 KICK/HARD/BD G# Overd 02 vtl.wav`, `20 SAMPLE/<CODE>/` pour les
+  samples maison), puis réécrit `PLAN.md`. **Rendu sur la ligne (7.J9b)** :
+  chaque fichier dont le code a un réglage dans `analyzer/line.FAMILY` est
+  rendu (coupures, mono, gain sur la ligne du kick de référence
+  `paths.LINE_REF_KICK`, plafond -6 dBFS) et écrit en 48 kHz / 16 bits avec
+  dither TPDF, au lieu d'être copié. L'index garde le rendu (`line` : code,
+  ligne, version) : un changement de kick de référence ou de `LINE_VERSION`
+  réécrit tout. Un son silencieux ou illisible est copié tel quel.
+  `--no-line` : export par copie. Même rendu pour l'export des lives. À envoyer sur le +Drive sans
+  `PLAN.md`
   avec Transfer. Rejouable : `library/samples/export.json` liste les fichiers
   écrits par l'export ; un relancement ne recopie que ce qui a changé et ne
   retire que ces fichiers (sortis des retenus ou changés de case). Un fichier
@@ -1188,7 +1214,10 @@ python api.py &   puis   cd ../web && npm run dev
 
 **Ce que fait le front** :
 - **Library** : 386 tracks, filtre texte (artiste, titre, genre, key, mood),
-  tri BPM / key / energy, filtres « a des stems » / « a une bank ».
+  tri date / A→Z / BPM (bouton, second clic = sens inverse, sans BPM en fin)
+  / key / energy, filtres « a des stems » / « a une bank » /
+  « réf » ; étoile par ligne = bookmark « morceau de référence » (colonne
+  `ref` de library.md, écrite par l'API).
 - **Lecteur** : forme d'onde, **clic = position de lecture**, bande des
   sections de structure sous l'onde (mêmes couleurs que `visualize.py`, clic =
   début de section), boutons de cues. Espace = lecture / pause, flèches = ±10 s.
@@ -1300,6 +1329,7 @@ dans library.md) :
 | GET | `/api/tracks` | liste (`TrackSummary`) |
 | GET | `/api/tracks/{slug}` | détail + segments + cues + `harmony` / `keyboard_setup` (7.H) |
 | GET | `/api/tracks/{slug}/audio` | fichier audio (requêtes Range pour le seek) |
+| PUT | `/api/tracks/{slug}/ref` | `{ref: bool}` → `TrackSummary` ; pose ou retire le bookmark (colonne `ref`, 404 si slug inconnu) |
 | GET | `/api/tracks/{slug}/bank` | `DigitaktBank` (404 si absente) |
 | POST | `/api/tracks/{slug}/bank` | génère la bank |
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
@@ -1537,3 +1567,50 @@ Rekordbox lisible par Mixxx), voir Phase 3 dans `quality-analyzer.md`
 - **`duplicates` ne fait pas de fuzzy match d'audio** : juste sur le
   texte normalisé. Deux mêmes morceaux nommés différemment ne seront
   pas détectés.
+
+---
+
+# premaster.py — import de packs sur la ligne inclinée (7.J9b)
+
+Met des one-shots de pack au format du pack perso
+(`/Users/tom/Documents/samples/solaris`), d'après
+[[../digitakt/doctrine-samples]] (« Niveaux ») : 48 kHz / 24 bits, coupure
+sous 20 Hz, passe-haut de la famille (24 dB/oct, phase minimale), mono sous
+120 Hz (BD, RM, BS, BL en mono intégral), gain qui pose le haut du spectre incliné (+4,5 dB/oct, maxima
+maintenus, lissage 1/6 d'octave) sur la ligne du kick de référence, crête au
+plus à -6 dBFS pour tous les sons (gardé le 2026-11-13, même si un clap
+posé à la main monte à -4,8). Pas de normalisation, pas de rognage. Le début, la fin et les
+creux se font à l'oreille dans Live.
+
+```bash
+# valeur de la ligne du kick de référence (échelle interne)
+.venv/bin/python premaster.py ref "/Users/tom/Documents/samples/solaris/01 KICK/BD 145 A# longtail 1 slr.wav"
+
+# import d'un dossier de pack (sous-dossiers Kick, Clap, Hat... -> codes), vers une zone de tri
+.venv/bin/python premaster.py import "/Library/Audio/Presets/Xfer Records/Serum 2 Presets/Samples/Factory Non-Tonal/Drum" \
+    "/Users/tom/Documents/samples/solaris/_import/serum" --ref "<kick de référence>" [--pack sr2] [--dry-run]
+
+# sons déjà dans le pack, en place, avec les réglages d'un code (ici passage BL -> ML)
+.venv/bin/python premaster.py apply /Users/tom/Documents/samples/solaris --ref "<kick de référence>" \
+    --code ML "/Users/tom/Documents/samples/solaris/14 BASS LOOP/BL 145 Deep 1 slr.wav"
+```
+
+`apply` déplace l'original dans `<ROOT>/_backup/<date>/<chemin>` et repart de
+lui aux passages suivants (rejouable sans double filtrage) ; la sortie va dans
+le dossier du code, préfixe renommé (`14 BASS LOOP/BL …` -> `18 MELO LOOP/ML …`).
+Boucles (BR, DL, PL, BL, ML) : mono sous 150 Hz, stéréo gardée au-dessus.
+
+- Sortie : `<DEST>/NN NOM/<CODE> <desc> <pack>.wav` (noms de 18 caractères,
+  machines gardées : `SD 808 C 01 sr2`) et `<DEST>/_import.tsv` (source,
+  cible, gain, crête, plafond atteint). Rejouable : réécrit à l'identique.
+- Hub des réglages par code (passe-haut, mono, décalage autour de la ligne) :
+  `FAMILY` dans `analyzer/line.py`. Les décalages sont à 0 tant qu'ils ne
+  sont pas fixés à l'oreille.
+- Correspondance des dossiers : `FOLDER_CODES` dans `premaster.py` (Serum 2 :
+  Perc, Conga, Cowbell, Rim, Shaker -> PC ; `open` dans un nom de Hat -> OH).
+- **Étalonnage** : `BAND_WEIGHT` (0,75) dans `analyzer/line.py`, ajusté le
+  2026-11-13 sur les sons posés sur la ligne à la main dans Live + Pro-Q 4
+  (`CP 909 1`, `HH 909 2/3/4 slr PRE MASTER`) : écarts de -0,5 à +1,7 dB.
+  Import Serum : crête médiane BD -6,0, CP -10,1, SD -8,9, HH -15,9,
+  CY -20,4 dBFS.
+- Tests : `pytest tests/test_line.py tests/test_premaster.py`.

@@ -67,6 +67,7 @@ from analyzer.samples import (
     NAME_MAX,
     PITCH_CLASSES,
     STARS_MAX,
+    ActionPlan,
     ExportReport,
     KitInfo,
     LooseSample,
@@ -105,17 +106,19 @@ from analyzer.samples import (
 from analyzer import lives as lv
 from analyzer import sounddesign as sd
 from analyzer.samples import move as move_sample
-from analyzer.samples import write_varispeed
+from analyzer.line import LineError, ref_line
+from analyzer.samples import write_action_plan, write_varispeed
 from analyzer.samples import restore as restore_sample
 from analyzer.samples import trash as trash_sample
 from analyzer.types import CuePoint, DigitaktBank, Segment
 from jobs import GrabRequest, Job, JobContext, JobStore, Runner, StepFailed
-from library_md import parse_library
+from library_md import parse_library, update_field
 from paths import (
     DIGITAKT_DIR,
     DT2_LIVES_DIR,
     DT2_SAMPLES_DIR,
     LIBRARY_FILE,
+    LINE_REF_KICK,
     LIVES_META_DIR,
     QUALITY_DIR,
     SAMPLES_SRC_DIR,
@@ -149,6 +152,7 @@ class TrackSummary(BaseModel):
     groove_cluster: str = ""
     added: str = ""  # date d'ajout ISO (tri par date du front)
     tags: str = ""  # tags manuels de library.md, separes par des virgules
+    ref: bool = False  # morceau de reference (colonne `ref` de library.md non vide)
     has_audio: bool = False
     has_stems: bool = False
     has_bank: bool = False
@@ -173,6 +177,7 @@ def _summary(slug: str, entry: dict[str, str]) -> TrackSummary:
     data: dict[str, Any] = {k: _clean(entry.get(k, "")) for k in _SUMMARY_FIELDS}
     return TrackSummary(
         slug=slug,
+        ref=bool(_clean(entry.get("ref", ""))),
         has_audio=_resolve_audio_path(entry) is not None,
         has_stems=(STEMS_DIR / slug / "drums.wav").exists(),
         has_bank=(DIGITAKT_DIR / f"{slug}.json").exists(),
@@ -186,6 +191,10 @@ def _bar_times(beats: dict[str, Any]) -> list[float]:
     if float(beats.get("time_signature_confidence") or 0) < 0.5:
         bpb = 4
     return [round(float(t), 3) for t in (beats.get("beat_times_s") or [])[::bpb]]
+
+
+class RefRequest(BaseModel):
+    ref: bool
 
 
 class SearchRequest(BaseModel):
@@ -506,7 +515,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
                lives_meta: Path = LIVES_META_DIR,
                lives_export: Path = DT2_LIVES_DIR,
                sounddesign_presets: Path = SOUNDDESIGN_PRESETS_DIR,
-               sounddesign_out: Path = SOUNDDESIGN_OUT_DIR) -> FastAPI:
+               sounddesign_out: Path = SOUNDDESIGN_OUT_DIR,
+               line_ref: Path | None | Literal[True] = True) -> FastAPI:
     app = FastAPI(title="music library", version="0.9.0")
     jobs = JobStore(runner)
     dt2 = sender or dt2_midi.Dt2Sender()
@@ -514,6 +524,16 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
     player = acid_player or acid_midi.AcidPlayer()
     app.router.on_shutdown.append(player.shutdown)
     app.router.on_shutdown.append(jobs.shutdown)
+
+    def current_line() -> float | None:
+        """Ligne du kick de reference (7.J9b) ; None : export par copie."""
+        ref = LINE_REF_KICK if line_ref is True else line_ref   # True : paths.py, lu a l'appel
+        if ref is None:
+            return None
+        try:
+            return ref_line(ref)
+        except LineError as exc:
+            raise HTTPException(422, str(exc)) from exc
 
     samples_lock = threading.Lock()
     rebuild = RebuildStatus()
@@ -583,6 +603,13 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             harmony=harmony,
             keyboard_setup=keyboard_setup(harmony.scale) if harmony else None,
         )
+
+    @app.put("/api/tracks/{slug}/ref", response_model=TrackSummary)
+    def set_track_ref(slug: str, req: RefRequest) -> TrackSummary:
+        """Pose ou retire le bookmark « morceau de reference » (colonne `ref`)."""
+        if not update_field(library_file, slug, "ref", "x" if req.ref else ""):
+            raise HTTPException(404, f"slug inconnu : {slug}")
+        return _summary(slug, entry_or_404(slug))
 
     @app.get("/api/tracks/{slug}/audio")
     def track_audio(slug: str) -> FileResponse:
@@ -960,7 +987,19 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             refuse_if_rebuilding()
             try:
                 return export(manifest(), samples_src, samples_export, samples_export_index,
-                              dry_run=req.dry_run)
+                              dry_run=req.dry_run, line_db=current_line())
+            except SampleError as exc:
+                raise HTTPException(422, str(exc)) from exc
+
+    @app.post("/api/samples/plan", response_model=ActionPlan)
+    def sample_plan() -> ActionPlan:
+        """Ecrit PLAN.md a la racine de l'export (7.J9) ; aucun WAV touche."""
+        media_or_503()
+        with samples_lock:
+            refuse_if_rebuilding()
+            try:
+                return write_action_plan(manifest(), samples_src, samples_export,
+                                         samples_export_index, line_db=current_line())
             except SampleError as exc:
                 raise HTTPException(422, str(exc)) from exc
 
@@ -1135,7 +1174,8 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             live = live_or_error(name)
             rumbles = rumble_live(live, req.dry_run)
             try:
-                rep = lv.export_live(live, samples_src, lives_export, lives_meta, dry_run=req.dry_run)
+                rep = lv.export_live(live, samples_src, lives_export, lives_meta,
+                                     dry_run=req.dry_run, line_db=current_line())
             except lv.LiveError as exc:
                 raise HTTPException(422, str(exc)) from exc
         return LiveExportReport(**rep.model_dump(), rumbles=rumbles)

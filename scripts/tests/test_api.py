@@ -25,6 +25,13 @@ count: 1
 """
 
 
+@pytest.fixture(autouse=True)
+def _export_by_copy(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Les faux WAV des tests ne se decodent pas : export par copie, sans
+    rendu sur la ligne (7.J9b, couvert dans test_samples)."""
+    monkeypatch.setattr(api, "LINE_REF_KICK", None)
+
+
 @pytest.fixture
 def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> TestClient:
     lib = tmp_path / "library.md"
@@ -55,6 +62,21 @@ def test_list_tracks(client: TestClient):
     assert t["slug"] == SLUG and t["artist"] == "Artist"  # guillemets retires
     assert t["has_audio"] is True and t["has_bank"] is False
     assert t["added"] == "2026-10-09" and t["tags"] == "lo-fi, tribe"  # tri / filtre du front
+
+
+def test_track_ref_toggle(client: TestClient, tmp_path: Path):
+    assert client.get("/api/tracks").json()[0]["ref"] is False
+    r = client.put(f"/api/tracks/{SLUG}/ref", json={"ref": True})
+    assert r.status_code == 200 and r.json()["ref"] is True
+    assert client.get("/api/tracks").json()[0]["ref"] is True
+    lib = (tmp_path / "library.md").read_text(encoding="utf-8")
+    assert any(line.startswith("| artist") and line.rstrip().endswith("| ref |") for line in lib.splitlines())
+    assert any("| Title |" in line and line.rstrip().endswith("| x |") for line in lib.splitlines())
+    # tags et autres champs preserves par la reecriture
+    assert client.get("/api/tracks").json()[0]["tags"] == "lo-fi, tribe"
+    r = client.put(f"/api/tracks/{SLUG}/ref", json={"ref": False})
+    assert r.json()["ref"] is False
+    assert client.put("/api/tracks/nope/ref", json={"ref": True}).status_code == 404
 
 
 def test_track_detail(client: TestClient):
@@ -465,9 +487,12 @@ def test_samples_export(tmp_path: Path):
                                        samples_export=dest,
                                        samples_export_index=tmp_path / "export.json"))
     dry = client.post("/api/samples/export", json={}).json()
-    assert dry["dry_run"] and dry["copied"] == ["FX/FX 1 p.wav"] and not dest.exists()
+    assert dry["dry_run"] and dry["copied"] == ["19 FX/FX 1 p.wav"] and not dest.exists()
+    plan = client.post("/api/samples/plan").json()
+    assert plan["files"][0]["state"] == "a ecrire" and plan["files"][0]["format"] is None
+    assert [p.name for p in dest.iterdir()] == ["PLAN.md"]
     r = client.post("/api/samples/export", json={"dry_run": False}).json()
-    assert r["files"] == 1 and (dest / "FX/FX 1 p.wav").exists()
+    assert r["files"] == 1 and (dest / "19 FX/FX 1 p.wav").exists()
 
 
 def test_sample_folder_add(samples_client: TestClient, tmp_path: Path):

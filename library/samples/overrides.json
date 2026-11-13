@@ -1,252 +1,6712 @@
 {
- "909/": {
+ "packs/909/": {
   "tags": [
    "techno"
   ]
  },
- "Drumbrute kick/KIK DB 160 (1).wav": {
+ "packs/909/BPB Cassette 909/cassette 1/bd01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/bd02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/bd03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/cp01.wav": {
   "trash": true
  },
- "Drumbrute kick/KIK DB 160 (17).wav": {
+ "packs/909/BPB Cassette 909/cassette 1/cp02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/hh01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/ht01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/oh01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 1/rs01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/bd01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/bd02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/bd03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/cp01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/hh01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/ht01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/oh01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/cassette 2/rs01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/bd01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/bd02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/bd03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/cp01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/hh01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/ht01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/oh01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BPB Cassette 909/clean/rs01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Cymbal Loops/BVKER - 909 Kit - Cym Loop 01 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Cymbal Loops/BVKER - 909 Kit - Cym Loop 02 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Full Drum Loops/BVKER - 909 Kit - Full Drum Loop 01 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Full Drum Loops/BVKER - 909 Kit - Full Drum Loop 02 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Kick Loops/BVKER - 909 Kit - Kick Loop 01 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Percussion Loops/BVKER - 909 Kit - Perc Loop 01 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Loops/Top Drum Loops/BVKER - 909 Kit - Top Loop 01 - 120 BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Claps/BVKER - 909 Kit - Clap 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Cymbals/Crashes/BVKER - 909 Kit - Crash 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Cymbals/Hats Closed/BVKER - 909 Kit - Closed Hat 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Cymbals/Hats Open/BVKER - 909 Kit - Open Hat 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Cymbals/Rides/BVKER - 909 Kit - Ride 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Kicks/BVKER - 909 Kit - Kick 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Kicks/BVKER - 909 Kit - Kick 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Rim Shots/BVKER - 909 Kit - Rim Shot 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Rim Shots/BVKER - 909 Kit - Rim Shot 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Snares/BVKER - 909 Kit - Snare 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/909/BVKER - 909 Kit/Drum Shots/Toms/BVKER - 909 Kit - Tom 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Drumbrute kick/KIK DB 160 (1).wav": {
+  "trash": true
+ },
+ "packs/Drumbrute kick/KIK DB 160 (10).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Drumbrute kick/KIK DB 160 (16).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Drumbrute kick/KIK DB 160 (17).wav": {
   "family": "UNIVERSEL",
   "code": "BD"
  },
- "Drumbrute kick/KIK DB 160 (4).wav": {
+ "packs/Drumbrute kick/KIK DB 160 (4).wav": {
   "family": "UNIVERSEL",
   "code": "BD"
  },
- "Drumbrute kick/KIK DB 160 (5).wav": {
+ "packs/Drumbrute kick/KIK DB 160 (5).wav": {
   "family": "UNIVERSEL",
   "code": "BD"
  },
- "Drumbrute kick/KIK DB 160 (6).wav": {
+ "packs/Drumbrute kick/KIK DB 160 (6).wav": {
   "family": "UNIVERSEL",
   "code": "BD"
  },
- "Drumbrute kick/KIK DB 160 (7).wav": {
+ "packs/Drumbrute kick/KIK DB 160 (7).wav": {
   "family": "UNIVERSEL",
   "code": "BD"
  },
- "Drumbrute kick/KIK DB 160 (8).wav": {
+ "packs/Drumbrute kick/KIK DB 160 (8).wav": {
   "family": "UNIVERSEL",
   "code": "BD"
  },
- "Hardcore free samples/": {
+ "packs/Grey Forge/Drums/Clap/Clap Anarcha 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Clap/Clap Euphoria.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Cymbal/Crash Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Cymbal/Crash Voltisken.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Cymbal/Ride Mantle.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/HiHat/ClosedHH Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/HiHat/OpenHH Analoground 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Kick/Kick Analoground 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Conga Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Conga Collectors.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Cowbell Undertone.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Cowbell Xarelto.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Glass Kosmokrator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Perc Ircam DS 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Tambourine Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Wooden Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Percussion/Wooden Kosmokrator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Shaker/Shaker Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Snare/Rimshot Aphasia DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Snare/Rimshot Boka DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Snare/Snare Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Drums/Tom/Tom Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Analoground/Bass[120] Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Analoground/Full[120] C Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Analoground/HiHats[120] Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Analoground/Synth[120] Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Anarcha/Clap[133] Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Anarcha/Perc[133] Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Anarcha/Ride[133] Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Anarcha/Shaker[133] Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Anarcha/Synth[133] Cm Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Aphasia/Bass[125] Bm Aphasia.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Aphasia/Full[125] Bm Aphasia.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Aphasia/HiHats[125] Aphasia.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Aphasia/Perc[125] Aphasia.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Aphasia/SFX[125] Aphasia.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Athenian/Chord[123] C# Athenian.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Athenian/Clap[125] Athenian.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Athenian/HiHats[125] Athenian.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Athenian/Perc[125] Athenian.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Black Mantle/Bass[125] Em BlackMantle.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Black Mantle/Combo[125] Em BlackMantle.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Black Mantle/HiHats[125] BlackMantle.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Black Mantle/Stab[125] BlackMantle.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Blackened Sea/Combo[123] Cm BlackenedSea.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Blackened Sea/HiHats[123] BlackenedSea 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Blackened Sea/Synth[123] Cm Blackened.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Boka/Atmos[123] Boka.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Boka/Full[123] C#m Boka.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Boka/HiHats[123] Boka 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Circuit/Clap[126] Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Circuit/HiHats[126] Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Circuit/SFX[126] Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Circuit/Synth[126] F# Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Colossus/Full[126] Dm Colossus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Colossus/HiHats[126] Colossus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Colossus/Perc[126] Colossus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Colossus/Shaker[126] Colossus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Colossus/Synth[126] Dm Colossus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Droga/Chord[128] F# Droga.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Droga/Clap[128] Droga.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Droga/HiHats[128] Droga.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Euphoria/Clap[128] Euphoria.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Euphoria/HiHats[128] Euphoria.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Euphoria/Perc[128] Euphoria.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Extroplanet/Full[123] A Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Extroplanet/HiHats[123] Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Extroplanet/Perc[123] Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Extroplanet/SFX[123] Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Extroplanet/Synth[123] A Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Faint/Chord[123] G Faint.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Faint/Full[123] G Faint.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Faint/Shaker[123] Faint.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Flatiron/Combo[123] F#m Flatiron.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Flatiron/Synth[123] F# Flatiron.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Grayscale/Atmos[121] Grayscale.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Grayscale/Bass[121] D#m Grayscale.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Grayscale/Clap[121] Grayscale.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Grayscale/HiHats[121] Grayscale.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Grayscale/Perc[121] Grayscale.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Grayscale/Shaker[121] Grayscale.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ircam/Clap[126] Ircam.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ircam/HiHats[126] Ircam.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ircam/Perc[126] Ircam.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ircam/Shaker[126] Ircam.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Jaguar/Combo[128] Jaguar.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Jaguar/HiHats[128] Jaguar.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Jaguar/Perc[128] Jaguar.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Jaguar/Synth[128] A#m Jaguar.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kabethon/Chord[125] C Kabethon.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kabethon/Full[125] C Kabethon.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kabethon/Perc[125] Kabethon.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kabethon/Ride[125] Kabethon.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kabethon/Shaker[125] Kabethon.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kosmokrator/Combo[130] Gm Kosmokrator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kosmokrator/HiHats[130] Kosmokrator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kosmokrator/Perc[130] Kosmokrator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Kosmokrator/Shaker[130] Kosmokrator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Lava/Drums[125] Lava 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Lava/HiHats[125] Lava.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Lava/Perc[125] Lava.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Len Fathi/Atmos[125] Fathi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Len Fathi/Full[125] Am Fathi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Len Fathi/HiHats[125] Fathi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Len Fathi/Perc[125] Fathi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Lurker/Blip[125] G#m Lurker.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Lurker/HiHats[125] Lurker.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Lurker/Shaker[125] Lurker.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Mescaline/Click[125] Mescaline.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Mescaline/HiHats[125] Mescaline.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Mescaline/Perc[125] Mescaline.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Mescaline/Shaker[125] Mescaline.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Murdah/Drums[125] Murdah 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Murdah/HiHats[125] Murdah.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Murdah/SFX[125] Murdah.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Murdah/Shaker[125] Murdah.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Niavent/Drums[125] Niavent 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Niavent/HiHats[125] Niavent.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Niavent/Perc[125] Niavent.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Niavent/SFX[125] Niavent.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Niavent/Shaker[125] Niavent.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ominous/Atmos[125] D Ominous.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ominous/Drums[125] Ominous.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Ominous/HiHats[125] Ominous.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Opposer/Bass[125] E Opposer.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Opposer/Clap[125] Opposer.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Opposer/SFX[125] Opposer.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Panas/Drums[125] Panas 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Panas/HiHats[125] Panas.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Panas/Pad[125] Em Panas.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Panas/Sub[125] Panas.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Perky/Conga[125] Perky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Perky/Drums[125] Perky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Perky/SFX[125] Perky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Quantum/Blip[128] Quantum.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Quantum/HiHats[128] Quantum.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Quantum/Shaker[128] Quantum.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Samsara/HiHats[125] Samsara 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Solidfire/HiHats[127] Solidfire.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Solidfire/SFX[127] Solidfire.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Spasm/HiHats[128] Spasm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Star Sky/HiHats[128] StarSky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Star Sky/Perc[128] StarSky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Star Sky/SFX[128] StarSky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Star Sky/Shaker[128] StarSky.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Tamsik/Shaker[126] Tamsik.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/The Collectors/Perc[127] Collectors.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/The Collectors/Shaker[127] Collectors.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/The Fog/Atmos[125] TheFog.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/The Fog/Tamb[125] TheFog.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Tijuana/SFX[125] Tijuana.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Tribalism/Perc[125] Tribalism.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Tribalism/SFX[125] Tribalism.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Tribalism/Shaker[125] Tribalism.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Undertone/Perc[125] Undertone.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Voltisken/Perc[125] Voltisken.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Voltisken/SFX[125] Voltisken.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Xarelto/Perc[128] Xarelto.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/Loops/Construction/Xarelto/Shaker[128] Xarelto.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Acoustic Note/Guitar Flatiron 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Acoustic Note/Guitar Flatiron 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Acoustic Note/Pluck Arab 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Ambience/Ambience Ominous.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Ambience/Atmos Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Ambience/Atmos Flatiron DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Blip & Blop/Blip Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Buzz/Buzz Fathi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Chord/Chord A Athenian MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Chord/Chord A Panas MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Chord/Chord A The Collectors MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Chord/Chord A# Ircam DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Click/Click Mescaline DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Click/Tick Kabethon DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Distortion/Distro Aphasia DS 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Distortion/Distro Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Distortion/Distro Lava.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Drill/Drill Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Glitch/Glitch Fog.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Glitch/Glitch Kabethon DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Impact/Impact Aphasia DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Noise/Noise Analoground.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/SFX/Alarm Colossus DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Stab & Hit/Hit Collectors.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Stab & Hit/Hit Tamsik.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Stab & Hit/Stab Anarcha.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass Analoground 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass Analoground 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass C Grayscale DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass C Murdah MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass Circuit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass Extroplanet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Bass Undertone.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Guitar Euphoria.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Lead C Extroplanet MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Lead Samsara.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Pad C Grayscale MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Pad C Niavent MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Sub Aphasia DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Synth Note/Sub Athenian DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Vocal/Vocal Droga.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Grey Forge/One Shots/Zap/Lazer Colossus DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/": {
   "tags": [
    "hardcore"
   ]
  },
- "Jungle 89  to 99/": {
+ "packs/Hardcore free samples/Cut Vocals Party (Remastered Version)/LS-CVP Dance-dry 028 (16 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Cut Vocals Party (Remastered Version)/LS-CVP Dance-wet 055 (8 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Cut Vocals Party (Remastered Version)/LS-CVP Dance-wet 065 (8 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Cut Vocals Party (Remastered Version)/LS-CVP Dance-wet 126 (8 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Cut Vocals Party (Remastered Version)/LS-CVP Dance-wet 127 (8 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Kicks Invasion/LS-HKI Bonus Distorted Kick 05 E.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Kicks Invasion/LS-HKI Bonus Filtered Kick 20 H.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Bounce Kick 35 E.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Dark Pad 07-3 (142 bpm).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Fx Sound 075.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Hardcore Loop 144 BPM 02-3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Open Hi-hat 22.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Ride 03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Snare 06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Techno Synth 39.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Samples Invasion/LS-HSI Techno Synth 61.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardcore Voices Invasion/LS-HVI Phrases Loops - fuckin commerce 1-1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Fx/LS-HFX Bassdrum Shot 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Fx/LS-HFX Dusky Noise 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Fx/LS-HFX Reverse 17.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Fx/LS-HFX Voice 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Fx/LS-HFX Wet Crash 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Kicks/LS-HK Bounce Kick 21 F#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Kicks/LS-HK Distorted Kick 51.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Hardcore free samples/Hardstyle Kicks/LS-HK Distorted Kick 81.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/": {
   "tags": [
    "jungle"
   ]
  },
- "KORGER1Samples/BD-ER1-908-uhhhhhhh.wav": {
+ "packs/Jungle 89  to 99/Bass/19 Bass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/Arabian Sub.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/Beta Bass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/Champion Sub.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/Difference Bass Hi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/Dubplate Bass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/Hurt U So Bass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Bass/What Ya Gonna Sub.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Adrift Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Alzir Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Angles Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Angles Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Angles Break - 6.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Angles Break - 7.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Angles Break - 8.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Angles Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Apollo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Arson Fill.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Atlantis Amen.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Back Break 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Back Break 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Back Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bad Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Beep Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Beta Break - 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Beta Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Beta Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Blaze Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Blaze Break 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Blaze Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Blue Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bonanza Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Boo Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Boo Worm Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bouncer Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 2 - 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 5 - 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 5 - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Box Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Breeze Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bringing Me Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bronx Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Brut Force Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Brut Force Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Brut Force Break - 6.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Brut Force Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Brut Force Fuller Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bulldozer Amen 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Bulldozer Amen.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Calling Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Calling Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Calling Reverse Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Camo Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Camo Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Careless Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Centuries Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Champion Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Change Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Check Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Chopper Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Connected Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Connected Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Connected Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Control Amen 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Control Amen.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Control Break 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Control Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Control Kick Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cool Amen.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cool Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cosmik Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cosmik Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cosmik Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cumulus Break - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Cumulus Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Drumz Amen Compound - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Effect Break 2 - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Breaks/Ten Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Aura Boom.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Aura Rise.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Bad Stats.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Enchanted Water.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Metropolis Reverse.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Oh Hit.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/FX/Renegade Snares Perc.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/19 Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/31 Secs Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Apollo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Aura Arp Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Back Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Bang Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Boo Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Bringing Me Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Bulldozer Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Careless Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Connected Modu Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Connected Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Drumz BassPad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Emotion Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Enchanted Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Feenin Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Fluid Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/God Chord Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Greetings Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Groove Therapy Lo Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Groove Therapy Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Hoovers Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Moomin Loop Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Pads/Northern Breakdown Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/19 Synth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/40 Miles Glock.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/40 Miles Piano.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Alzir Chord.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Arabian Drone.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Breeze Chord.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Change Chord.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Chase Chord.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Dreams Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/God Chord Vox Pads.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Little Roller Sharp Pad.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Moves Rise .wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Right Bass Mentasm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Riffs, Arps & Hits/Session Shout.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Vocals/All The People Vox.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Jungle 89  to 99/Vocals/Control Vocal - 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/BD-ER1-808ish1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/BD-ER1-808ish2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/BD-ER1-808ish3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/BD-ER1-908-uhhhhhhh.wav": {
   "trash": true
  },
- "Low Entropy /": {
+ "packs/KORGER1Samples/BD-ER1-909iooo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/BD-ER1-90sTrance2longdecay.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/BD-ER1-GoaKickLongDecay.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/CLPZ-ER1-ClapClick.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/CYM-ER1-CrashCymbal1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/FX-ER1-Robobreak.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/FX-ER1-Shakerz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/HH-ER-ActionHat.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/LP-ER1-Loopoz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/KORGER1Samples/SD-ER-BagOgrind.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Drum Loops/102 BPM Drum Loop 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Drum Loops/120 BPM Drum Loop 2A.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Drum Loops/75 BPM Drum Loop 1A.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Drum Loops/75 BPM Drum Loop 1B.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Drum Loops/95 BPM Perc Loop 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Guitar Loops/110 BPM Soft Rock 1B.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Guitar Loops/110 BPM Soft Rock 1C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Guitar Loops/110 BPM Soft Rock 2A.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Guitar Loops/110 BPM Soft Rock 2B.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Sax Party/LS-CSP Dance Sax Loop 128 BPM 15-1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Sax Party/LS-CSP Keys Loop 128 BPM 12.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Sax Party/One Shots/LS-CSP One Shot 003.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Sax Party/One Shots/LS-CSP One Shot 088.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Sax Party/One Shots/LS-CSP One Shot 176.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Vocals Party 2021/LS-CVP Dance 028 (16 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Vocals Party 2021/LS-CVP Dance Wet 055 (8 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Vocals Party 2021/LS-CVP Dance Wet 065 (8 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Cut Vocals Party 2021/LS-CVP Deep Male Wet 16 (4 beats).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Guitar House Mafia/1A.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Guitar House Mafia/3C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Guitar House Mafia/Dry/16A#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Guitar House Mafia/Dry/16C#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Guitar House Mafia/Dry/16C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 1/Fat Bassline 11 D.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 1/Fat Bassline 24 A#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 1/Fundamental Bassline 11 D.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 1/Fundamental Bassline 24 A#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 2/Deep Bassline 11 F#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 2/Fundamental Bassline 2 11 F#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 2/Fundamental Bassline 2 18 D.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/House & Garage Basslines/Basslines 2/Fundamental Bassline 2 36 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/Nino Anthony Electro Tools/NA Full Loop 20.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/SeqTech Loops/Experimental Seq 19.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/SeqTech Loops/Experimental Seq 40.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/SeqTech Loops/Industrial Seq 12.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Loops Pack/Sample Packs/SeqTech Loops/Metal Pattern 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Low Entropy /": {
   "tags": [
    "hardcore"
   ]
  },
- "Music Radar/Percussion/Cajon/Cajon_Fill27.wav": {
+ "packs/Low Entropy /Low Entropy - 47 Hardcore Techno and Gabber drums that were played in club and squat parties (Sample Pack 4) - 01 topdogs.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Low Entropy /Low Entropy - 47 Hardcore Techno and Gabber drums that were played in club and squat parties (Sample Pack 4) - 03 androdrums.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Low Entropy /Low Entropy - 47 Hardcore Techno and Gabber drums that were played in club and squat parties (Sample Pack 4) - 07 dark world.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Low Entropy /Low Entropy - 47 Hardcore Techno and Gabber drums that were played in club and squat parties (Sample Pack 4) - 30 overdog.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Low Entropy /Low Entropy - 47 Hardcore Techno and Gabber drums that were played in club and squat parties (Sample Pack 4) - 35 rise above it.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Low Entropy /Low Entropy - 47 Hardcore Techno and Gabber drums that were played in club and squat parties (Sample Pack 4) - 38 tenth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/bass kork.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/bass rko.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/bass tritch.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog charger.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog crash.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog driver 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog driver.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog grave.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog loud.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog sunshine - 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog sunshine 2 - 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog sunshine 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/eprom analog sunshine.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/bass/long bass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/nappe/eprom nappe.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/nappe/nappe hear too.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/sfx/atmo sfx.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/sfx/eprom sfx - 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/sfx/eprom sfx 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Minibrute resample/sfx/eprom sfx.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Movie tracks/Dune/dune_sardaukar_chant_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Movie tracks/Matrix/matrix_smith_speech_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Movie tracks/Matrix/matrix_smith_speech_04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Movie tracks/Matrix/matrix_smith_speech_05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_BeanMaraca_110-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_BellStrings_110-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_HandDrum[A]_110-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_HandDrum[A]_110-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_HandDrum[A]_110-03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_StringDrum_110-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/110bpm/WP_StringDrum_110-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_BeanGourd_120-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_BeanMaraca_120-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_BellStrings_120-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_HandDrum[A]_120-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_HandDrum[A]_120-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_HandDrum[A]_120-03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_StringDrum_120-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/120bpm/WP_StringDrum_120-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_BeanGourd_130-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_BeanMaraca_130-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_BellStrings_130-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_HandDrum[A]_130-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_HandDrum[A]_130-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_HandDrum[A]_130-03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_StringDrum_130-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/130bpm/WP_StringDrum_130-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_BeanGourd_140-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_BeanMaraca_140-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_BellStrings_140-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_HandDrum[A]_140-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_HandDrum[A]_140-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_HandDrum[A]_140-03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_StringDrum_140-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/140bpm/WP_StringDrum_140-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/95bpm/WP_BeanMaraca_95-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/95bpm/WP_BellStrings_95-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/95bpm/WP_HandDrum[A]_95-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/95bpm/WP_HandDrum[A]_95-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/95bpm/WP_HandDrum[A]_95-03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Cyclick/95bpm/WP_StringDrum_95-01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Bodhran/Bodhran_01(100BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Bodhran/Bodhran_02(100BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Bodhran/Bodhran_03(100BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Cajon/Cajon_Fill01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Cajon/Cajon_Fill02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Cajon/Cajon_Fill03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Cajon/Cajon_Fill04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Cajon/Cajon_Fill07.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Cajon/Cajon_Fill27.wav": {
   "family": "AUTRES",
   "code": "PL"
  },
- "Music Radar/Percussion/Djembe/Djembe_loop04(100BPM).wav": {
+ "packs/Music Radar/Percussion/Conga/Conga_Loop01(140BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Conga/Conga_Loop02(140BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Conga/Conga_Loop03(140BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Conga/Fill_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Conga/Fill_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Djembe/Djembe_Fill01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Djembe/Djembe_Fill03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Djembe/Djembe_Fill04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Djembe/Djembe_Fill05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Djembe/Djembe_loop04(100BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ],
   "stars": 2
  },
- "SoundDesign/rumble/RM 150 B Kick ni 7d19ff.wav": {
-  "code": "RM",
-  "name": "RM 150 B Kick ni",
-  "trash": true,
-  "sub": ""
- },
- "SoundDesign/rumble/RM 160 D Tranc er1 f46545.wav": {
-  "code": "RM",
-  "name": "RM 160 D Tranc er1",
-  "sub": ""
- },
- "SoundDesign/rumble/RM A Attac 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM A Attac 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/AttacKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM A Shinra 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM A Shinra 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM B Matte 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM B Matte 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/MatteKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM Box 03 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM Box 03 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_03.wav"
- },
- "SoundDesign/rumble/RM Bubble 03 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM Bubble 03 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/BubbleKick_SP_03.wav"
- },
- "SoundDesign/rumble/RM C# Kicks 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM C# Kicks 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/90sKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM D Indust 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM D Indust 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/IndustrialKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM D Trance 90 er1 890944.wav": {
-  "code": "RM",
-  "sub": "CLEAN"
- },
- "SoundDesign/rumble/RM D# Dive 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM D# Dive 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/DiveKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM F Box 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM F Box 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM F# Apart 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM F# Apart 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM F# Dive 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM F# Dive 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/DiveKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM F# Kicks 02 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM F# Kicks 02 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/KickKick_SP_02.wav"
- },
- "SoundDesign/rumble/RM F# Shinr 03 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM F# Shinr 03 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_03.wav"
- },
- "SoundDesign/rumble/RM G# Air 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM G# Air 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/AirKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM G# Apart 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM G# Apart 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/BreakApartKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM G# Box 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM G# Box 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/BoxKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM G# Shinr 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM G# Shinr 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/ShinraKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM Kicks 01 rth b7d885.wav": {
-  "code": "RM",
-  "name": "RM Kicks 01 rth",
-  "sub": "",
-  "parent": "rthm/packs/neurotek/Kicks/OpenKick_SP_01.wav"
- },
- "SoundDesign/rumble/RM Kik Db 01 dbr 890944.wav": {
-  "code": "RM",
-  "sub": "CLEAN"
- },
- "SoundDesign/variations/BD V8 Clean 01 909 b4e0be.wav": {
-  "code": "BD",
-  "name": "BD V8 Clean 01 909",
+ "packs/Music Radar/Percussion/Jaw_Harp/Jaw_Harp_Hit_01.wav": {
   "tags": [
-   "slices"
-  ],
-  "sub": "CLEAN"
+   "pre-solaris"
+  ]
  },
- "bass graves/": {
+ "packs/Music Radar/Percussion/Thumb_Piano/Thumb_Piano01(120BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Thumb_Piano/Thumb_Piano02(120BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Thumb_Piano/Thumb_Piano03(120BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Thumb_Piano/Thumb_Piano04(120BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Udu/Udu_01(90BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Udu/Udu_02(90BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Music Radar/Percussion/Udu/Udu_03(90BPM).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Ambience/Ambience Airburst.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Ambience/Ambience DirtyManson.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Ambience/Ambience Gizmo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Blip & Blop/Beep Karma.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Buzz/Buzz NoLies 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Buzz/Hum Vader.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Click/Click Blizz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Click/Click Hegemony 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Click/Click Hegemony 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Crackle/Crackle Desert.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Distortion/Dist DirtyManson 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drill/Drill Desert.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drill/Drill MetalKids.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Clap/Clap Arrow Vader DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/HiHat/ClosedHH Airburst 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/HiHat/OpenHH Airburst 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Kick/Kick Airburst 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Kick/Kick TightTimes 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Kick/Kick TightTimes 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Percussion/Clock Blizz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Percussion/Conga Teknist.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Percussion/Tamb Teknist.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Percussion/Wooden Eosforos.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Shaker/Shaker BattleGround.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Snare/Rim Filmator DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Snare/Rim FlightRisk 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Snare/Snare Airburst 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Drums/Tom/Floor Tom DirtyManson 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Glitch/Glitch Blizz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Metal/Metal BattleGround.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Metal/Metal DarkLight.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Metal/Metal Desert.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Metal/Metal Eraser.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Metal/Metal Gizmo 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Noise/Noise Airburst 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/SFX/Reverse Hipstress.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Vocal/Breath Airburst.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/Zap/Zap Blizz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/arcane/one shot/sub/Sub Filmator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/Waveforms/Saw Siren/SawSiren C3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/Waveforms/Triangle Siren/TriangleSiren C3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Blip & Blop/Blip Avo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Buzz/Buzz Karnaval.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Buzz/Buzz SupaSoaker.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Combo/Combo Abacaxi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Combo/Combo Percussionista 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Combo/Combo SupaSoaker.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Cymbal/Crash Carnival.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Hihat/ClosedHH Abacaxi .wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Kick/Kick Abacaxi 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Alegre Calientes.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Bell AtSteppa.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Bongo Klima.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Clave Avocado.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Clave BadBwai.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Cowbell Avo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Percussion/Tamb Avocado.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Shaker/Guache Calientes 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Snare/Rim Avo.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Drums/Tom/Tom CapoKotta.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/SFX/Fall Cookies 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Sweep & Swell/Drop Avocado.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Bass A AtSteppa MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Bass A Karneval MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Bass Bazouka 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Bass Bazouka 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Bass BlackLion 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Sub CapoKotta.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Synth A Karneval MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Synth A# LaMami MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Synth Note/Synth Deekay.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/caribean/oneshot/Vocal/Cat Paipa.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Ambience/Ambience BlackEarth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Ambience/Atmos BlackEarth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Ambience/Atmos OrangeTen.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Hihat/ClosedHH BlackEarth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Hihat/OpenHH BlackEarth 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Kick/Kick BlackEarth 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Percussion/Clave Exosphere.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Percussion/Clave OrangeTen.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Percussion/Cowbell Dev.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Percussion/Flexitone OffScript.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Percussion/Tamb GunFingers 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Shaker/Shaker ConcreteDubs 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Snare/Rim Dev.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Snare/Snare BlackEarth 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Drums/Tom/HiTom Dev.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Noise/Noise BlackEarth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Noise/NoiseFall Exosphere.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Vocal/Breath TenYearsOff.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/chromatique fire/one shot/Zap/Lazer GunFingers 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Burb RD Modular 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Burb RD Modular 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Charge RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Clap JB 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/ClosedHH Flohio.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/DarkTime RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Flasher RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Gargel RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Ghost RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/HighZap RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Kick Flohio.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Metal RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Noise RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/OpenHH Flohio 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Rim TTA Drive 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Snare Flohio 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Sub JB.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Tamb JB 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Thump RD Modular.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/drum/Tom JB 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/community drive/one shot/vocal/Voc MG 50s.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Acoustic Note/Rhodes D# Clan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Ambience/Ambience A Alice.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Ambience/Ambience Rei.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Ambience/Atmos A# Wonder.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Blip & Blop/Blip Kalahari.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Buzz/Buzz LeBrock 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Buzz/Buzz LeBrock 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Click/Click Cassette 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Clap/Clap Alice 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Cymbal/Crash 1973 DS 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/HiHat/ClosedHH 1973 DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/HiHat/OpenHH 1973 DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Kick/Kick 1973 DS 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Percussion/Bell Wonder.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Percussion/Block LastMan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Percussion/Castanet Diq 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Percussion/Conga Svengali 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Percussion/Metal 1973 DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Shaker/Shaker 1973 DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Snare/Rim Wonder.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Snare/Snare 1973 DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Drums/Tom/Tom Clan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Impact/Impact Clan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Lick/Arp Clan 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Lick/Bell Luci.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Lick/Lick Alice.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Noise/Noise 1973 DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Stab & Hit/Hit Baraka.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Stab & Hit/Hit Marabu.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Sweep & Swell/Swell Luci.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Bass A# Wonder.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Bass C Phaze.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Bass C Santoku.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Bass D# Santoku.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Pad B Clan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Pad C# Alice.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Pad F Phaze 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Pad F Phaze 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Synth A dBump.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Synth C dBump.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Synth Note/Synth D# Baraka.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Vocal/Vox Oxide.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/decoded form/one shot/Zap/Zap Luci.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Ambience/Ambience Cellophane 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Ambience/Sub Whistla.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Buzz Arcade.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Buzz Bounca.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Buzz Cellophane.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Buzz Chop 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Lick Bass DubLove.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/LoFill Untouchable.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Sub Flexer.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Wah Chop 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Wobble Chop 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Wobble Chop 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Wobble MetalRider.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Wobble Slapper 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Bass/Wobble Slapper 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Blip & Blop/Blip Dungeon.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Chord/Chord Mentalism.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drone/Drone BlackHeart.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Combo/Combo BlackHeart.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Hand Drum/Bongo Tribe.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Hand Drum/Cabasa Tribe.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Hand Drum/Djembe Tribe.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/HiHat/ClosedHH Arcade.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/HiHat/OpenHH Arcade.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Kick/Kick Arcade 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Kick/Kick Submarine 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Kick/Kick Submarine 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Mallet Drum/Glassdrum Paper.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Metallic/Metal Cellophane 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Shaker/Shaker Arcade.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Snare/Rim Cronotilus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Snare/Snare Arcade 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Tom/HiTom Paper.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Drums/Wooden/Wood Flexer.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/SFX/Gun Survival 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/SFX/Rise YoungerBro.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Stab & Hit/Hit Arcade.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Sweep & Swell/Fall Prodigal.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass A CloudMachine MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass A Distant MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass A Survival MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass BlackSky 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass D Submarine MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass Distant.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass E Filthy MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass Filthy.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Synth Note/Bass Wobbler Em 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Vocal/0oa Vowel.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/drop squad/one shot/Vocal/Vox Chop.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Acoustic Note/Bass Chameleon 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Acoustic Note/Bass Chameleon 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Acoustic Note/Clavinet Sewer 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Ambience/Ambience Arctic.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Ambience/Ambience Hunter.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Ambience/Ambience Schwarzwald 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Blip & Blop/Blip Butze.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Buzz/Buzz Emboss.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Chord/Chord A Snowfall MSV 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Chord/Chord A Snowfall MSV 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Chord/Chord A Teppich MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Click/Click Marching.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Crackle/Crackle Abbrand.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Distortion/Dist Diary.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Clap/Clap Abbrand.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Cymbal/Crash Arctic DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Hihat/ClosedHH Abbrand 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Hihat/OpenHH Aerial.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Kick/Kick Abbrand 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Percussion/Bell Vapor.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Percussion/Bongo Snowfall DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Percussion/Clave Box.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Percussion/Cowbell Fifth DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Percussion/Perc Aerial 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Percussion/Tambourine Box.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Shaker/Shaker Aerial.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Snare/Rim Abbrand.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Snare/Snare Aerial.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Drums/Tom/Tom Box 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Glitch/Glitch Arctic.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Lick/Lick Buda PRSM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Lick/Synth Supernova.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Metal/Metal Box.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Metal/Metal Snowfall.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Noise/Noise Abbrand.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Stab & Hit/Hit Hunter.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Stab & Hit/Hit Inside.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Sweep & Swell/Sweep Equator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Bass Abbrand 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Bass Aurora.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Bass Bipolar 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Lead Sewer.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Pad Equator.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Pad Marching.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Pad Path.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Pad Supernova.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Pad Twisted.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Sub Dubtree.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Synth Note/Synth Abbrand 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/lone forest/oneshot/Vocal/Voc Buda.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Acoustic Note/Flute C Egyptian Wind PRSM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Ambience/Ambience Mahabharata.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Chord/Chord F4 Tribes.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Clap/Clap Dembowton.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/HiHat/ClosedHH Baghdat.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/HiHat/OpenHH Anubis 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Kick/Kick Abyss 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Percussion/Bells Caravan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Percussion/Bendir Banshee.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Percussion/Bongo Dembowton.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Percussion/Tamb Algerian 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Percussion/Wooden Algerian 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Snare/Rim Egypt 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Snare/Snare Atlas.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Drums/Tom/Tom House 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Lick/Oud Sea 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Metal/Metal Bosphorus.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Metal/Metal Camel.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Metal/Metal Caravan.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Metal/Metal Cyclades 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Metal/Metal Cyclades 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Metal/Metal Pot 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Synth Note/Bass C Egyptian Wind PRSM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Synth Note/Pad C Oriental Plucks MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Synth Note/Pad C Ritual Dance MSV.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Native instrument/rising/one shot/Synth Note/Sub Unrest DS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Reverse FX/LS-RFX Atmos Reverse 52.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Reverse FX/LS-RFX Atmos Reverse 58.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Reverse FX/LS-RFX Reverse FX Medium 49.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Reverse FX/LS-RFX Reverse FX Short 27.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 1/LS-SFX1 - Ambient Bass Fx - 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 1/LS-SFX1 - Long Reverse - 07.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 1/LS-SFX1 - Long Reverse - 18.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 1/LS-SFX1 - Synthetic Bass Fx - 08.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 2/LS-SFX2 - Cinematic Reverse 17.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 3/LS-SFX3 Cinematic Reverse 19.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/1000 Sfx Production Tools Vol. 3/LS-SFX3 Reverse Wet 06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drum Loops/LS-95ITP - Hard Drum Loop 06-06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drum Loops/LS-95ITP - Industrial Drum Loop 02-02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Clap 60.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Closed Hihat 21.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Crash 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Crash 23.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Kick 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Open Hihat 08.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Drums/LS-95ITP - Snare 27.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Effects/LS-95ITP - Reverse FX 14.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Effects/LS-95ITP - Sequence Texture 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Effects/LS-95ITP - Sweep FX 09.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/95 BPM Industrial Techno Pack/Effects/LS-95ITP - Synth Sound 31.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Deep Tech Elements/Drum Loops 126 BPM/BDHE_126BPM_LOOPS_001.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Dirty Dutch House Loops/Wav/AFROLOOP 017.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Drumtronic/LSD Disco Tom 001 (P).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Drumtronic/LSD Kick 010 (P).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Drumtronic/LSD Percussion 157 (P).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Drumtronic/LSD Tom 081 (P).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/EDM Risers & Falls/Falls/EDM Fall 06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/EDM Risers & Falls/Risers/EDM Riser 06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Frose Instrumental Beats Vol. 3/LS-FIB3 Bongo 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Frose Instrumental Beats Vol. 3/LS-FIB3 Clap 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Frose Instrumental Beats Vol. 3/LS-FIB3 Drum Loop 87 bpm 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Frose Instrumental Beats Vol. 3/LS-FIB3 Drum Loop 94 bpm 09.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Frose Instrumental Beats Vol. 3/LS-FIB3 Kick 11.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Frose Instrumental Beats Vol. 3/LS-FIB3 Korg Analog Bass 87 bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/J. Sylvester Producer Sound Library Vol. 1/Chords & Stabs 15.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/J. Sylvester Producer Sound Library Vol. 1/Vocal Snip 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/J. Sylvester Producer Sound Library Vol. 1/cymbals.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Darbouka Loops/4-4 92p - 00.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Darbouka Loops/4-4 92p - 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Darbouka Loops/4-4 92p - 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Darbouka Loops/4-4 92p - 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Dirt South Kit/808-stak.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Dirt South Kit/bassandjuve.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Dirt South Kit/bassandjuve2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Killah Sounds/Dirt South Kit/westbassfart44d.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Large FX Collection/LS-LFXC Club-Trance Reverse 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Large FX Collection/LS-LFXC Voice 032.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Minimal Heaven Vol. 1/LS-MH1 Clap 22.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Minimal Heaven Vol. 1/LS-MH1 Crash 15.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Minimal Heaven Vol. 1/LS-MH1 Laser Sweep 10.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Minimal Heaven Vol. 1/LS-MH1 Minimal & Tech House Loop 126 Bpm 20-1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Minimal Heaven Vol. 1/LS-MH1 Noise Drumsound 21.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Minimal Heaven Vol. 1/LS-MH1 Reverse 49.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Bongo 1-034.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Clap 06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Cowbell 45.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Ethnic Perc 010.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Ethnic Perc 666.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Percussion XXL Pack/LS-PXXL Metallic 002.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pirate MC Vocals - Melanie Jane/Baby you drive me crazy.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pirate MC Vocals - Melanie Jane/Be Bold the future ours to.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pirate MC Vocals - Melanie Jane/Do you like it 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Psygate FX/LS-PFX Bassline 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pumpin House Elements/Clap_54.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pumpin House Elements/Crash_15.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pumpin House Elements/Kick_152.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pumpin House Elements/PercMix_24.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Pumpin House Elements/Tom_19.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ray Diaz Latin House Tools/bass loops/ClassicSynthBass2 Dm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ray Diaz Latin House Tools/drum loops/Drum Loop 09(1)-130.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ray Diaz Latin House Tools/keys loops/A.Piano2 Cm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ray Diaz Latin House Tools/keys loops/AquaRhodes Gm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ray Diaz Latin House Tools/keys loops/E.Piano2 Gm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Sex Weed Deep Tech/24 Bit Wav/bounce 1a-126 bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Socafrica Latin House Tools/Latin Cool Loop 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Sounds Of Nu Skool Garage/APPLE LOOPS/NUSKOOL_DRUMS_030.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Steel Strings Guitar Major/90 BPM Steel Strings Guitar 01A Cmaj.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Steel Strings Guitar Major/90 BPM Steel Strings Guitar 01B Cmaj.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Steel Strings Guitar Major/90 BPM Steel Strings Guitar 01C Cmaj.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Techno Elements/LS-TE 128 BPM Bass Loop 03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Techno Elements/LS-TE 128 BPM Drum Loop 18.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Techno Elements/LS-TE Clubhouse Kick 34.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/This Is UK Grime Fever/Cross Keyz_LOOP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/This Is UK Grime Fever/The Score_LOOP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/This is Future Garage/APPLE LOOPS/FG_FD_130_LOOP_002.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/This is Future Garage/WAVS/FG_138_MUSIC_PATTERN_025.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Top Club Drums 2020 Edition/Bassdrums/LS-TCD Distorted Kick 14.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Top Club Drums 2020 Edition/Crash/LS-TCD Crash 2 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Top Club Drums 2020 Edition/Rides/LS-TCD Ride 1 16.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Bass Sounds/LS-UPS Bass Sound 007 A#.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Bass Sounds/LS-UPS Bass Sound 016 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Bass Sounds/LS-UPS Bass Sound 025 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Dubstep Bass/LS-UPS Dubstep Bass 05 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Dubstep Bass/LS-UPS Dubstep Bass 09 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Dubstep Bass/LS-UPS Dubstep Bass 47 H.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Power Synths/LS-UPS Power Synth 08 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultimate Power Synths/Trance Synths/LS-UPS Trance Synth 16 C.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultra Kicks Vol. 2/LS-UK2 Bonus Loop 14.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultra Kicks Vol. 2/LS-UK2 Hard Kick 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Ultra Kicks Vol. 2/LS-UK2 Hard Kick 16.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Vinyl Cut Chords/LS-VCC Piano Chord (P) 28.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Vinyl Cut Chords/LS-VCC Piano Chord (P) 29.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/Vinyl Cut Chords/LS-VCC Piano Chord 28.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/SAMPLES MEGABIT/fx ambiant nap/LS-CT1 Noise Fx 12.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Taktile/BOLT - clock ticking 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /DARKTECHNO/Vi Ta Lee - DARKTECHNO (Free-Or-Tip) - 23 Bass_G_01_DT_VTL.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /DARKTECHNO/Vi Ta Lee - DARKTECHNO (Free-Or-Tip) - 33 Bass_G_011_DT_VTL.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /MILLENNIUM KICKS 3/Vi Ta Lee - MILLENNIUM KICKS 3 - 01 XTRMRAW_MLNM3_KICK_A_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /MILLENNIUM KICKS 3/Vi Ta Lee - MILLENNIUM KICKS 3 - 02 XTRMRAW_MLNM3_KICK_A_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /MILLENNIUM KICKS 3/Vi Ta Lee - MILLENNIUM KICKS 3 - 03 XTRMRAW_MLNM3_KICK_A_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /OVERDRIVE III/Vi Ta Lee - OVERDRIVE III - 01 XTRMRAW_OVERDRIVE3_KICK_F#_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/Vi Ta Lee /OVERDRIVE III/Vi Ta Lee - OVERDRIVE III - 02 XTRMRAW_OVERDRIVE3_KICK_G#_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass graves/": {
   "tags": [
    "bass",
    "dubstep"
   ]
  },
- "bass/": {
+ "packs/bass graves/GS_CESTRA_808_05_F_V1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass graves/GS_CESTRA_WOB_SYNTH_BASS_04_F_V2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass graves/GS_CESTRA_WOB_SYNTH_BASS_05_F_V2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass graves/GS_CESTRA_WOB_SYNTH_BASS_16_F.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass graves/GS_CESTRA_WOB_SYNTH_BASS_21_F_V2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass/": {
   "tags": [
    "bass",
    "hardcore",
    "techno"
   ]
  },
- "bass/oneshot/170_C_BigFrogBass_01_516.wav": {
+ "packs/bass/loops/170_D_BassTalker_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass/loops/170_E_RaspSynth_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass/loops/170_F#_ArpeggSynth_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass/oneshot/170_C_BigFrogBass_01_516.wav": {
+  "family": "TRIBE",
+  "code": "BS",
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass/oneshot/170_D#_DescenderSynth_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/bass/oneshot/170_E_DownBass_01_516.wav": {
   "family": "TRIBE",
   "code": "BS"
  },
- "bass/oneshot/170_E_DownBass_01_516.wav": {
-  "family": "TRIBE",
-  "code": "BS"
+ "packs/bass/oneshot/170_G#_SubBass_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
  },
- "bass/oneshot/BUZZBASS.wav": {
+ "packs/bass/oneshot/BUZZBASS.wav": {
+  "tags": [
+   "pre-solaris"
+  ],
   "stars": 5
  },
- "cinematic Noiiz/": {
+ "packs/bass/oneshot/DAR_180_C_Gator_Horn_1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/cinematic Noiiz/": {
   "tags": [
    "ambiance",
    "noise"
   ]
  },
- "jungle dnb rthm/": {
+ "packs/cinematic Noiiz/Hybrid Trailer Impacts/CrashingImpact_01_531.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/cinematic Noiiz/Transitions/BreathingTransition_01_531.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/drum wizadry/BASEDRUMS/Legowelt Basedrum 002.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/drum wizadry/BASEDRUMS/Legowelt Basedrum 046.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/drum wizadry/BASEDRUMS/Legowelt Basedrum 103.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/drum wizadry/SNAREDRUMS/Legowelt Snare 063.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Aotearoa/Flying_Fox_Descent-BD.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Aotearoa/Lawn Mower-CP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Aotearoa/Sizzle-CP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Aotearoa/Tui-CP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Aotearoa/bunker_hit_BEAM-JD.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Aotearoa/bunker_hit_BOLT-JD.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Buchla16 Bass 85-115hz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Buchla18 Pulse Bass180hz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Buchla38 Bass 110hz top.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Buchla42 c.a.Noise Tom 150hz.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Cough Sounds as a Cymbal.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Feedback Rough Bass 110hz top.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Gothenburg Xmas Illumination Noise1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Hitting Table Near Strings.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/elektron pack/Phaised air/Kick Bass 70hz top.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/glitch/BAD WIRING.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/glitch/OSR_fx_reverse_glitch_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/atmos/CPCT_120_Atmos_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/atmos/CPCT_140_Atmos_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/atmos/CPCT_160_Atmos_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/atmos/GS_ABYSS_140_A_ATMO_MAHARLOO_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/atmos/GS_DBRS_174_G#m_Music_multitrack(2).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/guitar/6L_105_F_Playa_Rhythm_Gtr_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/guitar/6L_130_D_Rosa_Lead_Gtr_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/guitar/AED_140_A_Skank_Guitar_Chick_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/guitar/EM_HIJAZ_OUD_D_85BPM_08_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/guitar/EM_HIJAZ_OUD_D_85BPM_44_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/guitar/Slap Bass Fill 110 Bpm F#m.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/key/CPCT_120_C_Gamelan_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/key/CPCT_120_C_Ocean_Chords_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/key/CPCT_120_F_Countdown_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/oneshot/BLEEP Midnight 110 Bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/oneshot/HTB_C_Synth_Hit_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/oneshot/HTB_C_Synth_Hit_09.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/pad/CPCT_120_C_Pad_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/pad/CPCT_120_F_Pad_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/piano/100_Cm_Lofipiano_SP_09_406.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/piano/110_Am_Lofipiano_SP_08_406.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/piano/110_Gm_Lofipiano_SP_10_406.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/risers/FX White Noise 110bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/instru/string/CPCT_160_F_Strings_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/": {
   "tags": [
    "jungle"
   ]
  },
- "jungle dnb rthm/Bpm170_Screw_Drums.wav": {
+ "packs/jungle dnb rthm/Bpm170_Screw_Drums.wav": {
   "family": "JUNGLE",
-  "code": "BR"
+  "code": "BR",
+  "tags": [
+   "pre-solaris"
+  ]
  },
- "rthm/loops/hardcore/01_CBDNB_Bassdrum_Fill_175_multitrack(2).wav": {
+ "packs/jungle dnb rthm/Drums_-_Jungle_Break__Dry_.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/RDB_170_drum_loop_alias_break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/RDB_170_drum_loop_analog_full.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/RDB_170_drum_loop_crushed_full.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/RDB_170_drum_loop_step_full.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/RDB_170_drum_loop_ticktock_full.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/Torpp_Break_170.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/cj_170_drum_loop_comb.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/cj_170_drum_loop_env.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm100_bristolwobble.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm100_diamonds.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm100_oggface.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm120_kevin.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm172_busybee2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm190_kigu.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/jungle dnb rthm/vb6_drm90_shakerboi.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-ButterBass1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-ButterBass2Low.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-Chokotofat.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-Chokotofat2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-Dogbass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-DoubleFany.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-DoubleSmooth.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-DoubleSmoothTweaking.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-Gummbass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-InsidioBass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-JojabiBass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-SharpyAcidoBass.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-SharpyAcidoBass2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-SharpyAcidoBass3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-SharpyAcidoBassHigh.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/BASS-SoftSubVelvet.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-DuneValley-Dyssymentric.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-DuneValley-RumbleMud.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-DuneValley-WithThunder.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-DuneValley-Zelig.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-DuneValley1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-DuneValley2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-GarlicWaves1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/CHORDPAD-VanillaVla.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyBellio.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyBellio2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyBellio3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyBellioLow.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyBellioLower.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyBellioX.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyTone1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-BeautyTone2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-MedievalOnionDrone1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-MedievalOnionDrone2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-Metaly.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/minimoog synth/SYNTH-MiniMoogStab2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/CYMBAL/GH2_Crash_10.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/Impacts/CrashImpact_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Foley Fx/Branch Breaking.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Foley Fx/Ticking 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Orch Perc and Stings/Glock 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Orch Perc and Stings/Glock 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Orch Perc and Stings/Harp 03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Percussive FX/Block 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Percussive FX/Castinets 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Percussive FX/Castinets 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Percussive FX/Cuicas 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Percussive FX/Cuicas 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Percussive FX/Cuicas 03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Synth FX/Synth perc 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Synth FX/Synth perc 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Synth FX/Synth perc 03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Synth FX/Synth perc 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Synth FX/Synth perc 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 04.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 06.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 07.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 08.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 09.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 10.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 11.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 12.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 13.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 14.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/cartoon/Vocal/Mouth Fx 15.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/BD LONG.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/BD SUB.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/CYMBAL/Crash20.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/CYMBAL/Crash21.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/CYMBAL/Reverse07.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/HARDCORE/K05_Kick_processed_.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/HARDCORE/SHKV_F_Reversed_Hell_Kicks_22.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/HARDCORE/TBD_Kick_01_F__-_200_BPM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/HARDSTYLE/HardKick01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/kick/HARDSTYLE/HardKick02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/blutotnium 142/142BPM_001.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/100 Ogasawara Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/110 Trivial Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/115 Aldabra Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Bumex Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Crocomonk Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Dyrenium Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Enduron Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Lozol Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Sklep Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/120 Unvital Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/125 Crybaby Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/125 Hortizan Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/125 Plutokrat Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/125 Vati Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/130 Arixtra Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/130 Klint Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/160 Tosnick Break - 3.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/160 Tosnick Break - 5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/160 Tosnick Break.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/GH2_Top_Loop_17_110bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/GH2_Top_Loop_22_110bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/GH2_Top_Loop_5_110bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/HTB_109_DrumLoop_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/HTB_109_DrumLoop_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/OSR_drum_loops_broken_full_90_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/OSR_drum_loops_fast_one_full_92_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/OSR_drum_loops_licker_full_92_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/OSR_drum_loops_switcher_full_92_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/US_ME_Drum_108_kilter_FULL_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/US_ME_Drum_108_minimal_FULL_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/US_ME_Drum_86_classicdc_FULL_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/US_ME_Drum_92_heavina_TOMS_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/breakbeat/gravit trash 160 bpm.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_03a.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_03c.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_04b.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_10a.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_10e.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_12a.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_28a.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_28b.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_30c.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_32a.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_32c.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/dubstep/DubstepBeats_33b.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/hardcore/01_CBDNB_Bassdrum_Fill_175_multitrack(2).wav": {
   "family": "TRIBE",
-  "code": "DL"
+  "code": "DL",
+  "tags": [
+   "pre-solaris"
+  ]
  },
- "rthm/packs/neurotek/": {
+ "packs/rthm/loops/hh loops/120_Abm_GASPIELP__8_474.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/histibe/HTB_134_DrumLoop_02 - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/06_CBDNB_Break_Loop_175_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/07_CBDNB_Break_Loop_175_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/12L_174_Drums_1_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/12L_174_Drums_6_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/12L_174_Drums_7_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/164_Banger_369_SP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/165_Break_295_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/165_Break_295_SP_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/165_Drums_295_SP_20.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/167_8thStomper_369_SP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/167_Skippy_369_SP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_Break_295_SP_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_Break_295_SP_03 - 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_Break_295_SP_03 - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_Break_295_SP_03 - 6.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_Break_295_SP_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_Break_295_SP_05.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/170_RaggaBreak_SP_300_11.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/25_CBDNB_Break_Loop_175_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Fills/170_BallsyFill_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Fills/170_CyberFill_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Fills/170_EverythingFill_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Fills/170_FearFill_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Fills/170_GamerFill_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Fills/170_HeavyFill_01_516 - 4.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/GS_PRSM_140_Drum_Loop_07.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/L46_75_Plantation_Drums_Full_2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/loops/jungle dnb/Tops/170_GlitchingTop_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/linndrum/Linn_CongaHi_01_SP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/linndrum/Linn_Cowbell_01_SP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/linndrum/Linn_OpenHat_01_SP.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/": {
   "tags": [
    "tribe"
   ]
  },
- "rthm/packs/nightmares dnb/": {
+ "packs/rthm/packs/neurotek/Kicks/LowPunchKick_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Kicks/LowPunchKick_SP_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/BitLaser_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/Chime_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/Chime_SP_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/ClickTrack_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/Crunchy_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/Crunchy_SP_02.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Percussion & Foley/Crunchy_SP_03.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/neurotek/Snares/RimSnare_SP_01.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/nightmares dnb/": {
   "tags": [
    "jungle"
   ]
  },
- "rthm/packs/tortured dubstep/": {
+ "packs/rthm/packs/nightmares dnb/Percussion/NoiseyClick_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/nightmares dnb/Snares/RimShot_01_516.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/packs/tortured dubstep/": {
   "tags": [
    "dubstep"
   ]
+ },
+ "packs/rthm/percu et fx/COWBELL.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/rthm/percu et fx/PERC RIM.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/sfx/EVU_Bbm_Dbl_Bass_Fx_1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/transfers-261003/kodaman_kick.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/110_F#_Adlib_02_371_SP-0_170 - 14.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/300 vocal one shot/300VS_Elvan Shout.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/CV_Spoken_Powers of a God_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/DRD_172_C#m_Lost_Choirs.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/JD2_172_Jungle_DnB_Break_C_5.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/LFH_Spoken_Agony_2_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/LFH_Spoken_Do You Know_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/LFH_Spoken_Mission_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/LFH_Spoken_Nightmare_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/LFME_Spoken_Vocal-Why should I talk_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/RX_Spoken_A friend indeed_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/SRDR_155_E_SAVAGE_Choir.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Female Vocals_02_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Kids Choir & Clap_E_112_03_multitrack - 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Kids Choir & Clap_E_112_03_multitrack - 2.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Kids Choir & Clap_E_112_03_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Kids Choir & Clap_E_112_04_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Kids Choir & Clap_E_112_10_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Male Vocals_Ab_06_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_103_01_multitrack(2).wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_103_02_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/african/EM_Maasai Tribal Textures_Tribal Rhythm_123_29_multitrack.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/documentary/rft000.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/documentary/rft001.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/documentary/rft002.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/documentary/rft003.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/documentary/rft004.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "packs/vocal/documentary/rft005.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/BUZZ BASS.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/GLOSSY GOURD.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/KICK 1.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/KICK SNOW.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/KNIGHTLY AVIATOR.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/PRINCIPAL FLINT.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/REVERSE HAT.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/WARY CARGO.wav": {
+  "tags": [
+   "pre-solaris"
+  ]
+ },
+ "recorded/solaris/02 RM 165 G# Cass.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": "CLEAN"
+ },
+ "recorded/solaris/BD V8 Clean 01 909.wav": {
+  "family": "UNIVERSEL",
+  "code": "BD",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": "CLEAN"
+ },
+ "recorded/solaris/RM A Boka 01 gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Boka 02 gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Filte 41 hcf.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Ircam 01 gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Ircam 02 gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Nasty 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Nasty 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Nasty 03 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Ominous gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Quantu 01 gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM A Rev Mant gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Box 03 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Bubble 03 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Flat Grit gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Flat Tube gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Jag Grit gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Jag Tube gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Kic Grit rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Kic Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Kick Grit rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM F Kick Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Flatir Grit gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Flatir Tube gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Air 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Air Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Apa Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Apart 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Apart 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Atta Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Attac 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Box 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Box 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Box Tub 2 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Box Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Div Tub 2 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Div Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Dive 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Dive 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Indu Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Indust 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Kic Tub 2 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Kic Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Kicks 0 2 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Kicks 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Matte 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Omi Tube gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Shi Tub 2 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Shi Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Shin Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Shinr 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Shinr 03 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM G Shinra 02 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Kick Grit rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Kick Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Kicks 01 rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Kicks Tube rth.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
+ },
+ "recorded/solaris/RM Ominous gre.wav": {
+  "family": "UNIVERSEL",
+  "code": "RM",
+  "tags": [
+   "rendu-solaris"
+  ],
+  "sub": ""
  }
 }
