@@ -64,11 +64,13 @@ LIVE_DIR = MEDIA_ROOT / "Live"
 RENOISE_DIR = LIVE_DIR / "renoise"
 GROOVES_DIR = LIVE_DIR / "grooves"
 DIGITAKT_MIDI_DIR = LIVE_DIR / "digitakt"
-DT2_SAMPLES_DIR = LIVE_DIR / "samples" / "00 curated"   # arbre numerote pret pour Transfer (deplace le 2026-11-13)
 DT2_LIVES_DIR = LIVE_DIR / "00-live"     # un dossier par live (7.L), meme nom sur le +Drive
 
 # Copie des samples de la DT2 faite depuis Transfer (packs bruts, lecture seule)
 SAMPLES_SRC_DIR = MEDIA_ROOT / "Samples"
+# Arbre numerote rendu pour Transfer, range dans la source (2026-11-13) ;
+# le scan l'ignore (analyzer.samples.EXPORT_DIR_RE).
+DT2_SAMPLES_DIR = SAMPLES_SRC_DIR / "01 curated"
 # Kick de reference de la ligne inclinee (doctrine-samples, 7.J9b) : pack perso,
 # hors SSD ; l'export rend chaque sample sur sa ligne.
 LINE_REF_KICK = Path(os.environ.get(

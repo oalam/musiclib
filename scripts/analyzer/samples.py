@@ -732,8 +732,16 @@ def penalty(flags: list[str] | None) -> int:
     return sum(FLAG_WEIGHT.get(f, 1) for f in flags or [])
 
 
+# Dossier d'export rendu (`01 curated`, paths.DT2_SAMPLES_DIR) range dans la
+# source depuis le 2026-11-13 : a ne pas relire comme des samples a trier.
+EXPORT_DIR_RE = re.compile(r"^\d\d curated$")
+
+
 def iter_wavs(root: Path) -> Iterable[Path]:
     for p in sorted(root.rglob("*")):
+        rel = p.relative_to(root).parts
+        if len(rel) > 1 and EXPORT_DIR_RE.match(rel[0]):
+            continue
         if p.is_file() and p.suffix.lower() == ".wav" and not p.name.startswith("._"):
             yield p
 

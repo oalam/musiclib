@@ -1134,3 +1134,12 @@ def test_sync_without_line_still_copies(tmp_path: Path) -> None:
     _line_tone(root / "a.wav", 1000, 0.5)
     smp.sync({"x/a.wav": "a.wav"}, root, dest, index, codes={"x/a.wav": "CP"})
     assert (dest / "x/a.wav").read_bytes() == (root / "a.wav").read_bytes()
+
+
+def test_iter_wavs_skips_rendered_export_dir(tmp_path: Path):
+    """L'export rendu (`01 curated`) range dans la source n'est pas relu au scan."""
+    _wav(tmp_path / "packs" / "Kit" / "kick.wav")
+    _wav(tmp_path / "01 curated" / "01 KICK" / "BD kick rth.wav")
+    _wav(tmp_path / "packs" / "01 curated" / "garde.wav")   # seul le premier niveau compte
+    rels = [p.relative_to(tmp_path).as_posix() for p in smp.iter_wavs(tmp_path)]
+    assert rels == ["packs/01 curated/garde.wav", "packs/Kit/kick.wav"]

@@ -376,6 +376,11 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Corrigé
 
+- [7.J9b] L'export des samples écrit dans `<MEDIA>/Samples/01 curated`
+  (`paths.DT2_SAMPLES_DIR`), où le dossier a été rangé le 2026-11-13 ; le
+  scan de la source ignore ce dossier (`EXPORT_DIR_RE`, `NN curated` au
+  premier niveau) pour ne pas relire les rendus comme des samples à trier.
+
 - [7.M] KT20 [[kt-hats]] proposait une ride en `3:4` et `4:4` sur les mêmes
   trigs : une condition par trig, donc `NOT 1:4`, deux trigs voisins
   micro-timés, ou les mutes.

@@ -877,14 +877,14 @@ BL basse.
   des chemins du vault : `migrate_packs.py --dry-run`, puis `migrate_packs.py`
   (rejouable, copie `.bak`).
 - **Plan d'action (7.J9a)** : `samples.py --plan` (ou
-  `POST /api/samples/plan`) écrit seulement `<MEDIA>/Live/samples/00 curated/PLAN.md`.
+  `POST /api/samples/plan`) écrit seulement `<MEDIA>/Samples/01 curated/PLAN.md`.
   Le plan contient le bilan, les traitements prévus ([[digitakt/doctrine-samples]])
   et, par dossier numéroté, le format de chaque fichier (lu dans l'en-tête),
   ses conversions et son état. Aucun WAV n'est touché.
 - **Export (7.J3, 7.J9a)** : `samples.py --export --dry-run` (bilan), puis
   `samples.py --export` (ou `POST /api/samples/export`). Copie les retenus
   tels quels vers l'arbre numéroté
-  `<MEDIA>/Live/samples/00 curated/<NN NOM>/[<SOUS>/]<nom>.wav`
+  `<MEDIA>/Samples/01 curated/<NN NOM>/[<SOUS>/]<nom>.wav`
   (`01 KICK/HARD/BD G# Overd 02 vtl.wav`, `20 SAMPLE/<CODE>/` pour les
   samples maison), puis réécrit `PLAN.md`. **Rendu sur la ligne (7.J9b)** :
   chaque fichier dont le code a un réglage dans `analyzer/line.FAMILY` est

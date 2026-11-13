@@ -275,7 +275,7 @@ demande pas d'écoute :
 
 Une compression automatique aplatirait les attaques des kicks hard.
 
-**Appliqué depuis le 2026-11-13 (7.J9b)**, pour la lib (`00 curated`) comme
+**Appliqué depuis le 2026-11-13 (7.J9b)**, pour la lib (`Samples/01 curated`) comme
 pour les lives : l'export rend chaque son avec les réglages de la section
 « Import dans le pack perso » (coupures, mono, ligne du kick de référence,
 plafond de -6 dBFS) et l'écrit en 48 kHz / 16 bits avec dither. Les deux
