@@ -8,6 +8,12 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Ajouté
 
+- [7.M3] Le guide utilisateur de mk-brain (`mk-brain/docs/GUIDE.md`) entre
+  dans le panneau KB du front : onglet « mk-brain », recherche plein texte,
+  captures d'écran affichées (route `/api/kb/asset`, limitée aux images de
+  `mk-brain/docs/img/`). Les liens markdown relatifs des notes sont résolus :
+  images servies par l'API, notes du corpus en lien interne, autres `.md` en
+  texte.
 - [7.J9b] Niveau sur la ligne inclinée, automatisé : `analyzer/line.py`
   (spectre aux maxima maintenus incliné de +4,5 dB/oct, étalonné sur un kick
   de référence, plafond de crête à -6 dBFS, coupure sous 20 Hz, passe-haut de

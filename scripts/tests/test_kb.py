@@ -75,6 +75,8 @@ def vault(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         "---\nlot: 2\nordre: 1\ntheme: Cellules rythmiques\nstatut: à rédiger\n---\n\n"
         "# Cellules rythmiques\n\n## Tresillo\n\nLe tresillo `x..x..x.` ; voir [[../euclidien]].\n",
         encoding="utf-8")
+    # guide mk-brain absent par defaut (fixture `guide` pour l'ecrire)
+    monkeypatch.setattr(kb, "MK_BRAIN_GUIDE", tmp_path / "mk-brain" / "docs" / "GUIDE.md")
     monkeypatch.setattr(kb, "MANUAL_PDF", tmp_path / "refs" / "manuel.pdf")
     monkeypatch.setattr(kb, "manual_outline", lambda: OUTLINE)
     return tmp_path
@@ -211,3 +213,35 @@ def test_api_toc_and_manual(vault: Path):
     (vault / "refs" / "manuel.pdf").write_bytes(b"%PDF-1.4 fake")
     res = client.get("/api/manual")
     assert res.status_code == 200 and res.headers["content-type"] == "application/pdf"
+
+
+@pytest.fixture
+def guide(vault: Path) -> Path:
+    docs = vault / "mk-brain" / "docs"
+    (docs / "img").mkdir(parents=True)
+    (docs / "GUIDE.md").write_text(
+        "---\nversion: 0.49.0\n---\n\n# Guide utilisateur — mk-brain\n\n"
+        "## Pads MPC\n\nUn pad joue une track.\n\n![Jeu](img/04-mpc-jeu.png)\n",
+        encoding="utf-8")
+    (docs / "img" / "04-mpc-jeu.png").write_bytes(b"\x89PNG\r\n\x1a\n")
+    (docs / "screens.py").write_text("print('code')\n", encoding="utf-8")
+    return docs
+
+
+def test_mk_brain_guide_in_toc_and_search(guide: Path):
+    toc = kb.table_of_contents()
+    assert (toc[-1].group, toc[-1].name, toc[-1].hub) == ("mk-brain", "Guide utilisateur", "")
+    assert [(e.path, e.title, e.statut) for e in toc[-1].notes] == [
+        ("mk-brain/docs/GUIDE.md", "Guide utilisateur — mk-brain", "v0.49.0")]
+    hits = kb.search("pad track", kb.load_corpus())
+    assert hits[0].path == "mk-brain/docs/GUIDE.md" and hits[0].anchor == "pads-mpc"
+    assert kb.read_note("mk-brain/docs/GUIDE.md") is not None
+
+
+def test_api_asset_serves_guide_images_only(guide: Path):
+    client = TestClient(api.create_app())
+    res = client.get("/api/kb/asset", params={"path": "mk-brain/docs/img/04-mpc-jeu.png"})
+    assert res.status_code == 200 and res.headers["content-type"] == "image/png"
+    for path in ("mk-brain/docs/screens.py", "mk-brain/docs/GUIDE.md", "secret.md",
+                 "mk-brain/docs/img/../../../secret.md", "mk-brain/docs/img/absent.png"):
+        assert client.get("/api/kb/asset", params={"path": path}).status_code == 404

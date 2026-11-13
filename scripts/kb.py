@@ -3,7 +3,8 @@
 
 Corpus = `digitakt/kb/**/*.md` (fiches machine a la racine, notes de KT
 theorie dans `theorie/`, hubs `_index.md` compris) + les doctrines
-`digitakt/doctrine*.md` (doctrine generale et doctrines de live), decoupes
+`digitakt/doctrine*.md` (doctrine generale et doctrines de live) + le guide
+utilisateur de mk-brain (`mk-brain/docs/GUIDE.md`), decoupes
 en sections (titres `##` / `###`). Recherche plein texte sans index
 ni RAG : le corpus tient en memoire, on le relit a chaque requete (les notes
 editees dans Obsidian sont vues tout de suite).
@@ -12,7 +13,9 @@ Sommaire (7.M2) : un groupe par dossier (`fiches` = racine, puis un groupe
 par sous-dossier), chaque groupe range ses notes par `lot` puis `ordre` ; les
 noms des lots viennent du hub `_index.md` du dossier (`## Lot N — nom` ou
 `### Lot N — nom`). Les doctrines forment le groupe `doctrine` (un seul lot,
-dans l'ordre des fichiers : la doctrine generale d'abord).
+dans l'ordre des fichiers : la doctrine generale d'abord). Le guide mk-brain
+forme le groupe `mk-brain` ; ses captures (`docs/img/`) sont servies par
+`asset_path` (images seulement, dossiers listes dans `ASSET_DIRS`).
 
 Lien avec le manuel PDF (7.F) : le sommaire du PDF donne la page de chaque
 paragraphe `§x.y` ; les references du frontmatter `manuel` et celles citees
@@ -39,6 +42,7 @@ VAULT_ROOT = Path(__file__).resolve().parent.parent
 KB_DIR = VAULT_ROOT / "digitakt" / "kb"
 DOCTRINE = VAULT_ROOT / "digitakt" / "doctrine.md"
 KB_INDEX = KB_DIR / "_index.md"
+MK_BRAIN_GUIDE = VAULT_ROOT / "mk-brain" / "docs" / "GUIDE.md"
 MANUAL_PDF = VAULT_ROOT / "refs" / "Digitakt-2-User-Manual_ENG_OS1.17_260930.pdf"
 
 _HEADING = re.compile(r"^(#{1,3})\s+(.+?)\s*$")
@@ -49,6 +53,8 @@ _DOCTRINE_BEFORE = re.compile(r"doctrine\]*\s*\(?\s*$", re.IGNORECASE)  # « doc
 _LOT_HEADING = re.compile(r"^#{2,3}\s+Lot\s+(\d+)\s*[—–-]\s*(.+?)\s*$", re.MULTILINE)
 ROOT_GROUP = "fiches"   # groupe des notes a la racine de `digitakt/kb/`
 DOCTRINE_GROUP = "doctrine"   # doctrine generale + doctrines de live (`digitakt/doctrine*.md`)
+MK_BRAIN_GROUP = "mk-brain"   # guide utilisateur de mk-brain (Maschine MK2 -> DT2)
+ASSET_EXT = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"}
 
 
 class KbHit(BaseModel):
@@ -140,9 +146,29 @@ def doctrine_files() -> list[Path]:
     return ([DOCTRINE] if DOCTRINE.exists() else []) + others
 
 
+def guide_files() -> list[Path]:
+    """Guide utilisateur de mk-brain, s'il existe."""
+    return [MK_BRAIN_GUIDE] if MK_BRAIN_GUIDE.exists() else []
+
+
 def corpus_files() -> list[Path]:
     files = sorted(KB_DIR.rglob("*.md")) if KB_DIR.exists() else []
-    return doctrine_files() + files
+    return doctrine_files() + files + guide_files()
+
+
+def asset_dirs() -> list[Path]:
+    """Dossiers d'images servis au front : les captures du guide mk-brain."""
+    return [MK_BRAIN_GUIDE.parent / "img"]
+
+
+def asset_path(rel_path: str) -> Path | None:
+    """Image d'un dossier autorise (pas de chemin libre), None sinon."""
+    path = (VAULT_ROOT / rel_path).resolve()
+    if path.suffix.lower() not in ASSET_EXT or not path.is_file():
+        return None
+    if not any(path.is_relative_to(d.resolve()) for d in asset_dirs()):
+        return None
+    return path
 
 
 def split_sections(text: str, rel_path: str) -> list[KbSection]:
@@ -296,13 +322,14 @@ def table_of_contents() -> list[KbLot]:
     lots: dict[tuple[str, int], list[KbEntry]] = {}
     hubs: dict[str, Path] = {}
     doctrines = doctrine_files()
+    guides = guide_files()
     for hub in sorted(KB_DIR.rglob("_index.md")) if KB_DIR.exists() else []:
         group = ROOT_GROUP if hub.parent == KB_DIR else hub.parent.relative_to(KB_DIR).as_posix()
         hubs[group] = hub
         for n in _lot_names(hub):
             lots.setdefault((group, n), [])
     for f in corpus_files():
-        if f in doctrines:
+        if f in doctrines or f in guides:
             continue
         raw = f.read_text(encoding="utf-8")
         fm = parse_frontmatter(raw)
@@ -332,6 +359,14 @@ def table_of_contents() -> list[KbLot]:
                                    title=m.group(1).strip() if m else f.stem, ordre=i,
                                    statut=parse_frontmatter(raw).get("status", "")))
         out.insert(1, KbLot(number=1, name="Doctrine", notes=entries, group=DOCTRINE_GROUP))
+    for f in guides:
+        raw = f.read_text(encoding="utf-8")
+        fm = parse_frontmatter(raw)
+        m = re.search(r"^#\s+(.+)$", strip_frontmatter(raw), re.MULTILINE)
+        out.append(KbLot(number=1, name="Guide utilisateur", group=MK_BRAIN_GROUP, notes=[KbEntry(
+            path=f.relative_to(VAULT_ROOT).as_posix(),
+            title=m.group(1).strip() if m else f.stem, ordre=1,
+            statut=f"v{fm['version']}" if fm.get("version") else "")]))
     return out
 
 

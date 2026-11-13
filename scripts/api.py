@@ -763,6 +763,14 @@ def create_app(library_file: Path = LIBRARY_FILE, runner: Runner = run_grab,
             raise HTTPException(404, "manuel PDF absent de refs/")
         return FileResponse(kb.MANUAL_PDF, media_type="application/pdf")
 
+    @app.get("/api/kb/asset")
+    def kb_asset(path: str) -> FileResponse:
+        """Image d'une note (captures du guide mk-brain), dossiers autorises seulement."""
+        found = kb.asset_path(path)
+        if found is None:
+            raise HTTPException(404, f"image hors base de connaissance : {path}")
+        return FileResponse(found)
+
     @app.get("/api/kb/grille")
     def kb_grille() -> FileResponse:
         """Grille des 16 tracks interactive (`digitakt/grille.html`, doctrine §1), pour l'iframe du panneau KB."""

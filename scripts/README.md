@@ -1334,7 +1334,8 @@ dans library.md) :
 | POST | `/api/tracks/{slug}/bank` | génère la bank |
 | GET | `/api/kb/search?q=` | recherche plein texte KB + doctrine (`KbHit`) |
 | GET | `/api/kb/note?path=` | note du corpus KB (404 hors corpus) + références au manuel |
-| GET | `/api/kb/toc` | notes par groupe (`fiches`, `theorie`) et lot (`KbLot`, `group`, `hub`) |
+| GET | `/api/kb/toc` | notes par groupe (`fiches`, `doctrine`, `theorie`, `tutos`, `mk-brain`) et lot (`KbLot`, `group`, `hub`) |
+| GET | `/api/kb/asset?path=` | image d'une note, servie seulement depuis `mk-brain/docs/img/` (404 sinon) |
 | GET | `/api/samples?tag=&min_stars=` | cases de la bibliothèque de samples, une par dossier final (`SampleCell` : `folder`, `branch`, `code`, `sub`, plafond, retenus, keep, drop, à écouter, signalés) ; filtres optionnels |
 | GET | `/api/samples/folders` | dossiers cibles d'un rangement (7.J8), racine du code puis sous-catégories, dans l'ordre de l'arbre |
 | GET | `/api/samples/cell?folder=` | candidats d'une case par rang (`SampleEntry`, avec `tags` et `stars`) |

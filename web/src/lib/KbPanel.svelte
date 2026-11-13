@@ -24,20 +24,22 @@
   const DOCTRINE = 'digitakt/doctrine.md'
   const known = $derived(new Set([DOCTRINE, ...toc.flatMap(l => [l.hub, ...l.notes.map(n => n.path)])].filter(Boolean)))
 
-  // groupes du sommaire (7.M2), un onglet chacun (7.M3) : fiches machine, doctrine, théorie, tutos
-  type Group = 'fiches' | 'doctrine' | 'theorie' | 'tutos'
+  // groupes du sommaire (7.M2), un onglet chacun (7.M3) : fiches machine, doctrine, théorie, tutos, guide mk-brain
+  type Group = 'fiches' | 'doctrine' | 'theorie' | 'tutos' | 'mk-brain'
   const TABS: { key: Group; label: string }[] = [
     { key: 'fiches', label: 'Fiches machine' },
     { key: 'doctrine', label: 'Doctrine' },
     { key: 'theorie', label: 'Théorie' },
     { key: 'tutos', label: 'Tutos' },
+    { key: 'mk-brain', label: 'mk-brain' },
   ]
-  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', doctrine: 'Doctrine', theorie: 'Théorie (notes de KT)', tutos: 'Tutos (sessions vidéo)' }
+  const GROUP_LABELS: Record<string, string> = { fiches: 'Fiches machine', doctrine: 'Doctrine', theorie: 'Théorie (notes de KT)', tutos: 'Tutos (sessions vidéo)', 'mk-brain': 'mk-brain' }
   const GROUP_HINTS: Record<string, string> = {
     fiches: "Le geste sur la machine, dans l'ordre de préparation d'un set.",
     doctrine: 'Les règles arbitrées : grille des 16 tracks, banks, mutes, grave, tonalité ; puis une doctrine par live.',
     theorie: 'Le pourquoi et le vocabulaire, style par style ; les fiches donnent le geste.',
     tutos: 'Des sessions vidéo complètes décortiquées : chaque trick avec sa track, ses pas et le chapitre.',
+    'mk-brain': 'Guide utilisateur de la Maschine MK2 qui joue la DT2 : branchements, pads, encodeurs, écrans.',
   }
   let tab = $state<Group>('fiches')
   /** Onglet d'une note du corpus, d'après son chemin. */
@@ -45,6 +47,7 @@
     if (path.startsWith('digitakt/doctrine')) return 'doctrine'
     if (path.startsWith('digitakt/kb/theorie/')) return 'theorie'
     if (path.startsWith('digitakt/kb/tutos/')) return 'tutos'
+    if (path.startsWith('mk-brain/')) return 'mk-brain'
     return 'fiches'
   }
   const groups = $derived.by(() => {
@@ -83,8 +86,31 @@
     const label = alias || (target.split('#')[0].split('/').pop() ?? target)
     return path ? `[${label}](#kb:${path})` : label
   }
+  /** Chemin relatif d'une note (`img/x.png`, `../SPEC.md`) -> chemin depuis la racine du vault. */
+  function fromNote(rel: string): string {
+    const dir = (note?.path ?? '').split('/').slice(0, -1)
+    for (const seg of rel.split('/')) {
+      if (seg === '..') dir.pop()
+      else if (seg && seg !== '.') dir.push(seg)
+    }
+    return dir.join('/')
+  }
+  /** Liens markdown relatifs : images servies par /api/kb/asset (captures du guide
+   *  mk-brain), notes du corpus en lien interne, autres `.md` en texte (sinon le
+   *  clic remplacerait l'app). */
+  function relativeLinks(md: string): string {
+    const relative = (href: string) => !/^([a-z]+:|\/|#)/i.test(href)
+    return md
+      .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (all, alt: string, href: string) =>
+        relative(href) ? `![${alt}](/api/kb/asset?path=${encodeURIComponent(fromNote(href))})` : all)
+      .replace(/(?<!!)\[([^\]]*)\]\(([^)\s]+?\.md)(#[^)\s]*)?\)/g, (all, label: string, href: string, hash?: string) => {
+        if (!relative(href)) return all
+        const path = fromNote(href)
+        return known.has(path) ? `[${label}](#kb:${path}${hash ?? ''})` : label
+      })
+  }
   const html = $derived(note
-    ? marked.parse(replaceWikilinks(note.markdown, wikilink), { async: false })
+    ? marked.parse(relativeLinks(replaceWikilinks(note.markdown, wikilink)), { async: false })
     : '')
 
   // les § cites dans le texte deviennent des liens vers la page du manuel
@@ -274,7 +300,7 @@
             <button class="small" class:on={tab === t.key} onclick={() => (tab = t.key)}>{t.label}</button>
           {/each}
         </nav>
-        <p class="muted small">Touche <kbd>/</kbd> pour chercher dans les fiches, la doctrine et la théorie.</p>
+        <p class="muted small">Touche <kbd>/</kbd> pour chercher dans les fiches, la doctrine, la théorie et le guide mk-brain.</p>
         {#each groups.filter(g => g.key === tab) as g (g.key)}
           {#if g.hub}
             <h2 class="grp">
@@ -368,6 +394,7 @@
   .note :global(table) { border-collapse: collapse; font-size: 12px; }
   .note :global(td), .note :global(th) { border: 1px solid var(--border); padding: 2px 6px; }
   .note :global(pre) { overflow-x: auto; font-size: 12px; }
+  .note :global(img) { max-width: 100%; height: auto; display: block; margin: 6px 0; }
   .toc { flex: 1; overflow-y: auto; padding: 4px 4px 24px; }
   .toc > p { padding: 6px 10px 0; margin: 0 0 6px; }
   .toc h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 14px 10px 4px; }
