@@ -3,6 +3,20 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.49.0] - 2026-11-12
+
+### Ajouté
+
+- [22] SHIFT + REC : coupe la boucle de gestes sans la vider, dès l'appui
+  (`OFF` à l'écran, LED REC éteinte, `LOOP off`). SHIFT + REC ou REC seul
+  la relance en lecture, de son début, au premier temps de la mesure
+  suivante (`LOOP on`). Un Stop de la DT2 la laisse coupée.
+
+### Modifié
+
+- [22] Écran droit : `LOOP` et `ARM` clignotent au temps (plein, puis
+  contour seul) ; `REC` et `OFF` restent fixes.
+
 ## [0.48.0] - 2026-11-12
 
 ### Ajouté
@@ -29,6 +43,40 @@ de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
   2,5 s (`play.splash_ms`, 0 : aucun) et se ferme au premier appui d'un
   pad ou d'un bouton ; le jeu tourne déjà dessous, le démarrage n'est pas
   retardé.
+
+## [0.46.0] - 2026-11-12
+
+### Ajouté
+
+- [22] Boucle de gestes (`loop.py`), en mémoire seulement. REC arme la
+  boucle, qui part au premier temps de la mesure suivante (LED clignotante
+  puis pleine) ; nouvel appui : lecture seule (LED faible) ; encore un :
+  overdub. REC tenu + bouton d'écran 1 à 4 : 1, 2, 4, 8 mesures, boucle
+  vide seulement (`play.loop_bars`, 8 au départ). ERASE seul : boucle
+  vidée. Stop de la DT2 : notes coupées, la boucle reste ; Start : elle
+  repart de son début.
+- Gestes gardés et rejoués par le moteur : frappes et relâchés de pads
+  avec leur pression (note directe, entrée dans l'arpège, note repeat),
+  encodeurs (CC, pitch bend, groupe SOLO compris), réglages de l'arpège,
+  division, maintien, rappel de preset. Chaque geste garde sa track. Les
+  réglages touchés par la boucle repartent de leur valeur d'avant à chaque
+  tour.
+- Annuler / rétablir geste par geste : SHIFT + pad 1 / pad 2, dans l'ordre
+  de l'enregistrement, note tenue coupée tout de suite, retour à l'écran
+  (`UNDO CUT T10`, `REDO pad T01`, `nothing to undo`). Sans boucle, SHIFT +
+  pad joue la note comme avant.
+- Écran droit : `ARM`, `REC` ou `LOOP` à la place du mode, mesure de la
+  boucle (`L 5 / 8`).
+- Points durs tranchés en codant : la main qui bouge un paramètre
+  l'emporte sur la boucle jusqu'à la fin du tour ; en overdub, le nouveau
+  geste remplace les anciens sur la portion de boucle qu'il couvre (rendue
+  s'il est annulé) ; pad tenu à cheval sur le bouclage relâché dans la
+  boucle ; une valeur par tick et par paramètre ; notes directes confiées à
+  l'ordonnanceur en avance, à leur instant exact.
+
+### Modifié
+
+- ERASE seul agit au relâché ; SHIFT + ERASE tenus 2 s reste l'extinction.
 
 ## [0.45.0] - 2026-11-11
 

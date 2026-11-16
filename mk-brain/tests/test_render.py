@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from test_engine import MS, PAD1, SECOND, advance, design, running_clock
+from test_engine import MS, PAD1, SECOND, Bench, advance, design, running_clock
 
 from mk_brain import render
 from mk_brain.config import Config
@@ -289,3 +289,18 @@ def test_splash_sweeps_from_left_to_right() -> None:
 def test_splash_shows_the_version_on_the_right_only() -> None:
     assert render.splash(0, "1.2.3") == render.splash(0)
     assert render.splash(1, "1.2.3") != render.splash(1)
+
+
+def test_loop_tag_blinks_on_the_beat(cfg: Config) -> None:
+    b = Bench(cfg)
+    eng = b.eng
+    b.hit(100)
+    b.lift(110)
+    assert eng.screen_tag == "REC" and not eng.loop_blink  # REC reste fixe
+    b.tap("REC")
+    b.to(193)  # première moitié du temps
+    assert eng.screen_tag == "LOOP" and not eng.loop_blink
+    full = render.right(eng, b.now)
+    b.to(206)  # seconde moitié (ticks 12 à 23 du temps)
+    assert eng.loop_blink
+    assert render.right(eng, b.now) != full

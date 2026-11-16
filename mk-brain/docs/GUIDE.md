@@ -1,14 +1,14 @@
 ---
 tags: [mk-brain, guide, maschine, digitakt]
-version: 0.21.0
-maj: 2026-11-09
+version: 0.49.0
+maj: 2026-11-12
 ---
 
 # Guide utilisateur — mk-brain
 
 La Maschine MK2 joue la Digitakt II sans Mac ni logiciel Native Instruments :
 pads, encodeurs et écrans pilotés par mk-brain, la DT2 garde l'horloge et le
-transport. Ce guide décrit la v0.21.0 (mode unique, pads MPC). La spec fait
+transport. Ce guide décrit la v0.49.0 (mode unique, pads MPC). La spec fait
 foi pour le détail : [SPEC.md](../SPEC.md).
 
 Les captures sont rendues par le code de l'appareil (`docs/screens.py`),
@@ -323,7 +323,38 @@ les notes envoyées sur le canal d'une track qui n'est pas la track active
 s'enregistrent-elles ? Et la tranche jouée en MPC ? En attendant, le plus
 sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 
-## 12. Aide-mémoire
+## 12. La boucle de gestes (REC)
+
+Le Pi garde ce que les mains font et le rejoue en boucle : frappes de
+pads avec leur pression, encodeurs, réglages de l'arpège, division,
+maintien, rappel de preset. Brouillon en mémoire, perdu à l'extinction et
+au changement de projet : pour garder, passer la DT2 en LIVE REC pendant
+un tour.
+
+1. DT2 lancée. **REC tenu + bouton d'écran 1 à 4** : 1, 2, 4 ou 8 mesures
+   (8 au départ, boucle vide seulement).
+2. **REC** : `ARM` à l'écran droit, LED clignotante ; la boucle part au
+   premier temps de la mesure suivante (`REC`, LED pleine). Jouer.
+3. Au bouclage, ce qui vient d'être joué se rejoue ; tant que REC est
+   allumé, les nouveaux gestes s'ajoutent (overdub).
+4. **REC** : lecture seule (`LOOP`, LED faible), les mains jouent
+   par-dessus sans rien enregistrer. **REC** encore : overdub.
+5. **SHIFT + pad 1** : annule le dernier geste enregistré (`UNDO CUT T10`),
+   un de plus à chaque appui. **SHIFT + pad 2** : le rétablit.
+6. **SHIFT + REC** : coupe la boucle sans la vider (`OFF`, LED éteinte),
+   pour un break. **SHIFT + REC** ou **REC** : elle repart de son début à
+   la mesure suivante, en lecture.
+7. **ERASE** : vide la boucle.
+
+`LOOP` et `ARM` clignotent au temps à l'écran droit ; `REC` et `OFF`
+restent fixes.
+
+L'écran droit montre la mesure de la boucle (`L 5 / 8`). Un encodeur
+tourné à la main fait taire la boucle sur ce paramètre jusqu'à la fin du
+tour. Stop de la DT2 : la boucle se tait ; Start : elle repart de son
+début.
+
+## 13. Aide-mémoire
 
 | Geste | Effet |
 |---|---|
@@ -345,6 +376,10 @@ sûr est d'enregistrer sur la track active de la DT2 (SELECT + pad 16).
 | Encodeur maître | valeur de l'entrée au focus ; appui = entrée suivante |
 | SHIFT + PLAY | phrase à 1 à la barre suivante |
 | SHIFT + GROUP n | recalage au bloc n |
+| REC | boucle de gestes : armer, puis lecture seule, puis overdub ; tenu + bouton d'écran 1-4 = 1, 2, 4, 8 mesures |
+| SHIFT + pad 1 / pad 2 | boucle : annuler / rétablir le dernier geste |
+| SHIFT + REC | boucle : couper sans vider, puis relancer à la mesure suivante |
+| ERASE | vide la boucle |
 | SHIFT + ERASE tenus 2 s | extinction propre du Pi (sur le Pi seulement) ; relâcher avant annule |
 
 PLAY et REC de la MK2 n'envoient ni Start ni Stop : la DT2 reste maître du

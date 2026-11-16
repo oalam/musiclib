@@ -49,6 +49,11 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   pads ne jouent plus, un tap sur le pad n ajoute ou retire la track n au groupe
   des encodeurs, PAD MODE en sort ; PB tenu par SHIFT ;
   écrans du clavier = ceux du MPC.
+- Slice 22 : boucle de gestes (`loop.py`). REC arme la boucle (départ à la mesure
+  suivante), puis lecture seule, puis overdub ; REC tenu + bouton d'écran 1-4 = 1, 2, 4,
+  8 mesures (boucle vide) ; ERASE la vide ; SHIFT + pad 1 / 2 = annuler / rétablir le
+  dernier geste. Les gestes rejoués passent par les mêmes chemins que la main, sur des
+  pads virtuels (`_loop_real`) ; les notes directes sont planifiées en avance.
 """
 
 from __future__ import annotations
@@ -57,6 +62,7 @@ import math
 import random
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Literal
 
 from mk_brain.arp import (
     BARS,
@@ -88,7 +94,7 @@ from mk_brain.arp import (
 )
 from mk_brain.arp import chord as arp_chord
 from mk_brain.arp import sequence as arp_sequence
-from mk_brain.clock import ClockTracker
+from mk_brain.clock import TICKS_PER_BAR, TICKS_PER_STEP, ClockTracker
 from mk_brain.config import PITCH_BEND, PRESET_SLOTS, RGB, ArpPreset, Config, Layout
 from mk_brain.faders import Accel, Faders
 from mk_brain.hid_mk2 import (
@@ -113,6 +119,21 @@ from mk_brain.layouts import (
     shift_octave,
     velocity,
 )
+from mk_brain.loop import EDGE as LOOP_EDGE
+from mk_brain.loop import (
+    LOOP_BARS,
+    Gesture,
+    Key,
+    Loop,
+    LoopBars,
+    PadMode,
+    PadOff,
+    PadOn,
+    Param,
+    Setting,
+    Value,
+)
+from mk_brain.loop import Pressure as PadPressure
 from mk_brain.phrase import BLOCK_BARS, PhraseCounter, PhraseLength, PhraseState, pattern_label
 from mk_brain.presets import user_name
 from mk_brain.project import Bank, Project
@@ -180,6 +201,23 @@ MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transp
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # boutons d'écran 1-4 (banque : GROUP)
 PHRASES: tuple[PhraseLength, ...] = (32, 64)
 Timed = tuple[int, MidiOut]
+LoopState = Literal["idle", "rec", "play", "off"]  # off : coupée, gardée (SHIFT + REC)
+# pads virtuels de la boucle : au-delà des 16 pads, deux par frappe (tour pair, impair)
+LOOP_KEY = 100
+# réglages que la boucle garde et rejoue : nom → attribut du moteur
+LOOP_SETTINGS = {
+    "order": "arp_order",
+    "octaves": "arp_octaves",
+    "gate": "arp_gate",
+    "motif": "arp_motif",
+    "chord": "arp_chord",
+    "progression": "arp_progression",
+    "bars": "arp_bars",
+    "inversion": "arp_inversion",
+    "preset": "arp_preset",
+    "division": "division",
+    "hold": "arp_hold",
+}
 
 
 @dataclass
@@ -200,6 +238,16 @@ class _ArpNote:
     channel: int
     note: int
     velocity: int  # dernière vélocité jouée : celle des notes maintenues, pad relâché
+
+
+@dataclass
+class _Open:
+    """Pad tenu par la main, en cours d'enregistrement dans la boucle."""
+
+    gesture: Gesture
+    hit: int
+    pos: float  # position de la frappe, tours compris
+    mode: PadMode
 
 
 class Engine:
@@ -300,6 +348,23 @@ class Engine:
         self.octave = 0  # décalage d'octave du clavier (flèches de transport), remis à 0 par GROUP
         # annonce d'une nouvelle banque reçue par PC : (clé, fiche, instant) ; instant posé au tick
         self.announce: tuple[str, Bank, int | None] | None = None
+        # --- boucle de gestes (slice 22), en mémoire seulement ---
+        self.loop: Loop | None = None
+        self.loop_state: LoopState = "idle"
+        self.loop_bars: LoopBars = cfg.play.loop_bars  # longueur de la prochaine boucle
+        self._loop_origin = 0  # ticks depuis le Start où la boucle a commencé (une barre)
+        self._loop_pos: float | None = None  # position courante, tours compris (< 0 : armée)
+        self._loop_lap = 0  # tour en cours
+        self._loop_done = 0.0  # gestes appliqués jusqu'ici ; `_loop_ahead` : notes planifiées
+        self._loop_ahead = 0.0
+        self._loop_real: dict[int, int] = {}  # pad virtuel en cours → pad d'origine
+        self._loop_open: dict[int, _Open] = {}  # pads tenus en cours d'enregistrement
+        self._loop_turns: dict[object, tuple[Gesture, int]] = {}  # encodeur → geste en cours
+        self._loop_chord: tuple[int, Gesture] | None = None  # pas de quantize du dernier accord
+        self._loop_hand: dict[Key, int] = {}  # paramètre bougé à la main → tour où elle l'emporte
+        self._rec_used = False  # REC tenu a servi à régler la longueur : pas de bascule au relâché
+        self._erase_alone = False  # ERASE appuyé sans SHIFT : vide la boucle au relâché
+        self._pending: list[Timed] = []  # note off de la boucle coupée, envoyés au prochain tick
 
     @property
     def mode_name(self) -> str:
@@ -434,7 +499,7 @@ class Engine:
         self.arp_inversion = p.inversion
         self.leds_dirty = True
 
-    def _preset_pad(self, pad: int) -> None:
+    def _preset_pad(self, pad: int, now: int) -> None:
         """PATTERN tenu en ARPG : pad n = rappel de l'emplacement n ; SHIFT + pad n = les
         réglages courants y sont écrits (slice 14)."""
         self._pattern_used()
@@ -448,8 +513,10 @@ class Engine:
         if slot is None:
             self.last_control = f"ARP PRE {pad:02d} empty"
             return
+        before = self._loop_settings()
         self._arp_recall(slot[0])
         self.last_control = f"ARP PRE {slot[0]}"
+        self._loop_changed(None, f"PRE {slot[0]}", before, now)
 
     @property
     def arp_now(self) -> tuple[list[int], int, list[int]] | None:
@@ -523,6 +590,7 @@ class Engine:
         self.last_control = f"{who} {name} {value}"
         if param == PITCH_BEND:
             self._bent.add(track)
+        self._loop_param(("enc", index), f"{name} {who}", track, param, value, now)
         return [(now, self._param_out(track - 1, param, value))]
 
     # --- arpégiateur : mode ARPG (slice 11) -------------------------------------
@@ -563,14 +631,20 @@ class Engine:
         self._arp_tones = []
         self.leds_dirty = True
 
-    def _toggle_hold(self) -> None:
+    def _set_hold(self, hold: bool) -> None:
         """NOTE REPEAT en ARPG : maintien. Coupé, seules les notes des pads tenus restent."""
-        self.arp_hold = not self.arp_hold
+        self.arp_hold = hold
         if not self.arp_hold:
             for pad in [p for p in self._arp_notes if p not in self._pressure]:
                 del self._arp_notes[pad]
             if not self._arp_notes:
                 self._arp_clear()
+
+    def _set_division(self, division: str) -> None:
+        self.division = division
+        if self._arp_pos is not None:  # arpège en cours : recalé sur la nouvelle grille
+            div = DIVISION_TICKS[division]
+            self._arp_pos = math.ceil(self._arp_pos / div) * div
 
     def _arp_turn(self, index: int, delta: int, now: int) -> None:
         """Encodeurs 1-8, PATTERN tenu en ARPG : ordre, octaves, gate, motif, preset, accord,
@@ -585,6 +659,7 @@ class Engine:
         if steps == 0:
             return
         self.last_touch = (index, now)
+        before = self._loop_settings()
         if index == 1:
             i = max(0, min(len(ORDERS) - 1, ORDERS.index(self.arp_order) + steps))
             self.arp_order = ORDERS[i]
@@ -610,6 +685,7 @@ class Engine:
         self.leds_dirty = True  # le pad du preset courant s'éteint dès qu'un réglage s'en écarte
         name, value = self.arp_view()[index - 1]
         self.last_control = f"ARP {name} {value}"
+        self._loop_changed(("arp", index), f"ARP {name}", before, now)
 
     def _arp_add(self, pad: int, channel: int, note: int, vel: int, ticks: float) -> None:
         """Frappe en ARPG : la note entre dans l'arpège. En maintien, une frappe alors
@@ -689,10 +765,456 @@ class Engine:
                     off = min(off, nxt - NOTE_OFF_MIN_NS)
                 out.append((on, NoteOn(entry.channel, note, vel)))
                 out.append((max(off, on + NOTE_OFF_MIN_NS), NoteOff(entry.channel, note)))
-            self.last_played = (pad, note, vel)
+            self.last_played = (self._real(pad), note, vel)
             self._arp_pos += div
             self._arp_step += 1
         return out
+
+    # --- boucle de gestes : REC (slice 22) -----------------------------------------
+
+    @property
+    def loop_armed(self) -> bool:
+        """REC appuyé, la boucle attend le premier temps de la mesure suivante."""
+        return self.loop_state == "rec" and (self._loop_pos is None or self._loop_pos < 0)
+
+    @property
+    def loop_tag(self) -> str | None:
+        """Étiquette de l'écran droit à la place du mode : ARM, REC, LOOP ou OFF."""
+        if self.loop is None:
+            return None
+        if self.loop_state == "off":
+            return "OFF"
+        if self.loop_state == "rec":
+            return "ARM" if self.loop_armed else "REC"
+        return "LOOP" if self.running else None
+
+    @property
+    def loop_blink(self) -> bool:
+        """Seconde moitié du temps, boucle armée ou en lecture : l'étiquette de l'écran
+        s'éclipse (ARM et LOOP clignotent au temps, REC et OFF restent fixes)."""
+        st = self.phrase_state
+        blinks = self.screen_tag in ("ARM", "LOOP") and self.screen_tag == self.loop_tag
+        return blinks and st is not None and not st.half_beat_on
+
+    @property
+    def screen_tag(self) -> str:
+        """Étiquette de l'écran droit : MUTE ou SELECT tenu, sinon la boucle, sinon le mode."""
+        name, tag = self.mode_name, self.loop_tag
+        return name if tag is None or name in MODIFIERS else tag
+
+    @property
+    def loop_bar(self) -> tuple[int, int] | None:
+        """(mesure en cours dans la boucle, longueur), None hors lecture."""
+        if self.loop is None or self._loop_pos is None or self._loop_pos < 0:
+            return None
+        return int(self._loop_pos % self.loop.ticks // TICKS_PER_BAR) + 1, self.loop.bars
+
+    def _real(self, pad: int) -> int:
+        """Pad d'origine d'un pad virtuel de la boucle (écran, LED, console)."""
+        return pad if pad < LOOP_KEY else self._loop_real.get(pad, 1)
+
+    @staticmethod
+    def _loop_key(hit: int, lap: int) -> int:
+        """Pad virtuel d'une frappe rejouée : un par parité de tour, pour qu'une note tenue
+        jusqu'au bouclage et sa reprise au tour suivant ne se marchent pas dessus."""
+        return LOOP_KEY + 2 * hit + (lap & 1)
+
+    def _loop_at(self, now: int) -> float | None:
+        """Position dans la boucle, tours compris ; négative tant qu'elle est armée."""
+        ticks = self.clock.ticks_at(now)
+        return None if ticks is None else ticks - self._loop_origin
+
+    def _loop_rec(self, pos: float | None) -> Loop | None:
+        """La boucle, si elle enregistre à cette position."""
+        if self.loop is None or self.loop_state != "rec" or pos is None or pos < 0:
+            return None
+        return self.loop
+
+    def _rec_toggle(self, now: int) -> None:
+        """REC : arme une boucle (départ à la mesure suivante), puis lecture seule, puis
+        overdub, et ainsi de suite. Armée et vide, un second appui l'abandonne."""
+        if self.loop is None:
+            ticks = self.clock.ticks_since_start
+            if ticks is None:
+                self._note("REC: start the DT2 first")
+                return
+            self.loop = Loop(self.loop_bars)
+            self.loop_state = "rec"
+            self._loop_origin = (ticks // TICKS_PER_BAR + 1) * TICKS_PER_BAR
+            self._loop_rewind()
+            self._note(f"REC armed, {self.loop_bars} bars")
+        elif self.loop_state == "off":
+            self._loop_mute(now)
+        elif self.loop_state == "rec":
+            if self.loop_armed and self.loop.empty:
+                self._loop_erase()
+                self._note("REC cancelled")
+            else:
+                self._loop_close()
+                self.loop_state = "play"
+                self._note("LOOP play")
+        else:
+            self.loop_state = "rec"
+            self._note("LOOP overdub")
+        self.leds_dirty = True
+
+    def _loop_mute(self, now: int) -> None:
+        """SHIFT + REC : coupe la boucle sans la vider (notes arrêtées tout de suite), ou la
+        relance en lecture, de son début, au premier temps de la mesure suivante."""
+        if self.loop is None:
+            self._note("no loop")
+            return
+        if self.loop_state != "off":
+            self._loop_close()
+            self._loop_silence()
+            if self.loop.empty:  # armée, rien de joué : rien à garder
+                self._loop_erase()
+                self._note("REC cancelled")
+                return
+            self.loop_state = "off"
+            self._loop_pos = None
+            self._note("LOOP off")
+        else:
+            ticks = self.clock.ticks_since_start
+            if ticks is None:
+                self._note("LOOP: start the DT2 first")
+                return
+            self.loop_state = "play"
+            self._loop_origin = (ticks // TICKS_PER_BAR + 1) * TICKS_PER_BAR
+            self._loop_rewind()
+            self._note("LOOP on")
+        self.leds_dirty = True
+
+    def _loop_length(self, index: int) -> None:
+        """REC tenu + bouton d'écran 1-4 : 1, 2, 4, 8 mesures, boucle vide seulement."""
+        if index >= len(LOOP_BARS):
+            return
+        if self.loop is not None and not self.loop.empty:
+            self._note("LOOP length: ERASE first")
+            return
+        self.loop_bars = LOOP_BARS[index]
+        if self.loop is not None:
+            self.loop.resize(self.loop_bars)
+            self._loop_lap = int(self._loop_done // self.loop.ticks)
+        self._note(f"LOOP {self.loop_bars} bars")
+
+    def _loop_rewind(self) -> None:
+        """Début de la boucle : lecture depuis zéro, réglages à leur valeur de départ."""
+        self._loop_pos = None
+        self._loop_lap = 0
+        self._loop_done = self._loop_ahead = 0.0
+        self._loop_hand.clear()
+        if self.loop is not None:
+            self.loop.settle()
+            self._loop_restore()
+            self.loop.rebuild()
+
+    def _loop_erase(self) -> None:
+        """ERASE, changement de projet : boucle et piles vidées, notes coupées."""
+        if self.loop is None:
+            return
+        self._loop_silence()
+        self.loop = None
+        self.loop_state = "idle"
+        self._loop_pos = None
+        self._loop_open.clear()
+        self._loop_turns.clear()
+        self._loop_chord = None
+        self._loop_hand.clear()
+        self.leds_dirty = True
+
+    def _loop_stop(self) -> None:
+        """Stop de la DT2 : lecture arrêtée, notes coupées ; la boucle reste, en lecture seule."""
+        if self.loop is None or self.loop_state == "off":  # coupée : elle le reste
+            return
+        self._loop_close()
+        self._loop_silence()
+        if self.loop.empty:  # armée, rien de joué
+            self._loop_erase()
+            return
+        self.loop_state = "play"
+        self._loop_pos = None
+        self.leds_dirty = True
+
+    def _loop_close(self) -> None:
+        """Fin d'enregistrement : les pads encore tenus sont relâchés dans la boucle."""
+        for o in self._loop_open.values():
+            self._loop_end(o, self._loop_pos)
+        self._loop_open.clear()
+        self._loop_turns.clear()
+        self._loop_chord = None
+
+    def _loop_silence(self) -> None:
+        for key in list(self._loop_real):
+            self._loop_cut(key)
+
+    def _loop_cut(self, key: int) -> None:
+        """Coupe ce qu'un pad virtuel tient : sa note (au prochain tick), sa place dans
+        l'arpège, même maintenu, son repeat."""
+        self._pressure.pop(key, None)
+        self._repeats.pop(key, None)
+        if self._arp_notes.pop(key, None) is not None and not self._arp_notes:
+            self._arp_clear()
+        if key in self._sounding:
+            channel, note, on_at = self._sounding.pop(key)
+            self._pending.append((on_at + NOTE_OFF_MIN_NS, NoteOff(channel, note)))
+        self._loop_real.pop(key, None)
+        self.leds_dirty = True
+
+    def _loop_undo(self, undo: bool) -> None:
+        """SHIFT + pad 1 : le dernier geste enregistré sort de la boucle, ses notes tenues
+        coupées ; SHIFT + pad 2 : le dernier annulé revient, rejoué à son prochain passage."""
+        loop = self.loop
+        if loop is None:
+            return
+        verb = "UNDO" if undo else "REDO"
+        g = loop.undo() if undo else loop.redo()
+        if g is None:
+            self._note(f"nothing to {verb.lower()}")
+            return
+        if undo:
+            for hit in g.hits:
+                for lap in (0, 1):
+                    self._loop_cut(self._loop_key(hit, lap))
+            # geste en cours (pad tenu, encodeur en mouvement) : clos, la main joue sans lui
+            self._loop_open = {p: o for p, o in self._loop_open.items() if o.gesture is not g}
+            self._loop_turns.clear()
+            self._loop_chord = None
+        self._note(f"{verb} {g.label}")
+
+    # enregistrement : appelé là où la main vient d'agir
+
+    def _loop_pad_on(
+        self,
+        pad: int,
+        mode: PadMode,
+        channel: int,
+        note: int,
+        vel: int,
+        pressure: int,
+        at: float,
+        grid: float,
+    ) -> None:
+        """Frappe gardée à `at` (ticks depuis le Start) ; `grid` : la position visée sur la
+        grille de l'arpège ou du repeat. Des pads frappés sur le même pas de quantize
+        forment un seul geste (un accord)."""
+        pos = at - self._loop_origin
+        loop = self._loop_rec(pos)
+        if loop is None:
+            return
+        step = round(pos / GRID_TICKS.get(self.quantize, TICKS_PER_STEP))
+        if self._loop_chord is not None and self._loop_chord[0] == step:
+            g = self._loop_chord[1]
+        else:
+            g = loop.open(f"pad T{channel + 1:02d}")
+            self._loop_chord = (step, g)
+        hit = loop.new_hit(g)
+        action = PadOn(hit, pad, mode, channel, note, vel, pressure, grid - at)
+        loop.add(g, pos, action, ahead=mode == "note")
+        self._loop_open[pad] = _Open(g, hit, pos, mode)
+
+    def _loop_pressure(self, pad: int, value: int, now: int) -> None:
+        o = self._loop_open.get(pad)
+        pos = self._loop_at(now)
+        loop = self._loop_rec(pos)
+        if o is None or loop is None or pos is None:
+            return
+        key: Key = ("pressure", o.hit, 0)
+        loop.add(o.gesture, max(pos, o.pos), PadPressure(o.hit, value), key=key, dedupe=True)
+
+    def _loop_pad_off(self, pad: int, now: int) -> None:
+        o = self._loop_open.pop(pad, None)
+        if o is not None:
+            self._loop_end(o, self._loop_at(now))
+
+    def _loop_end(self, o: _Open, at: float | None) -> None:
+        """Relâché d'un pad enregistré : après sa frappe, et avant le bouclage (un pad tenu
+        à cheval sur la fin de la boucle y est relâché, aucune note ne reste bloquée)."""
+        loop = self.loop
+        if loop is None:
+            return
+        end = (int(o.pos // loop.ticks) + 1) * loop.ticks - LOOP_EDGE
+        pos = max(o.pos, min(end, max(o.pos + 0.01, o.pos if at is None else at)))
+        loop.add(o.gesture, pos, PadOff(o.hit), ahead=o.mode == "note")
+
+    def _loop_gesture(self, loop: Loop, slot: object, label: str, key: Key, now: int) -> Gesture:
+        """Geste en cours de l'encodeur `slot`, clos par `play.loop_gap_ms` sans rotation.
+        Sans `slot` (retour au relâché de SHIFT) : le geste qui a bougé ce paramètre."""
+        if slot is None:
+            for g, _ in self._loop_turns.values():
+                if key in g.masks:
+                    return g
+            return loop.open(label)
+        current = self._loop_turns.get(slot)
+        if current is not None and now - current[1] <= int(self.cfg.play.loop_gap_ms * 1e6):
+            g = current[0]
+        else:
+            g = loop.open(label)
+        self._loop_turns[slot] = (g, now)
+        return g
+
+    def _loop_param(
+        self, slot: object, label: str, track: int, param: int, value: int, now: int
+    ) -> None:
+        """Valeur d'encodeur envoyée par la main : elle l'emporte sur la boucle jusqu'à la
+        fin du tour ; en enregistrement, elle entre dans le geste de l'encodeur."""
+        pos = self._loop_at(now)
+        if self.loop is None or pos is None or pos < 0:
+            return
+        key: Key = ("cc", track, param)
+        self._loop_hand[key] = int(pos // self.loop.ticks)
+        loop = self._loop_rec(pos)
+        if loop is None:
+            return
+        g = self._loop_gesture(loop, slot, label, key, now)
+        loop.add(g, pos, Param(track, param, value), key=key, dedupe=True, mask=True)
+
+    def _loop_settings(self) -> dict[str, Value]:
+        """Réglages que la boucle garde : arpège, division, maintien, preset rappelé."""
+        return {name: getattr(self, attr) for name, attr in LOOP_SETTINGS.items()}
+
+    def _loop_changed(self, slot: object, label: str, before: dict[str, Value], now: int) -> None:
+        """Réglages changés par la main depuis `before` : un geste (un encodeur de choix
+        tourné d'une traite reste le même geste). Leur valeur d'avant le premier geste
+        enregistré est gardée : chaque tour en repart."""
+        pos = self._loop_at(now)
+        if self.loop is None or pos is None or pos < 0:
+            return
+        changed = {n: v for n, v in self._loop_settings().items() if before[n] != v}
+        for name in changed:
+            self._loop_hand[("set", name)] = int(pos // self.loop.ticks)
+        loop = self._loop_rec(pos)
+        if loop is None or not changed:
+            return
+        if slot is None:
+            g = loop.open(label)
+        else:
+            g = self._loop_gesture(loop, slot, label, ("set", ""), now)
+        for name, value in changed.items():
+            loop.base.setdefault(name, before[name])
+            loop.add(g, pos, Setting(name, value), key=("set", name), dedupe=True, mask=True)
+
+    # lecture
+
+    def _loop_set(self, name: str, value: Value) -> None:
+        if name == "division" and isinstance(value, str):
+            self._set_division(value)
+        elif name == "hold":
+            self._set_hold(bool(value))
+        else:
+            setattr(self, LOOP_SETTINGS[name], value)
+        self.leds_dirty = True
+
+    def _loop_restore(self) -> None:
+        """Début de tour : les réglages que la boucle change repartent de leur valeur d'avant."""
+        if self.loop is None:
+            return
+        for name in sorted(self.loop.touched()):
+            if name in self.loop.base:
+                self._loop_set(name, self.loop.base[name])
+
+    def _loop_wrap(self) -> None:
+        """Bouclage : pads tenus relâchés dans la boucle, réglages de départ, nouveaux gestes
+        mis en lecture."""
+        loop = self.loop
+        if loop is None:
+            return
+        start = self._loop_lap * loop.ticks
+        for pad, o in list(self._loop_open.items()):
+            if o.pos < start:
+                del self._loop_open[pad]
+                self._loop_end(o, start)
+        self._loop_hand = {k: lap for k, lap in self._loop_hand.items() if lap >= self._loop_lap}
+        self._loop_restore()
+        if loop.dirty:
+            loop.rebuild()
+
+    def _loop_tick(self, now: int, horizon: int) -> list[Timed]:
+        """Gestes de la boucle arrivés à leur position : appliqués comme ceux de la main.
+        Les notes directes sont confiées à l'ordonnanceur en avance, à leur instant exact."""
+        out: list[Timed] = [(max(t, now), m) for t, m in self._pending]
+        self._pending = []
+        loop = self.loop
+        pos = self._loop_at(now)
+        if loop is None or pos is None or self.loop_state == "off":
+            return out
+        self._loop_pos = pos
+        if pos < 0:
+            return out
+        while True:
+            end = (self._loop_lap + 1) * loop.ticks
+            bound = min(pos, end)
+            for at, action, key in loop.due(self._loop_done, bound, False):
+                out += self._loop_apply(loop, at, action, key, now)
+            self._loop_done = max(self._loop_done, bound)
+            if pos < end:
+                break
+            self._loop_lap += 1
+            self._loop_wrap()
+        ahead = (self.clock.ticks_at(horizon) or 0.0) - self._loop_origin
+        if loop.dirty and ahead // loop.ticks > self._loop_ahead // loop.ticks:
+            loop.rebuild()  # les notes du tour qui vient de s'enregistrer, dès son premier pas
+        for at, action, _ in loop.due(self._loop_ahead, ahead, True):
+            out += self._loop_note(loop, at, action, now)
+        self._loop_ahead = max(self._loop_ahead, ahead)
+        return out
+
+    def _loop_apply(
+        self, loop: Loop, at: float, action: object, key: Key | None, now: int
+    ) -> list[Timed]:
+        lap = int(at // loop.ticks)
+        if isinstance(action, PadOn):
+            pad = self._loop_key(action.hit, lap)
+            self._loop_real[pad] = action.pad
+            self._pressure[pad] = action.pressure
+            grid = self._loop_origin + at + action.shift
+            if action.mode == "arp":
+                self._arp_add(pad, action.channel, action.note, action.velocity, grid)
+            else:
+                self._repeats[pad] = _Repeat(action.channel, action.note, grid)
+            self.leds_dirty = True
+            return []
+        if isinstance(action, PadPressure):
+            pad = self._loop_key(action.hit, lap)
+            if pad in self._pressure:
+                self._pressure[pad] = action.value
+            return []
+        if isinstance(action, PadOff):
+            pad = self._loop_key(action.hit, lap)
+            if pad not in self._pressure:
+                return []
+            out = self._release(pad, now)
+            if pad not in self._arp_notes:  # maintien : la note reste dans l'arpège
+                self._loop_real.pop(pad, None)
+            return out
+        if key is not None and self._loop_hand.get(key) == lap:
+            return []  # réglage bougé à la main pendant ce tour : elle l'emporte
+        if isinstance(action, Param):
+            self.faders.received(action.track, action.param, action.value)
+            self.leds_dirty = True
+            return [(now, self._param_out(action.track - 1, action.param, action.value))]
+        if isinstance(action, Setting):
+            self._loop_set(action.name, action.value)
+        return []
+
+    def _loop_note(self, loop: Loop, at: float, action: object, now: int) -> list[Timed]:
+        """Note directe rejouée : note on et note off à leur instant exact."""
+        pad = self._loop_key(getattr(action, "hit", 0), int(at // loop.ticks))
+        t = self._time_of(self._loop_origin + at) or now
+        if isinstance(action, PadOn):
+            on = max(t, now)
+            self._loop_real[pad] = action.pad
+            self._pressure[pad] = action.pressure
+            self._sounding[pad] = (action.channel, action.note, on)
+            self.leds_dirty = True
+            return [(on, NoteOn(action.channel, action.note, action.velocity))]
+        if isinstance(action, PadOff) and pad in self._sounding:
+            channel, note, on_at = self._sounding.pop(pad)
+            self._pressure.pop(pad, None)
+            self._loop_real.pop(pad, None)
+            self.leds_dirty = True
+            return [(max(t, now, on_at + NOTE_OFF_MIN_NS), NoteOff(channel, note))]
+        return []
 
     # --- perform : SOLO -------------------------------------------------------
 
@@ -736,6 +1258,9 @@ class Engine:
             self.last_control = f"{who} {name} {value}"
             if param == PITCH_BEND:
                 self._bent.add(track)
+            # un seul geste pour tout le groupe SOLO : il garde chaque track
+            label = f"{name} {'FX' if param in self.faders.fixed else f'T{track:02d}'}"
+            self._loop_param(("enc", index), label, track, param, value, now)
             out.append((now, self._param_out(track - 1, param, value)))
         return out
 
@@ -786,9 +1311,13 @@ class Engine:
 
     def on_start(self) -> None:
         self.phrase.start()
+        if self.loop is not None:  # Start : la boucle repart de son début
+            self._loop_origin = 0
+            self._loop_rewind()
 
     def on_stop(self) -> None:
         self._arp_clear()  # pas d'arpège à l'arrêt, même maintenu
+        self._loop_stop()
         self.phrase.stop()
         self.phrase_state = None
         self.leds_dirty = True
@@ -862,6 +1391,7 @@ class Engine:
         """Change de projet : la banque courante (dernier PC ou GROUP) prend ses réglages."""
         self.project = project
         self.announce = None
+        self._loop_erase()  # la boucle est un brouillon du projet quitté
         if self.bank is not None:
             self._set_bank(self.bank)
         self._apply_phrase()
@@ -1052,10 +1582,12 @@ class Engine:
         out: list[Timed] = []
         for (track, param), value in sorted(self._shift_saved.items()):
             self.faders.received(track, param, value)
+            self._loop_param(None, "SHIFT", track, param, value, now)
             out.append((now, self._param_out(track - 1, param, value)))
         self._shift_saved.clear()
         for track in sorted(self._bent):
             self.faders.received(track, PITCH_BEND, 64)
+            self._loop_param(None, "SHIFT", track, PITCH_BEND, 64, now)
             out.append((now, PitchBend(track - 1, 0)))
         self._bent.clear()
         self.leds_dirty = bool(out) or self.leds_dirty
@@ -1078,6 +1610,13 @@ class Engine:
                 self.leds_dirty = True
             if name == "PATTERN":
                 self._pattern_released(now)
+            if name == "REC" and not self._rec_used:
+                self._rec_toggle(now)
+            if name == "ERASE" and self._erase_alone:
+                self._erase_alone = False
+                if self.loop is not None:
+                    self._loop_erase()
+                    self._note("LOOP erased")
             if name == "NOTE_REPEAT":
                 self.repeat_held = False
                 if not self.repeat_locked:
@@ -1089,7 +1628,20 @@ class Engine:
         shift = "SHIFT" in held
         if self.poweroff_enabled and name in ("SHIFT", "ERASE") and {"SHIFT", "ERASE"} <= held:
             self._poweroff_since = now
+            self._erase_alone = False
             self.last_control = "POWER OFF: hold 2 s"
+            return
+        if name in ("SHIFT", "ERASE"):  # ERASE seul vide la boucle, au relâché
+            self._erase_alone = name == "ERASE" and not shift
+            return
+        if name == "REC":  # bascule au relâché, sauf si l'appui a réglé la longueur
+            self._rec_used = shift
+            if shift:  # SHIFT + REC : boucle coupée ou relancée, dès l'appui
+                self._loop_mute(now)
+            return
+        if "REC" in held and name.startswith("DISPLAY_"):
+            self._rec_used = True
+            self._loop_length(int(name[-1]) - 1)
             return
         if shift and name == "PLAY":
             self._recalibrate(1)
@@ -1131,7 +1683,9 @@ class Engine:
             i = QUANTIZE_CYCLE.index(self.quantize)
             self.quantize = QUANTIZE_CYCLE[(i + 1) % len(QUANTIZE_CYCLE)]
         elif name == "NOTE_REPEAT" and self.arp:
-            self._toggle_hold()
+            before = self._loop_settings()
+            self._set_hold(not self.arp_hold)
+            self._loop_changed(None, "HOLD", before, now)
         elif name == "NOTE_REPEAT":
             if shift:
                 self.repeat_locked = not self.repeat_locked
@@ -1140,11 +1694,10 @@ class Engine:
             else:
                 self.repeat_held = True
         elif name.startswith("DISPLAY_") and (self.repeat_active or self.arp):
-            self.division = DIVISIONS[int(name[-1]) - 1][0]
+            before = self._loop_settings()
+            self._set_division(DIVISIONS[int(name[-1]) - 1][0])
             self._pattern_used()
-            if self._arp_pos is not None:  # arpège en cours : recalé sur la nouvelle grille
-                div = DIVISION_TICKS[self.division]
-                self._arp_pos = math.ceil(self._arp_pos / div) * div
+            self._loop_changed(None, f"DIV {self.division}", before, now)
         elif name.startswith("DISPLAY_"):
             self._focus_menu(int(name[-1]) - 1)
         elif name == "MASTER_PUSH":  # focus à l'entrée suivante, en boucle
@@ -1171,7 +1724,18 @@ class Engine:
             self._consumed.add(pad)
             self.leds_dirty = True
             if not self._bounce(pad, now):
-                self._preset_pad(pad)
+                self._preset_pad(pad, now)
+            return []
+        if (
+            ev.pressed
+            and pad in (1, 2)
+            and pad not in self._pressure
+            and self.loop is not None
+            and "SHIFT" in self._held_buttons
+        ):  # SHIFT + pad 1 / 2 : annuler / rétablir, dès qu'une boucle existe
+            self._consumed.add(pad)
+            if not self._bounce(pad, now):
+                self._loop_undo(pad == 1)
             return []
         if ev.pressed and pad not in self._pressure and self._held_buttons & set(MODIFIERS):
             self._consumed.add(pad)
@@ -1191,12 +1755,20 @@ class Engine:
             elif not was_held:  # pad tenu à la fin d'un repeat : pas de nouvelle frappe
                 self._attacks[pad] = _Attack(now, ev.pressure)
                 self.leds_dirty = True
+            else:
+                self._loop_pressure(pad, ev.pressure, now)
             return self.tick(now)
         # relâché
-        self._pressure.pop(pad, None)
         out: list[Timed] = []
         if pad in self._attacks:
             out += self._fire(pad, now)
+        self._loop_pad_off(pad, now)
+        return out + self._release(pad, now) + self._aftertouch(now)
+
+    def _release(self, pad: int, now: int) -> list[Timed]:
+        """Relâché d'un pad, de la main ou rejoué par la boucle : sa note s'arrête."""
+        self._pressure.pop(pad, None)
+        out: list[Timed] = []
         if self._repeats.pop(pad, None) is not None:
             self.leds_dirty = True
         if pad in self._arp_notes and not self.arp_hold:  # sans maintien : la note sort
@@ -1208,7 +1780,7 @@ class Engine:
             channel, note, on_at = self._sounding.pop(pad)
             out.append((max(now, on_at + NOTE_OFF_MIN_NS), NoteOff(channel, note)))
             self.leds_dirty = True
-        return out + self._aftertouch(now)
+        return out
 
     # --- temps ----------------------------------------------------------------
 
@@ -1228,6 +1800,7 @@ class Engine:
         for pad in [p for p, a in self._attacks.items() if now - a.start >= window]:
             out += self._fire(pad, now)
         horizon = now + int(self.cfg.play.horizon_ms * 1e6)
+        out += self._loop_tick(now, horizon)  # avant l'arpège : il joue leurs réglages
         div = DIVISION_TICKS[self.division]
         for pad, rep in self._repeats.items():
             while (t := self._time_of(rep.next_pos)) is not None and t < horizon:
@@ -1235,7 +1808,7 @@ class Engine:
                 gate = self._time_of(rep.next_pos + div * GATE) or t + NOTE_OFF_MIN_NS
                 out.append((max(t, now), NoteOn(rep.channel, rep.note, vel)))
                 out.append((max(gate, now + NOTE_OFF_MIN_NS), NoteOff(rep.channel, rep.note)))
-                self.last_played = (pad, rep.note, vel)
+                self.last_played = (self._real(pad), rep.note, vel)
                 rep.next_pos += div
         out += self._arp_tick(now, horizon, div)
         return out + self._aftertouch(now)
@@ -1306,24 +1879,30 @@ class Engine:
         if ticks is None:  # transport arrêté : immédiat, pas de repeat
             self._sounding[pad] = (channel, note, now)
             return [(now, NoteOn(channel, note, vel))]
+        here = self.clock.ticks_at(now) or ticks  # position où le geste prend effet
         if self.arp:  # la note entre dans l'arpège au lieu de sonner
             self._arp_add(pad, channel, note, vel, ticks)
+            self._loop_pad_on(pad, "arp", channel, note, vel, att.peak, here, ticks)
             return self.tick(now)
         if self.repeat_active:
             pos, _ = nearest(ticks, DIVISION_TICKS[self.division])
             self._repeats[pad] = _Repeat(channel, note, pos)
+            self._loop_pad_on(pad, "repeat", channel, note, vel, att.peak, here, pos)
             return self.tick(now)
         target = now
+        sounds = here  # position où la note sonne : le pas visé si elle est retardée
         self.last_decision = f"frappe {ticks:.1f} ticks, Qoff"
         if self.quantize != "off":
             pos, immediate = nearest(ticks, GRID_TICKS[self.quantize])
             t = self._time_of(pos)
             if not immediate and t is not None:
                 target = max(now, t)
+                sounds = max(here, pos)
             ms = (ticks - pos) * (self.clock.period_ns or 0) / 1e6
             verdict = "immédiat" if immediate else "retardé"
             self.last_decision = f"frappe {ticks:.1f} -> pas {pos:.0f} ({ms:+.0f} ms) {verdict}"
         self._sounding[pad] = (channel, note, target)
+        self._loop_pad_on(pad, "note", channel, note, vel, att.peak, sounds, sounds)
         return [(target, NoteOn(channel, note, vel))]
 
     # --- sorties ----------------------------------------------------------------
@@ -1343,6 +1922,7 @@ class Engine:
     def leds(self) -> LedState:
         dim = self.cfg.leds.dim
         lit = set(self._attacks) | set(self._sounding) | set(self._repeats) | set(self._arp_notes)
+        lit = {self._real(p) for p in lit}  # gestes rejoués par la boucle : leur pad d'origine
         lit |= set(self._latched)  # pads du groupe SOLO : pleins
         held = self._held_buttons
         pads: list[RGB] = [(0, 0, 0)] * N_PADS
@@ -1378,7 +1958,16 @@ class Engine:
             if self.bank is not None:
                 groups[self.bank] = self.cfg.leds.bank
         low = round(LED_MAX * dim)
+        if self.loop is None or self.loop_state == "off":
+            rec = 0
+        elif self.loop_state == "play":
+            rec = low
+        elif self.loop_armed:  # armée : clignote au temps jusqu'au départ
+            rec = LED_MAX if st is not None and st.half_beat_on else 0
+        else:
+            rec = LED_MAX
         buttons = {
+            "REC": rec,
             "GRID": LED_MAX if self.quantize != "off" else 0,
             "NOTE_REPEAT": LED_MAX if self.repeat_active or self.arp_hold else 0,
             "PATTERN": LED_MAX if self.arp else low,

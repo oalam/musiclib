@@ -254,9 +254,15 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
 def _mode_tag(d: ImageDraw.ImageDraw, engine: Engine, box: Box = TAG_BOX, ink: int = 1) -> None:
     """Mode courant en vidéo inverse, toujours affiché (demandé le 2026-11-10), sur
     l'écran droit depuis le 2026-11-11. `ink` 0 : sur un bandeau lui-même inversé."""
+    name = engine.screen_tag  # boucle de gestes : ARM, REC, LOOP ou OFF à la place du mode
+    if engine.loop_blink:  # ARM et LOOP clignotent au temps : plein, puis contour seul
+        d.rectangle((box[0] - 2, box[1] - 1, box[2] + 2, box[3] + 1), fill=1 - ink)
+        d.rectangle(box, fill=ink)
+        d.rectangle((box[0] + 1, box[1] + 1, box[2] - 1, box[3] - 1), fill=1 - ink)
+        _centered(d, box, name, _fit(d, name, box[2] - box[0] - 4, (SMALL, 10)), ink)
+        return
     d.rectangle((box[0] - 2, box[1] - 1, box[2] + 2, box[3] + 1), fill=1 - ink)
     d.rectangle(box, fill=ink)
-    name = engine.mode_name
     _centered(d, box, name, _fit(d, name, box[2] - box[0] - 4, (SMALL, 10)), 1 - ink)
 
 
@@ -404,6 +410,9 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
         d.text((x, -2), line, font=_fit(d, line, room, (SMALL, 10, 9)), fill=1)
     nxt = engine.next_pattern
     side = f"> {nxt}" if nxt is not None else ""  # pattern suivant, à la fin de la phrase
+    loop_bar = engine.loop_bar
+    if not side and loop_bar is not None:  # mesure de la boucle de gestes
+        side = f"L {loop_bar[0]} / {loop_bar[1]}"
     if not side and engine.keyboard and engine.octave:
         side = f"oct {engine.octave:+d}"
     if side:

@@ -1440,3 +1440,274 @@ def test_fx_encoder_sent_once_for_a_solo_group(cfg: Config) -> None:
     assert len(eng.perform_tracks) == 2
     out = eng.handle(EncoderEvent(8, CC_STEP, 0), APART)
     assert out == [(APART, ControlChange(8, 24, 65))]
+
+
+# --- boucle de gestes (slice 22) ------------------------------------------------
+
+PADS = {pad_label(i): i for i in range(16)}  # pad 1-16 → index HID
+BAR = 96
+SUB = 16  # appels du moteur par tick d'horloge (un par ms environ, comme la boucle de la CLI)
+
+
+class Bench:
+    """Moteur sous horloge simulée, sans trou : `to(k)` joue tous les ticks jusqu'à `k`."""
+
+    def __init__(self, cfg: Config, bars: int = 1) -> None:
+        self.eng = Engine(cfg, running_clock(30))
+        self.at = 29  # dernier tick joué
+        eng = self.eng
+        btn(eng, "REC", True)
+        btn(eng, f"DISPLAY_{(1, 2, 4, 8).index(bars) + 1}", True)
+        btn(eng, f"DISPLAY_{(1, 2, 4, 8).index(bars) + 1}", False)
+        btn(eng, "REC", False)
+        assert eng.loop is None and eng.loop_bars == bars  # REC tenu a réglé la longueur
+        self.tap("REC")  # armée au tick 29 : la boucle part au tick 96
+        assert eng.loop_tag == "ARM"
+
+    @property
+    def now(self) -> int:
+        return self.at * TICK
+
+    def to(self, tick: int) -> list[Timed]:
+        out: list[Timed] = []
+        for k in range(self.at + 1, tick + 1):
+            self.eng.clock.tick(k * TICK)
+            for j in range(SUB):
+                out += self.eng.tick(k * TICK + j * TICK // SUB)
+        self.at = max(self.at, tick)
+        return out
+
+    def tap(self, name: str) -> None:
+        btn(self.eng, name, True, self.now)
+        btn(self.eng, name, False, self.now)
+
+    def hit(self, tick: int, pad: int = 1) -> list[Timed]:
+        return self.to(tick) + press(self.eng, self.now, pad=PADS[pad])
+
+    def lift(self, tick: int, pad: int = 1) -> list[Timed]:
+        return self.to(tick) + self.eng.handle(PadEvent(PADS[pad], False, 0), self.now)
+
+    def turn(self, tick: int, encoder: int = 1) -> list[Timed]:
+        return self.to(tick) + self.eng.handle(EncoderEvent(encoder, CC_STEP, 0), self.now)
+
+    def shift_pad(self, pad: int) -> list[Timed]:
+        """SHIFT + pad, relâchés."""
+        btn(self.eng, "SHIFT", True, self.now)
+        out = self.eng.handle(PadEvent(PADS[pad], True, 2500), self.now)
+        out += self.eng.handle(PadEvent(PADS[pad], False, 0), self.now)
+        btn(self.eng, "SHIFT", False, self.now)
+        return out
+
+
+def ons(out: list[Timed]) -> list[int]:
+    return [t for t, m in out if isinstance(m, NoteOn)]
+
+
+def offs(out: list[Timed]) -> list[int]:
+    return [t for t, m in out if isinstance(m, NoteOff)]
+
+
+def test_loop_replays_a_note_at_the_same_place_each_lap(cfg: Config) -> None:
+    b = Bench(cfg)
+    b.to(100)
+    assert b.eng.loop_tag == "REC"
+    played = b.hit(108) + b.lift(120)  # pas 12 de la boucle : immédiat
+    (first,), (first_off,) = ons(played), offs(played)
+    out = b.to(96 * 4 + 90)
+    assert ons(out) == pytest.approx([first + n * BAR * TICK for n in (1, 2, 3)], abs=1000)
+    assert offs(out) == pytest.approx([first_off + n * BAR * TICK for n in (1, 2, 3)], abs=1000)
+    assert b.eng.loop_bar == (1, 1)
+
+
+def test_loop_needs_running_transport_and_rec_cancels_when_empty(cfg: Config) -> None:
+    eng = Engine(cfg)
+    btn(eng, "REC", True)
+    btn(eng, "REC", False)
+    assert eng.loop is None and eng.last_control == "REC: start the DT2 first"
+    b = Bench(cfg)
+    b.to(40)
+    b.tap("REC")  # encore armée, rien de joué
+    assert b.eng.loop is None and b.eng.loop_tag is None
+
+
+def test_loop_play_does_not_record_and_overdub_adds(cfg: Config) -> None:
+    b = Bench(cfg)
+    b.hit(108)
+    b.lift(112)
+    b.to(192)
+    b.tap("REC")  # lecture seule
+    assert b.eng.loop_tag == "LOOP"
+    b.hit(230, pad=2)
+    b.lift(234, pad=2)
+    assert b.eng.loop is not None and len(b.eng.loop.gestures) == 1
+    b.to(288)
+    b.tap("REC")  # overdub
+    b.hit(330, pad=2)
+    b.lift(334, pad=2)
+    assert len(b.eng.loop.gestures) == 2
+    b.to(383)
+    out = b.to(96 * 5 - 2)  # tour suivant : les deux notes
+    assert len(ons(out)) == 2 and len(offs(out)) == 2
+
+
+def test_loop_undo_cuts_the_held_note_and_redo_brings_it_back(cfg: Config) -> None:
+    b = Bench(cfg)
+    b.hit(108)
+    b.lift(170)  # note longue, pas 12 à 74
+    b.to(192 + 40)  # tour suivant, la boucle tient la note
+    assert b.shift_pad(1) == []  # SHIFT + pad 1 ne joue pas
+    assert b.eng.last_control == "UNDO pad T01"
+    out = b.to(288 + 95)
+    assert len(offs(out)) == 1 and offs(out)[0] < 234 * TICK  # coupée tout de suite
+    assert ons(out) == []  # et plus rejouée
+    b.shift_pad(1)
+    assert b.eng.last_control == "nothing to undo"
+    b.shift_pad(2)
+    assert b.eng.last_control == "REDO pad T01"
+    out = b.to(400)  # au-delà de l'anti-rebond du pad
+    b.shift_pad(2)
+    assert b.eng.last_control == "nothing to redo"
+    out += b.to(479)
+    assert len(ons(out)) == 1 and len(offs(out)) == 1
+
+
+def test_shift_pad_plays_without_loop(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock())
+    btn(eng, "SHIFT", True)
+    assert ons(press(eng, 30 * TICK))
+
+
+def test_loop_pad_held_over_the_wrap_is_released_in_the_loop(cfg: Config) -> None:
+    b = Bench(cfg)
+    b.hit(150)
+    b.lift(200)  # tenu à travers le bouclage (tick 192)
+    b.to(96 * 3 - 1)
+    out = b.to(96 * 6 - 1)  # trois tours
+    assert len(ons(out)) == len(offs(out)) == 3
+    for on, off in zip(ons(out), offs(out), strict=True):
+        assert on < off <= on + 42 * TICK  # relâchée au bouclage : pas 54 à 96
+
+
+def test_loop_stop_cuts_notes_start_rewinds_and_erase_empties(cfg: Config) -> None:
+    b = Bench(cfg)
+    played = b.hit(108)
+    b.lift(170)
+    b.to(230)
+    b.eng.clock.stop(b.now)
+    b.eng.on_stop()
+    out = b.eng.tick(b.now + MS)
+    assert len(offs(out)) == 1
+    assert b.eng.loop_state == "play" and b.eng.loop_tag is None
+    b.eng.clock.start(b.now + 2 * MS)
+    b.eng.on_start()
+    out = b.to(230 + 60)  # Start : le tick 231 est la position 0, la boucle repart de son début
+    assert ons(out) == pytest.approx([ons(played)[0] + (231 - 96) * TICK], abs=1000)
+    b.tap("ERASE")
+    assert b.eng.loop is None and b.eng.last_control == "LOOP erased"
+    out = b.to(500)
+    assert len(offs(out)) == 1 and ons(out) == []
+    b.shift_pad(1)  # plus de boucle : SHIFT + pad 1 rejoue la note
+
+
+def test_loop_replays_encoder_as_one_gesture_and_hand_wins_for_the_lap(cfg: Config) -> None:
+    b = Bench(cfg)
+    b.eng.track = 10
+    sent: list[Timed] = []
+    for k in range(4):  # un mouvement continu
+        sent += b.turn(100 + k)
+    assert b.eng.loop is not None and len(b.eng.loop.gestures) == 1
+    sent += b.turn(140)  # 300 ms plus tard : autre geste
+    assert len(b.eng.loop.gestures) == 2
+    assert len(sent) == 5
+    assert b.to(191) == []
+    out = b.to(287)
+    assert [m for _, m in out] == [m for _, m in sent]  # mêmes valeurs, au tour suivant
+    b.turn(290)  # la main reprend le paramètre
+    assert b.to(383) == []  # la boucle se tait jusqu'à la fin du tour
+    # le geste de la main (pas 2) n'a couvert aucune valeur des anciens : tout rejoue
+    assert len(b.to(479)) == 6
+    b.shift_pad(1)
+    assert b.eng.last_control == "UNDO LVL T10"
+
+
+def test_loop_restores_arp_settings_at_each_lap(cfg: Config) -> None:
+    b = Bench(cfg, bars=2)
+    eng = b.eng
+    btn(eng, "PATTERN", True)  # ARPG
+    btn(eng, "PATTERN", False, t=SECOND)
+    start = eng.division
+    b.to(96 + 100)
+    other = "DISPLAY_2" if eng.leds().buttons["DISPLAY_2"] != LED_MAX else "DISPLAY_3"
+    b.tap(other)  # division changée en mesure 2
+    changed = eng.division
+    assert changed != start and eng.loop is not None
+    assert eng.loop.gestures[-1].label == f"DIV {changed}"
+    b.to(96 + 192 + 50)
+    assert eng.division == start  # nouveau tour : photo de départ
+    b.to(96 + 192 + 110)
+    assert eng.division == changed  # rejouée à sa place
+    b.shift_pad(1)
+    assert eng.last_control == f"UNDO DIV {changed}"
+    b.to(96 + 384 + 110)
+    assert eng.division == changed  # annulé : plus rien ne ramène la division
+
+
+def test_loop_replays_arp_pads(cfg: Config) -> None:
+    b = Bench(cfg)
+    btn(b.eng, "PATTERN", True)
+    btn(b.eng, "PATTERN", False, t=SECOND)
+    played = b.hit(108) + b.lift(150) + b.to(191)
+    first = ons(played)
+    assert len(first) >= 4
+    out = b.to(287)
+    # l'entrée du pad est appliquée à son passage, à un appel du moteur près
+    assert ons(out) == pytest.approx([t + BAR * TICK for t in first], abs=1.2 * MS)
+    assert len(offs(out)) == len(ons(out))
+    assert b.eng.last_played is not None and b.eng.last_played[0] == 1  # pad d'origine
+
+
+def test_loop_rec_led_and_screen_tag(cfg: Config) -> None:
+    b = Bench(cfg)
+    eng = b.eng
+    assert eng.screen_tag == "ARM"
+    b.to(100)
+    assert eng.leds().buttons["REC"] == LED_MAX and eng.screen_tag == "REC"
+    btn(eng, "MUTE", True)
+    assert eng.screen_tag == "MUTE"
+    btn(eng, "MUTE", False)
+    b.hit(101)
+    b.lift(104)
+    b.tap("REC")
+    assert 0 < eng.leds().buttons["REC"] < LED_MAX and eng.screen_tag == "LOOP"
+    btn(eng, "REC", True)
+    btn(eng, "DISPLAY_2", True)
+    btn(eng, "REC", False)
+    assert eng.last_control == "LOOP length: ERASE first" and eng.loop_state == "play"
+
+
+def test_shift_rec_cuts_the_loop_and_brings_it_back(cfg: Config) -> None:
+    b = Bench(cfg)
+    eng = b.eng
+    b.hit(100)
+    b.lift(110)
+    b.tap("REC")  # lecture seule
+    assert ons(b.to(200)) != []  # tour 2 : la note est rejouée
+    btn(eng, "SHIFT", True, b.now)
+    b.tap("REC")
+    btn(eng, "SHIFT", False, b.now)
+    assert eng.loop_state == "off" and eng.screen_tag == "OFF" and eng.loop is not None
+    assert eng.leds().buttons["REC"] == 0 and eng.last_control == "LOOP off"
+    assert ons(b.to(400)) == []  # coupée : plus rien, la boucle reste
+    b.tap("REC")  # REC seul la relance aussi, à la mesure suivante (tick 480), de son début
+    assert eng.loop_tag == "LOOP" and eng.last_control == "LOOP on"
+    assert ons(b.to(479)) == []
+    assert len(ons(b.to(500))) == 1  # la note du tick 100 - 96 = 4, rejouée au tick 484
+
+
+def test_shift_rec_without_a_loop_does_nothing(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(30))
+    btn(eng, "SHIFT", True)
+    btn(eng, "REC", True)
+    btn(eng, "REC", False)
+    btn(eng, "SHIFT", False)
+    assert eng.loop is None and eng.last_control == "no loop"

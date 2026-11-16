@@ -45,7 +45,7 @@ couper ; SPEC « Synchro Mac / Pi des réglages appris »).
 
 ## Configuration
 
-`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur, ses motifs et ses presets (`arp`, `arp.motifs`, `arp.progressions`, `arp.presets` ; presets sauvés depuis la MK2 dans `state/arp-presets.json`), longueur de phrase, écran d'accueil
+`config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur, ses motifs et ses presets (`arp`, `arp.motifs`, `arp.progressions`, `arp.presets` ; presets sauvés depuis la MK2 dans `state/arp-presets.json`), longueur de phrase, boucle de gestes (`play.loop_bars`), écran d'accueil
 (`play.splash_ms`), synchro avec le Pi (`pi`),
 couleurs, dispositions du clavier (B-H), table `mpc` des 16 pads (track, tranche,
 label, couleur).
