@@ -1210,6 +1210,72 @@ l'ordre inverse de leur enregistrement, sans note bloquée, et SHIFT +
 pad 2 les remet ; ERASE vide tout ; un tour capté en LIVE REC sur
 la DT2 relit les mêmes notes et le mouvement de CUT.
 
+## Slice 23 : mode ACID V (cadré le 2026-11-13, à coder)
+
+Exemple : track 10 de la DT2 en machine MIDI, `CHAN` = 1, sortie vers une
+piste Live armée qui joue Acid V (Arturia, émulation 303). STEP allume
+ACID V. En ARPG, motif `ACID` (`X-.x x~X- .xx~ X.x-`), pads Bb, Db et F
+tenus : les `X` partent à la vélocité d'accent d'Acid V, les autres en
+dessous ; le Db du pas 6 glisse vers la note suivante au lieu d'être
+rattaqué. Les encodeurs règlent cutoff, résonance, env mod, decay,
+accent et drive d'Acid V, et la DT2 enregistre leurs mouvements en
+p-locks en LIVE REC.
+
+**Arbitré le 2026-11-13** :
+
+- **Le chemin passe par la track MIDI de la DT2**, pas par une seconde
+  sortie : mk-brain envoie notes et CC sur le canal de la track comme
+  d'habitude ; la track MIDI réémet les notes sur son `CHAN` et ses VAL1-8
+  sur les CC choisis en page FLTR 2. Marche depuis le Pi (DIN MIDI OUT de
+  la DT2 vers le Mac) comme depuis le Mac (USB), et tout s'enregistre en
+  LIVE REC.
+- **STEP bascule ACID V** (appui bref, LED allumée quand actif), quelle
+  que soit la track sélectionnée. L'étiquette du mode affiche `ACID` à
+  côté de `ARPG` / `KEYS` / `MPC`. Réglage gardé dans la session.
+- **Page d'encodeurs ACID**, à la place des pages p1 / p2 tant qu'ACID V
+  est actif (les flèches ne changent plus de page). Les encodeurs envoient
+  les CC des VAL1-8 de la track MIDI (manuel, annexe B.8 : CC 70 à 77) ;
+  la page FLTR 2 de la track fait le lien avec Acid V :
+
+  | Encodeur | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+  |---|---|---|---|---|---|---|---|---|
+  | Étiquette | CUT | RES | ENV | DEC | ACC | DRV | DIST | FX1 |
+  | CC envoyé (VAL) | 70 (VAL1) | 71 (VAL2) | 72 (VAL3) | 73 (VAL4) | 74 (VAL5) | 75 (VAL6) | 76 (VAL7) | 77 (VAL8) |
+  | CC Acid V (FLTR 2, SEL) | 74 Cutoff | 71 Resonance | 19 Envelope Mod | 16 Decay | 17 Accent | 81 Distortion Drive | 82 Distortion Dry/Wet | 93 FX1 Dry/Wet |
+
+  Table dans `config/default.yaml` (`acid.knobs`), comme les pages p1 / p2.
+- **Accent** : en ACID V, un pas `X` part à `acid.accent_velocity` (127)
+  et un pas `x` à `acid.velocity` (90), au lieu de la pression du pad et
+  de l'atténuation (slice 12) ; Acid V fait l'accent par la vélocité.
+  Seuil exact d'Acid V **à vérifier à l'essai**. Pas de nouveau caractère
+  pour l'accent : `X` le porte déjà.
+- **Slide** : nouveau caractère `~` dans les motifs, écrit à la place d'un
+  `x` ou d'un `X` (`~` = note glissée, sans accent ; le pas suivant porte
+  la note d'arrivée). La note du pas `~` n'est coupée qu'après l'attaque
+  de la suivante (chevauchement de `acid.slide_overlap_ms`, 10 ms) : Acid
+  V glisse quand deux notes se chevauchent (legato), **à vérifier à
+  l'essai**, comme le passage des notes chevauchées par la track MIDI de
+  la DT2 et leur relecture après LIVE REC. Hors ACID V, `~` se joue comme
+  un `x`. Le motif `ACID` de la bibliothèque est réécrit avec des `~`.
+
+**Hors périmètre** : seconde sortie MIDI directe vers Live (bus IAC, MIDI
+réseau), autres synthés que Acid V (la table `acid.knobs` reste propre à
+Acid V, un autre synthé = une autre slice), édition des motifs sur la
+machine, réglage des CC Acid V depuis la MK2 (la page FLTR 2 se règle sur
+la DT2).
+
+**Réglages requis** : track MIDI sur la DT2 (`[FUNC] + [SRC]` > MIDI,
+`CHAN` = canal de la piste Live), VAL1-8 activés (`[FUNC]` + appui sur
+chaque DATA ENTRY) et SEL1-8 de la page FLTR 2 = 74, 71, 19, 16, 17, 81,
+82, 93 ; `OUTPUT TO` = MIDI (Pi) ou USB (Mac) ; piste Live armée.
+
+**Critère de fin** : STEP allumé, motif `ACID`, trois pads tenus, DT2
+lancée : Acid V joue la ligne, accents audibles sur les `X`, glissés sur
+les `~` ; les 8 encodeurs font bouger les bons réglages d'Acid V ; en
+LIVE REC, le pattern relu rejoue notes, accents, glissés et mouvements
+des encodeurs. STEP éteint : retour aux pages p1 / p2 et aux vélocités
+de la slice 12.
+
 ## Modes : live et design
 
 > **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
@@ -2059,6 +2125,7 @@ conditionne tout le reste.
 | 20 | **Pas probabilistes** : pas `?` dans `arp.motifs` (note jouée une fois sur deux, silence sinon), motif `HASA` | cf. « Slice 20 », critère de fin | codée le 2026-11-11 (v0.42.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 21 | **Renversements** : encodeur 5 `INV` PATTERN tenu, à la place de `PRE` (`OFF`, `1`, `2`, `FIX` = accords gardés dans l'octave au-dessus du pad), gardé dans les presets | cf. « Slice 21 », critère de fin | codée le 2026-11-11 (v0.43.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 22 | **Boucle de gestes** : REC de la MK2 enregistre dans le Pi pads, encodeurs, réglages de l'arpège et divisions sur 1, 2, 4 ou 8 mesures, rejoués en boucle par le moteur, overdub, annuler / rétablir geste par geste (SHIFT + pad 1 / pad 2), ERASE pour vider ; en mémoire | cf. « Slice 22 », critère de fin | cadrée le 2026-11-11, annulation arbitrée le 2026-11-12, codée le 2026-11-12 (v0.46.0), gestes REC / ERASE tels que proposés ; SHIFT + REC (couper sans vider) et étiquette clignotante ajoutés en v0.49.0 ; à essayer sur la MK2 et la DT2 (critère de fin, LIVE REC) |
+| 23 | **Mode ACID V** : STEP bascule, page d'encodeurs ACID sur les VAL1-8 de la track MIDI (cutoff, résonance, env mod, decay, accent, drive, distorsion, FX1 d'Acid V), accent par vélocité fixe sur les `X`, slide `~` (notes chevauchées) dans les motifs | cf. « Slice 23 », critère de fin | cadrée le 2026-11-13, à coder après le commit de la slice 22 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
