@@ -315,8 +315,17 @@ class MpcPad(BaseModel):
     color: RGB
 
 
+class PiConfig(BaseModel):
+    """Synchro de `state/` avec le Pi, depuis le Mac (`state_sync.py`)."""
+
+    host: str = ""  # cible SSH (`pi@mk-brain.local`) ; vide : pas de synchro
+    state_dir: str = "musiclib/mk-brain/state"  # sur le Pi, depuis le dossier de l'utilisateur
+    timeout_s: float = Field(3.0, gt=0)  # Pi absent : on joue sans lui après ce délai
+
+
 class Config(BaseModel):
     midi: MidiConfig = MidiConfig()
+    pi: PiConfig = PiConfig()
     velocity: VelocityConfig = VelocityConfig()
     aftertouch: AftertouchConfig = AftertouchConfig()
     leds: LedConfig = LedConfig()

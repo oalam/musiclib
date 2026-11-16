@@ -142,6 +142,7 @@ mk-brain/
 │   ├── project.py                # modèle Pydantic du projet, chargement
 │   ├── selection.py              # liste des projets, dernier joué (6.C)
 │   ├── session.py                # derniers réglages par projet (state/)
+│   ├── state_sync.py             # synchro Mac / Pi des sessions et presets (SSH)
 │   ├── presets.py                # banque des presets d'arpège sauvés (state/arp-presets.json)
 │   ├── modes.py                  # bascule live / design
 │   ├── hid_mk2.py                # rapports HID MK2 : parse entrée, LED, écrans
@@ -1400,6 +1401,27 @@ l'essai sur la MK2 :
   absente du projet ou une octave hors bornes est ignorée ; pitch bend non
   sauvé (ressort) ;
 - fichier illisible ou hors bornes : session neuve, sans erreur.
+
+**Synchro Mac / Pi des réglages appris (demandé et codé le 2026-11-12,
+v0.48.0, à essayer)** : le Mac sert à travailler, le Pi au live.
+- `play` lancé sur le Mac (jamais par le service du Pi) échange avec le
+  Pi, par SSH (`pi.host`, clé sans mot de passe), au lancement avant de
+  lire la session, et à l'arrêt après l'avoir écrite ;
+- ce qui voyage : `session-<projet>.json` et `arp-presets.json`, rien
+  d'autre de `state/` (`last_good`, `fails`, `last_project` restent
+  locaux) ;
+- fichier entier, sans fusion (décidé le 2026-11-12). Le côté qui a
+  changé depuis la dernière synchro est copié vers l'autre ; ce qui a
+  changé se lit aux empreintes gardées sur le Mac
+  (`state/sync-base.json`), pas aux dates : le Pi 3 n'a pas d'horloge
+  sauvegardée, ses dates hors ligne ne valent rien ;
+- modifié des deux côtés : le plus récent gagne (à dates égales, le Mac),
+  l'autre version est perdue, la ligne affichée le dit ; un fichier absent
+  d'un côté y est copié, une suppression ne se propage pas ;
+- le service du Pi est arrêté le temps de l'échange (`sudo systemctl
+  stop`, il écrit alors sa session), puis relancé : en marche, il
+  réécrirait sa session par-dessus la copie ;
+- Pi injoignable : `play` démarre sans synchro après `pi.timeout_s` (3 s).
 
 ## Comportements
 

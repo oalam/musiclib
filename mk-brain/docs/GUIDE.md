@@ -38,6 +38,14 @@ cd mk-brain && .venv/bin/mk-brain play
 Les deux écrans montrent d'abord l'accueil `MK BRAIN` et la version,
 2,5 s ou jusqu'au premier appui ; la MK2 joue déjà.
 
+**Mac et Pi** : sur le Mac, `play` échange avec le Pi, au lancement et à
+l'arrêt, les sessions par projet (valeurs des faders apprises de la DT2
+comprises) et les presets d'arpège sauvés. Le côté modifié depuis la
+dernière synchro est copié vers l'autre, fichier entier ; modifié des deux
+côtés, le plus récent gagne. La console le dit (`synchro Pi (lancement) :
+session-solaris.json : Mac -> Pi`). Pi éteint ou hors réseau : `play`
+démarre sans lui après 3 s.
+
 ![Sélection de projet](img/01-selection.png)
 
 L'encodeur maître fait défiler les projets, son appui charge. Le dernier

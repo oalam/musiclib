@@ -241,6 +241,7 @@ def cmd_play(
     from mk_brain.scheduler import Scheduler
     from mk_brain.selection import Selector, list_projects, read_last, write_last
     from mk_brain.session import SAVE_EVERY_NS, Session, load_session, save_session
+    from mk_brain.state_sync import SshRemote, SyncError, sync_state
 
     cfg = load_config()
     if raw_per_step is not None:  # essai d'une course fixe, sans toucher à la config
@@ -250,6 +251,19 @@ def cmd_play(
         print(f"course fixe des encodeurs : {raw_per_step} par cran, 0-127 en {turns:.2f} tour")
     project = None if project_path is None else load_project(project_path)
     clock = ClockTracker()
+
+    def sync(moment: str) -> None:
+        """Sessions et presets échangés avec le Pi (Mac seulement) ; jamais bloquant."""
+        if in_service() or not cfg.pi.host:
+            return
+        remote = SshRemote(cfg.pi.host, cfg.pi.state_dir, cfg.pi.timeout_s)
+        try:
+            for line in sync_state(remote) or ["rien à copier"]:
+                print(f"synchro Pi ({moment}) : {line}")
+        except SyncError as exc:
+            print(f"synchro Pi ({moment}) : sans le Pi ({exc})")
+
+    sync("lancement")  # avant de lire la session et les presets
 
     def catalog() -> Selector:
         return Selector(list_projects(), read_last(), read_sync())
@@ -392,6 +406,7 @@ def cmd_play(
                 out.close()
             if inp is not None:
                 inp.close()
+    sync("arrêt")  # le travail de cette séance part vers le Pi
     print(f"clock, écart d'arrivée des ticks à la prévision : {clock.prediction_error.summary()}")
     if sched is not None:
         print(f"envoi vs cible : {sched.errors.summary()} ; abandonnés : {sched.dropped}")

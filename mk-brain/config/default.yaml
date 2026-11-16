@@ -35,6 +35,11 @@ play:
   tap_debounce_ms: 150       # SOLO, MUTE, SELECT + pad : un pad relâché depuis moins de 150 ms ne rebascule pas
   splash_ms: 2500            # écran d'accueil MK BRAIN au lancement, fermé au premier appui ; 0 : aucun
 
+pi:                         # synchro des sessions et des presets d'arpège avec le Pi, au lancement et à l'arrêt de play sur le Mac
+  host: "pi@mk-brain.local"  # cible SSH, par clé ; "" : pas de synchro
+  state_dir: "musiclib/mk-brain/state"   # dossier state/ du Pi, depuis /home/pi
+  timeout_s: 3               # Pi absent : play démarre sans lui après ce délai
+
 arp:                        # mode ARPG (PATTERN) : réglages de départ (config : PATTERN tenu)
   order: up                  # up, down, updown, played (ordre d'appui), random
   octaves: 1                 # 1 à 3

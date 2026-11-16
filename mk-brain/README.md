@@ -38,10 +38,15 @@ commit qui échoue deux fois revient à `state/last_good` ; MK2 ou DT2
 absente (code de sortie 3) ne compte pas comme un échec, le service attend
 le branchement (SPEC « Service et retour arrière »).
 
+Synchro Mac / Pi : `play` lancé sur le Mac échange avec le Pi, par SSH, au
+lancement et à l'arrêt, `state/session-<projet>.json` et
+`state/arp-presets.json` (section `pi` de la config, `host: ""` pour la
+couper ; SPEC « Synchro Mac / Pi des réglages appris »).
+
 ## Configuration
 
 `config/default.yaml` : canal, courbe de vélocité, seuils d'aftertouch, quantize, arpégiateur, ses motifs et ses presets (`arp`, `arp.motifs`, `arp.progressions`, `arp.presets` ; presets sauvés depuis la MK2 dans `state/arp-presets.json`), longueur de phrase, écran d'accueil
-(`play.splash_ms`),
+(`play.splash_ms`), synchro avec le Pi (`pi`),
 couleurs, dispositions du clavier (B-H), table `mpc` des 16 pads (track, tranche,
 label, couleur).
 

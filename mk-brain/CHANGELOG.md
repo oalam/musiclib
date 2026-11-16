@@ -3,6 +3,22 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.48.0] - 2026-11-12
+
+### Ajouté
+
+- Synchro des réglages appris entre le Mac et le Pi (`state_sync.py`) :
+  `play` lancé sur le Mac échange avec le Pi, par SSH, au lancement et à
+  l'arrêt, les sessions par projet (`state/session-<projet>.json`, valeurs
+  des faders apprises de la DT2 comprises) et la banque de presets
+  d'arpège (`state/arp-presets.json`). Fichier entier, sans fusion. Le
+  côté qui a changé depuis la dernière synchro est copié vers l'autre
+  (empreintes dans `state/sync-base.json`, pas les dates : le Pi n'a pas
+  d'horloge sauvegardée) ; modifié des deux côtés, le plus récent gagne
+  et le compte rendu le dit. Le service du Pi est arrêté le temps de
+  l'échange puis relancé. Pi absent : `play` démarre sans lui après 3 s.
+  Réglages : section `pi` de la config (`host` vide : pas de synchro).
+
 ## [0.47.0] - 2026-11-12
 
 ### Ajouté
