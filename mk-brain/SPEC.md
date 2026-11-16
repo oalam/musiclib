@@ -1276,6 +1276,101 @@ LIVE REC, le pattern relu rejoue notes, accents, glissés et mouvements
 des encodeurs. STEP éteint : retour aux pages p1 / p2 et aux vélocités
 de la slice 12.
 
+## Slice 24 : menu des réglages (cadré le 2026-11-13, à coder)
+
+Exemple : un ami joue sur la DT2, toi sur la MK2. SHIFT + appui sur
+l'encodeur maître : l'écran gauche affiche les rubriques, `MIDI` choisi
+au bouton d'écran 5, l'encodeur 1 passe `2J` de `SOLO` à `DUO`. Ton ami
+change de track sur la DT2 : ta MK2 reste sur la sienne. Plus tard, les
+pads te semblent durs : rubrique `TOUCH`, encodeur 1 sur `DOUX`, sans
+ouvrir le Mac. Éteindre et rallumer le Pi retrouve ces réglages.
+
+**Arbitré le 2026-11-13** :
+
+- **SHIFT + appui sur l'encodeur maître** ouvre et ferme le menu. L'appui
+  seul garde son rôle (entrée suivante du menu, chargement de projet).
+  Les pads jouent toujours, menu ouvert ; seuls les encodeurs et les
+  boutons d'écran sont pris par le menu.
+- **Navigation calquée sur les pages d'encodeurs** : boutons d'écran 1-6
+  = rubriques (`JEU`, `TOUCH`, `ENC`, `AFF`, `MIDI`, `SYS`), l'écran
+  gauche les liste avec la rubrique courante en vidéo inverse ;
+  encodeurs 1-8 = les entrées de la rubrique, étiquette et valeur sous
+  chacun, comme une page de faders. Une entrée de type action (`PANIC`,
+  `RST`, `BACK`) part à la rotation de son encodeur vers la droite.
+- **Transport lancé, tout se règle sauf `SYS`** : ses actions affichent
+  `transport lancé` et ne font rien ; ses entrées en lecture restent
+  visibles.
+- **Fichier `state/settings.json`** (hors dépôt, comme
+  `arp-presets.json`), commun aux projets : seules les valeurs changées
+  depuis la MK2 y sont écrites, elles l'emportent sur `config/default.yaml`.
+  Il voyage avec la synchro Mac / Pi (fichier entier, mêmes règles que
+  `session-<projet>.json`). Fichier illisible ou valeur hors bornes :
+  valeur de la config, sans erreur.
+- **Entrées** (bornes et pas dans la config, bloc `settings`) :
+
+  | Rubrique | Encodeur | Étiquette | Valeurs | Clé remplacée |
+  |---|---|---|---|---|
+  | JEU | 1 | `PHR` | 32, 64 | `play.phrase` (sans banque du projet) |
+  | JEU | 2 | `REP` | les 8 divisions | `play.repeat` |
+  | JEU | 3 | `LOOP` | 1, 2, 4, 8 | `play.loop_bars` |
+  | JEU | 4 | `OFS` | −20 à +20 ms, pas de 1 | nouveau `play.offset_ms` (0) |
+  | TOUCH | 1 | `VEL` | `DOUX`, `NORM`, `DUR` | nouveau `velocity.profile` ; profils dans `velocity.profiles` (gamma, full_scale), `NORM` = valeurs actuelles (0,4 ; 3000) |
+  | TOUCH | 2 | `FIX` | `OFF`, 1 à 127 | nouveau `velocity.fixed` (`off`) |
+  | TOUCH | 3 | `AT` | `ON`, `OFF` | nouveau `aftertouch.enabled` (on) |
+  | TOUCH | 4 | `ATS` | 1500 à 3500, pas de 50 | `aftertouch.threshold` |
+  | TOUCH | 5 | `MES` | écran de mesure | — |
+  | ENC | 1 | `ACC` | `ON`, `OFF` | bloc `encoders.accel` (absent = `OFF`) |
+  | ENC | 2 | `SENS` | 8 à 30, pas de 1 | `encoders.raw_per_step` |
+  | AFF | 1 | `DIM` | 0,05 à 0,50, pas de 0,05 | `leds.dim` |
+  | AFF | 2 | `SEL` | 0,20 à 0,80, pas de 0,05 | `leds.selected` |
+  | AFF | 3 | `ECR` | luminosité des écrans | nouveau, **à vérifier** (commande HID non décodée) |
+  | AFF | 4 | `SPL` | `ON`, `OFF` | `play.splash_ms` (`OFF` = 0) |
+  | MIDI | 1 | `2J` | `SOLO`, `DUO` | nouveau `midi.players` (`solo`) |
+  | MIDI | 2 | `PANIC` | action | — |
+  | SYS | 1 | `VER` | version, lecture | — |
+  | SYS | 2 | `SYNC` | statut de synchro, lecture (`sync a1b2c3d`, `offline 2026-11-08`) | — |
+  | SYS | 3 | `IP` | adresse, lecture | — |
+  | SYS | 4 | `ALIM` | `OK`, `SOUS-T`, `EU SOUS-T`, lecture | — |
+  | SYS | 5 | `RST` | action | — |
+  | SYS | 6 | `BACK` | action | — |
+
+- **`OFS`** : décalage des notes calées sur l'horloge (quantize, repeat,
+  arpège, boucle de gestes) pour les aligner à l'oreille sur les trigs de
+  la DT2. Une frappe non quantizée part toujours tout de suite.
+- **`FIX`** : toutes les notes des pads à cette vélocité (le kick en
+  live) ; les accents des motifs gardent leur rapport (slice 12).
+- **`MES`** : tant que l'entrée a le focus, l'écran droit affiche la
+  pression de la dernière frappe (crête sur `window_ms`), la vélocité
+  obtenue et la pression tenue, sur 4095. On recale les seuils sans Mac.
+- **`2J` = `DUO`** : la MK2 ne change plus de track quand la DT2 en
+  change (ni au bouton tourné sur la DT2, ni au Program Change). Seuls
+  SELECT + pad choisissent sa track ; les encodeurs restent dessus. En
+  `SOLO`, comportement actuel.
+- **`PANIC`** : All Notes Off (CC 123) sur les 16 canaux, notes tenues et
+  repeat relâchés, arpège en maintien coupé ; la boucle de gestes est
+  gardée.
+- **`ALIM`** : `vcgencmd get_throttled` sur le Pi (`SOUS-T` en cours, `EU
+  SOUS-T` depuis le démarrage) ; `--` sur le Mac.
+- **`RST`** et **`BACK`** : redémarrer le service, revenir à
+  `state/last_good` (slice 7). Confirmation à l'appui sur l'encodeur
+  maître dans les 5 s, comme l'extinction ; Pi seulement (`Pi seul` sur
+  le Mac).
+
+**Découpage** : 24.A cadre du menu, `settings.json`, synchro, rubriques
+`JEU`, `ENC` et `AFF` (sans `ECR`) ; 24.B `TOUCH` avec l'écran de mesure ;
+24.C `MIDI` ; 24.D `SYS` ; `ECR` à part, une fois la commande HID trouvée.
+Une version mineure par sous-slice.
+
+**Hors périmètre** : réglages par projet (ils restent dans la session),
+édition des motifs, presets ou progressions depuis le menu, réglages DT2
+(MIDI CONFIG se règle sur la DT2), Wi-Fi.
+
+**Critère de fin** : chaque entrée changée depuis la MK2 agit tout de
+suite, survit à un redémarrage du Pi et revient sur le Mac après `play`.
+En `DUO`, la DT2 change de track pendant que la MK2 joue : pads et
+encodeurs de la MK2 restent sur leur track. `PANIC` coupe une note
+coincée. `RST` refusé transport lancé, accepté à l'arrêt.
+
 ## Modes : live et design
 
 > **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
@@ -2027,6 +2122,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
 | SHIFT + CONTROL (1 s) | changer de mode (refusé transport lancé) | changer de mode |
 | SHIFT + BROWSE | sélection de projet (refusé transport lancé) | idem |
 | SHIFT + ERASE (2 s) | extinction du Pi (service seulement) | idem |
+| SHIFT + appui maître | menu des réglages, ouvert / fermé (slice 24) | idem |
 | Autres (PLAY, REC, ERASE, RESTART, STEP, SAMPLING, ALL, AUTO WRITE, SCENE, NAVIGATE, DUPLICATE, SOLO, TEMPO, VOLUME, flèches du maître) | non affectés, LED éteintes | idem |
 
 - **La DT2 reste maître du transport** : PLAY et REC de la MK2 n'envoient
@@ -2126,6 +2222,7 @@ conditionne tout le reste.
 | 21 | **Renversements** : encodeur 5 `INV` PATTERN tenu, à la place de `PRE` (`OFF`, `1`, `2`, `FIX` = accords gardés dans l'octave au-dessus du pad), gardé dans les presets | cf. « Slice 21 », critère de fin | codée le 2026-11-11 (v0.43.0), essayée sur la DT2 et validée par l'utilisateur le 2026-11-11 |
 | 22 | **Boucle de gestes** : REC de la MK2 enregistre dans le Pi pads, encodeurs, réglages de l'arpège et divisions sur 1, 2, 4 ou 8 mesures, rejoués en boucle par le moteur, overdub, annuler / rétablir geste par geste (SHIFT + pad 1 / pad 2), ERASE pour vider ; en mémoire | cf. « Slice 22 », critère de fin | cadrée le 2026-11-11, annulation arbitrée le 2026-11-12, codée le 2026-11-12 (v0.46.0), gestes REC / ERASE tels que proposés ; SHIFT + REC (couper sans vider) et étiquette clignotante ajoutés en v0.49.0 ; à essayer sur la MK2 et la DT2 (critère de fin, LIVE REC) |
 | 23 | **Mode ACID V** : STEP bascule, page d'encodeurs ACID sur les VAL1-8 de la track MIDI (cutoff, résonance, env mod, decay, accent, drive, distorsion, FX1 d'Acid V), accent par vélocité fixe sur les `X`, slide `~` (notes chevauchées) dans les motifs | cf. « Slice 23 », critère de fin | cadrée le 2026-11-13, à coder après le commit de la slice 22 |
+| 24 | **Menu des réglages** : SHIFT + appui maître, 6 rubriques aux boutons d'écran (`JEU`, `TOUCH`, `ENC`, `AFF`, `MIDI`, `SYS`), entrées aux encodeurs, `state/settings.json` synchronisé ; mode 2 joueurs, panique, profils de vélocité, écran de mesure, santé du Pi | cf. « Slice 24 », critère de fin | cadrée le 2026-11-13, à coder après la 23 (24.A à 24.D) |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
