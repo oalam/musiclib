@@ -3,6 +3,19 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.50.0] - 2026-11-13
+
+### Modifié
+
+- Mode MPC : un pad par track, note 60 pour tous (table `mpc` de la
+  config), à la place du kit par tranches de la slice 8. Rangées du bas
+  pour le finger drumming (`BD RM SD HH`, puis `DL PC BR CY`), tracks 9 à
+  16 dans l'ordre au-dessus. Pad 16 (`AUTO`) :
+  track de l'AUTO CHANNEL, il joue la track active de la DT2 ; la
+  validation ne refuse plus cette track. Couleurs par parenté, propres au
+  mode MPC (rouge, orange, jaune, bleu, cyan). Les tranches 2 et plus ne se jouent
+  plus aux pads du mode MPC (clavier).
+
 ## [0.49.0] - 2026-11-12
 
 ### Ajouté

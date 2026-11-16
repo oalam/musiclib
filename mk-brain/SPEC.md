@@ -283,9 +283,38 @@ restent comme historique. Ordre : la slice 8 passe **avant** le portage Pi
 
 **Table `mpc` de `config/default.yaml`** (routage minimal, choisi le
 2026-11-09) : 16 entrées `{pad, track, note, label, color}`. Le canal
-est celui de la track (`TRACK n CHANNEL` = n) ; la track 16 (AUTO
-CHANNEL) y est refusée à la validation. Kit retenu, lecture MPC (rangée
-du bas = pads 1-4) :
+est celui de la track (`TRACK n CHANNEL` = n).
+
+**Table revue le 2026-11-13 (v0.50.0, demande de l'utilisateur, à
+essayer) : un pad par track, note 60 pour tous.** Lecture MPC (rangée du
+bas = pads 1-4) :
+
+```
+ BL  T13   ML  T14   FX  T15   AUTO T16
+ BS  T9    ST  T10   PD  T11   VX  T12
+ DL  T8    PC  T4    BR  T7    CY  T6
+ BD  T1    RM  T2    SD  T3    HH  T5
+```
+
+- Rangées du bas rangées pour le finger drumming (arbitré le 2026-11-13) :
+  kick et rumble à gauche, snare et hat à droite, la perc au-dessus du
+  rumble, la cymbale au-dessus du hat ; tracks 9 à 16 dans l'ordre.
+
+- Pad 16 : la track 16 est celle de l'AUTO CHANNEL, il joue donc la
+  track active de la DT2 (label `AUTO`, magenta). La validation ne refuse
+  plus cette track.
+- Couleurs par parenté, données par l'utilisateur le 2026-11-13 et
+  propres au mode MPC (`track_colors` reste la couleur des tracks sous
+  MUTE et SELECT) : pads 1, 2 et 9 rouges (`BD`, `RM`, `BS`) ; 3 et 6 orange (`SD`, `PC`) ; 4, 7 et 8
+  jaunes (`HH`, `BR`, `CY`) ; 10 bleu (`ST`) ; 11 à 14 cyan (`PD`, `VX`,
+  `BL`, `ML`) ; `DL` vert, `FX` blanc, `AUTO` magenta.
+- Les tranches 2 et plus ne sont plus jouées aux pads du mode MPC (plus
+  de `BD2`, `SD2`, `OH` séparés, donc plus de choke OH / CH aux pads) ;
+  elles restent accessibles au clavier (PAD MODE) sur la track choisie.
+- La table reste libre dans la config : le kit par tranches ci-dessous
+  peut y être remis.
+
+Kit d'origine (2026-11-09, remplacé le 2026-11-13) :
 
 ```
  CR  T6/60   RD  T6/61   CH2 T5/63   OH2 T5/64     cymbales / variantes

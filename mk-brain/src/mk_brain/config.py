@@ -308,7 +308,8 @@ class Layout(BaseModel):
 
 
 class MpcPad(BaseModel):
-    """Un pad du mode MPC (slice 8) : la tranche `note` sur le canal de la track `track`."""
+    """Un pad du mode MPC (slice 8) : la tranche `note` sur le canal de la track `track`.
+    Sur la track de l'AUTO CHANNEL, le pad joue la track active de la DT2 (2026-11-13)."""
 
     pad: int = Field(ge=1, le=16)
     track: int = Field(ge=1, le=16)
@@ -366,9 +367,6 @@ class Config(BaseModel):
             raise ValueError("layouts : noms en double")
         if sorted(p.pad for p in self.mpc) != list(range(1, 17)):
             raise ValueError("mpc : les 16 pads, une fois chacun")
-        auto = [p.pad for p in self.mpc if p.track == self.midi.auto_channel]
-        if auto:
-            raise ValueError(f"mpc : pads {auto} sur la track de l'AUTO CHANNEL")
         missing = {lay.family for lay in self.layouts} - set(self.families)
         if missing:
             raise ValueError(f"families : couleur manquante pour {sorted(missing)}")

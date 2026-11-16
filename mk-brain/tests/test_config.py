@@ -12,12 +12,17 @@ def test_default_config_loads(cfg: Config) -> None:
     assert all(lay.group is None and lay.mode is None for lay in cfg.layouts[7:])
     assert cfg.midi.auto_channel == 16
     assert (cfg.mpc_pad(1).label, cfg.mpc_pad(1).track, cfg.mpc_pad(1).note) == ("BD", 1, 60)
+    assert [p.track for p in cfg.mpc] == [1, 2, 3, 5, 8, 4, 7, 6, 9, 10, 11, 12, 13, 14, 15, 16]
+    assert {p.note for p in cfg.mpc} == {60}
+    same = [(1, 2, 9), (3, 6), (4, 7, 8), (11, 12, 13, 14)]  # pads apparentés : même couleur
+    assert all(len({cfg.mpc_pad(n).color for n in group}) == 1 for group in same)
+    assert cfg.mpc_pad(16).label == "AUTO"  # track 16 = AUTO CHANNEL : la track active
 
 
 def test_mpc_table_validated(tmp_path: Path, cfg: Config) -> None:
     import yaml
 
-    for change, match in (({"pad": 2}, "16 pads"), ({"track": 16}, "AUTO CHANNEL")):
+    for change, match in (({"pad": 2}, "16 pads"), ({"track": 17}, "mpc")):
         raw = cfg.model_dump()
         raw["mpc"][0].update(change)
         bad = tmp_path / "bad.yaml"

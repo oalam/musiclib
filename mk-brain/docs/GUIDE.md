@@ -83,24 +83,28 @@ joué est présélectionné : un appui suffit. SHIFT + BROWSE (◀ ou ▶) revie
 
 ## 3. Jouer le kit : les pads MPC
 
-Au chargement, les 16 pads sont un kit, lu comme sur une MPC (pad 1 en bas
-à gauche) :
+Au chargement, les 16 pads sont les 16 tracks, un pad par track, lus comme sur
+une MPC (pad 1 en bas à gauche) :
 
 ```
- CR   RD   CH2  OH2      cymbales / variantes    (T6, T5)
- LT   MT   HT   OH       toms, open hat          (T4, T5)
- RS   CP   SD2  CH       rim, clap, snare 2, hat (T4, T3, T5)
- BD   BD2  SD   CH1      kick, kick long, snare  (T1, T3, T5)
+ BL   ML   FX   AUTO     T13, T14, T15, T16
+ BS   ST   PD   VX       T9, T10, T11, T12
+ DL   PC   BR   CY       T8, T4, T7, T6
+ BD   RM   SD   HH       T1, T2, T3, T5
 ```
 
-- Chaque pad envoie **une tranche** (note) sur le **canal de sa track**.
-  Les tracks 1, 3, 4, 5 et 6 jouent un sample découpé en tranches (machine
-  SLICE, paramètre `SLICE` = `NOTE`).
-- **Couleurs** : kicks rouges, snares, clap et rim orange, hats fermés
-  jaunes, ouverts blancs, toms bleus, cymbales violettes. Pad plein à la
-  frappe.
-- **Choke gratuit** : une track ne joue qu'une voix. L'open hat coupe le
-  closed hat (T5), le clap coupe la snare (T3), un tom coupe le précédent.
+Les deux rangées du bas sont rangées pour le finger drumming : kick et
+rumble à gauche, snare et hat à droite, la perc au-dessus du rumble, la
+cymbale au-dessus du hat.
+
+- Chaque pad envoie la **note 60** sur le **canal de sa track** : la
+  tranche 1 d'un sample découpé (machine SLICE), le sample à sa hauteur
+  sinon.
+- **Pad 16 (`AUTO`)** : il joue la track active de la DT2.
+- **Couleurs** : les pads apparentés ont la même : pads 1, 2 et 9 rouges (`BD`, `RM`, `BS`) ; 3 et 6 orange (`SD`, `PC`) ; 4, 7 et 8
+  jaunes (`HH`, `BR`, `CY`) ; 10 bleu (`ST`) ; 11 à 14 cyan (`PD`, `VX`,
+  `BL`, `ML`) ; `DL` vert, `FX` blanc, `AUTO` magenta. Pad plein à la frappe.
+- Les autres tranches d'une track se jouent au clavier (PAD MODE).
 - **Aftertouch** : tenir un pad et appuyer plus fort module sa track
   (aftertouch de canal), si le preset de la DT2 lui assigne un paramètre.
   La frappe seule n'en envoie pas ; au clavier, le pad le plus appuyé

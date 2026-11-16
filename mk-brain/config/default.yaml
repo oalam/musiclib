@@ -218,26 +218,28 @@ layouts:
   - {name: Pelog, kind: gamme, base: 60, intervals: [0, 1, 3, 7, 8], family: gamme}
   - {name: Whole tone, kind: gamme, base: 60, intervals: [0, 2, 4, 6, 8, 10], family: gamme}
 
-# Mode MPC (slice 8, SPEC « Mode unique et pads MPC ») : un pad = une tranche
-# (machine SLICE, SLICE = NOTE) sur le canal de sa track (grille doctrine §1).
-# La note 60 joue la tranche 1 (vérifié le 2026-11-10) ; au-delà de la dernière
-# tranche, la note reboucle : la grille doit compter assez de tranches.
-# Une track ne joue qu'une voix : OH coupe CH, le clap coupe la snare.
-# Lecture MPC : pad 1 en bas à gauche, 16 en haut à droite.
+# Mode MPC (slice 8, revu le 2026-11-13) : un pad par track, note 60 (la tranche 1 d'une
+# machine SLICE, le sample à sa hauteur sinon), sur le canal de la track.
+# Rangées du bas pour le finger drumming : BD RM SD HH, puis DL PC BR CY (la cymbale au-dessus
+# du hat) ; tracks 9 à 16 dans l'ordre au-dessus.
+# Pad 16 : track 16 = AUTO CHANNEL, il joue la track active de la DT2.
+# Couleurs par parenté (arbitrées le 2026-11-13, propres au mode MPC) : pads 1, 2, 9 rouges ;
+# 3, 6 orange ; 4, 7, 8 jaunes ; 10 bleu ; 11 à 14 cyan ; 5 vert, 15 blanc, 16 magenta.
+# Lecture MPC : pad 1 en bas à gauche, 16 en haut à droite. Label : 4 caractères au plus.
 mpc:
-  - {pad: 1,  track: 1, note: 60, label: BD,  color: [255, 0, 0]}
-  - {pad: 2,  track: 1, note: 61, label: BD2, color: [255, 0, 0]}
-  - {pad: 3,  track: 3, note: 60, label: SD,  color: [255, 80, 0]}
-  - {pad: 4,  track: 5, note: 60, label: CH1, color: [255, 200, 0]}
-  - {pad: 5,  track: 4, note: 60, label: RS,  color: [255, 80, 0]}
-  - {pad: 6,  track: 3, note: 62, label: CP,  color: [255, 80, 0]}
-  - {pad: 7,  track: 3, note: 61, label: SD2, color: [255, 80, 0]}
-  - {pad: 8,  track: 5, note: 61, label: CH,  color: [255, 200, 0]}
-  - {pad: 9,  track: 4, note: 61, label: LT,  color: [0, 60, 255]}
-  - {pad: 10, track: 4, note: 62, label: MT,  color: [0, 60, 255]}
-  - {pad: 11, track: 4, note: 63, label: HT,  color: [0, 60, 255]}
-  - {pad: 12, track: 5, note: 62, label: OH,  color: [255, 255, 255]}
-  - {pad: 13, track: 6, note: 60, label: CR,  color: [170, 0, 255]}
-  - {pad: 14, track: 6, note: 61, label: RD,  color: [170, 0, 255]}
-  - {pad: 15, track: 5, note: 63, label: CH2, color: [255, 200, 0]}
-  - {pad: 16, track: 5, note: 64, label: OH2, color: [255, 255, 255]}
+  - {pad: 1, track: 1, note: 60, label: BD, color: [255, 0, 0]}
+  - {pad: 2, track: 2, note: 60, label: RM, color: [255, 0, 0]}
+  - {pad: 3, track: 3, note: 60, label: SD, color: [255, 80, 0]}
+  - {pad: 4, track: 5, note: 60, label: HH, color: [255, 200, 0]}
+  - {pad: 5, track: 8, note: 60, label: DL, color: [0, 255, 0]}
+  - {pad: 6, track: 4, note: 60, label: PC, color: [255, 80, 0]}
+  - {pad: 7, track: 7, note: 60, label: BR, color: [255, 200, 0]}
+  - {pad: 8, track: 6, note: 60, label: CY, color: [255, 200, 0]}
+  - {pad: 9, track: 9, note: 60, label: BS, color: [255, 0, 0]}
+  - {pad: 10, track: 10, note: 60, label: ST, color: [0, 60, 255]}
+  - {pad: 11, track: 11, note: 60, label: PD, color: [0, 200, 255]}
+  - {pad: 12, track: 12, note: 60, label: VX, color: [0, 200, 255]}
+  - {pad: 13, track: 13, note: 60, label: BL, color: [0, 200, 255]}
+  - {pad: 14, track: 14, note: 60, label: ML, color: [0, 200, 255]}
+  - {pad: 15, track: 15, note: 60, label: FX, color: [255, 255, 255]}
+  - {pad: 16, track: 16, note: 60, label: AUTO, color: [255, 0, 255]}

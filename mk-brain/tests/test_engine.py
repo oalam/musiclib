@@ -334,10 +334,11 @@ def test_program_change_marks_faders_stale_once(cfg: Config) -> None:
 def test_mpc_pads_play_slices_on_track_channels(cfg: Config) -> None:
     idx = {pad_label(i): i for i in range(16)}
     eng = Engine(cfg)
-    assert press(eng, 0, pad=idx[12]) == [(3 * MS, NoteOn(4, 62, 127))]  # OH : T5, tranche 62
+    assert press(eng, 0, pad=idx[12]) == [(3 * MS, NoteOn(11, 60, 127))]  # pad 12 : T12, note 60
+    assert press(eng, SECOND, pad=idx[16])[-1] == (SECOND + 3 * MS, NoteOn(15, 60, 127))  # AUTO
     leds = eng.leds()
     assert leds.pads[idx[12]] == cfg.mpc_pad(12).color  # frappé : plein
-    assert leds.pads[idx[13]] == scale(cfg.mpc_pad(13).color, cfg.leds.dim)  # CR au repos
+    assert leds.pads[idx[13]] == scale(cfg.mpc_pad(13).color, cfg.leds.dim)  # pad 13 au repos
     btn(eng, "GROUP_C")  # banque choisie, les pads restent en MPC
     assert eng.mpc and eng.bank == 2
 
@@ -369,7 +370,7 @@ def test_modifier_held_shows_track_grid(cfg: Config) -> None:
     assert pads[PAD7] == cfg.track_colors[7]  # pad n = track n pendant SELECT
     assert pads[PAD1] == (0, 0, 0)  # les autres éteints, comme sous MUTE
     btn(eng, "SELECT", False)
-    assert eng.leds().pads[PAD7] == scale(cfg.mpc_pad(7).color, cfg.leds.dim)  # SD2 au repos
+    assert eng.leds().pads[PAD7] == scale(cfg.mpc_pad(7).color, cfg.leds.dim)  # pad 7 au repos
 
 
 def test_program_change_when_stopped_sets_current_pattern(cfg: Config) -> None:
@@ -738,7 +739,7 @@ def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
 def test_shift_pad_plays_and_pad_mode_leaves_solo(cfg: Config) -> None:
     eng = Engine(cfg)
     btn(eng, "SHIFT")
-    assert press(eng, 0, pad=PAD7)[0][1] == NoteOn(2, 61, 127)  # plus de perform par SHIFT
+    assert press(eng, 0, pad=PAD7)[0][1] == NoteOn(6, 60, 127)  # plus de perform par SHIFT
     btn(eng, "SHIFT", False)
     eng.handle(PadEvent(PAD7, False, 0), 10 * MS)
     btn(eng, "SOLO")
@@ -774,7 +775,7 @@ def test_solo_locks_perform_taps_toggle_tracks(cfg: Config) -> None:
     assert eng.perform_tracks == [1]
     btn(eng, "SOLO")  # sortie : groupe vidé, pads rejoués
     assert not eng.perform_lock and eng.perform_tracks == [] and eng.fader_track == 9
-    assert press(eng, 700 * MS, pad=PAD7)[0][1] == NoteOn(2, 61, 127)
+    assert press(eng, 700 * MS, pad=PAD7)[0][1] == NoteOn(6, 60, 127)
 
 
 def test_solo_lock_keyboard_pad16_refused(cfg: Config) -> None:
