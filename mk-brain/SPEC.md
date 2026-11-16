@@ -2315,6 +2315,23 @@ la slice 0.
     grille de 6 tranches) : 60 joue la tranche 1, 61 la 2… ; au-delà, la
     note reboucle (66 et 67 rejouent les tranches 1 et 2). Le trig
     enregistré porte une NOTE (pas un lock SLICE) et rejoue sa tranche.
+18. **Faders tactiles TouchOSC sur l'iPhone** (idée du 2026-11-13, en
+    attente, non cadrée) : une interface tactile reçue par mk-brain, qui
+    la traduit en CC vers la DT2. Elle **va contre deux décisions du
+    2026-11-09** (« Front web, mobile ou non » et « Wi-Fi sur scène »,
+    Périmètre) : à réviser si l'idée est retenue.
+    - Liaison iPhone → Pi, à choisir : OSC en Wi-Fi avec le Pi en point
+      d'accès, réseau fermé, option désactivée par défaut (piste
+      préférée : démarrage et jeu sans réseau intacts) ; MIDI Bluetooth
+      (sans Wi-Fi, mais support bluez sur le Pi **à vérifier**) ; partage
+      de connexion de l'iPhone (le Pi dépend du téléphone).
+    - Apport de mk-brain par rapport à TouchOSC branché seul : la track
+      sélectionnée (`SOLO` / `DUO`, slice 24), les valeurs apprises de la
+      DT2 renvoyées aux faders (pas de saut), la gamme, les presets
+      d'arpège et la boucle de gestes pilotables.
+    - Usage, à choisir : table de mixage (16 niveaux et mutes) ; gestes
+      expressifs (XY cutoff / résonance, macros) ; copie des 8 encodeurs
+      (doublon) ; interface du 2e joueur en `DUO`.
 
 ## Constats HID (slice 0, 2026-11-09)
 
