@@ -35,6 +35,9 @@ alimenté, elle n'y apparaît pas), DT2 en USB. Elektron Transfer fermé.
 cd mk-brain && .venv/bin/mk-brain play
 ```
 
+Les deux écrans montrent d'abord l'accueil `MK BRAIN` et la version,
+2,5 s ou jusqu'au premier appui ; la MK2 joue déjà.
+
 ![Sélection de projet](img/01-selection.png)
 
 L'encodeur maître fait défiler les projets, son appui charge. Le dernier

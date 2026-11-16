@@ -33,6 +33,7 @@ play:
   phrase: 32                 # 32 ou 64 mesures ; sans banque du projet (sinon celle de la banque, 6.B)
   horizon_ms: 20             # note confiée à l'ordonnanceur 20 ms avant sa cible
   tap_debounce_ms: 150       # SOLO, MUTE, SELECT + pad : un pad relâché depuis moins de 150 ms ne rebascule pas
+  splash_ms: 2500            # écran d'accueil MK BRAIN au lancement, fermé au premier appui ; 0 : aucun
 
 arp:                        # mode ARPG (PATTERN) : réglages de départ (config : PATTERN tenu)
   order: up                  # up, down, updown, played (ordre d'appui), random

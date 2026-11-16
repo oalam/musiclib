@@ -276,3 +276,16 @@ def test_left_band_shows_the_chord_of_the_progression(cfg: Config) -> None:
     assert len({idle, *views}) == 4
     eng._leave_arp()
     assert render.left(eng, SECOND).crop(top).tobytes() == idle
+
+
+def test_splash_sweeps_from_left_to_right() -> None:
+    assert render.splash(0, "1.2.3", 0.0).getbbox() == (0, 0, 1, HEIGHT)  # le front seul
+    assert render.splash(1, "1.2.3", 0.5).getbbox() == (0, 0, 1, HEIGHT)
+    half = render.splash(0, "1.2.3", 0.5)
+    assert half == render.splash(0, "1.2.3")  # écran gauche entier à mi-course
+    assert half.getpixel((WIDTH - 1, render.SPLASH_RULE))  # le filet file vers l'écran droit
+
+
+def test_splash_shows_the_version_on_the_right_only() -> None:
+    assert render.splash(0, "1.2.3") == render.splash(0)
+    assert render.splash(1, "1.2.3") != render.splash(1)

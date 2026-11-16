@@ -98,6 +98,7 @@ class PlayConfig(BaseModel):
     phrase: Literal[32, 64] = 32  # longueur de phrase sans banque du projet (6.B)
     horizon_ms: float = Field(20.0, gt=0)  # envoi confié à l'ordonnanceur ce délai avant la cible
     tap_debounce_ms: float = Field(150.0, ge=0)  # SOLO, MUTE, SELECT : rebond ignoré
+    splash_ms: float = Field(2500.0, ge=0)  # écran d'accueil au lancement ; 0 : aucun
 
 
 PRESET_SLOTS = 16  # un emplacement par pad (slice 14)

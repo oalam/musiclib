@@ -160,8 +160,11 @@ mk-brain/
 
 ## Démarrage et choix du projet
 
-1. Le Pi démarre et le service `mk-brain` se lance. Pendant ce temps,
-   l'écran gauche affiche `mk-brain · démarrage`.
+1. Le Pi démarre et le service `mk-brain` se lance. Dès que la MK2 répond,
+   les deux écrans montrent l'accueil (v0.47.0) : `MK BRAIN` à cheval sur
+   les deux écrans, `MASCHINE MK2` / `DIGITAKT II` et la version dessous,
+   pendant 2,5 s (`play.splash_ms`) ou jusqu'au premier appui. Le jeu
+   tourne déjà dessous : rien n'est retardé.
 2. Synchronisation : si le réseau répond (Wi-Fi ou Ethernet de la maison),
    `git pull` du dossier `mk-brain/` (projets et code), avec un délai
    maximum de 10 s. Sinon, on garde la copie locale. L'écran affiche

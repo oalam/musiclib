@@ -6,6 +6,8 @@ import argparse
 import signal
 import sys
 import time
+import tomllib
+from importlib import metadata
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -45,6 +47,7 @@ RAINBOW: list[tuple[int, int, int]] = [
     (0, 255, 255), (0, 0, 255), (128, 0, 255), (255, 0, 255),
 ]  # fmt: skip
 OFF = (0, 0, 0)
+SPLASH_SWEEP_NS = 600_000_000  # écran d'accueil : durée du balayage, puis image fixe
 FRAME_NS = 50_000_000  # écrans redessinés au plus toutes les 50 ms, envoyés s'ils changent
 
 
@@ -59,6 +62,22 @@ def cmd_list() -> int:
             f"usage_page 0x{info.get('usage_page', 0):04x} · path {info.get('path')!r}"
         )
     return 0
+
+
+PYPROJECT = Path(__file__).resolve().parents[2] / "pyproject.toml"
+
+
+def _version(pyproject: Path = PYPROJECT) -> str:
+    """Version affichée à l'accueil : celle du dépôt (l'installation éditable garde
+    la version du jour de l'installation), à défaut celle du paquet installé."""
+    try:
+        return str(tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]["version"])
+    except (OSError, tomllib.TOMLDecodeError, KeyError):
+        pass
+    try:
+        return metadata.version("mk-brain")
+    except metadata.PackageNotFoundError:
+        return ""
 
 
 def _show(dev: Mk2Device, screen: int, image: object) -> None:
@@ -254,6 +273,9 @@ def cmd_play(
     message: tuple[str, int] | None = None  # dernier geste de contrôle, 2e ligne du bandeau gauche
     shown: list[bytes] = [b"", b""]  # dernière image envoyée par écran
     last_draw = 0
+    version = _version()
+    splash_start = time.perf_counter_ns()
+    splash_end = splash_start + round(cfg.play.splash_ms * 1e6)  # un appui le ferme avant
 
     def emit(msgs: list[Timed]) -> None:
         nonlocal last
@@ -287,7 +309,6 @@ def cmd_play(
     try:
         if sched is not None:
             sched.start()
-        _show(dev, 1, display.new_image())
         mark_ready()  # ce commit démarre : retour arrière possible vers lui
         while not stop.requested():
             try:
@@ -303,6 +324,8 @@ def cmd_play(
                     if ev.kind in ("start", "stop"):
                         print(f"{ev.kind} {_clock_line(clock)}")
             for hid_ev in decoder.feed(report):
+                if not isinstance(hid_ev, EncoderEvent) and hid_ev.pressed:
+                    splash_end = now  # premier appui : l'accueil laisse la place
                 emit(engine.handle(hid_ev, now))
             emit(engine.tick(now))
             if engine.poweroff:
@@ -340,8 +363,13 @@ def cmd_play(
             warn = "TRANSFER OPEN?" if clock.transfer_suspected(now) else ""
             if clock.bpm is None and not dry_run:
                 warn = warn or "no clock"
-            left = render.left(engine, now, message, warn)  # cadre en clavier
-            for screen, img in enumerate((left, render.right(engine, now))):
+            if now < splash_end:  # accueil : le jeu tourne déjà dessous
+                progress = (now - splash_start) / SPLASH_SWEEP_NS
+                images = tuple(render.splash(s, version, progress) for s in (0, 1))
+            else:
+                left = render.left(engine, now, message, warn)  # cadre en clavier
+                images = (left, render.right(engine, now))
+            for screen, img in enumerate(images):
                 frame = display.image_to_frame(img)
                 if frame != shown[screen]:
                     for report in display.frame_reports(screen, frame):

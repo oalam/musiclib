@@ -3,6 +3,17 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.47.0] - 2026-11-12
+
+### Ajouté
+
+- Écran d'accueil au lancement de `play` : `MK BRAIN` en capitales
+  espacées à cheval sur les deux écrans, révélé par un balayage de 0,6 s,
+  avec `MASCHINE MK2`, `DIGITAKT II` et la version dessous. Il reste
+  2,5 s (`play.splash_ms`, 0 : aucun) et se ferme au premier appui d'un
+  pad ou d'un bouton ; le jeu tourne déjà dessous, le démarrage n'est pas
+  retardé.
+
 ## [0.45.0] - 2026-11-11
 
 ### Ajouté

@@ -92,3 +92,10 @@ def test_play_passes_the_encoder_travel_to_try(monkeypatch: pytest.MonkeyPatch) 
     assert seen == [8, None]
     with pytest.raises(SystemExit):
         cli.main(["play", "--raw-per-step", "0"])
+
+
+def test_version_comes_from_the_repository(tmp_path: Path) -> None:
+    pyproject = tmp_path / "pyproject.toml"
+    pyproject.write_text('[project]\nversion = "9.8.7"\n', encoding="utf-8")
+    assert cli._version(pyproject) == "9.8.7"
+    assert cli._version(tmp_path / "absent.toml") != "9.8.7"  # repli sur le paquet installé

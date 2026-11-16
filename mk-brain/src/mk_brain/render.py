@@ -37,6 +37,9 @@ sur une ligne, sans valeur ; jauge en pointillé tant qu'elle est hors prise.
 - Sélection de projet (slice 6.C) : liste à gauche, la ligne choisie en
   gros et inversée ; à droite le projet choisi (banques, date) et les gestes.
   Elle remplace les deux écrans entiers.
+- Écran d'accueil (v0.47.0) : `MK BRAIN` en capitales espacées à cheval sur les
+  deux écrans (`MK` au bord droit du gauche, `BRAIN` au bord gauche du droit),
+  révélé par un balayage de gauche à droite, souligné, la version dessous.
 """
 
 from __future__ import annotations
@@ -611,4 +614,54 @@ def right(engine: Engine, now: int) -> Image.Image:
         _right_band(d, engine, now)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
     _faders(d, engine, now, 1)
+    return img
+
+
+SPLASH_SIZE = 40  # hauteur du mot
+SPLASH_SPACING = 10  # vide entre deux capitales
+SPLASH_EDGE = 14  # marge du mot au bord intérieur de chaque écran
+SPLASH_TOP = 7
+SPLASH_RULE = 46  # filet sous le mot
+SPLASH_WORDS = ("MK", "BRAIN")
+SPLASH_SUB = ("MASCHINE MK2", "DIGITAKT II")  # ce que le Pi relie, de part et d'autre
+
+
+def _spaced_width(d: ImageDraw.ImageDraw, text: str, font: Font) -> int:
+    return round(sum(d.textlength(c, font=font) for c in text)) + SPLASH_SPACING * (len(text) - 1)
+
+
+def _spaced(d: ImageDraw.ImageDraw, x: int, y: int, text: str, font: Font) -> None:
+    for c in text:
+        _bold(d, (x, y), c, font, 1)
+        x += round(d.textlength(c, font=font)) + SPLASH_SPACING
+
+
+def splash(screen: int, version: str = "", progress: float = 1.0) -> Image.Image:
+    """Écran d'accueil. `progress` : avancée du balayage sur les deux écrans, de 0 à 1."""
+    img = new_image()
+    d = ImageDraw.Draw(img)
+    big, small = _font(SPLASH_SIZE), _font(SMALL)
+    word = SPLASH_WORDS[screen]
+    width = _spaced_width(d, word, big)
+    x0 = WIDTH - SPLASH_EDGE - width if screen == 0 else SPLASH_EDGE
+    x1 = x0 + width
+    top = round(d.textbbox((0, 0), word, font=big)[1])
+    _spaced(d, x0, SPLASH_TOP - top, word, big)
+    sub = SPLASH_SUB[screen]
+    if screen == 0:  # le filet file d'un écran à l'autre ; sous-titre calé à droite du mot
+        xs = x1 - round(d.textlength(sub, font=small))
+        d.line((min(x0, xs), SPLASH_RULE, WIDTH - 1, SPLASH_RULE), fill=1)
+    else:
+        xs = x0
+        d.line((0, SPLASH_RULE, x1, SPLASH_RULE), fill=1)
+        if version:
+            tag = f"v{version}"
+            length = round(d.textlength(tag, font=small))
+            d.text((x1 - length, SPLASH_RULE + 3), tag, font=small, fill=1)
+    d.text((xs, SPLASH_RULE + 3), sub, font=small, fill=1)
+    front = round(min(1.0, max(0.0, progress)) * 2 * WIDTH) - screen * WIDTH  # front du balayage
+    if front < WIDTH:
+        d.rectangle((max(front, 0), 0, WIDTH - 1, HEIGHT - 1), fill=0)
+        if front >= 0:
+            d.line((front, 0, front, HEIGHT - 1), fill=1)
     return img
