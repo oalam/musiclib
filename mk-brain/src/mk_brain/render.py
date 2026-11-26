@@ -207,6 +207,7 @@ PATTERN_BARS = 4  # un tour de pattern de 64 pas
 TAG_W = 46  # étiquette du mode (MPC, KEYS, SOLO)
 TAG_TOP = 25
 TAG_BOX: Box = (WIDTH - TAG_W + 2, 1, WIDTH - 3, 12)  # en haut à droite du bandeau droit
+REC_DOT: Box = (WIDTH - TAG_W - 9, 2, WIDTH - TAG_W - 1, 10)  # à gauche du mode
 TAG_BOX_REPEAT: Box = (2, TAG_TOP, TAG_W - 4, BAND - 3)  # NOTE REPEAT : sous les divisions
 
 
@@ -579,11 +580,13 @@ def _selection_right(engine: Engine) -> Image.Image:
             "SHIFT + BROWSE: back",
         ]
     else:
+        free = "" if sel.free_gb is None else f"   {sel.free_gb:.0f} GB free"
+        rec = f"REC SESSION ON{free}" if e.name in engine.armed else "REC: record session"
         lines = [
             e.name.upper(),
             f"{e.banks} banks   {e.date}",
-            "push: load",
-            "SHIFT + BROWSE: back",
+            rec,
+            "push: load   SHIFT+BROWSE: back",
         ]
     return text_image(lines, bold=frozenset({0}))
 
@@ -623,6 +626,8 @@ def right(engine: Engine, now: int) -> Image.Image:
         _right_band(d, engine, now)
     d.line((0, BAND, WIDTH - 1, BAND), fill=1)
     _faders(d, engine, now, 1)
+    if engine.recording:  # session enregistrée : point plein, cerné pour rester lisible
+        d.ellipse(REC_DOT, fill=1, outline=0)
     return img
 
 

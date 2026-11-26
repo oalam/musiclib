@@ -3,6 +3,24 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.51.0] - 2026-11-26
+
+### Ajouté
+
+- [25] Journal de session, partie 25.A. REC à l'écran de sélection arme
+  l'enregistrement de la session du projet choisi (LED REC, ligne
+  `REC SESSION ON` avec l'espace libre) ; le choix est retenu par projet
+  dans `state/rec-sessions.json`. Au chargement d'un projet armé,
+  `journal.py` ouvre `state/sessions/<date>-<heure>-<set>/journal.jsonl` :
+  une ligne JSON par événement (`session`, `transport`, `bar`, `pattern`,
+  `mute`, `cc`, `note`, `geste`), avec l'instant, la mesure et le tick.
+  Origine notée : `mk2`, `dt2`, `loop`, `arp` ou `repeat`. Écriture par un
+  fil dédié derrière une file, vidée sur la carte toutes les 2 s ; un
+  disque en panne n'arrête pas le jeu. En jeu, un point dans le bandeau de
+  l'écran droit rappelle que la session s'enregistre. Le journal se ferme
+  au changement de projet et à l'arrêt.
+- `Continue` de la DT2 transmis au moteur (`on_continue`), pour le journal.
+
 ## [0.50.1] - 2026-11-26
 
 ### Modifié

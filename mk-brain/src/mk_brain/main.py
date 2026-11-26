@@ -234,6 +234,7 @@ def cmd_play(
     from mk_brain.boot import in_service, mark_ready, poweroff, read_sync
     from mk_brain.config import load_config
     from mk_brain.engine import Engine, MidiOut, Timed
+    from mk_brain.journal import Journal, free_gb, load_armed, open_journal, save_armed
     from mk_brain.layouts import describe_note
     from mk_brain.midi_io import Dt2In, Dt2Out, feed_engine
     from mk_brain.presets import load_bank, save_bank
@@ -266,10 +267,27 @@ def cmd_play(
     sync("lancement")  # avant de lire la session et les presets
 
     def catalog() -> Selector:
-        return Selector(list_projects(), read_last(), read_sync())
+        return Selector(list_projects(), read_last(), read_sync(), free_gb())
 
     engine = Engine(cfg, clock, project, catalog)
     engine.arp_user = load_bank(cfg.arp)  # presets sauvés depuis la MK2, avant la session
+    engine.armed = load_armed()  # projets dont la session s'enregistre (REC à la sélection)
+    journal: Journal | None = None
+    version = _version()
+
+    def record(project_name: str | None) -> None:
+        """Ferme le journal en cours ; en ouvre un si le projet chargé est armé."""
+        nonlocal journal
+        if journal is not None:
+            journal.close()
+            if journal.failed:
+                print(f"journal de session : écriture en échec ({journal.directory})")
+        journal, engine.journal = None, None
+        if project_name is not None and project_name in engine.armed:
+            journal = open_journal(project_name, version)
+            engine.journal = journal.write
+            print(f"journal de session : {journal.directory}")
+
     name = None if project_path is None else project_path.stem  # session de ce projet
     saved: Session | None = None
     if name is not None and (saved := load_session(name)) is not None:
@@ -287,7 +305,6 @@ def cmd_play(
     message: tuple[str, int] | None = None  # dernier geste de contrôle, 2e ligne du bandeau gauche
     shown: list[bytes] = [b"", b""]  # dernière image envoyée par écran
     last_draw = 0
-    version = _version()
     splash_start = time.perf_counter_ns()
     splash_end = splash_start + round(cfg.play.splash_ms * 1e6)  # un appui le ferme avant
 
@@ -324,6 +341,7 @@ def cmd_play(
         if sched is not None:
             sched.start()
         mark_ready()  # ce commit démarre : retour arrière possible vers lui
+        record(name)  # matériel ouvert : pas de dossier de session par relance du service
         while not stop.requested():
             try:
                 report = dev.read(timeout_ms=1)
@@ -357,6 +375,10 @@ def cmd_play(
                 if (saved := load_session(name)) is not None:
                     engine.restore(saved)
                     print(f"session {name} reprise")
+                record(name)  # changement de projet : l'ancien journal se ferme
+            if engine.armed_dirty:  # REC à la sélection : retenu d'un démarrage à l'autre
+                engine.armed_dirty = False
+                save_armed(engine.armed)
             if engine.arp_bank_dirty:  # preset sauvé : écrit tout de suite, hors session
                 engine.arp_bank_dirty = False
                 save_bank(engine.arp_user)
@@ -392,6 +414,7 @@ def cmd_play(
     finally:
         if name is not None:  # derniers réglages, même après Ctrl-C ou l'arrêt du service
             save_session(name, engine.snapshot())
+        record(None)  # journal vidé sur le disque
         try:
             dev.send_leds(LedState.off())
             # extinction : le message reste affiché, la MK2 garde l'image une fois le Pi arrêté

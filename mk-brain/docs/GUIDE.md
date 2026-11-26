@@ -52,6 +52,14 @@ L'encodeur maître fait défiler les projets, son appui charge. Le dernier
 joué est présélectionné : un appui suffit. SHIFT + BROWSE (◀ ou ▶) revient
 à cette liste, transport arrêté seulement.
 
+**REC** à cet écran arme l'enregistrement de la session du projet choisi :
+la LED REC s'allume, l'écran droit affiche `REC SESSION ON` et l'espace
+libre. Le choix est retenu d'un démarrage à l'autre. Une fois le projet
+chargé, un point à gauche de l'étiquette de mode rappelle que la session
+s'enregistre ; le journal (`state/sessions/<date>-<heure>-<set>/journal.jsonl`)
+garde patterns, mutes, CC, notes et réglages, et se ferme au changement de
+projet ou à l'arrêt. En jeu, REC reste la boucle de gestes.
+
 ## 2. Lire les écrans
 
 ![Pads en MPC, transport arrêté](img/02-mpc-arret.png)

@@ -162,6 +162,8 @@ def feed_engine(engine: Engine, ev: MidiIn) -> None:
         engine.on_start()
     elif ev.kind == "stop":
         engine.on_stop()
+    elif ev.kind == "continue":
+        engine.on_continue()
     elif ev.kind == "program_change":
         engine.on_program_change(ev.data[1])
     elif ev.kind == "control_change":

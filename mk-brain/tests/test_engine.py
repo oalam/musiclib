@@ -1721,3 +1721,118 @@ def test_shift_rec_without_a_loop_does_nothing(cfg: Config) -> None:
     btn(eng, "REC", False)
     btn(eng, "SHIFT", False)
     assert eng.loop is None and eng.last_control == "no loop"
+
+
+# --- slice 25.A : journal de session ---------------------------------------------
+
+
+class Tape:
+    """Prise du journal : garde (événement, ticks, contenu)."""
+
+    def __init__(self, eng: Engine) -> None:
+        self.rows: list[tuple[str, int | None, dict[str, object]]] = []
+        eng.journal = lambda kind, ticks, fields: self.rows.append((kind, ticks, fields))
+
+    def of(self, kind: str) -> list[dict[str, object]]:
+        return [fields for k, _, fields in self.rows if k == kind]
+
+
+def test_rec_at_selection_arms_the_session_not_the_loop(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, catalog=_catalog(project))
+    eng.open_selection()
+    btn(eng, "REC")
+    btn(eng, "REC", False)
+    assert eng.armed == {"solaris"} and eng.armed_dirty
+    assert eng.loop is None and eng.loop_state == "idle"  # la boucle de gestes n'a pas bougé
+    assert eng.leds().buttons["REC"] > 0
+    btn(eng, "REC")
+    btn(eng, "REC", False)
+    assert eng.armed == set() and eng.leds().buttons["REC"] == 0
+
+
+def test_rec_at_selection_ignores_an_invalid_project(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, catalog=_catalog(project))
+    eng.open_selection()
+    assert eng.selector is not None
+    eng.selector.scroll(-1)  # « broken »
+    btn(eng, "REC")
+    assert eng.armed == set() and not eng.armed_dirty
+
+
+def test_journal_is_silent_without_a_sink(cfg: Config) -> None:
+    eng = Engine(cfg)
+    assert not eng.recording
+    assert press(eng, 0)  # la note part, rien n'est noté ni ne lève
+
+
+def test_journal_notes_hand_played_note_with_position(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(30))
+    tape = Tape(eng)
+    assert eng.recording
+    press(eng, 20 * TICK)
+    (note,) = tape.of("note")
+    assert note["src"] == "mk2" and note["vel"] and note["track"]
+    assert tape.rows[-1][1] == 29  # ticks depuis le Start
+
+
+def test_journal_tells_mute_origins_apart(cfg: Config) -> None:
+    eng = Engine(cfg)
+    tape = Tape(eng)
+    btn(eng, "MUTE")
+    eng.handle(PadEvent(PAD1, True, 3000), 0)
+    track = int(str(tape.of("mute")[0]["track"]))
+    eng.on_control_change(track - 1, eng.faders.mute_cc, 0)  # rouvert sur la DT2
+    assert tape.of("mute") == [
+        {"track": track, "on": True, "src": "mk2"},
+        {"track": track, "on": False, "src": "dt2"},
+    ]
+    assert tape.of("cc") == []  # un mute n'est pas compté comme un CC
+
+
+def test_journal_notes_cc_from_mk2_and_dt2(cfg: Config) -> None:
+    eng = Engine(cfg)
+    tape = Tape(eng)
+    eng.handle(EncoderEvent(1, 4 * CC_STEP, 0), 0)
+    eng.on_control_change(eng.track - 1, 74, 99)
+    sources = [(row["src"], row["track"]) for row in tape.of("cc")]
+    assert sources == [("mk2", eng.track), ("dt2", eng.track)]
+    assert tape.of("cc")[1]["param"] == 74 and tape.of("cc")[1]["value"] == 99
+
+
+def test_journal_notes_transport_pattern_and_bars(cfg: Config, project: Project) -> None:
+    eng = Engine(cfg, ClockTracker(), project)
+    tape = Tape(eng)
+    eng.clock.start(0)
+    eng.on_start()
+    eng.on_program_change(16 + 2)  # B03
+    advance(eng, 0, 2 * 96 + 2)
+    eng.clock.stop(300 * TICK)
+    eng.on_stop()
+    assert [row["action"] for row in tape.of("transport")] == ["start", "stop"]
+    assert tape.of("pattern") == [{"pattern": "B03", "bank": "B", "program": 18}]
+    bars = tape.of("bar")
+    assert [bar["n"] for bar in bars] == [3]  # `advance` ne lit l'état qu'à son dernier tick
+    assert bars[0]["length"] == eng.phrase.length and bars[0]["bpm"]
+
+
+def test_journal_notes_a_gesture_only_when_settings_change(cfg: Config) -> None:
+    eng = Engine(cfg)
+    tape = Tape(eng)
+    btn(eng, "PAD_MODE")  # MPC → clavier
+    btn(eng, "PAD_MODE", False)  # relâché : rien ne change
+    btn(eng, "SHIFT")
+    btn(eng, "SHIFT", False)
+    gestures = tape.of("geste")
+    assert len(gestures) == 1
+    assert gestures[0]["mode"] == eng.mode_name and gestures[0]["src"] == "mk2"
+    btn(eng, "GRID")
+    assert tape.of("geste")[-1]["quantize"] == eng.quantize and len(tape.of("geste")) == 2
+
+
+def test_journal_notes_repeat_notes_as_repeat(cfg: Config) -> None:
+    eng = Engine(cfg, running_clock(30))
+    tape = Tape(eng)
+    btn(eng, "NOTE_REPEAT")
+    press(eng, 20 * TICK)
+    advance(eng, 30, 60)
+    assert {str(row["src"]) for row in tape.of("note")} == {"repeat"}

@@ -143,6 +143,7 @@ mk-brain/
 │   ├── project.py                # modèle Pydantic du projet, chargement
 │   ├── selection.py              # liste des projets, dernier joué (6.C)
 │   ├── session.py                # derniers réglages par projet (state/)
+│   ├── journal.py                # journal de session : une ligne JSON par événement (25.A)
 │   ├── state_sync.py             # synchro Mac / Pi des sessions et presets (SSH)
 │   ├── presets.py                # banque des presets d'arpège sauvés (state/arp-presets.json)
 │   ├── modes.py                  # bascule live / design
@@ -1372,7 +1373,7 @@ En `DUO`, la DT2 change de track pendant que la MK2 joue : pads et
 encodeurs de la MK2 restent sur leur track. `PANIC` coupe une note
 coincée. `RST` refusé transport lancé, accepté à l'arrêt.
 
-## Slice 25 : journal de session et rapport (cadré le 2026-11-26, à coder)
+## Slice 25 : journal de session et rapport (cadré le 2026-11-26, 25.A codée)
 
 Exemple : à l'écran de sélection, `solaris` présélectionné, un appui sur
 REC allume sa LED et l'écran droit affiche `REC SESSION · 21 Go · 30 h`.
@@ -1431,6 +1432,25 @@ disque), vidée sur la carte toutes les 2 s : une coupure de courant perd
 | `cc` | track, paramètre, valeur | `mk2`, `dt2` ou `loop` |
 | `note` | track, note, vélocité | `mk2`, `arp` ou `loop` |
 | `geste` | mode, groupe, preset d'arpège, quantize, REC de la boucle | `mk2` |
+
+**Codé en 25.A (v0.51.0, 2026-11-26)**, écarts au cadrage compris :
+
+- Origine des notes : `repeat` s'ajoute à `mk2`, `arp` et `loop` (les
+  coups du NOTE REPEAT ne sont pas des frappes).
+- `geste` porte les réglages de jeu (`mode`, `bank`, `track`, `quantize`,
+  `division`, `loop`, `arp_preset`) et n'est écrit que quand l'un d'eux
+  change, quel que soit le bouton ou l'encodeur qui l'a changé.
+- Position prise à l'envoi : une note d'arpège ou de boucle confiée à
+  l'ordonnanceur en avance (`play.horizon_ms`) est notée quelques
+  millisecondes avant de sonner.
+- Note off, pitch bend et aftertouch ne sont pas notés.
+- L'écran de sélection donne l'espace libre (`REC SESSION ON   21 GB
+  free`) ; l'autonomie en heures viendra avec l'audio (25.B), dont elle
+  dépend.
+- Le journal s'ouvre une fois la MK2 et la DT2 ouvertes : une relance du
+  service faute de matériel ne crée pas de dossier de session.
+- `state/sessions/` et `state/rec-sessions.json` ne passent pas par la
+  synchro Mac / Pi (`state_sync.py`) : `sessions pull` s'en chargera (25.C).
 
 Volume : `bar` à 165 BPM = 165 / 4 × 60 = 2 475 lignes par heure ; les CC
 dominent, de l'ordre de quelques Mo par heure, sans enjeu pour la carte.
@@ -2418,7 +2438,7 @@ conditionne tout le reste.
 | 22 | **Boucle de gestes** : REC de la MK2 enregistre dans le Pi pads, encodeurs, réglages de l'arpège et divisions sur 1, 2, 4 ou 8 mesures, rejoués en boucle par le moteur, overdub, annuler / rétablir geste par geste (SHIFT + pad 1 / pad 2), ERASE pour vider ; en mémoire | cf. « Slice 22 », critère de fin | cadrée le 2026-11-11, annulation arbitrée le 2026-11-12, codée le 2026-11-12 (v0.46.0), gestes REC / ERASE tels que proposés ; SHIFT + REC (couper sans vider) et étiquette clignotante ajoutés en v0.49.0 ; à essayer sur la MK2 et la DT2 (critère de fin, LIVE REC) |
 | 23 | **Mode ACID V** : STEP bascule, page d'encodeurs ACID sur les VAL1-8 de la track MIDI (cutoff, résonance, env mod, decay, accent, drive, distorsion, FX1 d'Acid V), accent par vélocité fixe sur les `X`, slide `~` (notes chevauchées) dans les motifs | cf. « Slice 23 », critère de fin | cadrée le 2026-11-13, à coder après le commit de la slice 22 |
 | 24 | **Menu des réglages** : SHIFT + appui maître, 6 rubriques aux boutons d'écran (`JEU`, `TOUCH`, `ENC`, `AFF`, `MIDI`, `SYS`), entrées aux encodeurs, `state/settings.json` synchronisé ; mode 2 joueurs, panique, profils de vélocité, écran de mesure, santé du Pi | cf. « Slice 24 », critère de fin | cadrée le 2026-11-13, à coder après la 23 (24.A à 24.D) |
-| 25 | **Journal de session et rapport** : armé par REC à l'écran de sélection, journal des patterns, mutes (origine), CC, notes et gestes ; capture audio du main de la DT2 avec garde-fou disque ; `sessions pull` et rapport HTML sur le Mac | cf. « Slice 25 », critère de fin | cadrée le 2026-11-26, à coder (25.A journal, 25.B audio après vérification sur le Pi, 25.C rapport sans audio, 25.D rapport avec audio) ; analyse précisée le 2026-11-26 |
+| 25 | **Journal de session et rapport** : armé par REC à l'écran de sélection, journal des patterns, mutes (origine), CC, notes et gestes ; capture audio du main de la DT2 avec garde-fou disque ; `sessions pull` et rapport HTML sur le Mac | cf. « Slice 25 », critère de fin | 25.A journal codée le 2026-11-26 (v0.51.0), à essayer sur le Pi ; restent 25.B audio après vérification sur le Pi, 25.C rapport sans audio, 25.D rapport avec audio ; analyse précisée le 2026-11-26 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 

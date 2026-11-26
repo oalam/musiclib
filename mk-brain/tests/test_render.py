@@ -304,3 +304,25 @@ def test_loop_tag_blinks_on_the_beat(cfg: Config) -> None:
     b.to(206)  # seconde moitié (ticks 12 à 23 du temps)
     assert eng.loop_blink
     assert render.right(eng, b.now) != full
+
+
+def test_recording_session_shows_a_dot_on_the_right_screen(cfg: Config) -> None:
+    eng = Engine(cfg)
+    plain = render.right(eng, 0).tobytes()
+    eng.journal = lambda kind, ticks, fields: None
+    assert render.right(eng, 0).tobytes() != plain
+    assert render.left(eng, 0).tobytes() == render.left(Engine(cfg), 0).tobytes()
+
+
+def test_selection_shows_armed_session_and_free_space(cfg: Config, project: Project) -> None:
+    from test_engine import _catalog
+
+    eng = Engine(cfg, catalog=_catalog(project))
+    eng.open_selection()
+    assert eng.selector is not None
+    plain = render.right(eng, 0).tobytes()
+    eng.armed = {"solaris"}
+    armed = render.right(eng, 0).tobytes()
+    assert armed != plain
+    eng.selector.free_gb = 21.4
+    assert render.right(eng, 0).tobytes() != armed

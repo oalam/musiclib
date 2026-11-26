@@ -107,6 +107,7 @@ from mk_brain.hid_mk2 import (
     PadEvent,
     pad_label,
 )
+from mk_brain.journal import Kind, Sink
 from mk_brain.layouts import (
     FLAT_NAMES,
     N_PADS,
@@ -365,6 +366,12 @@ class Engine:
         self._rec_used = False  # REC tenu a servi à régler la longueur : pas de bascule au relâché
         self._erase_alone = False  # ERASE appuyé sans SHIFT : vide la boucle au relâché
         self._pending: list[Timed] = []  # note off de la boucle coupée, envoyés au prochain tick
+        # --- journal de session (slice 25.A) ---
+        self.journal: Sink | None = None  # prise posée par la CLI quand la session s'enregistre
+        self.armed: set[str] = set()  # projets armés par REC à la sélection
+        self.armed_dirty = False  # à écrire dans `state/` par la CLI
+        self._journal_bar: int | None = None  # dernière mesure notée
+        self._journal_state: tuple[object, ...] = ()  # derniers réglages notés (`geste`)
 
     @property
     def mode_name(self) -> str:
@@ -535,6 +542,11 @@ class Engine:
     # --- entrées ------------------------------------------------------------
 
     def handle(self, ev: Event, now: int) -> list[Timed]:
+        out = self._handle(ev, now)
+        self._journal_gesture()
+        return out
+
+    def _handle(self, ev: Event, now: int) -> list[Timed]:
         if isinstance(ev, ButtonEvent):
             self._button(ev, now)
             if ev.name == "SHIFT" and not ev.pressed:
@@ -551,6 +563,62 @@ class Engine:
                 return []
             return self._encoder(ev.index, ev.delta, now)
         return self._pad(pad_label(ev.index), ev, now)
+
+    # --- journal de session (slice 25.A) ----------------------------------------
+
+    @property
+    def recording(self) -> bool:
+        """La session s'enregistre : point dans le bandeau de l'écran droit."""
+        return self.journal is not None
+
+    def _j(self, kind: Kind, **fields: object) -> None:
+        if self.journal is not None:
+            self.journal(kind, self.clock.ticks_since_start, fields)
+
+    def _journal_out(self, msgs: list[Timed], src: str) -> list[Timed]:
+        """Note les notes, CC et mutes envoyés, avec leur origine ; rend la liste telle quelle.
+        Note off, pitch bend et aftertouch ne sont pas notés."""
+        if self.journal is None:
+            return msgs
+        for _, m in msgs:
+            if isinstance(m, NoteOn):
+                self._j("note", track=m.channel + 1, note=m.note, vel=m.velocity, src=src)
+            elif isinstance(m, ControlChange) and m.control == self.faders.mute_cc:
+                self._j("mute", track=m.channel + 1, on=m.value != 0, src=src)
+            elif isinstance(m, ControlChange):
+                self._j("cc", track=m.channel + 1, param=m.control, value=m.value, src=src)
+        return msgs
+
+    def _journal_gesture(self) -> None:
+        """`geste` : les réglages de jeu, notés quand l'un d'eux change, quel que soit le
+        bouton ou l'encodeur qui l'a changé."""
+        if self.journal is None:
+            return
+        sheet = self.sheet
+        state: tuple[object, ...] = (
+            self.mode_name,
+            None if sheet is None else sheet[0],
+            self.track,
+            self.quantize,
+            self.division,
+            self.loop_state,
+            self.arp_preset_shown,
+        )
+        if state != self._journal_state:
+            self._journal_state = state
+            names = ("mode", "bank", "track", "quantize", "division", "loop", "arp_preset")
+            self._j("geste", **dict(zip(names, state, strict=True)), src="mk2")
+
+    def _toggle_armed(self) -> None:
+        """REC à l'écran de sélection : la session du projet choisi sera enregistrée ou non."""
+        assert self.selector is not None
+        entry = self.selector.current
+        if entry is None or entry.project is None:
+            return
+        self.armed ^= {entry.name}
+        self.armed_dirty = True
+        on = entry.name in self.armed
+        self._note(f"{entry.name}: session rec {'on' if on else 'off'}")
 
     def _reachable(self, track: int) -> bool:
         if track == self.cfg.midi.auto_channel:
@@ -591,7 +659,7 @@ class Engine:
         if param == PITCH_BEND:
             self._bent.add(track)
         self._loop_param(("enc", index), f"{name} {who}", track, param, value, now)
-        return [(now, self._param_out(track - 1, param, value))]
+        return self._journal_out([(now, self._param_out(track - 1, param, value))], "mk2")
 
     # --- arpégiateur : mode ARPG (slice 11) -------------------------------------
 
@@ -765,6 +833,7 @@ class Engine:
                     off = min(off, nxt - NOTE_OFF_MIN_NS)
                 out.append((on, NoteOn(entry.channel, note, vel)))
                 out.append((max(off, on + NOTE_OFF_MIN_NS), NoteOff(entry.channel, note)))
+                self._j("note", track=entry.channel + 1, note=note, vel=vel, src="arp")
             self.last_played = (self._real(pad), note, vel)
             self._arp_pos += div
             self._arp_step += 1
@@ -1192,7 +1261,8 @@ class Engine:
         if isinstance(action, Param):
             self.faders.received(action.track, action.param, action.value)
             self.leds_dirty = True
-            return [(now, self._param_out(action.track - 1, action.param, action.value))]
+            out = [(now, self._param_out(action.track - 1, action.param, action.value))]
+            return self._journal_out(out, "loop")
         if isinstance(action, Setting):
             self._loop_set(action.name, action.value)
         return []
@@ -1207,7 +1277,9 @@ class Engine:
             self._pressure[pad] = action.pressure
             self._sounding[pad] = (action.channel, action.note, on)
             self.leds_dirty = True
-            return [(on, NoteOn(action.channel, action.note, action.velocity))]
+            return self._journal_out(
+                [(on, NoteOn(action.channel, action.note, action.velocity))], "loop"
+            )
         if isinstance(action, PadOff) and pad in self._sounding:
             channel, note, on_at = self._sounding.pop(pad)
             self._pressure.pop(pad, None)
@@ -1262,7 +1334,7 @@ class Engine:
             label = f"{name} {'FX' if param in self.faders.fixed else f'T{track:02d}'}"
             self._loop_param(("enc", index), label, track, param, value, now)
             out.append((now, self._param_out(track - 1, param, value)))
-        return out
+        return self._journal_out(out, "mk2")
 
     def _command(self, pad: int, now: int) -> list[Timed]:
         held = self._held_buttons
@@ -1276,7 +1348,7 @@ class Engine:
                 return []
             cc, value = self.faders.toggle_mute(pad)
             self.last_control = f"T{pad:02d} {'muted' if value else 'unmuted'}"
-            return [(now, ControlChange(pad - 1, cc, value))]
+            return self._journal_out([(now, ControlChange(pad - 1, cc, value))], "mk2")
         return []
 
     def on_control_change(self, channel: int, control: int, value: int) -> None:
@@ -1294,11 +1366,13 @@ class Engine:
         track = channel + 1
         if self.faders.fixed.get(control) == track:  # réglage global tourné sur la DT2
             self.faders.received(track, control, value)
+            self._j("cc", track=track, param=control, value=value, src="dt2")
             return
         auto = track == self.cfg.midi.auto_channel
         if control == self.faders.mute_cc:
             if not auto:
                 self.faders.received(track, control, value)
+                self._j("mute", track=track, on=value != 0, src="dt2")
                 self.leds_dirty = True
             return
         if auto and not self.cfg.midi.knobs_on_track_channel:
@@ -1307,15 +1381,23 @@ class Engine:
             self.track = track  # suit la track active de la DT2
             self.last_control = f"T{track:02d} selected (DT2)"
         self.faders.received(track, control, value)
+        self._j("cc", track=track, param=control, value=value, src="dt2")
         self.leds_dirty = True
 
     def on_start(self) -> None:
+        self._journal_bar = None
+        self._j("transport", action="start")
         self.phrase.start()
         if self.loop is not None:  # Start : la boucle repart de son début
             self._loop_origin = 0
             self._loop_rewind()
 
+    def on_continue(self) -> None:
+        self._j("transport", action="continue")
+
     def on_stop(self) -> None:
+        self._j("transport", action="stop")
+        self._journal_bar = None
         self._arp_clear()  # pas d'arpège à l'arrêt, même maintenu
         self._loop_stop()
         self.phrase.stop()
@@ -1346,6 +1428,7 @@ class Engine:
             self.last_control = f"{sheet[0]} (DT2)"
             self.log.append(f"{sheet[0]} : {sheet[1].title}, phrase {length}")
         label = pattern_label(program)
+        self._j("pattern", pattern=label, bank=label[0], program=program)
         ticks = self.clock.ticks_since_start
         if ticks is None:  # arrêté : pattern et phrase changés tout de suite, compteur inchangé
             self.phrase.pattern = label
@@ -1591,7 +1674,7 @@ class Engine:
             out.append((now, PitchBend(track - 1, 0)))
         self._bent.clear()
         self.leds_dirty = bool(out) or self.leds_dirty
-        return out
+        return self._journal_out(out, "mk2")
 
     def _note(self, msg: str | None) -> None:
         if msg:
@@ -1633,6 +1716,10 @@ class Engine:
             return
         if name in ("SHIFT", "ERASE"):  # ERASE seul vide la boucle, au relâché
             self._erase_alone = name == "ERASE" and not shift
+            return
+        if name == "REC" and self.selector is not None:  # sélection : arme la session
+            self._rec_used = True  # pas de boucle de gestes au relâché
+            self._toggle_armed()
             return
         if name == "REC":  # bascule au relâché, sauf si l'appui a réglé la longueur
             self._rec_used = shift
@@ -1807,6 +1894,7 @@ class Engine:
                 vel = velocity(self.cfg.velocity, self._pressure.get(pad, 0))
                 gate = self._time_of(rep.next_pos + div * GATE) or t + NOTE_OFF_MIN_NS
                 out.append((max(t, now), NoteOn(rep.channel, rep.note, vel)))
+                self._j("note", track=rep.channel + 1, note=rep.note, vel=vel, src="repeat")
                 out.append((max(gate, now + NOTE_OFF_MIN_NS), NoteOff(rep.channel, rep.note)))
                 self.last_played = (self._real(pad), rep.note, vel)
                 rep.next_pos += div
@@ -1849,6 +1937,20 @@ class Engine:
         ticks = self.clock.ticks_since_start
         st = None if ticks is None else self.phrase.update(ticks)
         self.phrase_state = st
+        if self.journal is not None and ticks is not None and st is not None:
+            bar = ticks // TICKS_PER_BAR
+            if bar != self._journal_bar:
+                self._journal_bar = bar
+                bpm = self.clock.bpm_smooth or self.clock.bpm
+                self._j(
+                    "bar",
+                    n=bar + 1,
+                    bpm=bpm,
+                    phrase=st.phrase,
+                    phrase_bar=st.bar,
+                    length=st.length,
+                )
+                self._journal_gesture()  # boucle de gestes passée seule de REC à LOOP
         sig: tuple[object, ...] = (
             () if st is None else (st.blocks_lit, st.blinking, st.half_beat_on)
         )
@@ -1878,7 +1980,7 @@ class Engine:
         ticks = self.clock.ticks_at(att.start)  # instant de la frappe, pas de la fin de fenêtre
         if ticks is None:  # transport arrêté : immédiat, pas de repeat
             self._sounding[pad] = (channel, note, now)
-            return [(now, NoteOn(channel, note, vel))]
+            return self._journal_out([(now, NoteOn(channel, note, vel))], "mk2")
         here = self.clock.ticks_at(now) or ticks  # position où le geste prend effet
         if self.arp:  # la note entre dans l'arpège au lieu de sonner
             self._arp_add(pad, channel, note, vel, ticks)
@@ -1903,7 +2005,7 @@ class Engine:
             self.last_decision = f"frappe {ticks:.1f} -> pas {pos:.0f} ({ms:+.0f} ms) {verdict}"
         self._sounding[pad] = (channel, note, target)
         self._loop_pad_on(pad, "note", channel, note, vel, att.peak, sounds, sounds)
-        return [(target, NoteOn(channel, note, vel))]
+        return self._journal_out([(target, NoteOn(channel, note, vel))], "mk2")
 
     # --- sorties ----------------------------------------------------------------
 
@@ -1966,6 +2068,9 @@ class Engine:
             rec = LED_MAX if st is not None and st.half_beat_on else 0
         else:
             rec = LED_MAX
+        if self.selector is not None:  # sélection : la session du projet choisi est armée
+            entry = self.selector.current
+            rec = LED_MAX if entry is not None and entry.name in self.armed else 0
         buttons = {
             "REC": rec,
             "GRID": LED_MAX if self.quantize != "off" else 0,
