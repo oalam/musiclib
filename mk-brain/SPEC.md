@@ -92,7 +92,8 @@ Le portage sur le Pi vient en fin de MVP.
   réelles des paramètres, pattern en cours de lecture.
 - Microcontrôleur (Teensy, ESP32) : écarté pour le MVP, le HID des écrans y
   serait trop coûteux à porter.
-- Audio, sampling, navigateur de samples, séquenceur propre.
+- Audio (sauf la capture du main pour le journal de session, slice 25,
+  révisé le 2026-11-26), sampling, navigateur de samples, séquenceur propre.
 - Maschine MK3, Mikro, Maschine+ : MK2 seulement.
 
 ## Décisions arbitrées
@@ -277,7 +278,7 @@ restent comme historique. Ordre : la slice 8 passe **avant** le portage Pi
   où elle est partie (pas de note bloquée).
 - Un PC ne remplace la banque courante que si la DT2 change de banque et
   pas vers celle déjà choisie : GROUP A pendant que la DT2 joue E, puis
-  E02, garde A (règle de la 5.D, précisée au code le 2026-11-09).
+  D02, garde A (règle de la 5.D, précisée au code le 2026-11-09).
 - Au chargement d'un projet : MPC. La session retient la dernière
   disposition du clavier, pas la bascule.
 
@@ -448,7 +449,7 @@ banque dans les deux dispositions ; plus aucune trace des modes à l'écran.
 - **PATTERN non affecté** : la DT2 seule change de pattern. PATTERN + pad
   joue le pad comme sans modificateur ; LED PATTERN éteinte (slice 11 :
   PATTERN devient l'entrée du mode `ARPG`). Le prochain
-  pattern affiché (`> E07`) ne vient plus que de la DT2.
+  pattern affiché (`> D07`) ne vient plus que de la DT2.
 - **LED GROUP** : transport arrêté, seule la banque courante (PC reçu ou
   GROUP seul) est allumée, en `leds.bank` ; les autres éteintes. Transport
   lancé, le compteur de phrases inchangé.
@@ -1371,6 +1372,200 @@ En `DUO`, la DT2 change de track pendant que la MK2 joue : pads et
 encodeurs de la MK2 restent sur leur track. `PANIC` coupe une note
 coincée. `RST` refusé transport lancé, accepté à l'arrêt.
 
+## Slice 25 : journal de session et rapport (cadré le 2026-11-26, à coder)
+
+Exemple : à l'écran de sélection, `solaris` présélectionné, un appui sur
+REC allume sa LED et l'écran droit affiche `REC SESSION · 21 Go · 30 h`.
+Appui sur l'encodeur maître, tu joues une heure, tu éteins. Le lendemain
+sur le Mac, `mk-brain sessions pull` rapatrie la session, le rapport HTML
+s'ouvre : « A01 à A04 : 96 mesures pour une phrase de 32, 2 gestes »,
+« E03 : grave à 62 % de l'énergie pendant 48 mesures », la frise des
+patterns au-dessus de la courbe d'énergie et des mutes par track.
+
+But : relire un set pour progresser (sections trop longues, manque de
+variété, mutes, zones trop chargées, déséquilibre des fréquences).
+
+**Arbitré le 2026-11-26** :
+
+- **Armement à l'écran de sélection de projet**, pas en jeu : un bouton
+  y bascule l'enregistrement de la session, qui démarre au chargement du
+  projet et se ferme au changement de projet ou à l'arrêt. En jeu, REC
+  garde la boucle de gestes (slice 22).
+- **Origine des mutes distinguée** : faits à la main (MK2 ou DT2),
+  rejoués par la boucle de gestes, ou silences programmés dans le
+  pattern. Les deux premiers viennent du journal ; les silences
+  programmés ne passent pas en MIDI, l'analyse les déduit du son (chute
+  d'énergie sans mute au journal).
+- **Audio sur le Pi à étudier**, en surveillant l'espace disque.
+  Révise la ligne « Audio » du hors périmètre : la capture du main de la
+  DT2 entre dans le périmètre, rien d'autre (ni sampling, ni traitement).
+- **Rapport HTML** consultable d'un double-clic, produit sur le Mac.
+  Fichier statique sans serveur : la décision « Front web » du
+  2026-11-09 (pilotage de la MK2) n'est pas touchée.
+
+**Confirmé par l'utilisateur le 2026-11-26** :
+
+- Bouton d'armement : **REC**, à l'écran de sélection seulement. Choix
+  retenu par projet dans `state/` (armé une fois, armé aux démarrages
+  suivants), LED REC et mention à l'écran pour ne pas l'ignorer.
+- Rappel en jeu : un point `●` dans le bandeau de l'écran droit. Si
+  l'audio s'arrête faute de place : `REC AUDIO OFF` 3 s, le journal
+  continue.
+- Dossier d'une session sur le Pi : `state/sessions/<date>-<heure>-<set>/`
+  avec `journal.jsonl` et, si l'audio est actif, `audio.wav`.
+- Rangement sur le Mac : journal, métriques et rapport dans
+  `library/sessions/<date>-<set>/`, audio sur le SSD par `scripts/paths.py`.
+
+**Journal** (`journal.py`, 25.A) : une ligne JSON par événement, écrite
+par un thread dédié derrière une file (la boucle MIDI n'attend jamais le
+disque), vidée sur la carte toutes les 2 s : une coupure de courant perd
+2 s au plus. Chaque ligne porte `t_ns`, la position (mesure, tick) et :
+
+| Événement | Contenu | Source |
+|---|---|---|
+| `session` | projet, version, commit, date | en-tête |
+| `transport` | start, stop, continue | DT2 |
+| `bar` | numéro de mesure, BPM, position dans la phrase | horloge |
+| `pattern` | pattern (`A03`), banque | Program Change |
+| `mute` | track, état | `mk2`, `dt2` ou `loop` |
+| `cc` | track, paramètre, valeur | `mk2`, `dt2` ou `loop` |
+| `note` | track, note, vélocité | `mk2`, `arp` ou `loop` |
+| `geste` | mode, groupe, preset d'arpège, quantize, REC de la boucle | `mk2` |
+
+Volume : `bar` à 165 BPM = 165 / 4 × 60 = 2 475 lignes par heure ; les CC
+dominent, de l'ordre de quelques Mo par heure, sans enjeu pour la carte.
+
+**Audio** (25.B, après vérification sur le Pi) : `arecord` en processus
+séparé sur la carte USB de la DT2 (main stéréo, mode USB class-compliant),
+48 kHz 16 bits. Taille : 48 000 × 2 × 2 = 192 000 octets/s, × 3 600 =
+691 Mo par heure. L'heure de départ de la capture est notée au journal
+pour caler le son sur les mesures.
+
+- **Garde-fou disque** : à l'armement, l'écran donne l'espace libre et
+  l'autonomie (libre − 2 Go de réserve, divisé par 691 Mo/h). Sous 2 Go
+  libres, l'audio n'est pas lancé (journal seul). En jeu, la capture
+  s'arrête proprement sous 1 Go libre. Aucune suppression automatique :
+  `sessions pull --purge` efface du Pi ce qui a été rapatrié et vérifié.
+- FLAC (environ 60 % du WAV, estimation) seulement si la charge mesurée
+  le permet.
+
+**Rapatriement et rapport** (25.C sans audio, 25.D avec) :
+
+- `mk-brain sessions pull` sur le Mac : `rsync` par ssh depuis le Pi,
+  rejouable, hors git (trop lourd pour le dépôt).
+- `scripts/session_report.py` : lit le journal, et l'audio s'il existe,
+  en réutilisant `scripts/analyze.py` (LUFS, bandes, structure). Écrit
+  `metrics.json` et `rapport.html` autonome (SVG en ligne, pas de CDN).
+- Ce que le rapport mesure et critique : cf. « Analyse » ci-dessous.
+
+### Analyse : la critique du set (25.C et 25.D, précisé le 2026-11-26)
+
+Exemple de ce que le rapport doit dire, en tête :
+
+> **Axe 1. L'ouverture stagne.** A01 à A04, mesures 1 à 96 (0:00 à
+> 2:24) : 3 phrases de 32 sans entrée ni sortie de track, 2 gestes
+> d'encodeur, énergie stable à ± 0,5 LU. Principe 2 de la doctrine : une
+> boucle peut tourner longtemps *si quelque chose évolue lentement*.
+> Piste : une entrée par phrase (ordre des mutes, doctrine §4) ou un
+> filtre qui s'ouvre sur les 96 mesures.
+
+Un constat a toujours ces cinq parties : **où** (pattern, mesures,
+minutes), **mesure**, **seuil**, **principe** cité avec son renvoi,
+**piste d'action**. Pas de constat sans mesure, pas de jugement de goût
+(« ce son est faible ») : le rapport critique la conduite du set, pas la
+matière.
+
+**Référence de la critique**, trois sources, aucune valeur recopiée :
+
+- les **principes** de `digitakt/doctrine.md` §4 (mutes), §6
+  (construction du set), §9 (partage des fréquences) ;
+- le **plan** du set : tempos, phrases et banques du projet, durées des
+  sections de la doctrine du set. Les durées ne sont que dans un tableau
+  en prose : à ajouter au front matter `mkbrain.banks` (`duree: [10, 15]`,
+  en minutes) et à faire suivre par `convert` ;
+- les **morceaux de référence** de la bibliothèque, par genre de banque :
+  l'équilibre des bandes et le facteur de crête de la session sont
+  comparés aux leurs, calculés par la même fonction de `scripts/analyze.py`.
+
+**Unités** : la mesure (grain des courbes), la **phrase** de la banque
+(grain des constats), le pattern, la section (banque), le set. Un
+**geste** = une suite de CC d'un même paramètre séparés de moins de 2 s,
+gardée avec son amplitude ; une **décision** = entrée ou sortie d'une
+track structurante (kick 1, rumble 2, basse 9, lead 10) ou changement de
+pattern.
+
+**Règles.** Journal seul (25.C) :
+
+| Règle | Mesure | Principe |
+|---|---|---|
+| Section hors durée | durée jouée par banque contre la plage du plan | §6.1, arc |
+| Stagnation | phrases consécutives sans décision ni geste | §6.2 |
+| Agitation | plus d'un mute par 8 mesures ou plus d'une décision par 16, sur une fenêtre | §4, §6.2, §6.3 |
+| Changements empilés | plusieurs décisions sur la même mesure, hors bascule de section | §6.3 |
+| Hors phrase | part des décisions qui ne tombent pas sur le 1 d'une phrase de 8, écart en mesures | §6.6 |
+| Kick coupé | nombre de coupures, durée de chacune, durée de kick tourné avant, retour sur le 1 ou non | §6.4 |
+| Jamais retranché | tracks entrées et jamais ressorties d'une section ; rapport entrées / sorties | §6.5 |
+| Textures | gestes par famille de paramètres (filtre, drive, delay, reverb) et par section ; familles jamais touchées | §6.8 |
+| Origine des mutes | part main / boucle de gestes par section | §4 |
+| Tempo | paliers joués contre le plan (C et D : + 2 BPM par 32 mesures), stabilité ailleurs | plan du set |
+| Matière inutilisée | patterns jamais joués, tracks jamais démutées | §6.9 |
+| Début et fin | fiche des 2 premières et 2 dernières minutes : délai avant la première décision, fin nette ou étirée | §6.11 |
+
+Avec l'audio (25.D) :
+
+| Règle | Mesure | Principe |
+|---|---|---|
+| Arc d'énergie | LUFS par phrase, lissé : nombre de sommets, place du premier, respirations, pente par section | §6.1 |
+| Énergie plate | phrases consécutives à ± 1 LU sans respiration | §6.1, §6.10 |
+| Pas d'espace | part du temps à pleine charge ; plus longue durée sans chute d'au moins 3 LU | §6.10 |
+| Zone chargée | facteur de crête sous celui des références pendant plus d'une phrase, crêtes au plafond | §6.10, §9 |
+| Équilibre des bandes | parts sub / grave / bas-médium / médium / aigu par phrase contre la plage des références du genre | §9 |
+| Grave encombré | part du sub et du grave au-dessus de la plage alors que kick, rumble et basse jouent ensemble | §9, KT23 |
+| Stagnation réelle | règle « Stagnation » confirmée ou levée par le son : énergie et centre spectral stables ou non | §6.2 |
+| Silences programmés | chute d'une bande sans mute au journal : variation écrite dans le pattern | §6.3, étage du tour |
+| Effet d'un retour | gain d'énergie au retour du kick selon la durée de son absence | §6.4, §6.5 |
+
+**Seuils** : ceux que la doctrine chiffre sont repris d'elle (un mute par
+phrase de 8, une décision par 16 ou 32, paliers de 2 BPM) ; les autres
+(LU, parts de bandes, nombre de phrases) partent des valeurs ci-dessus,
+marquées « à étalonner » et réglées sur les trois premières sessions.
+Tous dans un seul bloc de configuration, affichés dans le rapport à côté
+de chaque mesure.
+
+**Rapport** (`rapport.html`), du plus utile au plus détaillé :
+
+1. **Verdict** : trois axes d'amélioration au plus, classés par poids
+   (durée touchée × écart au seuil), et deux points forts mesurés de la
+   même façon (une règle largement respectée est dite).
+2. **L'arc** : frise des banques et patterns, courbe d'énergie, tempo,
+   plan en filigrane.
+3. **Une fiche par section** : durée contre le plan, constats, couloirs
+   de mutes par track colorés par origine, gestes, bandes.
+4. **Détail** : tableau des patterns (mesures jouées, phrases, décisions,
+   gestes), tous les constats, seuils utilisés.
+
+**Limites, dites dans le rapport** : le main seul, donc pas de niveau
+par track (« la basse est trop forte » ne se mesure pas, seulement « le
+grave déborde ») ; pas de jugement sur le choix des sons ni sur la
+justesse d'une transition à l'oreille ; l'état des mutes de pattern à
+l'entrée d'un pattern n'est connu que si la DT2 l'envoie (question
+ouverte 20), sinon les couloirs de mutes partent du premier mute vu.
+
+**À vérifier sur le Pi avant 25.B** (question ouverte 19) : la DT2
+apparaît-elle en capture (`arecord -l`), charge CPU d'`arecord` pendant
+le jeu, retour du lag des pads ou de la gigue d'envoi (banc de la
+slice 2), espace libre de la carte (`df -h`).
+
+**Hors périmètre** : marqueur posé en jeu depuis la MK2 (« à revoir »),
+capture piste par piste (Overbridge, absent du Pi),
+écoute ou lecture depuis la MK2, analyse sur le Pi, comparaison entre
+sessions, envoi automatique par le réseau.
+
+**Critère de fin** : une session solaris de 30 min armée à la MK2 donne,
+après `sessions pull`, un rapport qui retrouve chaque changement de
+pattern à la mesure près, l'origine de chaque mute, et au moins un
+constat juste à la relecture ; aucun lag aux pads pendant la capture.
+
 ## Modes : live et design
 
 > **Remplacé par « Mode unique et pads MPC » (slice 8, 2026-11-09).**
@@ -1488,7 +1683,7 @@ coincée. `RST` refusé transport lancé, accepté à l'arrêt.
 | Donnée | Hub | Exemple |
 |---|---|---|
 | Samples par banque et track | `library/lives/<set>.json` | `items[].bank`, `items[].track`, `items[].name` |
-| Fiche de chaque banque : titre, description, tempo, tonique, mode ; et ce que mk-brain ajoute pour jouer : longueur de phrase, paliers de tempo, longueur des patterns | front matter `mkbrain:` de la doctrine du set (`digitakt/doctrine-dt2-<set>.md`) | `E-TRIBE: {title: Tribe, tempo: 162, tonique: A#, mode: phrygien, phrase: 64}` |
+| Fiche de chaque banque : titre, description, tempo, tonique, mode ; et ce que mk-brain ajoute pour jouer : longueur de phrase, paliers de tempo, longueur des patterns | front matter `mkbrain:` de la doctrine du set (`digitakt/doctrine-dt2-<set>.md`) | `D-TRIBE: {title: Tribe, tempo: 152, tonique: A#, mode: phrygien, phrase: 64}` |
 | Matériel, dispositions de pads, page d'encodeurs (CC) | `mk-brain/config/default.yaml` | `encodeurs: [{nom: CUT, cc: 74}, …]` |
 | Projet résolu, prêt à jouer | `mk-brain/projects/<set>.yaml` (généré par `convert` depuis la slice 6.A, jamais édité à la main) | tout ce qui précède, aplati par banque |
 
@@ -1516,16 +1711,16 @@ mkbrain:
       mode: eolien
       quantize: "1/8"
       paliers: {de: 143, a: 152, pas: 2, toutes: 32}
-    E-TRIBE:
+    D-TRIBE:
       title: Tribe
-      desc: Cœur du set, rumble, couleur phrygienne
-      tempo: 162
+      desc: Percussive et bruitée, kickbass à longue queue, phrygien
+      tempo: 152
       tonique: A#
       mode: phrygien
       phrase: 64
-    # … B-DNB, D-ACID, F-MENTAL, G-JOKER sur le même modèle
+    # … B-DNB, E-ACID, F-MENTAL, G-JOKER sur le même modèle
   patterns:                          # facultatif, longueur si ≠ 64 pas
-    E-TRIBE: {13: 32, 14: 16}
+    D-TRIBE: {13: 32, 14: 16}
 ---
 ```
 
@@ -1594,7 +1789,7 @@ mkbrain:
 - **tonique et mode** en haut à droite du bandeau droit live
   (`Bb Phrygian`), phrase et cap dessous (`ph 2  -6 to 32`) ;
 - console de `mk-brain play` : banque, tonique et mode devant chaque note
-  (`E-TRIBE A# Phrygian : pad 3 -> b2 (B5, 71)`) ; en design, la
+  (`D-TRIBE A# Phrygian : pad 3 -> b2 (B5, 71)`) ; en design, la
   disposition part de la tonique (5.D), le nom MIDI est donc la vraie
   note ; en live (rythmique), la track.
 
@@ -1790,7 +1985,7 @@ mk-brain                   sync ok a1b2c3d
 ```
 E·TRIBE  A# phrg        162.0 ▶  Q16 SW54
                                           
-  27 / 64              PAT E04  2/4       <- chiffres doubles
+  27 / 64              PAT D04  2/4       <- chiffres doubles
                                           
 [████████|████████|████████|██▒░░░░░░░░░] <- 8 blocs de 8 mesures
  ● ○ ○ ○                     cap 32 : -6  <- temps, mesures avant le cap
@@ -1831,7 +2026,7 @@ jour** : chaque valeur s'affiche juste au-dessus de son encodeur. Les deux
 
 ```
 écran gauche                              écran droit
-E04 > E06 (gros)       SD/CP T03 (gros)  25 / 32 (gros)       phrase 1
+D04 > D06 (gros)       SD/CP T03 (gros)  25 / 32 (gros)       phrase 1
                                                                cap 32 : -8
 ■ ■ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           [████████|████████|████████|██░░]
 ----------------------------------------  ---------------------------------
@@ -1844,7 +2039,7 @@ CUT [███░] RES [██░░] ENV [██░░] DEC [██░] LVL [�
   pointillé tant qu'elle est hors prise (remplace le `~`) ; le pan depuis le centre
   (`bipolar` dans la page d'encodeurs) ; colonne touchée inversée 1 s ;
 - bandeau gauche (revu à l'essai) : en gros, le pattern en cours, suivi
-  du prochain (`> E06`) annoncé par la DT2 ou demandé par PATTERN + pad,
+  du prochain (`> D06`) annoncé par la DT2 ou demandé par PATTERN + pad,
   et la track sélectionnée avec son code de la grille (doctrine §1,
   `T03` + `SD/CP` ; `track_names` de `config/default.yaml`, deux codes au
   plus, à remplacer par le projet à la slice 6) ; dessous, 16 cases de mutes (pleine =
@@ -1874,15 +2069,15 @@ changent pas :
 
 ```
 écran gauche                              écran droit
-[E03]  E-TRIBE  Bb Phrygian               [PHR 01] 10 / 32  -7 to 16    [MPC]
-TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·                      > E04      143.0
+[D03]  D-TRIBE  Bb Phrygian               [PHR 01] 10 / 32  -7 to 16    [MPC]
+TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·                      > D04      143.0
                                           [████:████|██░░:░░░░|░░░░:░░░░|░░░░:░░░░]
 ```
 
 - bandeau gauche, colonne « écran de la DT2 » : le pattern en noir sur
   blanc, puis `TR 12`, la track des faders, sans son code de la grille
   (`x2 3` : groupe SOLO de 2 tracks, la première étant la 3) ;
-- à sa droite, la clé de la banque et sa tonalité (`E-TRIBE  Bb
+- à sa droite, la clé de la banque et sa tonalité (`D-TRIBE  Bb
   Phrygian`), remplacées 1,5 s par le dernier geste, 1 s par la frappe, ou
   par une alerte ; les mutes ne sont plus jamais masqués ;
 - mutes sur toute la largeur restante, cases de 10 px ; elles comptent
@@ -1898,7 +2093,7 @@ TR 1   ■ ▣ □ ■ ■ ■ ■ ■ ■ ■ □ ■ ■ ■ ■ ·           
   cache du rendu (v0.30.2) ;
 - bandeau droit : la phrase en noir sur blanc dans le coin gauche (`PHR
   01`, `PHR --` à l'arrêt), `mesure / longueur` en gros, les mesures avant
-  le cap, dessous le pattern suivant (`> E04`) ou l'octave du clavier ;
+  le cap, dessous le pattern suivant (`> D04`) ou l'octave du clavier ;
 - à droite, l'étiquette du mode (`MPC`, `KEYS`, `SOLO`, `MUTE`, `SELECT`),
   qui quitte l'écran gauche, et dessous le **tempo de la clock** (la
   décision « ni tempo » du 2026-11-09 est levée), lissé par régression sur
@@ -1917,7 +2112,7 @@ divisions du repeat ; faders inchangés.
 
 ```
 écran gauche (bordé)                          écran droit
-[D] Chroma   T03 SD/CP   Q off   32 mes       E-TRIBE 162 (gras)
+[D] Chroma   T03 SD/CP   Q off   32 mes       D-TRIBE 152 (gras)
 [██Db6 tierce mineure██████░░░░░░░░░░░]       Bb phrygien · Tribe
                                               6 / 32  cap 16 : -11  [██░░░░]
 ```
@@ -1940,7 +2135,7 @@ divisions du repeat ; faders inchangés.
   mutes ;
 - écran droit : fiche de la banque (clé, tempo, tonique en bémols, mode,
   titre), `pas de projet` sans projet ; **pattern en cours en gros en haut
-  à droite** (`E04`, demandé le 2026-11-09), la fiche rétrécit sa police
+  à droite** (`D04`, demandé le 2026-11-09), la fiche rétrécit sa police
   pour lui laisser la place ; phrase en petit, sans compte à rebours en
   gros ;
 - noms courts des dispositions pour tenir sous un bouton (Chroma, Min.
@@ -1948,7 +2143,7 @@ divisions du repeat ; faders inchangés.
 
 **Design, écran gauche : ce qui part vers la DT2** (maquette d'origine)
 ```
-╔DESIGN═ E-TRIBE ═ T10 acid ═ ch11 ═══════╗
+╔DESIGN═ D-TRIBE ═ T10 acid ═ ch11 ═══════╗
 ║ pad 6 -> A#3 (70) vel 96   Grp H penta  ║
 ║ MIDI > CC74=87 ch11                     ║
 ║ clock 162.0 ■   Q off   mes 3 / 4       ║
@@ -2144,7 +2339,7 @@ Noms de la face avant MK2, tous décodés en HID le 2026-11-09 (slice 0, cf. Con
   - automatique : Program Change reçu (DT2 `PRG CH SEND` = on) → mesure 1
     à la frontière suivante. En live, le même PC change aussi la banque
     courante et ses réglages (cf. Modes). Changement de pattern dans la
-    même banque (E03 → E04) : remise à zéro aussi (décidé le 2026-11-09).
+    même banque (D03 → D04) : remise à zéro aussi (décidé le 2026-11-09).
 - Longueur de phrase par banque, lue dans le projet. `intro: 16` = première
   phrase de 16 mesures après le premier PC de la banque.
 - Patterns de longueur non puissance de 2 : le compteur dérive, c'est
@@ -2223,6 +2418,7 @@ conditionne tout le reste.
 | 22 | **Boucle de gestes** : REC de la MK2 enregistre dans le Pi pads, encodeurs, réglages de l'arpège et divisions sur 1, 2, 4 ou 8 mesures, rejoués en boucle par le moteur, overdub, annuler / rétablir geste par geste (SHIFT + pad 1 / pad 2), ERASE pour vider ; en mémoire | cf. « Slice 22 », critère de fin | cadrée le 2026-11-11, annulation arbitrée le 2026-11-12, codée le 2026-11-12 (v0.46.0), gestes REC / ERASE tels que proposés ; SHIFT + REC (couper sans vider) et étiquette clignotante ajoutés en v0.49.0 ; à essayer sur la MK2 et la DT2 (critère de fin, LIVE REC) |
 | 23 | **Mode ACID V** : STEP bascule, page d'encodeurs ACID sur les VAL1-8 de la track MIDI (cutoff, résonance, env mod, decay, accent, drive, distorsion, FX1 d'Acid V), accent par vélocité fixe sur les `X`, slide `~` (notes chevauchées) dans les motifs | cf. « Slice 23 », critère de fin | cadrée le 2026-11-13, à coder après le commit de la slice 22 |
 | 24 | **Menu des réglages** : SHIFT + appui maître, 6 rubriques aux boutons d'écran (`JEU`, `TOUCH`, `ENC`, `AFF`, `MIDI`, `SYS`), entrées aux encodeurs, `state/settings.json` synchronisé ; mode 2 joueurs, panique, profils de vélocité, écran de mesure, santé du Pi | cf. « Slice 24 », critère de fin | cadrée le 2026-11-13, à coder après la 23 (24.A à 24.D) |
+| 25 | **Journal de session et rapport** : armé par REC à l'écran de sélection, journal des patterns, mutes (origine), CC, notes et gestes ; capture audio du main de la DT2 avec garde-fou disque ; `sessions pull` et rapport HTML sur le Mac | cf. « Slice 25 », critère de fin | cadrée le 2026-11-26, à coder (25.A journal, 25.B audio après vérification sur le Pi, 25.C rapport sans audio, 25.D rapport avec audio) ; analyse précisée le 2026-11-26 |
 | 9 | **Perform et simplifications** : PATTERN retiré, LED GROUP = banque courante seule, perform par SOLO (pad n = track n, groupe par taps, PAD MODE en sort), PB sur SHIFT, mode toujours affiché, écrans du clavier = MPC | cf. « Slice 9 », critère de fin | codée le 2026-11-10 (v0.23.0 à v0.26.0), à essayer sur la MK2 et la DT2 |
 | 8 | **Mode MPC et mode unique** : table `mpc` (kit en tranches sur T1, T3-T6), PAD MODE = MPC ↔ clavier, fusion live / design, une quantize, banque courante unique | cf. « Mode unique et pads MPC », critère de fin ; préalable : sonde LIVE REC (`scripts/dt2_mpc_probe.py`) | codée le 2026-11-09 (v0.21.0), à essayer sur la MK2 ; sonde LIVE REC à passer sur la DT2 |
 
@@ -2332,6 +2528,17 @@ la slice 0.
     - Usage, à choisir : table de mixage (16 niveaux et mutes) ; gestes
       expressifs (XY cutoff / résonance, macros) ; copie des 8 encodeurs
       (doublon) ; interface du 2e joueur en `DUO`.
+
+19. **Capture audio de la DT2 sur le Pi** (slice 25.B, à vérifier, Pi
+    injoignable le 2026-11-26) : carte de capture visible par
+    `arecord -l` en mode USB class-compliant ? charge CPU du Pi 3B et
+    effet sur le lag des pads et la gigue d'envoi ? espace libre de la
+    carte SD ?
+
+20. **Mutes de pattern au changement de pattern** (slice 25.C, à
+    vérifier sur la DT2) : la DT2 envoie-t-elle l'état des mutes
+    enregistré avec le pattern quand elle le charge ? Sinon le journal
+    ne connaît une track mutée qu'à partir de son premier mute joué.
 
 ## Constats HID (slice 0, 2026-11-09)
 
