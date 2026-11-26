@@ -1943,7 +1943,8 @@ v0.48.0, à essayer)** : le Mac sert à travailler, le Pi au live.
   track active de la DT2, que le MIDI ne peut ni lire ni changer.
 - **MUTE + pad = mute / démute de la track n** : mute de pattern, CC 110
   sur son canal depuis la v0.52.0 (CC 94, mute global, avant ; réglage
-  `encoders.mute_cc`). Les mutes connus sont oubliés au changement de
+  `encoders.mute_cc`). État inconnu affiché en demi-teinte (pad) et en
+  case tramée (écran) depuis la v0.53.0. Les mutes connus sont oubliés au changement de
   pattern, la DT2 n'envoyant pas ceux du pattern chargé.
 - **PATTERN + pad = pattern n de la banque courante** : Program Change
   `banque × 16 + (n − 1)` envoyé à la DT2, qui le met en file comme ses

@@ -243,6 +243,10 @@ def _mute_strip(d: ImageDraw.ImageDraw, engine: Engine, left: int = COLUMN) -> N
             d.point(((x0 + x1) // 2, (top + bottom) // 2), fill=1)
         elif engine.faders.muted.get(t):
             d.rectangle((x0, top, x1, bottom), outline=1)
+        elif t not in engine.faders.muted:  # inconnue depuis le changement de pattern : tramée
+            d.rectangle((x0, top, x1, bottom), outline=1)
+            grid = [(x, y) for x in range(x0, x1 + 1) for y in range(top, bottom + 1)]
+            d.point([p for p in grid if (p[0] + p[1]) % 2], fill=1)
         else:
             d.rectangle((x0, top, x1, bottom), fill=1)
             full = True
@@ -416,6 +420,12 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
         side = f"L {loop_bar[0]} / {loop_bar[1]}"
     if not side and engine.keyboard and engine.octave:
         side = f"oct {engine.octave:+d}"
+    minutes = engine.play_minutes(now)
+    if minutes is not None:  # temps de jeu, calé à droite contre l'étiquette du mode
+        played, font = f"{minutes}'", _font(10)
+        width = int(d.textlength(played, font=font))
+        d.text((TAG_BOX[0] - 3 - width, 12), played, font=font, fill=1)
+        room -= width + 4
     if side:
         _bold(d, (x, 11), side, _fit(d, side, room, (SMALL, 10, 9)), 1)
     bpm = engine.clock.bpm_smooth  # sous l'étiquette du mode, lissé sur une mesure

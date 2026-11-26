@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.53.0] - 2026-11-26
+
+### Ajouté
+
+- [5.A] Mute inconnu : une track dont aucun mute n'a été vu depuis le
+  changement de pattern (ou le démarrage) s'affiche en demi-teinte sur son
+  pad, MUTE tenu, et en case tramée dans la bande des mutes. Elle reste
+  traitée comme ouverte : le premier MUTE + pad la mute.
+- [5.C] Temps de jeu en minutes sur l'écran droit, à gauche du tempo
+  (`42'`) : part du premier Start après le chargement du projet, continue
+  pendant les arrêts, repart au changement de projet.
+
 ## [0.52.0] - 2026-11-26
 
 ### Modifié

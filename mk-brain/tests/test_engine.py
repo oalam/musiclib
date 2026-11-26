@@ -1808,6 +1808,17 @@ def test_pattern_change_forgets_mutes(cfg: Config) -> None:
     assert not eng.faders.muted.get(3)  # la DT2 n'envoie pas les mutes du pattern chargé
 
 
+def test_mute_leds_dim_unknown_tracks(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.on_control_change(0, eng.faders.mute_cc, 0)  # track 1 : ouverte, vue
+    eng.on_control_change(1, eng.faders.mute_cc, 1)  # track 2 : mutée
+    btn(eng, "MUTE")
+    pads = {pad_label(i): rgb for i, rgb in enumerate(eng.leds().pads)}
+    full = cfg.track_colors[3]
+    assert pads[1] == cfg.track_colors[1] and pads[2] == (0, 0, 0)
+    assert pads[3] != (0, 0, 0) and pads[3] != full and sum(pads[3]) < sum(full)  # inconnue
+
+
 def test_journal_gesture_followed_from_dt2_names_its_source(cfg: Config) -> None:
     eng = Engine(cfg)
     tape = Tape(eng)

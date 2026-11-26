@@ -64,6 +64,8 @@ def test_pad_hit_shown_in_both_layouts(cfg: Config) -> None:
     assert render.left(eng, 3 * MS).tobytes() != before
     assert render.left(eng, 3 * MS + SECOND).tobytes() == before
 
+MINUTE = 60_000_000_000  # ns
+
 
 def _cell(track: int) -> int:
     """Abscisse du centre de la case de mute de `track`."""
@@ -72,7 +74,7 @@ def _cell(track: int) -> int:
 
 def test_mute_strip_open_muted_and_selected(cfg: Config) -> None:
     eng = Engine(cfg)
-    eng.faders.muted[3] = True
+    eng.faders.muted.update({1: False, 3: True})
     img = render.left(eng, 0)
     mid, under = render.MUTE_TOP + 4, render.MUTE_BOTTOM + 2
     assert img.getpixel((_cell(1), mid))  # track 1 ouverte : case pleine
@@ -81,16 +83,46 @@ def test_mute_strip_open_muted_and_selected(cfg: Config) -> None:
     assert not img.getpixel((_cell(2), under))
 
 
+def test_mute_strip_unknown_track_is_hatched(cfg: Config) -> None:
+    """Pas de mute vu depuis le changement de pattern : case tramée, ni pleine ni vide."""
+    eng = Engine(cfg)
+    eng.faders.muted.update({1: False, 3: True})
+    img = render.left(eng, 0)
+    mid = render.MUTE_TOP + 4
+
+    def row(track: int) -> list[bool]:
+        return [bool(img.getpixel((_cell(track) + dx, mid))) for dx in (-1, 0, 1, 2)]
+
+    assert row(1) == [True] * 4 and row(3) == [False] * 4
+    assert sorted(row(2)) == [False, False, True, True]  # un pixel sur deux
+
+
+def test_play_time_in_minutes_from_first_start(cfg: Config) -> None:
+    eng = Engine(cfg)
+    assert eng.play_minutes(0) is None
+    stopped = render.right(eng, 0).tobytes()
+    eng = Engine(cfg, running_clock(30))
+    eng.tick(5 * MINUTE)  # premier tick transport lancé : origine du temps de jeu
+    eng.tick(9 * MINUTE)
+    assert eng.play_minutes(5 * MINUTE) == 0 and eng.play_minutes(47 * MINUTE + 59) == 42
+    assert render.right(eng, 5 * MINUTE).tobytes() != render.right(eng, 47 * MINUTE).tobytes()
+    assert stopped != render.right(eng, 5 * MINUTE).tobytes()
+    eng.set_project(None)  # autre projet : le temps de jeu repart
+    assert eng.play_minutes(50 * MINUTE) is None
+
+
 def test_mute_strip_marks_playing_sixteenth(cfg: Config) -> None:
     """Carré intérieur, en inverse de sa case, sur la double croche en cours."""
     mid = render.MUTE_TOP + 4
     eng = at_bar(cfg, 3)  # 10 ticks dans la mesure : 2e double croche
-    eng.faders.muted[3] = True
+    eng.faders.muted.update({1: False, 2: False, 3: True})
     img = render.left(eng, 0)
     assert not img.getpixel((_cell(2), mid)) and img.getpixel((_cell(1), mid))
     advance(eng, 2 * 96 + 10, 2 * 96 + 16)  # 3e double croche, case mutée
     assert render.left(eng, 0).getpixel((_cell(3), mid))
-    assert render.left(Engine(cfg), 0).getpixel((_cell(2), mid))  # à l'arrêt : rien
+    stopped = Engine(cfg)
+    stopped.faders.muted[2] = False
+    assert render.left(stopped, 0).getpixel((_cell(2), mid))  # à l'arrêt : rien
 
 
 def test_mute_strip_dotted_line_between_beats(cfg: Config) -> None:

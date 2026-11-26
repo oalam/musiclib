@@ -373,6 +373,7 @@ class Engine:
         self.armed: set[str] = set()  # projets armés par REC à la sélection
         self.armed_dirty = False  # à écrire dans `state/` par la CLI
         self._journal_bar: int | None = None  # dernière mesure notée
+        self._play_origin: int | None = None  # premier Start depuis le chargement du projet
         self._journal_state: tuple[object, ...] = ()  # derniers réglages notés (`geste`)
 
     @property
@@ -411,6 +412,12 @@ class Engine:
     @property
     def running(self) -> bool:
         return self.clock.ticks_since_start is not None
+
+    def play_minutes(self, now: int) -> int | None:
+        """Minutes écoulées depuis le premier Start du projet, arrêts compris ; None avant."""
+        if self._play_origin is None:
+            return None
+        return max(0, now - self._play_origin) // 60_000_000_000
 
     @property
     def next_pattern(self) -> str | None:
@@ -1484,6 +1491,7 @@ class Engine:
     def set_project(self, project: Project | None) -> None:
         """Change de projet : la banque courante (dernier PC ou GROUP) prend ses réglages."""
         self.project = project
+        self._play_origin = None
         self.announce = None
         self._loop_erase()  # la boucle est un brouillon du projet quitté
         if self.bank is not None:
@@ -1884,6 +1892,8 @@ class Engine:
 
     def tick(self, now: int) -> list[Timed]:
         """Attaques dont la fenêtre de vélocité est écoulée, coups de repeat à venir."""
+        if self._play_origin is None and self.running:
+            self._play_origin = now  # le temps de jeu part du premier Start
         if self.selector is not None and self.running:
             self.selector = None  # Start : la sélection se ferme sur le projet en cours
             self._note("transport running: selection closed")
@@ -2044,8 +2054,12 @@ class Engine:
             pad = pad_label(index)
             track = self.cfg.track_colors[pad]  # modificateur tenu : pad n = track n
             auto = pad == self.cfg.midi.auto_channel
-            if "MUTE" in held:  # tracks ouvertes pleines, mutées éteintes ; la 16 sans mute
-                pads[index] = (0, 0, 0) if auto or self.faders.muted.get(pad) else track
+            if "MUTE" in held:  # ouvertes pleines, mutées éteintes, inconnues faibles ; 16 sans
+                muted = self.faders.muted.get(pad)
+                if auto or muted:
+                    pads[index] = (0, 0, 0)
+                else:  # inconnue : pas de mute vu depuis le changement de pattern
+                    pads[index] = scale(track, dim) if muted is None else track
             elif "SELECT" in held:
                 pads[index] = track if pad == self.track else (0, 0, 0)
             elif self.arp_menu:  # banque de presets : occupé faible, courant plein, vide éteint
