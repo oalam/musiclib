@@ -1429,8 +1429,8 @@ class Engine:
         son titre annoncé 2 s. Un autre pattern de la même banque garde les surcharges.
         """
         if program != self.last_program:
-            self.faders.pattern_changed()
-            self.leds_dirty = True  # mutes oubliés
+            self.faders.pattern_changed(self.last_program, program)
+            self.leds_dirty = True  # mutes du pattern retrouvé, ou inconnus
         # la DT2 change de banque, et pas vers celle déjà choisie (GROUP) : surcharges gardées
         moved = self.last_program is None or program // 16 != self.last_program // 16
         new_bank = moved and program // 16 != self.bank

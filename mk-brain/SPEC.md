@@ -1944,8 +1944,10 @@ v0.48.0, à essayer)** : le Mac sert à travailler, le Pi au live.
 - **MUTE + pad = mute / démute de la track n** : mute de pattern, CC 110
   sur son canal depuis la v0.52.0 (CC 94, mute global, avant ; réglage
   `encoders.mute_cc`). État inconnu affiché en demi-teinte (pad) et en
-  case tramée (écran) depuis la v0.53.0. Les mutes connus sont oubliés au changement de
-  pattern, la DT2 n'envoyant pas ceux du pattern chargé.
+  case tramée (écran) depuis la v0.53.0. Les mutes vus sont gardés par
+  pattern (v0.53.1) et réaffichés au retour ; pour un pattern jamais
+  joué, rien n'est connu, la DT2 n'envoyant pas les mutes du pattern
+  chargé.
 - **PATTERN + pad = pattern n de la banque courante** : Program Change
   `banque × 16 + (n − 1)` envoyé à la DT2, qui le met en file comme ses
   propres changements.

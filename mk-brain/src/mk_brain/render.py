@@ -422,10 +422,12 @@ def _right_band(d: ImageDraw.ImageDraw, engine: Engine, now: int) -> None:
         side = f"oct {engine.octave:+d}"
     minutes = engine.play_minutes(now)
     if minutes is not None:  # temps de jeu, calé à droite contre l'étiquette du mode
-        played, font = f"{minutes}'", _font(10)
-        width = int(d.textlength(played, font=font))
-        d.text((TAG_BOX[0] - 3 - width, 12), played, font=font, fill=1)
-        room -= width + 4
+        played, font = f"{minutes}'", _font(13)
+        box = (TAG_BOX[0] - 9 - int(d.textlength(played, font=font)), 12, TAG_BOX[0] - 3, 24)
+        d.rectangle(box, fill=1)  # noir sur blanc, comme la phrase
+        for dx in (0, 1):
+            _centered(d, (box[0] + dx, box[1], box[2] + dx, box[3]), played, font, 0)
+        room = box[0] - x - 3
     if side:
         _bold(d, (x, 11), side, _fit(d, side, room, (SMALL, 10, 9)), 1)
     bpm = engine.clock.bpm_smooth  # sous l'étiquette du mode, lissé sur une mesure

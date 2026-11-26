@@ -69,6 +69,7 @@ class Faders:
         self._residue: dict[int, float] = {}  # encodeur → reste de rotation brute (pondérée)
         self._recent: dict[int, deque[tuple[int, int]]] = {}  # encodeur → (instant, rotation)
         self.muted: dict[int, bool] = {}
+        self._pattern_mutes: dict[int, dict[int, bool]] = {}  # mutes vus, par pattern quitté
 
     @property
     def n_pages(self) -> int:
@@ -160,11 +161,14 @@ class Faders:
             self._values[(track, cc)] = value
             self._stale.discard((track, cc))
 
-    def pattern_changed(self) -> None:
-        """Autre pattern : valeurs hors prise ; mutes oubliés, la DT2 n'envoie pas ceux du
-        pattern chargé (constaté le 2026-11-26)."""
+    def pattern_changed(self, old: int | None = None, new: int | None = None) -> None:
+        """Autre pattern : valeurs hors prise. La DT2 n'envoie pas les mutes du pattern
+        chargé (constaté le 2026-11-26) : ceux vus sur le pattern quitté sont rangés, ceux
+        déjà vus sur le pattern retrouvé reviennent ; un pattern jamais joué : inconnus."""
         self._stale = set(self._values)
-        self.muted = {}
+        if old is not None:
+            self._pattern_mutes[old] = self.muted
+        self.muted = dict(self._pattern_mutes.get(new, {})) if new is not None else {}
 
     # --- session (sauvée, reprise au démarrage) -----------------------------------
 
@@ -178,6 +182,7 @@ class Faders:
         self._values = {k: v for k, v in values.items() if k[1] in known}
         self._stale = set(self._values)
         self.muted = {t: True for t in muted}
+        self._pattern_mutes = {}
 
     # --- lecture --------------------------------------------------------------
 

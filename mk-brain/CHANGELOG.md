@@ -3,6 +3,15 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.53.1] - 2026-11-26
+
+### Modifié
+
+- [5.A] Les mutes vus sur un pattern sont gardés par pattern : quitté puis
+  retrouvé, il réaffiche ses mutes au lieu de repartir d'inconnu. Un
+  pattern jamais joué depuis le chargement du projet reste inconnu.
+- [5.C] Temps de jeu en noir sur blanc, en gras, comme la phrase.
+
 ## [0.53.0] - 2026-11-26
 
 ### Ajouté

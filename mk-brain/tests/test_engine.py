@@ -1805,7 +1805,12 @@ def test_pattern_change_forgets_mutes(cfg: Config) -> None:
     eng.on_control_change(2, eng.faders.mute_cc, 1)
     assert eng.faders.muted.get(3)
     eng.on_program_change(17)
-    assert not eng.faders.muted.get(3)  # la DT2 n'envoie pas les mutes du pattern chargé
+    assert 3 not in eng.faders.muted  # jamais joué : inconnu, la DT2 n'envoie rien
+    eng.on_program_change(18)
+    eng.on_control_change(4, eng.faders.mute_cc, 1)
+    eng.on_program_change(17)
+    eng.on_program_change(18)
+    assert eng.faders.muted == {5: True}  # pattern retrouvé : ses mutes vus reviennent
 
 
 def test_mute_leds_dim_unknown_tracks(cfg: Config) -> None:

@@ -82,7 +82,7 @@ projet ou à l'arrêt. En jeu, REC reste la boucle de gestes.
   (`-7 to 16`) et, dessous, le pattern suivant quand il est annoncé
   (`> D04`) ; à droite le mode des pads (`MPC`, `KEYS`, `SOLO`) et, dessous,
   le tempo de la clock, lissé sur une mesure. À gauche du tempo, le temps
-  de jeu en minutes (`42'`) : il part du premier Start après le chargement
+  de jeu en minutes, en noir sur blanc (`42'`) : il part du premier Start après le chargement
   du projet et continue pendant les arrêts.
 - **Barre de la phrase** : une case par mesure, un trait tous les 8
   mesures, un pointillé à chaque tour de pattern (4 mesures).
@@ -208,9 +208,10 @@ DT2 s'affichent aussi.
 
 C'est le mute de pattern de la DT2 (CC 110), pas le mute global. La DT2
 n'envoie pas les mutes enregistrés dans un pattern : à chaque changement
-de pattern, l'état des tracks est inconnu : pads en demi-teinte (MUTE
-tenu) et cases tramées à l'écran, jusqu'au premier mute joué ou reçu sur
-la track. Une track inconnue est traitée comme ouverte : le premier
+de pattern, la MK2 réaffiche les mutes qu'elle a vus la dernière fois sur
+ce pattern. Pour un pattern pas encore joué, ou une track jamais touchée,
+l'état est inconnu : pads en demi-teinte (MUTE tenu) et cases tramées à
+l'écran, jusqu'au premier mute joué ou reçu sur la track. Une track inconnue est traitée comme ouverte : le premier
 MUTE + pad la mute.
 
 ## 8. Quantize, swing, note repeat
