@@ -1783,10 +1783,31 @@ def test_journal_tells_mute_origins_apart(cfg: Config) -> None:
     track = int(str(tape.of("mute")[0]["track"]))
     eng.on_control_change(track - 1, eng.faders.mute_cc, 0)  # rouvert sur la DT2
     assert tape.of("mute") == [
-        {"track": track, "on": True, "src": "mk2"},
-        {"track": track, "on": False, "src": "dt2"},
+        {"track": track, "on": True, "scope": "global", "src": "mk2"},
+        {"track": track, "on": False, "scope": "global", "src": "dt2"},
     ]
     assert tape.of("cc") == []  # un mute n'est pas compté comme un CC
+
+
+def test_journal_notes_dt2_pattern_mute_without_following_track(cfg: Config) -> None:
+    eng = Engine(cfg)
+    tape = Tape(eng)
+    other = eng.track % 8 + 1
+    eng.on_control_change(other - 1, 110, 1)  # mute de pattern sur la DT2
+    eng.on_control_change(other - 1, 110, 0)
+    assert tape.of("mute") == [
+        {"track": other, "on": True, "scope": "pattern", "src": "dt2"},
+        {"track": other, "on": False, "scope": "pattern", "src": "dt2"},
+    ]
+    assert tape.of("cc") == [] and eng.track != other
+
+
+def test_journal_gesture_followed_from_dt2_names_its_source(cfg: Config) -> None:
+    eng = Engine(cfg)
+    tape = Tape(eng)
+    other = eng.track % 8 + 1
+    eng.on_control_change(other - 1, 74, 99)  # la DT2 sélectionne une autre track
+    assert tape.of("geste")[-1]["src"] == "dt2" and tape.of("geste")[-1]["track"] == other
 
 
 def test_journal_notes_cc_from_mk2_and_dt2(cfg: Config) -> None:

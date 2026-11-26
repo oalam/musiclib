@@ -198,6 +198,7 @@ MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
 ARP_TAP_NS = 300_000_000  # PATTERN relâché avant : appui bref (sortie d'ARPG), sinon config
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
+PATTERN_MUTE_CC = 110  # mute de pattern de la DT2 : 1 = muté, 0 = ouvert (constaté le 2026-11-26)
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # boutons d'écran 1-4 (banque : GROUP)
 PHRASES: tuple[PhraseLength, ...] = (32, 64)
@@ -584,14 +585,15 @@ class Engine:
             if isinstance(m, NoteOn):
                 self._j("note", track=m.channel + 1, note=m.note, vel=m.velocity, src=src)
             elif isinstance(m, ControlChange) and m.control == self.faders.mute_cc:
-                self._j("mute", track=m.channel + 1, on=m.value != 0, src=src)
+                self._j("mute", track=m.channel + 1, on=m.value != 0, scope="global", src=src)
             elif isinstance(m, ControlChange):
                 self._j("cc", track=m.channel + 1, param=m.control, value=m.value, src=src)
         return msgs
 
-    def _journal_gesture(self) -> None:
+    def _journal_gesture(self, src: str = "mk2") -> None:
         """`geste` : les réglages de jeu, notés quand l'un d'eux change, quel que soit le
-        bouton ou l'encodeur qui l'a changé."""
+        bouton ou l'encodeur qui l'a changé ; `src` dit qui l'a changé (`dt2` : track ou
+        banque suivie depuis la machine)."""
         if self.journal is None:
             return
         sheet = self.sheet
@@ -607,7 +609,7 @@ class Engine:
         if state != self._journal_state:
             self._journal_state = state
             names = ("mode", "bank", "track", "quantize", "division", "loop", "arp_preset")
-            self._j("geste", **dict(zip(names, state, strict=True)), src="mk2")
+            self._j("geste", **dict(zip(names, state, strict=True)), src=src)
 
     def _toggle_armed(self) -> None:
         """REC à l'écran de sélection : la session du projet choisi sera enregistrée ou non."""
@@ -1372,8 +1374,12 @@ class Engine:
         if control == self.faders.mute_cc:
             if not auto:
                 self.faders.received(track, control, value)
-                self._j("mute", track=track, on=value != 0, src="dt2")
+                self._j("mute", track=track, on=value != 0, scope="global", src="dt2")
                 self.leds_dirty = True
+            return
+        if control == PATTERN_MUTE_CC:  # noté au journal, sans suivre la track ni les LEDs
+            if not auto:
+                self._j("mute", track=track, on=value != 0, scope="pattern", src="dt2")
             return
         if auto and not self.cfg.midi.knobs_on_track_channel:
             track = self.track
@@ -1381,6 +1387,7 @@ class Engine:
             self.track = track  # suit la track active de la DT2
             self.last_control = f"T{track:02d} selected (DT2)"
         self.faders.received(track, control, value)
+        self._journal_gesture("dt2")  # track suivie depuis la DT2
         self._j("cc", track=track, param=control, value=value, src="dt2")
         self.leds_dirty = True
 
@@ -1429,6 +1436,7 @@ class Engine:
             self.log.append(f"{sheet[0]} : {sheet[1].title}, phrase {length}")
         label = pattern_label(program)
         self._j("pattern", pattern=label, bank=label[0], program=program)
+        self._journal_gesture("dt2")  # banque suivie depuis la DT2
         ticks = self.clock.ticks_since_start
         if ticks is None:  # arrêté : pattern et phrase changés tout de suite, compteur inchangé
             self.phrase.pattern = label

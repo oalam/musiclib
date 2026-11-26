@@ -1428,7 +1428,7 @@ disque), vidée sur la carte toutes les 2 s : une coupure de courant perd
 | `transport` | start, stop, continue | DT2 |
 | `bar` | numéro de mesure, BPM, position dans la phrase | horloge |
 | `pattern` | pattern (`A03`), banque | Program Change |
-| `mute` | track, état | `mk2`, `dt2` ou `loop` |
+| `mute` | track, état, `scope` (`global` CC 94, `pattern` CC 110 reçu de la DT2) | `mk2`, `dt2` ou `loop` |
 | `cc` | track, paramètre, valeur | `mk2`, `dt2` ou `loop` |
 | `note` | track, note, vélocité | `mk2`, `arp` ou `loop` |
 | `geste` | mode, groupe, preset d'arpège, quantize, REC de la boucle | `mk2` |
@@ -2559,6 +2559,13 @@ la slice 0.
     vérifier sur la DT2) : la DT2 envoie-t-elle l'état des mutes
     enregistré avec le pattern quand elle le charge ? Sinon le journal
     ne connaît une track mutée qu'à partir de son premier mute joué.
+    Constat du 2026-11-26 : un mute de pattern joué sort en CC 110
+    (1 = muté, 0 = ouvert), noté au journal depuis la v0.51.1. Au
+    chargement d'un pattern, la DT2 n'envoie rien : essai B16 → B01
+    (l'un tout ouvert, l'autre avec la seule track 1 ouverte), deux
+    Program Change reçus, aucun CC 110. Réponse : non. Le rapport 25.C
+    ne peut pas lire dans le journal les mutes enregistrés d'un pattern ;
+    il lui faut une autre source, à choisir au cadrage de 25.C.
 
 ## Constats HID (slice 0, 2026-11-09)
 

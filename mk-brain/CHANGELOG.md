@@ -3,6 +3,18 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.51.1] - 2026-11-26
+
+### Corrigé
+
+- [25] Journal : un mute de pattern joué sur la DT2 (CC 110, 1 = muté,
+  constaté à l'essai) est noté `mute` avec `scope: pattern` et non plus
+  `cc` ; il ne déplace plus la track sélectionnée sur la MK2. Les mutes
+  globaux (CC 94) portent `scope: global`.
+- [25] Journal : un `geste` dû à la DT2 (track ou banque suivie) est noté
+  tout de suite avec `src: dt2`, et non au geste suivant de la MK2 avec
+  `src: mk2`.
+
 ## [0.51.0] - 2026-11-26
 
 ### Ajouté
