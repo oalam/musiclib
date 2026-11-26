@@ -2054,12 +2054,12 @@ class Engine:
             pad = pad_label(index)
             track = self.cfg.track_colors[pad]  # modificateur tenu : pad n = track n
             auto = pad == self.cfg.midi.auto_channel
-            if "MUTE" in held:  # ouvertes pleines, mutées éteintes, inconnues faibles ; 16 sans
+            if "MUTE" in held:  # ouvertes en couleur, mutées éteintes, inconnues en blanc
                 muted = self.faders.muted.get(pad)
                 if auto or muted:
                     pads[index] = (0, 0, 0)
                 else:  # inconnue : pas de mute vu depuis le changement de pattern
-                    pads[index] = scale(track, dim) if muted is None else track
+                    pads[index] = self.cfg.leds.mute_unknown if muted is None else track
             elif "SELECT" in held:
                 pads[index] = track if pad == self.track else (0, 0, 0)
             elif self.arp_menu:  # banque de presets : occupé faible, courant plein, vide éteint

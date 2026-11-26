@@ -134,6 +134,7 @@ encoders:
 
 leds:
   dim: 0.15                  # pad au repos = couleur × dim ; frappé = couleur pleine
+  mute_unknown: [90, 90, 90] # MUTE tenu : track au mute inconnu, en blanc faible (ouverte = sa couleur, mutée = éteinte)
   selected: 0.5              # live : pad de la track sélectionnée (encodeurs), entre repos et frappe
   phrase: [0, 255, 0]        # LED GROUP du compteur de phrases (transport lancé)
   phrase_warn: [255, 110, 0] # bloc en cours, dernière mesure avant un cap (orange)

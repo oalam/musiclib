@@ -65,6 +65,7 @@ class VelocityConfig(BaseModel):
 
 class LedConfig(BaseModel):
     dim: float = Field(0.15, ge=0, le=1)
+    mute_unknown: RGB = (90, 90, 90)  # MUTE tenu : track dont le mute n'a pas été vu
     selected: float = Field(0.5, ge=0, le=1)  # live : pad de la track sélectionnée, au repos
     phrase: RGB = (0, 255, 0)  # LED GROUP du compteur de phrases
     phrase_warn: RGB = (255, 110, 0)  # bloc en cours, dernière mesure avant un cap

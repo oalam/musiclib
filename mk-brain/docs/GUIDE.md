@@ -210,7 +210,7 @@ C'est le mute de pattern de la DT2 (CC 110), pas le mute global. La DT2
 n'envoie pas les mutes enregistrés dans un pattern : à chaque changement
 de pattern, la MK2 réaffiche les mutes qu'elle a vus la dernière fois sur
 ce pattern. Pour un pattern pas encore joué, ou une track jamais touchée,
-l'état est inconnu : pads en demi-teinte (MUTE tenu) et cases tramées à
+l'état est inconnu : pads en blanc faible (MUTE tenu) et cases tramées à
 l'écran, jusqu'au premier mute joué ou reçu sur la track. Une track inconnue est traitée comme ouverte : le premier
 MUTE + pad la mute.
 

@@ -3,6 +3,13 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.53.2] - 2026-11-26
+
+### Corrigé
+
+- [5.A] Mute inconnu en blanc faible sur le pad (`leds.mute_unknown`) : la
+  demi-teinte de la couleur de la track ne se distinguait pas à l'essai.
+
 ## [0.53.1] - 2026-11-26
 
 ### Modifié

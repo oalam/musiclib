@@ -1821,7 +1821,7 @@ def test_mute_leds_dim_unknown_tracks(cfg: Config) -> None:
     pads = {pad_label(i): rgb for i, rgb in enumerate(eng.leds().pads)}
     full = cfg.track_colors[3]
     assert pads[1] == cfg.track_colors[1] and pads[2] == (0, 0, 0)
-    assert pads[3] != (0, 0, 0) and pads[3] != full and sum(pads[3]) < sum(full)  # inconnue
+    assert pads[3] == cfg.leds.mute_unknown and pads[3] not in ((0, 0, 0), full)  # inconnue
 
 
 def test_journal_gesture_followed_from_dt2_names_its_source(cfg: Config) -> None:
