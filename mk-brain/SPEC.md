@@ -1428,7 +1428,7 @@ disque), vidée sur la carte toutes les 2 s : une coupure de courant perd
 | `transport` | start, stop, continue | DT2 |
 | `bar` | numéro de mesure, BPM, position dans la phrase | horloge |
 | `pattern` | pattern (`A03`), banque | Program Change |
-| `mute` | track, état, `scope` (`global` CC 94, `pattern` CC 110 reçu de la DT2) | `mk2`, `dt2` ou `loop` |
+| `mute` | track, état, `scope` (`global` CC 94, `pattern` CC 110) | `mk2`, `dt2` ou `loop` |
 | `cc` | track, paramètre, valeur | `mk2`, `dt2` ou `loop` |
 | `note` | track, note, vélocité | `mk2`, `arp` ou `loop` |
 | `geste` | mode, groupe, preset d'arpège, quantize, REC de la boucle | `mk2` |
@@ -1941,7 +1941,10 @@ v0.48.0, à essayer)** : le Mac sert à travailler, le Pi au live.
 - **SELECT + pad = sélectionner la track n** pour les 8 encodeurs (cf.
   Encodeurs). Rien ne sonne. La track sélectionnée est celle du Pi, pas la
   track active de la DT2, que le MIDI ne peut ni lire ni changer.
-- **MUTE + pad = mute / démute de la track n** (CC 94 sur son canal).
+- **MUTE + pad = mute / démute de la track n** : mute de pattern, CC 110
+  sur son canal depuis la v0.52.0 (CC 94, mute global, avant ; réglage
+  `encoders.mute_cc`). Les mutes connus sont oubliés au changement de
+  pattern, la DT2 n'envoyant pas ceux du pattern chargé.
 - **PATTERN + pad = pattern n de la banque courante** : Program Change
   `banque × 16 + (n − 1)` envoyé à la DT2, qui le met en file comme ses
   propres changements.

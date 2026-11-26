@@ -161,7 +161,10 @@ class Faders:
             self._stale.discard((track, cc))
 
     def pattern_changed(self) -> None:
+        """Autre pattern : valeurs hors prise ; mutes oubliés, la DT2 n'envoie pas ceux du
+        pattern chargé (constaté le 2026-11-26)."""
         self._stale = set(self._values)
+        self.muted = {}
 
     # --- session (sauvée, reprise au démarrage) -----------------------------------
 

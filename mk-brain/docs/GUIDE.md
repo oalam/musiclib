@@ -203,6 +203,10 @@ supposée). Si la DT2 joue autre chose, on corrige les notes de la table.
 les tracks ouvertes en couleur, les mutées éteintes. Les mutes joués sur la
 DT2 s'affichent aussi.
 
+C'est le mute de pattern de la DT2 (CC 110), pas le mute global. La DT2
+n'envoie pas les mutes enregistrés dans un pattern : à chaque changement
+de pattern, la MK2 repart de « tout ouvert » jusqu'au premier mute joué.
+
 ## 8. Quantize, swing, note repeat
 
 - **GRID** : quantize off → 1/16 → 1/8 (LED allumée si active). Une frappe

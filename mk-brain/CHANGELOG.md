@@ -3,6 +3,20 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.52.0] - 2026-11-26
+
+### Modifié
+
+- [5.A] MUTE + pad joue le mute de pattern de la DT2 (CC 110) et non plus
+  le mute global (CC 94), comme la doctrine du 2026-11-24 ; réception du
+  CC 110 vérifiée sur la machine. Les LEDs de mute suivent les mutes de
+  pattern joués sur la DT2. `encoders.mute_cc: 94` rend l'ancien réglage.
+- [5.A] Au changement de pattern, les mutes connus sont oubliés (LEDs
+  rouvertes) : la DT2 n'envoie pas ceux du pattern chargé.
+- [25] Journal : `scope` d'un mute lu sur son CC (94 `global`, 110
+  `pattern`) ; un mute global joué sur la DT2 est noté sans toucher aux
+  LEDs.
+
 ## [0.51.1] - 2026-11-26
 
 ### Corrigé

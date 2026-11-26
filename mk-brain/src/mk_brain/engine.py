@@ -10,7 +10,7 @@ Rend des messages datés `(instant_ns, message)` que l'ordonnanceur envoie.
   reçus de la DT2 ; SHIFT + PLAY = mesure 1 à la barre suivante, SHIFT +
   GROUP n = début du bloc n ; transport lancé, les LED GROUP montrent le
   compteur et PLAY pulse sur le 1.
-- Slice 5.A : SELECT + pad = track des encodeurs, MUTE + pad = mute (CC 94),
+- Slice 5.A : SELECT + pad = track des encodeurs, MUTE + pad = mute (CC 110, de pattern),
   PATTERN + GROUP A-H = banque (sans envoi), PATTERN + pad = Program
   Change dans la banque courante (refusé tant qu'elle est inconnue) ;
   8 encodeurs → CC sur le canal de la track, valeurs apprises de la DT2
@@ -198,7 +198,8 @@ MODIFIERS = ("MUTE", "SELECT")  # + pad : commande, pas de note
 KEYBOARD_GROUP = 0  # chromatique, disposition du clavier sans banque
 ARP_TAP_NS = 300_000_000  # PATTERN relâché avant : appui bref (sortie d'ARPG), sinon config
 POWEROFF_HOLD_NS = 2_000_000_000  # SHIFT + ERASE tenus : extinction du Pi
-PATTERN_MUTE_CC = 110  # mute de pattern de la DT2 : 1 = muté, 0 = ouvert (constaté le 2026-11-26)
+# mutes de la DT2, 1 = muté, 0 = ouvert ; `encoders.mute_cc` choisit celui que joue la MK2
+MUTE_SCOPES = {94: "global", 110: "pattern"}
 MAX_OCTAVE = 4  # clavier : décalage d'octave borné à ±4 (flèches de transport)
 MENU = ("GAMME", "TRACK", "QUANT", "PHRASE")  # boutons d'écran 1-4 (banque : GROUP)
 PHRASES: tuple[PhraseLength, ...] = (32, 64)
@@ -576,6 +577,10 @@ class Engine:
         if self.journal is not None:
             self.journal(kind, self.clock.ticks_since_start, fields)
 
+    def _j_mute(self, track: int, control: int, value: int, src: str) -> None:
+        scope = MUTE_SCOPES.get(control, "global")
+        self._j("mute", track=track, on=value != 0, scope=scope, src=src)
+
     def _journal_out(self, msgs: list[Timed], src: str) -> list[Timed]:
         """Note les notes, CC et mutes envoyés, avec leur origine ; rend la liste telle quelle.
         Note off, pitch bend et aftertouch ne sont pas notés."""
@@ -585,7 +590,7 @@ class Engine:
             if isinstance(m, NoteOn):
                 self._j("note", track=m.channel + 1, note=m.note, vel=m.velocity, src=src)
             elif isinstance(m, ControlChange) and m.control == self.faders.mute_cc:
-                self._j("mute", track=m.channel + 1, on=m.value != 0, scope="global", src=src)
+                self._j_mute(m.channel + 1, m.control, m.value, src)
             elif isinstance(m, ControlChange):
                 self._j("cc", track=m.channel + 1, param=m.control, value=m.value, src=src)
         return msgs
@@ -1371,15 +1376,12 @@ class Engine:
             self._j("cc", track=track, param=control, value=value, src="dt2")
             return
         auto = track == self.cfg.midi.auto_channel
-        if control == self.faders.mute_cc:
+        if control == self.faders.mute_cc or control in MUTE_SCOPES:
             if not auto:
-                self.faders.received(track, control, value)
-                self._j("mute", track=track, on=value != 0, scope="global", src="dt2")
-                self.leds_dirty = True
-            return
-        if control == PATTERN_MUTE_CC:  # noté au journal, sans suivre la track ni les LEDs
-            if not auto:
-                self._j("mute", track=track, on=value != 0, scope="pattern", src="dt2")
+                if control == self.faders.mute_cc:  # l'autre mute : journal seul, sans LED
+                    self.faders.received(track, control, value)
+                    self.leds_dirty = True
+                self._j_mute(track, control, value, "dt2")
             return
         if auto and not self.cfg.midi.knobs_on_track_channel:
             track = self.track
@@ -1421,6 +1423,7 @@ class Engine:
         """
         if program != self.last_program:
             self.faders.pattern_changed()
+            self.leds_dirty = True  # mutes oubliés
         # la DT2 change de banque, et pas vers celle déjà choisie (GROUP) : surcharges gardées
         moved = self.last_program is None or program // 16 != self.last_program // 16
         new_bank = moved and program // 16 != self.bank

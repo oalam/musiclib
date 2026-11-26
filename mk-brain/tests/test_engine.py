@@ -295,12 +295,12 @@ def test_pad16_mute_refused_select_targets_active_track(cfg: Config) -> None:
     assert eng.handle(EncoderEvent(2, CC_STEP, 0), 0) == [(0, ControlChange(15, 54, 65))]
 
 
-def test_mute_pad_sends_cc94(cfg: Config) -> None:
+def test_mute_pad_sends_pattern_mute_cc110(cfg: Config) -> None:
     from mk_brain.engine import ControlChange
 
     eng = Engine(cfg)
     btn(eng, "MUTE")
-    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ControlChange(0, 94, 127))]
+    assert eng.handle(PadEvent(PAD1, True, 2500), 0) == [(0, ControlChange(0, 110, 127))]
     assert eng.leds().pads[PAD1] == (0, 0, 0)  # muté : éteint pendant MUTE
 
 
@@ -311,7 +311,7 @@ def test_dt2_knob_on_auto_channel_goes_to_selected_track(cfg: Config) -> None:
     eng = Engine(cfg.model_copy(update={"midi": midi}))
     eng.track = 7
     eng.on_control_change(15, 54, 74)  # bouton tourné sur la DT2 : arrive sur le canal 16
-    eng.on_control_change(15, 94, 1)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
+    eng.on_control_change(15, 110, 1)  # mute sur l'AUTO CHANNEL : track incertaine, ignoré
     assert not eng.faders.muted
     assert eng.handle(EncoderEvent(2, -CC_STEP, 0), 0) == [
         (0, ControlChange(6, 54, 73))
@@ -736,7 +736,7 @@ def test_dt2_knob_on_track_channel_selects_track(cfg: Config) -> None:
     eng.on_control_change(3, 54, 112)  # BR tourné sur la track 4 active
     assert eng.track == 4 and eng.last_control == "T04 selected (DT2)"
     assert eng.faders.view(4)[1].value == 112
-    eng.on_control_change(6, 94, 1)  # mute de la track 7 : pas de sélection
+    eng.on_control_change(6, 110, 1)  # mute de la track 7 : pas de sélection
     assert eng.track == 4 and eng.faders.muted[7]
     eng.on_control_change(15, 54, 90)  # track 16 (AUTO CHANNEL) : suivie aussi
     assert eng.track == 16 and eng.faders.view(16)[1].value == 90
@@ -834,12 +834,13 @@ def test_mute_tap_ignores_release_bounces(cfg: Config) -> None:
 
     eng = Engine(cfg)
     btn(eng, "MUTE")
-    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == [(0, ControlChange(6, 94, 127))]
+    assert eng.handle(PadEvent(PAD7, True, 2500), 0) == [(0, ControlChange(6, 110, 127))]
     eng.handle(PadEvent(PAD7, False, 0), 200 * MS)
     assert eng.handle(PadEvent(PAD7, True, 600), 205 * MS) == []  # rebond : pas de démute
     eng.handle(PadEvent(PAD7, False, 0), 210 * MS)
     assert eng.faders.muted[7]
-    assert eng.handle(PadEvent(PAD7, True, 2500), 500 * MS) == [(500 * MS, ControlChange(6, 94, 0))]
+    reopened = eng.handle(PadEvent(PAD7, True, 2500), 500 * MS)
+    assert reopened == [(500 * MS, ControlChange(6, 110, 0))]
 
 
 def _hold_shift_erase(eng: Engine, t: int = 0) -> None:
@@ -1783,23 +1784,28 @@ def test_journal_tells_mute_origins_apart(cfg: Config) -> None:
     track = int(str(tape.of("mute")[0]["track"]))
     eng.on_control_change(track - 1, eng.faders.mute_cc, 0)  # rouvert sur la DT2
     assert tape.of("mute") == [
-        {"track": track, "on": True, "scope": "global", "src": "mk2"},
-        {"track": track, "on": False, "scope": "global", "src": "dt2"},
+        {"track": track, "on": True, "scope": "pattern", "src": "mk2"},
+        {"track": track, "on": False, "scope": "pattern", "src": "dt2"},
     ]
     assert tape.of("cc") == []  # un mute n'est pas compté comme un CC
 
 
-def test_journal_notes_dt2_pattern_mute_without_following_track(cfg: Config) -> None:
+def test_journal_notes_dt2_global_mute_without_led_or_track(cfg: Config) -> None:
     eng = Engine(cfg)
     tape = Tape(eng)
+    assert eng.faders.mute_cc == 110  # la MK2 joue le mute de pattern
     other = eng.track % 8 + 1
-    eng.on_control_change(other - 1, 110, 1)  # mute de pattern sur la DT2
-    eng.on_control_change(other - 1, 110, 0)
-    assert tape.of("mute") == [
-        {"track": other, "on": True, "scope": "pattern", "src": "dt2"},
-        {"track": other, "on": False, "scope": "pattern", "src": "dt2"},
-    ]
-    assert tape.of("cc") == [] and eng.track != other
+    eng.on_control_change(other - 1, 94, 1)  # mute global sur la DT2
+    assert tape.of("mute") == [{"track": other, "on": True, "scope": "global", "src": "dt2"}]
+    assert tape.of("cc") == [] and eng.track != other and not eng.faders.muted.get(other)
+
+
+def test_pattern_change_forgets_mutes(cfg: Config) -> None:
+    eng = Engine(cfg)
+    eng.on_control_change(2, eng.faders.mute_cc, 1)
+    assert eng.faders.muted.get(3)
+    eng.on_program_change(17)
+    assert not eng.faders.muted.get(3)  # la DT2 n'envoie pas les mutes du pattern chargé
 
 
 def test_journal_gesture_followed_from_dt2_names_its_source(cfg: Config) -> None:
