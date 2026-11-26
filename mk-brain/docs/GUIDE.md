@@ -57,9 +57,9 @@ joué est présélectionné : un appui suffit. SHIFT + BROWSE (◀ ou ▶) revie
 ![Pads en MPC, transport arrêté](img/02-mpc-arret.png)
 
 - **Écran gauche, coin gauche** : comme sur la DT2, le pattern en cours en
-  noir sur blanc (`E03`, `---` tant que la DT2 n'a rien dit) et, dessous,
+  noir sur blanc (`D03`, `---` tant que la DT2 n'a rien dit) et, dessous,
   la track sélectionnée (`TR 1`).
-- **Écran gauche, en haut** : la banque et sa tonalité (`E-TRIBE  Bb
+- **Écran gauche, en haut** : la banque et sa tonalité (`D-TRIBE  Bb
   Phrygian`), remplacées un instant par une alerte, le dernier geste ou la
   frappe d'un pad.
 - **Bande des mutes** : une case par track, pleine = ouverte, vide =
@@ -71,7 +71,7 @@ joué est présélectionné : un appui suffit. SHIFT + BROWSE (◀ ou ▶) revie
 - **Écran droit, en haut** : la phrase en noir sur blanc (`PHR 01`), la
   mesure dans la phrase (`10 / 32`), les mesures avant le prochain cap
   (`-7 to 16`) et, dessous, le pattern suivant quand il est annoncé
-  (`> E04`) ; à droite le mode des pads (`MPC`, `KEYS`, `SOLO`) et, dessous,
+  (`> D04`) ; à droite le mode des pads (`MPC`, `KEYS`, `SOLO`) et, dessous,
   le tempo de la clock, lissé sur une mesure.
 - **Barre de la phrase** : une case par mesure, un trait tous les 8
   mesures, un pointillé à chaque tour de pattern (4 mesures).

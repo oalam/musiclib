@@ -3,6 +3,22 @@
 Format [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/). Chaque slice
 de `SPEC.md` § Phases = une entrée balisée `[N]` et une version mineure.
 
+## [0.50.1] - 2026-11-26
+
+### Modifié
+
+- Projet solaris régénéré sur le plan du 2026-11-26 : cinq banques nommées,
+  jouées de B à F, la banque A vide (`B-FLATIRON` 160 fa mineur harmonique,
+  `C-DAVYL` 142 la# éolien, `D-AVIRUS` 154 la# phrygien, `E-NEPTUNE` 160
+  fa mineur harmonique, `F-OMINOUS` 170 fa phrygien) ; plus de banque G.
+  Tests recalés sur ces banques, la banque chromatique des tests est
+  ajoutée par `with_joker`.
+
+### Corrigé
+
+- `convert` lit l'abréviation `harm` (mineur harmonique) dans les `keys`
+  du lives JSON ; elle levait `ProjectError`.
+
 ## [0.50.0] - 2026-11-13
 
 ### Modifié

@@ -4,45 +4,33 @@ name: solaris
 defaults:
   phrase: 32
 banks:
-  A-HALF:
-    title: Half-time
-    desc: Ouverture lourde et lente, basse lente, peu de notes
+  B-FLATIRON:
+    title: Flatiron
+    desc: Half-time, ouverture lourde et lente
     tempo: 160.0
     tonique: F
+    mode: mineur-harmonique
+  C-DAVYL:
+    title: Davyl
+    desc: Techno, kick glissant la#, stab à la tierce, charley
+    tempo: 142.0
+    tonique: A#
     mode: eolien
-  B-DNB:
-    title: Drum and bass
-    desc: Ça s'ouvre, vers la jungle et les rollers, reese fa / sol bémol
-    tempo: 165.0
+  D-AVIRUS:
+    title: A Virus
+    desc: Acid en la# phrygien
+    tempo: 154.0
+    tonique: A#
+    mode: phrygien
+  E-NEPTUNE:
+    title: Neptune
+    desc: Tribe percussive et bruitée, retour en fa
+    tempo: 160.0
+    tonique: F
+    mode: mineur-harmonique
+  F-OMINOUS:
+    title: Ominous
+    desc: Drum and bass à gros kick régulier, fin du set
+    tempo: 170.0
     tonique: F
     mode: phrygien
-  C-GROOVE:
-    title: Groove tribe
-    desc: Kick glissant la#, stab à la tierce, charley ; paliers vers 152
-    tempo: 143.0
-    tonique: A#
-    mode: eolien
-  D-ACID:
-    title: Acid
-    desc: L'acid entre en la#, percs, kick-sub ; paliers vers 162
-    tempo: 152.0
-    tonique: A#
-    mode: eolien
-  E-TRIBE:
-    title: Tribe
-    desc: Cœur du set, rumble, couleur phrygienne ; fin en respiration
-    tempo: 162.0
-    tonique: A#
-    mode: phrygien
-  F-MENTAL:
-    title: Mental
-    desc: Tension hypnotique en do, drone et acid, kick sèche
-    tempo: 168.0
-    tonique: C
-    mode: eolien
-  G-JOKER:
-    title: Jokers
-    desc: Breaks et secours, kick + sub seuls en fa, la# et do
-    tempo: 165.0
-    tonique: A#
-    mode: chromatique

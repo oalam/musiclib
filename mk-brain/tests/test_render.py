@@ -165,7 +165,7 @@ def test_design_hit_shows_note_and_degree(cfg: Config, project: Project) -> None
     from mk_brain.layouts import degree_name, flat_note
 
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_E")
+    btn(eng, "GROUP_D")
     eng.group = 0  # chromatique (surcharge de la disposition phrygienne)
     assert (flat_note(70), degree_name(eng.layout, 73)) == ("Bb5", "minor 3rd")
     assert degree_name(eng.layout, 72) == "2nd, out of scale"
@@ -184,7 +184,7 @@ def test_live_announce_for_two_seconds_then_bank_and_tonic_on_the_left(
 ) -> None:
     eng = Engine(cfg, project=project)
     plain, bare = render.right(eng, 0).tobytes(), render.left(eng, 0).tobytes()
-    eng.on_program_change(4 * 16)  # E01 : E-TRIBE annoncée
+    eng.on_program_change(3 * 16)  # D01 : D-AVIRUS annoncée
     eng.tick(0)
     assert render.right(eng, 10 * MS).tobytes() != plain
     assert render.right(eng, 3 * SECOND).tobytes() == plain  # annonce retombée

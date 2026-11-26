@@ -18,7 +18,7 @@ from mk_brain.engine import (
 )
 from mk_brain.hid_mk2 import BUTTONS, LED_MAX, ButtonEvent, EncoderEvent, PadEvent, pad_label
 from mk_brain.layouts import scale
-from mk_brain.project import Project
+from mk_brain.project import Bank, Project
 from mk_brain.quantize import QUANTIZE_CYCLE
 from mk_brain.selection import Entry, Selector
 from mk_brain.session import Session
@@ -229,12 +229,12 @@ def test_program_change_resets_at_next_bar(cfg: Config) -> None:
     eng = Engine(cfg, running_clock(1))
     eng.on_start()
     advance(eng, 1, 3 * 96 + 86 + 1)  # 10 clocks avant la 5ᵉ mesure
-    eng.on_program_change(16 * 4 + 3)
-    assert eng.log == ["banque E (PC reçu)", "PC E04 -> mesure 1 à la barre 5"]
+    eng.on_program_change(16 * 3 + 3)
+    assert eng.log == ["banque D (PC reçu)", "PC D04 -> mesure 1 à la barre 5"]
     assert eng.phrase_state is not None and eng.phrase_state.bar == 4
     advance(eng, 3 * 96 + 87, 4 * 96 + 1)
     assert eng.phrase_state is not None and eng.phrase_state.bar == 1
-    assert eng.phrase.pattern == "E04"
+    assert eng.phrase.pattern == "D04"
 
 
 def test_program_change_ignored_when_stopped(cfg: Config) -> None:
@@ -382,20 +382,29 @@ def test_program_change_when_stopped_sets_current_pattern(cfg: Config) -> None:
 # --- slice 5.D : design, banques et menu ------------------------------------------
 
 
+def with_joker(project: Project) -> Project:
+    """Copie du projet avec une banque G chromatique (solaris n'en a plus depuis le 2026-11-26)."""
+    copy = project.model_copy(deep=True)
+    copy.banks["G-JOKER"] = Bank(
+        title="Jokers", desc="Secours", tempo=160, tonique="A#", mode="chromatique"
+    )
+    return copy
+
+
 def turn_master(eng: Engine, delta: int) -> None:
     eng.handle(EncoderEvent(0, delta, 0), 0)
 
 
 def test_design_group_is_bank(cfg: Config, project: Project) -> None:
-    eng = design(cfg, project=project)
+    eng = design(cfg, project=with_joker(project))
     assert eng.bank is None  # ni PC reçu ni GROUP
-    btn(eng, "GROUP_E")
-    assert eng.last_control == "E-TRIBE  Bb Phrygian"
+    btn(eng, "GROUP_D")
+    assert eng.last_control == "D-AVIRUS  Bb Phrygian"
     assert eng.layout.group == "D"  # disposition calée sur le mode de la banque
     eng.group = KEYBOARD_GROUP  # surcharge (PAD MODE, menu GAMME) : chromatique
     assert press(eng, 0) == [(3 * MS, NoteOn(0, 70, 127))]  # chromatique depuis A#
     leds = eng.leds()
-    assert leds.groups[4] == cfg.leds.bank  # choisie : blanc plein
+    assert leds.groups[3] == cfg.leds.bank  # choisie : blanc plein
     assert leds.groups[0] == (0, 0, 0)  # les autres éteintes (slice 9)
     from mk_brain.hid_mk2 import pad_label
 
@@ -422,17 +431,17 @@ def test_design_without_project(cfg: Config) -> None:
 
 def test_program_change_sets_current_bank(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, project=project)
-    eng.on_program_change(4 * 16 + 2)  # E03
-    assert eng.bank == 4 and eng.layout.group == "D"  # clavier calé sur E-TRIBE phrygien
+    eng.on_program_change(3 * 16 + 2)  # E03
+    assert eng.bank == 3 and eng.layout.group == "D"  # clavier calé sur D-AVIRUS phrygien
 
 
 def test_menu_master_applies_on_turn(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_A")
+    btn(eng, "GROUP_C")
     assert eng.menu == 0  # focus sur GAMME au départ
     assert eng.leds().buttons["DISPLAY_1"] > eng.leds().buttons["DISPLAY_2"]
     assert "DISPLAY_5" not in eng.leds().buttons  # 4 entrées, plus de BANK
-    turn_master(eng, 1)  # A-HALF éolien : Aeolian au départ, Phrygian juste après
+    turn_master(eng, 1)  # C-DAVYL éolien : Aeolian au départ, Phrygian juste après
     assert eng.menu_view()[0] == ("GAMME", "Phrygian", True)
     assert (eng.layout.group, eng.last_control) == ("D", "Phrygian")  # appliqué au cran
     turn_master(eng, -2)  # Aeolian, puis Chroma
@@ -473,7 +482,7 @@ def test_menu_phrase_until_bank_change(cfg: Config, project: Project) -> None:
 
 def test_hit_kept_with_note_for_screen(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_E")
+    btn(eng, "GROUP_D")
     press(eng, 0, pressure=3000)
     assert eng.last_hit is not None and eng.last_hit[1:3] == (70, 127)
 
@@ -507,7 +516,7 @@ def test_arrows_switch_encoder_page_and_pitch_bend(cfg: Config) -> None:
 
 def test_transport_arrows_shift_octave_in_design(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_E")  # la#
+    btn(eng, "GROUP_D")  # la#
     eng.group = KEYBOARD_GROUP  # chromatique depuis A#5 (70)
     btn(eng, "TRANSPORT_RIGHT")
     assert (eng.octave, eng.last_control) == (1, "octave +1")
@@ -547,12 +556,12 @@ def test_live_program_change_sets_bank_context_and_phrase_at_bar(
     cfg: Config, project: Project
 ) -> None:
     long_bank = project.model_copy(deep=True)
-    long_bank.banks["E-TRIBE"].phrase = 64
+    long_bank.banks["D-AVIRUS"].phrase = 64
     eng = Engine(cfg, running_clock(1), long_bank)
     eng.on_start()
     advance(eng, 1, 3 * 96 + 86 + 1)
-    eng.on_program_change(16 * 4 + 3)  # E04
-    assert eng.sheet is not None and eng.sheet[0] == "E-TRIBE"
+    eng.on_program_change(16 * 3 + 3)  # E04
+    assert eng.sheet is not None and eng.sheet[0] == "D-AVIRUS"
     assert eng.phrase.length == 32  # pas avant la barre
     assert eng.announce is not None and eng.announce[2] is None
     eng.tick(5 * MS)
@@ -564,7 +573,7 @@ def test_live_program_change_sets_bank_context_and_phrase_at_bar(
 
 def test_live_program_change_stopped_applies_phrase_now(cfg: Config, project: Project) -> None:
     long_bank = project.model_copy(deep=True)
-    long_bank.banks["C-GROOVE"].phrase = 64
+    long_bank.banks["C-DAVYL"].phrase = 64
     eng = Engine(cfg, project=long_bank)
     eng.on_program_change(2 * 16)  # C01
     assert eng.phrase.length == 64
@@ -574,21 +583,21 @@ def test_live_program_change_stopped_applies_phrase_now(cfg: Config, project: Pr
 
 def test_announce_only_on_bank_change(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, project=project)
-    eng.on_program_change(4 * 16 + 2)  # E03
+    eng.on_program_change(3 * 16 + 2)  # E03
     eng.announce = None
-    eng.on_program_change(4 * 16 + 3)  # E04 : même banque
+    eng.on_program_change(3 * 16 + 3)  # D04 : même banque
     assert eng.announce is None
     eng.on_program_change(5 * 16)  # F01
-    assert eng.announce is not None and eng.announce[0] == "F-MENTAL"
+    assert eng.announce is not None and eng.announce[0] == "F-OMINOUS"
 
 
 def test_bank_follows_dt2_unless_same_pattern_bank(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    eng.on_program_change(4 * 16)  # E01 : banque E, comme GROUP E, annoncée
-    assert eng.sheet is not None and eng.sheet[0] == "E-TRIBE" and eng.announce is not None
-    btn(eng, "GROUP_A")  # choix à la main
-    eng.on_program_change(4 * 16 + 1)  # E02 : la DT2 reste en E, le choix tient
-    assert eng.sheet is not None and eng.sheet[0] == "A-HALF"
+    eng.on_program_change(3 * 16)  # D01 : banque D, comme GROUP D, annoncée
+    assert eng.sheet is not None and eng.sheet[0] == "D-AVIRUS" and eng.announce is not None
+    btn(eng, "GROUP_C")  # choix à la main (C-DAVYL éolien : disposition C)
+    eng.on_program_change(3 * 16 + 1)  # D02 : la DT2 reste en D, le choix tient
+    assert eng.sheet is not None and eng.sheet[0] == "C-DAVYL"
     eng.on_program_change(7 * 16)  # H01 : la DT2 passe en H, absente du projet
     assert eng.bank == 7 and eng.sheet is None and group(eng) == "C"  # disposition gardée
 
@@ -607,12 +616,12 @@ def _catalog(project: Project) -> Callable[[], Selector]:
 
 def test_selection_loads_preselected_project(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, catalog=_catalog(project))
-    eng.on_program_change(4 * 16)  # E01 reçu avant le chargement
+    eng.on_program_change(3 * 16)  # D01 reçu avant le chargement
     eng.open_selection()
     assert eng.selector is not None and eng.selector.index == 1
     btn(eng, "MASTER_PUSH")
     assert eng.selector is None and eng.project is project and eng.loaded == "solaris"
-    assert eng.sheet is not None and eng.sheet[0] == "E-TRIBE"  # contexte repris du PC
+    assert eng.sheet is not None and eng.sheet[0] == "D-AVIRUS"  # contexte repris du PC
 
 
 def test_selection_scroll_and_invalid_refused(cfg: Config, project: Project) -> None:
@@ -654,20 +663,20 @@ def test_starts_in_mpc_without_bank(cfg: Config, project: Project) -> None:
 
 def test_snapshot_restore_round_trip(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_E")
+    btn(eng, "GROUP_D")
     btn(eng, "TRANSPORT_RIGHT")  # octave +1
     btn(eng, "SELECT")
     eng.handle(PadEvent(PAD1 - 2, True, 2500), 0)  # pad 3
     btn(eng, "SELECT", False)
     eng.handle(EncoderEvent(5, 10 * CC_STEP, 0), 0)  # CUT de T03
-    eng.on_program_change(4 * 16 + 3)  # E04
+    eng.on_program_change(3 * 16 + 3)  # E04
     eng.faders.muted[7] = True
     snap = eng.snapshot()
 
     fresh = Engine(cfg, project=project)
     fresh.restore(snap)
     assert fresh.snapshot() == snap
-    assert fresh.phrase.pattern == "E04" and fresh.track == snap.track
+    assert fresh.phrase.pattern == "D04" and fresh.track == snap.track
     view = fresh.faders.view(snap.track)[4]
     assert view.stale and view.value == snap.faders[0].value  # hors prise : DT2 à confirmer
 
@@ -675,20 +684,20 @@ def test_snapshot_restore_round_trip(cfg: Config, project: Project) -> None:
 def test_restore_keeps_program_already_received(cfg: Config, project: Project) -> None:
     eng = Engine(cfg, project=project)
     eng.on_program_change(2 * 16)  # C01 reçu de la DT2
-    eng.restore(Session(program=4 * 16 + 3, bank=7))
+    eng.restore(Session(program=3 * 16 + 3, bank=7))
     assert eng.last_program == 2 * 16 and eng.bank == 2  # la DT2 l'emporte
 
 
 def test_restore_session_from_before_slice_8(cfg: Config, project: Project) -> None:
-    old = Session.model_validate({"design_bank": 4, "group": 1, "octave": 0, "track": 3})
+    old = Session.model_validate({"design_bank": 3, "group": 1, "octave": 0, "track": 3})
     eng = Engine(cfg, project=project)
     eng.restore(old)
-    assert eng.bank == 4 and group(eng) == "D" and eng.track == 3
+    assert eng.bank == 3 and group(eng) == "D" and eng.track == 3
 
 
 def test_session_keeps_layout_by_name_or_old_group(cfg: Config, project: Project) -> None:
     eng = design(cfg, project=project)
-    btn(eng, "GROUP_A")
+    btn(eng, "GROUP_C")  # C-DAVYL éolien
     turn_master(eng, -2)  # Aeolian, Chroma, puis en boucle la dernière gamme (sans groupe)
     snap = eng.snapshot()
     assert snap.layout == cfg.layouts[-1].name
@@ -701,14 +710,14 @@ def test_session_keeps_layout_by_name_or_old_group(cfg: Config, project: Project
 
 
 def test_keyboard_layout_follows_bank_mode_until_gamme(cfg: Config, project: Project) -> None:
-    eng = design(cfg, project=project)
+    eng = design(cfg, project=with_joker(project))
     assert group(eng) == "B"  # sans banque : chromatique
-    btn(eng, "GROUP_E")
-    assert group(eng) == "D"  # E-TRIBE phrygien
+    btn(eng, "GROUP_D")
+    assert group(eng) == "D"  # D-AVIRUS phrygien
     btn(eng, "DISPLAY_1")  # GAMME : surcharge
     turn_master(eng, 1)
     assert group(eng) == "E"
-    eng.on_program_change(4 * 16 + 1)  # la DT2 en E, déjà choisie : la surcharge tient
+    eng.on_program_change(3 * 16 + 1)  # la DT2 en D, déjà choisie : la surcharge tient
     assert group(eng) == "E"
     eng.on_program_change(6 * 16)  # G-JOKER : chromatique
     assert group(eng) == "B"

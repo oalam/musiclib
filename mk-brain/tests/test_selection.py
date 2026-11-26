@@ -17,7 +17,7 @@ def test_list_projects_marks_invalid_and_dates(tmp_path: Path) -> None:
     assert [e.name for e in entries] == ["broken", "solaris"]
     broken, solaris = entries
     assert broken.project is None and broken.error and broken.banks == 0
-    assert solaris.project is not None and solaris.banks == 7
+    assert solaris.project is not None and solaris.banks == 5
     assert len(solaris.date) == 10  # hors git : date de modification
 
 

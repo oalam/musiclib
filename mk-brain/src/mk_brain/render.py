@@ -365,7 +365,7 @@ def _left_band(
         _progression(d, x, playing)
         return
     sheet = engine.sheet
-    if sheet is not None:  # banque puis tonalité : `E-TRIBE  Bb Phrygian`
+    if sheet is not None:  # banque puis tonalité : `D-TRIBE  Bb Phrygian`
         bank = sheet[1]
         tonic = f"{FLAT_NAMES[bank.tonic]} {engine.cfg.scale(bank.mode).name}"
         line = ascii_text(f"{sheet[0]}  {tonic}")

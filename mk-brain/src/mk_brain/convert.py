@@ -24,7 +24,7 @@ from mk_brain.project import PROJECTS, Defaults, Project, ProjectError, note_nam
 
 # abréviations de mode des `keys` du lives JSON (« A# phrg ») ; une autre lève
 # ProjectError, à ajouter ici le jour où un set l'emploie
-JSON_MODES = {"m": "eolien", "phrg": "phrygien"}
+JSON_MODES = {"m": "eolien", "phrg": "phrygien", "harm": "mineur-harmonique"}
 
 HEADER = (
     "# GÉNÉRÉ par `mk-brain convert {doctrine}` : ne pas éditer à la main.\n"

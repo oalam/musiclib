@@ -75,7 +75,7 @@ class Project(BaseModel):
     def _keys(cls, v: dict[str, Bank]) -> dict[str, Bank]:
         bad = [k for k in v if not BANK_KEY.match(k)]
         if bad:
-            raise ValueError(f"banques : clé {bad[0]!r}, attendu lettre A-H, tiret, nom (E-TRIBE)")
+            raise ValueError(f"banques : clé {bad[0]!r}, attendu lettre A-H, tiret, nom (D-TRIBE)")
         letters = [k[0] for k in v]
         if len(set(letters)) != len(letters):
             raise ValueError("banques : une seule clé par lettre")

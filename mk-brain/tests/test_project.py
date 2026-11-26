@@ -9,9 +9,9 @@ from mk_brain.project import Project, ProjectError, load_project, note_name
 
 
 def test_solaris_banks(project: Project) -> None:
-    assert [k[0] for k in project.banks] == list("ABCDEFG")
-    key, bank = project.bank(4) or ("", None)
-    assert key == "E-TRIBE" and bank is not None
+    assert [k[0] for k in project.banks] == list("BCDEF")
+    key, bank = project.bank(3) or ("", None)
+    assert key == "D-AVIRUS" and bank is not None
     assert (bank.tonique, bank.tonic, bank.mode) == ("A#", 10, "phrygien")
     assert project.phrase(bank) == 32  # defaults
     assert project.bank(7) is None  # H libre
