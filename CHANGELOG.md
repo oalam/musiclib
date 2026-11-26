@@ -242,6 +242,20 @@ renvoient aux phases de [[SPEC]]. Pas de `pyproject.toml` : la version vit ici.
 
 ### Modifié
 
+- [7.L] Live solaris, track 15 en pool de FX (2026-11-26) : huit presets
+  `FX-` rangés par fonction dans les slots 1 à 8 du Preset Pool, section
+  dédiée dans [[digitakt/doctrine-dt2-solaris]] ; cas 5 ajouté à
+  [[digitakt/kb/preset-pool]].
+- [7.L] Live solaris, prose de [[digitakt/doctrine-dt2-solaris]] réécrite le
+  2026-11-26 sur le plan à cinq banques (B-FLATIRON, C-DAVYL, D-AVIRUS,
+  E-NEPTUNE, F-OMINOUS) : structure du set et transitions, progression
+  harmonique fa → la# → fa, banques, arborescence du +Drive, fills, rumble,
+  checklist. Le tableau du plan reste le hub des tempos et des gammes, les
+  autres sections y renvoient. Pense-bête aligné et ramené à une page :
+  `scripts/solaris_pense_bete.py` écrit `digitakt/solaris-pense-bete.svg`
+  (déroulé, chrono et sauts de tempo, notes par banque, grille des 16
+  tracks avec le kick fantôme en 16) ; transitions, rappels de jeu, fills
+  et samples sortent de la fiche, les deux anciens SVG sont supprimés.
 - [7.L] Doctrine, grille révisée le 2026-11-07 : rangée haute en quatre
   paires, 1-2 kick / sub-rumble, 3-4 clap-snare / percs-toms, 5-6 hats /
   cymbales, 7-8 textures rythmiques en call and response (Id1 passe de la 5

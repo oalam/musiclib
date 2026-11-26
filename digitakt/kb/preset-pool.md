@@ -8,7 +8,7 @@ os: "1.17"
 statut: draft
 ---
 
-# Preset Pool : quatre cas d'usage
+# Preset Pool : cinq cas d'usage
 
 **En une phrase** : le pool met **plusieurs sons complets sur une seule
 track** (preset locks, trig mode Preset Pool), ce n'est pas un rangement ;
@@ -81,6 +81,24 @@ sans repasser par le +Drive.
 
 1. Ajouter ces presets au pool dès la préparation du projet.
 2. Dans n'importe quel pattern du projet : preset lock ou `LOAD TO TRACK`.
+
+## Cas 5 : un jeu de FX sur la track 15
+
+But : varier les transitions (risers, impacts, downlifters, reverses) sur
+la seule track FX.
+
+1. Régler chaque FX sur la 15 et le sauver avec un nom en `FX-` : riser
+   court, riser long, impact, downlifter, reverse, bruit, texture.
+2. Les ranger par fonction dans les slots 1 à 8 du pool (`SAVE TO HERE`),
+   toujours dans le même ordre.
+3. **Écrit** : preset locks sur des trigs conditionnels (`FILL`, `1:4`,
+   `1ST`) ; le riser de sortie et l'impact du premier temps tombent seuls.
+4. **À la main** : track 15 en trig mode Preset Pool, comme au cas 3.
+5. Un FX qui se contente des réglages de la track reste en sample lock :
+   le pool sert aux sons qui ont leur LFO, leur enveloppe ou leurs envois.
+
+La track n'a qu'une voix : un impact coupe le riser en cours. Liste des
+slots du live solaris : [[doctrine-dt2-solaris]], « Track 15, pool de FX ».
 
 **Proposition de rangement (à arbitrer dans la doctrine)** : slots 1-16 =
 one-shots joués aux touches (cas 3) ; 17-32 = fil rouge (cas 4) ; 33 et

@@ -14,13 +14,13 @@ Cinq outils :
   (waveform + mel-spectrogram + structure + cues overlay + tonal profile)
 - **`stems.py`** : Phase 6.B, sépare en 4 stems via Demucs
   (drums/bass/other/vocals) pour sampling TidalCycles
-- **`solaris_pense_bete.py`** : pense-bête du live solaris, deux pages A4
-  paysage en couleur (`digitakt/solaris-pense-bete-p1.svg` « le live » : déroulé par
-  banque, chrono, transitions, rappels ; `-p2.svg` « le son » : gammes en
-  grandes cases par section, grille des 16 tracks, fills, samples). Les
-  tableaux sont recopiés à la main de `digitakt/doctrine-dt2-solaris.md`, qui
-  fait foi : `python solaris_pense_bete.py` après chaque changement de la
-  doctrine, puis imprimer à 100 %.
+- **`solaris_pense_bete.py`** : pense-bête du live solaris, une page A4
+  paysage en couleur (`digitakt/solaris-pense-bete.svg` : déroulé par banque,
+  chrono et sauts de tempo, gammes en grandes cases par banque, grille des
+  16 tracks). Les tableaux sont recopiés à la main de
+  `digitakt/doctrine-dt2-solaris.md`, qui fait foi :
+  `python solaris_pense_bete.py` après chaque changement de la doctrine,
+  puis imprimer à 100 %.
 
 Format library.md : **table markdown unique** (migration de 2026-05-31).
 Voir `../SPEC.md` (source of truth) pour l'état détaillé.
